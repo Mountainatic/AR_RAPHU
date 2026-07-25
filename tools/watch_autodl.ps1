@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet("E1", "E2", "E3", "E4", "M6", "M7", "M8")]
+    [ValidateSet("E1", "E2", "E3", "E4", "M6", "M7", "M8", "Extensions")]
     [string]$Task = "E1",
 
     [ValidateRange(2, 3600)]
@@ -27,6 +27,7 @@ $statusScript = switch ($Task) {
     "M6" { "deploy/autodl/status_m6.sh" }
     "M7" { "deploy/autodl/status_m7.sh" }
     "M8" { "deploy/autodl/status_m8.sh" }
+    "Extensions" { "deploy/autodl/status_phase1_extensions.sh" }
 }
 $remoteCommand = "cd /root/AR_RAPHU_AUTODL; bash $statusScript"
 $passwordWasAlreadySet = Test-Path Env:AR_RAPHU_DEPLOY_PASSWORD
