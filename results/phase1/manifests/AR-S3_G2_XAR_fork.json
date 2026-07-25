@@ -1,0 +1,1632 @@
+{
+  "device": "cuda",
+  "generator_version": 2,
+  "job_count": 90,
+  "jobs": [
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "0",
+        "--scale",
+        "0.003",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed0_s0.003000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "0",
+        "--scale",
+        "0.004",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed0_s0.004000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "0",
+        "--scale",
+        "0.005",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed0_s0.005000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "0",
+        "--scale",
+        "0.006",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed0_s0.006000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "0",
+        "--scale",
+        "0.007",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed0_s0.007000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "0",
+        "--scale",
+        "0.008",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed0_s0.008000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "0",
+        "--scale",
+        "0.009",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed0_s0.009000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "0",
+        "--scale",
+        "0.01",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed0_s0.010000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "0",
+        "--scale",
+        "0.012",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed0_s0.012000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "1",
+        "--scale",
+        "0.003",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed1_s0.003000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "1",
+        "--scale",
+        "0.004",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed1_s0.004000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "1",
+        "--scale",
+        "0.005",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed1_s0.005000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "1",
+        "--scale",
+        "0.006",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed1_s0.006000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "1",
+        "--scale",
+        "0.007",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed1_s0.007000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "1",
+        "--scale",
+        "0.008",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed1_s0.008000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "1",
+        "--scale",
+        "0.009",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed1_s0.009000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "1",
+        "--scale",
+        "0.01",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed1_s0.010000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "1",
+        "--scale",
+        "0.012",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed1_s0.012000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "2",
+        "--scale",
+        "0.003",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed2_s0.003000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "2",
+        "--scale",
+        "0.004",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed2_s0.004000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "2",
+        "--scale",
+        "0.005",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed2_s0.005000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "2",
+        "--scale",
+        "0.006",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed2_s0.006000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "2",
+        "--scale",
+        "0.007",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed2_s0.007000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "2",
+        "--scale",
+        "0.008",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed2_s0.008000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "2",
+        "--scale",
+        "0.009",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed2_s0.009000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "2",
+        "--scale",
+        "0.01",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed2_s0.010000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "2",
+        "--scale",
+        "0.012",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed2_s0.012000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "3",
+        "--scale",
+        "0.003",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed3_s0.003000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "3",
+        "--scale",
+        "0.004",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed3_s0.004000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "3",
+        "--scale",
+        "0.005",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed3_s0.005000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "3",
+        "--scale",
+        "0.006",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed3_s0.006000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "3",
+        "--scale",
+        "0.007",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed3_s0.007000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "3",
+        "--scale",
+        "0.008",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed3_s0.008000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "3",
+        "--scale",
+        "0.009",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed3_s0.009000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "3",
+        "--scale",
+        "0.01",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed3_s0.010000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "3",
+        "--scale",
+        "0.012",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed3_s0.012000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "4",
+        "--scale",
+        "0.003",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed4_s0.003000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "4",
+        "--scale",
+        "0.004",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed4_s0.004000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "4",
+        "--scale",
+        "0.005",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed4_s0.005000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "4",
+        "--scale",
+        "0.006",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed4_s0.006000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "4",
+        "--scale",
+        "0.007",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed4_s0.007000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "4",
+        "--scale",
+        "0.008",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed4_s0.008000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "4",
+        "--scale",
+        "0.009",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed4_s0.009000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "4",
+        "--scale",
+        "0.01",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed4_s0.010000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "4",
+        "--scale",
+        "0.012",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed4_s0.012000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "5",
+        "--scale",
+        "0.003",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed5_s0.003000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "5",
+        "--scale",
+        "0.004",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed5_s0.004000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "5",
+        "--scale",
+        "0.005",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed5_s0.005000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "5",
+        "--scale",
+        "0.006",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed5_s0.006000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "5",
+        "--scale",
+        "0.007",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed5_s0.007000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "5",
+        "--scale",
+        "0.008",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed5_s0.008000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "5",
+        "--scale",
+        "0.009",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed5_s0.009000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "5",
+        "--scale",
+        "0.01",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed5_s0.010000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "5",
+        "--scale",
+        "0.012",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed5_s0.012000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "6",
+        "--scale",
+        "0.003",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed6_s0.003000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "6",
+        "--scale",
+        "0.004",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed6_s0.004000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "6",
+        "--scale",
+        "0.005",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed6_s0.005000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "6",
+        "--scale",
+        "0.006",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed6_s0.006000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "6",
+        "--scale",
+        "0.007",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed6_s0.007000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "6",
+        "--scale",
+        "0.008",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed6_s0.008000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "6",
+        "--scale",
+        "0.009",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed6_s0.009000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "6",
+        "--scale",
+        "0.01",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed6_s0.010000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "6",
+        "--scale",
+        "0.012",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed6_s0.012000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "7",
+        "--scale",
+        "0.003",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed7_s0.003000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "7",
+        "--scale",
+        "0.004",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed7_s0.004000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "7",
+        "--scale",
+        "0.005",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed7_s0.005000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "7",
+        "--scale",
+        "0.006",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed7_s0.006000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "7",
+        "--scale",
+        "0.007",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed7_s0.007000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "7",
+        "--scale",
+        "0.008",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed7_s0.008000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "7",
+        "--scale",
+        "0.009",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed7_s0.009000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "7",
+        "--scale",
+        "0.01",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed7_s0.010000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "7",
+        "--scale",
+        "0.012",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed7_s0.012000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "8",
+        "--scale",
+        "0.003",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed8_s0.003000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "8",
+        "--scale",
+        "0.004",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed8_s0.004000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "8",
+        "--scale",
+        "0.005",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed8_s0.005000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "8",
+        "--scale",
+        "0.006",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed8_s0.006000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "8",
+        "--scale",
+        "0.007",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed8_s0.007000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "8",
+        "--scale",
+        "0.008",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed8_s0.008000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "8",
+        "--scale",
+        "0.009",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed8_s0.009000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "8",
+        "--scale",
+        "0.01",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed8_s0.010000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "8",
+        "--scale",
+        "0.012",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed8_s0.012000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "9",
+        "--scale",
+        "0.003",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed9_s0.003000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "9",
+        "--scale",
+        "0.004",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed9_s0.004000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "9",
+        "--scale",
+        "0.005",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed9_s0.005000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "9",
+        "--scale",
+        "0.006",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed9_s0.006000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "9",
+        "--scale",
+        "0.007",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed9_s0.007000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "9",
+        "--scale",
+        "0.008",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed9_s0.008000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "9",
+        "--scale",
+        "0.009",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed9_s0.009000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "9",
+        "--scale",
+        "0.01",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed9_s0.010000"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "fork",
+        "--scenario",
+        "AR-S3",
+        "--track",
+        "XAR",
+        "--seed",
+        "9",
+        "--scale",
+        "0.012",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S3_xar_fork_seed9_s0.012000"
+    }
+  ],
+  "scenario": "AR-S3",
+  "schema_version": 1,
+  "stage": "fork",
+  "test_access": false,
+  "track": "XAR"
+}

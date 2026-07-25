@@ -1,0 +1,5 @@
+{
+  "data_seed": 4,
+  "fork_seed_rule": "seed_and_scale",
+  "model_seed": 4
+}

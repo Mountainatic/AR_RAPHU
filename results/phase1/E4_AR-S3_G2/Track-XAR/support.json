@@ -1,0 +1,98 @@
+{
+  "frequency": [
+    {
+      "selection_count": 0,
+      "selection_frequency": 0.0,
+      "variable": 0
+    },
+    {
+      "selection_count": 0,
+      "selection_frequency": 0.0,
+      "variable": 1
+    },
+    {
+      "selection_count": 0,
+      "selection_frequency": 0.0,
+      "variable": 2
+    },
+    {
+      "selection_count": 0,
+      "selection_frequency": 0.0,
+      "variable": 3
+    },
+    {
+      "selection_count": 0,
+      "selection_frequency": 0.0,
+      "variable": 4
+    },
+    {
+      "selection_count": 0,
+      "selection_frequency": 0.0,
+      "variable": 5
+    },
+    {
+      "selection_count": 0,
+      "selection_frequency": 0.0,
+      "variable": 6
+    },
+    {
+      "selection_count": 0,
+      "selection_frequency": 0.0,
+      "variable": 7
+    },
+    {
+      "selection_count": 0,
+      "selection_frequency": 0.0,
+      "variable": 8
+    },
+    {
+      "selection_count": 0,
+      "selection_frequency": 0.0,
+      "variable": 9
+    }
+  ],
+  "per_seed": [
+    {
+      "seed": 0,
+      "support": []
+    },
+    {
+      "seed": 1,
+      "support": []
+    },
+    {
+      "seed": 2,
+      "support": []
+    },
+    {
+      "seed": 3,
+      "support": []
+    },
+    {
+      "seed": 4,
+      "support": []
+    },
+    {
+      "seed": 5,
+      "support": []
+    },
+    {
+      "seed": 6,
+      "support": []
+    },
+    {
+      "seed": 7,
+      "support": []
+    },
+    {
+      "seed": 8,
+      "support": []
+    },
+    {
+      "seed": 9,
+      "support": []
+    }
+  ],
+  "selected_scale": 0.012,
+  "status": "COMPLETED"
+}

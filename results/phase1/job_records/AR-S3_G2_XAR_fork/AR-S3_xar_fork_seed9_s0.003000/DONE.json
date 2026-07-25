@@ -1,0 +1,25 @@
+{
+  "job_id": "AR-S3_xar_fork_seed9_s0.003000",
+  "index": 81,
+  "command": [
+    "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+    "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+    "fork",
+    "--scenario",
+    "AR-S3",
+    "--track",
+    "XAR",
+    "--seed",
+    "9",
+    "--scale",
+    "0.003",
+    "--device",
+    "cuda"
+  ],
+  "physical_gpu": "0",
+  "worker_slot": 0,
+  "returncode": 0,
+  "started": 1784983382.4738429,
+  "finished": 1784983450.7871914,
+  "runtime_seconds": 68.31334900856018
+}
