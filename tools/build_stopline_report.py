@@ -94,6 +94,9 @@ def main() -> int:
     output_root = (
         PROJECT_ROOT / "generated" / "AR_RAPHU_STOPLINE_20260725"
     )
+    stop_record = read_json(
+        "results/runtime/STOPPED_BY_USER_20260725.json"
+    )
     scenario_rows = []
     for scenario, root in SCENARIO_ROOTS.items():
         metrics = read_json(f"{root}/test_metrics.json")
@@ -198,14 +201,27 @@ def main() -> int:
             / model_lookup["E3 M5 Scheme A"]["mean_rmse"],
         },
     ]
-    bootstrap = read_json(
-        "results/phase1/E2_AR-S1_G2/M8/bootstrap_rank_audit.json"
+    bootstrap_path = (
+        PROJECT_ROOT
+        / "results/phase1/E2_AR-S1_G2/M8/bootstrap_rank_audit.json"
+    )
+    bootstrap = (
+        json.loads(bootstrap_path.read_text(encoding="utf-8"))
+        if bootstrap_path.is_file()
+        else {
+            "status": "NOT_YET_RUN",
+            "replicates_per_seed": 0,
+            "seed_count": 0,
+            "global_rejection_count": 0,
+            "global_false_positive_rate": None,
+            "variable_rejection_count": 0,
+            "variable_false_positive_rate": None,
+            "rank1_false_positive_gate_passed": False,
+            "test_partition_accessed": False,
+        }
     )
     config = read_json("configs/protocol_v2.yaml")
     fp_limit = float(config["statistics"]["support_false_positive_threshold"])
-    rank1_fp_limit = float(
-        config["statistics"]["rank1_false_positive_threshold"]
-    )
     s1 = next(row for row in scenario_rows if row["scenario"] == "AR-S1")
     s3 = next(row for row in scenario_rows if row["scenario"] == "AR-S3")
     gates = [
@@ -221,14 +237,12 @@ def main() -> int:
             "threshold": 0.80,
             "passed": s3["support_recall"] >= 0.80,
         },
-        {
-            "gate": "AR-S1 rank-1 bootstrap false-positive rate",
-            "observed": bootstrap["global_false_positive_rate"],
-            "threshold": rank1_fp_limit,
-            "passed": bootstrap["rank1_false_positive_gate_passed"],
-        },
     ]
-    phase1_gate_passed = all(bool(row["passed"]) for row in gates)
+    phase1_gate_passed = (
+        all(bool(row["passed"]) for row in gates)
+        and bootstrap["status"] == "COMPLETED"
+        and bool(bootstrap["rank1_false_positive_gate_passed"])
+    )
     phases = [
         {
             "phase": "Phase 0 protocol and implementation",
@@ -237,11 +251,10 @@ def main() -> int:
         },
         {
             "phase": "Phase 1 synthetic",
-            "status": "COMPLETED" if phase1_gate_passed else "FAILED",
+            "status": "FAILED",
             "reason": (
-                "All stop-line computations completed and all gates passed."
-                if phase1_gate_passed
-                else "Computations completed, but preregistered scientific gates failed."
+                "AR-S0 through AR-S7 screening completed, but support gates "
+                "failed; critical-30 and bootstrap were stopped by the user."
             ),
         },
         {
@@ -291,9 +304,22 @@ def main() -> int:
                 "global_false_positive_rate",
                 "variable_rejection_count",
                 "variable_false_positive_rate",
-                "rank1_false_positive_gate_passed",
-                "test_partition_accessed",
+            "rank1_false_positive_gate_passed",
+            "test_partition_accessed",
             )
+        },
+        "early_stop": {
+            "status": "COMPLETED",
+            "requested_by_user": True,
+            "AR-S0_critical_added_warmup_completed": 20,
+            "AR-S0_critical_added_forks_completed": 55,
+            "AR-S0_critical_added_forks_planned": 180,
+            "partial_critical_results_used_for_conclusions": False,
+            "bootstrap_status": "NOT_YET_RUN",
+            "actual_logged_optimizer_epochs": stop_record[
+                "actual_logged_optimizer_epochs"
+            ],
+            "epochs_by_stage": stop_record["epochs_by_stage"],
         },
         "gates": gates,
         "phase1_gate_passed": phase1_gate_passed,
@@ -354,7 +380,7 @@ def main() -> int:
 
 ## 技术摘要
 
-停止线前的已冻结计算已完成：Phase 0 回归与协议、AR-S0–AR-S7 Scheme A 筛选、E1–E4 的 critical-30 验证集稳定性确认，以及 E2/M8 的每种子 500 次残差移动块 bootstrap。计算完成不等于科学门槛通过：Phase 1 总体结论为 `{'COMPLETED' if phase1_gate_passed else 'FAILED'}`。
+按用户指令提前停止后，Phase 0 与 AR-S0–AR-S7 Scheme A screening 已完成。累计记录 {stop_record['actual_logged_optimizer_epochs']:,} 个实际优化 epoch。AR-S0 critical-30 仅完成新增 20 个 warmup 和 55/180 个分叉，未形成验证选择，且不参与结论；E2/M8 bootstrap 为 `NOT_YET_RUN`。Phase 1 科学结论为 `FAILED`。
 
 当前证据只支持保守的 rank-1 预测组件。由于至少一个预注册支持/rank 门槛失败，M9 rank-2 与 M10 完整 Urysohn 升级为 `NOT_APPLICABLE`，Phase 2 为 `NOT_YET_RUN`。私有 CZ 轨道保持排除，未读取私有工作簿。
 
@@ -370,7 +396,7 @@ def main() -> int:
 |---|---:|---:|---|
 {gate_lines}
 
-E2/M8 rank-1 bootstrap 的全局假阳性率为 {bootstrap['global_false_positive_rate']:.3f}（阈值 {rank1_fp_limit:.3f}），10 个种子各做 500 次重采样；bootstrap 不读取 test 分区。
+E2/M8 的 Gram 白化 SVD 已有描述性结果，但 formal bootstrap 按用户指令停止，状态为 `NOT_YET_RUN`，因此不作 rank 显著性结论。
 
 ### 模型增益
 
@@ -385,13 +411,13 @@ M7/M8/M6 的超参数均先由 validation-only one-SE 冻结；SVD/bootstrap/ran
 ## 范围、数据与指标
 
 - 数据范围：合成生成器 G2 的 AR-S0–AR-S7；screening test 每场景 10 个独立种子。
-- critical-30：E1–E4 只用于 validation-only 稳定性确认。由于 10 种子 test 产物已存在，critical-30 没有重新打开或重新解释为新的锁箱测试。
+- critical-30：AR-S0 只有部分计算产物，没有形成 validation selection；E1–E4 critical-30 均不作为报告证据。
 - 指标：RMSE、R²、支持召回率、支持假阳性率、Gram 白化非可分离统计量、全局 bootstrap p 值和 BH-FDR。
 - 不在本报告证据范围：TEP、Debutanizer、Gas Turbine、私有 CZ、多晶棒。
 
 ## 方法
 
-Scheme A 使用共享 warmup、独立剪枝分叉与跨种子 validation-only one-SE。M7 联合搜索幅值 grid 与平滑权重，one-SE 内先选小 grid、再选强平滑。M8 固定 Scheme A/M7 后，先以预注册 pilot 平滑选择 lag grid并做相邻平滑稳定性检查，再冻结 grid 选择更强平滑。rank 审计在模型冻结后进行：Gram 白化 SVD，加上以 M7 rank-1 为零假设的 FP64 残差移动块 bootstrap；块长按训练残差 ACF 首个不显著滞后确定，全局检验先于变量级 BH-FDR。
+Scheme A 使用共享 warmup、独立剪枝分叉与跨种子 validation-only one-SE。M7 联合搜索幅值 grid 与平滑权重，one-SE 内先选小 grid、再选强平滑。M8 固定 Scheme A/M7 后顺序选择 lag grid 与平滑。formal bootstrap 未运行，因此报告不进行显著性 rank 判定。
 
 ## 限制与稳健性
 

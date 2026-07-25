@@ -107,6 +107,14 @@ def main() -> int:
         row["gate"] for row in summary["gates"] if not row["passed"]
     ]
     bootstrap = summary["rank_bootstrap"]
+    bootstrap_text = (
+        f"E2/M8 每个种子执行 {bootstrap['replicates_per_seed']} 次"
+        "残差移动块 bootstrap；"
+        f"全局假阳性率为 {bootstrap['global_false_positive_rate']:.3f}。"
+        if bootstrap["status"] == "COMPLETED"
+        else "E2/M8 formal bootstrap 按用户指令停止，状态为 `NOT_YET_RUN`；"
+        "不作 rank 显著性结论。"
+    )
     comparison_text = "\n".join(
         f"- {row['comparison']}: {row['relative_rmse_gain'] * 100:.2f}%"
         for row in summary["model_comparisons"]
@@ -181,11 +189,9 @@ def main() -> int:
                     "type": "markdown",
                     "body": (
                         "## M8 rank 审计\n\n"
-                        f"E2/M8 每个种子执行 {bootstrap['replicates_per_seed']} 次"
-                        "残差移动块 bootstrap；"
-                        f"全局假阳性率为 {bootstrap['global_false_positive_rate']:.3f}。"
+                        f"{bootstrap_text}"
                         "超参数在 SVD/bootstrap 前由 validation-only one-SE 冻结，"
-                        "bootstrap 未读取 test 分区。"
+                        "已有的部分 critical-30 结果不参与结论。"
                     ),
                 },
                 {
@@ -203,7 +209,7 @@ def main() -> int:
                     "body": (
                         "## 限制与结论边界\n\n"
                         "- 10 种子 test 已在先前筛选中打开；critical-30 "
-                        "只作 validation-only 稳定性确认。\n"
+                        "被提前停止且不作为证据。\n"
                         "- 高预测拟合可由 AR 持续性承担，不能证明机制识别。\n"
                         "- AR-S3 支持失败阻止有效的 rank-2 power 结论。\n"
                         "- TEP、Debutanizer、Gas Turbine、私有 CZ 和多晶棒"

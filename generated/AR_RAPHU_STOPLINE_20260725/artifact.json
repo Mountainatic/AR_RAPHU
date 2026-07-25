@@ -1,0 +1,431 @@
+{
+  "manifest": {
+    "blocks": [
+      {
+        "body": "# AR-RAPHU v2 停止线验证报告\n\n停止线前的计算已完成；科学门槛与计算完成状态分开报告。",
+        "id": "title",
+        "type": "markdown"
+      },
+      {
+        "body": "## 技术摘要\n\nPhase 1 总体状态为 `FAILED`。当前证据只支持保守的 rank-1 预测组件；M9/M10 未获得升级资格，Phase 2 未启动。失败门槛：AR-S1 support false-positive rate；AR-S3 support recall。",
+        "id": "technical-summary",
+        "sourceId": "scenario-evidence",
+        "type": "markdown"
+      },
+      {
+        "body": "## 场景级预测表现\n\nRMSE 与 R² 是 10 个 screening test 种子的均值；高 R² 不能代替外生支持恢复证据。",
+        "id": "rmse-header",
+        "sourceId": "scenario-evidence",
+        "type": "markdown"
+      },
+      {
+        "chartId": "scenario-rmse",
+        "id": "rmse-chart-block",
+        "type": "chart"
+      },
+      {
+        "body": "## 支持恢复\n\n支持召回率与假阳性率按每个种子、每个候选变量汇总。",
+        "id": "support-header",
+        "sourceId": "support-evidence",
+        "type": "markdown"
+      },
+      {
+        "chartId": "support-rates",
+        "id": "support-chart-block",
+        "type": "chart"
+      },
+      {
+        "body": "## M8 rank 审计\n\nE2/M8 formal bootstrap 按用户指令停止，状态为 `NOT_YET_RUN`；不作 rank 显著性结论。超参数在 SVD/bootstrap 前由 validation-only one-SE 冻结，已有的部分 critical-30 结果不参与结论。",
+        "id": "rank-audit",
+        "type": "markdown"
+      },
+      {
+        "body": "## 模型比较\n\n相对 RMSE 增益为正才表示候选模型优于参照：\n\n- E2 M7 vs M5: -3.33%\n- E2 M8 vs M7: -0.43%\n- E3 M6 vs M5: -0.12%",
+        "id": "model-comparison",
+        "type": "markdown"
+      },
+      {
+        "body": "## 限制与结论边界\n\n- 10 种子 test 已在先前筛选中打开；critical-30 被提前停止且不作为证据。\n- 高预测拟合可由 AR 持续性承担，不能证明机制识别。\n- AR-S3 支持失败阻止有效的 rank-2 power 结论。\n- TEP、Debutanizer、Gas Turbine、私有 CZ 和多晶棒不在本次证据范围。",
+        "id": "limitations",
+        "type": "markdown"
+      },
+      {
+        "body": "## 阶段状态\n\n- `COMPLETED` — Phase 0 protocol and implementation: Frozen v2 semantics, tests, leakage guards, and runtime.\n- `FAILED` — Phase 1 synthetic: AR-S0 through AR-S7 screening completed, but support gates failed; critical-30 and bootstrap were stopped by the user.\n- `NOT_APPLICABLE` — M9 rank-2 and M10 full surface upgrade: No external variable passed all frozen upgrade gates.\n- `NOT_YET_RUN` — Phase 2 TEP: Stopped before Phase 2 because the Phase 1 gate did not pass.\n- `NOT_YET_RUN` — Phase 3 Debutanizer and Gas Turbine: Phase 2 has not been completed.\n- `NOT_APPLICABLE` — Phase 4 private CZ: Excluded by user on 2026-07-25; private data was not read.\n- `NOT_APPLICABLE` — Phase 5 multi-rod CZ: Excluded by user and no additional rods are in scope.",
+        "id": "phase-status",
+        "type": "markdown"
+      },
+      {
+        "body": "## 建议的下一步\n\n1. 不启动 Phase 2，也不启用 M9/M10。\n2. 如需继续，先由用户批准新的 Phase 1 预注册版本，在新 namespace 中修正支持筛选并补齐 AR-S3 power。\n3. 若不修改方案，则按“高预测拟合、有限外生支持证据、无 rank-2 升级依据”封存。",
+        "id": "next-steps",
+        "type": "markdown"
+      }
+    ],
+    "charts": [
+      {
+        "dataset": "scenario_metrics",
+        "encodings": {
+          "x": {
+            "field": "scenario",
+            "type": "nominal"
+          },
+          "y": {
+            "field": "mean_test_rmse",
+            "type": "quantitative"
+          }
+        },
+        "id": "scenario-rmse",
+        "source": {
+          "id": "scenario-evidence",
+          "label": "Scenario evidence summary",
+          "path": "report/scenario_evidence.csv",
+          "query": {
+            "description": "Read the reviewed scenario-level synthetic validation evidence.",
+            "engine": "DuckDB",
+            "filters": [
+              "Generator version 2",
+              "Screening seeds 0 through 9",
+              "Private CZ excluded"
+            ],
+            "language": "SQL",
+            "sql": "SELECT scenario, mean_test_rmse, mean_test_r2, support_recall, support_false_positive_rate FROM read_csv_auto('report/scenario_evidence.csv') ORDER BY scenario",
+            "tables_used": [
+              "report/scenario_evidence.csv"
+            ]
+          }
+        },
+        "title": "AR-S0–AR-S7 测试 RMSE",
+        "type": "bar"
+      },
+      {
+        "dataset": "support_rates",
+        "encodings": {
+          "color": {
+            "field": "metric",
+            "type": "nominal"
+          },
+          "x": {
+            "field": "scenario",
+            "type": "nominal"
+          },
+          "y": {
+            "field": "rate",
+            "type": "quantitative"
+          }
+        },
+        "id": "support-rates",
+        "source": {
+          "id": "support-evidence",
+          "label": "Support recovery summary",
+          "path": "report/scenario_evidence.csv",
+          "query": {
+            "description": "Reshape the reviewed support recall and false-positive rates.",
+            "engine": "DuckDB",
+            "filters": [
+              "Generator version 2",
+              "Screening seeds 0 through 9",
+              "Private CZ excluded"
+            ],
+            "language": "SQL",
+            "sql": "SELECT scenario, metric, rate FROM (SELECT scenario, support_recall, support_false_positive_rate FROM read_csv_auto('report/scenario_evidence.csv')) UNPIVOT(rate FOR metric IN (support_recall, support_false_positive_rate)) ORDER BY scenario, metric",
+            "tables_used": [
+              "report/scenario_evidence.csv"
+            ]
+          }
+        },
+        "title": "AR-S0–AR-S7 支持恢复率",
+        "type": "bar"
+      }
+    ],
+    "description": "合成层停止线前的证据、失败门槛、结论边界与后续条件。",
+    "generatedAt": "2026-07-25T00:00:00+08:00",
+    "sources": [
+      {
+        "id": "scenario-evidence",
+        "label": "Scenario evidence summary",
+        "path": "report/scenario_evidence.csv",
+        "query": {
+          "description": "Read the reviewed scenario-level synthetic validation evidence.",
+          "engine": "DuckDB",
+          "filters": [
+            "Generator version 2",
+            "Screening seeds 0 through 9",
+            "Private CZ excluded"
+          ],
+          "language": "SQL",
+          "sql": "SELECT scenario, mean_test_rmse, mean_test_r2, support_recall, support_false_positive_rate FROM read_csv_auto('report/scenario_evidence.csv') ORDER BY scenario",
+          "tables_used": [
+            "report/scenario_evidence.csv"
+          ]
+        }
+      },
+      {
+        "id": "support-evidence",
+        "label": "Support recovery summary",
+        "path": "report/scenario_evidence.csv",
+        "query": {
+          "description": "Reshape the reviewed support recall and false-positive rates.",
+          "engine": "DuckDB",
+          "filters": [
+            "Generator version 2",
+            "Screening seeds 0 through 9",
+            "Private CZ excluded"
+          ],
+          "language": "SQL",
+          "sql": "SELECT scenario, metric, rate FROM (SELECT scenario, support_recall, support_false_positive_rate FROM read_csv_auto('report/scenario_evidence.csv')) UNPIVOT(rate FOR metric IN (support_recall, support_false_positive_rate)) ORDER BY scenario, metric",
+          "tables_used": [
+            "report/scenario_evidence.csv"
+          ]
+        }
+      }
+    ],
+    "surface": "report",
+    "title": "AR-RAPHU v2 停止线验证报告",
+    "version": 1
+  },
+  "package_info": {
+    "offline": true,
+    "snapshot": true,
+    "title": "AR-RAPHU v2 stop-line portable report"
+  },
+  "snapshot": {
+    "datasets": {
+      "phase_status": [
+        {
+          "phase": "Phase 0 protocol and implementation",
+          "reason": "Frozen v2 semantics, tests, leakage guards, and runtime.",
+          "status": "COMPLETED"
+        },
+        {
+          "phase": "Phase 1 synthetic",
+          "reason": "AR-S0 through AR-S7 screening completed, but support gates failed; critical-30 and bootstrap were stopped by the user.",
+          "status": "FAILED"
+        },
+        {
+          "phase": "M9 rank-2 and M10 full surface upgrade",
+          "reason": "No external variable passed all frozen upgrade gates.",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "phase": "Phase 2 TEP",
+          "reason": "Stopped before Phase 2 because the Phase 1 gate did not pass.",
+          "status": "NOT_YET_RUN"
+        },
+        {
+          "phase": "Phase 3 Debutanizer and Gas Turbine",
+          "reason": "Phase 2 has not been completed.",
+          "status": "NOT_YET_RUN"
+        },
+        {
+          "phase": "Phase 4 private CZ",
+          "reason": "Excluded by user on 2026-07-25; private data was not read.",
+          "status": "NOT_APPLICABLE"
+        },
+        {
+          "phase": "Phase 5 multi-rod CZ",
+          "reason": "Excluded by user and no additional rods are in scope.",
+          "status": "NOT_APPLICABLE"
+        }
+      ],
+      "scenario_metrics": [
+        {
+          "critical30_selected_scale": null,
+          "mean_test_r2": 0.6571141401242756,
+          "mean_test_rmse": 0.20341823015017643,
+          "scenario": "AR-S0",
+          "screening_selected_scale": 0.012,
+          "support_false_positive_rate": 0.0,
+          "support_recall": 1.0
+        },
+        {
+          "critical30_selected_scale": null,
+          "mean_test_r2": 0.9764628282128133,
+          "mean_test_rmse": 0.38245204717130593,
+          "scenario": "AR-S1",
+          "screening_selected_scale": 0.003,
+          "support_false_positive_rate": 0.15714285714285714,
+          "support_recall": 0.8666666666666667
+        },
+        {
+          "critical30_selected_scale": null,
+          "mean_test_r2": 0.9612087376676566,
+          "mean_test_rmse": 0.45386515678956735,
+          "scenario": "AR-S2",
+          "screening_selected_scale": 0.005,
+          "support_false_positive_rate": 0.05714285714285714,
+          "support_recall": 0.7
+        },
+        {
+          "critical30_selected_scale": null,
+          "mean_test_r2": 0.9585567675450862,
+          "mean_test_rmse": 0.47331370127225547,
+          "scenario": "AR-S3",
+          "screening_selected_scale": 0.012,
+          "support_false_positive_rate": 0.0,
+          "support_recall": 0.0
+        },
+        {
+          "critical30_selected_scale": null,
+          "mean_test_r2": 0.9453639026604007,
+          "mean_test_rmse": 0.638623441530036,
+          "scenario": "AR-S4",
+          "screening_selected_scale": 0.005,
+          "support_false_positive_rate": 0.04285714285714286,
+          "support_recall": 0.7
+        },
+        {
+          "critical30_selected_scale": null,
+          "mean_test_r2": 0.9847457553441016,
+          "mean_test_rmse": 0.3100742108648666,
+          "scenario": "AR-S5",
+          "screening_selected_scale": 0.003,
+          "support_false_positive_rate": 0.15714285714285714,
+          "support_recall": 0.8333333333333334
+        },
+        {
+          "critical30_selected_scale": null,
+          "mean_test_r2": 0.9810624888491983,
+          "mean_test_rmse": 0.34357530628583,
+          "scenario": "AR-S6",
+          "screening_selected_scale": 0.003,
+          "support_false_positive_rate": 0.17142857142857143,
+          "support_recall": 1.0
+        },
+        {
+          "critical30_selected_scale": null,
+          "mean_test_r2": 0.9639367744421865,
+          "mean_test_rmse": 0.5693845214642048,
+          "scenario": "AR-S7",
+          "screening_selected_scale": 0.006,
+          "support_false_positive_rate": 0.04285714285714286,
+          "support_recall": 0.36666666666666664
+        }
+      ],
+      "support_rates": [
+        {
+          "metric": "support recall",
+          "rate": 1.0,
+          "scenario": "AR-S0"
+        },
+        {
+          "metric": "support false-positive rate",
+          "rate": 0.0,
+          "scenario": "AR-S0"
+        },
+        {
+          "metric": "support recall",
+          "rate": 0.8666666666666667,
+          "scenario": "AR-S1"
+        },
+        {
+          "metric": "support false-positive rate",
+          "rate": 0.15714285714285714,
+          "scenario": "AR-S1"
+        },
+        {
+          "metric": "support recall",
+          "rate": 0.7,
+          "scenario": "AR-S2"
+        },
+        {
+          "metric": "support false-positive rate",
+          "rate": 0.05714285714285714,
+          "scenario": "AR-S2"
+        },
+        {
+          "metric": "support recall",
+          "rate": 0.0,
+          "scenario": "AR-S3"
+        },
+        {
+          "metric": "support false-positive rate",
+          "rate": 0.0,
+          "scenario": "AR-S3"
+        },
+        {
+          "metric": "support recall",
+          "rate": 0.7,
+          "scenario": "AR-S4"
+        },
+        {
+          "metric": "support false-positive rate",
+          "rate": 0.04285714285714286,
+          "scenario": "AR-S4"
+        },
+        {
+          "metric": "support recall",
+          "rate": 0.8333333333333334,
+          "scenario": "AR-S5"
+        },
+        {
+          "metric": "support false-positive rate",
+          "rate": 0.15714285714285714,
+          "scenario": "AR-S5"
+        },
+        {
+          "metric": "support recall",
+          "rate": 1.0,
+          "scenario": "AR-S6"
+        },
+        {
+          "metric": "support false-positive rate",
+          "rate": 0.17142857142857143,
+          "scenario": "AR-S6"
+        },
+        {
+          "metric": "support recall",
+          "rate": 0.36666666666666664,
+          "scenario": "AR-S7"
+        },
+        {
+          "metric": "support false-positive rate",
+          "rate": 0.04285714285714286,
+          "scenario": "AR-S7"
+        }
+      ]
+    },
+    "generatedAt": "2026-07-25T00:00:00+08:00",
+    "status": "ready",
+    "version": 1
+  },
+  "sources": [
+    {
+      "id": "scenario-evidence",
+      "label": "Scenario evidence summary",
+      "path": "report/scenario_evidence.csv",
+      "query": {
+        "description": "Read the reviewed scenario-level synthetic validation evidence.",
+        "engine": "DuckDB",
+        "filters": [
+          "Generator version 2",
+          "Screening seeds 0 through 9",
+          "Private CZ excluded"
+        ],
+        "language": "SQL",
+        "sql": "SELECT scenario, mean_test_rmse, mean_test_r2, support_recall, support_false_positive_rate FROM read_csv_auto('report/scenario_evidence.csv') ORDER BY scenario",
+        "tables_used": [
+          "report/scenario_evidence.csv"
+        ]
+      }
+    },
+    {
+      "id": "support-evidence",
+      "label": "Support recovery summary",
+      "path": "report/scenario_evidence.csv",
+      "query": {
+        "description": "Reshape the reviewed support recall and false-positive rates.",
+        "engine": "DuckDB",
+        "filters": [
+          "Generator version 2",
+          "Screening seeds 0 through 9",
+          "Private CZ excluded"
+        ],
+        "language": "SQL",
+        "sql": "SELECT scenario, metric, rate FROM (SELECT scenario, support_recall, support_false_positive_rate FROM read_csv_auto('report/scenario_evidence.csv')) UNPIVOT(rate FOR metric IN (support_recall, support_false_positive_rate)) ORDER BY scenario, metric",
+        "tables_used": [
+          "report/scenario_evidence.csv"
+        ]
+      }
+    }
+  ],
+  "surface": "report"
+}

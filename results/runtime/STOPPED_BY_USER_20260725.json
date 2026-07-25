@@ -1,0 +1,49 @@
+{
+  "M8_formal_bootstrap": "NOT_YET_RUN",
+  "MPS_stopped": true,
+  "actual_logged_optimizer_epochs": 2476482,
+  "completed_log_files": 1867,
+  "completed_screening": [
+    "AR-S0",
+    "AR-S1",
+    "AR-S2",
+    "AR-S3",
+    "AR-S4",
+    "AR-S5",
+    "AR-S6",
+    "AR-S7"
+  ],
+  "critical30": {
+    "AR-S0": {
+      "added_forks": "55/180",
+      "added_warmup": "20/20",
+      "selection": "NOT_YET_RUN",
+      "used_for_conclusions": false
+    },
+    "AR-S1": "NOT_YET_RUN",
+    "AR-S2": "NOT_YET_RUN",
+    "AR-S3": "NOT_YET_RUN"
+  },
+  "epochs_by_stage": {
+    "other_neural_fit": {
+      "epochs": 25750,
+      "files": 11
+    },
+    "scheme_a_prune": {
+      "epochs": 517867,
+      "files": 870
+    },
+    "scheme_a_refit": {
+      "epochs": 1770850,
+      "files": 870
+    },
+    "scheme_a_warmup": {
+      "epochs": 162015,
+      "files": 116
+    }
+  },
+  "status": "COMPLETED",
+  "stopped_at_utc": "2026-07-25T14:18:16.995278+00:00",
+  "stopped_by_user": true,
+  "training_processes_remaining": false
+}
