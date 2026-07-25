@@ -1,0 +1,21 @@
+{
+  "job_id": "m6_seed4_lambda0.01",
+  "index": 19,
+  "command": [
+    "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+    "/root/AR_RAPHU_AUTODL/tools/run_phase1_m6.py",
+    "fit",
+    "--seed",
+    "4",
+    "--smoothness",
+    "0.01",
+    "--device",
+    "cuda"
+  ],
+  "physical_gpu": "0",
+  "worker_slot": 10,
+  "returncode": 0,
+  "started": 1784982021.075116,
+  "finished": 1784982058.7826786,
+  "runtime_seconds": 37.707563400268555
+}

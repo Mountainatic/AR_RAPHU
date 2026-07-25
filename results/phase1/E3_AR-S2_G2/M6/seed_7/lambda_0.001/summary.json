@@ -1,0 +1,39 @@
+{
+  "best_epoch": 1305,
+  "best_lag_logit_roughness": 0.23017358779907227,
+  "config_id": "lambda=0.001",
+  "dtype": "float32",
+  "frozen_M5_support": [
+    0
+  ],
+  "initialization_audit": {
+    "copied_state_entries": 90.0,
+    "kernel_max_abs_error": 5.960464477539063e-08,
+    "prediction_max_abs_error_scaled": 2.384185791015625e-07
+  },
+  "joint_refit": "fixed_support_external_responses_external_lag_logits_AR_branch_and_bias",
+  "model": "M6",
+  "objective": "mean_train_MSE_plus_lambda_times_sum_squared_lag_logit_second_differences",
+  "runtime": {
+    "cpu_threads": 1,
+    "deterministic_algorithms": true,
+    "device": "cuda",
+    "gpu": "NVIDIA GeForce RTX 5090",
+    "interop_threads": 1,
+    "peak_memory_bytes": 219830784,
+    "python": "3.10.20",
+    "torch": "2.8.0+cu128",
+    "torch_cuda": "12.8",
+    "wall_seconds": 97.78309007093776
+  },
+  "scenario": "AR-S2",
+  "second_difference_smoothness_weight": 0.001,
+  "seed": 7,
+  "status": "COMPLETED",
+  "terminal_support": [
+    0
+  ],
+  "test_accessed": false,
+  "track": "XAR",
+  "validation_rmse_scaled": 0.1781073096341562
+}
