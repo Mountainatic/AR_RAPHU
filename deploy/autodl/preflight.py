@@ -16,6 +16,7 @@ import torch
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from ar_raphu.runtime_environment import require_runtime_environment  # noqa: E402
