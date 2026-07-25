@@ -1,0 +1,24 @@
+{
+  "compute_capability": [
+    12,
+    0
+  ],
+  "cpu_count": 208,
+  "cuda_test_checksum": 0.0980849340558052,
+  "cuda_visible_devices": "0",
+  "gpu": "NVIDIA GeForce RTX 5090",
+  "gpu_memory_mib": 32110,
+  "mps_log_directory": "/tmp/ar_raphu_0_log",
+  "mps_pipe_directory": "/tmp/ar_raphu_0_pipe",
+  "mps_required": true,
+  "nvidia_smi": "NVIDIA GeForce RTX 5090, 595.71.05, 32607 MiB, 12.0",
+  "private_cz_present": false,
+  "python": "3.10.20",
+  "runtime_manager": "uv",
+  "status": "COMPLETED",
+  "torch": "2.8.0+cu128",
+  "torch_compiled_cuda": "12.8",
+  "torch_interop_threads": 1,
+  "torch_threads": 3,
+  "unix_time": 1784974291.2920847
+}

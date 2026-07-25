@@ -1,0 +1,145 @@
+{
+  "frequency": [
+    {
+      "selection_count": 9,
+      "selection_frequency": 0.9,
+      "variable": 0
+    },
+    {
+      "selection_count": 10,
+      "selection_frequency": 1.0,
+      "variable": 1
+    },
+    {
+      "selection_count": 7,
+      "selection_frequency": 0.7,
+      "variable": 2
+    },
+    {
+      "selection_count": 2,
+      "selection_frequency": 0.2,
+      "variable": 3
+    },
+    {
+      "selection_count": 3,
+      "selection_frequency": 0.3,
+      "variable": 4
+    },
+    {
+      "selection_count": 1,
+      "selection_frequency": 0.1,
+      "variable": 5
+    },
+    {
+      "selection_count": 1,
+      "selection_frequency": 0.1,
+      "variable": 6
+    },
+    {
+      "selection_count": 1,
+      "selection_frequency": 0.1,
+      "variable": 7
+    },
+    {
+      "selection_count": 3,
+      "selection_frequency": 0.3,
+      "variable": 8
+    },
+    {
+      "selection_count": 0,
+      "selection_frequency": 0.0,
+      "variable": 9
+    }
+  ],
+  "per_seed": [
+    {
+      "seed": 0,
+      "support": [
+        1,
+        5
+      ]
+    },
+    {
+      "seed": 1,
+      "support": [
+        0,
+        1,
+        2,
+        3,
+        8
+      ]
+    },
+    {
+      "seed": 2,
+      "support": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "seed": 3,
+      "support": [
+        0,
+        1,
+        2,
+        7
+      ]
+    },
+    {
+      "seed": 4,
+      "support": [
+        0,
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "seed": 5,
+      "support": [
+        0,
+        1
+      ]
+    },
+    {
+      "seed": 6,
+      "support": [
+        0,
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "seed": 7,
+      "support": [
+        0,
+        1,
+        2,
+        8
+      ]
+    },
+    {
+      "seed": 8,
+      "support": [
+        0,
+        1
+      ]
+    },
+    {
+      "seed": 9,
+      "support": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        6,
+        8
+      ]
+    }
+  ],
+  "selected_scale": 0.003,
+  "status": "COMPLETED"
+}
