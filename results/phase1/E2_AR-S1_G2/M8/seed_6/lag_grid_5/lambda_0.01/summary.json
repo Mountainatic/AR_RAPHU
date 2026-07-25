@@ -1,0 +1,24 @@
+{
+  "anchor_orthogonality_max_abs": 9.046387894574221e-17,
+  "config_id": "gtau=5;lambda=0.01",
+  "dtype": "float64",
+  "kkt_residual": 2.6412651723257134e-11,
+  "lag_grid": 5,
+  "model": "M8",
+  "numerical_jitter": 1.4208039483395444e-10,
+  "numerical_relative_jitter": 1e-10,
+  "objective": 0.010564303744835727,
+  "rank_audit_accessed": false,
+  "seed": 6,
+  "smoothing_weight": 0.01,
+  "status": "COMPLETED",
+  "support": [
+    0,
+    1,
+    2,
+    4
+  ],
+  "test_accessed": false,
+  "validation_rmse_scaled": 0.14796329482474266,
+  "wall_seconds": 1.4784543310524896
+}

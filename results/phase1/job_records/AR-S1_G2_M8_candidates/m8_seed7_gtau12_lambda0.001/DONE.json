@@ -1,0 +1,23 @@
+{
+  "job_id": "m8_seed7_gtau12_lambda0.001",
+  "index": 70,
+  "command": [
+    "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+    "/root/AR_RAPHU_AUTODL/tools/run_phase1_m8.py",
+    "fit",
+    "--seed",
+    "7",
+    "--lag-grid",
+    "12",
+    "--smoothness",
+    "0.001",
+    "--device",
+    "cuda"
+  ],
+  "physical_gpu": "0",
+  "worker_slot": 4,
+  "returncode": 0,
+  "started": 1784979332.5574741,
+  "finished": 1784979336.6803522,
+  "runtime_seconds": 4.122878313064575
+}

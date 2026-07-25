@@ -1,0 +1,162 @@
+{
+  "M8_GRID_SMOOTHING_INTERACTION": false,
+  "all_config_stats": [
+    {
+      "config_id": "gtau=5;lambda=0.0001",
+      "mean_validation_loss": 0.15159790243817164,
+      "standard_deviation": 0.01326981952374977,
+      "standard_error": 0.00419628538344201,
+      "unit_count": 10
+    },
+    {
+      "config_id": "gtau=5;lambda=0.001",
+      "mean_validation_loss": 0.1503500214641404,
+      "standard_deviation": 0.013470957649418849,
+      "standard_error": 0.004259890843583157,
+      "unit_count": 10
+    },
+    {
+      "config_id": "gtau=5;lambda=0.01",
+      "mean_validation_loss": 0.14926957892103107,
+      "standard_deviation": 0.013621472979804441,
+      "standard_error": 0.004307487970262279,
+      "unit_count": 10
+    }
+  ],
+  "eligible_config_ids": [
+    "gtau=5;lambda=0.0001",
+    "gtau=5;lambda=0.001",
+    "gtau=5;lambda=0.01"
+  ],
+  "minimum_config_id": "gtau=5;lambda=0.01",
+  "minimum_mean_validation_loss": 0.14926957892103107,
+  "minimum_standard_error": 0.004307487970262279,
+  "one_se_threshold": 0.15357706689129336,
+  "per_weight_lag_grid_one_se": {
+    "0.0001": {
+      "all_config_stats": [
+        {
+          "config_id": "gtau=5;lambda=0.0001",
+          "mean_validation_loss": 0.15159790243817164,
+          "standard_deviation": 0.01326981952374977,
+          "standard_error": 0.00419628538344201,
+          "unit_count": 10
+        },
+        {
+          "config_id": "gtau=8;lambda=0.0001",
+          "mean_validation_loss": 0.15222072870652573,
+          "standard_deviation": 0.013077276100391517,
+          "standard_error": 0.004135397806812195,
+          "unit_count": 10
+        },
+        {
+          "config_id": "gtau=12;lambda=0.0001",
+          "mean_validation_loss": 0.15303564829773622,
+          "standard_deviation": 0.012795806146087692,
+          "standard_error": 0.004046389191961835,
+          "unit_count": 10
+        }
+      ],
+      "eligible_config_ids": [
+        "gtau=5;lambda=0.0001",
+        "gtau=8;lambda=0.0001",
+        "gtau=12;lambda=0.0001"
+      ],
+      "minimum_config_id": "gtau=5;lambda=0.0001",
+      "minimum_mean_validation_loss": 0.15159790243817164,
+      "minimum_standard_error": 0.00419628538344201,
+      "one_se_threshold": 0.15579418782161367,
+      "selected_config_id": "gtau=5;lambda=0.0001",
+      "selection_data": "validation_only",
+      "status": "COMPLETED",
+      "test_used": false
+    },
+    "0.001": {
+      "all_config_stats": [
+        {
+          "config_id": "gtau=5;lambda=0.001",
+          "mean_validation_loss": 0.1503500214641404,
+          "standard_deviation": 0.013470957649418849,
+          "standard_error": 0.004259890843583157,
+          "unit_count": 10
+        },
+        {
+          "config_id": "gtau=8;lambda=0.001",
+          "mean_validation_loss": 0.15065799800430174,
+          "standard_deviation": 0.013356443122566355,
+          "standard_error": 0.0042236781705801175,
+          "unit_count": 10
+        },
+        {
+          "config_id": "gtau=12;lambda=0.001",
+          "mean_validation_loss": 0.15108378811009943,
+          "standard_deviation": 0.01314256406425069,
+          "standard_error": 0.00415604367377117,
+          "unit_count": 10
+        }
+      ],
+      "eligible_config_ids": [
+        "gtau=5;lambda=0.001",
+        "gtau=8;lambda=0.001",
+        "gtau=12;lambda=0.001"
+      ],
+      "minimum_config_id": "gtau=5;lambda=0.001",
+      "minimum_mean_validation_loss": 0.1503500214641404,
+      "minimum_standard_error": 0.004259890843583157,
+      "one_se_threshold": 0.15460991230772356,
+      "selected_config_id": "gtau=5;lambda=0.001",
+      "selection_data": "validation_only",
+      "status": "COMPLETED",
+      "test_used": false
+    },
+    "0.01": {
+      "all_config_stats": [
+        {
+          "config_id": "gtau=5;lambda=0.01",
+          "mean_validation_loss": 0.14926957892103107,
+          "standard_deviation": 0.013621472979804441,
+          "standard_error": 0.004307487970262279,
+          "unit_count": 10
+        },
+        {
+          "config_id": "gtau=8;lambda=0.01",
+          "mean_validation_loss": 0.14945226907497397,
+          "standard_deviation": 0.013562410877059587,
+          "standard_error": 0.004288810893455016,
+          "unit_count": 10
+        },
+        {
+          "config_id": "gtau=12;lambda=0.01",
+          "mean_validation_loss": 0.1496351975573957,
+          "standard_deviation": 0.01346190901329247,
+          "standard_error": 0.004257029413595413,
+          "unit_count": 10
+        }
+      ],
+      "eligible_config_ids": [
+        "gtau=5;lambda=0.01",
+        "gtau=8;lambda=0.01",
+        "gtau=12;lambda=0.01"
+      ],
+      "minimum_config_id": "gtau=5;lambda=0.01",
+      "minimum_mean_validation_loss": 0.14926957892103107,
+      "minimum_standard_error": 0.004307487970262279,
+      "one_se_threshold": 0.15357706689129336,
+      "selected_config_id": "gtau=5;lambda=0.01",
+      "selection_data": "validation_only",
+      "status": "COMPLETED",
+      "test_used": false
+    }
+  },
+  "pilot_grid_one_se_membership_count": 3,
+  "pilot_selected_lag_grid": 5,
+  "pilot_smoothing_weight": 0.001,
+  "rank_inputs_used_for_selection": false,
+  "required_memberships": 2,
+  "selected_config_id": "gtau=5;lambda=0.01",
+  "selection_branch": "stable_sequential",
+  "selection_data": "validation_only",
+  "selection_unit": "independent_seed_replicate",
+  "status": "COMPLETED",
+  "test_used": false
+}
