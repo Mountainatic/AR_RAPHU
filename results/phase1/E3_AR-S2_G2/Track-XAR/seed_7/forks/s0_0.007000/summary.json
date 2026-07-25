@@ -1,0 +1,16 @@
+{
+  "active_count": 1,
+  "config_id": "s0=0.007",
+  "prune_validation_rmse": 0.18122505805622044,
+  "refit_val_rmse": 0.18033371402232568,
+  "requested_scale": 0.007,
+  "seed": 7,
+  "smoke_not_scientific_evidence": false,
+  "stable": true,
+  "status": "COMPLETED",
+  "support_stable_epoch": 580,
+  "terminal_support": [
+    0
+  ],
+  "test_accessed": false
+}

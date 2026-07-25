@@ -1,0 +1,23 @@
+{
+  "job_id": "AR-S2_xar_warmup_seed7",
+  "index": 7,
+  "command": [
+    "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+    "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+    "warmup",
+    "--scenario",
+    "AR-S2",
+    "--track",
+    "XAR",
+    "--seed",
+    "7",
+    "--device",
+    "cuda"
+  ],
+  "physical_gpu": "0",
+  "worker_slot": 7,
+  "returncode": 0,
+  "started": 1784979618.9018652,
+  "finished": 1784979708.6055017,
+  "runtime_seconds": 89.70363688468933
+}

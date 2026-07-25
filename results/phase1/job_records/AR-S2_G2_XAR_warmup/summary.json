@@ -1,0 +1,242 @@
+{
+  "manifest": "/root/AR_RAPHU_AUTODL/results/phase1/manifests/AR-S2_G2_XAR_warmup.json",
+  "devices": [
+    "0"
+  ],
+  "workers_per_device": 16,
+  "submitted": 10,
+  "executed": 10,
+  "failed": 0,
+  "results": [
+    {
+      "job_id": "AR-S2_xar_warmup_seed0",
+      "index": 0,
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S2",
+        "--track",
+        "XAR",
+        "--seed",
+        "0",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 0,
+      "returncode": 0,
+      "started": 1784979618.8948932,
+      "finished": 1784979686.9475565,
+      "runtime_seconds": 68.05266404151917
+    },
+    {
+      "job_id": "AR-S2_xar_warmup_seed1",
+      "index": 1,
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S2",
+        "--track",
+        "XAR",
+        "--seed",
+        "1",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 1,
+      "returncode": 0,
+      "started": 1784979618.8958626,
+      "finished": 1784979692.1061432,
+      "runtime_seconds": 73.21028113365173
+    },
+    {
+      "job_id": "AR-S2_xar_warmup_seed2",
+      "index": 2,
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S2",
+        "--track",
+        "XAR",
+        "--seed",
+        "2",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 2,
+      "returncode": 0,
+      "started": 1784979618.8953848,
+      "finished": 1784979733.0785863,
+      "runtime_seconds": 114.18320202827454
+    },
+    {
+      "job_id": "AR-S2_xar_warmup_seed3",
+      "index": 3,
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S2",
+        "--track",
+        "XAR",
+        "--seed",
+        "3",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 3,
+      "returncode": 0,
+      "started": 1784979618.8986437,
+      "finished": 1784979670.2862039,
+      "runtime_seconds": 51.38756060600281
+    },
+    {
+      "job_id": "AR-S2_xar_warmup_seed4",
+      "index": 4,
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S2",
+        "--track",
+        "XAR",
+        "--seed",
+        "4",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 4,
+      "returncode": 0,
+      "started": 1784979618.8993924,
+      "finished": 1784979689.4453773,
+      "runtime_seconds": 70.54598546028137
+    },
+    {
+      "job_id": "AR-S2_xar_warmup_seed5",
+      "index": 5,
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S2",
+        "--track",
+        "XAR",
+        "--seed",
+        "5",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 5,
+      "returncode": 0,
+      "started": 1784979618.899223,
+      "finished": 1784979670.4756997,
+      "runtime_seconds": 51.57647681236267
+    },
+    {
+      "job_id": "AR-S2_xar_warmup_seed6",
+      "index": 6,
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S2",
+        "--track",
+        "XAR",
+        "--seed",
+        "6",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 6,
+      "returncode": 0,
+      "started": 1784979618.9027524,
+      "finished": 1784979706.4132504,
+      "runtime_seconds": 87.51049876213074
+    },
+    {
+      "job_id": "AR-S2_xar_warmup_seed7",
+      "index": 7,
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S2",
+        "--track",
+        "XAR",
+        "--seed",
+        "7",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 7,
+      "returncode": 0,
+      "started": 1784979618.9018652,
+      "finished": 1784979708.6055017,
+      "runtime_seconds": 89.70363688468933
+    },
+    {
+      "job_id": "AR-S2_xar_warmup_seed8",
+      "index": 8,
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S2",
+        "--track",
+        "XAR",
+        "--seed",
+        "8",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 8,
+      "returncode": 0,
+      "started": 1784979618.903352,
+      "finished": 1784979703.8642352,
+      "runtime_seconds": 84.96088409423828
+    },
+    {
+      "job_id": "AR-S2_xar_warmup_seed9",
+      "index": 9,
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S2",
+        "--track",
+        "XAR",
+        "--seed",
+        "9",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 9,
+      "returncode": 0,
+      "started": 1784979618.904312,
+      "finished": 1784979676.3641124,
+      "runtime_seconds": 57.45980095863342
+    }
+  ]
+}
