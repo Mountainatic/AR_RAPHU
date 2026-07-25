@@ -29,7 +29,7 @@ requires-dist = [
     { name = "pandas", specifier = "==2.2.3" },
     { name = "pyarrow", specifier = "==24.0.0" },
     { name = "scipy", specifier = "==1.15.3" },
-    { name = "torch", specifier = "==2.8.0", index = "https://download.pytorch.org/whl/cu128" },
+    { name = "torch", specifier = "==2.8.0", index = "https://mirrors.nju.edu.cn/pytorch/whl/cu128" },
 ]
 
 [package.metadata.requires-dev]
@@ -595,7 +595,7 @@ wheels = [
 [[package]]
 name = "torch"
 version = "2.8.0+cu128"
-source = { registry = "https://download.pytorch.org/whl/cu128" }
+source = { registry = "https://mirrors.nju.edu.cn/pytorch/whl/cu128" }
 dependencies = [
     { name = "filelock" },
     { name = "fsspec" },
@@ -620,8 +620,8 @@ dependencies = [
     { name = "typing-extensions" },
 ]
 wheels = [
-    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:0c96999d15cf1f13dd7c913e0b21a9a355538e6cfc10861a17158320292f5954", upload-time = "2025-10-01T23:47:19Z" },
-    { url = "https://download-r2.pytorch.org/whl/cu128/torch-2.8.0%2Bcu128-cp310-cp310-win_amd64.whl", hash = "sha256:43938e9a174c90e5eb9e906532b2f1e21532bbfa5a61b65193b4f54714d34f9e", upload-time = "2025-10-01T23:47:42Z" },
+    { url = "https://mirrors.nju.edu.cn/pytorch/whl/cu128/torch-2.8.0%2Bcu128-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:0c96999d15cf1f13dd7c913e0b21a9a355538e6cfc10861a17158320292f5954", upload-time = "2025-10-01T23:47:19Z" },
+    { url = "https://mirrors.nju.edu.cn/pytorch/whl/cu128/torch-2.8.0%2Bcu128-cp310-cp310-win_amd64.whl", hash = "sha256:43938e9a174c90e5eb9e906532b2f1e21532bbfa5a61b65193b4f54714d34f9e", upload-time = "2025-10-01T23:47:42Z" },
 ]
 
 [[package]]
