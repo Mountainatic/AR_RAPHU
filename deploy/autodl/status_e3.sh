@@ -9,8 +9,16 @@ if test -s "${PID_FILE}" && kill -0 "$(cat "${PID_FILE}")" 2>/dev/null; then
 else
   echo "E3 process is not running."
 fi
-warmup="$(find results/phase1/job_records/AR-S2_G2_XAR_warmup -type f -name DONE.json 2>/dev/null | wc -l)"
-forks="$(find results/phase1/job_records/AR-S2_G2_XAR_fork -type f -name DONE.json 2>/dev/null | wc -l)"
+count_done() {
+  local root="$1"
+  if test -d "${root}"; then
+    find "${root}" -type f -name DONE.json | wc -l
+  else
+    echo 0
+  fi
+}
+warmup="$(count_done results/phase1/job_records/AR-S2_G2_XAR_warmup)"
+forks="$(count_done results/phase1/job_records/AR-S2_G2_XAR_fork)"
 echo "E3 M5 XAR warmup: ${warmup}/10; forks: ${forks}/90"
 test -f results/phase1/E3_AR-S2_G2/Track-XAR/validation_selection.json \
   && echo "E3 M5 validation selection: COMPLETED" \
