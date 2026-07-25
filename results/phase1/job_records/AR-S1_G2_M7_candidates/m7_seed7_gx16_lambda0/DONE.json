@@ -1,0 +1,23 @@
+{
+  "job_id": "m7_seed7_gx16_lambda0",
+  "index": 69,
+  "command": [
+    "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+    "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+    "fit",
+    "--seed",
+    "7",
+    "--grid-size",
+    "16",
+    "--smoothness",
+    "0.0",
+    "--device",
+    "cuda"
+  ],
+  "physical_gpu": "0",
+  "worker_slot": 1,
+  "returncode": 0,
+  "started": 1784979085.5443585,
+  "finished": 1784979089.3092103,
+  "runtime_seconds": 3.7648520469665527
+}

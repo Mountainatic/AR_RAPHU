@@ -1,0 +1,26 @@
+{
+  "amplitude_grid": 16,
+  "config_id": "gx=16;lambda=0.0001",
+  "convex_solver": "monotone_restarted_FISTA_v20",
+  "dtype": "float64",
+  "fista_converged": true,
+  "fista_iterations": 1645,
+  "kkt_residual": 1.048137382337989e-08,
+  "kkt_tolerance": 1e-05,
+  "last_recorded_relative_step": 1.1361341548407704e-07,
+  "model": "M7",
+  "objective": 0.00876853613110873,
+  "relative_step_tolerance": 1e-07,
+  "seed": 7,
+  "smoothing_weight": 0.0001,
+  "status": "COMPLETED",
+  "support": [
+    0,
+    1,
+    2,
+    8
+  ],
+  "test_accessed": false,
+  "validation_rmse_scaled": 0.1306863897376001,
+  "wall_seconds": 2.777370202005841
+}

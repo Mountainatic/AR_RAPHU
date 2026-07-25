@@ -1,0 +1,26 @@
+{
+  "amplitude_grid": 16,
+  "config_id": "gx=16;lambda=0",
+  "convex_solver": "fp64_rank_revealing_lstsq_gelsd",
+  "dtype": "float64",
+  "fista_converged": true,
+  "fista_iterations": 1,
+  "kkt_residual": 5.5459151618265966e-14,
+  "kkt_tolerance": 1e-05,
+  "last_recorded_relative_step": 0.0,
+  "model": "M7",
+  "objective": 0.009678122093368262,
+  "relative_step_tolerance": 1e-07,
+  "seed": 6,
+  "smoothing_weight": 0.0,
+  "status": "COMPLETED",
+  "support": [
+    0,
+    1,
+    2,
+    4
+  ],
+  "test_accessed": false,
+  "validation_rmse_scaled": 0.8892628155213619,
+  "wall_seconds": 1.5046026239870116
+}

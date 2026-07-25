@@ -1,0 +1,1452 @@
+{
+  "device": "cuda",
+  "generator_version": 2,
+  "job_count": 90,
+  "jobs": [
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "0",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed0_gx8_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "0",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed0_gx8_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "0",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed0_gx8_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "0",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed0_gx12_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "0",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed0_gx12_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "0",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed0_gx12_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "0",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed0_gx16_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "0",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed0_gx16_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "0",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed0_gx16_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "1",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed1_gx8_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "1",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed1_gx8_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "1",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed1_gx8_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "1",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed1_gx12_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "1",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed1_gx12_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "1",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed1_gx12_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "1",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed1_gx16_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "1",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed1_gx16_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "1",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed1_gx16_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "2",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed2_gx8_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "2",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed2_gx8_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "2",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed2_gx8_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "2",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed2_gx12_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "2",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed2_gx12_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "2",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed2_gx12_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "2",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed2_gx16_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "2",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed2_gx16_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "2",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed2_gx16_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "3",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed3_gx8_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "3",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed3_gx8_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "3",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed3_gx8_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "3",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed3_gx12_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "3",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed3_gx12_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "3",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed3_gx12_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "3",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed3_gx16_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "3",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed3_gx16_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "3",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed3_gx16_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "4",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed4_gx8_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "4",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed4_gx8_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "4",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed4_gx8_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "4",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed4_gx12_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "4",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed4_gx12_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "4",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed4_gx12_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "4",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed4_gx16_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "4",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed4_gx16_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "4",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed4_gx16_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "5",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed5_gx8_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "5",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed5_gx8_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "5",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed5_gx8_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "5",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed5_gx12_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "5",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed5_gx12_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "5",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed5_gx12_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "5",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed5_gx16_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "5",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed5_gx16_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "5",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed5_gx16_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "6",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed6_gx8_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "6",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed6_gx8_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "6",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed6_gx8_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "6",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed6_gx12_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "6",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed6_gx12_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "6",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed6_gx12_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "6",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed6_gx16_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "6",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed6_gx16_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "6",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed6_gx16_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "7",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed7_gx8_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "7",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed7_gx8_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "7",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed7_gx8_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "7",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed7_gx12_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "7",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed7_gx12_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "7",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed7_gx12_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "7",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed7_gx16_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "7",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed7_gx16_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "7",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed7_gx16_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "8",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed8_gx8_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "8",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed8_gx8_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "8",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed8_gx8_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "8",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed8_gx12_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "8",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed8_gx12_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "8",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed8_gx12_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "8",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed8_gx16_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "8",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed8_gx16_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "8",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed8_gx16_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "9",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed9_gx8_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "9",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed9_gx8_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "9",
+        "--grid-size",
+        "8",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed9_gx8_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "9",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed9_gx12_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "9",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed9_gx12_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "9",
+        "--grid-size",
+        "12",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed9_gx12_lambda0.001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "9",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed9_gx16_lambda0"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "9",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.0001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed9_gx16_lambda0.0001"
+    },
+    {
+      "command": [
+        "/root/AR_RAPHU_AUTODL/.venv/bin/python3",
+        "/root/AR_RAPHU_AUTODL/tools/run_phase1_m7.py",
+        "fit",
+        "--seed",
+        "9",
+        "--grid-size",
+        "16",
+        "--smoothness",
+        "0.001",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "m7_seed9_gx16_lambda0.001"
+    }
+  ],
+  "model": "M7",
+  "scenario": "AR-S1",
+  "schema_version": 1,
+  "stage": "validation_candidates",
+  "test_access": false
+}
