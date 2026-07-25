@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet("E1", "E2", "M7", "M8")]
+    [ValidateSet("E1", "E2", "E3", "M7", "M8")]
     [string]$Task = "E1",
 
     [ValidateRange(2, 3600)]
@@ -22,6 +22,7 @@ $expectedHostKey = "SHA256:liZ36vNCsNcNdXeWs4f+g5ZIhPM/ZihP834vxs8Ulqc"
 $statusScript = switch ($Task) {
     "E1" { "deploy/autodl/status_e1.sh" }
     "E2" { "deploy/autodl/status.sh" }
+    "E3" { "deploy/autodl/status_e3.sh" }
     "M7" { "deploy/autodl/status_m7.sh" }
     "M8" { "deploy/autodl/status_m8.sh" }
 }
