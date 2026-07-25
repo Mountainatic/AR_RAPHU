@@ -53,8 +53,9 @@ def test_manifest_counts_and_no_test_aggregate_commands(tmp_path, monkeypatch) -
     assert warmup_payload["job_count"] == 10
     assert fork_payload["job_count"] == 20
     assert dense_payload["job_count"] == 10
-    assert critical_payload["job_count"] == 30
+    assert critical_payload["job_count"] == 20
     assert critical_payload["replicate_profile"] == "critical"
+    assert critical_payload["analysis_seed_count"] == 30
     assert warmup_payload["track"] == "XAR"
     assert fork_payload["track"] == "X"
     assert dense_payload["track"] == "AR"

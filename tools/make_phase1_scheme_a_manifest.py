@@ -38,7 +38,16 @@ def make_manifest(
     replicate_profile: str = "screening",
 ) -> Path:
     config = load_protocol_config(require_phase1_frozen=True)
-    seeds = config["training"]["seeds"][replicate_profile]
+    analysis_seeds = config["training"]["seeds"][replicate_profile]
+    seeds = (
+        analysis_seeds
+        if replicate_profile == "screening"
+        else [
+            seed
+            for seed in analysis_seeds
+            if seed not in set(config["training"]["seeds"]["screening"])
+        ]
+    )
     scales = config["training"]["source_backed_v20_reference"]["pruning_scales"]
     runner = PROJECT_ROOT / "tools" / "run_phase1_scheme_a.py"
     jobs: list[dict] = []
@@ -132,6 +141,8 @@ def make_manifest(
             "stage": stage,
             "track": manifest_track,
             "replicate_profile": replicate_profile,
+            "analysis_seed_count": len(analysis_seeds),
+            "execution_seeds": seeds,
             "device": device,
             "job_count": len(jobs),
             "test_access": stage == "dense_ar",
