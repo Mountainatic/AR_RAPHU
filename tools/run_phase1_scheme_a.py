@@ -154,6 +154,8 @@ def build_model(
     x_ranges: list[tuple[float, float]],
     y_range: tuple[float, float],
     device: torch.device,
+    *,
+    external_delay_mode: str = "static_gamma",
 ) -> ARRAPHURank1:
     return ARRAPHURank1(
         track=track,
@@ -167,6 +169,7 @@ def build_model(
         hidden_kan=8,
         grid_size=7,
         response_execution_mode="vectorized",
+        external_delay_mode=external_delay_mode,
     ).to(device)
 
 

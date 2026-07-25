@@ -360,3 +360,108 @@ def refit_fixed_external_support(
     )
     result.terminal_support = sorted(support_set)
     return result
+
+
+def refit_m6_free_lag(
+    model: ARRAPHURank1,
+    data: PreparedDirectForecastData,
+    support: list[int],
+    *,
+    smoothness_weight: float,
+    epochs: int,
+    learning_rate: float,
+    patience: int,
+    batch_size: int,
+    device: torch.device,
+    validation_interval: int = 5,
+) -> TrainingStageResult:
+    """Jointly refit a fixed-support M6 model with free external lag logits."""
+
+    if model.external_branch is None:
+        raise ValueError("M6 requires an external branch.")
+    if model.external_delay_mode != "free_static_logits":
+        raise ValueError("M6 requires free_static_logits external delays.")
+    if smoothness_weight < 0:
+        raise ValueError("M6 smoothness weight must be nonnegative.")
+    support_set = set(support)
+    if not support_set:
+        raise ValueError("M6 requires a non-empty frozen external support.")
+    for variable in range(model.external_channels):
+        if variable not in support_set:
+            model.external_branch.prune_variable(variable)
+
+    optimizer = torch.optim.Adam(
+        [parameter for parameter in model.parameters() if parameter.requires_grad],
+        lr=learning_rate,
+    )
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, factor=0.5, patience=80, min_lr=1.0e-5
+    )
+    best_validation = float("inf")
+    best_state = None
+    best_epoch = 0
+    stale_epochs = 0
+    history: list[dict] = []
+    for epoch in range(1, epochs + 1):
+        model.train()
+        optimizer.zero_grad(set_to_none=True)
+        total = data.target_count("train")
+        squared_error_sum = 0.0
+        for batch in data.iter_contiguous_batches(
+            "train", batch_size=batch_size, device=device
+        ):
+            residual = _forward_batch(model, batch) - batch["target"]
+            squared_error = residual.square().sum()
+            (squared_error / total).backward()
+            squared_error_sum += float(squared_error.detach().cpu())
+        roughness = free_lag_logit_roughness(model)
+        penalty = smoothness_weight * roughness
+        penalty.backward()
+        optimizer.step()
+
+        validate = (
+            epoch == 1
+            or epoch % validation_interval == 0
+            or epoch == epochs
+        )
+        if validate:
+            validation_rmse = evaluate_rmse(
+                model,
+                data,
+                "validation",
+                batch_size=batch_size,
+                device=device,
+            )
+            scheduler.step(validation_rmse)
+            if validation_rmse < best_validation:
+                best_validation = validation_rmse
+                best_state = copy.deepcopy(model.state_dict())
+                best_epoch = epoch
+                stale_epochs = 0
+            else:
+                stale_epochs += validation_interval
+            history.append(
+                {
+                    "epoch": epoch,
+                    "train_mse": squared_error_sum / total,
+                    "lag_logit_roughness": float(roughness.detach().cpu()),
+                    "smoothness_penalty": float(penalty.detach().cpu()),
+                    "validation_rmse": validation_rmse,
+                    "learning_rate": optimizer.param_groups[0]["lr"],
+                    "external_support": sorted(support_set),
+                }
+            )
+        if stale_epochs >= patience:
+            break
+    if best_state is None:
+        raise RuntimeError("M6 refit produced no validation checkpoint.")
+    terminal_state = copy.deepcopy(model.state_dict())
+    model.load_state_dict(best_state)
+    return TrainingStageResult(
+        best_state=best_state,
+        terminal_state=terminal_state,
+        best_epoch=best_epoch,
+        best_validation_rmse=best_validation,
+        history=history,
+        terminal_support=sorted(support_set),
+    )

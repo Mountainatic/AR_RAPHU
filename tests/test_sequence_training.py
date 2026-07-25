@@ -12,6 +12,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from ar_raphu.model import ARRAPHURank1  # noqa: E402
+from ar_raphu.m6 import initialize_m6_from_m5_gamma  # noqa: E402
 from ar_raphu.sequence_data import PreparedDirectForecastData  # noqa: E402
 from ar_raphu.synthetic import generate_synthetic_sequence  # noqa: E402
 from ar_raphu.training import (  # noqa: E402
@@ -19,6 +20,7 @@ from ar_raphu.training import (  # noqa: E402
     free_lag_logit_roughness,
     prune_external_path,
     refit_fixed_external_support,
+    refit_m6_free_lag,
     seed_everything,
     train_dense_warmup,
 )
@@ -81,6 +83,27 @@ def build_small(data: PreparedDirectForecastData) -> ARRAPHURank1:
         hidden_kan=4,
         grid_size=5,
         response_execution_mode="vectorized",
+    )
+
+
+def build_small_free(data: PreparedDirectForecastData) -> ARRAPHURank1:
+    x_ranges, y_range = data.scaler.input_grid_ranges(
+        data.x_scaled * data.scaler.x_scale + data.scaler.x_mean,
+        data.y_scaled * data.scaler.y_scale + data.scaler.y_mean,
+    )
+    return ARRAPHURank1(
+        track="XAR",
+        horizon=1,
+        external_channels=10,
+        inactive_external_channels=(),
+        L_x=64,
+        L_y=32,
+        input_grid_ranges_x=x_ranges,
+        input_grid_range_y=y_range,
+        hidden_kan=4,
+        grid_size=5,
+        response_execution_mode="vectorized",
+        external_delay_mode="free_static_logits",
     )
 
 
@@ -157,3 +180,47 @@ def test_dense_training_and_external_pruning_protocol_execute() -> None:
     )
     assert refit.terminal_support == sorted(pruned.terminal_support)
     assert np.isfinite(refit.best_validation_rmse)
+
+
+def test_m6_gamma_initialization_is_prediction_and_kernel_equivalent() -> None:
+    data = prepared_small()
+    device = torch.device("cpu")
+    m5 = build_small(data).to(device)
+    m6 = build_small_free(data).to(device)
+    support = [0, 2, 7]
+    for variable in set(range(10)) - set(support):
+        m5.external_branch.prune_variable(variable)
+    batch = next(
+        data.iter_batches("validation", batch_size=32, device=device)
+    )
+    with torch.no_grad():
+        m5_prediction = m5(
+            batch["x_window"], batch["y_window"], return_aux=False
+        )
+        m5_q = m5.external_branch._static_q().clone()
+    audit = initialize_m6_from_m5_gamma(m5, m6, support)
+    with torch.no_grad():
+        m6_prediction = m6(
+            batch["x_window"], batch["y_window"], return_aux=False
+        )
+        m6_q = m6.external_branch._static_q()
+    torch.testing.assert_close(m6_q, m5_q, atol=2e-7, rtol=2e-6)
+    torch.testing.assert_close(
+        m6_prediction, m5_prediction, atol=2e-6, rtol=2e-6
+    )
+    assert audit["kernel_max_abs_error"] <= 2e-7
+
+    result = refit_m6_free_lag(
+        m6,
+        data,
+        support,
+        smoothness_weight=1.0e-3,
+        epochs=2,
+        learning_rate=0.003,
+        patience=2,
+        batch_size=128,
+        device=device,
+        validation_interval=1,
+    )
+    assert result.terminal_support == support
+    assert np.isfinite(result.best_validation_rmse)
