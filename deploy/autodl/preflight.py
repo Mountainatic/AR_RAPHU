@@ -28,11 +28,21 @@ def command_output(command: list[str]) -> str:
     ).strip()
 
 
+def configure_runtime_threads() -> None:
+    intraop = int(os.environ.get("AR_RAPHU_TORCH_THREADS", "1"))
+    interop = int(os.environ.get("AR_RAPHU_TORCH_INTEROP_THREADS", "1"))
+    if intraop < 1 or interop < 1:
+        raise ValueError("PyTorch thread limits must be positive.")
+    torch.set_num_threads(intraop)
+    torch.set_num_interop_threads(interop)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--require-mps", action="store_true")
     args = parser.parse_args()
     manager = require_runtime_environment()
+    configure_runtime_threads()
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA is unavailable.")
     device = torch.device("cuda:0")
