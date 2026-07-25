@@ -9,6 +9,7 @@ import os
 import sys
 import time
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
@@ -192,6 +193,42 @@ def predict_scaled(
     return centered_bias + external + ar_contribution
 
 
+def solve_unpenalized_rank_robust(
+    basis: torch.Tensor,
+    q: torch.Tensor,
+    target: torch.Tensor,
+) -> SimpleNamespace:
+    """Solve the lambda=0 candidate exactly with rank-revealing FP64 SVD."""
+
+    phi = torch.einsum("bnlm,nl->bnm", basis, q)
+    sample_count, variable_count, basis_count = phi.shape
+    design = phi.reshape(sample_count, -1).cpu()
+    response = target.reshape(-1).to(torch.float64).cpu()
+    design_mean = design.mean(0, keepdim=True)
+    response_mean = response.mean()
+    centered_design = design - design_mean
+    centered_response = response - response_mean
+    solution = torch.linalg.lstsq(
+        centered_design, centered_response, driver="gelsd"
+    ).solution
+    residual = centered_design @ solution - centered_response
+    gradient = centered_design.T @ residual / sample_count
+    coefficients = solution.reshape(variable_count, basis_count).to(basis.device)
+    bias = (
+        response_mean - design_mean.reshape(-1).dot(solution)
+    ).to(basis.device)
+    return SimpleNamespace(
+        coefficients=coefficients,
+        bias=bias,
+        iterations=1,
+        converged=True,
+        kkt_residual=float(gradient.norm()),
+        objective=float(0.5 * residual.square().mean()),
+        history=[{"relative_step": 0.0}],
+        solver="fp64_rank_revealing_lstsq_gelsd",
+    )
+
+
 def fit_job(args: argparse.Namespace, device: torch.device) -> None:
     config = load_protocol_config(require_phase1_frozen=True)
     allowed = set(declared_configs(config))
@@ -227,17 +264,23 @@ def fit_job(args: argparse.Namespace, device: torch.device) -> None:
     train_basis = basis_for(bank, train_windows)
     val_basis = basis_for(bank, val_windows)
     q = torch.as_tensor(q_array, device=device, dtype=torch.float64)
-    result = solve_fixed_q_fista_v20(
-        train_basis,
-        q,
-        train_target - train_ar,
-        lambda_group=0.0,
-        lambda_smooth=args.smoothness,
-        roughness_matrix=bank.roughness,
-        max_iter=100000,
-        tolerance=1.0e-7,
-        kkt_tolerance=1.0e-5,
-    )
+    if args.smoothness == 0.0:
+        result = solve_unpenalized_rank_robust(
+            train_basis, q, train_target - train_ar
+        )
+    else:
+        result = solve_fixed_q_fista_v20(
+            train_basis,
+            q,
+            train_target - train_ar,
+            lambda_group=0.0,
+            lambda_smooth=args.smoothness,
+            roughness_matrix=bank.roughness,
+            max_iter=100000,
+            tolerance=1.0e-7,
+            kkt_tolerance=1.0e-5,
+        )
+        result.solver = "monotone_restarted_FISTA_v20"
     centered_bias, response_means = centered_parameters(
         bank,
         result.coefficients,
@@ -288,6 +331,7 @@ def fit_job(args: argparse.Namespace, device: torch.device) -> None:
             "support": support,
             "fista_iterations": result.iterations,
             "fista_converged": result.converged,
+            "convex_solver": result.solver,
             "kkt_residual": result.kkt_residual,
             "last_recorded_relative_step": result.history[-1]["relative_step"],
             "relative_step_tolerance": 1.0e-7,

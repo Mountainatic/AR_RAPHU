@@ -1,6 +1,8 @@
 import pytest
+import torch
 
 from ar_raphu.model_selection import validation_one_se_select
+from tools.run_phase1_m7 import solve_unpenalized_rank_robust
 
 
 def test_one_se_uses_minimum_configuration_se_and_complexity_order() -> None:
@@ -46,3 +48,22 @@ def test_one_se_rejects_inconsistent_units() -> None:
             declared_config_order=["a", "b"],
             complexity_key=lambda config_id: (config_id,),
         )
+
+
+def test_rank_robust_unpenalized_solver_handles_collinearity() -> None:
+    torch.manual_seed(11)
+    basis = torch.randn(200, 2, 7, 5, dtype=torch.float64)
+    basis[:, 1] = basis[:, 0]
+    q = torch.rand(2, 7, dtype=torch.float64)
+    q /= q.sum(1, keepdim=True)
+    q[1] = q[0]
+    coefficients = torch.randn(2, 5, dtype=torch.float64)
+    target = torch.einsum("bnlm,nm,nl->b", basis, coefficients, q) + 0.4
+    result = solve_unpenalized_rank_robust(basis, q, target)
+    prediction = (
+        torch.einsum("bnlm,nm,nl->b", basis, result.coefficients, q)
+        + result.bias
+    )
+    torch.testing.assert_close(prediction, target, atol=1e-9, rtol=1e-9)
+    assert result.converged
+    assert result.kkt_residual < 1.0e-10
