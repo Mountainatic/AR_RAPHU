@@ -337,6 +337,26 @@ Layer I 至少覆盖 AR-S0 至 AR-S7：纯 AR、Gamma rank-1、非 Gamma rank-1�
   - M8 固定 M7 后顺序选择时滞 grid `{5,8,12}` 与残差平滑权重
     `{1e-4,1e-3,1e-2}`，不做完整笛卡尔积；
   - M9 使用 M8 Gram 白化面的前两项 SVD 重构，不新增超参数。
+- 用户随后进一步冻结 M7/M8 的 one-SE 与稳定性规则：
+  - v2 编号不可混用旧版：M7 是 A 锚定一维凸样条重拟合，M8 是只升级
+    外生过程分支的 A 锚定正交二维残差；
+  - M7 必须把全部 `(amplitude_grid, smoothing_weight)` 联合放入
+    validation-only one-SE；候选集内先选更小幅值 grid，再选更大平滑
+    权重，最后按预声明配置顺序；
+  - M8 冻结 Scheme A 支持/时滞及 M7 幅值 grid，以 `1e-3` 为 pilot
+    平滑对 lag grid 做 one-SE 并优先更小 grid；
+  - 必须在 `1e-4,1e-3,1e-2` 检查 lag-grid one-SE 稳定性，所选 grid
+    至少进入三个集合中的两个；否则设置
+    `M8_GRID_SMOOTHING_INTERACTION=TRUE`，对已预声明的完整
+    lag-grid × smoothing grid 做联合 one-SE 回退；
+  - lag grid 冻结后对平滑权重做 one-SE，候选集内优先更强平滑；
+  - M8 当前只有一个共享二维平滑权重；不得运行后拆分或新增方向权重；
+  - 超参数只由 validation prediction loss 冻结。SVD、rank 显著性、
+    test、真函数和物理外观均不得参与选择；固定模型后才能进行
+    Gram 白化 SVD 与 bootstrap rank 审计；
+  - Phase 1 合成数据没有外层 expanding-window folds，one-SE 以独立
+    seed replicate 为统计单位；对以后存在外层折的数据，先折内平均
+    seeds，再在 folds 间计算标准误，绝不按时间点计算 SE。
 - 用户明确指出 CPU 存在过热降频风险。自 2026-07-25 起所有新任务池
   固定 `workers_per_device=2`，每进程 PyTorch intra-op/interop、
   OMP、MKL、OpenBLAS、NumExpr 线程数均为 1；不得因 GPU 尚有余量提高

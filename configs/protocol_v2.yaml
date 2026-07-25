@@ -109,15 +109,64 @@
       "amplitude_spline_grid_sizes": [8, 12, 16],
       "spline_order": 3,
       "smoothness_weights": [0.0, 0.0001, 0.001],
-      "selection": "validation_only_cross_seed_one_standard_error"
+      "selection": "validation_only_one_standard_error",
+      "candidate_scope": "joint_amplitude_grid_x_smoothing_weight",
+      "selection_unit": {
+        "phase1_synthetic": "independent_seed_replicate",
+        "datasets_with_outer_folds": "average_seeds_within_fold_then_compute_standard_error_across_folds"
+      },
+      "one_se_threshold": "minimum_mean_validation_loss_plus_standard_error_of_minimum_configuration",
+      "complexity_order": [
+        "amplitude_grid_ascending",
+        "smoothing_weight_descending",
+        "predeclared_configuration_order"
+      ],
+      "selection_forbidden_inputs": [
+        "test_loss",
+        "true_function",
+        "visual_plausibility"
+      ]
     },
     "M8": {
       "sequence": "freeze_M7_then_select_lag_basis_then_residual_smoothness",
       "lag_spline_grid_sizes": [5, 8, 12],
       "residual_smoothness_weights": [0.0001, 0.001, 0.01],
       "full_cartesian_product": false,
+      "shared_lag_amplitude_smoothing_weight": true,
+      "pilot_smoothing_weight": 0.001,
+      "adjacent_stability_weights": [0.0001, 0.001, 0.01],
+      "lag_grid_one_se_complexity_order": [
+        "lag_grid_ascending",
+        "predeclared_configuration_order"
+      ],
+      "lag_grid_stability_rule": {
+        "minimum_one_se_memberships": 2,
+        "membership_checks": 3,
+        "unstable_flag": "M8_GRID_SMOOTHING_INTERACTION",
+        "unstable_fallback": "joint_one_se_over_predeclared_full_lag_grid_x_smoothing_grid",
+        "fallback_complexity_order": [
+          "lag_grid_ascending",
+          "smoothing_weight_descending",
+          "predeclared_configuration_order"
+        ]
+      },
+      "smoothing_one_se_complexity_order": [
+        "smoothing_weight_descending",
+        "predeclared_configuration_order"
+      ],
       "anchor_constraint": "q_transpose_W_C_D_equals_zero",
-      "selection": "validation_only_cross_seed_one_standard_error"
+      "selection": "validation_only_one_standard_error",
+      "selection_unit": {
+        "phase1_synthetic": "independent_seed_replicate",
+        "datasets_with_outer_folds": "average_seeds_within_fold_then_compute_standard_error_across_folds"
+      },
+      "rank_audit_after_hyperparameter_freeze": true,
+      "selection_forbidden_inputs": [
+        "singular_values",
+        "rank_significance",
+        "test_loss",
+        "physical_appearance"
+      ]
     },
     "M9": {
       "construction": "first_two_components_of_M8_Gram_whitened_SVD",
