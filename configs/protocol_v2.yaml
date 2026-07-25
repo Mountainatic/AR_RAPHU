@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "format": "JSON-compatible YAML 1.2",
+  "status": "PHASE1_PREREGISTERED",
+  "authoritative_documents": [
+    "AR_RAPHU_method_v2.md",
+    "AR_RAPHU_three_layer_validation_plan_v2.md",
+    "AR_RAPHU_v2_revision_notes.md",
+    "AGENTS.md"
+  ],
+  "frozen_protocol": {
+    "legacy_L_x": 32,
+    "legacy_L_y": 32,
+    "L_x_candidates": [32, 64, 128, 256],
+    "L_y_candidates": [1, 4, 8, 16, 32, 64],
+    "conditional_L_x_extension": 512,
+    "horizons": [1, 5, 10, 30, 60],
+    "forecast_mode": "direct",
+    "future_X_allowed": false,
+    "split_membership": "target_index_t_plus_h",
+    "development_folds": [1, 2, 3],
+    "final_lockbox_fold": 4,
+    "final_lockbox_test": [18092, 20103],
+    "external_channels": 9,
+    "historical_output_channels": 1,
+    "constant_argon_channel_0based": 6,
+    "kan_hidden_candidates": [4, 8],
+    "kan_grid_size_candidates": [5, 7, 11],
+    "kan_spline_order": 3,
+    "gamma_discretization": "point_value_then_softmax",
+    "gamma_beta_convention": "scale",
+    "gamma_delta": 0.001
+  },
+  "preprocessing": {
+    "scaler": "zscore_population_std_fit_on_fold_train_only",
+    "missing_value_policy": "fail_fast_no_imputation_in_phase1",
+    "outlier_policy": "report_only_no_clipping_or_removal_in_phase1",
+    "first_layer_grid_padding_fraction": 0.05,
+    "first_layer_grid_minimum_padding": 0.05,
+    "fit_partition": "train_only"
+  },
+  "training": {
+    "runtime_resources": {
+      "gpu_workers_per_device": 2,
+      "torch_intraop_threads_per_process": 1,
+      "torch_interop_threads_per_process": 1,
+      "OMP_NUM_THREADS": 1,
+      "MKL_NUM_THREADS": 1,
+      "OPENBLAS_NUM_THREADS": 1,
+      "NUMEXPR_NUM_THREADS": 1,
+      "reason": "user_requested_lower_CPU_load_due_to_thermal_throttling"
+    },
+    "seeds": {
+      "screening": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "critical": [
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+        10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+        20, 21, 22, 23, 24, 25, 26, 27, 28, 29
+      ]
+    },
+    "optimizer": "Adam",
+    "learning_rate": 0.003,
+    "batch_size": {
+      "physical_chunk": 4096,
+      "effective_batch": "entire_train_split_via_weighted_gradient_accumulation"
+    },
+    "dtype": {
+      "neural_training": "float32",
+      "convex_solvers_and_statistics": "float64"
+    },
+    "deterministic_algorithms": true,
+    "early_stopping_patience": {
+      "warmup": 300,
+      "refit": 500,
+      "validation_interval_epochs": 5
+    },
+    "source_backed_v20_reference": {
+      "seeds": [0, 1, 2, 3, 4],
+      "optimizer": "Adam",
+      "learning_rate": 0.003,
+      "warmup_epochs": 3000,
+      "warmup_patience": 300,
+      "pruning_scales": [
+        0.003,
+        0.004,
+        0.005,
+        0.006,
+        0.007,
+        0.008,
+        0.009,
+        0.010,
+        0.012
+      ],
+      "prune_epochs": 1800,
+      "ramp_epochs": 300,
+      "refit_epochs": 5000,
+      "refit_patience": 500,
+      "selection": "cross_seed_validation_only_one_standard_error"
+    }
+  },
+  "phase1_model_selection": {
+    "M6": {
+      "initialization": "log_of_selected_M5_Gamma_kernel",
+      "free_external_delay_logits": true,
+      "second_difference_smoothness_weights": [0.0, 0.0001, 0.001, 0.01],
+      "selection": "validation_only_cross_seed_one_standard_error"
+    },
+    "M7": {
+      "amplitude_spline_grid_sizes": [8, 12, 16],
+      "spline_order": 3,
+      "smoothness_weights": [0.0, 0.0001, 0.001],
+      "selection": "validation_only_cross_seed_one_standard_error"
+    },
+    "M8": {
+      "sequence": "freeze_M7_then_select_lag_basis_then_residual_smoothness",
+      "lag_spline_grid_sizes": [5, 8, 12],
+      "residual_smoothness_weights": [0.0001, 0.001, 0.01],
+      "full_cartesian_product": false,
+      "anchor_constraint": "q_transpose_W_C_D_equals_zero",
+      "selection": "validation_only_cross_seed_one_standard_error"
+    },
+    "M9": {
+      "construction": "first_two_components_of_M8_Gram_whitened_SVD",
+      "additional_free_hyperparameters": false
+    }
+  },
+  "phase1_synthetic": {
+    "generator_version": 2,
+    "sample_sizes": {
+      "core": 10000,
+      "boundary_grid": [2000, 10000, 50000, 200000]
+    },
+    "replicates_per_scenario": {
+      "screening": 10,
+      "critical_confirmation": 30
+    },
+    "external_variable_count": {
+      "core": 10,
+      "boundary_grid": [10, 30, 100]
+    },
+    "active_supports": {
+      "core_indices_0based": [0, 1, 2],
+      "boundary_active_counts": [3, 5, 10]
+    },
+    "AR_kernel_and_response": {
+      "L_y": 32,
+      "kernel": "normalized_discrete_Gamma_shape_1.5_scale_1.5_on_lags_0_to_31",
+      "response": "0.85*y + 0.10*tanh(y)",
+      "maximum_derivative": 0.95,
+      "interpretation": "strong_stable_autoregressive_persistence"
+    },
+    "latent_process_innovation": {
+      "distribution": "independent_zero_mean_Gaussian",
+      "standard_deviation": 0.2,
+      "applies_to": "AR-S0_through_AR-S7_at_every_generated_time_step",
+      "separate_from_measurement_noise": true
+    },
+    "noise_or_SNR_levels": {
+      "core_db": 20,
+      "boundary_grid_db": [40, 20, 10, 5],
+      "noise": "zero_mean_Gaussian_scaled_from_clean_target_variance"
+    },
+    "train_validation_test_split": {
+      "type": "chronological_contiguous",
+      "fractions": [0.6, 0.2, 0.2],
+      "membership": "by_target_index",
+      "future_history_at_left_boundary": "allowed_if_observed_before_origin"
+    },
+    "scenario_parameter_grids": {
+      "common": {
+        "L_x": 64,
+        "input_process": "stationary_VAR1",
+        "input_AR_coefficient": 0.7,
+        "weak_cross_correlation": 0.1,
+        "burn_in": 2000,
+        "truth_functions": [
+          "tanh(x)",
+          "0.5*x^2-0.5",
+          "sin(1.5*x)"
+        ]
+      },
+      "AR-S0": "pure_AR_no_external_effect",
+      "AR-S1": {
+        "type": "Gamma_rank1",
+        "shape_scale_by_active_variable": [
+          [4.0, 1.8],
+          [5.0, 2.0],
+          [6.0, 2.5]
+        ]
+      },
+      "AR-S2": {
+        "type": "non_Gamma_rank1",
+        "kernel": "equal_weight_two_Gaussian_modes",
+        "mode_pairs": [[4, 18], [8, 28], [12, 44]],
+        "mode_standard_deviation": 2.0
+      },
+      "AR-S3": {
+        "type": "rank2",
+        "early_mode_centers": [4, 8, 12],
+        "late_mode_centers": [24, 32, 44],
+        "mode_standard_deviation": 2.0,
+        "component_weights": [0.6, 0.4],
+        "second_response_family": [
+          "sin(0.75*x)",
+          "tanh(1.5*x)",
+          "0.25*x^3"
+        ]
+      },
+      "AR-S4": {
+        "type": "amplitude_dependent_delay",
+        "center_shift": "8 + 12*sigmoid(2*x)",
+        "mode_standard_deviation": 2.0
+      },
+      "AR-S5": {
+        "type": "measurement_filter",
+        "causal_filter_weights": [0.4, 0.3, 0.2, 0.1]
+      },
+      "AR-S6": {
+        "type": "measurement_delay",
+        "delay_samples": 5
+      },
+      "AR-S7": {
+        "type": "closed_loop_and_collinearity",
+        "feedback_input": "x0[t]=0.7*x0[t-1]+0.3*y[t-1]+innovation",
+        "correlated_distractor": "x3=x0+Gaussian_noise_sd_0.1"
+      },
+      "factor_expansion": "one_factor_at_a_time_around_core_then_prespecified_boundary_combinations",
+      "full_cartesian_product": false
+    }
+  },
+  "execution_scope": {
+    "private_CZ": "EXCLUDED_BY_USER_2026-07-25",
+    "phase4_CZ": "SKIP",
+    "phase5_multi_rod_CZ": "SKIP",
+    "remaining_scope": [
+      "Phase1_synthetic",
+      "Phase2_TEP",
+      "Phase3_Debutanizer",
+      "Phase3_Gas_Turbine"
+    ]
+  },
+  "statistics": {
+    "primary_metrics": {
+      "prediction": ["RMSE", "MAE", "R2", "target_std_normalized_RMSE"],
+      "support": ["precision", "recall", "F1", "exact_support"],
+      "lag": [
+        "discrete_Wasserstein1",
+        "mean_lag_absolute_error",
+        "peak_lag_absolute_error",
+        "lag_std_absolute_error",
+        "boundary_mass"
+      ],
+      "response": ["function_NRMSE", "function_correlation", "derivative_sign_agreement"],
+      "surface": [
+        "surface_NRMSE",
+        "rank_classification",
+        "first_singular_energy",
+        "conditional_mean_delay_error"
+      ],
+      "numerical": ["contribution_closure_max_abs_error"]
+    },
+    "support_false_positive_threshold": 0.10,
+    "rank1_false_positive_threshold": 0.10,
+    "rank2_power_threshold": 0.80,
+    "rank_decision_rule": {
+      "calibration": "AR-S0_AR-S1_AR-S2_and_rank1_residual_block_bootstrap",
+      "global_test_first": true,
+      "variable_test_requires_adjusted_q_below": 0.05,
+      "requires_free_rank1_M6_still_insufficient": true,
+      "requires_outer_gain": true,
+      "requires_direction_consistency_folds": "at_least_3_of_4_for_CZ",
+      "requires_supported_input_density": true
+    },
+    "significance_alpha": 0.05,
+    "bootstrap_replicates": {
+      "screening": 100,
+      "formal": 500
+    },
+    "block_length_rule": {
+      "method": "residual_ACF_first_nonsignificant_lag",
+      "threshold": "1.96/sqrt(T_train)",
+      "search_cap": "min(512,floor(T_train/10))",
+      "minimum": 2,
+      "maximum": "floor(T_train/10)",
+      "bootstrap": "moving_block"
+    },
+    "multiple_testing_correction": {
+      "method": "Benjamini-Hochberg",
+      "FDR_q": 0.05,
+      "global_test_precedes_variable_tests": true
+    },
+    "minimum_outer_test_gain": {
+      "synthetic_relative_RMSE": 0.10,
+      "real_relative_RMSE": 0.05
+    }
+  },
+  "required_before_phase1": [
+    "preprocessing.scaler",
+    "preprocessing.missing_value_policy",
+    "preprocessing.outlier_policy",
+    "training.seeds",
+    "training.optimizer",
+    "training.learning_rate",
+    "training.batch_size",
+    "training.dtype",
+    "training.deterministic_algorithms",
+    "training.early_stopping_patience",
+    "phase1_synthetic.sample_sizes",
+    "phase1_synthetic.replicates_per_scenario",
+    "phase1_synthetic.external_variable_count",
+    "phase1_synthetic.active_supports",
+    "phase1_synthetic.AR_kernel_and_response",
+    "phase1_synthetic.noise_or_SNR_levels",
+    "phase1_synthetic.train_validation_test_split",
+    "phase1_synthetic.scenario_parameter_grids",
+    "statistics.primary_metrics",
+    "statistics.support_false_positive_threshold",
+    "statistics.rank1_false_positive_threshold",
+    "statistics.rank2_power_threshold",
+    "statistics.rank_decision_rule",
+    "statistics.significance_alpha",
+    "statistics.bootstrap_replicates",
+    "statistics.block_length_rule",
+    "statistics.multiple_testing_correction",
+    "statistics.minimum_outer_test_gain"
+  ]
+}

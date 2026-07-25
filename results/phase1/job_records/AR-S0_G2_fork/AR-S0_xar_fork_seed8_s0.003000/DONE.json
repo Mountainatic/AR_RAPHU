@@ -1,0 +1,25 @@
+{
+  "job_id": "AR-S0_xar_fork_seed8_s0.003000",
+  "index": 72,
+  "command": [
+    "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+    "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+    "fork",
+    "--scenario",
+    "AR-S0",
+    "--track",
+    "XAR",
+    "--seed",
+    "8",
+    "--scale",
+    "0.003",
+    "--device",
+    "cuda"
+  ],
+  "physical_gpu": "0",
+  "worker_slot": 1,
+  "returncode": 0,
+  "started": 1784957994.7824984,
+  "finished": 1784958107.2405875,
+  "runtime_seconds": 112.45808982849121
+}

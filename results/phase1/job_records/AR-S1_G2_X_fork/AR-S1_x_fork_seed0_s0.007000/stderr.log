@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py", line 873, in <module>
+    raise SystemExit(main())
+  File "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py", line 859, in main
+    fork_job(args, device)
+  File "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py", line 524, in fork_job
+    refit = refit_fixed_external_support(
+  File "/home/mountainatic/modeling_school/zhangsproject/src/ar_raphu/training.py", line 351, in refit_fixed_external_support
+    result = train_dense_warmup(
+  File "/home/mountainatic/modeling_school/zhangsproject/src/ar_raphu/training.py", line 155, in train_dense_warmup
+    train_mse = _train_full_split_step(
+  File "/home/mountainatic/modeling_school/zhangsproject/src/ar_raphu/training.py", line 88, in _train_full_split_step
+    residual = _forward_batch(model, batch) - batch["target"]
+  File "/home/mountainatic/modeling_school/zhangsproject/src/ar_raphu/training.py", line 61, in _forward_batch
+    return model.forward_contiguous(
+  File "/home/mountainatic/modeling_school/zhangsproject/src/ar_raphu/model.py", line 401, in forward_contiguous
+    _, external_aux = self.external_branch.forward_contiguous(
+  File "/home/mountainatic/modeling_school/zhangsproject/STAGE1_DUAL_SOLVER_V20_bundle/stage1/model.py", line 266, in forward_contiguous
+    prior_mean, prior_var = self.delay_prior.compute_prior_stats()
+  File "/home/mountainatic/modeling_school/zhangsproject/STAGE1_DUAL_SOLVER_V20_bundle/stage1/delay_prior.py", line 142, in compute_prior_stats
+    pi = self.forward()  # [N, L]
+  File "/home/mountainatic/modeling_school/zhangsproject/STAGE1_DUAL_SOLVER_V20_bundle/stage1/delay_prior.py", line 130, in forward
+    log_pi_raw = (alpha - 1.0) * torch.log(taus + self.delta) - (taus + self.delta) / beta
+KeyboardInterrupt

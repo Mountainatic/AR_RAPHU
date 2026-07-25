@@ -1,0 +1,7 @@
+{
+  "cpu_threads": 1,
+  "device": "cpu",
+  "dtype": "float64",
+  "python": "3.10.18",
+  "wall_seconds": 0.05695985800412018
+}

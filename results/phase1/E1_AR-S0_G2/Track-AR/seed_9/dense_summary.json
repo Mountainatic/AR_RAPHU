@@ -1,0 +1,24 @@
+{
+  "artifact_recovery": {
+    "checkpoint_refit": false,
+    "configuration_selection_performed": false,
+    "reason": "initial_dense_runner_saved_metric_but_not_predictions",
+    "scaled_rmse_consistency_verified": true,
+    "status": "COMPLETED",
+    "test_read_only_replay": true
+  },
+  "best_epoch": 1850,
+  "external_support": [],
+  "smoke_not_scientific_evidence": false,
+  "status": "COMPLETED",
+  "test_metrics_physical": {
+    "bias": -0.008187382502132095,
+    "mae": 0.16104359406849836,
+    "max_abs_error": 0.7551586851477623,
+    "r2": 0.678179303847725,
+    "rmse": 0.2007465227137103
+  },
+  "test_opened_after_fixed_dense_configuration": true,
+  "test_rmse_scaled": 0.5882968125431562,
+  "validation_rmse_scaled": 0.5802614661862573
+}

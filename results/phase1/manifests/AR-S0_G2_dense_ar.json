@@ -1,0 +1,171 @@
+{
+  "device": "cuda",
+  "generator_version": 2,
+  "job_count": 10,
+  "jobs": [
+    {
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "dense",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "AR",
+        "--seed",
+        "0",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S0_ar_dense_seed0"
+    },
+    {
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "dense",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "AR",
+        "--seed",
+        "1",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S0_ar_dense_seed1"
+    },
+    {
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "dense",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "AR",
+        "--seed",
+        "2",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S0_ar_dense_seed2"
+    },
+    {
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "dense",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "AR",
+        "--seed",
+        "3",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S0_ar_dense_seed3"
+    },
+    {
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "dense",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "AR",
+        "--seed",
+        "4",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S0_ar_dense_seed4"
+    },
+    {
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "dense",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "AR",
+        "--seed",
+        "5",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S0_ar_dense_seed5"
+    },
+    {
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "dense",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "AR",
+        "--seed",
+        "6",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S0_ar_dense_seed6"
+    },
+    {
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "dense",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "AR",
+        "--seed",
+        "7",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S0_ar_dense_seed7"
+    },
+    {
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "dense",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "AR",
+        "--seed",
+        "8",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S0_ar_dense_seed8"
+    },
+    {
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "dense",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "AR",
+        "--seed",
+        "9",
+        "--device",
+        "cuda"
+      ],
+      "job_id": "AR-S0_ar_dense_seed9"
+    }
+  ],
+  "scenario": "AR-S0",
+  "schema_version": 1,
+  "stage": "dense_ar",
+  "test_access": true
+}

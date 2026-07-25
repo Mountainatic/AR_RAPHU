@@ -1,0 +1,12 @@
+{
+  "cpu_threads": 12,
+  "deterministic_algorithms": true,
+  "device": "cpu",
+  "gpu": null,
+  "interop_threads": 12,
+  "peak_memory_bytes": 0,
+  "python": "3.10.18",
+  "torch": "2.8.0.dev20250611+cu128",
+  "torch_cuda": "12.8",
+  "wall_seconds": 64.70208681000804
+}

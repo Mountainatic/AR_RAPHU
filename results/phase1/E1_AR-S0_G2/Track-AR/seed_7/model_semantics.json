@@ -1,0 +1,15 @@
+{
+  "KAN": {
+    "grid": 7,
+    "hidden": 8,
+    "spline_order": 3
+  },
+  "L_x": 64,
+  "L_y": 32,
+  "V20_static_Gamma": true,
+  "external_channels": 10,
+  "future_X": false,
+  "horizon": 1,
+  "inactive_external_channels": [],
+  "track": "AR"
+}

@@ -1,0 +1,242 @@
+{
+  "manifest": "/home/mountainatic/modeling_school/zhangsproject/results/phase1/manifests/AR-S0_G2_warmup.json",
+  "devices": [
+    "0"
+  ],
+  "workers_per_device": 4,
+  "submitted": 10,
+  "executed": 10,
+  "failed": 0,
+  "results": [
+    {
+      "job_id": "AR-S0_xar_warmup_seed0",
+      "index": 0,
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "XAR",
+        "--seed",
+        "0",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 0,
+      "returncode": 0,
+      "started": 1784953303.4293108,
+      "finished": 1784953305.2679288,
+      "runtime_seconds": 1.838618278503418
+    },
+    {
+      "job_id": "AR-S0_xar_warmup_seed1",
+      "index": 1,
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "XAR",
+        "--seed",
+        "1",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 1,
+      "returncode": 0,
+      "started": 1784953303.4330292,
+      "finished": 1784953305.2694592,
+      "runtime_seconds": 1.836430311203003
+    },
+    {
+      "job_id": "AR-S0_xar_warmup_seed2",
+      "index": 2,
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "XAR",
+        "--seed",
+        "2",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 2,
+      "returncode": 0,
+      "started": 1784953303.433218,
+      "finished": 1784953305.266749,
+      "runtime_seconds": 1.833531379699707
+    },
+    {
+      "job_id": "AR-S0_xar_warmup_seed3",
+      "index": 3,
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "XAR",
+        "--seed",
+        "3",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 3,
+      "returncode": 0,
+      "started": 1784953303.4333782,
+      "finished": 1784953305.2651918,
+      "runtime_seconds": 1.8318145275115967
+    },
+    {
+      "job_id": "AR-S0_xar_warmup_seed4",
+      "index": 4,
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "XAR",
+        "--seed",
+        "4",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 3,
+      "returncode": 0,
+      "started": 1784953305.2656522,
+      "finished": 1784953344.9767272,
+      "runtime_seconds": 39.7110755443573
+    },
+    {
+      "job_id": "AR-S0_xar_warmup_seed5",
+      "index": 5,
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "XAR",
+        "--seed",
+        "5",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 2,
+      "returncode": 0,
+      "started": 1784953305.267106,
+      "finished": 1784953352.5417569,
+      "runtime_seconds": 47.274651527404785
+    },
+    {
+      "job_id": "AR-S0_xar_warmup_seed6",
+      "index": 6,
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "XAR",
+        "--seed",
+        "6",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 0,
+      "returncode": 0,
+      "started": 1784953305.268283,
+      "finished": 1784953343.9603715,
+      "runtime_seconds": 38.692089319229126
+    },
+    {
+      "job_id": "AR-S0_xar_warmup_seed7",
+      "index": 7,
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "XAR",
+        "--seed",
+        "7",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 1,
+      "returncode": 0,
+      "started": 1784953305.2696888,
+      "finished": 1784953346.5909116,
+      "runtime_seconds": 41.321223974227905
+    },
+    {
+      "job_id": "AR-S0_xar_warmup_seed8",
+      "index": 8,
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "XAR",
+        "--seed",
+        "8",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 0,
+      "returncode": 0,
+      "started": 1784953343.960853,
+      "finished": 1784953373.9165967,
+      "runtime_seconds": 29.95574426651001
+    },
+    {
+      "job_id": "AR-S0_xar_warmup_seed9",
+      "index": 9,
+      "command": [
+        "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+        "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+        "warmup",
+        "--scenario",
+        "AR-S0",
+        "--track",
+        "XAR",
+        "--seed",
+        "9",
+        "--device",
+        "cuda"
+      ],
+      "physical_gpu": "0",
+      "worker_slot": 3,
+      "returncode": 0,
+      "started": 1784953344.977414,
+      "finished": 1784953379.4309256,
+      "runtime_seconds": 34.45351243019104
+    }
+  ]
+}

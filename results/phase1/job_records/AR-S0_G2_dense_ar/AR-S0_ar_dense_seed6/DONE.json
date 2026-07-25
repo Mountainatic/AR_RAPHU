@@ -1,0 +1,23 @@
+{
+  "job_id": "AR-S0_ar_dense_seed6",
+  "index": 6,
+  "command": [
+    "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+    "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+    "dense",
+    "--scenario",
+    "AR-S0",
+    "--track",
+    "AR",
+    "--seed",
+    "6",
+    "--device",
+    "cuda"
+  ],
+  "physical_gpu": "0",
+  "worker_slot": 1,
+  "returncode": 0,
+  "started": 1784955860.6399312,
+  "finished": 1784955925.7710567,
+  "runtime_seconds": 65.13112592697144
+}

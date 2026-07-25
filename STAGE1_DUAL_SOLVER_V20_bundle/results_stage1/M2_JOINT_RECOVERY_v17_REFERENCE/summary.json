@@ -1,0 +1,49 @@
+{
+  "M2_CLEAN_SUPPORT_PASS": true,
+  "M2_CLEAN_DELAY_PASS": true,
+  "M2_CLEAN_RESPONSE_PASS": true,
+  "M2_CLEAN_CONTRIBUTION_PASS": true,
+  "M2_CLEAN_PREDICTION_PASS": true,
+  "M2_CLEAN_STABILITY_PASS": true,
+  "M2_CLEAN_PASS": true,
+  "mean_f1": 1.0,
+  "mean_active_count": 3.0,
+  "exact_support_frequency": 5,
+  "pairwise_jaccard": 1.0,
+  "support_aware_delay_mae": 0.005379482085810849,
+  "support_aware_w1": 0.005477536365892498,
+  "uniform_w1": 6.144350717819935,
+  "mean_function_corr": 0.9999850412633045,
+  "mean_function_nrmse": 0.005203109900763645,
+  "mean_contribution_rmse": 0.0009014943698677514,
+  "mean_contribution_corr": 0.9999863352228254,
+  "mean_test_clean_rmse": 0.0018821425570445132,
+  "std_test_clean_rmse": 0.0006768727026564415,
+  "supports": [
+    [
+      0,
+      1,
+      2
+    ],
+    [
+      0,
+      1,
+      2
+    ],
+    [
+      0,
+      1,
+      2
+    ],
+    [
+      0,
+      1,
+      2
+    ],
+    [
+      0,
+      1,
+      2
+    ]
+  ]
+}

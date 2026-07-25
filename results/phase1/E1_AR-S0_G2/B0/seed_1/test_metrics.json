@@ -1,0 +1,16 @@
+{
+  "bias": 3.784730696619865e-05,
+  "future_X": false,
+  "horizon": 1,
+  "mae": 0.2299359158423377,
+  "max_abs_error": 0.9885210135348763,
+  "model": "B0",
+  "r2": 0.20631001903607593,
+  "rmse": 0.2897462082430754,
+  "scenario": "AR-S0",
+  "seed": 1,
+  "smoke_not_scientific_evidence": false,
+  "status": "COMPLETED",
+  "target_std_normalized_rmse": 0.890892799928209,
+  "test_opened_after_model_definition_frozen": true
+}

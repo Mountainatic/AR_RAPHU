@@ -1,0 +1,18 @@
+﻿# Stage1 base configuration
+window_size: 32
+horizon: 1
+hidden_score: 8
+hidden_kan: 8
+kan_grid_size: 7
+kan_spline_order: 3
+epsilon: 0.5
+delta: 0.001
+active_threshold: 0.000001
+batch_size: 128
+learning_rate: 0.001
+weight_decay: 0.00001
+max_epochs: 100
+patience: 15
+seed: 42
+lambda_group: 0.01
+lambda_smooth: 0.0

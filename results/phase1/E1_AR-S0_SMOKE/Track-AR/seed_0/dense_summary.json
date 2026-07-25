@@ -1,0 +1,9 @@
+{
+  "best_epoch": 6,
+  "external_support": [],
+  "smoke_not_scientific_evidence": true,
+  "status": "COMPLETED",
+  "test_opened_after_fixed_dense_configuration": true,
+  "test_rmse_scaled": 0.005120521157984609,
+  "validation_rmse_scaled": 0.00512052113850855
+}

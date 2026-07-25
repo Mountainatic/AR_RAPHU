@@ -1,0 +1,6 @@
+{
+  "lr": 0.003,
+  "hidden_kan": 8,
+  "grid_size": 7,
+  "grid_mode": "default_grid"
+}

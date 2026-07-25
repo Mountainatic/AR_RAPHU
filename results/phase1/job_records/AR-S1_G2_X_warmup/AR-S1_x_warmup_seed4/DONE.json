@@ -1,0 +1,23 @@
+{
+  "job_id": "AR-S1_x_warmup_seed4",
+  "index": 4,
+  "command": [
+    "/home/mountainatic/anaconda3/envs/Env_pytorch/bin/python",
+    "/home/mountainatic/modeling_school/zhangsproject/tools/run_phase1_scheme_a.py",
+    "warmup",
+    "--scenario",
+    "AR-S1",
+    "--track",
+    "X",
+    "--seed",
+    "4",
+    "--device",
+    "cuda"
+  ],
+  "physical_gpu": "0",
+  "worker_slot": 1,
+  "returncode": 0,
+  "started": 1784959068.4905477,
+  "finished": 1784959091.9037542,
+  "runtime_seconds": 23.413207054138184
+}

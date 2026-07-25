@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "profile": "autodl_rtx5090_32gb",
+  "scientific_protocol": "configs/protocol_v2.yaml",
+  "python": "3.10",
+  "environment_manager": "uv",
+  "pytorch_wheel_cuda": "cu128",
+  "host_driver_reported_by_user": "595.71.05",
+  "host_cuda_reported_by_user": "13.2",
+  "gpu": {
+    "count": 1,
+    "model": "NVIDIA GeForce RTX 5090",
+    "minimum_memory_mib": 30000,
+    "device": "0",
+    "workers_per_device": 8,
+    "mps_required": true,
+    "mps_active_thread_percentage": 100
+  },
+  "cpu": {
+    "reported_model": "Intel Xeon Platinum 8470Q",
+    "reported_cores": 25,
+    "threads_per_worker": 3,
+    "interop_threads_per_worker": 1,
+    "maximum_worker_thread_budget": 24
+  },
+  "privacy": {
+    "private_cz_included": false,
+    "forbidden_source_file": "实验数据1.xlsx",
+    "phase4_cz": "SKIP",
+    "phase5_multi_rod_cz": "SKIP"
+  },
+  "resume": {
+    "regenerate_manifests_in_target_uv_environment": true,
+    "reuse_successful_done_records": true,
+    "rerun_interrupted_jobs": true
+  }
+}

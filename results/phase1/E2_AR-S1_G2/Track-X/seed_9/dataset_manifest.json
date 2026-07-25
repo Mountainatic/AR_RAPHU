@@ -1,0 +1,25 @@
+{
+  "dataset": "fully_synthetic_AR_RAPHU",
+  "external_variables": 10,
+  "generator_version": 2,
+  "scenario": "AR-S1",
+  "seed": 9,
+  "sequence_rows": 10123,
+  "smoke_not_scientific_evidence": false,
+  "target_intervals": {
+    "test": [
+      8123,
+      10123
+    ],
+    "train": [
+      123,
+      6123
+    ],
+    "validation": [
+      6123,
+      8123
+    ]
+  },
+  "truth_access_policy": "not_used_for_configuration_selection; post_selection_audit_only",
+  "usable_target_count": 10000
+}

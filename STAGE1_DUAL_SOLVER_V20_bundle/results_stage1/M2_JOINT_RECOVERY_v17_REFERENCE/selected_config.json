@@ -1,0 +1,30 @@
+{
+  "run_id": "M2_JOINT_RECOVERY_v17",
+  "strategy": "ALTERNATING_WARMUP",
+  "s0": 0.006,
+  "selection_rule": "validation_one_standard_error",
+  "selection_fields": [
+    "refit_val_rmse",
+    "active_count",
+    "pairwise_jaccard",
+    "stable",
+    "converged"
+  ],
+  "candidate_s0": [
+    0.003,
+    0.004,
+    0.005,
+    0.006,
+    0.007,
+    0.008,
+    0.009,
+    0.01,
+    0.012,
+    0.015
+  ],
+  "config_id": "0.006",
+  "mean": 0.0014683866407722234,
+  "se": 0.0002460344459891742,
+  "count": 3.0,
+  "jaccard": 1.0
+}

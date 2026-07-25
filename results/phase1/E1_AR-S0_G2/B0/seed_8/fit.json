@@ -1,0 +1,8 @@
+{
+  "definition": "y_hat[t+h|t]=y[t]",
+  "fit": "none",
+  "train_target_interval": [
+    123,
+    6123
+  ]
+}

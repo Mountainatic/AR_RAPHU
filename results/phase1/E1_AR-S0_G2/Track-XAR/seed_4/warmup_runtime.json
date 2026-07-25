@@ -1,0 +1,12 @@
+{
+  "cpu_threads": 1,
+  "deterministic_algorithms": true,
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 5080 Laptop GPU",
+  "interop_threads": 12,
+  "peak_memory_bytes": 219785728,
+  "python": "3.10.18",
+  "torch": "2.8.0.dev20250611+cu128",
+  "torch_cuda": "12.8",
+  "wall_seconds": 37.32780776699656
+}

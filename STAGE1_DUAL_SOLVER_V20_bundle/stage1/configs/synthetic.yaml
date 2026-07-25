@@ -1,0 +1,23 @@
+﻿# Stage1 synthetic experiment configuration
+window_size: 32
+hidden_score: 8
+hidden_kan: 8
+kan_grid_size: 7
+epsilon: 0.5
+batch_size: 64
+learning_rate: 0.001
+weight_decay: 0.00001
+max_epochs: 200
+patience: 20
+seed: 42
+lambda_group: 0.01
+lambda_smooth: 0.001
+n_samples: 2000
+noise_std: 0.1
+scenarios:
+  - S1_gamma
+  - S2_exponential
+  - S3_near_pure_delay
+  - S4_correlated_distractor
+  - S5_mild_dynamic_delay
+  - S6_signed_oscillatory_violation

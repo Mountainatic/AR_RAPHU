@@ -1,0 +1,12 @@
+{
+  "run_id": "STAGE1_DUAL_SOLVER_V20_DEVELOPMENT",
+  "pytest_pass": true,
+  "pytest_count": 118,
+  "cpu_kan_independent_fork_smoke_pass": true,
+  "cpu_variational_adam_smoke_pass": true,
+  "cpu_variational_lbfgs_smoke_pass": true,
+  "gpu_job_pool_toy_test_pass": true,
+  "cuda_full_run_completed": false,
+  "scientific_results_claimed": false,
+  "note": "Run RUN_V20_FULL.ps1 on the local RTX 5080 machine."
+}

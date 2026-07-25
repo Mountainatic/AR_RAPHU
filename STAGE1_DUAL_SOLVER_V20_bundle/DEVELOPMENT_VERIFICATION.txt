@@ -1,0 +1,8 @@
+........................................................................ [ 61%]
+..............................................                           [100%]
+118 passed in 13.95s
+CPU smoke: KAN independent-fork path PASS.
+CPU smoke: variational Adam path PASS.
+CPU smoke: variational strong-Wolfe L-BFGS path PASS.
+GPU job-pool concurrency toy test PASS.
+CUDA/full scientific matrix was not run in this container.

@@ -1,0 +1,51 @@
+{
+  "per_seed": [
+    {
+      "bias": -0.11223157151665503,
+      "mae": 0.11223157151665503,
+      "max_abs_error": 0.19093389809131622,
+      "r2": 0.0,
+      "rmse": 0.1223363709775959,
+      "seed": 0,
+      "selected_scale": 0.006,
+      "terminal_support": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "bias": 0.04551491228800303,
+      "mae": 0.08149817271962834,
+      "max_abs_error": 0.2129494994878769,
+      "r2": 0.0,
+      "rmse": 0.10770075960657136,
+      "seed": 1,
+      "selected_scale": 0.006,
+      "terminal_support": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    }
+  ],
+  "selected_scale": 0.006,
+  "status": "COMPLETED",
+  "truth_audit_after_selection": {
+    "true_support_by_scenario": []
+  }
+}

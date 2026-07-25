@@ -1,0 +1,14 @@
+{
+  "data_hash": "0eed194011340467593f81f7ffc57f437dc44f44ee8452997ffa72c4428b00b2",
+  "split_hash": "3be627093a88ffef7cd5f3fde042dd802c3e4e71f5c6df1176eb1b2b007857ad",
+  "lag_order": "current_to_past",
+  "true_h_hash": "17c4d727bd3a744b3ac57dc56c1f8a0903cd8194830859ec8d130c0fa1f23463",
+  "config_hash": "0888d7a1791c7c41aacf62dd8ddc0f640d66d5872f3dd0c59fcdcf91ec548763",
+  "seed": 20260712,
+  "active_variables": [
+    0,
+    1,
+    2
+  ],
+  "registry_hash": "a35b4a2c7e2caa0c4a39d6480ae73628ac78061a40ce598758d0e8e57be2ef1b"
+}
