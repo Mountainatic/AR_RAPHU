@@ -4,7 +4,7 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${PROJECT_ROOT}"
 UV_BIN="${PROJECT_ROOT}/.autodl-tools/uv"
-WORKERS="${AR_RAPHU_GPU_WORKERS:-16}"
+WORKERS="${AR_RAPHU_GPU_WORKERS:-24}"
 CPU_THREADS="${AR_RAPHU_CPU_THREADS_PER_WORKER:-1}"
 if (( WORKERS < 1 || CPU_THREADS < 1 || WORKERS * CPU_THREADS > 24 )); then
   echo "Invalid worker/thread budget: ${WORKERS}*${CPU_THREADS}" >&2
