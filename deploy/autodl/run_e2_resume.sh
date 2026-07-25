@@ -3,6 +3,15 @@ set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "${PROJECT_ROOT}"
+UV_BIN="${PROJECT_ROOT}/.autodl-tools/uv"
+if command -v uv >/dev/null 2>&1; then
+  UV_BIN="$(command -v uv)"
+fi
+if test ! -x "${UV_BIN}"; then
+  echo "uv executable not found: ${UV_BIN}" >&2
+  echo "Run bash deploy/autodl/bootstrap.sh first." >&2
+  exit 2
+fi
 
 WORKERS="${AR_RAPHU_GPU_WORKERS:-8}"
 CPU_THREADS="${AR_RAPHU_CPU_THREADS_PER_WORKER:-3}"
@@ -42,18 +51,18 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 130' INT TERM
 
-uv run python deploy/autodl/preflight.py --require-mps
+"${UV_BIN}" run python deploy/autodl/preflight.py --require-mps
 
 for track in X XAR; do
-  uv run python tools/make_phase1_scheme_a_manifest.py \
+  "${UV_BIN}" run python tools/make_phase1_scheme_a_manifest.py \
     --scenario AR-S1 --track "${track}" --stage warmup --device cuda
-  uv run python tools/make_phase1_scheme_a_manifest.py \
+  "${UV_BIN}" run python tools/make_phase1_scheme_a_manifest.py \
     --scenario AR-S1 --track "${track}" --stage fork --device cuda
 done
 
 run_pool() {
   local manifest="$1"
-  uv run python STAGE1_DUAL_SOLVER_V20_bundle/tools/run_gpu_job_pool.py \
+  "${UV_BIN}" run python STAGE1_DUAL_SOLVER_V20_bundle/tools/run_gpu_job_pool.py \
     --manifest "${manifest}" \
     --devices 0 \
     --workers-per-device "${WORKERS}" \
@@ -68,14 +77,14 @@ run_pool results/phase1/manifests/AR-S1_G2_X_fork.json
 run_pool results/phase1/manifests/AR-S1_G2_XAR_fork.json
 
 # Freeze both validation-only choices before either track opens test.
-uv run python tools/run_phase1_scheme_a.py select \
+"${UV_BIN}" run python tools/run_phase1_scheme_a.py select \
   --scenario AR-S1 --track X --device cuda
-uv run python tools/run_phase1_scheme_a.py select \
+"${UV_BIN}" run python tools/run_phase1_scheme_a.py select \
   --scenario AR-S1 --track XAR --device cuda
 
-uv run python tools/run_phase1_scheme_a.py aggregate \
+"${UV_BIN}" run python tools/run_phase1_scheme_a.py aggregate \
   --scenario AR-S1 --track X --device cuda
-uv run python tools/run_phase1_scheme_a.py aggregate \
+"${UV_BIN}" run python tools/run_phase1_scheme_a.py aggregate \
   --scenario AR-S1 --track XAR --device cuda
 
 echo "E2 Scheme-A Track-X and Track-XAR completed."
