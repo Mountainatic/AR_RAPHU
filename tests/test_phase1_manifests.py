@@ -20,7 +20,10 @@ def test_manifest_counts_and_no_test_aggregate_commands(tmp_path, monkeypatch) -
         "load_protocol_config",
         lambda require_phase1_frozen: {
             "training": {
-                "seeds": {"screening": list(range(10))},
+                "seeds": {
+                    "screening": list(range(10)),
+                    "critical": list(range(30)),
+                },
                 "source_backed_v20_reference": {
                     "pruning_scales": [0.003, 0.006]
                 },
@@ -34,14 +37,24 @@ def test_manifest_counts_and_no_test_aggregate_commands(tmp_path, monkeypatch) -
     dense = MODULE.make_manifest(
         "AR-S0", "dense_ar", device="cuda", track="XAR"
     )
+    critical = MODULE.make_manifest(
+        "AR-S0",
+        "warmup",
+        device="cuda",
+        track="XAR",
+        replicate_profile="critical",
+    )
     import json
 
     warmup_payload = json.loads(warmup.read_text())
     fork_payload = json.loads(fork.read_text())
     dense_payload = json.loads(dense.read_text())
+    critical_payload = json.loads(critical.read_text())
     assert warmup_payload["job_count"] == 10
     assert fork_payload["job_count"] == 20
     assert dense_payload["job_count"] == 10
+    assert critical_payload["job_count"] == 30
+    assert critical_payload["replicate_profile"] == "critical"
     assert warmup_payload["track"] == "XAR"
     assert fork_payload["track"] == "X"
     assert dense_payload["track"] == "AR"

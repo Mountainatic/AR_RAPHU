@@ -35,9 +35,10 @@ def make_manifest(
     *,
     device: str,
     track: str = "XAR",
+    replicate_profile: str = "screening",
 ) -> Path:
     config = load_protocol_config(require_phase1_frozen=True)
-    seeds = config["training"]["seeds"]["screening"]
+    seeds = config["training"]["seeds"][replicate_profile]
     scales = config["training"]["source_backed_v20_reference"]["pruning_scales"]
     runner = PROJECT_ROOT / "tools" / "run_phase1_scheme_a.py"
     jobs: list[dict] = []
@@ -112,12 +113,15 @@ def make_manifest(
     else:
         raise ValueError(stage)
     manifest_track = "AR" if stage == "dense_ar" else track
+    profile_suffix = (
+        "" if replicate_profile == "screening" else f"_{replicate_profile}"
+    )
     output = (
         PROJECT_ROOT
         / "results"
         / "phase1"
         / "manifests"
-        / f"{scenario}_G2_{manifest_track}_{stage}.json"
+        / f"{scenario}_G2_{manifest_track}_{stage}{profile_suffix}.json"
     )
     atomic_json(
         output,
@@ -127,6 +131,7 @@ def make_manifest(
             "generator_version": 2,
             "stage": stage,
             "track": manifest_track,
+            "replicate_profile": replicate_profile,
             "device": device,
             "job_count": len(jobs),
             "test_access": stage == "dense_ar",
@@ -143,6 +148,11 @@ def parse_args() -> argparse.Namespace:
         "--stage", choices=["warmup", "fork", "dense_ar"], required=True
     )
     parser.add_argument("--track", choices=["X", "XAR"], default="XAR")
+    parser.add_argument(
+        "--replicate-profile",
+        choices=["screening", "critical"],
+        default="screening",
+    )
     parser.add_argument("--device", default="cuda")
     return parser.parse_args()
 
@@ -152,7 +162,11 @@ def main() -> int:
     args = parse_args()
     print(
         make_manifest(
-            args.scenario, args.stage, device=args.device, track=args.track
+            args.scenario,
+            args.stage,
+            device=args.device,
+            track=args.track,
+            replicate_profile=args.replicate_profile,
         )
     )
     return 0

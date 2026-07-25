@@ -613,7 +613,7 @@ def select_sparse_configuration(args: argparse.Namespace) -> float:
     seeds = (
         [0, 1]
         if args.smoke
-        else config["training"]["seeds"]["screening"]
+        else config["training"]["seeds"][args.replicate_profile]
     )
     scales = (
         [0.003, 0.006]
@@ -637,19 +637,41 @@ def select_sparse_configuration(args: argparse.Namespace) -> float:
             rows.append(json.loads(path.read_text(encoding="utf-8")))
     selected = cross_seed_one_se_select(rows)
     selected_scale = float(selected["config_id"].split("=")[1])
+    selection_path = (
+        root / "validation_selection.json"
+        if args.replicate_profile == "screening"
+        else root / "critical30_validation" / "validation_selection.json"
+    )
     atomic_json(
-        root / "validation_selection.json",
+        selection_path,
         {
             **selected,
+            "replicate_profile": args.replicate_profile,
+            "seed_count": len(seeds),
             "selection_data": "validation_only",
             "truth_used": False,
             "test_used": False,
+            "test_evaluation_status": (
+                "NOT_APPLICABLE"
+                if args.replicate_profile == "critical"
+                else "NOT_YET_RUN"
+            ),
+            "test_evaluation_reason": (
+                "Critical-30 is a validation-only stability confirmation "
+                "because screening test artifacts already exist."
+                if args.replicate_profile == "critical"
+                else "Test is read only by the separate aggregate command."
+            ),
         },
     )
     return selected_scale
 
 
 def aggregate(args: argparse.Namespace, device: torch.device) -> None:
+    if args.replicate_profile != "screening":
+        raise RuntimeError(
+            "Critical-30 is validation-only: aggregate/test access is forbidden."
+        )
     config = load_protocol_config(require_phase1_frozen=True)
     root = track_dir(args.scenario, args.track, args.smoke)
     seeds = (
@@ -840,6 +862,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--scale", type=float)
     parser.add_argument("--device", default="cuda")
+    parser.add_argument(
+        "--replicate-profile",
+        choices=["screening", "critical"],
+        default="screening",
+    )
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--force", action="store_true")
     return parser.parse_args()
@@ -862,9 +889,16 @@ def main() -> int:
         fork_job(args, device)
     elif args.mode == "select":
         selected = select_sparse_configuration(args)
-        print(
+        selection_path = (
             track_dir(args.scenario, args.track, args.smoke)
-            / "validation_selection.json",
+            / "validation_selection.json"
+            if args.replicate_profile == "screening"
+            else track_dir(args.scenario, args.track, args.smoke)
+            / "critical30_validation"
+            / "validation_selection.json"
+        )
+        print(
+            selection_path,
             selected,
         )
     else:
