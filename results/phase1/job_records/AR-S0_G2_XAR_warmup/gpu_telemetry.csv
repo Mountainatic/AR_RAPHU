@@ -1,0 +1,4 @@
+timestamp,gpu,utilization_gpu_percent,memory_used_mib,memory_total_mib,temperature_c,power_w
+1784977176.9343095,0,0,61,32607,34,14.39
+1784977178.017365,0,0,61,32607,34,15.28
+1784977179.0811892,0,0,61,32607,34,14.37
