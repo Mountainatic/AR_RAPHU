@@ -111,12 +111,13 @@ def make_manifest(
             )
     else:
         raise ValueError(stage)
+    manifest_track = "AR" if stage == "dense_ar" else track
     output = (
         PROJECT_ROOT
         / "results"
         / "phase1"
         / "manifests"
-        / f"{scenario}_G2_{track}_{stage}.json"
+        / f"{scenario}_G2_{manifest_track}_{stage}.json"
     )
     atomic_json(
         output,
@@ -125,7 +126,7 @@ def make_manifest(
             "scenario": scenario,
             "generator_version": 2,
             "stage": stage,
-            "track": track,
+            "track": manifest_track,
             "device": device,
             "job_count": len(jobs),
             "test_access": stage == "dense_ar",

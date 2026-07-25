@@ -44,6 +44,8 @@ def test_manifest_counts_and_no_test_aggregate_commands(tmp_path, monkeypatch) -
     assert dense_payload["job_count"] == 10
     assert warmup_payload["track"] == "XAR"
     assert fork_payload["track"] == "X"
+    assert dense_payload["track"] == "AR"
+    assert dense.name == "AR-S0_G2_AR_dense_ar.json"
     for payload in (warmup_payload, fork_payload):
         assert payload["test_access"] is False
         assert all("aggregate" not in job["command"] for job in payload["jobs"])
