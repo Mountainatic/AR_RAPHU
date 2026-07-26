@@ -6,6 +6,7 @@ import runpy
 
 import torch
 
+from ar_raphu.diagnostics.config import load_diagnostic_config
 from ar_raphu.diagnostics.instrumentation import (
     detect_starvation,
     gradient_norm,
@@ -13,6 +14,13 @@ from ar_raphu.diagnostics.instrumentation import (
     parameter_norm,
     proximal_collapse,
 )
+
+
+def test_frozen_v3_config_loads_without_runtime_overrides() -> None:
+    config = load_diagnostic_config()
+    assert config["status"] == "DIAGNOSTIC_ONLY"
+    assert config["common"]["seeds"] == [0, 1, 2, 3, 4]
+    assert config["runtime"]["gpu_workers"] == 8
 
 
 def test_gradient_and_kernel_instrumentation() -> None:
