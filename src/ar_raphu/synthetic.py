@@ -51,6 +51,18 @@ def _second_truth_response(index: int, values: np.ndarray) -> np.ndarray:
     return 0.25 * values**3
 
 
+def truth_response(index: int, values: np.ndarray) -> np.ndarray:
+    """Read-only public view of the frozen primary synthetic response."""
+
+    return _truth_response(index, np.asarray(values))
+
+
+def second_truth_response(index: int, values: np.ndarray) -> np.ndarray:
+    """Read-only public view of the frozen secondary synthetic response."""
+
+    return _second_truth_response(index, np.asarray(values))
+
+
 def _ar_response(values: np.ndarray) -> np.ndarray:
     return 0.85 * values + 0.10 * np.tanh(values)
 

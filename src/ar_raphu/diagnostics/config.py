@@ -1,0 +1,165 @@
+"""Load and strictly validate the frozen v3 diagnostic configuration."""
+
+from __future__ import annotations
+
+import json
+from copy import deepcopy
+from pathlib import Path
+from typing import Any
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+CONFIG_PATH = PROJECT_ROOT / "configs" / "v3_diagnostics.yaml"
+
+EXPERIMENT_VARIANTS = {
+    "D1": ("rank2_oracle_q", "rank2_learned_q_truth_init"),
+    "D2": ("rank1_free_q", "rank2_free_q"),
+    "D3": ("residual_rank1_free_q", "residual_rank2_free_q"),
+    "D4": ("simultaneous", "x_first", "ar_first"),
+    "D5": ("gate_path",),
+    "D6": ("gradient_timeline",),
+}
+
+_FROZEN_CONFIG: dict[str, Any] = {
+    "schema_version": 1,
+    "status": "DIAGNOSTIC_ONLY",
+    "common": {
+        "seeds": [0, 1, 2, 3, 4],
+        "d6_seeds": [0, 1, 2],
+        "n_samples": 10000,
+        "external_variables": 10,
+        "active_support": [0, 1, 2],
+        "L_x": 64,
+        "L_y": 32,
+        "primary_horizon": 1,
+        "conditional_horizons": [5, 10],
+        "hidden_kan": 8,
+        "grid_size": 7,
+        "spline_order": 3,
+        "response_execution_mode": "vectorized",
+        "physical_chunk": 4096,
+        "deterministic_algorithms": True,
+        "dtype_neural": "float32",
+        "validation_interval": 10,
+        "response_learning_rate": 0.003,
+        "lag_learning_rate": 0.0005,
+        "ar_learning_rate": 0.003,
+        "joint_finetune_learning_rate": 0.0003,
+        "free_lag_smoothness": 0.001,
+        "min_learning_rate": 0.00001,
+        "scheduler_factor": 0.5,
+        "scheduler_patience_validations": 20,
+    },
+    "D1": {
+        "scenario": "AR-S3",
+        "variants": ["rank2_oracle_q", "rank2_learned_q_truth_init"],
+        "fixed_component_weights": [0.6, 0.4],
+        "oracle_epochs": 2000,
+        "learned_q_epochs": 3000,
+        "patience": 300,
+    },
+    "D2": {
+        "scenario": "AR-S3",
+        "variants": ["rank1_free_q", "rank2_free_q"],
+        "epochs": 3000,
+        "patience": 300,
+        "rank1_q_initialization": "weighted_truth_mixture",
+        "rank2_q_initialization": "truth_components",
+    },
+    "D3": {
+        "scenario": "AR-S3",
+        "ar_epochs": 2000,
+        "residual_model_epochs": 2500,
+        "patience": 250,
+        "variants": ["residual_rank1_free_q", "residual_rank2_free_q"],
+        "conditional_extension_trigger": {
+            "minimum_failed_seed_count": 4,
+            "innovation_r2_threshold": 0.10,
+            "horizons": [5, 10],
+        },
+    },
+    "D4": {
+        "scenario": "AR-S1",
+        "variants": ["simultaneous", "x_first", "ar_first"],
+        "simultaneous_epochs": 2500,
+        "x_first": {
+            "x_pretrain_epochs": 1500,
+            "ar_fit_epochs": 500,
+            "joint_epochs": 500,
+        },
+        "ar_first": {
+            "ar_pretrain_epochs": 1000,
+            "x_fit_epochs": 1500,
+            "joint_epochs": 500,
+        },
+        "patience": 250,
+    },
+    "D5": {
+        "scenario": "AR-S1",
+        "source_checkpoint": "D4_x_first_best",
+        "lambda_ratios": [0.32, 0.16, 0.08, 0.04, 0.02, 0.01, 0.005, 0.0],
+        "fista_max_iterations": 10000,
+        "fista_tolerance": 1.0e-9,
+        "support_threshold": 1.0e-8,
+    },
+    "D6": {
+        "scenario": "AR-S1",
+        "warmup_epochs": 2000,
+        "pruning_epochs": 1200,
+        "pruning_scale": 0.003,
+        "ramp_epochs": 300,
+        "log_interval": 10,
+        "diagnostic_sample_count": 1024,
+        "starvation": {
+            "gradient_ratio_threshold": 0.10,
+            "contribution_signal_threshold": 0.05,
+            "consecutive_logs": 5,
+            "shrink_threshold": 0.99,
+        },
+    },
+    "runtime": {
+        "gpu_workers": 8,
+        "oom_fallback_workers": 4,
+        "cpu_threads_per_worker": 1,
+        "use_cuda_mps": True,
+    },
+}
+
+
+def load_diagnostic_config(path: Path | None = None) -> dict[str, Any]:
+    """Return the configuration only when it exactly matches the preregistration."""
+
+    resolved = CONFIG_PATH if path is None else Path(path)
+    payload = json.loads(resolved.read_text(encoding="utf-8"))
+    if payload != _FROZEN_CONFIG:
+        raise ValueError(
+            "v3 diagnostic configuration differs from the frozen execution plan."
+        )
+    return deepcopy(payload)
+
+
+def validate_job(
+    experiment: str,
+    variant: str,
+    seed: int,
+    horizon: int,
+) -> None:
+    config = _FROZEN_CONFIG
+    if experiment not in EXPERIMENT_VARIANTS:
+        raise ValueError(f"Unknown experiment {experiment!r}.")
+    if variant not in EXPERIMENT_VARIANTS[experiment]:
+        raise ValueError(f"Variant {variant!r} is not declared for {experiment}.")
+    allowed_seeds = (
+        config["common"]["d6_seeds"]
+        if experiment == "D6"
+        else config["common"]["seeds"]
+    )
+    if seed not in allowed_seeds:
+        raise ValueError(f"Seed {seed} is not declared for {experiment}.")
+    if horizon not in {
+        config["common"]["primary_horizon"],
+        *config["common"]["conditional_horizons"],
+    }:
+        raise ValueError(f"Horizon {horizon} is not preregistered.")
+    if experiment != "D3" and horizon != config["common"]["primary_horizon"]:
+        raise ValueError("Only D3 may use conditional horizons 5 and 10.")
