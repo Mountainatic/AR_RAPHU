@@ -751,3 +751,27 @@ loss 选择；rank 输入和 test 均不得参与选择。
 - E2--E8：`NOT_YET_RUN`；`NEXT_ALLOWED_STAGE=STOP_E1_PROJECTION_CAPACITY`。
 - 按冻结停止线不得启动 E2，不得扩大 basis grid；如需修改 E1 basis
   空间，必须由用户给出新协议或明确授权重新预注册。
+
+## Spectral v0.3.1 表示修复与核心验证
+
+- v0.3.1 的唯一执行规范为
+  `Spectral_PS_AR_RAPHU_Theory_v0_3_1.md`、
+  `Spectral_PS_AR_RAPHU_Validation_Plan_v0_3_1.md` 与
+  `Codex_Restart_Prompt_Spectral_v0_3_1.md`；旧 v0.3 仅作冻结历史。
+- 新分支固定为 `ps-ar-raphu-v031-representation-repair`；旧
+  `results/spectral_v03/` 与 `configs/spectral_v03.yaml` 不得修改或覆盖。
+- 新结果只写 `results/spectral_v031/`。E0 复用旧通过结果，旧 E1 保持
+  `E1_COMPRESSED_LAG_BASIS_UNDERSPECIFIED`，不得改写成通过。
+- E1R 固定幅值基 16，三次样条时滞候选 `24,28,32,40`，离散 identity
+  reference 为 `np.eye(64)`；两侧最小二乘投影，不构造巨大 Kronecker
+  design。必须选择 `32x16` 且 regression table 在 `5e-6` 内才可继续。
+- E2A 只拟合单一 oracle 变量的真实外生贡献；E2B 只拟合 oracle active
+  support 的总外生贡献；二者都不含 AR，且只由 validation contribution
+  MSE 选择平滑，CPU FP64 Cholesky，KKT residual `<=1e-8`。
+- E3 固定 `32x16`、十个外生变量与 O/Y/D/J 四方法；D 必须同时残差化
+  `y` 和 `Phi`。十变量解使用 matrix-free FP64 PCG、block-Jacobi，
+  relative residual `<=1e-8`、最多 2000 次；未收敛结果不得用于结论。
+- 本轮严格顺序为 `E1R -> E2A -> E2B -> E3`。任一级失败立即按预注册
+  标签停止；本轮不启动 E4--E8，不自行改变 basis、阈值、目标或模型。
+- 当前状态：v0.3.1 三份冻结文件已完整读取；独立分支已创建；E1R 及之后
+  尚未运行。
