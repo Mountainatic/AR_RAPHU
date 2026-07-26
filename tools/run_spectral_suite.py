@@ -13,6 +13,7 @@ from pathlib import Path
 import sys
 
 import numpy as np
+import scipy.linalg
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -42,6 +43,20 @@ from ar_raphu.spectral.excitation import (
     space_filling_history_excitation,
 )
 from ar_raphu.spectral.operator_metrics import empirical_operator_nrmse
+from ar_raphu.spectral.predictive_rank import predictive_rank_profile
+from ar_raphu.spectral.rank_bootstrap import (
+    circular_block_indices,
+    rank_interval,
+)
+from ar_raphu.spectral.rank_ladder import build_rank_ladder
+from ar_raphu.spectral.rank_profile import (
+    build_rank_profile,
+    classify_truth_profile,
+)
+from ar_raphu.spectral.rank_profile_metrics import (
+    normalized_spectrum_l1_distance,
+    tail_curve_max_abs_error,
+)
 from ar_raphu.spectral.representation_certificate import (
     certify_resolution_roles,
 )
@@ -74,6 +89,7 @@ from ar_raphu.spectral.weighted_projection import (
     normalized_trapezoidal_weights,
     weighted_tensor_projection,
 )
+from ar_raphu.spectral.v033_reinterpretation import reinterpret_v033
 from ar_raphu.spectral.solver import solve_full_kernel
 from ar_raphu.spectral.solver import solve_full_kernel_pcg
 from ar_raphu.synthetic import (
@@ -2679,6 +2695,485 @@ def run_capacity_v033(
     return status
 
 
+def _history_kernel_values(
+    sequence,
+    *,
+    scenario: str,
+    variable: int,
+    histories: np.ndarray,
+) -> np.ndarray:
+    """Evaluate K(lag, amplitude) at every supplied history coordinate."""
+
+    selected = np.asarray(histories, dtype=np.float64)
+    length = selected.shape[1]
+    primary = np.asarray(sequence.truth["q_primary"], dtype=np.float64)[
+        variable
+    ]
+    primary_response = truth_response(variable, selected)
+    if scenario == "AR-S3":
+        secondary = np.asarray(
+            sequence.truth["q_secondary"], dtype=np.float64
+        )[variable]
+        return (
+            0.6 * primary_response * primary[None, :]
+            + 0.4
+            * second_truth_response(variable, selected)
+            * secondary[None, :]
+        )
+    if scenario == "AR-S4U":
+        kernel = np.empty_like(selected)
+        lag_axis = np.arange(length, dtype=np.float64)[:, None]
+        for lag in range(length):
+            amplitudes = selected[:, lag]
+            centers = 8.0 + 12.0 / (1.0 + np.exp(-2.0 * amplitudes))
+            unnormalized = np.exp(
+                -0.5 * ((lag_axis - centers[None, :]) / 2.0) ** 2
+            )
+            weights = unnormalized[lag] / unnormalized.sum(axis=0)
+            kernel[:, lag] = weights * primary_response[:, lag]
+        return kernel
+    return primary_response * primary[None, :]
+
+
+def _v034_space_problem(
+    *,
+    scenario: str,
+    seed: int,
+    variable: int,
+    lag_count: int,
+    v033_config: dict[str, object],
+) -> dict[str, object]:
+    sequence = generate_synthetic_sequence(
+        scenario,
+        seed=seed,
+        n_samples=int(v033_config["common"]["n_samples_natural"]),
+        external_variables=10,
+    )
+    natural_train_stop = sequence.split_target_intervals["train"][1]
+    natural_domain = AmplitudeDomain.fit(
+        sequence.x[:natural_train_stop, variable],
+        padding_fraction=float(
+            v033_config["domain"]["padding_fraction"]
+        ),
+        core_quantiles=tuple(v033_config["domain"]["core_quantiles"]),
+    )
+    histories = space_filling_history_excitation(
+        natural_domain,
+        sample_count=int(v033_config["common"]["n_samples_excitation"]),
+        lag_count=int(v033_config["common"]["L_x"]),
+        seed=seed + int(v033_config["space"]["seed_offset"]),
+    )
+    splits = chronological_split_indices(
+        len(histories),
+        burn_in=0,
+        fractions=tuple(v033_config["space"]["split_fractions"]),
+    )
+    train_amplitudes = histories[splits["train"]].reshape(-1)
+    amplitude_basis = CenteredSplineBasis.fit(
+        train_amplitudes,
+        n_basis=28,
+        degree=3,
+        domain=natural_domain,
+    )
+    lag_basis = _v033_lag_basis(
+        lag_type="cubic_bspline",
+        lag_count=lag_count,
+        length=64,
+        degree=3,
+    )
+    matrices = {
+        name: build_matrix_from_histories(
+            histories[indices],
+            lag_basis=lag_basis,
+            amplitude_basis=amplitude_basis,
+        )
+        for name, indices in splits.items()
+    }
+    kernel_values = {
+        name: _history_kernel_values(
+            sequence,
+            scenario=scenario,
+            variable=variable,
+            histories=histories[indices],
+        )
+        for name, indices in splits.items()
+    }
+    targets = {
+        name: values.sum(axis=1) for name, values in kernel_values.items()
+    }
+    truth_mean = kernel_values["train"].mean(axis=0)[:, None]
+    amplitude_grid = np.linspace(
+        natural_domain.core_lower,
+        natural_domain.core_upper,
+        int(v033_config["domain"]["grid_points"]),
+    )
+    truth_surface = (
+        true_kernel_surface(sequence, variable, amplitude_grid) - truth_mean
+    )
+    amplitude_evaluation = amplitude_basis.transform(amplitude_grid)
+    lag_weights = np.full(64, 1.0 / 64)
+    amplitude_weights = normalized_trapezoidal_weights(amplitude_grid)
+    lag_gram = lag_basis.T @ (lag_weights[:, None] * lag_basis)
+    amplitude_gram = amplitude_evaluation.T @ (
+        amplitude_weights[:, None] * amplitude_evaluation
+    )
+    whitened_truth = (
+        np.sqrt(lag_weights)[:, None]
+        * truth_surface
+        * np.sqrt(amplitude_weights)[None, :]
+    )
+    truth_singular_values = scipy.linalg.svdvals(whitened_truth)
+    return {
+        "sequence": sequence,
+        "matrices": matrices,
+        "targets": targets,
+        "amplitude_basis": amplitude_basis,
+        "lag_basis": lag_basis,
+        "lag_gram": lag_gram,
+        "amplitude_gram": amplitude_gram,
+        "amplitude_evaluation": amplitude_evaluation,
+        "truth_surface": truth_surface,
+        "truth_singular_values": truth_singular_values,
+    }
+
+
+def run_r0_v034(config: dict[str, object], result_root: Path) -> str:
+    output = result_root / "R0"
+    old_root = ROOT / "results" / "spectral_v033"
+    old_decision = old_root / "V033_RESOLUTION_CAPACITY_DECISION.md"
+    before = old_decision.read_bytes()
+    interpretation = reinterpret_v033(old_root)
+    if old_decision.read_bytes() != before:
+        raise RuntimeError("R0 altered the frozen v0.3.3 decision.")
+    status = (
+        "R0_V033_SCIENTIFIC_REINTERPRETATION_PASS"
+        if all(
+            value in {"PASS", "TO_BE_AUDITED", "REJECTED"}
+            for value in interpretation.values()
+        )
+        and interpretation["E2A_STRUCTURAL_FULL_SURFACE_CAPACITY"] == "PASS"
+        else "R0_V033_SCIENTIFIC_REINTERPRETATION_FAIL"
+    )
+    output.mkdir(parents=True, exist_ok=True)
+    (output / "V033_SCIENTIFIC_REINTERPRETATION.md").write_text(
+        "\n".join(f"{key}: {value}" for key, value in interpretation.items())
+        + "\n",
+        encoding="utf-8",
+    )
+    contract = ExperimentContract(
+        scientific_question="What is the correct read-only interpretation of v0.3.3?",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="single_oracle_variable",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        experiment_role="ORACLE_COMPONENT_DIAGNOSTIC",
+        model_class="M2",
+        resolution_role="STRUCTURAL",
+        evaluation_distribution="SPACE",
+        allowed_next_experiment="E2A_SR",
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+    write_json(
+        output / "summary.json",
+        {
+            "status": status,
+            "interpretation": interpretation,
+            "old_decision_sha256_unchanged": True,
+            "next_allowed_experiment": "E2A_SR" if status.endswith("PASS") else "STOP",
+        },
+    )
+    return status
+
+
+def _v034_sr_task(payload: dict[str, object]) -> dict[str, object]:
+    scenario = str(payload["scenario"])
+    seed = int(payload["seed"])
+    variable = int(payload["variable"])
+    config = payload["config"]
+    v033_config = payload["v033_config"]
+    problem = _v034_space_problem(
+        scenario=scenario,
+        seed=seed,
+        variable=variable,
+        lag_count=48,
+        v033_config=v033_config,
+    )
+    archive = np.load(payload["fit_path"])
+    key = f"{scenario}_seed{seed}_var{variable}"
+    coefficients = archive[key + "_coefficients"].reshape(48, 28)
+    intercept = float(archive[key + "_intercept"][0])
+    spectrum = gram_whitened_svd(
+        coefficients,
+        problem["lag_gram"],
+        problem["amplitude_gram"],
+    )
+    rank_max = int(config["rank_profile"]["rank_max"])
+    budgets = tuple(config["rank_profile"]["structural_budgets"])
+    truth_profile = build_rank_profile(
+        problem["truth_singular_values"],
+        rank_max=rank_max,
+        budgets=budgets,
+    )
+    estimate_profile = build_rank_profile(
+        spectrum.singular_values,
+        rank_max=rank_max,
+        budgets=budgets,
+    )
+    truth_class = classify_truth_profile(truth_profile)
+    tail_error = tail_curve_max_abs_error(truth_profile, estimate_profile)
+    spectrum_distance = normalized_spectrum_l1_distance(
+        truth_profile, estimate_profile
+    )
+    modes = []
+    previous = np.zeros_like(coefficients)
+    for rank in range(1, rank_max + 1):
+        cumulative = spectrum.truncate(rank)
+        modes.append(cumulative - previous)
+        previous = cumulative
+    full_validation_prediction = (
+        problem["matrices"]["validation"] @ coefficients.reshape(-1)
+        + intercept
+    )
+    ladder = build_rank_ladder(
+        train_design=problem["matrices"]["train"],
+        validation_design=problem["matrices"]["validation"],
+        train_target=problem["targets"]["train"],
+        validation_target=problem["targets"]["validation"],
+        mode_coefficients=modes,
+        full_validation_prediction=full_validation_prediction,
+        rank_max=rank_max,
+    )
+    ladder_rows = []
+    for step in ladder:
+        prediction = step.validation_prediction
+        surface = (
+            problem["lag_basis"]
+            @ step.coefficients
+            @ problem["amplitude_evaluation"].T
+        )
+        ladder_rows.append(
+            {
+                "scenario": scenario,
+                "seed": seed,
+                "variable": variable,
+                "rank": step.rank,
+                "validation_contribution_r2": r2(
+                    problem["targets"]["validation"], prediction
+                ),
+                "empirical_operator_nrmse": empirical_operator_nrmse(
+                    problem["targets"]["validation"], prediction
+                ),
+                "normalized_excess_rmse": step.normalized_excess_rmse,
+                "core_surface_nrmse": normalized_root_mean_square_error(
+                    problem["truth_surface"], surface
+                ),
+                "modal_gains": json.dumps(step.modal_gains.tolist()),
+                "refit_intercept": step.intercept,
+            }
+        )
+    profile_common = {
+        "scenario": scenario,
+        "seed": seed,
+        "variable": variable,
+        "truth_class": truth_class,
+        "rank_010": truth_profile.effective_ranks[0.10],
+        "rank_005": truth_profile.effective_ranks[0.05],
+        "rank_002": truth_profile.effective_ranks[0.02],
+        "sigma_1_to_12": json.dumps(truth_profile.singular_values.tolist()),
+        "tail_1_to_12": json.dumps(truth_profile.tail_curve.tolist()),
+        "cumulative_1_to_12": json.dumps(
+            truth_profile.cumulative_energy.tolist()
+        ),
+        "tail_beyond_rank_max": truth_profile.tail_beyond_rank_max,
+    }
+    estimated_row = {
+        "scenario": scenario,
+        "seed": seed,
+        "variable": variable,
+        "truth_class": truth_class,
+        "rank_010": estimate_profile.effective_ranks[0.10],
+        "rank_005": estimate_profile.effective_ranks[0.05],
+        "rank_002": estimate_profile.effective_ranks[0.02],
+        "sigma_1_to_12": json.dumps(
+            estimate_profile.singular_values.tolist()
+        ),
+        "tail_1_to_12": json.dumps(estimate_profile.tail_curve.tolist()),
+        "cumulative_1_to_12": json.dumps(
+            estimate_profile.cumulative_energy.tolist()
+        ),
+        "tail_beyond_rank_max": estimate_profile.tail_beyond_rank_max,
+        "tail_curve_max_abs_error": tail_error,
+        "normalized_spectrum_l1_distance": spectrum_distance,
+        "estimated_tail_after_rank1": float(
+            estimate_profile.tail_curve[0]
+        ),
+    }
+    base_pass = (
+        tail_error
+        <= float(config["rank_profile"]["tail_curve_max_abs_error"])
+        and spectrum_distance
+        <= float(config["rank_profile"]["normalized_spectrum_l1_max"])
+    )
+    if truth_class == "near_rank1":
+        class_pass = estimate_profile.effective_ranks[0.05] == 1
+    elif truth_class == "strong_rank2":
+        class_pass = estimate_profile.effective_ranks[0.05] == 2
+    elif truth_class == "weak_rank2":
+        class_pass = (
+            abs(
+                estimate_profile.effective_ranks[0.02]
+                - truth_profile.effective_ranks[0.02]
+            )
+            <= 1
+            and estimate_profile.tail_curve[0] > 0
+        )
+    else:
+        class_pass = (
+            estimate_profile.effective_ranks[0.05] >= 3
+            and abs(
+                estimate_profile.effective_ranks[0.05]
+                - truth_profile.effective_ranks[0.05]
+            )
+            <= int(
+                config["rank_profile"][
+                    "higher_rank_effective_rank_tolerance"
+                ]
+            )
+        )
+    estimated_row["task_spectrum_pass"] = bool(base_pass)
+    estimated_row["task_class_pass"] = bool(class_pass)
+    estimated_row["seed_gate_pass"] = bool(base_pass and class_pass)
+    return {
+        "truth_row": profile_common,
+        "estimated_row": estimated_row,
+        "ladder_rows": ladder_rows,
+        "truth_spectrum": truth_profile.singular_values,
+        "estimated_spectrum": estimate_profile.singular_values,
+        "truth_tail": truth_profile.tail_curve,
+        "estimated_tail": estimate_profile.tail_curve,
+    }
+
+
+def run_e2a_sr_v034(config: dict[str, object], result_root: Path) -> str:
+    r0 = json.loads(
+        (result_root / "R0" / "summary.json").read_text(encoding="utf-8")
+    )
+    if r0["status"] != "R0_V033_SCIENTIFIC_REINTERPRETATION_PASS":
+        raise RuntimeError("E2A_SR is blocked until R0 passes.")
+    output = result_root / "E2A_SR"
+    contract = ExperimentContract(
+        scientific_question="Does the frozen structural fit recover the truth rank profile?",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="single_oracle_variable",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        experiment_role="RANK_PROFILE",
+        model_class="M2",
+        resolution_role="STRUCTURAL",
+        evaluation_distribution="SPACE",
+        rank_budget_grid=(0.10, 0.05, 0.02),
+        rank_max=12,
+        smoothing_reselected=False,
+        allowed_next_experiment="E2A_SRB_AND_E2A_P_NAT",
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+    v033_config = load_config(ROOT / "configs" / "spectral_v033.yaml")
+    payloads = [
+        {
+            "scenario": scenario,
+            "seed": seed,
+            "variable": variable,
+            "config": config,
+            "v033_config": v033_config,
+            "fit_path": str(
+                ROOT / "results" / "spectral_v033" / "E2A_S_SPACE" / "fit.npz"
+            ),
+        }
+        for scenario in config["common"]["scenarios"]
+        for seed in config["common"]["development_seeds"]
+        for variable in config["common"]["variables"]
+    ]
+    results = []
+    with ProcessPoolExecutor(max_workers=8) as pool:
+        futures = [pool.submit(_v034_sr_task, item) for item in payloads]
+        for index, future in enumerate(as_completed(futures), start=1):
+            results.append(future.result())
+            print(f"E2A_SR_PROGRESS={index}/{len(payloads)}", flush=True)
+    results.sort(
+        key=lambda item: (
+            item["truth_row"]["scenario"],
+            item["truth_row"]["seed"],
+            item["truth_row"]["variable"],
+        )
+    )
+    truth_rows = [item["truth_row"] for item in results]
+    estimated_rows = [item["estimated_row"] for item in results]
+    ladder_rows = [
+        row for item in results for row in item["ladder_rows"]
+    ]
+    group_results = {}
+    for scenario in config["common"]["scenarios"]:
+        for variable in config["common"]["variables"]:
+            group = [
+                row
+                for row in estimated_rows
+                if row["scenario"] == scenario
+                and int(row["variable"]) == int(variable)
+            ]
+            passed_seeds = sum(bool(row["seed_gate_pass"]) for row in group)
+            group_results[f"{scenario}:var{variable}"] = {
+                "truth_classes": sorted({row["truth_class"] for row in group}),
+                "passed_seeds": passed_seeds,
+                "required_seeds": 4,
+                "passed": passed_seeds >= 4,
+            }
+    passed = all(item["passed"] for item in group_results.values())
+    status = (
+        "E2A_SR_RANK_PROFILE_PASS"
+        if passed
+        else "E2A_SR_RANK_PROFILE_FAIL"
+    )
+    write_csv(output / "truth_rank_profile.csv", truth_rows)
+    write_csv(output / "estimated_rank_profile.csv", estimated_rows)
+    write_csv(output / "rank_ladder_metrics.csv", ladder_rows)
+    write_csv(output / "metrics.csv", estimated_rows)
+    arrays = {}
+    for item in results:
+        row = item["truth_row"]
+        key = f"{row['scenario']}_seed{row['seed']}_var{row['variable']}"
+        arrays[key + "_truth_spectrum"] = item["truth_spectrum"]
+        arrays[key + "_estimated_spectrum"] = item["estimated_spectrum"]
+        arrays[key + "_truth_tail"] = item["truth_tail"]
+        arrays[key + "_estimated_tail"] = item["estimated_tail"]
+    np.savez_compressed(output / "normalized_spectra.npz", **arrays)
+    write_json(
+        output / "summary.json",
+        {
+            "status": status,
+            "task_count": len(results),
+            "group_results": group_results,
+            "next_allowed_experiment": (
+                "E2A_SRB_AND_E2A_P_NAT" if passed else "STOP"
+            ),
+        },
+    )
+    return status
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=CONFIG_PATH)
@@ -2702,6 +3197,9 @@ def main() -> None:
             "E2A_S_SPACE",
             "E2A_P_NAT",
             "E2A_P_PERM",
+            "R0",
+            "E2A_SR",
+            "E2A_SRB",
         ],
         required=True,
     )
@@ -2716,7 +3214,18 @@ def main() -> None:
         config_path = ROOT / config_path
     config = load_config(config_path)
     schema_version = int(config.get("schema_version", 1))
-    if schema_version == 4:
+    if schema_version == 5:
+        result_root = ROOT / "results" / "spectral_v034"
+        runners = {
+            "R0": run_r0_v034,
+            "E2A_SR": run_e2a_sr_v034,
+        }
+        if args.experiment not in runners:
+            raise SystemExit(
+                f"{args.experiment} is not implemented or not unlocked for v0.3.4."
+            )
+        status = runners[args.experiment](config, result_root)
+    elif schema_version == 4:
         result_root = ROOT / "results" / "spectral_v033"
         runners = {
             "E1B": run_e1b,

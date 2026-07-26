@@ -26,6 +26,9 @@ class ExperimentContract:
     model_class: str = "M2"
     evaluation_distribution: str = "NAT"
     resolution_role: str = "NONE"
+    rank_budget_grid: tuple[float, ...] = ()
+    rank_max: int = 0
+    smoothing_reselected: bool = False
 
     def validate(self) -> None:
         if not self.scientific_question.strip():
@@ -77,6 +80,17 @@ class ExperimentContract:
             "NONE",
         }:
             raise ValueError("Unknown resolution role.")
+        if self.experiment_role in {
+            "RANK_PROFILE",
+            "PREDICTIVE_RANK",
+            "BOOTSTRAP_RANK",
+        }:
+            if self.rank_budget_grid != (0.10, 0.05, 0.02):
+                raise ValueError("Rank-profile budgets must be frozen.")
+            if self.rank_max != 12:
+                raise ValueError("rank_max must be 12.")
+            if self.smoothing_reselected:
+                raise ValueError("Rank experiments cannot reselect smoothing.")
 
     def to_dict(self) -> dict[str, object]:
         self.validate()

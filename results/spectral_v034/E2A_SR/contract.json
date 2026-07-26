@@ -1,0 +1,28 @@
+{
+  "scientific_question": "Does the frozen structural fit recover the truth rank profile?",
+  "target_contains_ar": false,
+  "model_contains_ar": false,
+  "target_contains_x": true,
+  "model_contains_x": true,
+  "truth_used_for_training": false,
+  "truth_used_for_evaluation": true,
+  "support_used_for_training": "single_oracle_variable",
+  "hyperparameter_selection_metric": "validation_prediction_loss_only",
+  "rank_inputs_used_for_selection": false,
+  "test_used_for_selection": false,
+  "experiment_role": "RANK_PROFILE",
+  "target_semantics": "",
+  "basis_selection_uses_truth": false,
+  "smoothing_selection_metric": "validation_prediction_mse",
+  "allowed_next_experiment": "E2A_SRB_AND_E2A_P_NAT",
+  "model_class": "M2",
+  "evaluation_distribution": "SPACE",
+  "resolution_role": "STRUCTURAL",
+  "rank_budget_grid": [
+    0.1,
+    0.05,
+    0.02
+  ],
+  "rank_max": 12,
+  "smoothing_reselected": false
+}
