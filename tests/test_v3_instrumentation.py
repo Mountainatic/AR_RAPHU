@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import ast
+from pathlib import Path
+import runpy
+
 import torch
 
 from ar_raphu.diagnostics.instrumentation import (
@@ -59,3 +63,14 @@ def test_starvation_requires_five_consecutive_joint_events() -> None:
         }
     ]
     assert proximal_collapse(warmup + pruning)
+
+
+def test_v3_runner_sources_are_syntactically_valid() -> None:
+    root = Path(__file__).resolve().parents[1]
+    for relative in (
+        "tools/run_v3_diagnostic_job.py",
+        "tools/run_v3_diagnostic_suite.py",
+    ):
+        source = (root / relative).read_text(encoding="utf-8")
+        ast.parse(source, filename=relative)
+        runpy.run_path(str(root / relative), run_name=f"test_{Path(relative).stem}")
