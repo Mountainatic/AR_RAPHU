@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Frozen Spectral v0.3 and v0.3.1 staged experiment runner."""
+"""Frozen Spectral v0.3 through v0.3.3 staged experiment runner."""
 
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import csv
+from dataclasses import replace
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -24,6 +27,21 @@ from ar_raphu.spectral.capacity_diagnostics import (
     direct_apply_projected_kernel,
     direct_apply_truth_kernel,
 )
+from ar_raphu.spectral.capacity_matrix import build_single_variable_matrix
+from ar_raphu.spectral.capacity_matrix import (
+    select_minimum_validation_mse,
+    smoothing_pairs,
+)
+from ar_raphu.spectral.excitation import (
+    chronological_split_indices,
+    permuted_marginal_excitation,
+    space_filling_core_excitation,
+)
+from ar_raphu.spectral.operator_metrics import empirical_operator_nrmse
+from ar_raphu.spectral.representation_certificate import (
+    certify_resolution_roles,
+)
+from ar_raphu.spectral.resolution_roles import role_from_config
 from ar_raphu.spectral.design import build_spectral_design
 from ar_raphu.spectral.gram_svd import gram_whitened_svd
 from ar_raphu.spectral.metrics import normalized_root_mean_square_error, r2
@@ -46,6 +64,11 @@ from ar_raphu.spectral.synthetic_components import (
     e2a_component_target,
     replay_synthetic_components,
     true_kernel_surface,
+)
+from ar_raphu.spectral.truth_spectrum import truth_spectrum
+from ar_raphu.spectral.weighted_projection import (
+    normalized_trapezoidal_weights,
+    weighted_tensor_projection,
 )
 from ar_raphu.spectral.solver import solve_full_kernel
 from ar_raphu.spectral.solver import solve_full_kernel_pcg
@@ -1589,6 +1612,997 @@ def run_e2a0(config: dict[str, object], result_root: Path) -> str:
     return status
 
 
+def _v033_lag_basis(
+    *,
+    lag_type: str,
+    lag_count: int,
+    length: int,
+    degree: int,
+) -> np.ndarray:
+    if lag_type == "discrete_identity":
+        if lag_count != length:
+            raise ValueError("The identity lag basis must span every discrete lag.")
+        return identity_lag_basis(length)
+    if lag_type != "cubic_bspline":
+        raise ValueError(f"Unknown lag basis type: {lag_type}.")
+    knots = clamped_knots(0.0, float(length - 1), lag_count, degree)
+    return evaluate_basis(np.arange(length), knots, degree)
+
+
+def run_e1b(config: dict[str, object], result_root: Path) -> str:
+    """Run the unconditional 1,440-row v0.3.3 representation certificate."""
+
+    output = result_root / "E1B"
+    common = config["common"]
+    domain_config = config["domain"]
+    e1b = config["e1b"]
+    for name in ("PREDICTIVE", "STRUCTURAL", "MOTHER"):
+        role_from_config(config, name)
+    contract = ExperimentContract(
+        scientific_question=(
+            "How much weighted representation error is attributable to lag and "
+            "amplitude resolution, and do the frozen P/S/M roles pass?"
+        ),
+        target_semantics="centered_true_2d_external_kernel_surface",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="single_oracle_variable",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        basis_selection_uses_truth=True,
+        smoothing_selection_metric="validation_prediction_mse",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        allowed_next_experiment="E2A0",
+        experiment_role="ORACLE_REPRESENTATION_DIAGNOSTIC",
+        model_class="M2",
+        evaluation_distribution="ORACLE_GRID",
+        resolution_role="NONE",
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+
+    rows: list[dict[str, object]] = []
+    truth_rows: list[dict[str, object]] = []
+    projection_arrays: dict[str, np.ndarray] = {}
+    lag_weights = np.full(
+        int(common["L_x"]), 1.0 / int(common["L_x"]), dtype=np.float64
+    )
+    degree = int(e1b["degree"])
+    strong = e1b["strong_rank2"]
+    for scenario in common["scenarios_2d"]:
+        for seed in common["development_seeds"]:
+            sequence = generate_synthetic_sequence(
+                str(scenario),
+                seed=int(seed),
+                n_samples=int(common["n_samples_natural"]),
+                external_variables=10,
+            )
+            train_stop = sequence.split_target_intervals["train"][1]
+            for variable in common["active_variables"]:
+                variable = int(variable)
+                if variable not in sequence.truth["active_support"]:
+                    raise RuntimeError(
+                        f"{scenario} variable {variable} is not oracle-active."
+                    )
+                train_values = sequence.x[:train_stop, variable]
+                amplitude_domain = AmplitudeDomain.fit(
+                    train_values,
+                    padding_fraction=float(domain_config["padding_fraction"]),
+                    core_quantiles=tuple(domain_config["core_quantiles"]),
+                )
+                truth_mean = true_kernel_surface(
+                    sequence, variable, train_values
+                ).mean(axis=1, keepdims=True)
+                for domain_name, lower, upper in (
+                    (
+                        "core",
+                        amplitude_domain.core_lower,
+                        amplitude_domain.core_upper,
+                    ),
+                    (
+                        "fit",
+                        amplitude_domain.fit_lower,
+                        amplitude_domain.fit_upper,
+                    ),
+                ):
+                    amplitude_grid = np.linspace(
+                        lower,
+                        upper,
+                        int(domain_config["grid_points"]),
+                        dtype=np.float64,
+                    )
+                    amplitude_weights = normalized_trapezoidal_weights(
+                        amplitude_grid
+                    )
+                    centered_truth = (
+                        true_kernel_surface(sequence, variable, amplitude_grid)
+                        - truth_mean
+                    )
+                    whitened_truth = (
+                        np.sqrt(lag_weights)[:, None]
+                        * centered_truth
+                        * np.sqrt(amplitude_weights)[None, :]
+                    )
+                    spectrum = truth_spectrum(
+                        whitened_truth,
+                        tail_energy_min=float(
+                            strong["truth_tail_energy_min"]
+                        ),
+                        sigma2_sigma1_min=float(
+                            strong["truth_sigma2_sigma1_min"]
+                        ),
+                    )
+                    singular = np.pad(
+                        spectrum.singular_values,
+                        (0, max(0, 3 - len(spectrum.singular_values))),
+                    )
+                    truth_rows.append(
+                        {
+                            "scenario": scenario,
+                            "seed": int(seed),
+                            "variable": variable,
+                            "domain": domain_name,
+                            "sigma1_truth": float(singular[0]),
+                            "sigma2_truth": float(singular[1]),
+                            "sigma3_truth": float(singular[2]),
+                            "truth_tail_energy": spectrum.tail_energy,
+                            "truth_sigma2_sigma1": spectrum.sigma2_sigma1,
+                            "truth_spectral_gap": spectrum.spectral_gap,
+                            "truth_rank_class": spectrum.rank_class,
+                        }
+                    )
+                    for amplitude_count in e1b["amplitude_basis_candidates"]:
+                        amplitude_basis = CenteredSplineBasis.fit(
+                            train_values,
+                            n_basis=int(amplitude_count),
+                            degree=degree,
+                            domain=amplitude_domain,
+                        )
+                        amplitude_evaluation = amplitude_basis.transform(
+                            amplitude_grid
+                        )
+                        for lag_spec in e1b["lag_basis_candidates"]:
+                            lag_type = str(lag_spec["type"])
+                            lag_count = int(lag_spec["count"])
+                            lag_basis = _v033_lag_basis(
+                                lag_type=lag_type,
+                                lag_count=lag_count,
+                                length=int(common["L_x"]),
+                                degree=degree,
+                            )
+                            projection = weighted_tensor_projection(
+                                centered_truth,
+                                lag_basis,
+                                amplitude_evaluation,
+                                lag_weights=lag_weights,
+                                amplitude_weights=amplitude_weights,
+                            )
+                            sigma2_denominator = max(
+                                float(singular[1]), np.finfo(np.float64).eps
+                            )
+                            gap_denominator = max(
+                                spectrum.spectral_gap,
+                                np.finfo(np.float64).eps,
+                            )
+                            rows.append(
+                                {
+                                    "scenario": scenario,
+                                    "seed": int(seed),
+                                    "variable": variable,
+                                    "domain": domain_name,
+                                    "lag_basis_type": lag_type,
+                                    "lag_basis_count": lag_count,
+                                    "amplitude_basis_count": int(
+                                        amplitude_count
+                                    ),
+                                    "epsilon_lag": projection.epsilon_lag,
+                                    "epsilon_amplitude": (
+                                        projection.epsilon_amplitude
+                                    ),
+                                    "epsilon_amplitude_given_lag": (
+                                        projection.epsilon_amplitude_given_lag
+                                    ),
+                                    "epsilon_lag_given_amplitude": (
+                                        projection.epsilon_lag_given_amplitude
+                                    ),
+                                    "epsilon_joint": projection.epsilon_joint,
+                                    "operator_error": projection.operator_error,
+                                    "sigma1_truth": float(singular[0]),
+                                    "sigma2_truth": float(singular[1]),
+                                    "sigma3_truth": float(singular[2]),
+                                    "truth_tail_energy": spectrum.tail_energy,
+                                    "truth_sigma2_sigma1": (
+                                        spectrum.sigma2_sigma1
+                                    ),
+                                    "operator_error_over_sigma2": (
+                                        projection.operator_error
+                                        / sigma2_denominator
+                                    ),
+                                    "operator_error_over_gap": (
+                                        projection.operator_error
+                                        / gap_denominator
+                                    ),
+                                    "truth_rank_class": spectrum.rank_class,
+                                }
+                            )
+                            if (
+                                int(amplitude_count) == 28
+                                and (
+                                    (lag_type, lag_count)
+                                    in {
+                                        ("cubic_bspline", 32),
+                                        ("cubic_bspline", 48),
+                                        ("discrete_identity", 64),
+                                    }
+                                )
+                            ):
+                                key = (
+                                    f"{scenario}_seed{seed}_var{variable}_"
+                                    f"{domain_name}_{lag_type}{lag_count}_x28"
+                                )
+                                projection_arrays[key + "_coefficients"] = (
+                                    projection.coefficients
+                                )
+                                projection_arrays[key + "_amplitude_grid"] = (
+                                    amplitude_grid
+                                )
+    expected_rows = (
+        len(common["scenarios_2d"])
+        * len(common["development_seeds"])
+        * len(common["active_variables"])
+        * 2
+        * len(e1b["lag_basis_candidates"])
+        * len(e1b["amplitude_basis_candidates"])
+    )
+    if len(rows) != expected_rows or expected_rows != 1440:
+        raise RuntimeError(
+            f"E1B full-grid violation: got {len(rows)}, expected 1440."
+        )
+    certificate = certify_resolution_roles(rows, config)
+    certificate["full_grid_row_count"] = len(rows)
+    certificate["all_lag_counts_present"] = sorted(
+        {int(row["lag_basis_count"]) for row in rows}
+    )
+    certificate["all_amplitude_counts_present"] = sorted(
+        {int(row["amplitude_basis_count"]) for row in rows}
+    )
+    write_csv(output / "representation_grid.csv", rows)
+    write_csv(output / "metrics.csv", rows)
+    write_csv(output / "truth_rank_profile.csv", truth_rows)
+    write_json(output / "role_certificate.json", certificate)
+    write_json(output / "summary.json", certificate)
+    np.savez_compressed(output / "projection_arrays.npz", **projection_arrays)
+    return str(certificate["status"])
+
+
+def run_e2a0_v033(config: dict[str, object], result_root: Path) -> str:
+    """Close truth replay, projected design, and direct/PCG solves."""
+
+    e1b_summary = json.loads(
+        (result_root / "E1B" / "summary.json").read_text(encoding="utf-8")
+    )
+    if e1b_summary["status"] != "E1B_RESOLUTION_ROLES_CERTIFIED":
+        raise RuntimeError("E2A0 is blocked until E1B certifies all roles.")
+    output = result_root / "E2A0"
+    common = config["common"]
+    domain_config = config["domain"]
+    tolerances = config["e2a0"]
+    contract = ExperimentContract(
+        scientific_question=(
+            "Do truth replay, projected tensor design, and FP64 direct/PCG "
+            "solvers form a numerically closed implementation?"
+        ),
+        target_semantics="implementation_and_projected_operator_closure",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="single_oracle_variable",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        basis_selection_uses_truth=False,
+        smoothing_selection_metric="validation_prediction_mse",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        allowed_next_experiment="E2A_M_SPACE",
+        experiment_role="ORACLE_COMPONENT_DIAGNOSTIC",
+        model_class="M2",
+        evaluation_distribution="ORACLE_GRID",
+        resolution_role="NONE",
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+    rows: list[dict[str, object]] = []
+    maximum_replay = 0.0
+    maximum_matrix_direct = 0.0
+    lag_weights = np.full(
+        int(common["L_x"]), 1.0 / int(common["L_x"]), dtype=np.float64
+    )
+    for scenario in common["scenarios_2d"]:
+        for seed in common["development_seeds"]:
+            sequence = generate_synthetic_sequence(
+                str(scenario),
+                seed=int(seed),
+                n_samples=int(common["n_samples_natural"]),
+                external_variables=10,
+            )
+            components = replay_synthetic_components(sequence)
+            train_stop = sequence.split_target_intervals["train"][1]
+            targets = np.arange(int(common["L_x"]), train_stop, dtype=np.int64)
+            for variable in common["active_variables"]:
+                variable = int(variable)
+                direct_truth = direct_apply_truth_kernel(
+                    sequence, variable, targets
+                )
+                replay_truth = components.x_contribution_by_variable[
+                    targets, variable
+                ]
+                replay_error = float(
+                    np.max(np.abs(direct_truth - replay_truth))
+                )
+                maximum_replay = max(maximum_replay, replay_error)
+                train_values = sequence.x[:train_stop, variable]
+                amplitude_domain = AmplitudeDomain.fit(
+                    train_values,
+                    padding_fraction=float(domain_config["padding_fraction"]),
+                    core_quantiles=tuple(domain_config["core_quantiles"]),
+                )
+                truth_mean = true_kernel_surface(
+                    sequence, variable, train_values
+                ).mean(axis=1, keepdims=True)
+                amplitude_grid = np.linspace(
+                    amplitude_domain.fit_lower,
+                    amplitude_domain.fit_upper,
+                    int(domain_config["grid_points"]),
+                    dtype=np.float64,
+                )
+                amplitude_weights = normalized_trapezoidal_weights(
+                    amplitude_grid
+                )
+                centered_truth = (
+                    true_kernel_surface(sequence, variable, amplitude_grid)
+                    - truth_mean
+                )
+                for role_name in ("PREDICTIVE", "STRUCTURAL", "MOTHER"):
+                    role = role_from_config(config, role_name)
+                    lag_basis = _v033_lag_basis(
+                        lag_type=role.lag_type,
+                        lag_count=role.lag_count,
+                        length=int(common["L_x"]),
+                        degree=int(config["e1b"]["degree"]),
+                    )
+                    amplitude_basis = CenteredSplineBasis.fit(
+                        train_values,
+                        n_basis=role.amplitude_count,
+                        degree=int(config["e1b"]["degree"]),
+                        domain=amplitude_domain,
+                    )
+                    projection = weighted_tensor_projection(
+                        centered_truth,
+                        lag_basis,
+                        amplitude_basis.transform(amplitude_grid),
+                        lag_weights=lag_weights,
+                        amplitude_weights=amplitude_weights,
+                    )
+                    matrix = build_single_variable_matrix(
+                        sequence.x[:, variable],
+                        origin_indices=targets - 1,
+                        lag_basis=lag_basis,
+                        amplitude_basis=amplitude_basis,
+                    )
+                    via_matrix = (
+                        matrix @ projection.coefficients.reshape(-1)
+                    )
+                    via_direct = direct_apply_projected_kernel(
+                        sequence.x,
+                        variable=variable,
+                        target_indices=targets,
+                        horizon=1,
+                        lag_basis=lag_basis,
+                        amplitude_basis=amplitude_basis,
+                        coefficients=projection.coefficients,
+                    )
+                    closure_error = float(
+                        np.max(np.abs(via_matrix - via_direct))
+                    )
+                    maximum_matrix_direct = max(
+                        maximum_matrix_direct, closure_error
+                    )
+                    rows.append(
+                        {
+                            "scenario": scenario,
+                            "seed": int(seed),
+                            "variable": variable,
+                            "resolution_role": role_name,
+                            "truth_replay_max_abs_error": replay_error,
+                            "matrix_direct_max_abs_error": closure_error,
+                        }
+                    )
+
+    rng = np.random.default_rng(330)
+    matrix = rng.normal(size=(800, 160))
+    theta = rng.normal(size=160)
+    projected_target = matrix @ theta
+    penalty = np.zeros((160, 160), dtype=np.float64)
+    direct = solve_full_kernel(
+        matrix,
+        projected_target,
+        penalty,
+        numerical_jitter_relative=1.0e-12,
+        compute_condition_number=False,
+    )
+    pcg = solve_full_kernel_pcg(
+        matrix,
+        projected_target,
+        penalty,
+        relative_tolerance=1.0e-10,
+        max_iterations=int(config["solver"]["pcg_max_iterations"]),
+        block_slices=tuple(
+            slice(start, min(start + 40, 160)) for start in range(0, 160, 40)
+        ),
+        numerical_jitter_relative=1.0e-12,
+    )
+    target_norm = max(
+        float(np.linalg.norm(projected_target)), np.finfo(np.float64).eps
+    )
+    projected_relative_error = float(
+        np.linalg.norm(direct.predictions - projected_target) / target_norm
+    )
+    direct_pcg_difference = float(
+        np.linalg.norm(direct.predictions - pcg.predictions) / target_norm
+    )
+    passed = (
+        maximum_replay <= float(tolerances["replay_tolerance"])
+        and maximum_matrix_direct
+        <= float(tolerances["matrix_direct_tolerance"])
+        and projected_relative_error
+        <= float(tolerances["projected_target_prediction_relative_error"])
+        and direct.relative_kkt_residual
+        <= float(config["solver"]["kkt_relative_residual"])
+        and direct_pcg_difference
+        <= float(tolerances["direct_pcg_relative_difference"])
+        and pcg.converged
+    )
+    status = (
+        "E2A0_IMPLEMENTATION_CLOSURE_PASS"
+        if passed
+        else "E2A0_IMPLEMENTATION_CLOSURE_FAIL"
+    )
+    summary = {
+        "status": status,
+        "maximum_truth_replay_error": maximum_replay,
+        "maximum_matrix_direct_error": maximum_matrix_direct,
+        "projected_target_prediction_relative_error": projected_relative_error,
+        "direct_kkt_relative_residual": direct.relative_kkt_residual,
+        "pcg_kkt_relative_residual": pcg.relative_kkt_residual,
+        "direct_pcg_prediction_relative_difference": direct_pcg_difference,
+        "pcg_converged": pcg.converged,
+        "next_allowed_experiment": "E2A_M_SPACE" if passed else "STOP",
+    }
+    write_csv(output / "metrics.csv", rows)
+    write_json(output / "summary.json", summary)
+    np.savez_compressed(
+        output / "fit.npz",
+        direct_coefficients=direct.coefficients,
+        pcg_coefficients=pcg.coefficients,
+        projected_target=projected_target,
+    )
+    return status
+
+
+def _capacity_split_and_values(
+    sequence,
+    *,
+    variable: int,
+    distribution: str,
+    config: dict[str, object],
+) -> tuple[object, np.ndarray, dict[str, np.ndarray]]:
+    """Create one-variable NAT/PERM/SPACE inputs and target-index splits."""
+
+    common = config["common"]
+    natural_train_stop = sequence.split_target_intervals["train"][1]
+    natural_train_values = sequence.x[:natural_train_stop, variable]
+    natural_domain = AmplitudeDomain.fit(
+        natural_train_values,
+        padding_fraction=float(config["domain"]["padding_fraction"]),
+        core_quantiles=tuple(config["domain"]["core_quantiles"]),
+    )
+    if distribution == "NAT":
+        values = sequence.x[:, variable].copy()
+        splits = {
+            name: np.arange(start, stop, dtype=np.int64)
+            for name, (start, stop) in sequence.split_target_intervals.items()
+        }
+        splits = {
+            name: indices[indices >= int(common["L_x"])]
+            for name, indices in splits.items()
+        }
+        return sequence, values, splits
+    length = int(common["n_samples_excitation"])
+    if distribution == "SPACE":
+        values = space_filling_core_excitation(
+            natural_domain,
+            length=length,
+            seed=int(sequence.seed) + int(config["space"]["seed_offset"]),
+        )
+    elif distribution == "PERM":
+        values = permuted_marginal_excitation(
+            natural_train_values,
+            length=length,
+            seed=int(sequence.seed) + int(config["perm"]["seed_offset"]),
+        )
+    else:
+        raise ValueError(f"Unknown capacity distribution: {distribution}.")
+    x = np.zeros((length, sequence.x.shape[1]), dtype=np.float64)
+    x[:, variable] = values
+    capacity_sequence = replace(sequence, x=x)
+    splits = chronological_split_indices(
+        length,
+        burn_in=int(common["L_x"]),
+        fractions=tuple(config["space"]["split_fractions"]),
+    )
+    return capacity_sequence, values, splits
+
+
+def _capacity_task(payload: dict[str, object]) -> dict[str, object]:
+    """Fit one scenario/seed/variable capacity task in an isolated process."""
+
+    os.environ["OMP_NUM_THREADS"] = "3"
+    os.environ["MKL_NUM_THREADS"] = "3"
+    os.environ["OPENBLAS_NUM_THREADS"] = "3"
+    os.environ["NUMEXPR_NUM_THREADS"] = "3"
+    config = payload["config"]
+    scenario = str(payload["scenario"])
+    seed = int(payload["seed"])
+    variable = int(payload["variable"])
+    distribution = str(payload["distribution"])
+    role_name = str(payload["role"])
+    e1b_projection_core = float(payload["e1b_projection_core"])
+    truth_rank_class = str(payload["truth_rank_class"])
+    common = config["common"]
+    sequence = generate_synthetic_sequence(
+        scenario,
+        seed=seed,
+        n_samples=int(common["n_samples_natural"]),
+        external_variables=10,
+    )
+    capacity_sequence, values, splits = _capacity_split_and_values(
+        sequence,
+        variable=variable,
+        distribution=distribution,
+        config=config,
+    )
+    natural_train_stop = sequence.split_target_intervals["train"][1]
+    natural_domain = AmplitudeDomain.fit(
+        sequence.x[:natural_train_stop, variable],
+        padding_fraction=float(config["domain"]["padding_fraction"]),
+        core_quantiles=tuple(config["domain"]["core_quantiles"]),
+    )
+    role = role_from_config(config, role_name)
+    lag_basis = _v033_lag_basis(
+        lag_type=role.lag_type,
+        lag_count=role.lag_count,
+        length=int(common["L_x"]),
+        degree=int(config["e1b"]["degree"]),
+    )
+    train_stop = int(splits["train"][-1] + 1)
+    amplitude_basis = CenteredSplineBasis.fit(
+        values[:train_stop],
+        n_basis=role.amplitude_count,
+        degree=int(config["e1b"]["degree"]),
+        domain=natural_domain,
+    )
+    matrices = {
+        name: build_single_variable_matrix(
+            values,
+            origin_indices=indices - 1,
+            lag_basis=lag_basis,
+            amplitude_basis=amplitude_basis,
+        )
+        for name, indices in splits.items()
+    }
+    targets = {
+        name: direct_apply_truth_kernel(
+            capacity_sequence, variable, indices
+        )
+        for name, indices in splits.items()
+    }
+    lag_gram = lag_basis.T @ lag_basis / len(lag_basis)
+    train_amplitude = amplitude_basis.transform(values[:train_stop])
+    amplitude_gram = train_amplitude.T @ train_amplitude / len(train_amplitude)
+    candidate_rows: list[dict[str, object]] = []
+    candidate_fits = []
+    for order, (lag_smoothing, amplitude_smoothing) in enumerate(
+        smoothing_pairs(config)
+    ):
+        penalty = tensor_penalty(
+            lag_gram,
+            [amplitude_gram],
+            lag_smoothness=lag_smoothing,
+            amplitude_smoothness=amplitude_smoothing,
+            ridge_weight=float(config["capacity"]["numerical_ridge"]),
+        )
+        fit = solve_full_kernel(
+            matrices["train"],
+            targets["train"],
+            penalty,
+            numerical_jitter_relative=float(config["capacity"]["numerical_ridge"]),
+            fit_intercept=True,
+            compute_condition_number=False,
+        )
+        validation_prediction = (
+            matrices["validation"] @ fit.coefficients + fit.intercept
+        )
+        candidate_rows.append(
+            {
+                "configuration_order": order,
+                "lag_smoothing": lag_smoothing,
+                "amplitude_smoothing": amplitude_smoothing,
+                "validation_contribution_mse": mse(
+                    targets["validation"], validation_prediction
+                ),
+            }
+        )
+        candidate_fits.append(fit)
+    selected = select_minimum_validation_mse(candidate_rows)
+    selected_fit = candidate_fits[int(selected["configuration_order"])]
+    predictions = {
+        name: matrix @ selected_fit.coefficients + selected_fit.intercept
+        for name, matrix in matrices.items()
+    }
+
+    amplitude_grid_core = np.linspace(
+        natural_domain.core_lower,
+        natural_domain.core_upper,
+        int(config["domain"]["grid_points"]),
+        dtype=np.float64,
+    )
+    amplitude_grid_fit = np.linspace(
+        natural_domain.fit_lower,
+        natural_domain.fit_upper,
+        int(config["domain"]["grid_points"]),
+        dtype=np.float64,
+    )
+    truth_mean = true_kernel_surface(
+        capacity_sequence, variable, values[:train_stop]
+    ).mean(axis=1, keepdims=True)
+
+    def surface_metrics(amplitude_grid: np.ndarray) -> tuple[float, np.ndarray]:
+        truth = (
+            true_kernel_surface(capacity_sequence, variable, amplitude_grid)
+            - truth_mean
+        )
+        estimate = (
+            lag_basis
+            @ selected_fit.coefficients.reshape(
+                role.lag_count, role.amplitude_count
+            )
+            @ amplitude_basis.transform(amplitude_grid).T
+        )
+        return normalized_root_mean_square_error(truth, estimate), estimate
+
+    core_surface_nrmse, core_estimate = surface_metrics(amplitude_grid_core)
+    fit_surface_nrmse, _ = surface_metrics(amplitude_grid_fit)
+    covariance = matrices["train"].T @ matrices["train"] / len(
+        matrices["train"]
+    )
+    eigenvalues = np.linalg.eigvalsh(covariance)
+    positive = eigenvalues[
+        eigenvalues > max(float(eigenvalues[-1]), 1.0) * 1.0e-12
+    ]
+    design_condition = (
+        float(np.sqrt(positive[-1] / positive[0]))
+        if positive.size
+        else float("inf")
+    )
+    probabilities = np.maximum(eigenvalues, 0)
+    probabilities /= max(float(probabilities.sum()), np.finfo(float).eps)
+    probabilities = probabilities[probabilities > 0]
+    effective_rank = float(
+        np.exp(-np.sum(probabilities * np.log(probabilities)))
+    )
+
+    lag_surface_gram = lag_basis.T @ (
+        np.full(len(lag_basis), 1.0 / len(lag_basis))[:, None] * lag_basis
+    )
+    amplitude_weights = normalized_trapezoidal_weights(amplitude_grid_core)
+    amplitude_evaluation = amplitude_basis.transform(amplitude_grid_core)
+    amplitude_surface_gram = amplitude_evaluation.T @ (
+        amplitude_weights[:, None] * amplitude_evaluation
+    )
+    spectrum = gram_whitened_svd(
+        selected_fit.coefficients.reshape(
+            role.lag_count, role.amplitude_count
+        ),
+        lag_surface_gram,
+        amplitude_surface_gram,
+    )
+    validation_full_mse = mse(
+        targets["validation"], predictions["validation"]
+    )
+    rank_mses: dict[int, float] = {}
+    for rank in (1, 2):
+        if rank <= min(role.lag_count, role.amplitude_count):
+            truncated = spectrum.truncate(rank).reshape(-1)
+            rank_prediction = (
+                matrices["validation"] @ truncated + selected_fit.intercept
+            )
+            rank_mses[rank] = mse(targets["validation"], rank_prediction)
+    reducible_gap_capture = float("nan")
+    if validation_full_mse < rank_mses[1]:
+        reducible_gap_capture = (
+            rank_mses[1] - rank_mses[2]
+        ) / max(rank_mses[1] - validation_full_mse, np.finfo(float).eps)
+
+    row = {
+        "scenario": scenario,
+        "seed": seed,
+        "variable": variable,
+        "distribution": distribution,
+        "resolution_role": role_name,
+        "lag_basis_type": role.lag_type,
+        "lag_basis_count": role.lag_count,
+        "amplitude_basis_count": role.amplitude_count,
+        "selected_lag_smoothing": selected["lag_smoothing"],
+        "selected_amplitude_smoothing": selected["amplitude_smoothing"],
+        "validation_contribution_mse": validation_full_mse,
+        "validation_contribution_r2": r2(
+            targets["validation"], predictions["validation"]
+        ),
+        "test_contribution_mse": mse(
+            targets["test"], predictions["test"]
+        ),
+        "test_contribution_r2": r2(
+            targets["test"], predictions["test"]
+        ),
+        "empirical_operator_nrmse": empirical_operator_nrmse(
+            targets["validation"], predictions["validation"]
+        ),
+        "core_surface_nrmse": core_surface_nrmse,
+        "fit_surface_nrmse": fit_surface_nrmse,
+        "e1b_projection_core_nrmse": e1b_projection_core,
+        "estimator_to_projection_core_nrmse": float("nan"),
+        "kkt_relative_residual": selected_fit.relative_kkt_residual,
+        "design_condition_number": design_condition,
+        "effective_rank": effective_rank,
+        "truth_rank_class": truth_rank_class,
+        "estimated_sigma1": float(spectrum.singular_values[0]),
+        "estimated_sigma2": float(spectrum.singular_values[1]),
+        "rank1_validation_mse": rank_mses[1],
+        "rank2_validation_mse": rank_mses[2],
+        "rank2_reducible_gap_capture": reducible_gap_capture,
+        "candidate_count": len(candidate_rows),
+    }
+    return {
+        "row": row,
+        "coefficients": selected_fit.coefficients,
+        "intercept": selected_fit.intercept,
+        "core_estimate": core_estimate,
+        "candidate_rows": candidate_rows,
+    }
+
+
+def _e1b_lookup(
+    result_root: Path,
+    *,
+    role_name: str,
+) -> dict[tuple[str, int, int], tuple[float, str]]:
+    role = {
+        "MOTHER": ("discrete_identity", 64),
+        "STRUCTURAL": ("cubic_bspline", 48),
+        "PREDICTIVE": ("cubic_bspline", 32),
+    }[role_name]
+    lookup = {}
+    with (result_root / "E1B" / "representation_grid.csv").open(
+        encoding="utf-8", newline=""
+    ) as stream:
+        for row in csv.DictReader(stream):
+            if (
+                row["domain"] == "core"
+                and row["lag_basis_type"] == role[0]
+                and int(row["lag_basis_count"]) == role[1]
+                and int(row["amplitude_basis_count"]) == 28
+            ):
+                lookup[
+                    (row["scenario"], int(row["seed"]), int(row["variable"]))
+                ] = (
+                    float(row["epsilon_joint"]),
+                    row["truth_rank_class"],
+                )
+    return lookup
+
+
+def run_capacity_v033(
+    config: dict[str, object],
+    result_root: Path,
+    *,
+    experiment: str,
+) -> str:
+    specifications = {
+        "E2A_M_SPACE": (
+            "MOTHER",
+            "SPACE",
+            "mother_space",
+            "E2A_M_SPACE_CAPACITY_PASS",
+            "E2A_M_SPACE_CAPACITY_FAIL",
+            "E2A_S_SPACE",
+        ),
+        "E2A_S_SPACE": (
+            "STRUCTURAL",
+            "SPACE",
+            "structural_space",
+            "E2A_S_SPACE_CAPACITY_PASS",
+            "E2A_S_SPACE_CAPACITY_FAIL",
+            "E2A_P_NAT",
+        ),
+        "E2A_P_NAT": (
+            "PREDICTIVE",
+            "NAT",
+            "predictive_natural",
+            "E2A_P_NAT_CAPACITY_PASS",
+            "E2A_P_NAT_CAPACITY_FAIL",
+            "E2A_P_PERM",
+        ),
+        "E2A_P_PERM": (
+            "PREDICTIVE",
+            "PERM",
+            "predictive_permuted",
+            "E2A_P_PERM_CAPACITY_PASS",
+            "E2A_P_PERM_CAPACITY_FAIL",
+            "DECISION",
+        ),
+    }
+    role_name, distribution, gate_name, pass_status, fail_status, next_stage = (
+        specifications[experiment]
+    )
+    dependency = {
+        "E2A_M_SPACE": ("E2A0", "E2A0_IMPLEMENTATION_CLOSURE_PASS"),
+        "E2A_S_SPACE": ("E2A_M_SPACE", "E2A_M_SPACE_CAPACITY_PASS"),
+        "E2A_P_NAT": ("E2A_S_SPACE", "E2A_S_SPACE_CAPACITY_PASS"),
+        "E2A_P_PERM": ("E2A_S_SPACE", "E2A_S_SPACE_CAPACITY_PASS"),
+    }[experiment]
+    dependency_summary = result_root / dependency[0] / "summary.json"
+    if not dependency_summary.exists() or json.loads(
+        dependency_summary.read_text(encoding="utf-8")
+    )["status"] != dependency[1]:
+        raise RuntimeError(f"{experiment} is blocked by {dependency[0]}.")
+    output = result_root / experiment
+    contract = ExperimentContract(
+        scientific_question=(
+            f"Does the frozen {role_name} space recover one-variable "
+            f"contributions under {distribution} excitation?"
+        ),
+        target_semantics="single_oracle_variable_true_external_contribution",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="single_oracle_variable",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        basis_selection_uses_truth=False,
+        smoothing_selection_metric="validation_prediction_mse",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        allowed_next_experiment=next_stage,
+        experiment_role="ORACLE_COMPONENT_DIAGNOSTIC",
+        model_class="M2",
+        evaluation_distribution=distribution,
+        resolution_role=role_name,
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+    lookup = _e1b_lookup(result_root, role_name=role_name)
+    payloads = []
+    for scenario in config["common"]["scenarios_2d"]:
+        for seed in config["common"]["development_seeds"]:
+            for variable in config["common"]["active_variables"]:
+                projection, rank_class = lookup[
+                    (str(scenario), int(seed), int(variable))
+                ]
+                payloads.append(
+                    {
+                        "config": config,
+                        "scenario": scenario,
+                        "seed": seed,
+                        "variable": variable,
+                        "distribution": distribution,
+                        "role": role_name,
+                        "e1b_projection_core": projection,
+                        "truth_rank_class": rank_class,
+                    }
+                )
+    results = []
+    workers = min(8, len(payloads))
+    with ProcessPoolExecutor(max_workers=workers) as pool:
+        futures = [pool.submit(_capacity_task, payload) for payload in payloads]
+        for index, future in enumerate(as_completed(futures), start=1):
+            results.append(future.result())
+            print(
+                f"{experiment}_PROGRESS={index}/{len(payloads)}",
+                flush=True,
+            )
+    results.sort(
+        key=lambda item: (
+            item["row"]["scenario"],
+            int(item["row"]["seed"]),
+            int(item["row"]["variable"]),
+        )
+    )
+    rows = [item["row"] for item in results]
+    gate = config["gates"][gate_name]
+    for row in rows:
+        base_pass = (
+            float(row["validation_contribution_r2"])
+            >= float(gate["validation_contribution_r2"])
+            and float(row["empirical_operator_nrmse"])
+            <= float(gate["empirical_operator_nrmse"])
+            and float(row["kkt_relative_residual"])
+            <= float(config["solver"]["kkt_relative_residual"])
+        )
+        if role_name in {"MOTHER", "STRUCTURAL"}:
+            surface_limit = max(
+                float(gate["surface_nrmse_absolute_max"]),
+                float(gate["surface_nrmse_projection_multiplier"])
+                * float(row["e1b_projection_core_nrmse"]),
+            )
+            base_pass &= float(row["core_surface_nrmse"]) <= surface_limit
+        if role_name == "STRUCTURAL":
+            if row["truth_rank_class"] == "rank1":
+                base_pass &= float(row["rank1_validation_mse"]) <= (
+                    float(gate["rank1_full_mse_ratio_max"])
+                    * float(row["validation_contribution_mse"])
+                )
+            elif row["truth_rank_class"] == "strong_rank2":
+                base_pass &= float(row["rank2_validation_mse"]) <= (
+                    1.05 * float(row["validation_contribution_mse"])
+                ) and float(row["rank2_reducible_gap_capture"]) >= float(
+                    gate["strong_rank2_reducible_gap_capture"]
+                )
+        row["seed_gate_pass"] = bool(base_pass)
+    group_passes = {}
+    for scenario in config["common"]["scenarios_2d"]:
+        for variable in config["common"]["active_variables"]:
+            group = [
+                row
+                for row in rows
+                if row["scenario"] == scenario
+                and int(row["variable"]) == int(variable)
+            ]
+            passed_seeds = sum(bool(row["seed_gate_pass"]) for row in group)
+            group_passes[f"{scenario}:var{variable}"] = {
+                "passed_seeds": passed_seeds,
+                "required_seeds": 4,
+                "passed": passed_seeds >= 4,
+            }
+    passed = all(item["passed"] for item in group_passes.values())
+    status = pass_status if passed else fail_status
+    write_csv(output / "metrics.csv", rows)
+    write_json(
+        output / "summary.json",
+        {
+            "status": status,
+            "task_count": len(rows),
+            "group_results": group_passes,
+            "next_allowed_experiment": next_stage if passed else "STOP",
+        },
+    )
+    arrays = {}
+    for item in results:
+        row = item["row"]
+        key = f"{row['scenario']}_seed{row['seed']}_var{row['variable']}"
+        arrays[key + "_coefficients"] = item["coefficients"]
+        arrays[key + "_intercept"] = np.array([item["intercept"]])
+    np.savez_compressed(output / "fit.npz", **arrays)
+    return status
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=CONFIG_PATH)
@@ -1607,6 +2621,11 @@ def main() -> None:
             "E2A_NAT",
             "E2A_PERM",
             "E2A_SPACE",
+            "E1B",
+            "E2A_M_SPACE",
+            "E2A_S_SPACE",
+            "E2A_P_NAT",
+            "E2A_P_PERM",
         ],
         required=True,
     )
@@ -1621,7 +2640,30 @@ def main() -> None:
         config_path = ROOT / config_path
     config = load_config(config_path)
     schema_version = int(config.get("schema_version", 1))
-    if schema_version == 3:
+    if schema_version == 4:
+        result_root = ROOT / "results" / "spectral_v033"
+        runners = {
+            "E1B": run_e1b,
+            "E2A0": run_e2a0_v033,
+            "E2A_M_SPACE": lambda cfg, root: run_capacity_v033(
+                cfg, root, experiment="E2A_M_SPACE"
+            ),
+            "E2A_S_SPACE": lambda cfg, root: run_capacity_v033(
+                cfg, root, experiment="E2A_S_SPACE"
+            ),
+            "E2A_P_NAT": lambda cfg, root: run_capacity_v033(
+                cfg, root, experiment="E2A_P_NAT"
+            ),
+            "E2A_P_PERM": lambda cfg, root: run_capacity_v033(
+                cfg, root, experiment="E2A_P_PERM"
+            ),
+        }
+        if args.experiment not in runners:
+            raise SystemExit(
+                f"{args.experiment} is not implemented or not unlocked for v0.3.3."
+            )
+        status = runners[args.experiment](config, result_root)
+    elif schema_version == 3:
         result_root = ROOT / "results" / "spectral_v032"
         runners = {
             "R1": run_r1,

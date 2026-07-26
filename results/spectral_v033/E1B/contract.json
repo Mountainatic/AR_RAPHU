@@ -1,0 +1,21 @@
+{
+  "scientific_question": "How much weighted representation error is attributable to lag and amplitude resolution, and do the frozen P/S/M roles pass?",
+  "target_contains_ar": false,
+  "model_contains_ar": false,
+  "target_contains_x": true,
+  "model_contains_x": true,
+  "truth_used_for_training": false,
+  "truth_used_for_evaluation": true,
+  "support_used_for_training": "single_oracle_variable",
+  "hyperparameter_selection_metric": "validation_prediction_loss_only",
+  "rank_inputs_used_for_selection": false,
+  "test_used_for_selection": false,
+  "experiment_role": "ORACLE_REPRESENTATION_DIAGNOSTIC",
+  "target_semantics": "centered_true_2d_external_kernel_surface",
+  "basis_selection_uses_truth": true,
+  "smoothing_selection_metric": "validation_prediction_mse",
+  "allowed_next_experiment": "E2A0",
+  "model_class": "M2",
+  "evaluation_distribution": "ORACLE_GRID",
+  "resolution_role": "NONE"
+}

@@ -1,0 +1,21 @@
+{
+  "scientific_question": "Does the frozen MOTHER space recover one-variable contributions under SPACE excitation?",
+  "target_contains_ar": false,
+  "model_contains_ar": false,
+  "target_contains_x": true,
+  "model_contains_x": true,
+  "truth_used_for_training": false,
+  "truth_used_for_evaluation": true,
+  "support_used_for_training": "single_oracle_variable",
+  "hyperparameter_selection_metric": "validation_prediction_loss_only",
+  "rank_inputs_used_for_selection": false,
+  "test_used_for_selection": false,
+  "experiment_role": "ORACLE_COMPONENT_DIAGNOSTIC",
+  "target_semantics": "single_oracle_variable_true_external_contribution",
+  "basis_selection_uses_truth": false,
+  "smoothing_selection_metric": "validation_prediction_mse",
+  "allowed_next_experiment": "E2A_S_SPACE",
+  "model_class": "M2",
+  "evaluation_distribution": "SPACE",
+  "resolution_role": "MOTHER"
+}

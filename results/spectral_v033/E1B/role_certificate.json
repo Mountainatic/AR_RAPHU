@@ -1,0 +1,39 @@
+{
+  "status": "E1B_RESOLUTION_ROLES_CERTIFIED",
+  "roles": {
+    "MOTHER": {
+      "passed": true,
+      "row_count": 120,
+      "worst_core_joint_nrmse": 0.025201977335289207,
+      "worst_fit_joint_nrmse": 0.013227695109072976,
+      "strong_rank_resolution_valid": true
+    },
+    "STRUCTURAL": {
+      "passed": true,
+      "row_count": 120,
+      "worst_core_joint_nrmse": 0.02523874542260876,
+      "worst_fit_joint_nrmse": 0.013253263464472507,
+      "strong_rank_resolution_valid": true
+    },
+    "PREDICTIVE": {
+      "passed": true,
+      "row_count": 120,
+      "worst_core_joint_nrmse": 0.029997095507137774,
+      "worst_fit_joint_nrmse": 0.018991310901991614,
+      "strong_rank_resolution_valid": true
+    }
+  },
+  "next_allowed_experiment": "E2A0",
+  "full_grid_row_count": 1440,
+  "all_lag_counts_present": [
+    32,
+    40,
+    48,
+    64
+  ],
+  "all_amplitude_counts_present": [
+    24,
+    28,
+    32
+  ]
+}

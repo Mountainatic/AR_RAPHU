@@ -23,6 +23,9 @@ class ExperimentContract:
     basis_selection_uses_truth: bool = False
     smoothing_selection_metric: str = "validation_prediction_mse"
     allowed_next_experiment: str = ""
+    model_class: str = "M2"
+    evaluation_distribution: str = "NAT"
+    resolution_role: str = "NONE"
 
     def validate(self) -> None:
         if not self.scientific_question.strip():
@@ -40,8 +43,12 @@ class ExperimentContract:
             )
         if self.hyperparameter_selection_metric != "validation_prediction_loss_only":
             raise ValueError("Hyperparameters must use validation prediction loss only.")
-        if self.basis_selection_uses_truth:
-            raise ValueError("Truth cannot select the operational basis.")
+        if self.basis_selection_uses_truth and self.experiment_role != (
+            "ORACLE_REPRESENTATION_DIAGNOSTIC"
+        ):
+            raise ValueError(
+                "Truth may select a basis only in the oracle representation diagnostic."
+            )
         if self.smoothing_selection_metric != "validation_prediction_mse":
             raise ValueError("Smoothing must use validation prediction MSE.")
         if self.rank_inputs_used_for_selection or self.test_used_for_selection:
@@ -54,6 +61,22 @@ class ExperimentContract:
         if self.experiment_role == "FORMAL_STRUCTURE_RECOVERY":
             if not self.model_contains_x:
                 raise ValueError("Formal structure recovery must contain X.")
+        if self.model_class not in {"M1", "M2", "M3"}:
+            raise ValueError("model_class must be M1, M2, or M3.")
+        if self.evaluation_distribution not in {
+            "ORACLE_GRID",
+            "NAT",
+            "PERM",
+            "SPACE",
+        }:
+            raise ValueError("Unknown evaluation distribution.")
+        if self.resolution_role not in {
+            "PREDICTIVE",
+            "STRUCTURAL",
+            "MOTHER",
+            "NONE",
+        }:
+            raise ValueError("Unknown resolution role.")
 
     def to_dict(self) -> dict[str, object]:
         self.validate()

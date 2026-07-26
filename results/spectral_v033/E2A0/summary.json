@@ -1,0 +1,11 @@
+{
+  "status": "E2A0_IMPLEMENTATION_CLOSURE_PASS",
+  "maximum_truth_replay_error": 8.881784197001252e-16,
+  "maximum_matrix_direct_error": 3.3029134982598407e-15,
+  "projected_target_prediction_relative_error": 1.1137513007719951e-12,
+  "direct_kkt_relative_residual": 3.5144106385507844e-16,
+  "pcg_kkt_relative_residual": 4.744182089726453e-11,
+  "direct_pcg_prediction_relative_difference": 5.6085514671417436e-11,
+  "pcg_converged": true,
+  "next_allowed_experiment": "E2A_M_SPACE"
+}
