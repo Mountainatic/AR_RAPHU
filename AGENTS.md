@@ -847,3 +847,27 @@ loss 选择；rank 输入和 test 均不得参与选择。
   因此状态为 `E2A_S_SPACE_CAPACITY_FAIL`。停止线为
   `NEXT_ALLOWED_STAGE=STOP_STRUCTURAL_SPACE_CAPACITY`；P-NAT、P-PERM、
   E2B、E3 均不得运行。
+
+## Spectral v0.3.4 自适应有效秩验证
+
+- 当前活动规范升级为
+  `Adaptive_Rank_Spectral_PS_AR_RAPHU_Theory_v0_3_4.md` 与
+  `Adaptive_Rank_Spectral_PS_AR_RAPHU_Validation_Plan_v0_3_4.md`；
+  v0.3.3 的代码、结果和自动决策保持只读，不覆盖、不改写。
+- 新分支固定为 `ps-ar-raphu-v034-adaptive-rank-profile`，新结果只写
+  `results/spectral_v034/`。冻结复用 v0.3.3 的 `48x28` full structural
+  fits、已选 smoothing、原 seeds、SPACE 历史、split 和 FP64 solver。
+- Scheme A 固定为第一谱模态；Scheme B 固定为所有 `r>=2` 的完整谱尾，
+  不再等同于单一第二模态。禁止把 AR-S4U 强制归为 rank-2。
+- 结构/预测预算均固定为 `{0.10,0.05,0.02}`，`rank_max=12`；第 12
+  模态之后的能量必须聚合保存。结构、预测与部署有效秩必须分开报告。
+- 严格顺序为
+  `R0 -> E2A_SR -> E2A_SRB + E2A_P_NAT -> E2A_P_PERM`。SR 失败即
+  `STOP_RANK_PROFILE`；SRB 失败即 `STOP_RANK_UNCERTAINTY`；P-NAT full
+  capacity 失败即 `STOP_PREDICTIVE_CAPACITY`。
+- E2A-SRB development 固定 200 次 circular moving-block bootstrap、
+  block length 64；每次使用原 basis/smoothing 重新拟合 full kernel，
+  不允许重新选择 smoothing。
+- 本轮生成 `V034_RANK_PROFILE_DECISION.md` 与
+  `SPECTRAL_PS_AR_RAPHU_V034_RANK_PROFILE_RESULTS.zip` 后暂停，不实现、
+  不运行 E2B/E3。
