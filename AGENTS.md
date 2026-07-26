@@ -1,17 +1,21 @@
-# 项目持久约束：AR-RAPHU v2 冻结基线与 v3 D1--D6 诊断
+# 项目持久约束：AR-RAPHU v2/v3 历史基线与 Spectral Predictive-State v0.3
 
 本文件是本项目后续 Codex 会话必须遵守的项目记忆。开始任何实现、数据处理、下载或实验前，必须完整阅读：
 
 1. 本文件；
-2. `PS_AR_RAPHU_V3_D1_D6_Diagnostic_Execution_Plan.md`；
-3. `AR_RAPHU_method_v2.md`；
-4. `AR_RAPHU_three_layer_validation_plan_v2.md`；
-5. `AR_RAPHU_v2_revision_notes.md`。
+2. `Spectral_PS_AR_RAPHU_Theory_v0_3.md`；
+3. `Spectral_PS_AR_RAPHU_Validation_Plan_v0_3.md`；
+4. `PS_AR_RAPHU_V3_D1_D6_Diagnostic_Execution_Plan.md`；
+5. `AR_RAPHU_method_v2.md`；
+6. `AR_RAPHU_three_layer_validation_plan_v2.md`；
+7. `AR_RAPHU_v2_revision_notes.md`。
 
-当前活动规范是 `PS_AR_RAPHU_V3_D1_D6_Diagnostic_Execution_Plan.md`。
-对 D1--D6 的范围、文件、数值、执行、判定、输出或停止条件有冲突时，
-一律以该 v3 计划为最高优先级；计划未另行规定之处才沿用本文件和 v2
-冻结基线。不得以旧 v2 执行习惯覆盖 v3 的最小诊断约束。
+当前活动规范是 `Spectral_PS_AR_RAPHU_Theory_v0_3.md` 与
+`Spectral_PS_AR_RAPHU_Validation_Plan_v0_3.md`。对 Spectral v0.3 的模型、
+目标、文件、数值、执行、判定、输出或停止条件有冲突时，一律以验证计划为
+最高优先级、理论文档为语义边界；未规定处才沿用本文件和 v2/v3 历史基线。
+v3 D1--D6 已完成并作为只读诊断证据保留，不再是活动执行合同。不得用旧 v2
+支持门控、M7/M8 路线或 v3 最小诊断实现覆盖 Spectral v0.3。
 
 旧文件 `rank_adaptive_parallel_hammerstein_urysohn_method.md` 与
 `three_layer_validation_plan.md` 仅用于追踪 v1 设计演化，不再作为当前执行规范。
@@ -19,7 +23,9 @@
 
 ## 用户授权边界
 
-- 当前只可严格按照 v3 D1--D6 最小诊断合同推进；v2 作为停止线后的只读科学与实现基线。不得跳过诊断、扩展实验或把计划/期望写成结果。
+- 当前只可严格按照 Spectral v0.3 的 E0--E8 执行合同推进；v2 停止线和
+  v3 D1--D6 作为只读科学与实现基线。不得跳过进入条件、扩展实验或把
+  计划/期望写成结果。
 - 对文档未规定但执行所必需、且不同选择会实质影响结果的事项，不得自行决定；暂停并询问用户。
 - 质量和可复核性优先于速度。任何加速不得改变科学模型、数据边界、数值精度要求或统计方案，并须通过等价性/一致性测试。
 - 结果状态统一使用：`COMPLETED`、`FAILED`、`NOT_YET_RUN`、`NOT_APPLICABLE`、`BLOCKED_BY_MISSING_METADATA`、`BLOCKED_BY_MISSING_DATA`。
@@ -599,10 +605,143 @@ D1--D3 可额外输出 surface/lag；D5 可额外输出 gate path；D6 可额外
 最终交付只允许计划列出的 v3 diagnostic 源码、配置、测试、结果和一个
 简单 zip；禁止 HTML、SHA 和复杂 manifest。
 
-## v3 当前状态与授权状态
+## v3 当前状态与正确承接
 
 - `PS_AR_RAPHU_V3_D1_D6_Diagnostic_Execution_Plan.md`：`FROZEN`。
-- D1--D6：`NOT_YET_RUN`。
-- v3 diagnostic implementation：`NOT_YET_IMPLEMENTED`。
-- 本次仅更新 `AGENTS.md`。这不构成开始实现、训练、服务器部署、Git
-  提交、GitHub 推送或覆盖既有产物的授权。
+- D1--D6 与实现：`COMPLETED`；已发布 `v3-diagnostics-20260726`。
+- 冻结结果：D1 `D1_CAPACITY_FAIL`；D2
+  `D2_RANK1_BLIND_SPOT_NOT_CONFIRMED`；D3
+  `D3_X_INFORMATION_REMAINS_AT_H1`；D4
+  `D4_TRAINING_ORDER_NOT_PRIMARY`；D5
+  `D5_SCALE_NORMALIZED_GATE_PATH_SUCCESS`；D6
+  `D6_NOT_A_GRADIENT_MAGNITUDE_PROBLEM+D6_PROXIMAL_COLLAPSE_CONFIRMED`。
+- D1/D2 的 X-only 模型与含强 AR 的完整目标不匹配，不能据此否定 rank-2
+  容量；D3/D4 说明 X 信息仍存在且 dense simultaneous XAR 可学习外生
+  贡献；D5 支持标准化函数贡献路径；D6 将原失败定位为 proximal 持续
+  收缩而非长期梯度饥饿。
+
+## Spectral Predictive-State AR-RAPHU v0.3 活动语义
+
+- 状态：`THEORY_V0.3 / PROPOSED_AND_TESTABLE` 与
+  `PROPOSED_CORE_VALIDATION`。
+- v0.3 替换旧“Scheme A 硬支持筛选后 Scheme B 审计”的结构路线，但不
+  篡改旧结果。预测路径使用 dense simultaneous XAR；结构路径使用前向
+  cross-fitting、双残差正交化和全变量平滑 Urysohn 强凸估计。
+- 删除训练期变量硬门控、KAN 参数块 group-prox、用 gate/激活权重解释
+  rank，以及 Scheme A 对 Scheme B 的资格控制。
+- Scheme A 是同一 Gram 白化完整核的第一谱模态；Scheme B 是该核谱尾。
+  支持是评价层的核范数、实际贡献、块消融与 D5 路径证据；rank 证据与
+  部署 rank 分离。
+- Predictive State 只表示给定阶段、视野与分布下的预测商状态，不声称
+  完整物理状态、全局 Takens 嵌入或无条件因果效应。
+- 条件加性模型允许每变量独立的平滑时滞--幅值核与不同 rank；本版不允许
+  外生变量间显式交互核、未观测阶段切换或不可稳定截断的无穷记忆。
+
+## Spectral v0.3 科学合同
+
+每个实验必须生成并验证 `contract.json`，至少声明：科学问题；target/model
+是否含 AR/X；`truth_used_for_training=false`；truth 是否只用于评价；
+`support_used_for_training=all|oracle`；超参数只由 validation prediction
+loss 选择；rank 输入和 test 均不得参与选择。
+
+- 完整目标含 AR 而模型不含 AR 时，只能标记
+  `ORACLE_COMPONENT_DIAGNOSTIC`，不得用于完整目标容量验收。
+- 正式结构恢复必须同时残差化目标 y 和外生设计 Phi；truth 仅用于合成
+  评价和 oracle capacity。
+- support、真核、奇异值、rank、test 与图形不得参与 grid/smoothing 选择。
+- 失败必须按预注册映射解释，不得自动换网络、扩大 grid、增加 epoch 或
+  改变目标。
+
+## Spectral v0.3 分支、范围与实现边界
+
+- 新分支固定为 `ps-ar-raphu-v4-spectral`，不得覆盖 v2/v3 diagnostics。
+- 起点是 `PS_AR_RAPHU_V3_DIAGNOSTICS_RESULTS.zip` 中源码与旧停止线
+  `source/`；本轮只做合成 E0--E8，不做公开数据、真实 CZ、MPC、PLC、
+  最终论文图或全仓 SHA/manifest。
+- 可复用现有 synthetic、sequence/data protocol、preprocessing、model、
+  training、phase1 evidence、statistics、gate_fista 与 V20 spline；禁止
+  复用 `training.prune_external_path`、A-support-only M8 dispatch 和旧
+  group-prox 支持选择。
+- 新实现限制在 `src/ar_raphu/spectral/`、三个 spectral tools、
+  `configs/spectral_v03.yaml` 和七个 `tests/test_spectral_*.py`。
+
+## Spectral v0.3 固定配置与数值规则
+
+- development seeds `0..4`；confirmation `100..119`；null `200..249`；
+  `n_samples=10000`，外生变量 10，`L_x=64`，`L_y=32`，horizons
+  `[1,5,10,30,60]`，primary horizon 1。
+- 外生三次样条候选 lag `[5,8]`、amplitude `[8,12]`；唯一 fallback
+  `(12,16)`；幅值域为 train-only `[0.01,0.99]` 分位。
+- AR nuisance basis `6x8`，ridge 候选 `[1e-4,1e-3,1e-2,1e-1]`；lag 与
+  amplitude smoothing 候选均为 `[1e-4,1e-3,1e-2,1e-1]`；稳定 ridge
+  `1e-6`。
+- forward cross-fit：4 folds、initial prefix targets 2000、purge gap 65、
+  nuisance selection tail fraction 0.20。
+- block length 64；bootstrap development/confirmation `100/500`；jitter
+  relative `1e-10`。
+- support：max-null 0.95 分位、正消融折比例 0.80、recall 0.80、FPR 0.10。
+- rank：alpha 0.05、BH-FDR 0.10、正 rank-2 gain 折比例 0.80、第二模态
+  stability 0.70、邻近配置一致数 2。
+- adaptive 仅作对照：FISTA ratios
+  `[0.32,0.16,0.08,0.04,0.02,0.01,0.005,0.0]`，epsilon 0.05，权重
+  `[0.25,4.0]`。
+- 设计矩阵可 CUDA 分块构建后立即转 CPU FP64。维数 <2000 的主 full-kernel
+  ridge 必须用 FP64 Cholesky，不得用 Adam/FISTA；relative KKT residual
+  `<=1e-8`。`OMP_NUM_THREADS=1`，多 seed 并发 4--8，不用 DDP。
+- 联合 one-SE 只看 validation MSE；候选集内依次选最少总核系数、最大
+  `lambda_tau*lambda_x`、更小 lag basis、更小 amplitude basis、固定顺序。
+
+## Spectral v0.3 E0--E8 顺序与停止线
+
+1. E0 重放 AR/X/过程创新/测量噪声；任一恒等式误差 >`1e-10` 即停止。
+2. E1 做 AR-S1/S2/S3/S4 投影 oracle；NRMSE >0.10 时只允许 `(12,16)`
+   fallback，仍失败即停止。
+3. E2 用纯外生真值目标、oracle active support 和 full tensor Urysohn 验证
+   full/rank 容量；失败即停止，不讨论 support/rank。
+4. E3 比较 oracle、只残差 y、双残差和联合 AR+X。双残差须至少 4/5 seeds
+   更接近 oracle，median `d_D/d_Y<=0.85`，validation RMSE 恶化不超过 5%。
+   residual Gram condition number >1e8 标记弱可辨识；与 nuisance basis 最大
+   相关 >0.10 标记残差化不足。失败停止 E4/E5，不换网络。
+5. E4 用 50 个 AR-S0 null seeds 建 max-null cutoff；所有变量一直保留。
+   confirmation 上 AR-S0 FPR <=0.10，AR-S1/S2/S3 recall >=0.80 且
+   FPR <=0.10。
+6. E5 只对 E4 有支持证据的变量推断 rank；rank-2 同时要求 adjusted p
+   <=0.10、正增益折比例 >=0.80、稳定性 >=0.70 和邻居一致。AR-S1/S2
+   错误升级率 <=0.10，AR-S3 检出率 >=0.80。
+7. E6 比较 uniform 与 D5-adaptive；只有验证计划所有升级条件同时满足才
+   采用 adaptive，否则 uniform 保持默认。
+8. E7 比较 AR-only、dense XAR no-prox、spectral fixed、anchored refit；
+   rank 固定、全变量保留、无 group-prox。B3 须位于 B1 one-SE、至少三个
+   horizon 优于 AR-only、anchor 偏离 <=20%、不删除变量。
+9. E8 仅在 E7 通过后运行；依次尝试 Gamma/Erlang、多指数、Laguerre、
+   generic stable state-space，要求核误差 <=0.05、递推 RMSE 增量
+   <=`0.01*Std(y)`、谱半径 <=0.995。
+
+严格按 E0--E7 development 进入条件运行，全部满足后才 confirmation；E8
+仅由 E7 解锁。E4 失败只保留连续证据，E5 失败只保留预测器，E7 失败保持
+结构/预测双模型，E8 失败保留窗口实现。
+
+## Spectral v0.3 检查、输出与打包
+
+- 启动前只运行验证计划第 2 节列出的九个定向测试。禁止全仓测试、文件
+  SHA、manifest、HTML、Git tag 检查、旧 M7/M8 审计和 checkpoint replay。
+- CLI 只允许 `experiment`、`stage`、`device`、`force`；禁止覆盖 grid、
+  smoothing、threshold、seed、target semantics 和 bootstrap 次数。
+- 结果只写 `results/spectral_v03/`；job 只保存 `contract.json`、
+  `config.json`、`summary.json`、`metrics.csv`、`fit.npz`，bootstrap 时增加
+  `bootstrap_statistics.npz`。自动决策只能使用计划字段与映射。
+- 完成后只打包一次 `SPECTRAL_PS_AR_RAPHU_V03_RESULTS.zip`，只检查
+  `DEVELOPMENT_DECISION.md`、`spectral_summary.csv` 和 `unzip -t`；不生成
+  SHA 或 manifest。
+- 第一批严格限于：component replay+E0、tensor design+E1、FP64 ridge+
+  Gram SVD、正确外生目标 E2、cross-fit nuisance 与双残差测试、E3
+  development 5 seeds。六项通过后才开始 E4/E5。
+
+## Spectral v0.3 当前状态与本次授权边界
+
+- 两份 v0.3 文档已于 2026-07-26 纳入项目持久约束。
+- 分支 `ps-ar-raphu-v4-spectral`：`NOT_YET_CREATED`。
+- Spectral v0.3 implementation：`NOT_YET_IMPLEMENTED`。
+- E0--E8：`NOT_YET_RUN`。
+- 本次用户只要求更新 `AGENTS.md`；这不构成创建分支、实现、训练、部署、
+  Git 提交、GitHub 推送或覆盖既有 v2/v3 产物的授权。
