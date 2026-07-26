@@ -11,7 +11,7 @@ from .data_protocol import PREDICTION_HORIZONS
 from .protocol_config import load_protocol_config
 
 
-SCENARIOS = tuple(f"AR-S{index}" for index in range(8))
+SCENARIOS = tuple(f"AR-S{index}" for index in range(8)) + ("AR-S4U",)
 
 
 def _normalized_gamma(length: int, shape: float, scale: float) -> np.ndarray:
@@ -31,6 +31,20 @@ def _normalized_gaussian(
         -0.5 * ((lag - float(center)) / float(standard_deviation)) ** 2
     )
     return weights / weights.sum()
+
+
+def normalized_gaussian_value(
+    *,
+    lag: int,
+    length: int,
+    center: float,
+    standard_deviation: float,
+) -> float:
+    """Return one coordinate after normalization over the full lag axis."""
+
+    return float(
+        _normalized_gaussian(length, center, standard_deviation)[int(lag)]
+    )
 
 
 def _truth_response(index: int, values: np.ndarray) -> np.ndarray:
@@ -166,7 +180,9 @@ def generate_synthetic_sequence(
     q_primary = np.zeros((variables, L_x), dtype=np.float64)
     q_secondary = np.zeros_like(q_primary)
     active = [] if scenario == "AR-S0" else [0, 1, 2]
-    scenario_config = synthetic["scenario_parameter_grids"][scenario]
+    scenario_config = synthetic["scenario_parameter_grids"][
+        "AR-S4" if scenario == "AR-S4U" else scenario
+    ]
 
     if scenario in {"AR-S1", "AR-S5", "AR-S6", "AR-S7"}:
         gamma_parameters = synthetic["scenario_parameter_grids"]["AR-S1"][
@@ -233,6 +249,32 @@ def generate_synthetic_sequence(
                     np.dot(q_dynamic, _truth_response(variable, lagged_x[:, variable]))
                 )
                 means.append(center)
+            dynamic_delay_means[time] = means
+        elif scenario == "AR-S4U":
+            means = []
+            for variable in active:
+                contribution = 0.0
+                for lag, amplitude in enumerate(lagged_x[:, variable]):
+                    center = 8.0 + 12.0 / (
+                        1.0 + np.exp(-2.0 * amplitude)
+                    )
+                    contribution += normalized_gaussian_value(
+                        lag=lag,
+                        length=L_x,
+                        center=center,
+                        standard_deviation=2.0,
+                    ) * float(
+                        _truth_response(variable, np.array([amplitude]))[0]
+                    )
+                value += contribution
+                means.append(
+                    8.0
+                    + 12.0
+                    / (
+                        1.0
+                        + np.exp(-2.0 * x_full[time - 1, variable])
+                    )
+                )
             dynamic_delay_means[time] = means
         elif scenario == "AR-S3":
             for variable in active:
@@ -316,7 +358,7 @@ def generate_synthetic_sequence(
         "current_target_in_input": False,
         "future_X_in_primary_input": False,
     }
-    if scenario == "AR-S4":
+    if scenario in {"AR-S4", "AR-S4U"}:
         truth["dynamic_delay_means"] = dynamic_delay_means[burn_in:].copy()
     if scenario == "AR-S5":
         truth["measurement_filter_weights"] = np.asarray(

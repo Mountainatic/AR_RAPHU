@@ -16,6 +16,14 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 from ar_raphu.spectral.contracts import ExperimentContract
+from ar_raphu.spectral.amplitude_domain import (
+    AmplitudeDomain,
+    AmplitudeOutOfDomainError,
+)
+from ar_raphu.spectral.capacity_diagnostics import (
+    direct_apply_projected_kernel,
+    direct_apply_truth_kernel,
+)
 from ar_raphu.spectral.design import build_spectral_design
 from ar_raphu.spectral.gram_svd import gram_whitened_svd
 from ar_raphu.spectral.metrics import normalized_root_mean_square_error, r2
@@ -24,6 +32,10 @@ from ar_raphu.spectral.penalties import tensor_penalty
 from ar_raphu.spectral.projection import (
     identity_lag_basis,
     project_tensor_surface,
+)
+from ar_raphu.spectral.scenario_registry import (
+    SCENARIO_REGISTRY,
+    s4c_mixed_difference,
 )
 from ar_raphu.spectral.spline_basis import (
     CenteredSplineBasis,
@@ -36,6 +48,7 @@ from ar_raphu.spectral.synthetic_components import (
     true_kernel_surface,
 )
 from ar_raphu.spectral.solver import solve_full_kernel
+from ar_raphu.spectral.solver import solve_full_kernel_pcg
 from ar_raphu.synthetic import generate_synthetic_sequence
 
 
@@ -938,12 +951,663 @@ def run_e2a(config: dict[str, object], result_root: Path) -> str:
     return status
 
 
+def run_r1(config: dict[str, object], result_root: Path) -> str:
+    output = result_root / "R1"
+    common = config["common"]
+    domain_config = config["amplitude_domain"]
+    contract = ExperimentContract(
+        scientific_question=(
+            "Did the old amplitude protocol clip histories and is AR-S4 "
+            "outside the 2D additive Urysohn model class?"
+        ),
+        target_semantics="protocol_domain_and_model_class_audit",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="oracle",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        basis_selection_uses_truth=False,
+        smoothing_selection_metric="validation_prediction_mse",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        allowed_next_experiment="E1A",
+        experiment_role="ORACLE_COMPONENT_DIAGNOSTIC",
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+    rows: list[dict[str, object]] = []
+    L_x = int(common["L_x"])
+    for scenario in ("AR-S1", "AR-S2", "AR-S3", "AR-S4"):
+        for seed in common["development_seeds"]:
+            sequence = generate_synthetic_sequence(
+                scenario,
+                seed=int(seed),
+                n_samples=int(common["n_samples_natural"]),
+                external_variables=int(common["external_variables"]),
+            )
+            train_stop = sequence.split_target_intervals["train"][1]
+            for variable in (0, 1, 2):
+                train_values = sequence.x[:train_stop, variable]
+                lower, upper = np.quantile(
+                    train_values,
+                    tuple(domain_config["old_audit_quantiles"]),
+                )
+                for partition, (start, stop) in (
+                    sequence.split_target_intervals.items()
+                ):
+                    point_values = sequence.x[start:stop, variable]
+                    point_ood = (point_values < lower) | (point_values > upper)
+                    targets = np.arange(start, stop, dtype=np.int64)
+                    origins = targets - int(common["primary_horizon"])
+                    offsets = np.arange(L_x, dtype=np.int64)
+                    windows = sequence.x[
+                        origins[:, None] - offsets[None, :], variable
+                    ]
+                    window_ood = np.any(
+                        (windows < lower) | (windows > upper), axis=1
+                    )
+                    rows.append(
+                        {
+                            "scenario": scenario,
+                            "seed": int(seed),
+                            "variable": variable,
+                            "partition": partition,
+                            "old_lower": float(lower),
+                            "old_upper": float(upper),
+                            "point_clipping_rate": float(np.mean(point_ood)),
+                            "window_clipping_rate": float(np.mean(window_ood)),
+                            "point_count": len(point_values),
+                            "window_count": len(windows),
+                        }
+                    )
+    classification = {
+        name: spec.to_dict() for name, spec in SCENARIO_REGISTRY.items()
+    }
+    classification["AR-S4"]["mixed_difference"] = s4c_mixed_difference()
+    registry_valid = (
+        not classification["AR-S4"]["eligible_for_2d_capacity"]
+        and classification["AR-S4U"]["eligible_for_2d_capacity"]
+        and abs(classification["AR-S4"]["mixed_difference"]) > 1e-8
+    )
+    status = (
+        "R1_DOMAIN_AND_MODEL_CLASS_AUDIT_PASS"
+        if registry_valid
+        else "R1_SCENARIO_OR_DOMAIN_AUDIT_FAIL"
+    )
+    summary = {
+        "status": status,
+        "maximum_point_clipping_rate": max(
+            float(row["point_clipping_rate"]) for row in rows
+        ),
+        "maximum_window_clipping_rate": max(
+            float(row["window_clipping_rate"]) for row in rows
+        ),
+        "median_window_clipping_rate": float(
+            np.median([row["window_clipping_rate"] for row in rows])
+        ),
+        "model_class_registry_valid": registry_valid,
+        "next_allowed_experiment": "E1A" if registry_valid else "STOP",
+    }
+    write_csv(output / "old_clipping_audit.csv", rows)
+    write_csv(output / "metrics.csv", rows)
+    write_json(output / "scenario_classification.json", classification)
+    write_json(output / "summary.json", summary)
+    np.savez(output / "fit.npz", audit_only=np.array([1], dtype=np.int8))
+    return status
+
+
+def _v032_surface_projection(
+    sequence,
+    variable: int,
+    *,
+    lag_basis_count: int,
+    amplitude_basis_count: int,
+    domain: AmplitudeDomain,
+    evaluation_domain: str,
+    config: dict[str, object],
+):
+    basis_config = config["basis_recertification"]
+    train_stop = sequence.split_target_intervals["train"][1]
+    train_values = sequence.x[:train_stop, variable]
+    amplitude_basis = CenteredSplineBasis.fit(
+        train_values,
+        n_basis=amplitude_basis_count,
+        degree=int(basis_config["degree"]),
+        domain=domain,
+    )
+    if evaluation_domain == "core":
+        lower, upper = domain.core_lower, domain.core_upper
+    elif evaluation_domain == "fit":
+        lower, upper = domain.fit_lower, domain.fit_upper
+    else:
+        raise ValueError("evaluation_domain must be core or fit.")
+    amplitudes = np.linspace(
+        lower,
+        upper,
+        int(basis_config["evaluation_grid_points"]),
+    )
+    amplitude_eval = amplitude_basis.transform(amplitudes)
+    truth = true_kernel_surface(sequence, variable, amplitudes)
+    empirical_mean = true_kernel_surface(
+        sequence, variable, train_values
+    ).mean(axis=1, keepdims=True)
+    centered_truth = truth - empirical_mean
+    if lag_basis_count == int(basis_config["identity_lag_reference"]):
+        lag_basis = identity_lag_basis(int(config["common"]["L_x"]))
+        basis_type = "discrete_identity"
+    else:
+        knots = clamped_knots(
+            0.0,
+            float(int(config["common"]["L_x"]) - 1),
+            lag_basis_count,
+            int(basis_config["degree"]),
+        )
+        lag_basis = evaluate_basis(
+            np.arange(int(config["common"]["L_x"])),
+            knots,
+            int(basis_config["degree"]),
+        )
+        basis_type = "cubic_bspline"
+    result = project_tensor_surface(centered_truth, lag_basis, amplitude_eval)
+    return result, amplitude_basis, lag_basis, basis_type
+
+
+def run_e1a(config: dict[str, object], result_root: Path) -> str:
+    r1_path = result_root / "R1" / "summary.json"
+    if not r1_path.exists() or json.loads(
+        r1_path.read_text(encoding="utf-8")
+    )["status"] != "R1_DOMAIN_AND_MODEL_CLASS_AUDIT_PASS":
+        raise RuntimeError("E1A is blocked until R1 passes.")
+    output = result_root / "E1A"
+    common = config["common"]
+    basis_config = config["basis_recertification"]
+    domain_config = config["amplitude_domain"]
+    contract = ExperimentContract(
+        scientific_question=(
+            "Which frozen amplitude basis first represents the four core "
+            "2D Urysohn scenarios on both core and fit domains?"
+        ),
+        target_semantics="centered_true_2d_external_kernel_surface",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="oracle",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        basis_selection_uses_truth=False,
+        smoothing_selection_metric="validation_prediction_mse",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        allowed_next_experiment="E2A0",
+        experiment_role="ORACLE_COMPONENT_DIAGNOSTIC",
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+    scenarios = list(config["scenario_sets"]["core_2d_urysohn"])
+    core_rows: list[dict[str, object]] = []
+    fit_rows: list[dict[str, object]] = []
+    sequences: dict[tuple[str, int], object] = {}
+    e0u_errors: list[float] = []
+    for scenario in scenarios:
+        for seed in common["development_seeds"]:
+            sequence = generate_synthetic_sequence(
+                scenario,
+                seed=int(seed),
+                n_samples=int(common["n_samples_natural"]),
+                external_variables=int(common["external_variables"]),
+            )
+            sequences[(scenario, int(seed))] = sequence
+            if scenario == "AR-S4U":
+                components = replay_synthetic_components(sequence)
+                reconstructed = (
+                    components.ar_contribution
+                    + components.x_total_contribution
+                    + components.process_innovation
+                )
+                e0u_errors.append(
+                    float(
+                        np.max(np.abs(sequence.y_latent - reconstructed))
+                    )
+                )
+            train_stop = sequence.split_target_intervals["train"][1]
+            for variable in sequence.truth["active_support"]:
+                train_values = sequence.x[:train_stop, variable]
+                domain = AmplitudeDomain.fit(
+                    train_values,
+                    padding_fraction=float(domain_config["padding_fraction"]),
+                    core_quantiles=tuple(domain_config["core_quantiles"]),
+                )
+                for amplitude_count in basis_config[
+                    "amplitude_basis_candidates"
+                ]:
+                    for lag_count in (
+                        int(basis_config["lag_basis_count"]),
+                        int(basis_config["identity_lag_reference"]),
+                    ):
+                        for evaluation_domain, rows in (
+                            ("core", core_rows),
+                            ("fit", fit_rows),
+                        ):
+                            result, _, _, basis_type = _v032_surface_projection(
+                                sequence,
+                                int(variable),
+                                lag_basis_count=lag_count,
+                                amplitude_basis_count=int(amplitude_count),
+                                domain=domain,
+                                evaluation_domain=evaluation_domain,
+                                config=config,
+                            )
+                            rows.append(
+                                {
+                                    "scenario": scenario,
+                                    "seed": int(seed),
+                                    "variable": int(variable),
+                                    "lag_basis_type": basis_type,
+                                    "lag_basis_count": lag_count,
+                                    "amplitude_basis_count": int(
+                                        amplitude_count
+                                    ),
+                                    "surface_nrmse": result.nrmse,
+                                    "domain_lower": (
+                                        domain.core_lower
+                                        if evaluation_domain == "core"
+                                        else domain.fit_lower
+                                    ),
+                                    "domain_upper": (
+                                        domain.core_upper
+                                        if evaluation_domain == "core"
+                                        else domain.fit_upper
+                                    ),
+                                }
+                            )
+    selected = None
+    candidate_diagnostics: dict[str, object] = {}
+    main_lag = int(basis_config["lag_basis_count"])
+    identity_lag = int(basis_config["identity_lag_reference"])
+    for amplitude_count in basis_config["amplitude_basis_candidates"]:
+        core_main = [
+            row
+            for row in core_rows
+            if row["lag_basis_count"] == main_lag
+            and row["amplitude_basis_count"] == amplitude_count
+        ]
+        fit_main = [
+            row
+            for row in fit_rows
+            if row["lag_basis_count"] == main_lag
+            and row["amplitude_basis_count"] == amplitude_count
+        ]
+        ratios_valid = True
+        scenario_ratios = {}
+        for scenario in scenarios:
+            main_core = max(
+                row["surface_nrmse"]
+                for row in core_main
+                if row["scenario"] == scenario
+            )
+            identity_core = max(
+                row["surface_nrmse"]
+                for row in core_rows
+                if row["scenario"] == scenario
+                and row["lag_basis_count"] == identity_lag
+                and row["amplitude_basis_count"] == amplitude_count
+            )
+            main_fit = max(
+                row["surface_nrmse"]
+                for row in fit_main
+                if row["scenario"] == scenario
+            )
+            identity_fit = max(
+                row["surface_nrmse"]
+                for row in fit_rows
+                if row["scenario"] == scenario
+                and row["lag_basis_count"] == identity_lag
+                and row["amplitude_basis_count"] == amplitude_count
+            )
+            core_ratio = main_core / max(identity_core, np.finfo(float).eps)
+            fit_ratio = main_fit / max(identity_fit, np.finfo(float).eps)
+            scenario_ratios[scenario] = {
+                "core": core_ratio,
+                "fit": fit_ratio,
+            }
+            ratios_valid &= (
+                core_ratio <= float(basis_config["lag_reference_ratio_max"])
+                and fit_ratio
+                <= float(basis_config["lag_reference_ratio_max"])
+            )
+        passes = (
+            max(row["surface_nrmse"] for row in core_main)
+            <= float(basis_config["core_surface_max_nrmse"])
+            and max(row["surface_nrmse"] for row in fit_main)
+            <= float(basis_config["fit_surface_max_nrmse"])
+            and ratios_valid
+        )
+        candidate_diagnostics[str(amplitude_count)] = {
+            "worst_core_nrmse": max(
+                row["surface_nrmse"] for row in core_main
+            ),
+            "worst_fit_nrmse": max(
+                row["surface_nrmse"] for row in fit_main
+            ),
+            "scenario_reference_ratios": scenario_ratios,
+            "passes": bool(passes),
+        }
+        if selected is None and passes:
+            selected = int(amplitude_count)
+    e0u_max = max(e0u_errors) if e0u_errors else float("inf")
+    e0u_status = (
+        "E0U_COMPONENT_IDENTITY_PASS"
+        if e0u_max <= 1e-12
+        else "E0U_COMPONENT_IDENTITY_FAIL"
+    )
+    if selected is not None and e0u_status.endswith("_PASS"):
+        upper_lag = int(basis_config["upper_lag_neighbor"])
+        for scenario in scenarios:
+            for seed in common["development_seeds"]:
+                sequence = sequences[(scenario, int(seed))]
+                train_stop = sequence.split_target_intervals["train"][1]
+                for variable in sequence.truth["active_support"]:
+                    domain = AmplitudeDomain.fit(
+                        sequence.x[:train_stop, variable],
+                        padding_fraction=float(
+                            domain_config["padding_fraction"]
+                        ),
+                        core_quantiles=tuple(
+                            domain_config["core_quantiles"]
+                        ),
+                    )
+                    for evaluation_domain, rows in (
+                        ("core", core_rows),
+                        ("fit", fit_rows),
+                    ):
+                        result, _, _, basis_type = _v032_surface_projection(
+                            sequence,
+                            int(variable),
+                            lag_basis_count=upper_lag,
+                            amplitude_basis_count=selected,
+                            domain=domain,
+                            evaluation_domain=evaluation_domain,
+                            config=config,
+                        )
+                        rows.append(
+                            {
+                                "scenario": scenario,
+                                "seed": int(seed),
+                                "variable": int(variable),
+                                "lag_basis_type": basis_type,
+                                "lag_basis_count": upper_lag,
+                                "amplitude_basis_count": selected,
+                                "surface_nrmse": result.nrmse,
+                                "domain_lower": (
+                                    domain.core_lower
+                                    if evaluation_domain == "core"
+                                    else domain.fit_lower
+                                ),
+                                "domain_upper": (
+                                    domain.core_upper
+                                    if evaluation_domain == "core"
+                                    else domain.fit_upper
+                                ),
+                            }
+                        )
+    status = (
+        "E1A_DOMAIN_SAFE_REPRESENTATION_PASS"
+        if selected is not None and e0u_status.endswith("_PASS")
+        else "E1A_AMPLITUDE_REPRESENTATION_FAIL"
+    )
+    certificate = {
+        "status": status,
+        "e0u_status": e0u_status,
+        "e0u_maximum_identity_error": e0u_max,
+        "selected_amplitude_basis_count": selected,
+        "lag_basis_count": main_lag,
+        "candidate_diagnostics": candidate_diagnostics,
+        "next_allowed_experiment": "E2A0" if status.endswith("_PASS") else "STOP",
+    }
+    write_csv(output / "projection_core.csv", core_rows)
+    write_csv(output / "projection_fit.csv", fit_rows)
+    write_csv(output / "metrics.csv", core_rows + fit_rows)
+    write_json(output / "representation_certificate.json", certificate)
+    write_json(output / "summary.json", certificate)
+    np.savez(
+        output / "fit.npz",
+        selected_amplitude_basis_count=np.array(
+            [-1 if selected is None else selected], dtype=np.int64
+        ),
+    )
+    return status
+
+
+def run_e2a0(config: dict[str, object], result_root: Path) -> str:
+    e1a = json.loads(
+        (result_root / "E1A" / "summary.json").read_text(encoding="utf-8")
+    )
+    if e1a["status"] != "E1A_DOMAIN_SAFE_REPRESENTATION_PASS":
+        raise RuntimeError("E2A0 is blocked until E1A passes.")
+    output = result_root / "E2A0"
+    common = config["common"]
+    domain_config = config["amplitude_domain"]
+    basis_config = config["basis_recertification"]
+    tolerances = config["e2a0"]
+    amplitude_count = int(e1a["selected_amplitude_basis_count"])
+    lag_count = int(basis_config["lag_basis_count"])
+    contract = ExperimentContract(
+        scientific_question=(
+            "Do truth replay, tensor design, strict domains, and FP64 solvers "
+            "close before scientific capacity evaluation?"
+        ),
+        target_semantics="implementation_and_operator_closure",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="single_oracle_variable",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        basis_selection_uses_truth=False,
+        smoothing_selection_metric="validation_prediction_mse",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        allowed_next_experiment="E2A_NAT",
+        experiment_role="ORACLE_COMPONENT_DIAGNOSTIC",
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+    rows: list[dict[str, object]] = []
+    maximum_target_error = 0.0
+    maximum_design_error = 0.0
+    all_train_in_domain = True
+    strict_ood_raised = True
+    for scenario in config["scenario_sets"]["core_2d_urysohn"]:
+        for seed in common["development_seeds"]:
+            sequence = generate_synthetic_sequence(
+                scenario,
+                seed=int(seed),
+                n_samples=int(common["n_samples_natural"]),
+                external_variables=int(common["external_variables"]),
+            )
+            components = replay_synthetic_components(sequence)
+            start = sequence.split_target_intervals["train"][0]
+            stop = sequence.split_target_intervals["test"][1]
+            targets = np.arange(start, stop, dtype=np.int64)
+            train_stop = sequence.split_target_intervals["train"][1]
+            for variable in sequence.truth["active_support"]:
+                direct_target = direct_apply_truth_kernel(
+                    sequence, int(variable), targets
+                )
+                replayed_target = components.x_contribution_by_variable[
+                    targets, variable
+                ]
+                target_error = float(
+                    np.max(np.abs(direct_target - replayed_target))
+                )
+                maximum_target_error = max(maximum_target_error, target_error)
+                train_values = sequence.x[:train_stop, variable]
+                domain = AmplitudeDomain.fit(
+                    train_values,
+                    padding_fraction=float(domain_config["padding_fraction"]),
+                    core_quantiles=tuple(domain_config["core_quantiles"]),
+                )
+                all_train_in_domain &= bool(
+                    np.all(domain.in_domain_mask(train_values))
+                )
+                projection, amplitude_basis, lag_basis, _ = (
+                    _v032_surface_projection(
+                        sequence,
+                        int(variable),
+                        lag_basis_count=lag_count,
+                        amplitude_basis_count=amplitude_count,
+                        domain=domain,
+                        evaluation_domain="fit",
+                        config=config,
+                    )
+                )
+                design = build_spectral_design(
+                    sequence.x[:, [variable]],
+                    target_indices=targets,
+                    train_target_stop=train_stop,
+                    horizon=int(common["primary_horizon"]),
+                    L_x=int(common["L_x"]),
+                    lag_basis_count=lag_count,
+                    amplitude_basis_count=amplitude_count,
+                    degree=int(basis_config["degree"]),
+                    amplitude_domains=[domain],
+                )
+                via_matrix = design.matrix @ projection.coefficients.reshape(-1)
+                via_direct = direct_apply_projected_kernel(
+                    sequence.x,
+                    variable=int(variable),
+                    target_indices=targets,
+                    horizon=int(common["primary_horizon"]),
+                    lag_basis=lag_basis,
+                    amplitude_basis=amplitude_basis,
+                    coefficients=projection.coefficients,
+                )
+                design_error = float(
+                    np.max(np.abs(via_matrix - via_direct))
+                )
+                maximum_design_error = max(maximum_design_error, design_error)
+                try:
+                    amplitude_basis.transform(
+                        np.array([domain.fit_upper + 1e-6])
+                    )
+                    strict_ood_raised = False
+                except AmplitudeOutOfDomainError:
+                    pass
+                rows.append(
+                    {
+                        "scenario": scenario,
+                        "seed": int(seed),
+                        "variable": int(variable),
+                        "target_replay_max_abs_error": target_error,
+                        "design_forward_max_abs_error": design_error,
+                        "train_domain_coverage": float(
+                            np.mean(domain.in_domain_mask(train_values))
+                        ),
+                    }
+                )
+    rng = np.random.default_rng(320)
+    matrix = rng.normal(size=(700, 200))
+    target = rng.normal(size=700)
+    raw = rng.normal(size=(200, 200))
+    penalty = raw.T @ raw / 200 + 0.1 * np.eye(200)
+    direct = solve_full_kernel(
+        matrix, target, penalty, compute_condition_number=False
+    )
+    pcg = solve_full_kernel_pcg(
+        matrix,
+        target,
+        penalty,
+        relative_tolerance=1e-10,
+        max_iterations=2000,
+        block_slices=tuple(
+            slice(start, start + 50) for start in range(0, 200, 50)
+        ),
+    )
+    system = matrix.T @ matrix / len(matrix) + penalty
+    scale = max(float(np.trace(system) / len(system)), 1.0)
+    system = system + float(common["numerical_jitter_relative"]) * scale * np.eye(200)
+    rhs = matrix.T @ target / len(matrix)
+    reference = np.linalg.solve(system, rhs)
+    direct_error = float(
+        np.linalg.norm(direct.coefficients - reference)
+        / np.linalg.norm(reference)
+    )
+    pcg_error = float(
+        np.linalg.norm(pcg.coefficients - reference)
+        / np.linalg.norm(reference)
+    )
+    prediction_error = float(
+        np.linalg.norm(matrix @ pcg.coefficients - matrix @ reference)
+        / np.linalg.norm(matrix @ reference)
+    )
+    passes = (
+        maximum_target_error
+        <= float(tolerances["target_replay_tolerance"])
+        and maximum_design_error
+        <= float(tolerances["forward_operator_tolerance"])
+        and direct_error
+        <= float(tolerances["random_solver_relative_error"])
+        and pcg_error
+        <= float(tolerances["direct_vs_matrix_free_relative_error"])
+        and prediction_error <= 1e-9
+        and pcg.converged
+        and all_train_in_domain
+        and strict_ood_raised
+    )
+    status = (
+        "E2A0_IMPLEMENTATION_CONSISTENCY_PASS"
+        if passes
+        else "E2A0_IMPLEMENTATION_CONSISTENCY_FAIL"
+    )
+    summary = {
+        "status": status,
+        "maximum_target_replay_error": maximum_target_error,
+        "maximum_design_forward_error": maximum_design_error,
+        "direct_reference_relative_error": direct_error,
+        "pcg_reference_relative_error": pcg_error,
+        "pcg_prediction_relative_error": prediction_error,
+        "pcg_converged": pcg.converged,
+        "all_train_values_in_domain": all_train_in_domain,
+        "strict_ood_raised": strict_ood_raised,
+        "next_allowed_experiment": "E2A_NAT" if passes else "STOP",
+    }
+    write_csv(output / "metrics.csv", rows)
+    write_json(output / "summary.json", summary)
+    np.savez(
+        output / "fit.npz",
+        direct_coefficients=direct.coefficients,
+        pcg_coefficients=pcg.coefficients,
+        reference_coefficients=reference,
+    )
+    return status
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=CONFIG_PATH)
     parser.add_argument(
         "--experiment",
-        choices=["E0", "E1", "E1R", "E2A", "E2B", "E3"],
+        choices=[
+            "E0",
+            "E1",
+            "E1R",
+            "E2A",
+            "E2B",
+            "E3",
+            "R1",
+            "E1A",
+            "E2A0",
+            "E2A_NAT",
+            "E2A_PERM",
+            "E2A_SPACE",
+        ],
         required=True,
     )
     parser.add_argument("--stage", choices=["development", "confirmation"], required=True)
@@ -956,7 +1620,20 @@ def main() -> None:
     if not config_path.is_absolute():
         config_path = ROOT / config_path
     config = load_config(config_path)
-    if int(config.get("schema_version", 1)) == 2:
+    schema_version = int(config.get("schema_version", 1))
+    if schema_version == 3:
+        result_root = ROOT / "results" / "spectral_v032"
+        runners = {
+            "R1": run_r1,
+            "E1A": run_e1a,
+            "E2A0": run_e2a0,
+        }
+        if args.experiment not in runners:
+            raise SystemExit(
+                f"{args.experiment} is not implemented or not unlocked for v0.3.2."
+            )
+        status = runners[args.experiment](config, result_root)
+    elif schema_version == 2:
         result_root = ROOT / "results" / "spectral_v031"
         if args.experiment not in {"E1R", "E2A"}:
             raise SystemExit(

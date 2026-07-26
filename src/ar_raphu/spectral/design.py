@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from .amplitude_domain import AmplitudeDomain
 from .spline_basis import CenteredSplineBasis, clamped_knots, evaluate_basis
 
 
@@ -48,7 +49,9 @@ def build_ar_nuisance_design(
     )
     offsets = np.arange(L_y, dtype=np.int64)
     windows = y[origins[:, None] - offsets[None, :]]
-    amplitude = amplitude_basis.transform(windows.reshape(-1)).reshape(
+    amplitude = amplitude_basis.legacy_transform_for_audit(
+        windows.reshape(-1)
+    ).reshape(
         len(targets), L_y, amplitude_basis_count
     )
     tensor = np.einsum("la,nlb->nab", lag_basis, amplitude, optimize=True)
@@ -66,6 +69,7 @@ def build_spectral_design(
     amplitude_basis_count: int,
     degree: int = 3,
     amplitude_quantiles: tuple[float, float] = (0.01, 0.99),
+    amplitude_domains: list[AmplitudeDomain] | None = None,
 ) -> SpectralDesign:
     x = np.asarray(x, dtype=np.float64)
     targets = np.asarray(target_indices, dtype=np.int64)
@@ -80,11 +84,22 @@ def build_spectral_design(
     lag_basis = evaluate_basis(np.arange(L_x), lag_knots, degree)
     lag_gram = lag_basis.T @ lag_basis / L_x
     train_x = x[:train_target_stop]
+    domains = amplitude_domains or [
+        AmplitudeDomain.fit(
+            train_x[:, variable],
+            padding_fraction=0.10,
+            core_quantiles=amplitude_quantiles,
+        )
+        for variable in range(x.shape[1])
+    ]
+    if len(domains) != x.shape[1]:
+        raise ValueError("One amplitude domain is required per variable.")
     bases = [
         CenteredSplineBasis.fit(
             train_x[:, variable],
             n_basis=amplitude_basis_count,
             degree=degree,
+            domain=domains[variable],
             quantiles=amplitude_quantiles,
         )
         for variable in range(x.shape[1])

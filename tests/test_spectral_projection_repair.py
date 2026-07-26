@@ -97,6 +97,10 @@ def test_e1r_regression_table_matches_frozen_values():
     )
     repair = config["lag_representation_repair"]
     for scenario, expected in repair["expected_worst_nrmse"].items():
+        if scenario == "AR-S4":
+            # v0.3.2 reclassifies the old AR-S4 as conditional AR-S4C;
+            # its historical pseudo-2D table remains frozen but is not replayed.
+            continue
         for lag_count_text, target in expected.items():
             observed = _scenario_worst_nrmse(scenario, int(lag_count_text))
             assert abs(observed - target) <= repair["regression_tolerance"]

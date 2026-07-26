@@ -1,0 +1,39 @@
+{
+  "AR-S1": {
+    "name": "AR-S1",
+    "canonical_name": "AR-S1",
+    "model_class": "rank1_2d_urysohn",
+    "eligible_for_2d_capacity": true
+  },
+  "AR-S2": {
+    "name": "AR-S2",
+    "canonical_name": "AR-S2",
+    "model_class": "rank1_2d_urysohn",
+    "eligible_for_2d_capacity": true
+  },
+  "AR-S3": {
+    "name": "AR-S3",
+    "canonical_name": "AR-S3",
+    "model_class": "rank2_2d_urysohn",
+    "eligible_for_2d_capacity": true
+  },
+  "AR-S4": {
+    "name": "AR-S4",
+    "canonical_name": "AR-S4C",
+    "model_class": "conditional_urysohn_3d",
+    "eligible_for_2d_capacity": false,
+    "mixed_difference": -0.0023308466947990145
+  },
+  "AR-S4U": {
+    "name": "AR-S4U",
+    "canonical_name": "AR-S4U",
+    "model_class": "amplitude_dependent_2d_urysohn",
+    "eligible_for_2d_capacity": true
+  },
+  "AR-S7": {
+    "name": "AR-S7",
+    "canonical_name": "AR-S7",
+    "model_class": "closed_loop_unclassified",
+    "eligible_for_2d_capacity": false
+  }
+}

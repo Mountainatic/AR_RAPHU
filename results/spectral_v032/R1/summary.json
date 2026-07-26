@@ -1,0 +1,8 @@
+{
+  "status": "R1_DOMAIN_AND_MODEL_CLASS_AUDIT_PASS",
+  "maximum_point_clipping_rate": 0.036,
+  "maximum_window_clipping_rate": 0.7555,
+  "median_window_clipping_rate": 0.6185,
+  "model_class_registry_valid": true,
+  "next_allowed_experiment": "E1A"
+}

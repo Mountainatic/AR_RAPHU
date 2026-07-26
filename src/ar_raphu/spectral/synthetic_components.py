@@ -10,9 +10,12 @@ from ar_raphu.synthetic import (
     SyntheticSequence,
     _ar_response,
     _normalized_gaussian,
+    normalized_gaussian_value,
     second_truth_response,
     truth_response,
 )
+
+from .capacity_diagnostics import ModelClassMismatchError
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,6 +73,10 @@ def true_kernel_surface(
     if variable not in truth["active_support"]:
         return np.zeros((L_x, len(values)), dtype=np.float64)
     if sequence.scenario == "AR-S4":
+        raise ModelClassMismatchError(
+            "AR-S4C is conditional and has no canonical 2D Urysohn surface."
+        )
+    if sequence.scenario == "AR-S4U":
         result = np.empty((L_x, len(values)), dtype=np.float64)
         response = truth_response(variable, values)
         for index, amplitude in enumerate(values):
@@ -116,6 +123,22 @@ def replay_synthetic_components(
                 by_variable[time, variable] = float(
                     np.dot(q_dynamic, truth_response(variable, lagged_x[:, variable]))
                 )
+        elif sequence.scenario == "AR-S4U":
+            for variable in truth["active_support"]:
+                contribution = 0.0
+                for lag, amplitude in enumerate(lagged_x[:, variable]):
+                    center = 8.0 + 12.0 / (
+                        1.0 + np.exp(-2.0 * amplitude)
+                    )
+                    contribution += normalized_gaussian_value(
+                        lag=lag,
+                        length=L_x,
+                        center=center,
+                        standard_deviation=2.0,
+                    ) * float(
+                        truth_response(variable, np.array([amplitude]))[0]
+                    )
+                by_variable[time, variable] = contribution
         elif sequence.scenario == "AR-S3":
             for variable in truth["active_support"]:
                 primary = np.dot(
