@@ -19,16 +19,31 @@ class ExperimentContract:
     rank_inputs_used_for_selection: bool
     test_used_for_selection: bool
     experiment_role: str = "FORMAL_STRUCTURE_RECOVERY"
+    target_semantics: str = ""
+    basis_selection_uses_truth: bool = False
+    smoothing_selection_metric: str = "validation_prediction_mse"
+    allowed_next_experiment: str = ""
 
     def validate(self) -> None:
         if not self.scientific_question.strip():
             raise ValueError("scientific_question must be non-empty.")
         if self.truth_used_for_training:
             raise ValueError("Truth cannot be used for formal training.")
-        if self.support_used_for_training not in {"all", "oracle"}:
-            raise ValueError("support_used_for_training must be all or oracle.")
+        if self.support_used_for_training not in {
+            "all",
+            "oracle",
+            "single_oracle_variable",
+        }:
+            raise ValueError(
+                "support_used_for_training must be all, oracle, or "
+                "single_oracle_variable."
+            )
         if self.hyperparameter_selection_metric != "validation_prediction_loss_only":
             raise ValueError("Hyperparameters must use validation prediction loss only.")
+        if self.basis_selection_uses_truth:
+            raise ValueError("Truth cannot select the operational basis.")
+        if self.smoothing_selection_metric != "validation_prediction_mse":
+            raise ValueError("Smoothing must use validation prediction MSE.")
         if self.rank_inputs_used_for_selection or self.test_used_for_selection:
             raise ValueError("Rank inputs and test data cannot select hyperparameters.")
         if self.target_contains_ar and not self.model_contains_ar:

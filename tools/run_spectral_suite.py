@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Frozen Spectral v0.3 E0/E1 development runner."""
+"""Frozen Spectral v0.3 and v0.3.1 staged experiment runner."""
 
 from __future__ import annotations
 
@@ -17,6 +17,10 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from ar_raphu.spectral.contracts import ExperimentContract
 from ar_raphu.spectral.metrics import normalized_root_mean_square_error, r2
+from ar_raphu.spectral.projection import (
+    identity_lag_basis,
+    project_tensor_surface,
+)
 from ar_raphu.spectral.spline_basis import (
     CenteredSplineBasis,
     clamped_knots,
@@ -33,8 +37,8 @@ CONFIG_PATH = ROOT / "configs" / "spectral_v03.yaml"
 RESULT_ROOT = ROOT / "results" / "spectral_v03"
 
 
-def load_config() -> dict[str, object]:
-    return json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+def load_config(path: Path = CONFIG_PATH) -> dict[str, object]:
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def write_json(path: Path, payload: object) -> None:
@@ -366,17 +370,249 @@ def run_e1(config: dict[str, object]) -> str:
     return status
 
 
+def _e1r_projection(
+    sequence,
+    variable: int,
+    *,
+    lag_basis_count: int,
+    identity_reference: bool,
+    config: dict[str, object],
+) -> tuple[float, str]:
+    common = config["common"]
+    amplitude_config = config["amplitude_basis"]
+    _, train_stop = sequence.split_target_intervals["train"]
+    train_values = sequence.x[:train_stop, variable]
+    lower, upper = np.quantile(
+        train_values, tuple(amplitude_config["quantiles"])
+    )
+    amplitudes = np.linspace(
+        lower,
+        upper,
+        int(amplitude_config["evaluation_grid_points"]),
+        dtype=np.float64,
+    )
+    amplitude_basis = CenteredSplineBasis.fit(
+        train_values,
+        n_basis=int(amplitude_config["basis_count"]),
+        degree=int(amplitude_config["degree"]),
+        quantiles=tuple(amplitude_config["quantiles"]),
+    )
+    amplitude_eval = amplitude_basis.transform(amplitudes)
+    truth = true_kernel_surface(sequence, variable, amplitudes)
+    empirical_mean = true_kernel_surface(
+        sequence, variable, train_values
+    ).mean(axis=1, keepdims=True)
+    centered_truth = truth - empirical_mean
+    if identity_reference:
+        lag_basis = identity_lag_basis(int(common["L_x"]))
+        basis_type = "discrete_identity"
+    else:
+        lag_knots = clamped_knots(
+            0.0,
+            float(int(common["L_x"]) - 1),
+            lag_basis_count,
+            int(amplitude_config["degree"]),
+        )
+        lag_basis = evaluate_basis(
+            np.arange(int(common["L_x"])),
+            lag_knots,
+            int(amplitude_config["degree"]),
+        )
+        basis_type = "cubic_bspline"
+    result = project_tensor_surface(centered_truth, lag_basis, amplitude_eval)
+    return result.nrmse, basis_type
+
+
+def run_e1r(config: dict[str, object], result_root: Path) -> str:
+    common = config["common"]
+    repair = config["lag_representation_repair"]
+    amplitude_config = config["amplitude_basis"]
+    output = result_root / "E1R"
+    contract = ExperimentContract(
+        scientific_question=(
+            "Which compressed lag space first has structural-grade capacity "
+            "for the frozen synthetic kernel family?"
+        ),
+        target_semantics="centered_true_external_kernel_surface",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="oracle",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        basis_selection_uses_truth=False,
+        smoothing_selection_metric="validation_prediction_mse",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        allowed_next_experiment="E2A",
+        experiment_role="ORACLE_COMPONENT_DIAGNOSTIC",
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+    rows: list[dict[str, object]] = []
+    scenarios = ["AR-S1", "AR-S2", "AR-S3", "AR-S4"]
+    lag_counts = [
+        *[int(value) for value in repair["compressed_candidates"]],
+        int(repair["identity_reference"]),
+    ]
+    for scenario in scenarios:
+        for seed in common["development_seeds"]:
+            sequence = generate_synthetic_sequence(
+                scenario,
+                seed=int(seed),
+                n_samples=int(common["n_samples"]),
+                external_variables=int(common["external_variables"]),
+            )
+            for variable in sequence.truth["active_support"]:
+                per_lag: dict[int, tuple[float, str]] = {}
+                for lag_count in lag_counts:
+                    per_lag[lag_count] = _e1r_projection(
+                        sequence,
+                        int(variable),
+                        lag_basis_count=lag_count,
+                        identity_reference=(
+                            lag_count == int(repair["identity_reference"])
+                        ),
+                        config=config,
+                    )
+                reference = per_lag[int(repair["identity_reference"])][0]
+                for lag_count in lag_counts:
+                    nrmse, basis_type = per_lag[lag_count]
+                    reference_ratio = nrmse / max(
+                        reference, np.finfo(np.float64).eps
+                    )
+                    rows.append(
+                        {
+                            "scenario": scenario,
+                            "seed": seed,
+                            "variable": int(variable),
+                            "lag_basis_type": basis_type,
+                            "lag_basis_count": lag_count,
+                            "amplitude_basis_count": int(
+                                amplitude_config["basis_count"]
+                            ),
+                            "projection_surface_nrmse": nrmse,
+                            "identity_reference_nrmse": reference,
+                            "reference_ratio": reference_ratio,
+                            "prediction_grade_pass": (
+                                nrmse
+                                <= float(repair["prediction_grade_max_nrmse"])
+                            ),
+                            "structural_grade_pass": (
+                                nrmse
+                                <= float(repair["structural_grade_max_nrmse"])
+                                and reference_ratio
+                                <= float(
+                                    repair[
+                                        "structural_grade_max_reference_ratio"
+                                    ]
+                                )
+                            ),
+                        }
+                    )
+    compressed = [int(value) for value in repair["compressed_candidates"]]
+    scenario_worst: dict[str, dict[str, float]] = {}
+    for scenario in scenarios:
+        scenario_worst[scenario] = {}
+        for lag_count in lag_counts:
+            scenario_worst[scenario][str(lag_count)] = max(
+                float(row["projection_surface_nrmse"])
+                for row in rows
+                if row["scenario"] == scenario
+                and row["lag_basis_count"] == lag_count
+            )
+    certified: list[int] = []
+    for lag_count in compressed:
+        if max(
+            scenario_worst[scenario][str(lag_count)] for scenario in scenarios
+        ) > float(repair["structural_grade_max_nrmse"]):
+            continue
+        if all(
+            scenario_worst[scenario][str(lag_count)]
+            <= float(repair["structural_grade_max_reference_ratio"])
+            * scenario_worst[scenario][str(repair["identity_reference"])]
+            for scenario in scenarios
+        ):
+            certified.append(lag_count)
+    selected = min(certified) if certified else None
+    regression_errors = {
+        scenario: {
+            lag_count: abs(
+                scenario_worst[scenario][lag_count]
+                - float(repair["expected_worst_nrmse"][scenario][lag_count])
+            )
+            for lag_count in repair["expected_worst_nrmse"][scenario]
+        }
+        for scenario in scenarios
+    }
+    maximum_regression_error = max(
+        value
+        for scenario_errors in regression_errors.values()
+        for value in scenario_errors.values()
+    )
+    implementation_match = (
+        maximum_regression_error <= float(repair["regression_tolerance"])
+    )
+    selected_match = selected == int(repair["frozen_structural_basis"])
+    status = (
+        "E1R_REPRESENTATION_CERTIFIED_32x16"
+        if implementation_match and selected_match
+        else "E1R_IMPLEMENTATION_MISMATCH"
+    )
+    certificate = {
+        "status": status,
+        "selected_structural_lag_basis": selected,
+        "amplitude_basis_count": int(amplitude_config["basis_count"]),
+        "certified_lag_bases": certified,
+        "scenario_worst_nrmse": scenario_worst,
+        "maximum_regression_error": maximum_regression_error,
+        "regression_errors": regression_errors,
+        "next_allowed_experiment": "E2A" if "CERTIFIED" in status else "STOP",
+    }
+    write_csv(output / "projection_repair.csv", rows)
+    write_csv(output / "metrics.csv", rows)
+    write_json(output / "representation_certificate.json", certificate)
+    write_json(output / "summary.json", certificate)
+    np.savez(
+        output / "fit.npz",
+        selected_structural_lag_basis=np.array(
+            [-1 if selected is None else selected], dtype=np.int64
+        ),
+    )
+    return status
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--experiment", choices=["E0", "E1"], required=True)
+    parser.add_argument("--config", type=Path, default=CONFIG_PATH)
+    parser.add_argument(
+        "--experiment",
+        choices=["E0", "E1", "E1R", "E2A", "E2B", "E3"],
+        required=True,
+    )
     parser.add_argument("--stage", choices=["development", "confirmation"], required=True)
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     if args.stage != "development":
-        raise SystemExit("E0/E1 confirmation is not unlocked.")
-    config = load_config()
-    status = run_e0(config) if args.experiment == "E0" else run_e1(config)
+        raise SystemExit("Confirmation is not unlocked.")
+    config_path = args.config
+    if not config_path.is_absolute():
+        config_path = ROOT / config_path
+    config = load_config(config_path)
+    if int(config.get("schema_version", 1)) == 2:
+        result_root = ROOT / "results" / "spectral_v031"
+        if args.experiment != "E1R":
+            raise SystemExit(
+                f"{args.experiment} is not implemented or not unlocked for v0.3.1."
+            )
+        status = run_e1r(config, result_root)
+    else:
+        if args.experiment not in {"E0", "E1"}:
+            raise SystemExit("Only E0/E1 belong to the v0.3 runner.")
+        status = run_e0(config) if args.experiment == "E0" else run_e1(config)
     print(status)
 
 
