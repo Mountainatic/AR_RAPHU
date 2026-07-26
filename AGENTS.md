@@ -1,11 +1,17 @@
-# 项目持久约束：AR-RAPHU v2 验证
+# 项目持久约束：AR-RAPHU v2 冻结基线与 v3 D1--D6 诊断
 
 本文件是本项目后续 Codex 会话必须遵守的项目记忆。开始任何实现、数据处理、下载或实验前，必须完整阅读：
 
-1. `AR_RAPHU_method_v2.md`
-2. `AR_RAPHU_three_layer_validation_plan_v2.md`
-3. `AR_RAPHU_v2_revision_notes.md`
-4. 本文件
+1. 本文件；
+2. `PS_AR_RAPHU_V3_D1_D6_Diagnostic_Execution_Plan.md`；
+3. `AR_RAPHU_method_v2.md`；
+4. `AR_RAPHU_three_layer_validation_plan_v2.md`；
+5. `AR_RAPHU_v2_revision_notes.md`。
+
+当前活动规范是 `PS_AR_RAPHU_V3_D1_D6_Diagnostic_Execution_Plan.md`。
+对 D1--D6 的范围、文件、数值、执行、判定、输出或停止条件有冲突时，
+一律以该 v3 计划为最高优先级；计划未另行规定之处才沿用本文件和 v2
+冻结基线。不得以旧 v2 执行习惯覆盖 v3 的最小诊断约束。
 
 旧文件 `rank_adaptive_parallel_hammerstein_urysohn_method.md` 与
 `three_layer_validation_plan.md` 仅用于追踪 v1 设计演化，不再作为当前执行规范。
@@ -13,7 +19,7 @@
 
 ## 用户授权边界
 
-- 严格按照 v2 的证据链、阶段门槛、模型顺序、任务轨道、统计规则和结论边界推进，不跳阶段，不把计划或期望写成结果。
+- 当前只可严格按照 v3 D1--D6 最小诊断合同推进；v2 作为停止线后的只读科学与实现基线。不得跳过诊断、扩展实验或把计划/期望写成结果。
 - 对文档未规定但执行所必需、且不同选择会实质影响结果的事项，不得自行决定；暂停并询问用户。
 - 质量和可复核性优先于速度。任何加速不得改变科学模型、数据边界、数值精度要求或统计方案，并须通过等价性/一致性测试。
 - 结果状态统一使用：`COMPLETED`、`FAILED`、`NOT_YET_RUN`、`NOT_APPLICABLE`、`BLOCKED_BY_MISSING_METADATA`、`BLOCKED_BY_MISSING_DATA`。
@@ -317,7 +323,8 @@ Layer I 至少覆盖 AR-S0 至 AR-S7：纯 AR、Gamma rank-1、非 Gamma rank-1�
   分为独立命令；聚合前只读 validation，选定全局 penalty 后才允许读
   test。`--smoke` 只验证流程，不得作为科学证据。
 - AR-S0 Scheme A CPU 冒烟已验证 dense、共享 warmup、独立分叉、
-  validation-only one-SE 以及选择后测试的完整执行链；正式 E1 尚未完成。
+  validation-only one-SE 以及选择后测试的完整执行链。此处是当时状态；
+  v2 最终状态以本文末尾“v2 停止线最终状态”为准。
 - 2026-07-25 正式 E1 的首轮生成器审计发现 AR-S0 因全零初值且没有持续
   过程激励而恒为零，按 clean variance 缩放的观测噪声也随之为零。
   `results/phase1/E1_AR-S0/` 已写入 `INVALID_GENERATOR_AUDIT.md`；
@@ -381,3 +388,221 @@ Layer I 至少覆盖 AR-S0 至 AR-S7：纯 AR、Gamma rank-1、非 Gamma rank-1�
   - MPS、任务并行或 CPU 并发只可改变吞吐，不能改变确定性、种子、
     FP32/FP64、训练预算、早停、validation-only 选择或 test 访问顺序。
 - 仍不得为 recursive 辅助实验或其他未冻结扩展自行增加结构。
+
+## v2 停止线最终状态（2026-07-25，冻结只读）
+
+- 用户已停止 v2 后续训练与审计；不得恢复 S0 critical 剩余任务、S1--S3
+  critical、bootstrap、M7/M8 审计或任何 Phase 2/3/4/5 工作，除非用户
+  后续明确重新授权。
+- AR-S0--AR-S7 screening 已完成。S0 critical 留有 20/20 warmup 和
+  55/180 fork，但没有完成选择；这些仅为停止线前的部分计算，不得作为
+  完整科学证据。
+- S1--S3 critical 为 `NOT_YET_RUN`；bootstrap 为 `NOT_YET_RUN`。
+- v2 停止线累计实际优化 epoch 为 `2,476,482`。这是计算量记录，不代表
+  证据充分性。
+- v2 科学结论状态为 `FAILED`；M9/M10 为 `NOT_APPLICABLE`，Phase 2/3
+  为 `NOT_YET_RUN`，CZ 与多晶棒轨道为 `NOT_APPLICABLE`。
+- v2 停止线源码、结果、报告和打包产物只作为不可变历史证据保留。不得
+  将未完成阶段重新解释为通过，也不得为 v3 诊断覆盖或改写其结果目录。
+
+## v3 D1--D6 的唯一科学问题与执行边界
+
+当前活动任务是 Predictive-State AR-RAPHU v3 的最小诊断，只回答：
+
+> 强 AR 条件下，为什么外生支持与 rank 恢复会失败？
+
+D1--D6 不是完整 v3、不是 v2 续跑、不是最终模型选择，也不是公共数据或
+CZ 验证。任何超出这一问题的实现、训练、解释或产物均需用户另行授权。
+
+v2 停止线源码基线为：
+
+- `AR_RAPHU_STOPLINE_20260725.zip/source/`；
+- `STAGE1_DUAL_SOLVER_V20_bundle/`；
+- `tools/run_phase1_scheme_a.py`；
+- `tools/run_phase1_m6.py`；
+- `tools/run_phase1_m7.py`；
+- `tools/run_phase1_m8.py`；
+- `configs/protocol_v2.yaml`。
+
+上述内容在 v3 D1--D6 中一律只读，不得就地修补。必须复用现有合成
+生成器、数据协议、模型、训练、证据以及 V20 KAN/Gamma 组件；不得重写
+scaler、窗口、sequence-first convolution、KAN、Gamma 或 AR 分支。
+
+### v3 允许创建的文件
+
+只允许新增：
+
+```text
+configs/v3_diagnostics.yaml
+src/ar_raphu/diagnostics/__init__.py
+src/ar_raphu/diagnostics/config.py
+src/ar_raphu/diagnostics/rank2_model.py
+src/ar_raphu/diagnostics/residual_data.py
+src/ar_raphu/diagnostics/train_utils.py
+src/ar_raphu/diagnostics/truth_metrics.py
+src/ar_raphu/diagnostics/gate_fista.py
+src/ar_raphu/diagnostics/instrumentation.py
+tools/run_v3_diagnostic_job.py
+tools/run_v3_diagnostic_suite.py
+tests/test_v3_rank2_model.py
+tests/test_v3_residual_data.py
+tests/test_v3_gate_fista.py
+tests/test_v3_instrumentation.py
+```
+
+唯一允许的兼容性修改是向 `src/ar_raphu/synthetic.py` 暴露只读包装：
+
+- `truth_response`；
+- `second_truth_response`。
+
+包装只能读取既有真值响应，不得改变生成器逻辑、随机数消费顺序、场景
+定义、噪声或目标。
+
+## v3 冻结配置：禁止 CLI 覆盖或运行后修改
+
+### 数据、模型与运行
+
+- 通用 seeds：`0,1,2,3,4`；D6 seeds：`0,1,2`。
+- `n=10000`，外生变量数 `10`，真支持 `[0,1,2]`。
+- `Lx=64`，`Ly=32`，主 horizon `h=1`；只有 D3 的预声明失败分支可加
+  `h=5,10`。
+- `hidden_kan=8`，`grid_size=7`，`spline_order=3`，
+  `vectorized=true`，`chunk_size=4096`，deterministic FP32。
+- runtime：一块 GPU 默认 `workers=8`，OOM 后只允许回退为 `4`；
+  每任务 CPU/BLAS 线程为 `1`；使用 MPS。
+
+### 统一优化
+
+- validation 间隔 `10` epochs。
+- response learning rate `0.003`，lag learning rate `0.0005`，
+  AR learning rate `0.003`，joint learning rate `0.0003`。
+- lag smoothness `0.001`，minimum learning rate `1e-5`。
+- scheduler factor `0.5`，patience `20` 次 validation。
+- 全训练集梯度累积；只以 validation RMSE 早停。
+- 禁止用 test 早停、用 proximal/support/rank 早停、临时增加 epoch、
+  重启失败 seed 或按结果换初始化。
+
+### 各诊断预算
+
+- D1：oracle `2000` epochs，free `3000` epochs，patience `300`；
+  固定两个分量权重 `0.6/0.4`。
+- D2：`3000` epochs，patience `300`。
+- D3：AR `2000` epochs，residual `2500` epochs，patience `250`。
+  若至少 4 个 seed 的 innovation \(R^2<0.10\)，只允许追加 `h=5,10`。
+- D4：simultaneous `2500`；X-first `1500+500+500`；
+  AR-first `1000+1500+500`；patience `250`。
+- D5：固定使用 D4 X-first 的贡献设计；lambda ratio 路径严格为
+  `.32,.16,.08,.04,.02,.01,.005,0`；FISTA `10000` iterations，
+  tolerance `1e-9`，support threshold `1e-8`。
+- D6：warmup `2000`，prune `1200`，penalty scale `0.003`，
+  ramp `300`，每 `10` epochs 记录，sample `1024`；starvation 阈值为
+  gradient ratio `0.10`、contribution ratio `0.05`、连续 `5` 次、
+  shrink ratio `0.99`。
+
+## D1--D6 固定职责与顺序
+
+必须严格按 `D1 -> D2 -> D3 -> D4 -> D5 -> D6` 推进，D5 必须等待 D4
+X-first 产物。不得用后续结果回改前序配置。
+
+- D1：AR-S3、无 AR、无稀疏，分离容量失败与 lag 优化失败。
+- D2：AR-S3，对照自由 rank-1 与 rank-2，检查 rank-1 盲点。
+- D3：AR-S3，先冻结 AR，再在 innovation residual 上拟合外生分支。
+- D4：AR-S1，对照 simultaneous、X-first、AR-first，检查训练顺序捷径。
+- D5：AR-S1，固定 D4 X-first contribution design，运行凸 Lasso gate path。
+- D6：AR-S1，记录 gradient/prox 时间线，判断 starvation。
+
+D1 rank-2 模型必须恰好由两个独立的 `ARRAPHURank1(Track-X)` 分量组成，
+仅使用真支持 `[0,1,2]`，权重固定为 `0.6/0.4`，并遵守计划中的唯一
+bias 规则。q-mode 只允许 `oracle_fixed` 和 `free_truth_init`。禁止
+attention、MoE、跨变量交互、额外 MLP 或其他结构。response、lag、AR
+使用分离的 optimizer parameter groups，并保留冻结的 lag smoothness。
+
+## v3 冻结判定规则
+
+所有判定必须由程序按计划生成，不得由 Codex 目测、补充解释或调整阈值。
+
+- D1A 通过：至少 4/5 seeds 同时满足 validation \(R^2\ge0.95\)、
+  mean surface NRMSE \(\le0.20\)、surface correlation \(\ge0.90\)。
+- D1B 通过：至少 4/5 seeds 同时满足 RMSE 不超过 oracle 的 `1.10` 倍、
+  mean lag W1 \(\le3\) samples、surface NRMSE \(\le0.25\)。
+- D1 只允许产生 `capacity pass`、`capacity fail`、`lag optimization fail`
+  等计划规定标签。
+- D2：至少 4/5 seeds 的 surface gap \(\ge0.30\)，且 RMSE gap
+  \(\ge0.05\) 或 \(|RMSE gap|<0.05\)，才确认 rank-1 blind spot。
+- D3：以 median innovation \(R^2=0.10\) 为冻结分界；先判 h=1，只有
+  预声明失败分支才运行 h=5/10。
+- D4：至少 4/5 seeds 中，X-first 相对 simultaneous 的外生 energy
+  fraction 增加 \(\ge0.20\)，response NRMSE 改善 \(\ge20\%\)，且
+  validation RMSE 退化不超过 `2%`，才确认 optimization shortcut。
+- D5：至少 4/5 seeds 的路径上存在某个 lambda 同时满足 recall
+  \(\ge0.80\)、FPR \(\le0.10\)，才判设计中存在可恢复点。D5 只报告
+  整条 path，禁止据此选择 lambda。
+- D6 使用上述冻结 starvation 阈值；计划允许的标签可并存。
+
+最终必须自动生成：
+
+- `diagnostic_summary.csv`；
+- `DIAGNOSTIC_DECISION.md`。
+
+两者只能包含 v3 计划规定的九个字段及冻结 failure mapping。Codex 不得
+在自动判定中添加新标签、因果故事、人工裁决或扩大结论。
+
+## v3 CLI、检查、产物与禁止事项
+
+### CLI
+
+单任务 CLI 只允许：
+
+- experiment；
+- 计划声明的 variant；
+- seed；
+- horizon（仅 `1,5,10`）；
+- device；
+- force。
+
+不得提供任何超参数覆盖。suite 必须按 D1--D6 顺序调度，使用 subprocess
+任务并行，不生成环境/依赖 manifest。
+
+### 启动前仅允许的六组检查
+
+1. 既有 model 定向测试；
+2. 既有 sequence training 定向测试；
+3. `tests/test_v3_rank2_model.py`；
+4. `tests/test_v3_residual_data.py`；
+5. `tests/test_v3_gate_fista.py`；
+6. `tests/test_v3_instrumentation.py`。
+
+其中必须证明 causal input、rank-2 forward、residual alignment 和 FISTA
+exact-zero。禁止运行 V20 全部 118 项、全仓测试、文件 SHA、包 manifest、
+HTML、环境快照、Git commit/tag freeze、M7/M8 manifest、Fold 4、公开
+数据下载、逐阶段 zip、replay audit 或完整双路径等价审计。
+
+### 结果目录与单任务文件
+
+所有结果只能写入 `results/v3_diagnostics/`。每个任务只生成：
+
+- `config.json`；
+- `summary.json`；
+- `training_log.csv`；
+- `best.pt`。
+
+D1--D3 可额外输出 surface/lag；D5 可额外输出 gate path；D6 可额外
+输出 gradient timeline。不得生成 SHA 文件。
+
+### D1--D6 完成前禁止
+
+- 重跑 v2 Phase 1、30 seeds、M7/M8 bootstrap 或最终 v3；
+- TEP、Debutanizer、Gas Turbine、CZ、PLC/MCU；
+- 修改 one-SE、penalty、SNR、AR 或增加深度学习基线；
+- 把 oracle 结果用于最终模型。
+
+最终交付只允许计划列出的 v3 diagnostic 源码、配置、测试、结果和一个
+简单 zip；禁止 HTML、SHA 和复杂 manifest。
+
+## v3 当前状态与授权状态
+
+- `PS_AR_RAPHU_V3_D1_D6_Diagnostic_Execution_Plan.md`：`FROZEN`。
+- D1--D6：`NOT_YET_RUN`。
+- v3 diagnostic implementation：`NOT_YET_IMPLEMENTED`。
+- 本次仅更新 `AGENTS.md`。这不构成开始实现、训练、服务器部署、Git
+  提交、GitHub 推送或覆盖既有产物的授权。
