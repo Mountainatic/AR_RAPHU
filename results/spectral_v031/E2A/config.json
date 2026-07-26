@@ -1,0 +1,239 @@
+{
+  "schema_version": 2,
+  "status": "REPRESENTATION_REPAIR_AND_CORE_VALIDATION",
+  "provenance": {
+    "reuse_e0_from": "results/spectral_v03/E0",
+    "preserve_failed_e1_from": "results/spectral_v03/E1",
+    "previous_decision": "results/spectral_v03/DEVELOPMENT_DECISION.md"
+  },
+  "common": {
+    "development_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "confirmation_seeds": [
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119
+    ],
+    "null_seeds": [
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      234,
+      235,
+      236,
+      237,
+      238,
+      239,
+      240,
+      241,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249
+    ],
+    "n_samples": 10000,
+    "external_variables": 10,
+    "L_x": 64,
+    "L_y": 32,
+    "horizons": [
+      1,
+      5,
+      10,
+      30,
+      60
+    ],
+    "primary_horizon": 1,
+    "dtype_solver": "float64",
+    "numerical_jitter_relative": 1e-10
+  },
+  "amplitude_basis": {
+    "degree": 3,
+    "basis_count": 16,
+    "quantiles": [
+      0.01,
+      0.99
+    ],
+    "evaluation_grid_points": 401
+  },
+  "lag_representation_repair": {
+    "compressed_candidates": [
+      24,
+      28,
+      32,
+      40
+    ],
+    "identity_reference": 64,
+    "prediction_grade_max_nrmse": 0.1,
+    "structural_grade_max_nrmse": 0.05,
+    "structural_grade_max_reference_ratio": 2.0,
+    "frozen_structural_basis": 32,
+    "lower_sensitivity_basis": 28,
+    "upper_sensitivity_basis": 40,
+    "regression_tolerance": 5e-06,
+    "expected_worst_nrmse": {
+      "AR-S1": {
+        "24": 0.0197655724,
+        "28": 0.019184819,
+        "32": 0.0191374543,
+        "40": 0.0191279716,
+        "64": 0.0191218783
+      },
+      "AR-S2": {
+        "24": 0.0824809263,
+        "28": 0.0385967218,
+        "32": 0.0239039326,
+        "40": 0.0195050475,
+        "64": 0.0191218783
+      },
+      "AR-S3": {
+        "24": 0.0813967136,
+        "28": 0.0398569367,
+        "32": 0.0229130697,
+        "40": 0.0165423674,
+        "64": 0.0161209014
+      },
+      "AR-S4": {
+        "24": 0.0873408383,
+        "28": 0.0437828786,
+        "32": 0.0245928326,
+        "40": 0.0187414198,
+        "64": 0.0182692059
+      }
+    }
+  },
+  "ar_nuisance_basis": {
+    "degree": 3,
+    "lag_basis_count": 6,
+    "amplitude_basis_count": 8,
+    "ridge_candidates": [
+      0.0001,
+      0.001,
+      0.01,
+      0.1
+    ]
+  },
+  "spectral_regularization": {
+    "lag_smoothness_candidates": [
+      0.0001,
+      0.001,
+      0.01,
+      0.1
+    ],
+    "amplitude_smoothness_candidates": [
+      0.0001,
+      0.001,
+      0.01,
+      0.1
+    ],
+    "ridge_weight": 1e-06,
+    "selection_rule": "joint_one_se",
+    "complexity_order": [
+      "stronger_total_smoothing",
+      "fixed_configuration_order"
+    ]
+  },
+  "crossfit": {
+    "folds": 4,
+    "initial_nuisance_prefix_targets": 2000,
+    "purge_gap": 65,
+    "nuisance_selection_tail_fraction": 0.2
+  },
+  "solver": {
+    "direct_dimension_limit": 2000,
+    "pcg_relative_residual": 1e-08,
+    "pcg_max_iterations": 2000,
+    "block_jacobi_preconditioner": true,
+    "warm_start_smoothing_path": true
+  },
+  "support": {
+    "null_quantile": 0.95,
+    "required_positive_ablation_fold_fraction": 0.8,
+    "synthetic_recall_gate": 0.8,
+    "synthetic_fpr_gate": 0.1
+  },
+  "rank": {
+    "block_length": 64,
+    "bootstrap_replicates_development": 100,
+    "bootstrap_replicates_confirmation": 500,
+    "bootstrap_alpha": 0.05,
+    "bh_fdr": 0.1,
+    "required_positive_gain_fold_fraction": 0.8,
+    "mode_stability_threshold": 0.7,
+    "main_basis": 32,
+    "required_upper_neighbor_agreement": 40,
+    "lower_stress_basis": 28
+  },
+  "adaptive": {
+    "enabled_as_comparison_only": true,
+    "fista_lambda_ratios": [
+      0.32,
+      0.16,
+      0.08,
+      0.04,
+      0.02,
+      0.01,
+      0.005,
+      0.0
+    ],
+    "score_epsilon": 0.05,
+    "weight_min": 0.25,
+    "weight_max": 4.0
+  }
+}

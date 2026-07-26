@@ -24,6 +24,37 @@ class SyntheticComponents:
     measurement_noise: np.ndarray
 
 
+def e2a_component_target(
+    components: SyntheticComponents,
+    variable: int,
+    target_indices: np.ndarray,
+) -> np.ndarray:
+    """Return only one variable's true external contribution."""
+
+    indices = np.asarray(target_indices, dtype=np.int64)
+    return np.asarray(
+        components.x_contribution_by_variable[indices, int(variable)],
+        dtype=np.float64,
+    )
+
+
+def e2b_total_external_target(
+    components: SyntheticComponents,
+    active_support: tuple[int, ...] | list[int] | np.ndarray,
+    target_indices: np.ndarray,
+) -> np.ndarray:
+    """Return the oracle-support total external contribution and no AR term."""
+
+    indices = np.asarray(target_indices, dtype=np.int64)
+    support = np.asarray(active_support, dtype=np.int64)
+    return np.asarray(
+        components.x_contribution_by_variable[np.ix_(indices, support)].sum(
+            axis=1
+        ),
+        dtype=np.float64,
+    )
+
+
 def true_kernel_surface(
     sequence: SyntheticSequence,
     variable: int,

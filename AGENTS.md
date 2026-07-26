@@ -773,5 +773,9 @@ loss 选择；rank 输入和 test 均不得参与选择。
   relative residual `<=1e-8`、最多 2000 次；未收敛结果不得用于结论。
 - 本轮严格顺序为 `E1R -> E2A -> E2B -> E3`。任一级失败立即按预注册
   标签停止；本轮不启动 E4--E8，不自行改变 basis、阈值、目标或模型。
-- 当前状态：v0.3.1 三份冻结文件已完整读取；独立分支已创建；E1R 及之后
-  尚未运行。
+- 当前状态：v0.3.1 三份冻结文件已完整读取；独立分支已创建。
+  E1R=`E1R_REPRESENTATION_CERTIFIED_32x16`，冻结表格最大复现误差
+  `4.97e-11`，已选择 `32x16`。E2A=`E2A_ESTIMATOR_OR_DATA_EXCITATION_FAIL`：
+  60 个场景/seed/变量结果仅 15 个通过，四个场景均未达到 4/5 seed；
+  E2B/E3=`NOT_YET_RUN`，本轮停止线为
+  `NEXT_ALLOWED_STAGE=STOP_SINGLE_KERNEL_CAPACITY`。

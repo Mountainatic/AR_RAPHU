@@ -16,7 +16,11 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 from ar_raphu.spectral.contracts import ExperimentContract
+from ar_raphu.spectral.design import build_spectral_design
+from ar_raphu.spectral.gram_svd import gram_whitened_svd
 from ar_raphu.spectral.metrics import normalized_root_mean_square_error, r2
+from ar_raphu.spectral.metrics import mse, rmse
+from ar_raphu.spectral.penalties import tensor_penalty
 from ar_raphu.spectral.projection import (
     identity_lag_basis,
     project_tensor_surface,
@@ -27,9 +31,11 @@ from ar_raphu.spectral.spline_basis import (
     evaluate_basis,
 )
 from ar_raphu.spectral.synthetic_components import (
+    e2a_component_target,
     replay_synthetic_components,
     true_kernel_surface,
 )
+from ar_raphu.spectral.solver import solve_full_kernel
 from ar_raphu.synthetic import generate_synthetic_sequence
 
 
@@ -584,6 +590,354 @@ def run_e1r(config: dict[str, object], result_root: Path) -> str:
     return status
 
 
+def _select_one_se(
+    validation_scores: dict[tuple[float, float], list[float]],
+    configuration_order: list[tuple[float, float]],
+) -> tuple[float, float]:
+    means = {
+        key: float(np.mean(values)) for key, values in validation_scores.items()
+    }
+    best = min(configuration_order, key=lambda key: means[key])
+    values = np.asarray(validation_scores[best], dtype=np.float64)
+    standard_error = (
+        float(np.std(values, ddof=1) / np.sqrt(len(values)))
+        if len(values) > 1
+        else 0.0
+    )
+    threshold = means[best] + standard_error
+    eligible = [key for key in configuration_order if means[key] <= threshold]
+    order_index = {key: index for index, key in enumerate(configuration_order)}
+    return min(
+        eligible,
+        key=lambda key: (-key[0] * key[1], order_index[key]),
+    )
+
+
+def _split_positions(sequence) -> dict[str, np.ndarray]:
+    start = sequence.split_target_intervals["train"][0]
+    stop = sequence.split_target_intervals["test"][1]
+    targets = np.arange(start, stop, dtype=np.int64)
+    return {
+        name: np.flatnonzero(
+            (targets >= interval_start) & (targets < interval_stop)
+        )
+        for name, (interval_start, interval_stop) in (
+            sequence.split_target_intervals.items()
+        )
+    }
+
+
+def _read_e1r_projection_lookup(result_root: Path) -> dict[tuple[str, int, int], float]:
+    path = result_root / "E1R" / "projection_repair.csv"
+    if not path.exists():
+        raise RuntimeError("E2A requires a completed E1R projection table.")
+    lookup: dict[tuple[str, int, int], float] = {}
+    with path.open(encoding="utf-8", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if int(row["lag_basis_count"]) == 32:
+                lookup[
+                    (
+                        row["scenario"],
+                        int(row["seed"]),
+                        int(row["variable"]),
+                    )
+                ] = float(row["projection_surface_nrmse"])
+    return lookup
+
+
+def run_e2a(config: dict[str, object], result_root: Path) -> str:
+    e1r_summary = json.loads(
+        (result_root / "E1R" / "summary.json").read_text(encoding="utf-8")
+    )
+    if e1r_summary["status"] != "E1R_REPRESENTATION_CERTIFIED_32x16":
+        raise RuntimeError("E2A is blocked until E1R certifies 32x16.")
+    output = result_root / "E2A"
+    common = config["common"]
+    amplitude_config = config["amplitude_basis"]
+    regularization = config["spectral_regularization"]
+    lag_count = int(config["lag_representation_repair"]["frozen_structural_basis"])
+    amplitude_count = int(amplitude_config["basis_count"])
+    contract = ExperimentContract(
+        scientific_question=(
+            "Can a 32x16 full kernel recover one true variable contribution "
+            "when its identity is known?"
+        ),
+        target_semantics="single_true_external_variable_contribution",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="single_oracle_variable",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        basis_selection_uses_truth=False,
+        smoothing_selection_metric="validation_prediction_mse",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        allowed_next_experiment="E2B",
+        experiment_role="ORACLE_COMPONENT_DIAGNOSTIC",
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+    configurations = [
+        (float(lag_weight), float(amplitude_weight))
+        for lag_weight in regularization["lag_smoothness_candidates"]
+        for amplitude_weight in regularization["amplitude_smoothness_candidates"]
+    ]
+    projection_lookup = _read_e1r_projection_lookup(result_root)
+    rows: list[dict[str, object]] = []
+    saved_coefficients: list[np.ndarray] = []
+    saved_identifiers: list[tuple[str, int, int]] = []
+    selected_by_group: dict[str, dict[str, float]] = {}
+    scenarios = ["AR-S1", "AR-S2", "AR-S3", "AR-S4"]
+    for scenario in scenarios:
+        for variable in (0, 1, 2):
+            jobs: list[dict[str, object]] = []
+            scores = {key: [] for key in configurations}
+            for seed in common["development_seeds"]:
+                sequence = generate_synthetic_sequence(
+                    scenario,
+                    seed=int(seed),
+                    n_samples=int(common["n_samples"]),
+                    external_variables=int(common["external_variables"]),
+                )
+                if variable not in sequence.truth["active_support"]:
+                    raise RuntimeError("Frozen E2A variable is not active.")
+                components = replay_synthetic_components(sequence)
+                start = sequence.split_target_intervals["train"][0]
+                stop = sequence.split_target_intervals["test"][1]
+                targets = np.arange(start, stop, dtype=np.int64)
+                positions = _split_positions(sequence)
+                design = build_spectral_design(
+                    sequence.x[:, [variable]],
+                    target_indices=targets,
+                    train_target_stop=sequence.split_target_intervals["train"][1],
+                    horizon=int(common["primary_horizon"]),
+                    L_x=int(common["L_x"]),
+                    lag_basis_count=lag_count,
+                    amplitude_basis_count=amplitude_count,
+                    degree=int(amplitude_config["degree"]),
+                    amplitude_quantiles=tuple(amplitude_config["quantiles"]),
+                )
+                target = e2a_component_target(components, variable, targets)
+                train = positions["train"]
+                validation = positions["validation"]
+                fits = {}
+                for configuration in configurations:
+                    lag_weight, amplitude_weight = configuration
+                    penalty = tensor_penalty(
+                        design.lag_gram,
+                        design.amplitude_grams,
+                        lag_smoothness=lag_weight,
+                        amplitude_smoothness=amplitude_weight,
+                        ridge_weight=float(regularization["ridge_weight"]),
+                    )
+                    fit = solve_full_kernel(
+                        design.matrix[train],
+                        target[train],
+                        penalty,
+                        numerical_jitter_relative=float(
+                            common["numerical_jitter_relative"]
+                        ),
+                        fit_intercept=True,
+                        compute_condition_number=False,
+                    )
+                    fits[configuration] = fit
+                    prediction = (
+                        design.matrix[validation] @ fit.coefficients
+                        + fit.intercept
+                    )
+                    scores[configuration].append(
+                        mse(target[validation], prediction)
+                    )
+                jobs.append(
+                    {
+                        "seed": int(seed),
+                        "sequence": sequence,
+                        "design": design,
+                        "target": target,
+                        "positions": positions,
+                        "fits": fits,
+                    }
+                )
+            selected = _select_one_se(scores, configurations)
+            selected_by_group[f"{scenario}:x{variable}"] = {
+                "lag_smoothness": selected[0],
+                "amplitude_smoothness": selected[1],
+            }
+            for job in jobs:
+                seed = int(job["seed"])
+                sequence = job["sequence"]
+                design = job["design"]
+                target = job["target"]
+                positions = job["positions"]
+                fit = job["fits"][selected]
+                train = positions["train"]
+                validation = positions["validation"]
+                test = positions["test"]
+                selected_penalty = tensor_penalty(
+                    design.lag_gram,
+                    design.amplitude_grams,
+                    lag_smoothness=selected[0],
+                    amplitude_smoothness=selected[1],
+                    ridge_weight=float(regularization["ridge_weight"]),
+                )
+                checked_fit = solve_full_kernel(
+                    design.matrix[train],
+                    target[train],
+                    selected_penalty,
+                    numerical_jitter_relative=float(
+                        common["numerical_jitter_relative"]
+                    ),
+                    fit_intercept=True,
+                    compute_condition_number=True,
+                )
+                coefficients = checked_fit.coefficients.reshape(
+                    lag_count, amplitude_count
+                )
+                basis = design.amplitude_bases[0]
+                amplitudes = np.linspace(
+                    basis.lower,
+                    basis.upper,
+                    int(amplitude_config["evaluation_grid_points"]),
+                )
+                amplitude_eval = basis.transform(amplitudes)
+                truth = true_kernel_surface(sequence, variable, amplitudes)
+                train_values = sequence.x[
+                    : sequence.split_target_intervals["train"][1], variable
+                ]
+                empirical_mean = true_kernel_surface(
+                    sequence, variable, train_values
+                ).mean(axis=1, keepdims=True)
+                centered_truth = truth - empirical_mean
+                estimated_surface = (
+                    design.lag_basis @ coefficients @ amplitude_eval.T
+                )
+                surface_nrmse = normalized_root_mean_square_error(
+                    centered_truth, estimated_surface
+                )
+                projection_nrmse = projection_lookup[
+                    (scenario, seed, variable)
+                ]
+                spectrum = gram_whitened_svd(
+                    coefficients,
+                    design.lag_gram,
+                    design.amplitude_grams[0],
+                )
+                full_validation_prediction = (
+                    design.matrix[validation] @ checked_fit.coefficients
+                    + checked_fit.intercept
+                )
+                rank_validation_mse: dict[int, float] = {}
+                for rank in (1, 2):
+                    truncated = spectrum.truncate(rank).reshape(-1)
+                    truncated_intercept = float(
+                        np.mean(
+                            target[train]
+                            - design.matrix[train] @ truncated
+                        )
+                    )
+                    rank_validation_mse[rank] = mse(
+                        target[validation],
+                        design.matrix[validation] @ truncated
+                        + truncated_intercept,
+                    )
+                row: dict[str, object] = {
+                    "scenario": scenario,
+                    "seed": seed,
+                    "variable": variable,
+                    "lag_basis_count": lag_count,
+                    "amplitude_basis_count": amplitude_count,
+                    "lag_smoothness": selected[0],
+                    "amplitude_smoothness": selected[1],
+                    "train_contribution_rmse": rmse(
+                        target[train], checked_fit.predictions
+                    ),
+                    "train_contribution_r2": r2(
+                        target[train], checked_fit.predictions
+                    ),
+                    "validation_contribution_rmse": rmse(
+                        target[validation], full_validation_prediction
+                    ),
+                    "validation_contribution_r2": r2(
+                        target[validation], full_validation_prediction
+                    ),
+                    "test_contribution_rmse": rmse(
+                        target[test],
+                        design.matrix[test] @ checked_fit.coefficients
+                        + checked_fit.intercept,
+                    ),
+                    "test_contribution_r2": r2(
+                        target[test],
+                        design.matrix[test] @ checked_fit.coefficients
+                        + checked_fit.intercept,
+                    ),
+                    "surface_nrmse": surface_nrmse,
+                    "e1r_projection_nrmse": projection_nrmse,
+                    "excess_surface_error": surface_nrmse - projection_nrmse,
+                    "relative_kkt_residual": checked_fit.relative_kkt_residual,
+                    "condition_number": checked_fit.condition_number,
+                    "full_validation_mse": mse(
+                        target[validation], full_validation_prediction
+                    ),
+                    "rank1_validation_mse": rank_validation_mse[1],
+                    "rank2_validation_mse": rank_validation_mse[2],
+                    "eta1": spectrum.tail_energy_ratio(1),
+                    "eta2": spectrum.tail_energy_ratio(2),
+                    "eta3": spectrum.tail_energy_ratio(3),
+                }
+                row["capacity_pass"] = (
+                    row["validation_contribution_r2"] >= 0.995
+                    and row["surface_nrmse"]
+                    <= max(0.03, 1.5 * projection_nrmse)
+                    and row["relative_kkt_residual"] <= 1e-8
+                )
+                rows.append(row)
+                saved_coefficients.append(checked_fit.coefficients)
+                saved_identifiers.append((scenario, seed, variable))
+    scenario_seed_passes: dict[str, dict[str, bool]] = {}
+    scenario_pass = {}
+    for scenario in scenarios:
+        scenario_seed_passes[scenario] = {}
+        for seed in common["development_seeds"]:
+            selected_rows = [
+                row
+                for row in rows
+                if row["scenario"] == scenario and row["seed"] == seed
+            ]
+            scenario_seed_passes[scenario][str(seed)] = (
+                len(selected_rows) == 3
+                and all(bool(row["capacity_pass"]) for row in selected_rows)
+            )
+        scenario_pass[scenario] = (
+            sum(scenario_seed_passes[scenario].values()) >= 4
+        )
+    all_pass = all(scenario_pass.values())
+    status = (
+        "E2A_SINGLE_KERNEL_CAPACITY_PASS"
+        if all_pass
+        else "E2A_ESTIMATOR_OR_DATA_EXCITATION_FAIL"
+    )
+    summary = {
+        "status": status,
+        "selected_smoothing_by_scenario_variable": selected_by_group,
+        "scenario_seed_passes": scenario_seed_passes,
+        "scenario_pass": scenario_pass,
+        "passing_rows": sum(bool(row["capacity_pass"]) for row in rows),
+        "total_rows": len(rows),
+        "next_allowed_experiment": "E2B" if all_pass else "STOP",
+    }
+    write_csv(output / "metrics.csv", rows)
+    write_json(output / "summary.json", summary)
+    np.savez(
+        output / "fit.npz",
+        coefficients=np.stack(saved_coefficients),
+        identifiers=np.asarray(saved_identifiers, dtype="U16"),
+    )
+    return status
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=CONFIG_PATH)
@@ -604,11 +958,15 @@ def main() -> None:
     config = load_config(config_path)
     if int(config.get("schema_version", 1)) == 2:
         result_root = ROOT / "results" / "spectral_v031"
-        if args.experiment != "E1R":
+        if args.experiment not in {"E1R", "E2A"}:
             raise SystemExit(
                 f"{args.experiment} is not implemented or not unlocked for v0.3.1."
             )
-        status = run_e1r(config, result_root)
+        status = (
+            run_e1r(config, result_root)
+            if args.experiment == "E1R"
+            else run_e2a(config, result_root)
+        )
     else:
         if args.experiment not in {"E0", "E1"}:
             raise SystemExit("Only E0/E1 belong to the v0.3 runner.")

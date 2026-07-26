@@ -1,0 +1,92 @@
+{
+  "status": "E2A_ESTIMATOR_OR_DATA_EXCITATION_FAIL",
+  "selected_smoothing_by_scenario_variable": {
+    "AR-S1:x0": {
+      "lag_smoothness": 0.0001,
+      "amplitude_smoothness": 0.01
+    },
+    "AR-S1:x1": {
+      "lag_smoothness": 0.1,
+      "amplitude_smoothness": 0.1
+    },
+    "AR-S1:x2": {
+      "lag_smoothness": 0.1,
+      "amplitude_smoothness": 0.01
+    },
+    "AR-S2:x0": {
+      "lag_smoothness": 0.0001,
+      "amplitude_smoothness": 0.01
+    },
+    "AR-S2:x1": {
+      "lag_smoothness": 0.01,
+      "amplitude_smoothness": 0.1
+    },
+    "AR-S2:x2": {
+      "lag_smoothness": 0.001,
+      "amplitude_smoothness": 0.01
+    },
+    "AR-S3:x0": {
+      "lag_smoothness": 0.0001,
+      "amplitude_smoothness": 0.1
+    },
+    "AR-S3:x1": {
+      "lag_smoothness": 0.01,
+      "amplitude_smoothness": 0.1
+    },
+    "AR-S3:x2": {
+      "lag_smoothness": 0.01,
+      "amplitude_smoothness": 0.1
+    },
+    "AR-S4:x0": {
+      "lag_smoothness": 0.1,
+      "amplitude_smoothness": 0.1
+    },
+    "AR-S4:x1": {
+      "lag_smoothness": 0.1,
+      "amplitude_smoothness": 0.1
+    },
+    "AR-S4:x2": {
+      "lag_smoothness": 0.1,
+      "amplitude_smoothness": 0.1
+    }
+  },
+  "scenario_seed_passes": {
+    "AR-S1": {
+      "0": false,
+      "1": false,
+      "2": false,
+      "3": false,
+      "4": false
+    },
+    "AR-S2": {
+      "0": false,
+      "1": false,
+      "2": false,
+      "3": false,
+      "4": false
+    },
+    "AR-S3": {
+      "0": false,
+      "1": false,
+      "2": false,
+      "3": false,
+      "4": false
+    },
+    "AR-S4": {
+      "0": false,
+      "1": false,
+      "2": false,
+      "3": false,
+      "4": false
+    }
+  },
+  "scenario_pass": {
+    "AR-S1": false,
+    "AR-S2": false,
+    "AR-S3": false,
+    "AR-S4": false
+  },
+  "passing_rows": 15,
+  "total_rows": 60,
+  "next_allowed_experiment": "STOP"
+}

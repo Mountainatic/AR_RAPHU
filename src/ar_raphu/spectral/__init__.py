@@ -9,8 +9,13 @@ from .projection import (
     identity_lag_basis,
     project_tensor_surface,
 )
-from .solver import SpectralFit, solve_full_kernel
-from .synthetic_components import SyntheticComponents, replay_synthetic_components
+from .solver import SpectralFit, solve_full_kernel, solve_full_kernel_pcg
+from .synthetic_components import (
+    SyntheticComponents,
+    e2a_component_target,
+    e2b_total_external_target,
+    replay_synthetic_components,
+)
 
 __all__ = [
     "CrossFitResult",
@@ -21,10 +26,13 @@ __all__ = [
     "SurfaceProjectionResult",
     "SyntheticComponents",
     "build_spectral_design",
+    "e2a_component_target",
+    "e2b_total_external_target",
     "forward_crossfit",
     "gram_whitened_svd",
     "identity_lag_basis",
     "project_tensor_surface",
     "replay_synthetic_components",
     "solve_full_kernel",
+    "solve_full_kernel_pcg",
 ]
