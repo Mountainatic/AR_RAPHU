@@ -810,3 +810,28 @@ loss 选择；rank 输入和 test 均不得参与选择。
   候选 16/20/24 均失败，24 的最坏 core NRMSE 为 `0.0501239`，且 S1--S3
   的 32-lag/identity 比率超出 2。E2A0/NAT/PERM/SPACE=`NOT_YET_RUN`；
   `NEXT_ALLOWED_STAGE=STOP_REPRESENTATION`。
+
+## Spectral v0.3.3 分辨率解耦与容量验证
+
+- 当前活动规范升级为
+  `Resolution_Decoupled_Spectral_PS_AR_RAPHU_Theory_v0_3_3.md` 与
+  `Resolution_Decoupled_Spectral_PS_AR_RAPHU_Validation_Plan_v0_3_3.md`；
+  v0.3.2 的失败状态和全部结果保持只读，不覆盖、不改写。
+- 新分支固定为 `ps-ar-raphu-v033-resolution-decoupling`，新结果只写
+  `results/spectral_v033/`。旧 v0.3/v0.3.1/v0.3.2 配置和结果不得修改。
+- E1B 删除病态 identity-reference error ratio，改用 uniform lag 与
+  normalized trapezoidal amplitude 权重下的正交边际/联合投影误差；必须
+  无条件完成 lag `{32,40,48,64_identity}` × amplitude `{24,28,32}`
+  的 1,440 行完整网格，失败时也不得跳过邻居。
+- 三个角色固定且不可由 CLI 覆盖：预测空间 `32x28`、结构空间
+  `48x28`、母空间 `64_identity x 28`。strong/weak rank-2 分类必须由
+  truth spectrum 自动生成；weak rank-2 只报告，不进入停止线。
+- 严格顺序为
+  `E1B -> E2A0 -> E2A_M_SPACE -> E2A_S_SPACE -> E2A_P_NAT ->
+  E2A_P_PERM`。任一级失败立即按 v0.3.3 映射停止；不得自行替换分辨率、
+  basis、门槛、目标或求解器。
+- 容量实验固定 CPU FP64 convex solve，只按 validation contribution
+  MSE 取最小值，不使用 one-SE；truth surface、rank 和 test 不参与选择。
+- 本轮生成 `V033_RESOLUTION_CAPACITY_DECISION.md` 与
+  `SPECTRAL_PS_AR_RAPHU_V033_RESOLUTION_CAPACITY_RESULTS.zip` 后暂停，
+  不实现、不运行 E2B/E3。
