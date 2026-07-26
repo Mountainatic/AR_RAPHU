@@ -779,3 +779,30 @@ loss 选择；rank 输入和 test 均不得参与选择。
   60 个场景/seed/变量结果仅 15 个通过，四个场景均未达到 4/5 seed；
   E2B/E3=`NOT_YET_RUN`，本轮停止线为
   `NEXT_ALLOWED_STAGE=STOP_SINGLE_KERNEL_CAPACITY`。
+
+## Spectral v0.3.2 域、模型类与激励修复
+
+- 当前活动规范升级为
+  `Excitation_Aware_Spectral_PS_AR_RAPHU_Theory_v0_3_2.md` 与
+  `Excitation_Aware_Spectral_PS_AR_RAPHU_Validation_Plan_v0_3_2.md`；
+  验证计划优先于旧 v0.3/v0.3.1。旧结果与停止动作保持只读，不改写。
+- 新分支固定为 `ps-ar-raphu-v032-domain-identifiability`；旧
+  `results/spectral_v03/`、`results/spectral_v031/` 及对应配置不得修改。
+  新结果只写 `results/spectral_v032/`。
+- 幅值 fit 域固定为 train min/max 加 10% padding；core 报告域仍为
+  train Q01--Q99。新结构实验禁止 `np.clip` 和隐式外推，任何 validation
+  或 test 历史域外值必须显式失败。
+- 旧 `AR-S4` 正式注册为条件核 `AR-S4C`，不得进入二维 Urysohn 容量、
+  support 或 rank 门槛；新增 `AR-S4U` 才是二维幅值相关 Urysohn 场景。
+- 第一批严格顺序为
+  `R1 -> E0U -> E1A -> E2A0 -> E2A_NAT -> E2A_PERM -> E2A_SPACE`，
+  随后生成 `V032_CAPACITY_DECISION.md` 并暂停。不得自动运行 E2B/E3。
+- E1A 固定 lag 32，幅值 basis 候选仅 `16,20,24`，参考 identity 64 与
+  upper neighbor 40；均失败时停止，不得新增候选。
+- 容量平滑只选最小 validation contribution MSE，不使用 one-SE。
+  NAT 只以 contribution R2、经验算子 NRMSE 和 KKT 为门槛，surface 仅诊断；
+  SPACE 才承担完整核面与结构 rank 证书。
+- PERM 固定 `seed+20000`，SPACE 使用 `seed+10000` 的 scrambled Sobol，
+  excitation 长度 20000、burn-in 64、70/15/15 时间切分；不得改动。
+- 本轮当前状态：v0.3.2 理论与验证计划已完整读取，新分支已创建；R1 及
+  后续实验尚未运行。
