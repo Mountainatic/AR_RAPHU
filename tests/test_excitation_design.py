@@ -5,6 +5,7 @@ from ar_raphu.spectral.excitation import (
     chronological_split_indices,
     permuted_marginal_excitation,
     space_filling_core_excitation,
+    space_filling_history_excitation,
 )
 
 
@@ -32,3 +33,18 @@ def test_excitation_splits_are_chronological_after_burn_in():
     assert split["train"][-1] < split["validation"][0]
     assert split["validation"][-1] < split["test"][0]
     assert sum(len(values) for values in split.values()) == 20000 - 64
+
+
+def test_space_histories_fill_every_lag_dimension_reproducibly():
+    values = np.linspace(-2.0, 3.0, 1000)
+    domain = AmplitudeDomain.fit(values, padding_fraction=0.10)
+    first = space_filling_history_excitation(
+        domain, sample_count=256, lag_count=8, seed=123
+    )
+    second = space_filling_history_excitation(
+        domain, sample_count=256, lag_count=8, seed=123
+    )
+    assert first.shape == (256, 8)
+    np.testing.assert_array_equal(first, second)
+    assert np.all(first >= domain.core_lower)
+    assert np.all(first <= domain.core_upper)

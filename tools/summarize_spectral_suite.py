@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate only the pre-registered Spectral v0.3/v0.3.1 decision fields."""
+"""Generate pre-registered Spectral v0.3 through v0.3.3 decision fields."""
 
 from __future__ import annotations
 
@@ -222,6 +222,105 @@ def summarize_v032() -> None:
         writer.writerows(fields.items())
 
 
+def summarize_v033() -> None:
+    result_root = ROOT / "results" / "spectral_v033"
+
+    def experiment_status(experiment: str) -> str:
+        path = result_root / experiment / "summary.json"
+        if not path.exists():
+            return "NOT_YET_RUN"
+        return str(json.loads(path.read_text(encoding="utf-8"))["status"])
+
+    e1b = experiment_status("E1B")
+    e2a0 = experiment_status("E2A0")
+    mother = experiment_status("E2A_M_SPACE")
+    structural = experiment_status("E2A_S_SPACE")
+    natural = experiment_status("E2A_P_NAT")
+    permuted = experiment_status("E2A_P_PERM")
+    if e1b != "E1B_RESOLUTION_ROLES_CERTIFIED":
+        primary_limitation = "REPRESENTATION_CERTIFICATE"
+        next_stage = "STOP_REPRESENTATION_CERTIFICATE"
+    elif e2a0 != "E2A0_IMPLEMENTATION_CLOSURE_PASS":
+        primary_limitation = "IMPLEMENTATION_CLOSURE"
+        next_stage = "STOP_IMPLEMENTATION_CLOSURE"
+    elif mother != "E2A_M_SPACE_CAPACITY_PASS":
+        primary_limitation = "MOTHER_SPACE_CAPACITY"
+        next_stage = "STOP_MOTHER_SPACE_CAPACITY"
+    elif structural != "E2A_S_SPACE_CAPACITY_PASS":
+        primary_limitation = "STRUCTURAL_SPACE_CAPACITY"
+        next_stage = "STOP_STRUCTURAL_SPACE_CAPACITY"
+    elif natural == "E2A_P_NAT_CAPACITY_PASS":
+        primary_limitation = "NONE"
+        next_stage = "ALLOW_E2B"
+    elif permuted == "E2A_P_PERM_CAPACITY_PASS":
+        primary_limitation = "NATURAL_LAG_CORRELATION_LIMIT"
+        next_stage = "ALLOW_E2B_WITH_NATURAL_CORRELATION_QUALIFIER"
+    else:
+        primary_limitation = "NATURAL_DISTRIBUTION_COVERAGE_LIMIT"
+        next_stage = "ALLOW_E2B_STRUCTURE_ONLY_WITH_DISTRIBUTION_QUALIFIER"
+    certificate_path = result_root / "E1B" / "role_certificate.json"
+    certificate = (
+        json.loads(certificate_path.read_text(encoding="utf-8"))
+        if certificate_path.exists()
+        else {}
+    )
+    roles = certificate.get("roles", {})
+    fields = {
+        "V032_FROZEN_STATUS": "STOP_REPRESENTATION",
+        "E1B_STATUS": e1b,
+        "E2A0_STATUS": e2a0,
+        "E2A_M_SPACE_STATUS": mother,
+        "E2A_S_SPACE_STATUS": structural,
+        "E2A_P_NAT_STATUS": natural,
+        "E2A_P_PERM_STATUS": permuted,
+        "MOTHER_REPRESENTATION_VALID": (
+            "TRUE" if roles.get("MOTHER", {}).get("passed") else "FALSE"
+        ),
+        "STRUCTURAL_REPRESENTATION_VALID": (
+            "TRUE" if roles.get("STRUCTURAL", {}).get("passed") else "FALSE"
+        ),
+        "PREDICTIVE_REPRESENTATION_VALID": (
+            "TRUE" if roles.get("PREDICTIVE", {}).get("passed") else "FALSE"
+        ),
+        "STRONG_RANK_RESOLUTION_VALID": (
+            "TRUE"
+            if roles.get("STRUCTURAL", {}).get(
+                "strong_rank_resolution_valid"
+            )
+            else "FALSE"
+        ),
+        "IMPLEMENTATION_CLOSURE_VALID": (
+            "TRUE" if e2a0 == "E2A0_IMPLEMENTATION_CLOSURE_PASS" else "FALSE"
+        ),
+        "MOTHER_CAPACITY_VALID": (
+            "TRUE" if mother == "E2A_M_SPACE_CAPACITY_PASS" else "FALSE"
+        ),
+        "STRUCTURAL_CAPACITY_VALID": (
+            "TRUE" if structural == "E2A_S_SPACE_CAPACITY_PASS" else "FALSE"
+        ),
+        "NATURAL_PREDICTIVE_CAPACITY_VALID": (
+            "NOT_YET_RUN"
+            if natural == "NOT_YET_RUN"
+            else (
+                "TRUE" if natural == "E2A_P_NAT_CAPACITY_PASS" else "FALSE"
+            )
+        ),
+        "PRIMARY_LIMITATION": primary_limitation,
+        "NEXT_ALLOWED_STAGE": next_stage,
+    }
+    result_root.mkdir(parents=True, exist_ok=True)
+    (result_root / "V033_RESOLUTION_CAPACITY_DECISION.md").write_text(
+        "\n".join(f"{key}: {value}" for key, value in fields.items()) + "\n",
+        encoding="utf-8",
+    )
+    with (
+        result_root / "spectral_v033_resolution_capacity_summary.csv"
+    ).open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(["field", "value"])
+        writer.writerows(fields.items())
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -235,7 +334,9 @@ def main() -> None:
     )
     config = json.loads(config_path.read_text(encoding="utf-8"))
     schema_version = int(config.get("schema_version", 1))
-    if schema_version == 3:
+    if schema_version == 4:
+        summarize_v033()
+    elif schema_version == 3:
         summarize_v032()
     elif schema_version == 2:
         summarize_v031()

@@ -1,0 +1,67 @@
+{
+  "status": "E2A_M_SPACE_CAPACITY_PASS",
+  "task_count": 60,
+  "group_results": {
+    "AR-S1:var0": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    },
+    "AR-S1:var1": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    },
+    "AR-S1:var2": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    },
+    "AR-S2:var0": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    },
+    "AR-S2:var1": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    },
+    "AR-S2:var2": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    },
+    "AR-S3:var0": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    },
+    "AR-S3:var1": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    },
+    "AR-S3:var2": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    },
+    "AR-S4U:var0": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    },
+    "AR-S4U:var1": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    },
+    "AR-S4U:var2": {
+      "passed_seeds": 5,
+      "required_seeds": 4,
+      "passed": true
+    }
+  },
+  "next_allowed_experiment": "E2A_S_SPACE"
+}

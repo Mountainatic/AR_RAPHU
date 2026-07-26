@@ -5,6 +5,7 @@ import json
 
 from ar_raphu.spectral.capacity_matrix import (
     apply_tensor_coefficients,
+    build_matrix_from_histories,
     build_single_variable_matrix,
     select_minimum_validation_mse,
     smoothing_pairs,
@@ -61,3 +62,20 @@ def test_arbitrary_lag_matrix_matches_explicit_tensor_application():
     np.testing.assert_allclose(
         matrix @ theta.reshape(-1), expected, atol=1.0e-14
     )
+
+
+def test_independent_history_design_matches_explicit_application():
+    rng = np.random.default_rng(334)
+    histories = rng.uniform(-1.0, 1.0, size=(32, 8))
+    domain = AmplitudeDomain.fit(histories.reshape(-1), padding_fraction=0.10)
+    basis = CenteredSplineBasis.fit(
+        histories.reshape(-1), n_basis=6, degree=3, domain=domain
+    )
+    lag = np.eye(8)
+    matrix = build_matrix_from_histories(
+        histories, lag_basis=lag, amplitude_basis=basis
+    )
+    theta = rng.normal(size=(8, 6))
+    amplitude = basis.transform(histories.reshape(-1)).reshape(32, 8, 6)
+    expected = np.einsum("la,nlb,ab->n", lag, amplitude, theta)
+    np.testing.assert_allclose(matrix @ theta.reshape(-1), expected, atol=1e-14)

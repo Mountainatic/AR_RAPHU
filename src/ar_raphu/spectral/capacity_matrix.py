@@ -52,6 +52,25 @@ def build_single_variable_matrix(
     return tensor.reshape(len(origins), -1)
 
 
+def build_matrix_from_histories(
+    histories: np.ndarray,
+    *,
+    lag_basis: np.ndarray,
+    amplitude_basis,
+) -> np.ndarray:
+    """Build a tensor design from independent preconstructed lag histories."""
+
+    windows = np.asarray(histories, dtype=np.float64)
+    lag = np.asarray(lag_basis, dtype=np.float64)
+    if windows.ndim != 2 or lag.ndim != 2 or windows.shape[1] != lag.shape[0]:
+        raise ValueError("Histories and lag basis have incompatible shapes.")
+    amplitude = amplitude_basis.transform(windows.reshape(-1)).reshape(
+        len(windows), windows.shape[1], -1
+    )
+    tensor = np.einsum("la,nlb->nab", lag, amplitude, optimize=True)
+    return tensor.reshape(len(windows), -1)
+
+
 def select_minimum_validation_mse(
     rows: list[dict[str, object]],
 ) -> dict[str, object]:

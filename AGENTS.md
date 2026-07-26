@@ -835,3 +835,15 @@ loss 选择；rank 输入和 test 均不得参与选择。
 - 本轮生成 `V033_RESOLUTION_CAPACITY_DECISION.md` 与
   `SPECTRAL_PS_AR_RAPHU_V033_RESOLUTION_CAPACITY_RESULTS.zip` 后暂停，
   不实现、不运行 E2B/E3。
+- 当前执行状态：规定定向测试 `40 passed`；E1B 完整 1,440 行并得到
+  `E1B_RESOLUTION_ROLES_CERTIFIED`，P/S/M 最坏 core joint NRMSE 分别为
+  `0.0299971/0.0252387/0.0252020`；E2A0 闭环通过，最大真贡献重放误差
+  `8.88e-16`、矩阵/direct 误差 `3.30e-15`。
+- E2A-M-SPACE 正式 12 个场景-变量组均为 5/5 seeds 通过。一次把一维
+  Sobol 流误当连续历史的预跑因设计有效秩仅约 30--36 被隔离到
+  `results/spectral_v033/invalid_runs/`，不得作为科学结果。
+- E2A-S-SPACE 中 S1/S2/S3 九组均 5/5 通过；AR-S4U 三组完整 surface
+  与 contribution 通过，但 rank-2 截断不满足冻结的 full-MSE 门槛，
+  因此状态为 `E2A_S_SPACE_CAPACITY_FAIL`。停止线为
+  `NEXT_ALLOWED_STAGE=STOP_STRUCTURAL_SPACE_CAPACITY`；P-NAT、P-PERM、
+  E2B、E3 均不得运行。

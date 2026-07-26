@@ -27,7 +27,10 @@ from ar_raphu.spectral.capacity_diagnostics import (
     direct_apply_projected_kernel,
     direct_apply_truth_kernel,
 )
-from ar_raphu.spectral.capacity_matrix import build_single_variable_matrix
+from ar_raphu.spectral.capacity_matrix import (
+    build_matrix_from_histories,
+    build_single_variable_matrix,
+)
 from ar_raphu.spectral.capacity_matrix import (
     select_minimum_validation_mse,
     smoothing_pairs,
@@ -36,6 +39,7 @@ from ar_raphu.spectral.excitation import (
     chronological_split_indices,
     permuted_marginal_excitation,
     space_filling_core_excitation,
+    space_filling_history_excitation,
 )
 from ar_raphu.spectral.operator_metrics import empirical_operator_nrmse
 from ar_raphu.spectral.representation_certificate import (
@@ -72,7 +76,11 @@ from ar_raphu.spectral.weighted_projection import (
 )
 from ar_raphu.spectral.solver import solve_full_kernel
 from ar_raphu.spectral.solver import solve_full_kernel_pcg
-from ar_raphu.synthetic import generate_synthetic_sequence
+from ar_raphu.synthetic import (
+    generate_synthetic_sequence,
+    second_truth_response,
+    truth_response,
+)
 
 
 CONFIG_PATH = ROOT / "configs" / "spectral_v03.yaml"
@@ -2171,12 +2179,6 @@ def _capacity_task(payload: dict[str, object]) -> dict[str, object]:
         n_samples=int(common["n_samples_natural"]),
         external_variables=10,
     )
-    capacity_sequence, values, splits = _capacity_split_and_values(
-        sequence,
-        variable=variable,
-        distribution=distribution,
-        config=config,
-    )
     natural_train_stop = sequence.split_target_intervals["train"][1]
     natural_domain = AmplitudeDomain.fit(
         sequence.x[:natural_train_stop, variable],
@@ -2190,30 +2192,108 @@ def _capacity_task(payload: dict[str, object]) -> dict[str, object]:
         length=int(common["L_x"]),
         degree=int(config["e1b"]["degree"]),
     )
-    train_stop = int(splits["train"][-1] + 1)
-    amplitude_basis = CenteredSplineBasis.fit(
-        values[:train_stop],
-        n_basis=role.amplitude_count,
-        degree=int(config["e1b"]["degree"]),
-        domain=natural_domain,
-    )
-    matrices = {
-        name: build_single_variable_matrix(
-            values,
-            origin_indices=indices - 1,
-            lag_basis=lag_basis,
-            amplitude_basis=amplitude_basis,
+    if distribution == "SPACE":
+        histories = space_filling_history_excitation(
+            natural_domain,
+            sample_count=int(common["n_samples_excitation"]),
+            lag_count=int(common["L_x"]),
+            seed=seed + int(config["space"]["seed_offset"]),
         )
-        for name, indices in splits.items()
-    }
-    targets = {
-        name: direct_apply_truth_kernel(
-            capacity_sequence, variable, indices
+        splits = chronological_split_indices(
+            len(histories),
+            burn_in=0,
+            fractions=tuple(config["space"]["split_fractions"]),
         )
-        for name, indices in splits.items()
-    }
+        train_amplitude_values = histories[splits["train"]].reshape(-1)
+        amplitude_basis = CenteredSplineBasis.fit(
+            train_amplitude_values,
+            n_basis=role.amplitude_count,
+            degree=int(config["e1b"]["degree"]),
+            domain=natural_domain,
+        )
+        matrices = {
+            name: build_matrix_from_histories(
+                histories[indices],
+                lag_basis=lag_basis,
+                amplitude_basis=amplitude_basis,
+            )
+            for name, indices in splits.items()
+        }
+
+        def history_kernel_values(selected: np.ndarray) -> np.ndarray:
+            length = int(common["L_x"])
+            primary = np.asarray(
+                sequence.truth["q_primary"], dtype=np.float64
+            )[variable]
+            primary_response = truth_response(variable, selected)
+            if scenario == "AR-S3":
+                secondary = np.asarray(
+                    sequence.truth["q_secondary"], dtype=np.float64
+                )[variable]
+                return (
+                    0.6 * primary_response * primary[None, :]
+                    + 0.4
+                    * second_truth_response(variable, selected)
+                    * secondary[None, :]
+                )
+            if scenario == "AR-S4U":
+                kernel = np.empty_like(selected)
+                lag_axis = np.arange(length, dtype=np.float64)[:, None]
+                for lag in range(length):
+                    amplitudes = selected[:, lag]
+                    centers = 8.0 + 12.0 / (
+                        1.0 + np.exp(-2.0 * amplitudes)
+                    )
+                    unnormalized = np.exp(
+                        -0.5 * ((lag_axis - centers[None, :]) / 2.0) ** 2
+                    )
+                    weights = unnormalized[lag] / unnormalized.sum(axis=0)
+                    kernel[:, lag] = weights * primary_response[:, lag]
+                return kernel
+            return primary_response * primary[None, :]
+
+        targets = {
+            name: history_kernel_values(histories[indices]).sum(axis=1)
+            for name, indices in splits.items()
+        }
+        truth_mean = history_kernel_values(
+            histories[splits["train"]]
+        ).mean(axis=0)[:, None]
+    else:
+        capacity_sequence, values, splits = _capacity_split_and_values(
+            sequence,
+            variable=variable,
+            distribution=distribution,
+            config=config,
+        )
+        train_stop = int(splits["train"][-1] + 1)
+        train_amplitude_values = values[:train_stop]
+        amplitude_basis = CenteredSplineBasis.fit(
+            train_amplitude_values,
+            n_basis=role.amplitude_count,
+            degree=int(config["e1b"]["degree"]),
+            domain=natural_domain,
+        )
+        matrices = {
+            name: build_single_variable_matrix(
+                values,
+                origin_indices=indices - 1,
+                lag_basis=lag_basis,
+                amplitude_basis=amplitude_basis,
+            )
+            for name, indices in splits.items()
+        }
+        targets = {
+            name: direct_apply_truth_kernel(
+                capacity_sequence, variable, indices
+            )
+            for name, indices in splits.items()
+        }
+        truth_mean = true_kernel_surface(
+            capacity_sequence, variable, train_amplitude_values
+        ).mean(axis=1, keepdims=True)
     lag_gram = lag_basis.T @ lag_basis / len(lag_basis)
-    train_amplitude = amplitude_basis.transform(values[:train_stop])
+    train_amplitude = amplitude_basis.transform(train_amplitude_values)
     amplitude_gram = train_amplitude.T @ train_amplitude / len(train_amplitude)
     candidate_rows: list[dict[str, object]] = []
     candidate_fits = []
@@ -2268,13 +2348,9 @@ def _capacity_task(payload: dict[str, object]) -> dict[str, object]:
         int(config["domain"]["grid_points"]),
         dtype=np.float64,
     )
-    truth_mean = true_kernel_surface(
-        capacity_sequence, variable, values[:train_stop]
-    ).mean(axis=1, keepdims=True)
-
     def surface_metrics(amplitude_grid: np.ndarray) -> tuple[float, np.ndarray]:
         truth = (
-            true_kernel_surface(capacity_sequence, variable, amplitude_grid)
+            true_kernel_surface(sequence, variable, amplitude_grid)
             - truth_mean
         )
         estimate = (

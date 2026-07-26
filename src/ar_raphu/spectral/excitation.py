@@ -39,6 +39,26 @@ def space_filling_core_excitation(
     ).reshape(-1)
 
 
+def space_filling_history_excitation(
+    domain: AmplitudeDomain,
+    *,
+    sample_count: int,
+    lag_count: int,
+    seed: int,
+) -> np.ndarray:
+    """Fill the complete lag-history cube for structural operator audits."""
+
+    if sample_count <= 0 or lag_count <= 0:
+        raise ValueError("sample_count and lag_count must be positive.")
+    sampler = qmc.Sobol(d=lag_count, scramble=True, seed=seed)
+    unit = sampler.random(sample_count)
+    return qmc.scale(
+        unit,
+        np.full(lag_count, domain.core_lower),
+        np.full(lag_count, domain.core_upper),
+    )
+
+
 def chronological_split_indices(
     length: int,
     *,
