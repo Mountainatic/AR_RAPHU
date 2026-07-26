@@ -2811,6 +2811,7 @@ def _v034_space_problem(
         true_kernel_surface(sequence, variable, amplitude_grid) - truth_mean
     )
     amplitude_evaluation = amplitude_basis.transform(amplitude_grid)
+    train_amplitude_evaluation = amplitude_basis.transform(train_amplitudes)
     lag_weights = np.full(64, 1.0 / 64)
     amplitude_weights = normalized_trapezoidal_weights(amplitude_grid)
     lag_gram = lag_basis.T @ (lag_weights[:, None] * lag_basis)
@@ -2831,6 +2832,11 @@ def _v034_space_problem(
         "lag_basis": lag_basis,
         "lag_gram": lag_gram,
         "amplitude_gram": amplitude_gram,
+        "train_amplitude_gram": (
+            train_amplitude_evaluation.T
+            @ train_amplitude_evaluation
+            / len(train_amplitude_evaluation)
+        ),
         "amplitude_evaluation": amplitude_evaluation,
         "truth_surface": truth_surface,
         "truth_singular_values": truth_singular_values,
@@ -3174,6 +3180,644 @@ def run_e2a_sr_v034(config: dict[str, object], result_root: Path) -> str:
     return status
 
 
+def _v033_selected_smoothing_lookup(
+    experiment: str,
+) -> dict[tuple[str, int, int], tuple[float, float]]:
+    path = ROOT / "results" / "spectral_v033" / experiment / "metrics.csv"
+    lookup = {}
+    with path.open(encoding="utf-8", newline="") as stream:
+        for row in csv.DictReader(stream):
+            lookup[
+                (row["scenario"], int(row["seed"]), int(row["variable"]))
+            ] = (
+                float(row["selected_lag_smoothing"]),
+                float(row["selected_amplitude_smoothing"]),
+            )
+    return lookup
+
+
+def _v034_srb_task(payload: dict[str, object]) -> dict[str, object]:
+    scenario = str(payload["scenario"])
+    seed = int(payload["seed"])
+    variable = int(payload["variable"])
+    config = payload["config"]
+    v033_config = payload["v033_config"]
+    problem = _v034_space_problem(
+        scenario=scenario,
+        seed=seed,
+        variable=variable,
+        lag_count=48,
+        v033_config=v033_config,
+    )
+    archive = np.load(payload["fit_path"])
+    key = f"{scenario}_seed{seed}_var{variable}"
+    coefficients = archive[key + "_coefficients"].reshape(48, 28)
+    intercept = float(archive[key + "_intercept"][0])
+    lag_smoothing, amplitude_smoothing = payload["smoothing"]
+    penalty = tensor_penalty(
+        problem["lag_basis"].T @ problem["lag_basis"] / 64,
+        [problem["train_amplitude_gram"]],
+        lag_smoothness=float(lag_smoothing),
+        amplitude_smoothness=float(amplitude_smoothing),
+        ridge_weight=float(v033_config["capacity"]["numerical_ridge"]),
+    )
+    x = problem["matrices"]["train"]
+    y = problem["targets"]["train"]
+    fitted = x @ coefficients.reshape(-1) + intercept
+    residual = y - fitted
+    x_mean = x.mean(axis=0)
+    x_work = x - x_mean
+    covariance = x_work.T @ x_work / len(x_work)
+    system = covariance + penalty
+    scale = max(float(np.trace(system) / len(system)), 1.0)
+    jitter = (
+        float(v033_config["capacity"]["numerical_ridge"]) * scale
+    )
+    factor = scipy.linalg.cho_factor(
+        system + jitter * np.eye(len(system)),
+        lower=True,
+        check_finite=True,
+    )
+    replicates = int(config["bootstrap"]["development_replicates"])
+    rng = np.random.default_rng(int(payload["bootstrap_seed"]))
+    sampled_residuals = np.empty((len(y), replicates), dtype=np.float64)
+    for replicate in range(replicates):
+        indices = circular_block_indices(
+            len(y),
+            block_length=int(config["bootstrap"]["block_length"]),
+            rng=rng,
+        )
+        sampled_residuals[:, replicate] = residual[indices]
+    pseudo_targets = fitted[:, None] + sampled_residuals
+    pseudo_centered = pseudo_targets - pseudo_targets.mean(axis=0)
+    rhs = x_work.T @ pseudo_centered / len(x_work)
+    bootstrap_coefficients = scipy.linalg.cho_solve(
+        factor, rhs, check_finite=False
+    )
+    budgets = tuple(config["rank_profile"]["structural_budgets"])
+    rank_max = int(config["rank_profile"]["rank_max"])
+    ranks = np.empty((replicates, len(budgets)), dtype=np.int64)
+    tails = np.empty((replicates, rank_max), dtype=np.float64)
+    for replicate in range(replicates):
+        spectrum = gram_whitened_svd(
+            bootstrap_coefficients[:, replicate].reshape(48, 28),
+            problem["lag_gram"],
+            problem["amplitude_gram"],
+        )
+        profile = build_rank_profile(
+            spectrum.singular_values,
+            rank_max=rank_max,
+            budgets=budgets,
+        )
+        tails[replicate] = profile.tail_curve
+        ranks[replicate] = [
+            profile.effective_ranks[float(budget)] for budget in budgets
+        ]
+    truth_ranks = payload["truth_ranks"]
+    row = {
+        "scenario": scenario,
+        "seed": seed,
+        "variable": variable,
+        "truth_class": payload["truth_class"],
+        "smoothing_reselected": False,
+        "bootstrap_replicates": replicates,
+        "block_length": int(config["bootstrap"]["block_length"]),
+    }
+    main_valid = True
+    for column, budget in enumerate(budgets):
+        low, median, high = rank_interval(
+            ranks[:, column],
+            quantiles=tuple(config["bootstrap"]["interval_quantiles"]),
+        )
+        suffix = {0.10: "010", 0.05: "005", 0.02: "002"}[float(budget)]
+        row[f"rank_low_{suffix}"] = low
+        row[f"rank_median_{suffix}"] = median
+        row[f"rank_high_{suffix}"] = high
+        row[f"truth_rank_{suffix}"] = int(truth_ranks[str(float(budget))])
+        if float(budget) == 0.05:
+            truth_rank = int(truth_ranks[str(float(budget))])
+            main_valid &= (
+                high - low
+                <= int(config["bootstrap"]["stable_interval_width_max"])
+            )
+            if payload["truth_class"] in {"near_rank1", "strong_rank2"}:
+                main_valid &= low <= truth_rank <= high
+            elif payload["truth_class"] == "higher_rank":
+                main_valid &= low >= 2 and (
+                    low - 1 <= truth_rank <= high + 1
+                )
+    row["seed_gate_pass"] = bool(main_valid)
+    return {"row": row, "ranks": ranks, "tails": tails}
+
+
+def run_e2a_srb_v034(config: dict[str, object], result_root: Path) -> str:
+    sr = json.loads(
+        (result_root / "E2A_SR" / "summary.json").read_text(encoding="utf-8")
+    )
+    if sr["status"] != "E2A_SR_RANK_PROFILE_PASS":
+        raise RuntimeError("E2A_SRB is blocked until E2A_SR passes.")
+    output = result_root / "E2A_SRB"
+    contract = ExperimentContract(
+        scientific_question="Are frozen-smoothing structural rank profiles bootstrap-stable?",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="single_oracle_variable",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        experiment_role="BOOTSTRAP_RANK",
+        model_class="M2",
+        resolution_role="STRUCTURAL",
+        evaluation_distribution="SPACE",
+        rank_budget_grid=(0.10, 0.05, 0.02),
+        rank_max=12,
+        smoothing_reselected=False,
+        allowed_next_experiment="E2A_P_NAT",
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+    v033_config = load_config(ROOT / "configs" / "spectral_v033.yaml")
+    smoothing_lookup = _v033_selected_smoothing_lookup("E2A_S_SPACE")
+    truth_lookup = {}
+    with (result_root / "E2A_SR" / "truth_rank_profile.csv").open(
+        encoding="utf-8", newline=""
+    ) as stream:
+        for row in csv.DictReader(stream):
+            truth_lookup[
+                (row["scenario"], int(row["seed"]), int(row["variable"]))
+            ] = row
+    scenario_order = {
+        scenario: index
+        for index, scenario in enumerate(config["common"]["scenarios"])
+    }
+    payloads = []
+    for scenario in config["common"]["scenarios"]:
+        for seed in config["common"]["development_seeds"]:
+            for variable in config["common"]["variables"]:
+                key = (str(scenario), int(seed), int(variable))
+                truth = truth_lookup[key]
+                payloads.append(
+                    {
+                        "scenario": scenario,
+                        "seed": seed,
+                        "variable": variable,
+                        "config": config,
+                        "v033_config": v033_config,
+                        "fit_path": str(
+                            ROOT
+                            / "results"
+                            / "spectral_v033"
+                            / "E2A_S_SPACE"
+                            / "fit.npz"
+                        ),
+                        "smoothing": smoothing_lookup[key],
+                        "truth_class": truth["truth_class"],
+                        "truth_ranks": {
+                            "0.1": int(truth["rank_010"]),
+                            "0.05": int(truth["rank_005"]),
+                            "0.02": int(truth["rank_002"]),
+                        },
+                        "bootstrap_seed": (
+                            340000
+                            + 10000 * scenario_order[str(scenario)]
+                            + 100 * int(seed)
+                            + int(variable)
+                        ),
+                    }
+                )
+    results = []
+    with ProcessPoolExecutor(max_workers=8) as pool:
+        futures = [pool.submit(_v034_srb_task, item) for item in payloads]
+        for index, future in enumerate(as_completed(futures), start=1):
+            results.append(future.result())
+            print(f"E2A_SRB_PROGRESS={index}/{len(payloads)}", flush=True)
+    results.sort(
+        key=lambda item: (
+            item["row"]["scenario"],
+            item["row"]["seed"],
+            item["row"]["variable"],
+        )
+    )
+    rows = [item["row"] for item in results]
+    group_results = {}
+    for scenario in config["common"]["scenarios"]:
+        for variable in config["common"]["variables"]:
+            group = [
+                row
+                for row in rows
+                if row["scenario"] == scenario
+                and int(row["variable"]) == int(variable)
+            ]
+            passed_seeds = sum(bool(row["seed_gate_pass"]) for row in group)
+            group_results[f"{scenario}:var{variable}"] = {
+                "passed_seeds": passed_seeds,
+                "required_seeds": 4,
+                "passed": passed_seeds >= 4,
+            }
+    passed = all(item["passed"] for item in group_results.values())
+    status = (
+        "E2A_SRB_RANK_INTERVAL_PASS"
+        if passed
+        else "E2A_SRB_RANK_INTERVAL_FAIL"
+    )
+    write_csv(output / "bootstrap_rank_intervals.csv", rows)
+    write_csv(output / "metrics.csv", rows)
+    arrays = {}
+    for item in results:
+        row = item["row"]
+        key = f"{row['scenario']}_seed{row['seed']}_var{row['variable']}"
+        arrays[key + "_ranks"] = item["ranks"]
+        arrays[key + "_tail_curves"] = item["tails"]
+    np.savez_compressed(output / "bootstrap_tail_curves.npz", **arrays)
+    write_json(
+        output / "summary.json",
+        {
+            "status": status,
+            "task_count": len(rows),
+            "group_results": group_results,
+            "next_allowed_experiment": "E2A_P_NAT" if passed else "STOP",
+        },
+    )
+    return status
+
+
+def _v034_predictive_problem(
+    *,
+    scenario: str,
+    seed: int,
+    variable: int,
+    distribution: str,
+    v033_config: dict[str, object],
+) -> dict[str, object]:
+    sequence = generate_synthetic_sequence(
+        scenario,
+        seed=seed,
+        n_samples=int(v033_config["common"]["n_samples_natural"]),
+        external_variables=10,
+    )
+    capacity_sequence, values, splits = _capacity_split_and_values(
+        sequence,
+        variable=variable,
+        distribution=distribution,
+        config=v033_config,
+    )
+    natural_train_stop = sequence.split_target_intervals["train"][1]
+    domain = AmplitudeDomain.fit(
+        sequence.x[:natural_train_stop, variable],
+        padding_fraction=float(v033_config["domain"]["padding_fraction"]),
+        core_quantiles=tuple(v033_config["domain"]["core_quantiles"]),
+    )
+    lag_basis = _v033_lag_basis(
+        lag_type="cubic_bspline",
+        lag_count=32,
+        length=64,
+        degree=3,
+    )
+    train_stop = int(splits["train"][-1] + 1)
+    train_amplitudes = values[:train_stop]
+    amplitude_basis = CenteredSplineBasis.fit(
+        train_amplitudes,
+        n_basis=28,
+        degree=3,
+        domain=domain,
+    )
+    analysis_splits = {
+        name: splits[name] for name in ("train", "validation")
+    }
+    matrices = {
+        name: build_single_variable_matrix(
+            values,
+            origin_indices=indices - 1,
+            lag_basis=lag_basis,
+            amplitude_basis=amplitude_basis,
+        )
+        for name, indices in analysis_splits.items()
+    }
+    targets = {
+        name: direct_apply_truth_kernel(capacity_sequence, variable, indices)
+        for name, indices in analysis_splits.items()
+    }
+    train_amplitude_evaluation = amplitude_basis.transform(train_amplitudes)
+    return {
+        "sequence": sequence,
+        "values": values,
+        "splits": splits,
+        "domain": domain,
+        "lag_basis": lag_basis,
+        "amplitude_basis": amplitude_basis,
+        "matrices": matrices,
+        "targets": targets,
+        "solver_lag_gram": lag_basis.T @ lag_basis / 64,
+        "solver_amplitude_gram": (
+            train_amplitude_evaluation.T
+            @ train_amplitude_evaluation
+            / len(train_amplitude_evaluation)
+        ),
+    }
+
+
+def _v034_predictive_task(payload: dict[str, object]) -> dict[str, object]:
+    scenario = str(payload["scenario"])
+    seed = int(payload["seed"])
+    variable = int(payload["variable"])
+    distribution = str(payload["distribution"])
+    config = payload["config"]
+    v033_config = payload["v033_config"]
+    problem = _v034_predictive_problem(
+        scenario=scenario,
+        seed=seed,
+        variable=variable,
+        distribution=distribution,
+        v033_config=v033_config,
+    )
+    candidates = []
+    fits = []
+    for order, (lag_smoothing, amplitude_smoothing) in enumerate(
+        smoothing_pairs(v033_config)
+    ):
+        penalty = tensor_penalty(
+            problem["solver_lag_gram"],
+            [problem["solver_amplitude_gram"]],
+            lag_smoothness=lag_smoothing,
+            amplitude_smoothness=amplitude_smoothing,
+            ridge_weight=float(v033_config["capacity"]["numerical_ridge"]),
+        )
+        fit = solve_full_kernel(
+            problem["matrices"]["train"],
+            problem["targets"]["train"],
+            penalty,
+            numerical_jitter_relative=float(
+                v033_config["capacity"]["numerical_ridge"]
+            ),
+            fit_intercept=True,
+            compute_condition_number=False,
+        )
+        validation_prediction = (
+            problem["matrices"]["validation"] @ fit.coefficients
+            + fit.intercept
+        )
+        candidates.append(
+            {
+                "configuration_order": order,
+                "lag_smoothing": lag_smoothing,
+                "amplitude_smoothing": amplitude_smoothing,
+                "validation_contribution_mse": mse(
+                    problem["targets"]["validation"],
+                    validation_prediction,
+                ),
+            }
+        )
+        fits.append(fit)
+    selected = select_minimum_validation_mse(candidates)
+    fit = fits[int(selected["configuration_order"])]
+    full_validation_prediction = (
+        problem["matrices"]["validation"] @ fit.coefficients + fit.intercept
+    )
+    amplitude_grid = np.linspace(
+        problem["domain"].core_lower,
+        problem["domain"].core_upper,
+        int(v033_config["domain"]["grid_points"]),
+    )
+    amplitude_evaluation = problem["amplitude_basis"].transform(amplitude_grid)
+    amplitude_weights = normalized_trapezoidal_weights(amplitude_grid)
+    lag_weights = np.full(64, 1.0 / 64)
+    lag_gram = problem["lag_basis"].T @ (
+        lag_weights[:, None] * problem["lag_basis"]
+    )
+    amplitude_gram = amplitude_evaluation.T @ (
+        amplitude_weights[:, None] * amplitude_evaluation
+    )
+    spectrum = gram_whitened_svd(
+        fit.coefficients.reshape(32, 28), lag_gram, amplitude_gram
+    )
+    rank_max = int(config["rank_profile"]["rank_max"])
+    modes = []
+    previous = np.zeros((32, 28))
+    for rank in range(1, rank_max + 1):
+        cumulative = spectrum.truncate(rank)
+        modes.append(cumulative - previous)
+        previous = cumulative
+    ladder = build_rank_ladder(
+        train_design=problem["matrices"]["train"],
+        validation_design=problem["matrices"]["validation"],
+        train_target=problem["targets"]["train"],
+        validation_target=problem["targets"]["validation"],
+        mode_coefficients=modes,
+        full_validation_prediction=full_validation_prediction,
+        rank_max=rank_max,
+    )
+    curve = np.array([step.normalized_excess_rmse for step in ladder])
+    ranks = predictive_rank_profile(
+        curve, tuple(config["rank_profile"]["predictive_budgets"])
+    )
+    ladder_rows = [
+        {
+            "scenario": scenario,
+            "seed": seed,
+            "variable": variable,
+            "distribution": distribution,
+            "rank": step.rank,
+            "normalized_excess_rmse": step.normalized_excess_rmse,
+            "validation_contribution_r2": r2(
+                problem["targets"]["validation"],
+                step.validation_prediction,
+            ),
+            "empirical_operator_nrmse": empirical_operator_nrmse(
+                problem["targets"]["validation"],
+                step.validation_prediction,
+            ),
+            "modal_gains": json.dumps(step.modal_gains.tolist()),
+            "refit_intercept": step.intercept,
+        }
+        for step in ladder
+    ]
+    full_r2 = r2(
+        problem["targets"]["validation"], full_validation_prediction
+    )
+    full_operator = empirical_operator_nrmse(
+        problem["targets"]["validation"], full_validation_prediction
+    )
+    row = {
+        "scenario": scenario,
+        "seed": seed,
+        "variable": variable,
+        "distribution": distribution,
+        "selected_lag_smoothing": selected["lag_smoothing"],
+        "selected_amplitude_smoothing": selected["amplitude_smoothing"],
+        "smoothing_reselected_from_rank": False,
+        "full_validation_contribution_r2": full_r2,
+        "full_empirical_operator_nrmse": full_operator,
+        "full_kkt_relative_residual": fit.relative_kkt_residual,
+        "predictive_rank_010": ranks[0.10],
+        "predictive_rank_005": ranks[0.05],
+        "predictive_rank_002": ranks[0.02],
+        "normalized_excess_curve": json.dumps(curve.tolist()),
+        "structural_rank_005": int(payload["structural_rank_005"]),
+        "predictive_minus_structural_rank_005": (
+            ranks[0.05] - int(payload["structural_rank_005"])
+        ),
+        "seed_full_capacity_pass": (
+            full_r2
+            >= float(config["predictive_rank"]["full_prediction_r2_gate"])
+            and full_operator
+            <= float(
+                config["predictive_rank"][
+                    "full_empirical_operator_nrmse_gate"
+                ]
+            )
+            and fit.relative_kkt_residual
+            <= float(config["solver"]["kkt_relative_residual"])
+        ),
+    }
+    return {
+        "row": row,
+        "ladder_rows": ladder_rows,
+        "coefficients": fit.coefficients,
+        "intercept": fit.intercept,
+    }
+
+
+def run_predictive_rank_v034(
+    config: dict[str, object],
+    result_root: Path,
+    *,
+    distribution: str,
+) -> str:
+    sr = json.loads(
+        (result_root / "E2A_SR" / "summary.json").read_text(encoding="utf-8")
+    )
+    if sr["status"] != "E2A_SR_RANK_PROFILE_PASS":
+        raise RuntimeError("Predictive rank is blocked until E2A_SR passes.")
+    if distribution == "NAT":
+        experiment = "E2A_P_NAT"
+        pass_status = "E2A_P_NAT_PREDICTIVE_RANK_PASS"
+        fail_status = "E2A_P_NAT_FULL_CAPACITY_FAIL"
+        next_stage = "E2A_P_PERM"
+    else:
+        nat = json.loads(
+            (result_root / "E2A_P_NAT" / "summary.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        if nat["status"] != "E2A_P_NAT_PREDICTIVE_RANK_PASS":
+            raise RuntimeError("PERM is blocked until P-NAT passes.")
+        experiment = "E2A_P_PERM"
+        pass_status = "E2A_P_PERM_PREDICTIVE_RANK_PASS"
+        fail_status = "E2A_P_PERM_FULL_CAPACITY_FAIL"
+        next_stage = "DECISION"
+    output = result_root / experiment
+    contract = ExperimentContract(
+        scientific_question=f"What predictive rank is required under {distribution}?",
+        target_contains_ar=False,
+        model_contains_ar=False,
+        target_contains_x=True,
+        model_contains_x=True,
+        truth_used_for_training=False,
+        truth_used_for_evaluation=True,
+        support_used_for_training="single_oracle_variable",
+        hyperparameter_selection_metric="validation_prediction_loss_only",
+        rank_inputs_used_for_selection=False,
+        test_used_for_selection=False,
+        experiment_role="PREDICTIVE_RANK",
+        model_class="M2",
+        resolution_role="PREDICTIVE",
+        evaluation_distribution=distribution,
+        rank_budget_grid=(0.10, 0.05, 0.02),
+        rank_max=12,
+        smoothing_reselected=False,
+        allowed_next_experiment=next_stage,
+    )
+    write_json(output / "contract.json", contract.to_dict())
+    write_json(output / "config.json", config)
+    structural_lookup = {}
+    with (result_root / "E2A_SR" / "truth_rank_profile.csv").open(
+        encoding="utf-8", newline=""
+    ) as stream:
+        for row in csv.DictReader(stream):
+            structural_lookup[
+                (row["scenario"], int(row["seed"]), int(row["variable"]))
+            ] = int(row["rank_005"])
+    v033_config = load_config(ROOT / "configs" / "spectral_v033.yaml")
+    payloads = [
+        {
+            "scenario": scenario,
+            "seed": seed,
+            "variable": variable,
+            "distribution": distribution,
+            "config": config,
+            "v033_config": v033_config,
+            "structural_rank_005": structural_lookup[
+                (str(scenario), int(seed), int(variable))
+            ],
+        }
+        for scenario in config["common"]["scenarios"]
+        for seed in config["common"]["development_seeds"]
+        for variable in config["common"]["variables"]
+    ]
+    results = []
+    with ProcessPoolExecutor(max_workers=8) as pool:
+        futures = [
+            pool.submit(_v034_predictive_task, item) for item in payloads
+        ]
+        for index, future in enumerate(as_completed(futures), start=1):
+            results.append(future.result())
+            print(
+                f"{experiment}_PROGRESS={index}/{len(payloads)}", flush=True
+            )
+    results.sort(
+        key=lambda item: (
+            item["row"]["scenario"],
+            item["row"]["seed"],
+            item["row"]["variable"],
+        )
+    )
+    rows = [item["row"] for item in results]
+    ladder_rows = [row for item in results for row in item["ladder_rows"]]
+    group_results = {}
+    for scenario in config["common"]["scenarios"]:
+        for variable in config["common"]["variables"]:
+            group = [
+                row
+                for row in rows
+                if row["scenario"] == scenario
+                and int(row["variable"]) == int(variable)
+            ]
+            passed_seeds = sum(
+                bool(row["seed_full_capacity_pass"]) for row in group
+            )
+            group_results[f"{scenario}:var{variable}"] = {
+                "passed_seeds": passed_seeds,
+                "required_seeds": 4,
+                "passed": passed_seeds >= 4,
+            }
+    passed = all(item["passed"] for item in group_results.values())
+    status = pass_status if passed else fail_status
+    write_csv(output / "predictive_rank_profile.csv", rows)
+    write_csv(output / "predictive_rank_ladder_metrics.csv", ladder_rows)
+    write_csv(output / "metrics.csv", rows)
+    arrays = {}
+    for item in results:
+        row = item["row"]
+        key = f"{row['scenario']}_seed{row['seed']}_var{row['variable']}"
+        arrays[key + "_coefficients"] = item["coefficients"]
+        arrays[key + "_intercept"] = np.array([item["intercept"]])
+    np.savez_compressed(output / "fit.npz", **arrays)
+    write_json(
+        output / "summary.json",
+        {
+            "status": status,
+            "task_count": len(rows),
+            "group_results": group_results,
+            "next_allowed_experiment": next_stage if passed else "STOP",
+        },
+    )
+    return status
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=CONFIG_PATH)
@@ -3219,6 +3863,13 @@ def main() -> None:
         runners = {
             "R0": run_r0_v034,
             "E2A_SR": run_e2a_sr_v034,
+            "E2A_SRB": run_e2a_srb_v034,
+            "E2A_P_NAT": lambda cfg, root: run_predictive_rank_v034(
+                cfg, root, distribution="NAT"
+            ),
+            "E2A_P_PERM": lambda cfg, root: run_predictive_rank_v034(
+                cfg, root, distribution="PERM"
+            ),
         }
         if args.experiment not in runners:
             raise SystemExit(

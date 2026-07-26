@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate pre-registered Spectral v0.3 through v0.3.3 decision fields."""
+"""Generate pre-registered Spectral v0.3 through v0.3.4 decision fields."""
 
 from __future__ import annotations
 
@@ -321,6 +321,84 @@ def summarize_v033() -> None:
         writer.writerows(fields.items())
 
 
+def summarize_v034() -> None:
+    result_root = ROOT / "results" / "spectral_v034"
+
+    def experiment_status(experiment: str) -> str:
+        path = result_root / experiment / "summary.json"
+        if not path.exists():
+            return "NOT_YET_RUN"
+        return str(json.loads(path.read_text(encoding="utf-8"))["status"])
+
+    r0 = experiment_status("R0")
+    structural = experiment_status("E2A_SR")
+    bootstrap = experiment_status("E2A_SRB")
+    natural = experiment_status("E2A_P_NAT")
+    permuted = experiment_status("E2A_P_PERM")
+
+    r0_pass = r0 == "R0_V033_SCIENTIFIC_REINTERPRETATION_PASS"
+    structural_pass = structural == "E2A_SR_RANK_PROFILE_PASS"
+    bootstrap_pass = bootstrap == "E2A_SRB_RANK_INTERVAL_PASS"
+    natural_pass = natural == "E2A_P_NAT_PREDICTIVE_RANK_PASS"
+    permuted_pass = permuted == "E2A_P_PERM_PREDICTIVE_RANK_PASS"
+
+    if not r0_pass:
+        next_stage = "STOP_V033_REINTERPRETATION"
+        primary_finding = "V033_REINTERPRETATION_NOT_VALIDATED"
+    elif not structural_pass:
+        next_stage = "STOP_RANK_PROFILE"
+        primary_finding = "STRUCTURAL_RANK_PROFILE_NOT_VALIDATED"
+    elif not bootstrap_pass:
+        next_stage = "STOP_RANK_UNCERTAINTY"
+        primary_finding = "STRUCTURAL_RANK_UNCERTAINTY_NOT_VALIDATED"
+    elif not natural_pass:
+        next_stage = "STOP_PREDICTIVE_CAPACITY"
+        primary_finding = "NATURAL_PREDICTIVE_CAPACITY_NOT_VALIDATED"
+    else:
+        next_stage = "ALLOW_E2B"
+        primary_finding = "ADAPTIVE_RANK_PROFILE_VALIDATED"
+
+    profile_value = "TRUE" if structural_pass else "FALSE"
+    fields = {
+        "V033_FROZEN_STATUS": "STOP_STRUCTURAL_SPACE_CAPACITY",
+        "R0_REINTERPRETATION_STATUS": r0,
+        "E2A_SR_STATUS": structural,
+        "E2A_SRB_STATUS": bootstrap,
+        "E2A_P_NAT_STATUS": natural,
+        "E2A_P_PERM_STATUS": permuted,
+        "FULL_STRUCTURAL_SURFACE_CAPACITY": (
+            "PASS" if r0_pass else "NOT_VALIDATED"
+        ),
+        "NEAR_RANK1_RECOVERY": profile_value,
+        "STRONG_RANK2_RECOVERY": profile_value,
+        "WEAK_RANK2_PROFILE_RECOVERY": profile_value,
+        "HIGHER_RANK_PROFILE_RECOVERY": profile_value,
+        "BOOTSTRAP_RANK_STABILITY": (
+            "TRUE" if bootstrap_pass else "FALSE"
+        ),
+        "NATURAL_PREDICTIVE_CAPACITY": (
+            "TRUE" if natural_pass else "FALSE"
+        ),
+        "PREDICTIVE_RANK_PROFILE_VALID": (
+            "TRUE" if natural_pass and permuted_pass else "FALSE"
+        ),
+        "UNIVERSAL_RANK2_HYPOTHESIS": "REJECTED",
+        "PRIMARY_FINDING": primary_finding,
+        "NEXT_ALLOWED_STAGE": next_stage,
+    }
+    result_root.mkdir(parents=True, exist_ok=True)
+    (result_root / "V034_RANK_PROFILE_DECISION.md").write_text(
+        "\n".join(f"{key}: {value}" for key, value in fields.items()) + "\n",
+        encoding="utf-8",
+    )
+    with (
+        result_root / "spectral_v034_rank_profile_summary.csv"
+    ).open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(["field", "value"])
+        writer.writerows(fields.items())
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -334,7 +412,9 @@ def main() -> None:
     )
     config = json.loads(config_path.read_text(encoding="utf-8"))
     schema_version = int(config.get("schema_version", 1))
-    if schema_version == 4:
+    if schema_version == 5:
+        summarize_v034()
+    elif schema_version == 4:
         summarize_v033()
     elif schema_version == 3:
         summarize_v032()

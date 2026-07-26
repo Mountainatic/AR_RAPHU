@@ -871,3 +871,15 @@ loss 选择；rank 输入和 test 均不得参与选择。
 - 本轮生成 `V034_RANK_PROFILE_DECISION.md` 与
   `SPECTRAL_PS_AR_RAPHU_V034_RANK_PROFILE_RESULTS.zip` 后暂停，不实现、
   不运行 E2B/E3。
+- 当前执行状态：规定定向测试 `49 passed`；R0、E2A-SR、E2A-SRB、
+  E2A-P-NAT、E2A-P-PERM 全部通过，12 个场景-变量组均为 5/5 seeds
+  达标。结构尾曲线最大绝对误差 `0.00273752`，归一化谱最大 L1 距离
+  `0.00121692`。
+- 主预算 `0.05` 下 S1/S2 为 rank-1，S3 弱变量为 rank-1、强变量为
+  rank-2，S4U 为 rank-5；精细预算 `0.02` 下分别显露为 1、2、6。
+  200 次 bootstrap 的主预算区间宽度全部为 0，且未重选 smoothing。
+- 自然激励最低完整模型验证贡献 R2 为 `0.999464`，最大经验算子 NRMSE
+  为 `0.023155`；置换激励对应为 `0.998935` 与 `0.032636`，均通过。
+- 冻结结论为 `PRIMARY_FINDING=ADAPTIVE_RANK_PROFILE_VALIDATED`、
+  `UNIVERSAL_RANK2_HYPOTHESIS=REJECTED`、
+  `NEXT_ALLOWED_STAGE=ALLOW_E2B`。本轮已按停止线暂停，E2B/E3 未运行。

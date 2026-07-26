@@ -1,0 +1,126 @@
+{
+  "schema_version": 5,
+  "status": "ADAPTIVE_RANK_PROFILE_VALIDATION",
+  "provenance": {
+    "preserve_v033_results": "results/spectral_v033",
+    "preserve_v033_decision": "results/spectral_v033/V033_RESOLUTION_CAPACITY_DECISION.md"
+  },
+  "common": {
+    "development_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "confirmation_seeds": [
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119
+    ],
+    "scenarios": [
+      "AR-S1",
+      "AR-S2",
+      "AR-S3",
+      "AR-S4U"
+    ],
+    "variables": [
+      0,
+      1,
+      2
+    ],
+    "L_x": 64,
+    "dtype": "float64"
+  },
+  "resolutions": {
+    "structural": {
+      "lag_type": "cubic_bspline",
+      "lag_count": 48,
+      "amplitude_count": 28
+    },
+    "predictive": {
+      "lag_type": "cubic_bspline",
+      "lag_count": 32,
+      "amplitude_count": 28
+    },
+    "mother": {
+      "lag_type": "discrete_identity",
+      "lag_count": 64,
+      "amplitude_count": 28
+    }
+  },
+  "rank_profile": {
+    "rank_max": 12,
+    "structural_budgets": [
+      0.1,
+      0.05,
+      0.02
+    ],
+    "predictive_budgets": [
+      0.1,
+      0.05,
+      0.02
+    ],
+    "primary_budget": 0.05,
+    "tail_curve_max_abs_error": 0.05,
+    "normalized_spectrum_l1_max": 0.1,
+    "higher_rank_effective_rank_tolerance": 1
+  },
+  "truth_classification": {
+    "near_rank1_primary_rank": 1,
+    "strong_rank2_primary_rank": 2,
+    "weak_rank2_definition": {
+      "primary_rank": 1,
+      "fine_rank_min": 2
+    },
+    "higher_rank_primary_rank_min": 3,
+    "automatic_from_truth_profile": true
+  },
+  "rank_ladder": {
+    "refit_modal_gains": true,
+    "refit_intercept": true,
+    "refit_modes": false,
+    "full_model_is_frozen": true
+  },
+  "predictive_rank": {
+    "full_prediction_r2_gate": 0.995,
+    "full_empirical_operator_nrmse_gate": 0.08,
+    "required_seed_fraction": 0.8,
+    "surface_is_gate": false
+  },
+  "bootstrap": {
+    "enabled": true,
+    "development_replicates": 200,
+    "confirmation_replicates": 500,
+    "block_length": 64,
+    "interval_quantiles": [
+      0.05,
+      0.95
+    ],
+    "stable_interval_width_max": 1
+  },
+  "smoothing": {
+    "reuse_v033_selected_values": true,
+    "reselection_forbidden": true
+  },
+  "solver": {
+    "kkt_relative_residual": 1e-08
+  }
+}

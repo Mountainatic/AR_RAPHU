@@ -1,0 +1,34 @@
+concurrent.futures.process._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/root/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/concurrent/futures/process.py", line 246, in _process_worker
+    r = call_item.fn(*call_item.args, **call_item.kwargs)
+  File "/root/AR_RAPHU_SPECTRAL_V034/tools/run_spectral_suite.py", line 3527, in _v034_predictive_task
+    problem = _v034_predictive_problem(
+  File "/root/AR_RAPHU_SPECTRAL_V034/tools/run_spectral_suite.py", line 3488, in _v034_predictive_problem
+    matrices = {
+  File "/root/AR_RAPHU_SPECTRAL_V034/tools/run_spectral_suite.py", line 3489, in <dictcomp>
+    name: build_single_variable_matrix(
+  File "/root/AR_RAPHU_SPECTRAL_V034/src/ar_raphu/spectral/capacity_matrix.py", line 48, in build_single_variable_matrix
+    amplitude = amplitude_basis.transform(windows.reshape(-1)).reshape(
+  File "/root/AR_RAPHU_SPECTRAL_V034/src/ar_raphu/spectral/spline_basis.py", line 122, in transform
+    raise AmplitudeOutOfDomainError(
+ar_raphu.spectral.amplitude_domain.AmplitudeOutOfDomainError: 64 amplitude values are outside the fitted domain.
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/root/AR_RAPHU_SPECTRAL_V034/tools/run_spectral_suite.py", line 3930, in <module>
+    main()
+  File "/root/AR_RAPHU_SPECTRAL_V034/tools/run_spectral_suite.py", line 3875, in main
+    status = runners[args.experiment](config, result_root)
+  File "/root/AR_RAPHU_SPECTRAL_V034/tools/run_spectral_suite.py", line 3864, in <lambda>
+    "E2A_P_NAT": lambda cfg, root: run_predictive_rank_v034(
+  File "/root/AR_RAPHU_SPECTRAL_V034/tools/run_spectral_suite.py", line 3764, in run_predictive_rank_v034
+    results.append(future.result())
+  File "/root/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/concurrent/futures/_base.py", line 451, in result
+    return self.__get_result()
+  File "/root/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+ar_raphu.spectral.amplitude_domain.AmplitudeOutOfDomainError: 64 amplitude values are outside the fitted domain.

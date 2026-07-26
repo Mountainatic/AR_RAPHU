@@ -1,0 +1,28 @@
+{
+  "scientific_question": "What predictive rank is required under PERM?",
+  "target_contains_ar": false,
+  "model_contains_ar": false,
+  "target_contains_x": true,
+  "model_contains_x": true,
+  "truth_used_for_training": false,
+  "truth_used_for_evaluation": true,
+  "support_used_for_training": "single_oracle_variable",
+  "hyperparameter_selection_metric": "validation_prediction_loss_only",
+  "rank_inputs_used_for_selection": false,
+  "test_used_for_selection": false,
+  "experiment_role": "PREDICTIVE_RANK",
+  "target_semantics": "",
+  "basis_selection_uses_truth": false,
+  "smoothing_selection_metric": "validation_prediction_mse",
+  "allowed_next_experiment": "DECISION",
+  "model_class": "M2",
+  "evaluation_distribution": "PERM",
+  "resolution_role": "PREDICTIVE",
+  "rank_budget_grid": [
+    0.1,
+    0.05,
+    0.02
+  ],
+  "rank_max": 12,
+  "smoothing_reselected": false
+}
