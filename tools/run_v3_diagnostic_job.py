@@ -13,6 +13,11 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+
+# Required by torch deterministic algorithms for CUDA >= 10.2.  This is set
+# before importing torch so direct single-job execution is deterministic too.
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+
 import torch
 
 
