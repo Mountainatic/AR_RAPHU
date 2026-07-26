@@ -804,5 +804,9 @@ loss 选择；rank 输入和 test 均不得参与选择。
   SPACE 才承担完整核面与结构 rank 证书。
 - PERM 固定 `seed+20000`，SPACE 使用 `seed+10000` 的 scrambled Sobol，
   excitation 长度 20000、burn-in 64、70/15/15 时间切分；不得改动。
-- 本轮当前状态：v0.3.2 理论与验证计划已完整读取，新分支已创建；R1 及
-  后续实验尚未运行。
+- 本轮当前状态：R1=`R1_DOMAIN_AND_MODEL_CLASS_AUDIT_PASS`；旧 64 步
+  窗口裁剪率中位数 `0.6185`、最大 `0.7555`，S4C 已排除。E0U 恒等重放
+  通过，最大误差 `1.78e-15`。E1A=`E1A_AMPLITUDE_REPRESENTATION_FAIL`：
+  候选 16/20/24 均失败，24 的最坏 core NRMSE 为 `0.0501239`，且 S1--S3
+  的 32-lag/identity 比率超出 2。E2A0/NAT/PERM/SPACE=`NOT_YET_RUN`；
+  `NEXT_ALLOWED_STAGE=STOP_REPRESENTATION`。

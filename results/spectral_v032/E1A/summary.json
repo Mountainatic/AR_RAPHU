@@ -1,0 +1,79 @@
+{
+  "status": "E1A_AMPLITUDE_REPRESENTATION_FAIL",
+  "e0u_status": "E0U_COMPONENT_IDENTITY_PASS",
+  "e0u_maximum_identity_error": 1.7763568394002505e-15,
+  "selected_amplitude_basis_count": null,
+  "lag_basis_count": 32,
+  "candidate_diagnostics": {
+    "16": {
+      "worst_core_nrmse": 0.15131808310332165,
+      "worst_fit_nrmse": 0.08885621550024524,
+      "scenario_reference_ratios": {
+        "AR-S1": {
+          "core": 1.9046549259408896,
+          "fit": 1.7247811224866831
+        },
+        "AR-S2": {
+          "core": 7.383981741428072,
+          "fit": 7.236573130287848
+        },
+        "AR-S3": {
+          "core": 2.021575831707119,
+          "fit": 10.846363796450998
+        },
+        "AR-S4U": {
+          "core": 1.005102988970642,
+          "fit": 1.0101782765439087
+        }
+      },
+      "passes": false
+    },
+    "20": {
+      "worst_core_nrmse": 0.08857957788892201,
+      "worst_fit_nrmse": 0.04934648832389273,
+      "scenario_reference_ratios": {
+        "AR-S1": {
+          "core": 5.571166918093051,
+          "fit": 5.617442678127744
+        },
+        "AR-S2": {
+          "core": 24.33686645386125,
+          "fit": 24.716954283451958
+        },
+        "AR-S3": {
+          "core": 5.683820560242191,
+          "fit": 36.624408656187185
+        },
+        "AR-S4U": {
+          "core": 1.016022460172123,
+          "fit": 1.0360822939641754
+        }
+      },
+      "passes": false
+    },
+    "24": {
+      "worst_core_nrmse": 0.050123894870888544,
+      "worst_fit_nrmse": 0.028372979856567046,
+      "scenario_reference_ratios": {
+        "AR-S1": {
+          "core": 13.944859439190282,
+          "fit": 14.230861518472711
+        },
+        "AR-S2": {
+          "core": 61.498625835228516,
+          "fit": 62.804740951796184
+        },
+        "AR-S3": {
+          "core": 20.59870877752727,
+          "fit": 132.77016078204235
+        },
+        "AR-S4U": {
+          "core": 1.0539313647592685,
+          "fit": 1.1242698405971785
+        }
+      },
+      "passes": false
+    }
+  },
+  "next_allowed_experiment": "STOP"
+}

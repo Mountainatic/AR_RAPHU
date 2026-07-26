@@ -125,6 +125,103 @@ def summarize_v031() -> None:
         writer.writerows(fields.items())
 
 
+def summarize_v032() -> None:
+    result_root = ROOT / "results" / "spectral_v032"
+
+    def experiment_status(experiment: str) -> str:
+        path = result_root / experiment / "summary.json"
+        if not path.exists():
+            return "NOT_YET_RUN"
+        return str(json.loads(path.read_text(encoding="utf-8"))["status"])
+
+    r1 = experiment_status("R1")
+    e1a = experiment_status("E1A")
+    e1a_payload = (
+        json.loads(
+            (result_root / "E1A" / "summary.json").read_text(encoding="utf-8")
+        )
+        if (result_root / "E1A" / "summary.json").exists()
+        else {}
+    )
+    e0u = str(e1a_payload.get("e0u_status", "NOT_YET_RUN"))
+    e2a0 = experiment_status("E2A0")
+    natural = experiment_status("E2A_NAT")
+    permuted = experiment_status("E2A_PERM")
+    space = experiment_status("E2A_SPACE")
+    if r1 != "R1_DOMAIN_AND_MODEL_CLASS_AUDIT_PASS":
+        primary_limitation = "SCENARIO_OR_DOMAIN_AUDIT"
+        next_stage = "STOP_SCENARIO_OR_DOMAIN_AUDIT"
+    elif e1a != "E1A_DOMAIN_SAFE_REPRESENTATION_PASS":
+        primary_limitation = "REPRESENTATION"
+        next_stage = "STOP_REPRESENTATION"
+    elif e2a0 != "E2A0_IMPLEMENTATION_CONSISTENCY_PASS":
+        primary_limitation = "IMPLEMENTATION_CONSISTENCY"
+        next_stage = "STOP_IMPLEMENTATION_CONSISTENCY"
+    elif space not in {
+        "E2A_SPACE_FULL_SURFACE_CAPACITY_PASS",
+        "E2A_SPACE_CAPACITY_PASS",
+    }:
+        primary_limitation = "FULL_KERNEL_ESTIMATOR_OR_BASIS"
+        next_stage = "STOP_CAPACITY"
+    else:
+        primary_limitation = "NONE"
+        next_stage = "ALLOW_E2B"
+    fields = {
+        "V031_FROZEN_STATUS": "STOP_SINGLE_KERNEL_CAPACITY",
+        "R1_STATUS": r1,
+        "E0U_STATUS": e0u,
+        "E1A_STATUS": e1a,
+        "E2A0_STATUS": e2a0,
+        "E2A_NAT_STATUS": natural,
+        "E2A_PERM_STATUS": permuted,
+        "E2A_SPACE_STATUS": space,
+        "AMPLITUDE_DOMAIN_VALID": (
+            "TRUE"
+            if r1 == "R1_DOMAIN_AND_MODEL_CLASS_AUDIT_PASS"
+            else "FALSE"
+        ),
+        "MODEL_CLASS_REGISTRY_VALID": (
+            "TRUE"
+            if r1 == "R1_DOMAIN_AND_MODEL_CLASS_AUDIT_PASS"
+            else "FALSE"
+        ),
+        "REPRESENTATION_VALID": (
+            "TRUE" if e1a == "E1A_DOMAIN_SAFE_REPRESENTATION_PASS" else "FALSE"
+        ),
+        "IMPLEMENTATION_CONSISTENCY_VALID": (
+            "NOT_YET_RUN"
+            if e2a0 == "NOT_YET_RUN"
+            else (
+                "TRUE"
+                if e2a0 == "E2A0_IMPLEMENTATION_CONSISTENCY_PASS"
+                else "FALSE"
+            )
+        ),
+        "NATURAL_PREDICTIVE_CAPACITY": (
+            "NOT_YET_RUN" if natural == "NOT_YET_RUN" else natural
+        ),
+        "DECORRELATED_CAPACITY": (
+            "NOT_YET_RUN" if permuted == "NOT_YET_RUN" else permuted
+        ),
+        "SPACE_FILLING_SURFACE_CAPACITY": (
+            "NOT_YET_RUN" if space == "NOT_YET_RUN" else space
+        ),
+        "PRIMARY_LIMITATION": primary_limitation,
+        "NEXT_ALLOWED_STAGE": next_stage,
+    }
+    result_root.mkdir(parents=True, exist_ok=True)
+    (result_root / "V032_CAPACITY_DECISION.md").write_text(
+        "\n".join(f"{key}: {value}" for key, value in fields.items()) + "\n",
+        encoding="utf-8",
+    )
+    with (result_root / "spectral_v032_capacity_summary.csv").open(
+        "w", encoding="utf-8", newline=""
+    ) as stream:
+        writer = csv.writer(stream)
+        writer.writerow(["field", "value"])
+        writer.writerows(fields.items())
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -137,7 +234,10 @@ def main() -> None:
         args.config if args.config.is_absolute() else ROOT / args.config
     )
     config = json.loads(config_path.read_text(encoding="utf-8"))
-    if int(config.get("schema_version", 1)) == 2:
+    schema_version = int(config.get("schema_version", 1))
+    if schema_version == 3:
+        summarize_v032()
+    elif schema_version == 2:
         summarize_v031()
     else:
         summarize_v03()
