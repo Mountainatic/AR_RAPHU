@@ -740,8 +740,14 @@ loss 选择；rank 输入和 test 均不得参与选择。
 ## Spectral v0.3 当前状态与本次授权边界
 
 - 两份 v0.3 文档已于 2026-07-26 纳入项目持久约束。
-- 分支 `ps-ar-raphu-v4-spectral`：`NOT_YET_CREATED`。
-- Spectral v0.3 implementation：`NOT_YET_IMPLEMENTED`。
-- E0--E8：`NOT_YET_RUN`。
-- 本次用户只要求更新 `AGENTS.md`；这不构成创建分支、实现、训练、部署、
-  Git 提交、GitHub 推送或覆盖既有 v2/v3 产物的授权。
+- 分支 `ps-ar-raphu-v4-spectral`：`CREATED`。
+- Spectral v0.3 convex core：`IMPLEMENTED`；九组规定定向测试共
+  `35 passed`。
+- E0：`E0_COMPONENT_IDENTITY_PASS`。30 个 development jobs 的 latent
+  最大恒等误差为 `1.7763568394002505e-15`，measurement identity 为 0。
+- E1：`E1_PROJECTION_FALLBACK_FAIL`。唯一 `(12,16)` fallback 的最坏
+  projection NRMSE 为：AR-S1 `0.14709`、AR-S2 `0.44745`、AR-S3
+  `0.46491`、AR-S4 `0.43720`，均高于冻结 `0.10` 门槛。
+- E2--E8：`NOT_YET_RUN`；`NEXT_ALLOWED_STAGE=STOP_E1_PROJECTION_CAPACITY`。
+- 按冻结停止线不得启动 E2，不得扩大 basis grid；如需修改 E1 basis
+  空间，必须由用户给出新协议或明确授权重新预注册。

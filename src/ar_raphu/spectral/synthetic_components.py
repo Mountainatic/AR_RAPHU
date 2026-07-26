@@ -24,6 +24,38 @@ class SyntheticComponents:
     measurement_noise: np.ndarray
 
 
+def true_kernel_surface(
+    sequence: SyntheticSequence,
+    variable: int,
+    amplitudes: np.ndarray,
+) -> np.ndarray:
+    """Evaluate the frozen lag/amplitude truth kernel for one variable."""
+
+    values = np.asarray(amplitudes, dtype=np.float64)
+    truth = sequence.truth
+    q_primary = np.asarray(truth["q_primary"], dtype=np.float64)
+    q_secondary = np.asarray(truth["q_secondary"], dtype=np.float64)
+    L_x = q_primary.shape[1]
+    if variable not in truth["active_support"]:
+        return np.zeros((L_x, len(values)), dtype=np.float64)
+    if sequence.scenario == "AR-S4":
+        result = np.empty((L_x, len(values)), dtype=np.float64)
+        response = truth_response(variable, values)
+        for index, amplitude in enumerate(values):
+            center = 8.0 + 12.0 / (1.0 + np.exp(-2.0 * amplitude))
+            result[:, index] = (
+                _normalized_gaussian(L_x, center, 2.0) * response[index]
+            )
+        return result
+    primary = q_primary[variable, :, None] * truth_response(variable, values)[None, :]
+    if sequence.scenario == "AR-S3":
+        secondary = q_secondary[variable, :, None] * second_truth_response(
+            variable, values
+        )[None, :]
+        return 0.6 * primary + 0.4 * secondary
+    return primary
+
+
 def replay_synthetic_components(
     sequence: SyntheticSequence,
 ) -> SyntheticComponents:
