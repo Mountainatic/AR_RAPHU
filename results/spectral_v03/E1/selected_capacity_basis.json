@@ -1,0 +1,34 @@
+{
+  "AR-S1": {
+    "use_fallback": true,
+    "lag_basis": 12,
+    "amplitude_basis": 16,
+    "best_main_worst_active_seed_nrmse": 0.23550955579765478,
+    "fallback_worst_active_seed_nrmse": 0.14709052458012148,
+    "capacity_pass": false
+  },
+  "AR-S2": {
+    "use_fallback": true,
+    "lag_basis": 12,
+    "amplitude_basis": 16,
+    "best_main_worst_active_seed_nrmse": 0.6720839309736808,
+    "fallback_worst_active_seed_nrmse": 0.44745442592844636,
+    "capacity_pass": false
+  },
+  "AR-S3": {
+    "use_fallback": true,
+    "lag_basis": 12,
+    "amplitude_basis": 16,
+    "best_main_worst_active_seed_nrmse": 0.6539225875007306,
+    "fallback_worst_active_seed_nrmse": 0.4649135705177115,
+    "capacity_pass": false
+  },
+  "AR-S4": {
+    "use_fallback": true,
+    "lag_basis": 12,
+    "amplitude_basis": 16,
+    "best_main_worst_active_seed_nrmse": 0.6084516937155705,
+    "fallback_worst_active_seed_nrmse": 0.4372020404032611,
+    "capacity_pass": false
+  }
+}

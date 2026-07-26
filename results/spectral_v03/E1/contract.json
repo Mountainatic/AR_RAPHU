@@ -1,0 +1,14 @@
+{
+  "scientific_question": "Can the frozen tensor spline spaces represent each truth kernel?",
+  "target_contains_ar": false,
+  "model_contains_ar": false,
+  "target_contains_x": true,
+  "model_contains_x": true,
+  "truth_used_for_training": false,
+  "truth_used_for_evaluation": true,
+  "support_used_for_training": "oracle",
+  "hyperparameter_selection_metric": "validation_prediction_loss_only",
+  "rank_inputs_used_for_selection": false,
+  "test_used_for_selection": false,
+  "experiment_role": "ORACLE_COMPONENT_DIAGNOSTIC"
+}

@@ -1,0 +1,6 @@
+{
+  "status": "E0_COMPONENT_IDENTITY_PASS",
+  "jobs": 30,
+  "maximum_latent_identity_error": 1.7763568394002505e-15,
+  "maximum_measurement_identity_error": 0.0
+}

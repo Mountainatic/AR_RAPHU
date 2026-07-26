@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "status": "PROPOSED_CORE_VALIDATION",
+  "common": {
+    "development_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "confirmation_seeds": [
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119
+    ],
+    "null_seeds": [
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      234,
+      235,
+      236,
+      237,
+      238,
+      239,
+      240,
+      241,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249
+    ],
+    "n_samples": 10000,
+    "external_variables": 10,
+    "L_x": 64,
+    "L_y": 32,
+    "horizons": [
+      1,
+      5,
+      10,
+      30,
+      60
+    ],
+    "primary_horizon": 1,
+    "dtype_solver": "float64",
+    "block_length": 64,
+    "bootstrap_replicates_development": 100,
+    "bootstrap_replicates_confirmation": 500,
+    "numerical_jitter_relative": 1e-10
+  },
+  "external_basis": {
+    "degree": 3,
+    "lag_basis_candidates": [
+      5,
+      8
+    ],
+    "amplitude_basis_candidates": [
+      8,
+      12
+    ],
+    "fallback_lag_basis": 12,
+    "fallback_amplitude_basis": 16,
+    "amplitude_quantiles": [
+      0.01,
+      0.99
+    ]
+  },
+  "ar_nuisance_basis": {
+    "degree": 3,
+    "lag_basis_count": 6,
+    "amplitude_basis_count": 8,
+    "ridge_candidates": [
+      0.0001,
+      0.001,
+      0.01,
+      0.1
+    ]
+  },
+  "spectral_regularization": {
+    "lag_smoothness_candidates": [
+      0.0001,
+      0.001,
+      0.01,
+      0.1
+    ],
+    "amplitude_smoothness_candidates": [
+      0.0001,
+      0.001,
+      0.01,
+      0.1
+    ],
+    "ridge_weight": 1e-06,
+    "selection_rule": "joint_one_se",
+    "complexity_order": [
+      "total_basis_coefficients",
+      "stronger_total_smoothing",
+      "smaller_lag_basis",
+      "smaller_amplitude_basis"
+    ]
+  },
+  "crossfit": {
+    "folds": 4,
+    "initial_nuisance_prefix_targets": 2000,
+    "purge_gap": 65,
+    "nuisance_selection_tail_fraction": 0.2
+  },
+  "support": {
+    "null_quantile": 0.95,
+    "required_positive_ablation_fold_fraction": 0.8,
+    "synthetic_recall_gate": 0.8,
+    "synthetic_fpr_gate": 0.1
+  },
+  "rank": {
+    "bootstrap_alpha": 0.05,
+    "bh_fdr": 0.1,
+    "required_positive_gain_fold_fraction": 0.8,
+    "mode_stability_threshold": 0.7,
+    "neighbor_configuration_agreement": 2
+  },
+  "adaptive": {
+    "enabled_as_comparison_only": true,
+    "fista_lambda_ratios": [
+      0.32,
+      0.16,
+      0.08,
+      0.04,
+      0.02,
+      0.01,
+      0.005,
+      0.0
+    ],
+    "score_epsilon": 0.05,
+    "weight_min": 0.25,
+    "weight_max": 4.0
+  }
+}

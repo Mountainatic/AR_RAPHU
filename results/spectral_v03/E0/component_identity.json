@@ -1,0 +1,182 @@
+[
+  {
+    "scenario": "AR-S0",
+    "seed": 0,
+    "latent_identity_max_abs": 0.0,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S0",
+    "seed": 1,
+    "latent_identity_max_abs": 0.0,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S0",
+    "seed": 2,
+    "latent_identity_max_abs": 0.0,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S0",
+    "seed": 3,
+    "latent_identity_max_abs": 0.0,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S0",
+    "seed": 4,
+    "latent_identity_max_abs": 0.0,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S1",
+    "seed": 0,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S1",
+    "seed": 1,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S1",
+    "seed": 2,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S1",
+    "seed": 3,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S1",
+    "seed": 4,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S2",
+    "seed": 0,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S2",
+    "seed": 1,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S2",
+    "seed": 2,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S2",
+    "seed": 3,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S2",
+    "seed": 4,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S3",
+    "seed": 0,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S3",
+    "seed": 1,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S3",
+    "seed": 2,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S3",
+    "seed": 3,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S3",
+    "seed": 4,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S4",
+    "seed": 0,
+    "latent_identity_max_abs": 8.881784197001252e-16,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S4",
+    "seed": 1,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S4",
+    "seed": 2,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S4",
+    "seed": 3,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S4",
+    "seed": 4,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S7",
+    "seed": 0,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S7",
+    "seed": 1,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S7",
+    "seed": 2,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S7",
+    "seed": 3,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  },
+  {
+    "scenario": "AR-S7",
+    "seed": 4,
+    "latent_identity_max_abs": 1.7763568394002505e-15,
+    "measurement_identity_max_abs": 0.0
+  }
+]
