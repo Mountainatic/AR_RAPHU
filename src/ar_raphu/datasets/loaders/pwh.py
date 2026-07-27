@@ -17,7 +17,7 @@ def load_pwh(
     path = Path(raw_root) / "ParWH" / "ParWHFiles" / "ParWHData.mat"
     variables = ["uEst", "yEst", "fs"]
     if include_test:
-        variables.extend(("uVal", "yVal"))
+        variables.extend(("uVal", "yVal", "uValArr", "yValArr"))
     source = loadmat(path, variable_names=variables)
     fs = float(np.asarray(source["fs"]).squeeze())
     u_est = source["uEst"].reshape((16384 * 2, 20, 5))
@@ -55,6 +55,18 @@ def load_pwh(
                     name,
                 )
             )
+        records.append(
+            (
+                array_record(
+                    u=np.asarray(source["uValArr"]).reshape(-1),
+                    y=np.asarray(source["yValArr"]).reshape(-1),
+                    name="increasing_amplitude_test",
+                    sampling_time=1.0 / fs,
+                ),
+                "test",
+                "increasing_amplitude_test",
+            )
+        )
     return records_to_dynamic_dataset(
         records,
         dataset_id="pwh",
@@ -62,5 +74,6 @@ def load_pwh(
             "doi": "10.4121/12950081.v1",
             "loader_semantics_reference": "nonlinear-benchmarks.ParWH@1.0.1",
             "test_records_exposed": include_test,
+            "increasing_amplitude_transient_exclusion_samples": 500,
         },
     )

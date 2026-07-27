@@ -1,0 +1,68 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB0",
+  "private_cz_access": "FORBIDDEN",
+  "datasets": {
+    "pwh": {
+      "status": "COMPLETED",
+      "gates": {
+        "SOURCE_VERIFIED": true,
+        "HASH_VERIFIED": true,
+        "LICENSE_RECORDED": true,
+        "OFFICIAL_SPLIT_VERIFIED": true,
+        "TIME_ORDER_VERIFIED": true
+      },
+      "lineage": "data_manifests/public_benchmarks/pwh.json",
+      "audit": "results/public_benchmarks/pb0/pwh_source_audit.json",
+      "blockers": []
+    },
+    "whpn": {
+      "status": "NOT_YET_RUN",
+      "gates": {
+        "SOURCE_VERIFIED": false,
+        "HASH_VERIFIED": false,
+        "LICENSE_RECORDED": false,
+        "OFFICIAL_SPLIT_VERIFIED": false,
+        "TIME_ORDER_VERIFIED": false
+      },
+      "lineage": "data_manifests/public_benchmarks/whpn.json",
+      "audit": "results/public_benchmarks/pb0/whpn_source_audit.json",
+      "blockers": [
+        "SOURCE_VERIFIED",
+        "HASH_VERIFIED",
+        "LICENSE_RECORDED",
+        "OFFICIAL_SPLIT_VERIFIED",
+        "TIME_ORDER_VERIFIED"
+      ]
+    },
+    "cascaded_tanks": {
+      "status": "COMPLETED",
+      "gates": {
+        "SOURCE_VERIFIED": true,
+        "HASH_VERIFIED": true,
+        "LICENSE_RECORDED": true,
+        "OFFICIAL_SPLIT_VERIFIED": true,
+        "TIME_ORDER_VERIFIED": true
+      },
+      "lineage": "data_manifests/public_benchmarks/cascaded_tanks.json",
+      "audit": "results/public_benchmarks/pb0/cascaded_tanks_source_audit.json",
+      "blockers": []
+    },
+    "silverbox": {
+      "status": "BLOCKED_BY_MISSING_METADATA",
+      "gates": {
+        "SOURCE_VERIFIED": true,
+        "HASH_VERIFIED": true,
+        "LICENSE_RECORDED": false,
+        "OFFICIAL_SPLIT_VERIFIED": true,
+        "TIME_ORDER_VERIFIED": true
+      },
+      "lineage": "data_manifests/public_benchmarks/silverbox.json",
+      "audit": "results/public_benchmarks/pb0/silverbox_source_audit.json",
+      "blockers": [
+        "LICENSE_RECORDED"
+      ]
+    }
+  },
+  "overall_status": "BLOCKED_BY_MISSING_METADATA"
+}

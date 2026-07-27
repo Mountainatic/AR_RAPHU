@@ -58,6 +58,11 @@ def load_cascaded_tanks(
             "official_loader": "nonlinear-benchmarks.Cascaded_Tanks",
             "test_state_initialization_window_length": 50,
             "test_records_exposed": include_test,
+            "overflow_mask_status": "NOT_YET_DEFINED",
+            "overflow_mask_reason": (
+                "Official benchmark describes overflow but gives no numeric "
+                "sample-level threshold."
+            ),
         },
         feature_names=("pump_input",),
         target_names=("lower_tank_level",),

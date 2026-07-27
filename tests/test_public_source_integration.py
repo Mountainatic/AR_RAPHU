@@ -38,7 +38,7 @@ def test_default_loader_does_not_expose_official_test(
 @pytest.mark.parametrize(
     ("dataset_id", "test_count", "test_sequences"),
     [
-        ("pwh", 163_840, 5),
+        ("pwh", 196_608, 6),
         ("whpn", 32_768, 2),
         ("cascaded_tanks", 1_024, 1),
         ("silverbox", 94_163, 3),

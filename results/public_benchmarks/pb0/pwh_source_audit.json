@@ -3,16 +3,16 @@
   "dataset_id": "pwh",
   "audit_scope": "SOURCE_AND_SPLIT_ONLY_NO_MODEL_EVALUATION",
   "shape": {
-    "n_time": 3440640,
+    "n_time": 3473408,
     "n_features": 1,
     "n_targets": 1,
-    "n_sequences": 105
+    "n_sequences": 106
   },
   "split_counts": {
     "warmup": 0,
     "train": 3276800,
     "validation": 0,
-    "test": 163840
+    "test": 196608
   },
   "records": [
     {
@@ -749,6 +749,13 @@
       "n_time": 32768,
       "start_row": 3407872,
       "stop_row_exclusive": 3440640
+    },
+    {
+      "sequence_id": "0105:increasing_amplitude_test",
+      "split": "test",
+      "n_time": 32768,
+      "start_row": 3440640,
+      "stop_row_exclusive": 3473408
     }
   ],
   "validation_status": "NOT_YET_DEFINED",
@@ -765,8 +772,9 @@
     "doi": "10.4121/12950081.v1",
     "loader_semantics_reference": "nonlinear-benchmarks.ParWH@1.0.1",
     "test_records_exposed": true,
+    "increasing_amplitude_transient_exclusion_samples": 500,
     "dataset_id": "pwh",
-    "sequence_count": 105,
+    "sequence_count": 106,
     "sampling_time_by_sequence": {
       "Est-phase-0-amp-0": 1.28e-05,
       "Est-phase-0-amp-1": 1.28e-05,
@@ -872,7 +880,8 @@
       "Val-amp-1": 1.28e-05,
       "Val-amp-2": 1.28e-05,
       "Val-amp-3": 1.28e-05,
-      "Val-amp-4": 1.28e-05
+      "Val-amp-4": 1.28e-05,
+      "increasing_amplitude_test": 1.28e-05
     },
     "validation_status": "NOT_YET_DEFINED",
     "official_test_locked": true
