@@ -10,14 +10,29 @@
     "sequence_policy": "official_record",
     "preserve_process_noise": true,
     "development_split": {
-      "status": "BLOCKED_PENDING_USER_FREEZE",
+      "status": "FROZEN",
       "unit": "whole_estimation_record",
-      "validation_fraction": null
+      "train_realization_zero_based": [0, 7],
+      "validation_realization_zero_based": [8, 9],
+      "validation_record_ids": [
+        "WH_EstimationExample.mat::dataMeas[realization_zero_based=8]",
+        "WH_EstimationExample.mat::dataMeas[realization_zero_based=9]"
+      ],
+      "validation_record_sha256": [
+        "055f93b59825b6ab3a353913674d00532214278a40d67cdc2be6f3bbea13a2fa",
+        "91806bf64b08dc530ec2fa973e309cf38daa9549fba2f247bf5cf2ebe64b22b2"
+      ],
+      "validation_fraction": 0.2
     },
     "channel_alignment": {
-      "status": "BLOCKED_PENDING_USER_FREEZE",
+      "status": "FROZEN",
       "archive_warning": "possible one-sample inter-channel shift",
-      "implemented_primary": "raw_unshifted"
+      "implemented_primary": "raw_unshifted",
+      "input_shift_samples": 0,
+      "appendix_sensitivity": [-1, 0, 1],
+      "sensitivity_scope": "train_validation_only",
+      "may_change_primary": false,
+      "abnormal_difference_flag": "ALIGNMENT_AUDIT_REQUIRED"
     }
   },
   "task": {

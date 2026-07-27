@@ -9,9 +9,19 @@
     "target_columns": ["output"],
     "sequence_policy": "official_record",
     "development_split": {
-      "status": "BLOCKED_PENDING_USER_FREEZE",
+      "status": "FROZEN",
       "unit": "whole_estimation_record",
-      "validation_fraction": null
+      "train_phase_zero_based": [0, 15],
+      "validation_phase_zero_based": [16, 19],
+      "amplitude_zero_based": [0, 4],
+      "periods_per_record": 2,
+      "periods_are_atomic": true,
+      "validation_fraction": 0.2
+    },
+    "confirmation": {
+      "primary": "uVal/yVal all five amplitude levels",
+      "secondary_ood": "uValArr/yValArr increasing-amplitude record",
+      "access": "once_after_model_freeze"
     }
   },
   "task": {
