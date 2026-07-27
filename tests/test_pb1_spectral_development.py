@@ -1,0 +1,72 @@
+from __future__ import annotations
+
+import numpy as np
+
+from ar_raphu.datasets.base import DynamicDataset
+from ar_raphu.spectral.pb1_development import (
+    fit_pb1_shared_history_spectral,
+)
+
+
+def _dataset() -> DynamicDataset:
+    rng = np.random.default_rng(4)
+    records = []
+    for phase in range(6):
+        x = rng.uniform(-1.0, 1.0, size=140)
+        y = np.zeros(140)
+        for t in range(2, len(y)):
+            y[t] = (
+                0.6 * y[t - 1]
+                - 0.1 * y[t - 2]
+                + 0.5 * x[t - 1]
+                + 0.2 * x[t - 2] ** 2
+                + 0.02 * rng.normal()
+            )
+        records.append((x, y))
+    n = len(records[0][0])
+    return DynamicDataset(
+        x=np.concatenate([record[0] for record in records])[:, None],
+        y=np.concatenate([record[1] for record in records])[:, None],
+        timestamps=np.arange(len(records) * n, dtype=np.float64),
+        sequence_id=np.concatenate(
+            [
+                np.full(
+                    n,
+                    f"{phase:04d}:Est-phase-{phase}-amp-0",
+                    dtype=object,
+                )
+                for phase in range(len(records))
+            ]
+        ),
+        split=np.concatenate(
+            [
+                np.full(
+                    n,
+                    "train" if phase < 4 else "validation",
+                    dtype=object,
+                )
+                for phase in range(len(records))
+            ]
+        ),
+        label_mask=np.ones((len(records) * n, 1), dtype=bool),
+        quality_mask=np.ones((len(records) * n, 2), dtype=bool),
+        feature_names=("input",),
+        target_names=("output",),
+        metadata={"dataset_id": "pwh"},
+    )
+
+
+def test_pb1_spectral_adapter_is_no_test_cpu_fp64_and_rank_after_selection() -> None:
+    fit = fit_pb1_shared_history_spectral(
+        _dataset(),
+        L_x=4,
+        L_y=3,
+        amplitude_count=5,
+        grid_points=3,
+        maximum_expansions=0,
+    )
+    assert fit.selected.coefficients.dtype == np.float64
+    assert fit.selected.relative_kkt_residual <= 1.0e-8
+    assert len(fit.candidates) == 27
+    assert fit.rank_audit["structural_rank_claim_allowed"] is False
+    assert fit.rank_audit["predictive_svd_rank_claim_allowed"] is True
