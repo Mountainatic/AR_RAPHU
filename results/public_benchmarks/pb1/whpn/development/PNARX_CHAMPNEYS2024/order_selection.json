@@ -1,0 +1,184 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "dataset": "whpn",
+  "stage": "development",
+  "model": "PNARX_CHAMPNEYS2024",
+  "profile_source": "PEER_REVIEWED_PAPER",
+  "evaluation_mode": "FREE_RUNNING_SIMULATION",
+  "forecast_alignment": "X_THROUGH_T_AND_Y_THROUGH_T_TO_TARGET_Y_T_PLUS_1",
+  "horizon": 1,
+  "history_source": "H1_ARX_AIC_SELECTED",
+  "history": {
+    "nx": 18,
+    "ny": 15
+  },
+  "basis": "UNIVARIATE_LEGENDRE_MONOMIAL_NO_CROSS_TERMS",
+  "order_candidates": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "selection_metric": "MEAN_RECORD_VALIDATION_AIC",
+  "source_commit": "d04e7627d9808ecddde7f647c503dbdfdcdd9db9",
+  "h1_sha256": "ec5dd2498992558e4692e7091dc1d9da64bbd38d5669480553f4ecde278bb92f",
+  "protocol_freeze_sha256": "835c0a7c9619f9cdf32ad8c488c301992f0502a431ed85387c7094450bd473b7",
+  "official_test_rows_loaded": 0,
+  "official_test_access_count": 0,
+  "train_only_standardization": true,
+  "solver": "STREAMING_QR_THEN_SVD_MINIMUM_NORM_SUBSET",
+  "scientific_ridge": 0.0,
+  "selected": {
+    "order": 2,
+    "coefficients_standardized": [
+      3.4367424487930824,
+      0.0006642740788578294,
+      -5.18686814865444,
+      -0.0027977045903533337,
+      5.394100501235704,
+      0.005226566236292807,
+      -5.021725413167341,
+      -0.005234707169395447,
+      4.436250373111427,
+      0.0006584520351231582,
+      -3.954256950458423,
+      0.0070873009971857415,
+      3.495659189843771,
+      -0.014627635663016975,
+      -3.0203563505437487,
+      0.021832396130388357,
+      2.582682949135659,
+      -0.027258550276175797,
+      -2.0980703241087717,
+      0.028097195163316865,
+      1.6968778214458542,
+      -0.026963807276865648,
+      -1.2829019314249794,
+      0.025624336810280868,
+      0.8904710000143143,
+      -0.020478030950716486,
+      -0.5178759441052123,
+      0.010768865950911533,
+      0.14868151873093122,
+      -0.002607166682881884,
+      0.008780886047458747,
+      1.1590379977319265e-05,
+      -0.047931670600903836,
+      -4.0908183634336126e-05,
+      0.13243737736047856,
+      0.00010644118078673159,
+      -0.21423030039329483,
+      -0.00024776778792290344,
+      0.2115714912108797,
+      0.0004705845314268986,
+      -0.11596079715806451,
+      -0.0007142323762562297,
+      0.02455449112881236,
+      0.0009285779647260073,
+      -0.024278116911493064,
+      -0.001045529253623112,
+      0.08398108435289518,
+      0.0010977577795623361,
+      -0.10675280705180984,
+      -0.0011015414271779989,
+      0.06923864410644931,
+      0.0010327916329972986,
+      -0.027314915645350046,
+      -0.0008761794341562816,
+      0.01828267118258814,
+      0.0006564291453972082,
+      -0.022510900772992226,
+      -0.00042761937935731353,
+      0.015860875796456675,
+      0.0002559491870557373,
+      -0.003728452207062194,
+      -0.00014421889027316226,
+      -0.0017119909505045605,
+      6.800642712523342e-05,
+      0.0012786346352782196,
+      -1.850833407290864e-05
+    ],
+    "x_mean": 0.021219052749756884,
+    "x_scale": 0.7577635624420513,
+    "y_mean": 0.005384765881117914,
+    "y_scale": 0.13356110789298373
+  },
+  "candidates": [
+    {
+      "order": 2,
+      "validation_aic_mean": -6730.137326334592,
+      "validation_aic_by_record": [
+        -7652.455663963681,
+        -5807.818988705504
+      ],
+      "effective_rank": 66,
+      "condition_number": 96768.94726046735,
+      "stable_simulation": true
+    },
+    {
+      "order": 3,
+      "validation_aic_mean": -6579.317491560897,
+      "validation_aic_by_record": [
+        -7522.865420659353,
+        -5635.769562462441
+      ],
+      "effective_rank": 99,
+      "condition_number": 278931.2398967874,
+      "stable_simulation": true
+    },
+    {
+      "order": 4,
+      "validation_aic_mean": -6471.489139310209,
+      "validation_aic_by_record": [
+        -7416.561392372601,
+        -5526.416886247816
+      ],
+      "effective_rank": 132,
+      "condition_number": 1136099.8655785164,
+      "stable_simulation": true
+    },
+    {
+      "order": 5,
+      "validation_aic_mean": -6380.231131674178,
+      "validation_aic_by_record": [
+        -7262.273975431731,
+        -5498.188287916626
+      ],
+      "effective_rank": 165,
+      "condition_number": 5352319.147911239,
+      "stable_simulation": true
+    },
+    {
+      "order": 6,
+      "validation_aic_mean": -6262.00856964597,
+      "validation_aic_by_record": [
+        -7149.417292012273,
+        -5374.599847279668
+      ],
+      "effective_rank": 198,
+      "condition_number": 33728514.18828698,
+      "stable_simulation": true
+    },
+    {
+      "order": 7,
+      "validation_aic_mean": -6111.232088698958,
+      "validation_aic_by_record": [
+        -6981.308912039451,
+        -5241.155265358466
+      ],
+      "effective_rank": 231,
+      "condition_number": 215214132.342042,
+      "stable_simulation": true
+    }
+  ],
+  "runtime": {
+    "elapsed_seconds": 3.7353241252712905,
+    "dtype": "float64",
+    "device": "cpu"
+  },
+  "status": "COMPLETED",
+  "scientific_role": "DEVELOPMENT_BASELINE_SELECTION_NOT_TEST_EVIDENCE"
+}
