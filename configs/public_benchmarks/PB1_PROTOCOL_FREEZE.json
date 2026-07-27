@@ -1,0 +1,129 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "freeze_status": "PARTIALLY_FROZEN",
+  "private_cz_access": "FORBIDDEN",
+  "selection_uses_official_test": false,
+  "datasets": {
+    "pwh": {
+      "status": "FROZEN",
+      "train": {
+        "phase_zero_based": [
+          0,
+          15
+        ],
+        "amplitude_zero_based": [
+          0,
+          4
+        ],
+        "record_count": 80
+      },
+      "validation_record_ids": [
+        "ParWHData.mat::uEst[phase_zero_based=16,amplitude_zero_based=0]",
+        "ParWHData.mat::uEst[phase_zero_based=16,amplitude_zero_based=1]",
+        "ParWHData.mat::uEst[phase_zero_based=16,amplitude_zero_based=2]",
+        "ParWHData.mat::uEst[phase_zero_based=16,amplitude_zero_based=3]",
+        "ParWHData.mat::uEst[phase_zero_based=16,amplitude_zero_based=4]",
+        "ParWHData.mat::uEst[phase_zero_based=17,amplitude_zero_based=0]",
+        "ParWHData.mat::uEst[phase_zero_based=17,amplitude_zero_based=1]",
+        "ParWHData.mat::uEst[phase_zero_based=17,amplitude_zero_based=2]",
+        "ParWHData.mat::uEst[phase_zero_based=17,amplitude_zero_based=3]",
+        "ParWHData.mat::uEst[phase_zero_based=17,amplitude_zero_based=4]",
+        "ParWHData.mat::uEst[phase_zero_based=18,amplitude_zero_based=0]",
+        "ParWHData.mat::uEst[phase_zero_based=18,amplitude_zero_based=1]",
+        "ParWHData.mat::uEst[phase_zero_based=18,amplitude_zero_based=2]",
+        "ParWHData.mat::uEst[phase_zero_based=18,amplitude_zero_based=3]",
+        "ParWHData.mat::uEst[phase_zero_based=18,amplitude_zero_based=4]",
+        "ParWHData.mat::uEst[phase_zero_based=19,amplitude_zero_based=0]",
+        "ParWHData.mat::uEst[phase_zero_based=19,amplitude_zero_based=1]",
+        "ParWHData.mat::uEst[phase_zero_based=19,amplitude_zero_based=2]",
+        "ParWHData.mat::uEst[phase_zero_based=19,amplitude_zero_based=3]",
+        "ParWHData.mat::uEst[phase_zero_based=19,amplitude_zero_based=4]"
+      ],
+      "validation_record_count": 20,
+      "periods_per_record": 2,
+      "periods_are_atomic": true,
+      "primary_confirmation_test": "uVal/yVal all five amplitude levels",
+      "secondary_ood_test": "uValArr/yValArr increasing-amplitude record",
+      "confirmation_test_access": "ONCE_AFTER_PROTOCOL_FREEZE"
+    },
+    "whpn": {
+      "status": "FROZEN",
+      "train_realization_zero_based": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "validation_record_ids": [
+        "WH_EstimationExample.mat::dataMeas[realization_zero_based=8]",
+        "WH_EstimationExample.mat::dataMeas[realization_zero_based=9]"
+      ],
+      "validation_record_sha256": [
+        "055f93b59825b6ab3a353913674d00532214278a40d67cdc2be6f3bbea13a2fa",
+        "91806bf64b08dc530ec2fa973e309cf38daa9549fba2f247bf5cf2ebe64b22b2"
+      ],
+      "validation_interpretation": "WITHIN_FILE_REALIZATION_HOLDOUT_CAMPAIGN_ID_UNAVAILABLE",
+      "alignment": {
+        "primary": "RAW_UNSHIFTED",
+        "input_shift_samples": 0,
+        "appendix_sensitivity": [
+          -1,
+          0,
+          1
+        ],
+        "sensitivity_scope": "TRAIN_VALIDATION_ONLY",
+        "may_change_primary": false,
+        "abnormal_difference_flag": "ALIGNMENT_AUDIT_REQUIRED"
+      },
+      "official_test_access": "ONCE_AFTER_PROTOCOL_FREEZE"
+    },
+    "cascaded_tanks": {
+      "status": "PENDING_SPLIT_ADEQUACY_AUDIT",
+      "candidate_split": {
+        "train_rows_zero_based": [
+          0,
+          819
+        ],
+        "validation_rows_zero_based": [
+          819,
+          1024
+        ],
+        "boundary": 819,
+        "validation_fraction_realized": 0.2001953125
+      },
+      "blocked_metrics": [
+        "overflow_event_count",
+        "near_overflow_sample_count"
+      ],
+      "purge": {
+        "required_formula": "G=L_star+h+b",
+        "extra_mixing_gap_b": "NOT_YET_FROZEN",
+        "windows_cross_boundary": false
+      },
+      "official_test_access": "LOCKED"
+    },
+    "silverbox": {
+      "status": "BLOCKED_BY_MISSING_METADATA",
+      "reason": "LICENSE_METADATA_UNRESOLVED",
+      "loader": "COMPLETED",
+      "checksum": "VERIFIED",
+      "unit_tests": "ALLOWED",
+      "internal_smoke": "OPTIONAL",
+      "formal_experiment": "BLOCKED",
+      "raw_redistribution": "BLOCKED"
+    }
+  },
+  "formal_development_authorized": [
+    "pwh",
+    "whpn"
+  ],
+  "formal_development_not_authorized": [
+    "cascaded_tanks",
+    "silverbox"
+  ]
+}

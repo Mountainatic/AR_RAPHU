@@ -1,0 +1,157 @@
+{
+  "schema_version": 6,
+  "dataset": "cascaded_tanks",
+  "audit_scope": "ESTIMATION_RECORD_ONLY_NO_MODEL_RESULTS",
+  "split": {
+    "train_rows_zero_based": [
+      0,
+      819
+    ],
+    "validation_rows_zero_based": [
+      819,
+      1024
+    ],
+    "boundary": 819,
+    "validation_fraction_realized": 0.2001953125
+  },
+  "input": {
+    "train": {
+      "n": 819,
+      "range": [
+        1.2099252459897365,
+        6.471210099744564
+      ],
+      "mean": 2.744461806097949,
+      "std": 0.9051916943897418,
+      "rms": 2.8898862622467667,
+      "slew_abs_quantiles": {
+        "q50": 0.04267313045246768,
+        "q90": 0.11768620915837283,
+        "q99": 0.16068452284088128,
+        "max": 0.1754575805088936
+      },
+      "psd": {
+        "nperseg": 128,
+        "power_01_99_hz": [
+          0.0,
+          0.01171875
+        ],
+        "spectral_centroid_hz": 0.0030570559945333055,
+        "normalized_psd_sha256": "81bbb2d07df948dee0dc172792e56066ef422d2721428cba7da7b804350854b4"
+      }
+    },
+    "validation": {
+      "n": 205,
+      "range": [
+        0.40936826060393905,
+        5.317606162522681
+      ],
+      "mean": 3.021881857589169,
+      "std": 1.2865451209793897,
+      "rms": 3.284352038004214,
+      "slew_abs_quantiles": {
+        "q50": 0.08223280654080023,
+        "q90": 0.16726195791940163,
+        "q99": 0.2847788752190588,
+        "max": 0.29538352782009714
+      },
+      "psd": {
+        "nperseg": 128,
+        "power_01_99_hz": [
+          0.001953125,
+          0.009765625
+        ],
+        "spectral_centroid_hz": 0.003948751047021073,
+        "normalized_psd_sha256": "94fe0b8fc9fe69b1ac6068006e7794002a8a2d6fae85ab04127a9ad497e5418d"
+      }
+    },
+    "validation_ood_fraction_against_train_range": 0.13658536585365855,
+    "normalized_psd_overlap": 0.7171357156965523
+  },
+  "output": {
+    "train": {
+      "n": 819,
+      "range": [
+        2.911573968108644,
+        10.0
+      ],
+      "mean": 5.256566293416831,
+      "std": 1.9852611424827977,
+      "rms": 5.618963516605003,
+      "slew_abs_quantiles": {
+        "q50": 0.030975814450293626,
+        "q90": 0.08978408484016276,
+        "q99": 0.4416327153429505,
+        "max": 0.7064927138170436
+      },
+      "psd": {
+        "nperseg": 128,
+        "power_01_99_hz": [
+          0.0,
+          0.009765625
+        ],
+        "spectral_centroid_hz": 0.002561991118630374,
+        "normalized_psd_sha256": "04c79ecfac4de1c710763cb08be5349ccfc0da4c5cf700c60c6c96ba30dbe0c5"
+      }
+    },
+    "validation": {
+      "n": 205,
+      "range": [
+        3.3754482337682155,
+        10.0
+      ],
+      "mean": 6.885789942815885,
+      "std": 2.3552899357605184,
+      "rms": 7.277464793324607,
+      "slew_abs_quantiles": {
+        "q50": 0.05844205386434709,
+        "q90": 0.2045014114595254,
+        "q99": 0.4318211642633701,
+        "max": 0.510872053101397
+      },
+      "psd": {
+        "nperseg": 128,
+        "power_01_99_hz": [
+          0.0,
+          0.005859375
+        ],
+        "spectral_centroid_hz": 0.002086961480181313,
+        "normalized_psd_sha256": "a7afa2cce9d1a6b625ea31001aacf68ea9fd7250838e1bf77ac1e5a97db6c7bb"
+      }
+    },
+    "validation_ood_fraction_against_train_range": 0.0,
+    "normalized_psd_overlap": 0.8959900992828587
+  },
+  "overflow_event_count": {
+    "status": "BLOCKED_BY_MISSING_METADATA",
+    "reason": "Official benchmark supplies no sample-level overflow flag or numeric threshold."
+  },
+  "near_overflow_sample_count": {
+    "status": "BLOCKED_BY_MISSING_METADATA",
+    "reason": "Near-overflow margin cannot be defined without an overflow threshold."
+  },
+  "empirical_output_ceiling_contact": {
+    "value": 10.0,
+    "interpretation": "OBSERVED_EXACT_CEILING_CONTACT_NOT_AN_OFFICIAL_OVERFLOW_LABEL",
+    "train": {
+      "sample_count": 27,
+      "fraction": 0.03296703296703297,
+      "contiguous_run_count": 1,
+      "longest_run": 27
+    },
+    "validation": {
+      "sample_count": 20,
+      "fraction": 0.0975609756097561,
+      "contiguous_run_count": 1,
+      "longest_run": 20
+    }
+  },
+  "official_test_accessed": false,
+  "purge": {
+    "required_formula": "G=L_star+h+b",
+    "extra_mixing_gap_b": "NOT_YET_FROZEN",
+    "windows_cross_boundary": false
+  },
+  "status": "PENDING_SPLIT_ADEQUACY_AUDIT",
+  "decision": "AVAILABLE_DISTRIBUTION_CHECKS_COMPLETED_BUT_OVERFLOW_COVERAGE_UNRESOLVED"
+}

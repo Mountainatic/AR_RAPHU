@@ -1,0 +1,598 @@
+{
+  "schema_version": 6,
+  "dataset": "whpn",
+  "audit_scope": "ESTIMATION_RECORDS_ONLY_NO_MODEL_RESULTS",
+  "source_file": "/root/OPS_UOI_WORKSPACE/data/raw/WHPN/WienerHammersteinFiles/WH_EstimationExample.mat",
+  "source_file_sha256": "288177d863d03b87e56257764b7ac1772d8b0036b111b2a85700a4b3bbd54782",
+  "record_count": 10,
+  "records": [
+    {
+      "record_id": "WH_EstimationExample.mat::dataMeas[realization_zero_based=0]",
+      "realization_zero_based": 0,
+      "canonical_sha256": "8ddca3d33cc76bac00618f2415681a460b9a278dff0df48b6e961990fe5131fe",
+      "sample_count": 8192,
+      "sampling_rate_hz": 78125.0,
+      "input": {
+        "n": 8192,
+        "mean": 0.021106940374011174,
+        "std": 0.7578106329236144,
+        "rms": 0.7581045167416173,
+        "min": -2.814969874918461,
+        "max": 3.1869439110159874,
+        "trend_per_record": -0.010369223726551111,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            228.8818359375,
+            14801.025390625
+          ],
+          "spectral_centroid_hz": 7124.5945197502315,
+          "normalized_psd_sha256": "d4cf7038a67b809e44c6b0c12a2297d5eab17dd7b450ecb4e90bc9d1896b4161"
+        }
+      },
+      "output": {
+        "n": 8192,
+        "mean": 0.003393004902704888,
+        "std": 0.1371943584540483,
+        "rms": 0.13723630887592272,
+        "min": -0.30707152280956507,
+        "max": 0.29531785380095243,
+        "trend_per_record": 0.00034825842722273906,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            76.2939453125,
+            2365.1123046875
+          ],
+          "spectral_centroid_hz": 844.3874571703791,
+          "normalized_psd_sha256": "4a51d84e939027e6277823a6b4840dae91f424a1c305f208e8f4a5cc41c087be"
+        }
+      },
+      "measurement_campaign_id": "NOT_YET_AVAILABLE"
+    },
+    {
+      "record_id": "WH_EstimationExample.mat::dataMeas[realization_zero_based=1]",
+      "realization_zero_based": 1,
+      "canonical_sha256": "db11d8d406d5a2f9f9fcd478ebd0fbbd9a0d7a6647cb1532863801a9763b34e5",
+      "sample_count": 8192,
+      "sampling_rate_hz": 78125.0,
+      "input": {
+        "n": 8192,
+        "mean": 0.021247175204734958,
+        "std": 0.7577754141600292,
+        "rms": 0.7580732291537439,
+        "min": -2.8977096006274223,
+        "max": 2.573504999279976,
+        "trend_per_record": -0.010897235546736274,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            152.587890625,
+            14801.025390625
+          ],
+          "spectral_centroid_hz": 7150.848049255213,
+          "normalized_psd_sha256": "f92a8debacd9efa4f9cfc5fcb0d218c16ed263a4025c9404d02fd85b99d458cf"
+        }
+      },
+      "output": {
+        "n": 8192,
+        "mean": 0.007988587679847114,
+        "std": 0.12778261623353132,
+        "rms": 0.128032084043823,
+        "min": -0.2959124930202961,
+        "max": 0.3215467697009444,
+        "trend_per_record": 0.00618314545083375,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            0.0,
+            2441.40625
+          ],
+          "spectral_centroid_hz": 814.8258799229944,
+          "normalized_psd_sha256": "e99292e262c83958d669c1e3263f799ce018a297082036c12fa3fcf99bee9dea"
+        }
+      },
+      "measurement_campaign_id": "NOT_YET_AVAILABLE"
+    },
+    {
+      "record_id": "WH_EstimationExample.mat::dataMeas[realization_zero_based=2]",
+      "realization_zero_based": 2,
+      "canonical_sha256": "53a2b90df695e64bb2ad4a5e11c66f7f6d3e3fabf2e3c014fa1a05d091d9a687",
+      "sample_count": 8192,
+      "sampling_rate_hz": 78125.0,
+      "input": {
+        "n": 8192,
+        "mean": 0.021104332647155388,
+        "std": 0.7577792236637351,
+        "rms": 0.7580730470560834,
+        "min": -2.701267085969448,
+        "max": 2.692223407328129,
+        "trend_per_record": 0.008280239205534213,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            228.8818359375,
+            14801.025390625
+          ],
+          "spectral_centroid_hz": 7216.840279596337,
+          "normalized_psd_sha256": "5218f956c73493abb771d5e73336429043712cbe6802b0ab4c75b6f4797361f6"
+        }
+      },
+      "output": {
+        "n": 8192,
+        "mean": 0.0019811494512396166,
+        "std": 0.13174995167457046,
+        "rms": 0.13176484629596696,
+        "min": -0.29648745711892843,
+        "max": 0.3229130897670984,
+        "trend_per_record": 0.001117650009828038,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            0.0,
+            2441.40625
+          ],
+          "spectral_centroid_hz": 826.066894958491,
+          "normalized_psd_sha256": "82102aae851d2c055f83ca4fccc084e1e9e6e8fb518b44c586a499149e5bd755"
+        }
+      },
+      "measurement_campaign_id": "NOT_YET_AVAILABLE"
+    },
+    {
+      "record_id": "WH_EstimationExample.mat::dataMeas[realization_zero_based=3]",
+      "realization_zero_based": 3,
+      "canonical_sha256": "376afe7f67a3e92f5554783fd462beac7596f88f64ae1f7d1891d9b3242ee4eb",
+      "sample_count": 8192,
+      "sampling_rate_hz": 78125.0,
+      "input": {
+        "n": 8192,
+        "mean": 0.021216067329078214,
+        "std": 0.7577807878986368,
+        "rms": 0.7580777295378032,
+        "min": -2.680988907814026,
+        "max": 2.7806478142738342,
+        "trend_per_record": 0.07199262303643443,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            228.8818359375,
+            14801.025390625
+          ],
+          "spectral_centroid_hz": 7251.023731102903,
+          "normalized_psd_sha256": "f500f419c70c185c9bb6a0d5ee38f2fcc2298113762d48663f54545ea576fa54"
+        }
+      },
+      "output": {
+        "n": 8192,
+        "mean": 0.001300633331197787,
+        "std": 0.13161012132643538,
+        "rms": 0.1316165479057298,
+        "min": -0.30733305774629116,
+        "max": 0.3124049426987767,
+        "trend_per_record": 0.026728070550997785,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            76.2939453125,
+            2365.1123046875
+          ],
+          "spectral_centroid_hz": 790.9819608655278,
+          "normalized_psd_sha256": "0acf78fc08da9987ab3873c395fac5a59fce65f77a14eaab23a170971064668a"
+        }
+      },
+      "measurement_campaign_id": "NOT_YET_AVAILABLE"
+    },
+    {
+      "record_id": "WH_EstimationExample.mat::dataMeas[realization_zero_based=4]",
+      "realization_zero_based": 4,
+      "canonical_sha256": "bce93c0e8d0afadf71deb077012eaf7dbf8d48b5e9db2322e63d8980e0922caf",
+      "sample_count": 8192,
+      "sampling_rate_hz": 78125.0,
+      "input": {
+        "n": 8192,
+        "mean": 0.02126054346172168,
+        "std": 0.7577659766777073,
+        "rms": 0.7580641701852208,
+        "min": -2.9912142604589462,
+        "max": 2.3300473764538765,
+        "trend_per_record": 0.002236663680914284,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            228.8818359375,
+            14801.025390625
+          ],
+          "spectral_centroid_hz": 7225.811591255198,
+          "normalized_psd_sha256": "aa02763cb30692f79a255a91d710215a833ea650e055bc6c18f4929824365dcb"
+        }
+      },
+      "output": {
+        "n": 8192,
+        "mean": 0.002122149974866261,
+        "std": 0.1377611530928405,
+        "rms": 0.13777749751677473,
+        "min": -0.3012135550379753,
+        "max": 0.3150443686172366,
+        "trend_per_record": -0.03099645306223735,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            0.0,
+            2441.40625
+          ],
+          "spectral_centroid_hz": 818.112242597389,
+          "normalized_psd_sha256": "6e4c7d30359c9b14cc9c818a003ca44e685e56d05e4617b7f05f96396732f594"
+        }
+      },
+      "measurement_campaign_id": "NOT_YET_AVAILABLE"
+    },
+    {
+      "record_id": "WH_EstimationExample.mat::dataMeas[realization_zero_based=5]",
+      "realization_zero_based": 5,
+      "canonical_sha256": "e44b148014ac546c4533854eee3bbea6751c46f03090f2a27720315ed40db139",
+      "sample_count": 8192,
+      "sampling_rate_hz": 78125.0,
+      "input": {
+        "n": 8192,
+        "mean": 0.021236482430140313,
+        "std": 0.7577203898547055,
+        "rms": 0.7580179268246711,
+        "min": -2.857795961201191,
+        "max": 3.3052810579538345,
+        "trend_per_record": -0.020566545473644424,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            152.587890625,
+            14801.025390625
+          ],
+          "spectral_centroid_hz": 7223.84691286055,
+          "normalized_psd_sha256": "dad98f0a56346abac126ab117772653f3bfb539466ea4e5699e6e96a0ad40c86"
+        }
+      },
+      "output": {
+        "n": 8192,
+        "mean": 0.010110076323712747,
+        "std": 0.13112265357557376,
+        "rms": 0.13151183948212125,
+        "min": -0.30156792141497135,
+        "max": 0.2969647292047739,
+        "trend_per_record": -0.0019995741515639476,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            0.0,
+            2593.994140625
+          ],
+          "spectral_centroid_hz": 785.5798663565688,
+          "normalized_psd_sha256": "64fcc17bf0d79dcd1ae5b3cde2eaee1d1b0207520a0e86504aafc0ac1fa6a3b1"
+        }
+      },
+      "measurement_campaign_id": "NOT_YET_AVAILABLE"
+    },
+    {
+      "record_id": "WH_EstimationExample.mat::dataMeas[realization_zero_based=6]",
+      "realization_zero_based": 6,
+      "canonical_sha256": "bdfa1c17cc52bb160a16d83bf4b8122cee43c68aece82db4bb561d54f0e5f964",
+      "sample_count": 8192,
+      "sampling_rate_hz": 78125.0,
+      "input": {
+        "n": 8192,
+        "mean": 0.021264474426061497,
+        "std": 0.7577304702649837,
+        "rms": 0.7580287880025468,
+        "min": -2.542639136314392,
+        "max": 2.850763961672783,
+        "trend_per_record": -0.051324257720402236,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            228.8818359375,
+            14801.025390625
+          ],
+          "spectral_centroid_hz": 7181.41931972545,
+          "normalized_psd_sha256": "4fbc7322288f4e7643f8b45f4e47a99072d8f33ea14259725e5863b2cb9c1481"
+        }
+      },
+      "output": {
+        "n": 8192,
+        "mean": 0.013471639550971304,
+        "std": 0.1367794198445201,
+        "rms": 0.13744124113669376,
+        "min": -0.3123366432264447,
+        "max": 0.2984854318201542,
+        "trend_per_record": -0.01582481239526913,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            76.2939453125,
+            2365.1123046875
+          ],
+          "spectral_centroid_hz": 819.9550572090584,
+          "normalized_psd_sha256": "38e7bd25509de6037f1e128ee66f5423ecc907b0beeb6b057d3be232246356a8"
+        }
+      },
+      "measurement_campaign_id": "NOT_YET_AVAILABLE"
+    },
+    {
+      "record_id": "WH_EstimationExample.mat::dataMeas[realization_zero_based=7]",
+      "realization_zero_based": 7,
+      "canonical_sha256": "b20ec65cc0ee1a56cf565013044cef59f059eac9ea5782b9ae94e57249bdf229",
+      "sample_count": 8192,
+      "sampling_rate_hz": 78125.0,
+      "input": {
+        "n": 8192,
+        "mean": 0.021316406125151843,
+        "std": 0.7577455735542966,
+        "rms": 0.7580453439018159,
+        "min": -2.7880000472068787,
+        "max": 2.783546522259712,
+        "trend_per_record": 0.019362055385537143,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            152.587890625,
+            14801.025390625
+          ],
+          "spectral_centroid_hz": 7188.236286167192,
+          "normalized_psd_sha256": "e775d158663b5c7292daaa302bd2f60088cecfa51f23301242c4c750b9295a7c"
+        }
+      },
+      "output": {
+        "n": 8192,
+        "mean": 0.002710885834403598,
+        "std": 0.13361948259102865,
+        "rms": 0.1336469791274811,
+        "min": -0.3129297327250242,
+        "max": 0.30667955055832863,
+        "trend_per_record": 0.001722013942085491,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            76.2939453125,
+            2441.40625
+          ],
+          "spectral_centroid_hz": 797.2827039913823,
+          "normalized_psd_sha256": "ab4ea5c20ecb5052733c46ba80b3239d6ce220fbb65eaa946bea7105805bc02b"
+        }
+      },
+      "measurement_campaign_id": "NOT_YET_AVAILABLE"
+    },
+    {
+      "record_id": "WH_EstimationExample.mat::dataMeas[realization_zero_based=8]",
+      "realization_zero_based": 8,
+      "canonical_sha256": "055f93b59825b6ab3a353913674d00532214278a40d67cdc2be6f3bbea13a2fa",
+      "sample_count": 8192,
+      "sampling_rate_hz": 78125.0,
+      "input": {
+        "n": 8192,
+        "mean": 0.021267211122903973,
+        "std": 0.7576904160556285,
+        "rms": 0.7579888263368383,
+        "min": -2.51655550301075,
+        "max": 2.6534707695245743,
+        "trend_per_record": 0.03799827502833819,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            152.587890625,
+            14801.025390625
+          ],
+          "spectral_centroid_hz": 7137.196024738014,
+          "normalized_psd_sha256": "00ef02843c2c219daa44ee6e5dd929cc01f9fe9b8f4203aee3868195f474da75"
+        }
+      },
+      "output": {
+        "n": 8192,
+        "mean": 0.0015969434595035636,
+        "std": 0.13060194574281433,
+        "rms": 0.13061170874091602,
+        "min": -0.31075228191912174,
+        "max": 0.33147011045366526,
+        "trend_per_record": 0.028461532650747773,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            76.2939453125,
+            2517.7001953125
+          ],
+          "spectral_centroid_hz": 790.3323687678966,
+          "normalized_psd_sha256": "73d468bf3f93fb044efa5d8fc4cbfd4c11e2b4f1dcb2b2da38c13b6642e0d9cc"
+        }
+      },
+      "measurement_campaign_id": "NOT_YET_AVAILABLE"
+    },
+    {
+      "record_id": "WH_EstimationExample.mat::dataMeas[realization_zero_based=9]",
+      "realization_zero_based": 9,
+      "canonical_sha256": "91806bf64b08dc530ec2fa973e309cf38daa9549fba2f247bf5cf2ebe64b22b2",
+      "sample_count": 8192,
+      "sampling_rate_hz": 78125.0,
+      "input": {
+        "n": 8192,
+        "mean": 0.02133869921999576,
+        "std": 0.7576756922005136,
+        "rms": 0.7579761174574888,
+        "min": -2.523675337433815,
+        "max": 2.9015559181571007,
+        "trend_per_record": -0.024658659514117078,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            152.587890625,
+            14801.025390625
+          ],
+          "spectral_centroid_hz": 7164.3234485514495,
+          "normalized_psd_sha256": "9c21ad2986e43342d7e413a04e1cf16cefa8f703be49552ebd9a8d856be85498"
+        }
+      },
+      "output": {
+        "n": 8192,
+        "mean": 0.003589576646959358,
+        "std": 0.13151011042376995,
+        "rms": 0.13155909016170858,
+        "min": -0.2939963573589921,
+        "max": 0.29723568353801966,
+        "trend_per_record": -0.010924435100789567,
+        "nonfinite_count": 0,
+        "exact_min_count": 1,
+        "exact_max_count": 1,
+        "longest_exact_min_run": 1,
+        "longest_exact_max_run": 1,
+        "saturation_status": "NOT_DETERMINABLE_WITHOUT_SENSOR_LIMITS",
+        "psd": {
+          "nperseg": 1024,
+          "power_01_99_hz": [
+            0.0,
+            2517.7001953125
+          ],
+          "spectral_centroid_hz": 836.724511300911,
+          "normalized_psd_sha256": "f27f37039264aed78fcbc5d3ec6f0af3b143f9232ba628260349f41fe804648b"
+        }
+      },
+      "measurement_campaign_id": "NOT_YET_AVAILABLE"
+    }
+  ],
+  "validation_record_ids": [
+    "WH_EstimationExample.mat::dataMeas[realization_zero_based=8]",
+    "WH_EstimationExample.mat::dataMeas[realization_zero_based=9]"
+  ],
+  "validation_record_sha256": [
+    "055f93b59825b6ab3a353913674d00532214278a40d67cdc2be6f3bbea13a2fa",
+    "91806bf64b08dc530ec2fa973e309cf38daa9549fba2f247bf5cf2ebe64b22b2"
+  ],
+  "protocol_consistency": {
+    "same_mat_file": true,
+    "sample_count_consistent": true,
+    "sampling_rate_consistent": true,
+    "measurement_campaign_id": "NOT_YET_AVAILABLE"
+  },
+  "validation_interpretation": "WITHIN_FILE_REALIZATION_HOLDOUT_CAMPAIGN_ID_UNAVAILABLE",
+  "alignment": {
+    "primary": "RAW_UNSHIFTED",
+    "input_shift_samples": 0,
+    "appendix_sensitivity": [
+      -1,
+      0,
+      1
+    ],
+    "sensitivity_scope": "TRAIN_VALIDATION_ONLY",
+    "may_change_primary": false,
+    "abnormal_difference_flag": "ALIGNMENT_AUDIT_REQUIRED"
+  },
+  "status": "COMPLETED"
+}
