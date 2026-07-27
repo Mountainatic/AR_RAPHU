@@ -11,6 +11,7 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 from ar_raphu.baselines.pnarx_champneys2024 import fit_and_select_pnarx
