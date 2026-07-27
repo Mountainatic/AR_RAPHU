@@ -1,0 +1,196 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "dataset": "whpn",
+  "stage": "development",
+  "lane": "H3_SHARED_HISTORY_FAIRNESS",
+  "history": {
+    "L_x": 18,
+    "L_y": 15,
+    "source": "H1_ARX_AIC"
+  },
+  "horizons": [
+    {
+      "horizon": 1,
+      "persistence_mse_pooled": 0.006100332573540412,
+      "tracks": {
+        "X": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.7829679041949362,
+          "validation_rmse_group_mean": 0.8848547362109422,
+          "skill_vs_persistence": -127.34839654332649,
+          "relative_kkt_residual": 8.804660429277023e-09
+        },
+        "AR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 5.747471744475104e-06,
+          "validation_rmse_group_mean": 0.0023973885259746916,
+          "skill_vs_persistence": 0.9990578428839431,
+          "relative_kkt_residual": 2.602202053481158e-15
+        },
+        "XAR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 4.23788776202211e-06,
+          "validation_rmse_group_mean": 0.002058613067582665,
+          "skill_vs_persistence": 0.9993053021764087,
+          "relative_kkt_residual": 2.0736094520758377e-15
+        }
+      },
+      "incremental_external_value": {
+        "delta_X_given_AR_mse": 1.5095839824529937e-06,
+        "relative_AR_mse_reduction": 0.262651831895323,
+        "status": "COMPLETED"
+      },
+      "external_predictive_effective_ranks": {
+        "0.1": 1,
+        "0.05": 1,
+        "0.02": 1
+      },
+      "external_first_mode_energy": 0.9996941828892917
+    },
+    {
+      "horizon": 5,
+      "persistence_mse_pooled": 0.14675598817244484,
+      "tracks": {
+        "X": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.6743627629565734,
+          "validation_rmse_group_mean": 0.8211959345713868,
+          "skill_vs_persistence": -3.595129448238712,
+          "relative_kkt_residual": 6.175097070233554e-09
+        },
+        "AR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.002636969089908266,
+          "validation_rmse_group_mean": 0.051351427340515725,
+          "skill_vs_persistence": 0.9820316082311428,
+          "relative_kkt_residual": 2.0953870577794627e-12
+        },
+        "XAR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.0015550353884758053,
+          "validation_rmse_group_mean": 0.03943393701465535,
+          "skill_vs_persistence": 0.9894039390975408,
+          "relative_kkt_residual": 2.0883690891134673e-12
+        }
+      },
+      "incremental_external_value": {
+        "delta_X_given_AR_mse": 0.0010819337014324607,
+        "relative_AR_mse_reduction": 0.41029441929108795,
+        "status": "COMPLETED"
+      },
+      "external_predictive_effective_ranks": {
+        "0.1": 1,
+        "0.05": 1,
+        "0.02": 1
+      },
+      "external_first_mode_energy": 0.9999999780680912
+    },
+    {
+      "horizon": 10,
+      "persistence_mse_pooled": 0.526001519292717,
+      "tracks": {
+        "X": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.5547201150743235,
+          "validation_rmse_group_mean": 0.7447953511363531,
+          "skill_vs_persistence": -0.05459793313947592,
+          "relative_kkt_residual": 4.320342621557302e-09
+        },
+        "AR": {
+          "status": "FAILED",
+          "penalty_status": "PENALTY_INTERVAL_NOT_CERTIFIED",
+          "validation_mse_group_mean": 0.04017263072161431,
+          "validation_rmse_group_mean": 0.20043111215979995,
+          "skill_vs_persistence": 0.9236263979320211,
+          "relative_kkt_residual": 1.3613587036691197e-13
+        },
+        "XAR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.025624239272941086,
+          "validation_rmse_group_mean": 0.1600757298060549,
+          "skill_vs_persistence": 0.9512848569194315,
+          "relative_kkt_residual": 1.6658918912102565e-09
+        }
+      },
+      "incremental_external_value": {
+        "status": "FAILED_DEPENDENCY_TRACK_GATE",
+        "delta_X_given_AR_mse": null,
+        "relative_AR_mse_reduction": null
+      },
+      "external_predictive_effective_ranks": {
+        "0.1": 1,
+        "0.05": 1,
+        "0.02": 1
+      },
+      "external_first_mode_energy": 0.9999999999999283
+    },
+    {
+      "horizon": 20,
+      "persistence_mse_pooled": 1.4236762655801782,
+      "tracks": {
+        "X": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.5155600400674633,
+          "validation_rmse_group_mean": 0.7180250971013918,
+          "skill_vs_persistence": 0.6378670821927612,
+          "relative_kkt_residual": 4.2288827439888355e-09
+        },
+        "AR": {
+          "status": "FAILED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.46299683126179203,
+          "validation_rmse_group_mean": 0.6804387049997905,
+          "skill_vs_persistence": 0.674787841551105,
+          "relative_kkt_residual": 1.718464734278271e-08
+        },
+        "XAR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.31696556460333586,
+          "validation_rmse_group_mean": 0.5629969490177863,
+          "skill_vs_persistence": 0.7773612075536248,
+          "relative_kkt_residual": 5.9454712722882444e-09
+        }
+      },
+      "incremental_external_value": {
+        "status": "FAILED_DEPENDENCY_TRACK_GATE",
+        "delta_X_given_AR_mse": null,
+        "relative_AR_mse_reduction": null
+      },
+      "external_predictive_effective_ranks": {
+        "0.1": 1,
+        "0.05": 1,
+        "0.02": 1
+      },
+      "external_first_mode_energy": 0.999999999999951
+    }
+  ],
+  "failed_track_gates": [
+    {
+      "horizon": 10,
+      "track": "AR",
+      "status": "FAILED",
+      "penalty_status": "PENALTY_INTERVAL_NOT_CERTIFIED"
+    },
+    {
+      "horizon": 20,
+      "track": "AR",
+      "status": "FAILED",
+      "penalty_status": "PENALTY_INTERVAL_CERTIFIED"
+    }
+  ],
+  "official_test_rows_loaded": 0,
+  "official_test_access_count": 0,
+  "status": "PARTIAL",
+  "structural_rank_claim_allowed": false
+}

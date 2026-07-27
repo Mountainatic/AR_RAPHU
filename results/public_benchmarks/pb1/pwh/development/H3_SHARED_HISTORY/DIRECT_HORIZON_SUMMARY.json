@@ -1,0 +1,183 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "dataset": "pwh",
+  "stage": "development",
+  "lane": "H3_SHARED_HISTORY_FAIRNESS",
+  "history": {
+    "L_x": 16,
+    "L_y": 20,
+    "source": "H1_ARX_AIC"
+  },
+  "horizons": [
+    {
+      "horizon": 1,
+      "persistence_mse_pooled": 0.0036098410830393184,
+      "tracks": {
+        "X": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.8739958041356499,
+          "validation_rmse_group_mean": 0.9348774273324016,
+          "skill_vs_persistence": -241.11475907958422,
+          "relative_kkt_residual": 3.946255103114941e-14
+        },
+        "AR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 2.1506003759473487e-05,
+          "validation_rmse_group_mean": 0.004637456604591948,
+          "skill_vs_persistence": 0.9940423959767873,
+          "relative_kkt_residual": 1.187306812233523e-15
+        },
+        "XAR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 6.132235197744971e-06,
+          "validation_rmse_group_mean": 0.002476335033420351,
+          "skill_vs_persistence": 0.9983012451083908,
+          "relative_kkt_residual": 7.668916592990688e-16
+        }
+      },
+      "incremental_external_value": {
+        "delta_X_given_AR_mse": 1.5373768561728514e-05,
+        "relative_AR_mse_reduction": 0.7148593822297786,
+        "status": "COMPLETED"
+      },
+      "external_predictive_effective_ranks": {
+        "0.1": 1,
+        "0.05": 1,
+        "0.02": 1
+      },
+      "external_first_mode_energy": 0.99980192764083
+    },
+    {
+      "horizon": 5,
+      "persistence_mse_pooled": 0.045890235050488386,
+      "tracks": {
+        "X": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.774226046754598,
+          "validation_rmse_group_mean": 0.8799011573776898,
+          "skill_vs_persistence": -15.871259123052987,
+          "relative_kkt_residual": 2.9894004621513894e-14
+        },
+        "AR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.001202362887098813,
+          "validation_rmse_group_mean": 0.034675104716479416,
+          "skill_vs_persistence": 0.9737991560562727,
+          "relative_kkt_residual": 6.309231692575269e-15
+        },
+        "XAR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.00013469990455182153,
+          "validation_rmse_group_mean": 0.01160602880195554,
+          "skill_vs_persistence": 0.9970647370970398,
+          "relative_kkt_residual": 1.4489413107408867e-15
+        }
+      },
+      "incremental_external_value": {
+        "delta_X_given_AR_mse": 0.0010676629825469915,
+        "relative_AR_mse_reduction": 0.8879706734155447,
+        "status": "COMPLETED"
+      },
+      "external_predictive_effective_ranks": {
+        "0.1": 1,
+        "0.05": 1,
+        "0.02": 1
+      },
+      "external_first_mode_energy": 0.9999630953021618
+    },
+    {
+      "horizon": 10,
+      "persistence_mse_pooled": 0.16728823204817345,
+      "tracks": {
+        "X": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.6270641743607804,
+          "validation_rmse_group_mean": 0.7918738374013757,
+          "skill_vs_persistence": -2.7484057705876572,
+          "relative_kkt_residual": 2.472322150113398e-14
+        },
+        "AR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.01145203846837882,
+          "validation_rmse_group_mean": 0.10701419750845595,
+          "skill_vs_persistence": 0.931543071929405,
+          "relative_kkt_residual": 1.7829326816552302e-14
+        },
+        "XAR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.001354056283529311,
+          "validation_rmse_group_mean": 0.036797503767637706,
+          "skill_vs_persistence": 0.991905848564773,
+          "relative_kkt_residual": 6.092404612109974e-15
+        }
+      },
+      "incremental_external_value": {
+        "delta_X_given_AR_mse": 0.010097982184849509,
+        "relative_AR_mse_reduction": 0.8817628593138149,
+        "status": "COMPLETED"
+      },
+      "external_predictive_effective_ranks": {
+        "0.1": 1,
+        "0.05": 1,
+        "0.02": 1
+      },
+      "external_first_mode_energy": 0.9999947468473127
+    },
+    {
+      "horizon": 20,
+      "persistence_mse_pooled": 0.5466173353724633,
+      "tracks": {
+        "X": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.39354009449568506,
+          "validation_rmse_group_mean": 0.6273277408944108,
+          "skill_vs_persistence": 0.2800446143415336,
+          "relative_kkt_residual": 2.1538507435415714e-14
+        },
+        "AR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.14212728801296573,
+          "validation_rmse_group_mean": 0.3769977294533294,
+          "skill_vs_persistence": 0.7399875949486295,
+          "relative_kkt_residual": 5.612889568357591e-14
+        },
+        "XAR": {
+          "status": "COMPLETED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED",
+          "validation_mse_group_mean": 0.04375200081195699,
+          "validation_rmse_group_mean": 0.20916978943422251,
+          "skill_vs_persistence": 0.9199586292261578,
+          "relative_kkt_residual": 1.732463137542346e-14
+        }
+      },
+      "incremental_external_value": {
+        "delta_X_given_AR_mse": 0.09837528720100874,
+        "relative_AR_mse_reduction": 0.6921632613719776,
+        "status": "COMPLETED"
+      },
+      "external_predictive_effective_ranks": {
+        "0.1": 1,
+        "0.05": 1,
+        "0.02": 2
+      },
+      "external_first_mode_energy": 0.9999987502854277
+    }
+  ],
+  "failed_track_gates": [],
+  "official_test_rows_loaded": 0,
+  "official_test_access_count": 0,
+  "status": "COMPLETED",
+  "structural_rank_claim_allowed": false
+}
