@@ -1,0 +1,83 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "scope": "DEVELOPMENT_PREFLIGHT_NO_MODEL_FIT_NO_TEST_ACCESS",
+  "source_commit": "1e33ee51d1287b1021042f5badf8361517792a64",
+  "protocol_freeze_sha256": "835c0a7c9619f9cdf32ad8c488c301992f0502a431ed85387c7094450bd473b7",
+  "datasets": {
+    "pwh": {
+      "status": "BLOCKED_BY_MISSING_PREREGISTRATION",
+      "missing_preregistration": [
+        "baselines.narx_mlp.batch_size",
+        "baselines.narx_mlp.depth_grid",
+        "baselines.narx_mlp.early_stopping_patience",
+        "baselines.narx_mlp.hidden_width_grid",
+        "baselines.narx_mlp.learning_rate",
+        "baselines.narx_mlp.max_epochs",
+        "baselines.narx_mlp.seeds",
+        "baselines.ridge_weight_grid",
+        "bootstrap.block_length",
+        "bootstrap.development_replicates",
+        "bootstrap.seed",
+        "selection.regularization_grid.amplitude_smoothness",
+        "selection.regularization_grid.lag_smoothness",
+        "selection.regularization_grid.ridge_weight",
+        "task.xar_history_selection"
+      ],
+      "split": {
+        "time_rows": {
+          "train": 2621440,
+          "validation": 655360,
+          "test": 0
+        },
+        "whole_records": {
+          "train": 80,
+          "validation": 20,
+          "test": 0
+        },
+        "official_test_rows_loaded": 0,
+        "official_test_locked": true
+      },
+      "config_path": "configs/public_benchmarks/pb1_pwh.yaml",
+      "config_sha256": "ff09df6229ca21699f48cfe09619c547af97a1058c8fbb1528299b8e6409d2a7"
+    },
+    "whpn": {
+      "status": "BLOCKED_BY_MISSING_PREREGISTRATION",
+      "missing_preregistration": [
+        "baselines.narx_mlp.batch_size",
+        "baselines.narx_mlp.depth_grid",
+        "baselines.narx_mlp.early_stopping_patience",
+        "baselines.narx_mlp.hidden_width_grid",
+        "baselines.narx_mlp.learning_rate",
+        "baselines.narx_mlp.max_epochs",
+        "baselines.narx_mlp.seeds",
+        "baselines.ridge_weight_grid",
+        "bootstrap.block_length",
+        "bootstrap.development_replicates",
+        "bootstrap.seed",
+        "selection.huber_delta",
+        "selection.regularization_grid.amplitude_smoothness",
+        "selection.regularization_grid.lag_smoothness",
+        "selection.regularization_grid.ridge_weight",
+        "task.xar_history_selection"
+      ],
+      "split": {
+        "time_rows": {
+          "train": 65536,
+          "validation": 16384,
+          "test": 0
+        },
+        "whole_records": {
+          "train": 8,
+          "validation": 2,
+          "test": 0
+        },
+        "official_test_rows_loaded": 0,
+        "official_test_locked": true
+      },
+      "config_path": "configs/public_benchmarks/pb1_whpn.yaml",
+      "config_sha256": "8618a2961c2ed797c6a5d0e39940ca1d5f26fee3f1b513ab3a3f5dffd07a47bd"
+    }
+  },
+  "overall_status": "BLOCKED_BY_MISSING_PREREGISTRATION"
+}
