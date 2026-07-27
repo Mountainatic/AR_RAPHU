@@ -26,6 +26,11 @@ from ar_raphu.datasets.pb1_protocol import (
     apply_pb1_development_partition,
     load_pb1_protocol_freeze,
 )
+from ar_raphu.spectral.penalty_interval import (
+    automatic_penalty_interval,
+    normalize_penalty_relative_to_gram,
+    penalty_boundary_status,
+)
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -91,6 +96,43 @@ def main() -> int:
         / "whpn_realization_audit.json"
     )
     whpn_audit = _read_json(audit_path)
+    literature_profile_path = (
+        ROOT / "configs/public_benchmarks/PB1_LITERATURE_PROFILES.json"
+    )
+    literature_profile = _read_json(literature_profile_path)
+    literature_audit_path = (
+        ROOT
+        / "results/public_benchmarks/pb1/protocol_audit"
+        / "literature_profile_audit.json"
+    )
+    literature_audit = (
+        _read_json(literature_audit_path)
+        if literature_audit_path.is_file()
+        else {"status": "NOT_YET_RUN", "gates": {}}
+    )
+    normalization = normalize_penalty_relative_to_gram(
+        np.diag([0.0, 1.0, 2.0]), np.eye(3)
+    )
+    interval = automatic_penalty_interval(
+        normalization.normalized, np.eye(3)
+    )
+    penalty_algorithm_gates = {
+        "PENALTY_NORMALIZATION_FROZEN": bool(
+            np.isclose(
+                np.median(
+                    normalization.positive_generalized_eigenvalues
+                ),
+                1.0,
+            )
+        ),
+        "PENALTY_INTERVAL_ALGORITHM_FROZEN": interval.lower < interval.upper,
+        "PENALTY_BOUNDARY_POLICY_FROZEN": (
+            penalty_boundary_status(
+                selected_index=0, grid_size=7, expansion_count=0
+            )
+            == "PENALTY_INTERVAL_EXPANSION_REQUIRED"
+        ),
+    }
     entries: dict[str, Any] = {}
     for dataset_id, loader, audit in (
         ("pwh", load_pwh, None),
@@ -111,16 +153,43 @@ def main() -> int:
             "config_path": str(config_path.relative_to(ROOT)),
             "config_sha256": _sha256(config_path),
         }
+        if (
+            config["literature_profiles"]["companion_code_commit"]
+            != literature_profile["companion_code"]["commit"]
+        ):
+            entries[dataset_id]["status"] = (
+                "BLOCKED_BY_LITERATURE_PROFILE_MISMATCH"
+            )
+            entries[dataset_id]["missing_preregistration"].append(
+                "literature_profiles.companion_code_commit_mismatch"
+            )
+    literature_ready = (
+        literature_audit.get("status") == "COMPLETED"
+        and literature_audit.get("gates", {}).get(
+            "LITERATURE_PROFILE_PINNED"
+        )
+        is True
+    )
+    penalty_ready = all(penalty_algorithm_gates.values())
     payload = {
         "schema_version": 6,
         "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
         "scope": "DEVELOPMENT_PREFLIGHT_NO_MODEL_FIT_NO_TEST_ACCESS",
         "source_commit": _source_commit(),
         "protocol_freeze_sha256": _sha256(freeze_path),
+        "literature_profile_sha256": _sha256(literature_profile_path),
+        "literature_profile_audit": {
+            "path": str(literature_audit_path.relative_to(ROOT)),
+            "status": literature_audit.get("status"),
+            "gates": literature_audit.get("gates", {}),
+        },
+        "penalty_algorithm_gates": penalty_algorithm_gates,
         "datasets": entries,
         "overall_status": (
             "READY_FOR_DEVELOPMENT"
-            if all(
+            if literature_ready
+            and penalty_ready
+            and all(
                 value["status"] == "READY_FOR_DEVELOPMENT"
                 for value in entries.values()
             )

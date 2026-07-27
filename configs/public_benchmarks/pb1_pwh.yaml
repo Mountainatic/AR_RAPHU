@@ -29,7 +29,34 @@
     "horizons": [1, 5, 10, 20],
     "use_future_x": false,
     "lx_grid": [16, 32, 64, 128],
-    "ly_grid": [1, 4, 8, 16, 32, 64]
+    "ly_grid": [1, 4, 8, 16, 32, 64],
+    "xar_history_selection": {
+      "H1_baseline_faithful": {
+        "selector": "ARX_VALIDATION_AIC",
+        "nx_candidates": [1, 20],
+        "ny_candidates": [1, 20],
+        "shared_by": ["arx_qr", "pnarx", "mlpnarx_champneys2024"]
+      },
+      "H2_native_model": {
+        "selector": "FULL_LX_LY_GRID_ONE_SE",
+        "complexity_key": [
+          "Lx_plus_Ly",
+          "Lx_times_Ly",
+          "max_Lx_Ly",
+          "Lx",
+          "Ly"
+        ]
+      },
+      "H3_shared_history_fairness": {
+        "history": "H1_ARX_AIC_SELECTED",
+        "models": [
+          "rank1_ar_raphu",
+          "fixed_rank2_ar_raphu",
+          "full_spectral_ar_raphu",
+          "adaptive_spectral_ar_raphu"
+        ]
+      }
+    }
   },
   "basis": {
     "lag_candidates": [
@@ -41,24 +68,71 @@
   },
   "models": [
     "persistence",
-    "ar_ridge",
-    "arx_ridge",
-    "narx_mlp",
+    "arx_qr",
+    "pnarx",
+    "mlpnarx_champneys2024",
     "rank1_ar_raphu",
     "fixed_rank2_ar_raphu",
     "full_spectral_ar_raphu",
     "adaptive_spectral_ar_raphu"
   ],
+  "literature_profiles": {
+    "path": "configs/public_benchmarks/PB1_LITERATURE_PROFILES.json",
+    "paper_profile": "CHAMPNEYS2024_PEER_REVIEWED",
+    "companion_code_commit": "d9c4972f6bd59cfdde23a014bc57579e2af957aa",
+    "use_companion_internal_split": false
+  },
+  "baselines": {
+    "arx_primary": {
+      "solver": "PIVOTED_QR_OR_SVD_MINIMUM_NORM",
+      "scientific_ridge": 0.0,
+      "report_effective_rank": true,
+      "report_condition_number": true
+    },
+    "mlpnarx_primary": {
+      "profile": "MLPNARX_CHAMPNEYS2024",
+      "hidden_layers": 1,
+      "activation": "tanh",
+      "widths": [2, 5, 7, 10],
+      "optimizer": "Adam",
+      "learning_rate": 0.01,
+      "iterations": 20000,
+      "early_stopping": false,
+      "initializations": 5,
+      "history": "ARX_AIC_SELECTED",
+      "scaling": "TRAIN_ONLY_MINMAX_MINUS1_PLUS1",
+      "selection": "VALIDATION_AIC"
+    }
+  },
   "selection": {
     "split": "validation",
     "lepski_enabled": true,
     "rank_budgets": [0.10, 0.05, 0.02],
     "primary_rank_budget": 0.05,
-    "test_access": "once_after_freeze"
+    "test_access": "once_after_freeze",
+    "spectral_penalty": {
+      "normalization": "POSITIVE_GENERALIZED_EIGENVALUE_MEDIAN_RELATIVE_TO_TRAIN_GRAM",
+      "interval": "AUTOMATIC_SHRINKAGE_COVERAGE",
+      "near_unpenalized_shrinkage": 0.999,
+      "near_zero_shrinkage": 0.001,
+      "grid_points_per_axis": 7,
+      "boundary_expansions_max": 2,
+      "risk": "PHASE_GROUPED_VALIDATION",
+      "one_se_tie": "LOWEST_EFFECTIVE_DF"
+    }
+  },
+  "bootstrap": {
+    "primary_unit": "PHASE_CLUSTER_ALL_AMPLITUDES_AND_BOTH_PERIODS",
+    "within_record_block": "ONLY_IF_PREDECLARED_NESTED_AUDIT_IS_TRIGGERED",
+    "development_replicates": 250,
+    "confirmation_replicates": 1000,
+    "shared_fixed_block_length": null
   },
   "solver": {
     "dtype": "float64",
     "device": "cpu",
-    "kkt_relative_residual": 1.0e-8
+    "kkt_relative_residual": 1.0e-8,
+    "numerical_jitter": "64*machine_epsilon*max(1,norm2(H_plus_P))",
+    "numerical_jitter_is_scientific_ridge": false
   }
 }

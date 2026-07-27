@@ -1,0 +1,128 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "profile_status": "FROZEN",
+  "paper": {
+    "title": "Baseline Results for Selected Nonlinear System Identification Benchmarks",
+    "authors": [
+      "Max D. Champneys",
+      "Gerben I. Beintema",
+      "Roland Toth",
+      "Maarten Schoukens",
+      "Timothy J. Rogers"
+    ],
+    "year": 2024,
+    "doi": "10.1016/j.ifacol.2024.08.574",
+    "arxiv": "2405.10779v2",
+    "paper_profile_id": "CHAMPNEYS2024_PEER_REVIEWED"
+  },
+  "companion_code": {
+    "repository": "https://github.com/MDCHAMP/nonlinear_baselines.git",
+    "commit": "d9c4972f6bd59cfdde23a014bc57579e2af957aa",
+    "commit_authored_at": "2025-09-16T12:22:51+02:00",
+    "relationship_to_paper": "POST_PUBLICATION_CODE_AUDIT_PROFILE",
+    "file_sha256": {
+      "models.py": "7cf5200f09eadfed249ae4d57b02f02103c76c18827756840bd8f94283baf2fd",
+      "trainers.py": "07b520efb1e62ce6f56cac489421c6d87cfe797b39afae8918edbd73d477a55b",
+      "dataload.py": "1ed36554ae85909b64d7566059b08e396108a57121fefe282a56c2dafd32c8eb",
+      "src/linalg.py": "a3a89950f01327ecd8f2d0a14f73b1d74b7dad29dee0547f68497a03655a2d44",
+      "src/metrics.py": "0216017a4c5d9cb89f578ebdda62a257ca434dd1e02e638843ff6ee511c37648"
+    }
+  },
+  "split_override": {
+    "use_project_frozen_split": true,
+    "reuse_companion_internal_split": false,
+    "reason": "All PB1 methods must share the frozen realization-level split."
+  },
+  "arx_primary": {
+    "id": "ARX_CHAMPNEYS2024",
+    "lag_input_candidates": [1, 20],
+    "lag_output_candidates": [1, 20],
+    "selection_metric": "VALIDATION_AIC",
+    "solver": "PIVOTED_QR_OR_SVD_MINIMUM_NORM",
+    "scientific_ridge": 0.0,
+    "report_effective_rank": true,
+    "report_condition_number": true,
+    "tie_rule": [
+      "lower_aic",
+      "fewer_parameters",
+      "lower_nx_plus_ny",
+      "lower_max_nx_ny",
+      "lexicographic_nx_ny"
+    ],
+    "aic_tie_tolerance": "64*machine_epsilon*max(1,abs(best_aic))"
+  },
+  "mlp_narx_primary": {
+    "id": "MLPNARX_CHAMPNEYS2024",
+    "profile_source": "PEER_REVIEWED_PAPER",
+    "hidden_layers": 1,
+    "activation": "tanh",
+    "widths": [2, 5, 7, 10],
+    "optimizer": "Adam",
+    "learning_rate": 0.01,
+    "iterations": 20000,
+    "early_stopping": false,
+    "initializations": 5,
+    "history": "ARX_AIC_SELECTED",
+    "scaling": "TRAIN_ONLY_MINMAX_MINUS1_PLUS1",
+    "selection": "VALIDATION_AIC"
+  },
+  "mlp_narx_code_audit": {
+    "id": "MLPNARX_CODE_D9C4972",
+    "profile_source": "PINNED_COMPANION_CODE",
+    "hidden_layers": 1,
+    "activation": "tanh",
+    "widths": [2, 4, 8, 16, 32],
+    "optimizer": "Adam",
+    "learning_rate": 0.01,
+    "early_stopping": false,
+    "initializations": 10,
+    "pwh_iterations": 10000,
+    "tanks_iterations": 20000,
+    "selection": "BEST_FINAL_TRAINING_LOSS_INIT_THEN_VALIDATION_AIC_WIDTH",
+    "role": "OPTIONAL_CODE_AUDIT"
+  },
+  "history_lanes": {
+    "H1": "BASELINE_FAITHFUL_ARX_AIC_1_TO_20",
+    "H2": "PS_AR_RAPHU_NATIVE_FULL_GRID_ONE_SE",
+    "H3": "PS_AR_RAPHU_SHARED_ARX_HISTORY_ABLATION",
+    "native_one_se_complexity_key": [
+      "Lx_plus_Ly",
+      "Lx_times_Ly",
+      "max_Lx_Ly",
+      "Lx",
+      "Ly"
+    ]
+  },
+  "spectral_penalty": {
+    "normalization": "POSITIVE_GENERALIZED_EIGENVALUE_MEDIAN_RELATIVE_TO_TRAIN_GRAM",
+    "fallback": "POSITIVE_TRACE_PER_RANK_RATIO",
+    "interval": "AUTOMATIC_SHRINKAGE_COVERAGE",
+    "near_unpenalized_shrinkage": 0.999,
+    "near_zero_shrinkage": 0.001,
+    "grid_points_per_axis": 7,
+    "boundary_expansions_max": 2,
+    "risk": "GROUPED_OR_FORWARD_BLOCKED_DEVELOPMENT",
+    "selection": "ONE_SE_LOWEST_EFFECTIVE_DF",
+    "scientific_ridge_selected": true,
+    "numerical_jitter_is_scientific_ridge": false
+  },
+  "bootstrap": {
+    "development_replicates": 250,
+    "confirmation_replicates": 1000,
+    "pwh_primary_unit": "PHASE_CLUSTER_ALL_AMPLITUDES_AND_BOTH_PERIODS",
+    "whpn_primary_unit": "WHOLE_REALIZATION",
+    "tanks_primary_unit": "AUTOMATIC_MOVING_OR_STATIONARY_BLOCK",
+    "shared_fixed_block_length": null
+  },
+  "whpn_loss": {
+    "primary": "MSE",
+    "alignment": "RAW_UNSHIFTED",
+    "process_noise_preserved": true,
+    "outlier_filter": "NONE",
+    "huber_role": "APPENDIX_SENSITIVITY_ONLY",
+    "huber_scale": "1.4826*MAD(TRAIN_OOF_MSE_RESIDUAL)",
+    "huber_delta": "1.345*huber_scale",
+    "huber_participates_in_primary_selection": false
+  }
+}

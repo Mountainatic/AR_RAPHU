@@ -2,28 +2,26 @@
   "schema_version": 6,
   "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
   "scope": "DEVELOPMENT_PREFLIGHT_NO_MODEL_FIT_NO_TEST_ACCESS",
-  "source_commit": "1e33ee51d1287b1021042f5badf8361517792a64",
+  "source_commit": "f89ada6a73df6757dcec5d9148b8df0010add6a5",
   "protocol_freeze_sha256": "835c0a7c9619f9cdf32ad8c488c301992f0502a431ed85387c7094450bd473b7",
+  "literature_profile_sha256": "e458293bf3ce780ea1091cb05014f350531a4d565abb205710928c22766477c0",
+  "literature_profile_audit": {
+    "path": "results/public_benchmarks/pb1/protocol_audit/literature_profile_audit.json",
+    "status": "COMPLETED",
+    "gates": {
+      "LITERATURE_PROFILE_PINNED": true,
+      "EXTERNAL_BASELINE_COMMIT_UNPINNED": false
+    }
+  },
+  "penalty_algorithm_gates": {
+    "PENALTY_NORMALIZATION_FROZEN": true,
+    "PENALTY_INTERVAL_ALGORITHM_FROZEN": true,
+    "PENALTY_BOUNDARY_POLICY_FROZEN": true
+  },
   "datasets": {
     "pwh": {
-      "status": "BLOCKED_BY_MISSING_PREREGISTRATION",
-      "missing_preregistration": [
-        "baselines.narx_mlp.batch_size",
-        "baselines.narx_mlp.depth_grid",
-        "baselines.narx_mlp.early_stopping_patience",
-        "baselines.narx_mlp.hidden_width_grid",
-        "baselines.narx_mlp.learning_rate",
-        "baselines.narx_mlp.max_epochs",
-        "baselines.narx_mlp.seeds",
-        "baselines.ridge_weight_grid",
-        "bootstrap.block_length",
-        "bootstrap.development_replicates",
-        "bootstrap.seed",
-        "selection.regularization_grid.amplitude_smoothness",
-        "selection.regularization_grid.lag_smoothness",
-        "selection.regularization_grid.ridge_weight",
-        "task.xar_history_selection"
-      ],
+      "status": "READY_FOR_DEVELOPMENT",
+      "missing_preregistration": [],
       "split": {
         "time_rows": {
           "train": 2621440,
@@ -39,28 +37,11 @@
         "official_test_locked": true
       },
       "config_path": "configs/public_benchmarks/pb1_pwh.yaml",
-      "config_sha256": "ff09df6229ca21699f48cfe09619c547af97a1058c8fbb1528299b8e6409d2a7"
+      "config_sha256": "5f67bbfd2fda93f78b65f8dd2157141f6a96df1de94ca23e837eb8d313e0d67a"
     },
     "whpn": {
-      "status": "BLOCKED_BY_MISSING_PREREGISTRATION",
-      "missing_preregistration": [
-        "baselines.narx_mlp.batch_size",
-        "baselines.narx_mlp.depth_grid",
-        "baselines.narx_mlp.early_stopping_patience",
-        "baselines.narx_mlp.hidden_width_grid",
-        "baselines.narx_mlp.learning_rate",
-        "baselines.narx_mlp.max_epochs",
-        "baselines.narx_mlp.seeds",
-        "baselines.ridge_weight_grid",
-        "bootstrap.block_length",
-        "bootstrap.development_replicates",
-        "bootstrap.seed",
-        "selection.huber_delta",
-        "selection.regularization_grid.amplitude_smoothness",
-        "selection.regularization_grid.lag_smoothness",
-        "selection.regularization_grid.ridge_weight",
-        "task.xar_history_selection"
-      ],
+      "status": "READY_FOR_DEVELOPMENT",
+      "missing_preregistration": [],
       "split": {
         "time_rows": {
           "train": 65536,
@@ -76,8 +57,8 @@
         "official_test_locked": true
       },
       "config_path": "configs/public_benchmarks/pb1_whpn.yaml",
-      "config_sha256": "8618a2961c2ed797c6a5d0e39940ca1d5f26fee3f1b513ab3a3f5dffd07a47bd"
+      "config_sha256": "5b60afe608818bc60458144807bcc2a38a841163beee88da09d4901d59258f35"
     }
   },
-  "overall_status": "BLOCKED_BY_MISSING_PREREGISTRATION"
+  "overall_status": "READY_FOR_DEVELOPMENT"
 }

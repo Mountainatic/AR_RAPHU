@@ -1,0 +1,41 @@
+{
+  "schema_version": 6,
+  "scope": "EXTERNAL_BASELINE_PROFILE_AUDIT_NO_MODEL_FIT",
+  "paper": {
+    "title": "Baseline Results for Selected Nonlinear System Identification Benchmarks",
+    "authors": [
+      "Max D. Champneys",
+      "Gerben I. Beintema",
+      "Roland Toth",
+      "Maarten Schoukens",
+      "Timothy J. Rogers"
+    ],
+    "year": 2024,
+    "doi": "10.1016/j.ifacol.2024.08.574",
+    "arxiv": "2405.10779v2",
+    "paper_profile_id": "CHAMPNEYS2024_PEER_REVIEWED"
+  },
+  "repository": "https://github.com/MDCHAMP/nonlinear_baselines.git",
+  "commit": "d9c4972f6bd59cfdde23a014bc57579e2af957aa",
+  "commit_present_in_remote_refs": true,
+  "observed_file_sha256": {
+    "models.py": "7cf5200f09eadfed249ae4d57b02f02103c76c18827756840bd8f94283baf2fd",
+    "trainers.py": "07b520efb1e62ce6f56cac489421c6d87cfe797b39afae8918edbd73d477a55b",
+    "dataload.py": "1ed36554ae85909b64d7566059b08e396108a57121fefe282a56c2dafd32c8eb",
+    "src/linalg.py": "a3a89950f01327ecd8f2d0a14f73b1d74b7dad29dee0547f68497a03655a2d44",
+    "src/metrics.py": "0216017a4c5d9cb89f578ebdda62a257ca434dd1e02e638843ff6ee511c37648"
+  },
+  "expected_file_sha256": {
+    "models.py": "7cf5200f09eadfed249ae4d57b02f02103c76c18827756840bd8f94283baf2fd",
+    "trainers.py": "07b520efb1e62ce6f56cac489421c6d87cfe797b39afae8918edbd73d477a55b",
+    "dataload.py": "1ed36554ae85909b64d7566059b08e396108a57121fefe282a56c2dafd32c8eb",
+    "src/linalg.py": "a3a89950f01327ecd8f2d0a14f73b1d74b7dad29dee0547f68497a03655a2d44",
+    "src/metrics.py": "0216017a4c5d9cb89f578ebdda62a257ca434dd1e02e638843ff6ee511c37648"
+  },
+  "gaps": [],
+  "gates": {
+    "LITERATURE_PROFILE_PINNED": true,
+    "EXTERNAL_BASELINE_COMMIT_UNPINNED": false
+  },
+  "status": "COMPLETED"
+}
