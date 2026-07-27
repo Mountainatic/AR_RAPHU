@@ -2,7 +2,7 @@
   "schema_version": 6,
   "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
   "scope": "DEVELOPMENT_PREFLIGHT_NO_MODEL_FIT_NO_TEST_ACCESS",
-  "source_commit": "f89ada6a73df6757dcec5d9148b8df0010add6a5",
+  "source_commit": "4c393b16cd27b17a8bfbd2e42cbc4af60e8eee98",
   "protocol_freeze_sha256": "835c0a7c9619f9cdf32ad8c488c301992f0502a431ed85387c7094450bd473b7",
   "literature_profile_sha256": "e458293bf3ce780ea1091cb05014f350531a4d565abb205710928c22766477c0",
   "literature_profile_audit": {
