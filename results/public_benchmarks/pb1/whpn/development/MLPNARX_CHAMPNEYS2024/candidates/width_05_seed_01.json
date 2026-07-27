@@ -1,0 +1,31 @@
+{
+  "schema_version": 6,
+  "dataset": "whpn",
+  "model": "MLPNARX_CHAMPNEYS2024",
+  "width": 5,
+  "seed": 1,
+  "history": {
+    "nx": 18,
+    "ny": 15
+  },
+  "iterations_completed": 20000,
+  "early_stopping": false,
+  "optimizer": "Adam",
+  "learning_rate": 0.01,
+  "training_loss": "RMSE",
+  "final_training_rmse_scaled": 0.0037345269229263067,
+  "scaling": {
+    "x_min": -2.9912142604589462,
+    "x_max": 3.3052810579538345,
+    "y_min": -0.3129297327250242,
+    "y_max": 0.3229130897670984
+  },
+  "weights_file": "width_05_seed_01.npz",
+  "runtime_seconds": 40.04175789607689,
+  "dtype": "float32",
+  "device": "cpu",
+  "official_test_rows_loaded": 0,
+  "official_test_access_count": 0,
+  "source_commit": "638d8513ca1cfb918a23800fd0a988212ea7a8ff",
+  "status": "COMPLETED"
+}

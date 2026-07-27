@@ -1,0 +1,330 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "dataset": "whpn",
+  "stage": "development",
+  "model": "MLPNARX_CHAMPNEYS2024",
+  "profile_source": "PEER_REVIEWED_PAPER",
+  "history_source": "H1_ARX_AIC_SELECTED",
+  "history": {
+    "nx": 18,
+    "ny": 15
+  },
+  "widths": [
+    2,
+    5,
+    7,
+    10
+  ],
+  "initializations": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "iterations": 20000,
+  "early_stopping": false,
+  "selection_metric": "MEAN_RECORD_VALIDATION_AIC",
+  "forecast_alignment": "X_THROUGH_T_AND_Y_THROUGH_T_TO_TARGET_Y_T_PLUS_1",
+  "official_test_rows_loaded": 0,
+  "official_test_access_count": 0,
+  "selected": {
+    "width": 10,
+    "seed": 1,
+    "validation_aic_mean": -5759.4697507553665,
+    "validation_aic_by_record": [
+      -5635.272719687302,
+      -5883.666781823432
+    ],
+    "stable_simulation": true,
+    "final_training_rmse_scaled": 0.0037226583808660507,
+    "runtime_seconds": 53.3730581747368,
+    "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_01.json",
+    "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_01.npz"
+  },
+  "candidates": [
+    {
+      "width": 2,
+      "seed": 0,
+      "validation_aic_mean": 11304.126629212396,
+      "validation_aic_by_record": [
+        11187.744139285001,
+        11420.509119139791
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.003695736639201641,
+      "runtime_seconds": 28.334905195981264,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_02_seed_00.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_02_seed_00.npz"
+    },
+    {
+      "width": 2,
+      "seed": 1,
+      "validation_aic_mean": 12511.426955477113,
+      "validation_aic_by_record": [
+        12511.242034212226,
+        12511.611876741998
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.006448841188102961,
+      "runtime_seconds": 36.962192240171134,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_02_seed_01.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_02_seed_01.npz"
+    },
+    {
+      "width": 2,
+      "seed": 2,
+      "validation_aic_mean": 10333.478196672966,
+      "validation_aic_by_record": [
+        10301.771970968977,
+        10365.184422376955
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.003512235125526786,
+      "runtime_seconds": 35.455974846147,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_02_seed_02.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_02_seed_02.npz"
+    },
+    {
+      "width": 2,
+      "seed": 3,
+      "validation_aic_mean": 8160.469660750316,
+      "validation_aic_by_record": [
+        7354.492431185715,
+        8966.446890314917
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.003363802330568433,
+      "runtime_seconds": 34.77346935728565,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_02_seed_03.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_02_seed_03.npz"
+    },
+    {
+      "width": 2,
+      "seed": 4,
+      "validation_aic_mean": 11339.456091842922,
+      "validation_aic_by_record": [
+        11341.042884198998,
+        11337.869299486845
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.006487485021352768,
+      "runtime_seconds": 40.17311928421259,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_02_seed_04.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_02_seed_04.npz"
+    },
+    {
+      "width": 5,
+      "seed": 0,
+      "validation_aic_mean": 6159.772061159178,
+      "validation_aic_by_record": [
+        5204.301866270915,
+        7115.2422560474415
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.003677873406559229,
+      "runtime_seconds": 38.09553860593587,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_05_seed_00.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_05_seed_00.npz"
+    },
+    {
+      "width": 5,
+      "seed": 1,
+      "validation_aic_mean": -4389.25342470524,
+      "validation_aic_by_record": [
+        -4238.4312010861,
+        -4540.0756483243795
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.0037345269229263067,
+      "runtime_seconds": 40.04175789607689,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_05_seed_01.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_05_seed_01.npz"
+    },
+    {
+      "width": 5,
+      "seed": 2,
+      "validation_aic_mean": 8493.061329485183,
+      "validation_aic_by_record": [
+        8460.561811453746,
+        8525.56084751662
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.003691397374495864,
+      "runtime_seconds": 39.034213557839394,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_05_seed_02.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_05_seed_02.npz"
+    },
+    {
+      "width": 5,
+      "seed": 3,
+      "validation_aic_mean": 7997.346661291947,
+      "validation_aic_by_record": [
+        7965.382842460353,
+        8029.310480123542
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.003460321808233857,
+      "runtime_seconds": 37.647069117985666,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_05_seed_03.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_05_seed_03.npz"
+    },
+    {
+      "width": 5,
+      "seed": 4,
+      "validation_aic_mean": -2867.01064986888,
+      "validation_aic_by_record": [
+        -3022.3081693390345,
+        -2711.7131303987253
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.003624771721661091,
+      "runtime_seconds": 39.59439535299316,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_05_seed_04.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_05_seed_04.npz"
+    },
+    {
+      "width": 7,
+      "seed": 0,
+      "validation_aic_mean": 5577.944305412073,
+      "validation_aic_by_record": [
+        5556.8300630303565,
+        5599.058547793789
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.003742936998605728,
+      "runtime_seconds": 40.67905369121581,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_07_seed_00.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_07_seed_00.npz"
+    },
+    {
+      "width": 7,
+      "seed": 1,
+      "validation_aic_mean": 8713.295129613758,
+      "validation_aic_by_record": [
+        8702.04211437236,
+        8724.548144855156
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.003912853077054024,
+      "runtime_seconds": 43.820806968957186,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_07_seed_01.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_07_seed_01.npz"
+    },
+    {
+      "width": 7,
+      "seed": 2,
+      "validation_aic_mean": 8706.130002070775,
+      "validation_aic_by_record": [
+        8690.90696733373,
+        8721.353036807817
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.0041044773533940315,
+      "runtime_seconds": 42.889272309374064,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_07_seed_02.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_07_seed_02.npz"
+    },
+    {
+      "width": 7,
+      "seed": 3,
+      "validation_aic_mean": 6006.808463116906,
+      "validation_aic_by_record": [
+        6740.31770973962,
+        5273.299216494191
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.0034824663307517767,
+      "runtime_seconds": 43.17472531925887,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_07_seed_03.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_07_seed_03.npz"
+    },
+    {
+      "width": 7,
+      "seed": 4,
+      "validation_aic_mean": 7739.1878094182,
+      "validation_aic_by_record": [
+        7670.987681907296,
+        7807.387936929104
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.0036003815475851297,
+      "runtime_seconds": 41.23105864832178,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_07_seed_04.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_07_seed_04.npz"
+    },
+    {
+      "width": 10,
+      "seed": 0,
+      "validation_aic_mean": -1110.3152408516335,
+      "validation_aic_by_record": [
+        -1535.4343081909692,
+        -685.1961735122977
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.0037932030390948057,
+      "runtime_seconds": 49.029087690170854,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_00.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_00.npz"
+    },
+    {
+      "width": 10,
+      "seed": 1,
+      "validation_aic_mean": -5759.4697507553665,
+      "validation_aic_by_record": [
+        -5635.272719687302,
+        -5883.666781823432
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.0037226583808660507,
+      "runtime_seconds": 53.3730581747368,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_01.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_01.npz"
+    },
+    {
+      "width": 10,
+      "seed": 2,
+      "validation_aic_mean": -4486.5917369229155,
+      "validation_aic_by_record": [
+        -4302.433524779855,
+        -4670.749949065977
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.004003434907644987,
+      "runtime_seconds": 45.08026149217039,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_02.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_02.npz"
+    },
+    {
+      "width": 10,
+      "seed": 3,
+      "validation_aic_mean": 8517.504194677995,
+      "validation_aic_by_record": [
+        8524.820380685935,
+        8510.188008670055
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.003776128403842449,
+      "runtime_seconds": 51.87547525530681,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_03.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_03.npz"
+    },
+    {
+      "width": 10,
+      "seed": 4,
+      "validation_aic_mean": 7299.2404033021285,
+      "validation_aic_by_record": [
+        7336.5297148493755,
+        7261.9510917548805
+      ],
+      "stable_simulation": true,
+      "final_training_rmse_scaled": 0.0036456959787756205,
+      "runtime_seconds": 46.59431812912226,
+      "metadata_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_04.json",
+      "weights_file": "results/public_benchmarks/pb1/whpn/development/MLPNARX_CHAMPNEYS2024/candidates/width_10_seed_04.npz"
+    }
+  ],
+  "status": "COMPLETED",
+  "scientific_role": "DEVELOPMENT_BASELINE_SELECTION_NOT_TEST_EVIDENCE"
+}
