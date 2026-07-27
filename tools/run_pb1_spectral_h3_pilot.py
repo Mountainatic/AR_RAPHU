@@ -46,6 +46,9 @@ def main() -> int:
     parser.add_argument(
         "--horizon", type=int, choices=(1, 5, 10, 20), default=1
     )
+    parser.add_argument(
+        "--track", choices=("X", "AR", "XAR"), default="XAR"
+    )
     parser.add_argument("--force-development", action="store_true")
     args = parser.parse_args()
 
@@ -101,6 +104,7 @@ def main() -> int:
         amplitude_count=amplitude_count,
         grid_points=int(penalty["grid_points_per_axis"]),
         maximum_expansions=int(penalty["boundary_expansions_max"]),
+        track=args.track,
     )
     output = (
         ROOT
@@ -110,7 +114,11 @@ def main() -> int:
             "development/H3_SHARED_HISTORY/"
             f"SPECTRAL_PILOT_H{args.horizon}"
         )
-        / "full_spectral.json"
+        / (
+            "full_spectral.json"
+            if args.track == "XAR"
+            else f"spectral_{args.track}.json"
+        )
     )
     if output.exists() and not args.force_development:
         raise FileExistsError(f"{output} already exists.")
@@ -123,15 +131,23 @@ def main() -> int:
         "lane": "H3_SHARED_HISTORY_FAIRNESS",
         "role": "PENALTY_CERTIFICATION_AT_FIRST_PREDECLARED_RESOLUTION",
         "model": "FULL_SPECTRAL_AR_RAPHU",
-        "track": "XAR",
+        "track": args.track,
         "horizon": args.horizon,
         "use_future_x": False,
         "history": {"L_x": L_x, "L_y": L_y, "source": "H1_ARX_AIC"},
         "basis": {
             "lag": {"type": "discrete_identity"},
             "amplitude": {"type": "cubic_bspline", "count": amplitude_count},
-            "x_design_shape_train": list(fit.x_block.train_matrix.shape),
-            "ar_design_shape_train": list(fit.ar_block.train_matrix.shape),
+            "x_design_shape_train": (
+                None
+                if fit.x_block is None
+                else list(fit.x_block.train_matrix.shape)
+            ),
+            "ar_design_shape_train": (
+                None
+                if fit.ar_block is None
+                else list(fit.ar_block.train_matrix.shape)
+            ),
         },
         "penalty": {
             "normalization": "POSITIVE_GENERALIZED_EIGENVALUE_MEDIAN_RELATIVE_TO_TRAIN_GRAM",

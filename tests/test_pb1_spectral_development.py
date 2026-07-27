@@ -79,3 +79,21 @@ def test_pb1_spectral_adapter_is_no_test_cpu_fp64_and_rank_after_selection() -> 
     assert sum(
         bootstrap.spectral_tail_budget_rank_frequencies["0.05"].values()
     ) == 5
+
+
+def test_pb1_spectral_track_isolation() -> None:
+    for track in ("X", "AR"):
+        fit = fit_pb1_shared_history_spectral(
+            _dataset(),
+            L_x=4,
+            L_y=3,
+            amplitude_count=5,
+            grid_points=3,
+            maximum_expansions=0,
+            track=track,
+        )
+        assert fit.track == track
+        assert (fit.x_block is not None) is (track == "X")
+        assert (fit.ar_block is not None) is (track == "AR")
+        if track == "AR":
+            assert fit.rank_audit["status"] == "NOT_APPLICABLE"

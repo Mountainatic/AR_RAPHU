@@ -65,8 +65,8 @@ class PB1SpectralDevelopmentFit:
     candidates: tuple[PB1PenaltyCandidate, ...]
     interval_history: tuple[dict[str, object], ...]
     penalty_status: str
-    x_block: PB1TensorBlock
-    ar_block: PB1TensorBlock
+    x_block: PB1TensorBlock | None
+    ar_block: PB1TensorBlock | None
     train_target: np.ndarray
     validation_target: np.ndarray
     train_matrix: np.ndarray
@@ -75,6 +75,7 @@ class PB1SpectralDevelopmentFit:
     selected_penalty: np.ndarray
     rank_audit: dict[str, object]
     history: tuple[int, int]
+    track: str
     horizon: int
     elapsed_seconds: float
 
@@ -270,7 +271,7 @@ def _rank_audit(
     selected: PB1PenaltyCandidate,
     *,
     x_block: PB1TensorBlock,
-    ar_block: PB1TensorBlock,
+    ar_block: PB1TensorBlock | None,
     validation_target: np.ndarray,
 ) -> dict[str, object]:
     x_width = x_block.coefficient_slice.stop - x_block.coefficient_slice.start
@@ -281,7 +282,9 @@ def _rank_audit(
         theta_x, x_block.lag_gram, x_block.amplitude_gram
     )
     ar_prediction = (
-        ar_block.validation_matrix
+        np.zeros(len(validation_target), dtype=np.float64)
+        if ar_block is None
+        else ar_block.validation_matrix
         @ selected.coefficients[ar_block.coefficient_slice]
     )
     full_prediction = (
@@ -339,6 +342,8 @@ def bootstrap_external_rank_spectrum(
     started = time.perf_counter()
     if replicates <= 0:
         raise ValueError("Bootstrap replicates must be positive.")
+    if fit.x_block is None:
+        raise ValueError("External-rank bootstrap is not applicable to AR-only.")
     matrix = np.asarray(fit.train_matrix, dtype=np.float64)
     target = np.asarray(fit.train_target, dtype=np.float64)
     groups = np.asarray(fit.train_groups)
@@ -477,12 +482,15 @@ def fit_pb1_shared_history_spectral(
     amplitude_count: int = 16,
     grid_points: int = 7,
     maximum_expansions: int = 2,
+    track: str = "XAR",
 ) -> PB1SpectralDevelopmentFit:
     """Fit H3 full spectral XAR at one preregistered resolution."""
 
     started = time.perf_counter()
     if np.any(dataset.split == "test"):
         raise PermissionError("PB1 spectral development refuses test rows.")
+    if track not in {"X", "AR", "XAR"}:
+        raise ValueError("PB1 spectral track must be X, AR, or XAR.")
     dataset_id = str(dataset.metadata.get("dataset_id", ""))
     standardizer = TrainOnlyStandardizer.fit(dataset)
     scaled = standardizer.transform(dataset)
@@ -512,31 +520,40 @@ def fit_pb1_shared_history_spectral(
         lag_count=lag_count,
         amplitude_count=amplitude_count,
     )
-    x_width = x_matrix.shape[1]
-    ar_width = ar_matrix.shape[1]
-    x_block = PB1TensorBlock(
-        train_matrix=x_matrix[train_mask],
-        validation_matrix=x_matrix[validation_mask],
-        lag_basis=x_lag,
-        amplitude_basis=x_amp,
-        lag_gram=x_lag_gram,
-        amplitude_gram=x_amp_gram,
-        coefficient_slice=slice(0, x_width),
-    )
-    ar_block = PB1TensorBlock(
-        train_matrix=ar_matrix[train_mask],
-        validation_matrix=ar_matrix[validation_mask],
-        lag_basis=ar_lag,
-        amplitude_basis=ar_amp,
-        lag_gram=ar_lag_gram,
-        amplitude_gram=ar_amp_gram,
-        coefficient_slice=slice(x_width, x_width + ar_width),
-    )
+    offset = 0
+    x_block: PB1TensorBlock | None = None
+    ar_block: PB1TensorBlock | None = None
+    active_blocks: list[PB1TensorBlock] = []
+    if track in {"X", "XAR"}:
+        x_width = x_matrix.shape[1]
+        x_block = PB1TensorBlock(
+            train_matrix=x_matrix[train_mask],
+            validation_matrix=x_matrix[validation_mask],
+            lag_basis=x_lag,
+            amplitude_basis=x_amp,
+            lag_gram=x_lag_gram,
+            amplitude_gram=x_amp_gram,
+            coefficient_slice=slice(offset, offset + x_width),
+        )
+        active_blocks.append(x_block)
+        offset += x_width
+    if track in {"AR", "XAR"}:
+        ar_width = ar_matrix.shape[1]
+        ar_block = PB1TensorBlock(
+            train_matrix=ar_matrix[train_mask],
+            validation_matrix=ar_matrix[validation_mask],
+            lag_basis=ar_lag,
+            amplitude_basis=ar_amp,
+            lag_gram=ar_lag_gram,
+            amplitude_gram=ar_amp_gram,
+            coefficient_slice=slice(offset, offset + ar_width),
+        )
+        active_blocks.append(ar_block)
     train_matrix = np.column_stack(
-        (x_block.train_matrix, ar_block.train_matrix)
+        [block.train_matrix for block in active_blocks]
     )
     validation_matrix = np.column_stack(
-        (x_block.validation_matrix, ar_block.validation_matrix)
+        [block.validation_matrix for block in active_blocks]
     )
     train_target = task.target[train_mask]
     validation_target = task.target[validation_mask]
@@ -549,7 +566,7 @@ def fit_pb1_shared_history_spectral(
     centered_target = train_target - target_mean
     gram = centered_matrix.T @ centered_matrix / len(centered_matrix)
     rhs = centered_matrix.T @ centered_target / len(centered_matrix)
-    raw_penalties = _block_penalties((x_block, ar_block))
+    raw_penalties = _block_penalties(tuple(active_blocks))
     normalized = tuple(
         normalize_penalty_relative_to_gram(component, gram).normalized
         for component in raw_penalties
@@ -641,11 +658,21 @@ def fit_pb1_shared_history_spectral(
             strict=True,
         )
     )
-    rank_audit = _rank_audit(
-        selected,
-        x_block=x_block,
-        ar_block=ar_block,
-        validation_target=validation_target,
+    rank_audit = (
+        _rank_audit(
+            selected,
+            x_block=x_block,
+            ar_block=ar_block,
+            validation_target=validation_target,
+        )
+        if x_block is not None
+        else {
+            "status": "NOT_APPLICABLE",
+            "reason": "AR_ONLY_TRACK_HAS_NO_EXTERNAL_KERNEL_RANK",
+            "structural_rank_claim_allowed": False,
+            "predictive_svd_rank_claim_allowed": False,
+            "full_validation_mse": selected.validation_mse_mean,
+        }
     )
     return PB1SpectralDevelopmentFit(
         selected=selected,
@@ -664,6 +691,7 @@ def fit_pb1_shared_history_spectral(
         selected_penalty=selected_penalty,
         rank_audit=rank_audit,
         history=(L_x, L_y),
+        track=track,
         horizon=horizon,
         elapsed_seconds=time.perf_counter() - started,
     )
