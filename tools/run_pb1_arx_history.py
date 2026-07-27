@@ -92,7 +92,7 @@ def main() -> int:
         ROOT
         / "results/public_benchmarks/pb1"
         / args.dataset
-        / "development/H1_ARX/history_selection.json"
+        / "development/H1_ARX_NO_FUTURE_X/history_selection.json"
     )
     if output.exists() and not args.force_development:
         raise FileExistsError(
@@ -104,8 +104,10 @@ def main() -> int:
         "dataset": args.dataset,
         "stage": "development",
         "lane": "H1_BASELINE_FAITHFUL",
-        "model": "ARX_CHAMPNEYS2024_PROJECT_SPLIT",
+        "model": "ARX_CHAMPNEYS2024_PROJECT_SPLIT_NO_FUTURE_X",
         "evaluation_mode": "FREE_RUNNING_SIMULATION",
+        "forecast_alignment": "X_THROUGH_T_AND_Y_THROUGH_T_TO_TARGET_Y_T_PLUS_1",
+        "horizon": 1,
         "selection_metric": "MEAN_RECORD_VALIDATION_AIC",
         "source_commit": _commit(),
         "config_path": str(config_path.relative_to(ROOT)),

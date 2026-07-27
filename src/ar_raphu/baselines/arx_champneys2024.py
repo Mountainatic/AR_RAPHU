@@ -81,14 +81,14 @@ def _maximal_arx_design(
     max_nx: int,
     max_ny: int,
 ) -> tuple[np.ndarray, np.ndarray]:
-    burn = max(max_nx, max_ny)
-    if len(x) <= burn:
+    history = max(max_nx, max_ny)
+    if len(x) <= history:
         raise ValueError("Record is shorter than maximum ARX history.")
-    y_window = np.lib.stride_tricks.sliding_window_view(y, max_ny + 1)
-    y_lags = y_window[burn - max_ny :, -2::-1]
+    y_window = np.lib.stride_tricks.sliding_window_view(y, max_ny)
+    y_lags = y_window[history - max_ny : -1, ::-1]
     x_window = np.lib.stride_tricks.sliding_window_view(x, max_nx)
-    x_lags = x_window[burn - max_nx + 1 :, ::-1]
-    target = y[burn:]
+    x_lags = x_window[history - max_nx : -1, ::-1]
+    target = y[history:]
     if len(y_lags) != len(target) or len(x_lags) != len(target):
         raise AssertionError("ARX maximal design alignment failed.")
     return np.column_stack((y_lags, x_lags)), target
@@ -169,9 +169,10 @@ def simulate_arx(
     if len(x_values) != len(y_values) or len(x_values) <= burn:
         raise ValueError("Invalid ARX simulation record.")
     denominator = np.r_[1.0, -np.asarray(coefficients_y, dtype=np.float64)]
-    numerator = np.asarray(coefficients_x, dtype=np.float64)
+    # PB1 target y[t+1] may only use x through t, hence the leading zero.
+    numerator = np.r_[0.0, np.asarray(coefficients_x, dtype=np.float64)]
     past_y = y_values[burn - 1 :: -1][:ny]
-    past_x = x_values[burn - 1 :: -1][: max(nx - 1, 0)]
+    past_x = x_values[burn - 1 :: -1][:nx]
     initial_state = scipy.signal.lfiltic(
         numerator, denominator, y=past_y, x=past_x
     )

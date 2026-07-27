@@ -14,7 +14,12 @@ def _arx_sequence(seed: int, n: int = 800) -> tuple[np.ndarray, np.ndarray]:
     x = rng.normal(size=n)
     y = np.zeros(n)
     for t in range(2, n):
-        y[t] = 0.65 * y[t - 1] - 0.15 * y[t - 2] + 0.7 * x[t]
+        y[t] = (
+            0.65 * y[t - 1]
+            - 0.15 * y[t - 2]
+            + 0.7 * x[t - 1]
+            + 0.05 * rng.normal()
+        )
     return x, y
 
 
@@ -58,7 +63,7 @@ def test_lfilter_simulation_matches_manual_arx_recursion() -> None:
     manual = y.copy()
     for t in range(burn, len(y)):
         manual[t] = ay @ manual[t - np.arange(1, len(ay) + 1)] + bx @ x[
-            t - np.arange(len(bx))
+            t - 1 - np.arange(len(bx))
         ]
     np.testing.assert_allclose(prediction[burn:], manual[burn:])
 
