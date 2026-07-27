@@ -1,0 +1,4876 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "dataset": "whpn",
+  "stage": "development",
+  "lane": "H1_BASELINE_FAITHFUL",
+  "model": "ARX_CHAMPNEYS2024_PROJECT_SPLIT_NO_FUTURE_X",
+  "evaluation_mode": "FREE_RUNNING_SIMULATION",
+  "forecast_alignment": "X_THROUGH_T_AND_Y_THROUGH_T_TO_TARGET_Y_T_PLUS_1",
+  "horizon": 1,
+  "selection_metric": "MEAN_RECORD_VALIDATION_AIC",
+  "source_commit": "970a4189783efb7a9183fc4c184297ab175203bb",
+  "config_path": "configs/public_benchmarks/pb1_whpn.yaml",
+  "config_sha256": "5b60afe608818bc60458144807bcc2a38a841163beee88da09d4901d59258f35",
+  "protocol_freeze_sha256": "835c0a7c9619f9cdf32ad8c488c301992f0502a431ed85387c7094450bd473b7",
+  "preflight_sha256": "998a93dee4e84a946a09014acfd200725dd4a577297fb46c69bd8976ebf18355",
+  "official_test_rows_loaded": 0,
+  "official_test_access_count": 0,
+  "train_only_standardization": true,
+  "solver": "STREAMING_QR_THEN_SVD_MINIMUM_NORM_SUBSET",
+  "scientific_ridge": 0.0,
+  "selected": {
+    "nx": 18,
+    "ny": 15,
+    "coefficients_y_standardized": [
+      3.435578364329635,
+      -5.183573276496303,
+      5.392087301560304,
+      -5.02542699628615,
+      4.444435287956821,
+      -3.961055070486539,
+      3.4971935671654926,
+      -3.0195015425829053,
+      2.5849553487697445,
+      -2.104588250844456,
+      1.7040419969363692,
+      -1.2870557028792764,
+      0.8913920656084027,
+      -0.5175832074320719,
+      0.1485086040320253
+    ],
+    "coefficients_x_standardized": [
+      0.006488901204796065,
+      -0.034247087630701036,
+      0.09478848078525753,
+      -0.15497028960561926,
+      0.1602134722908629,
+      -0.10445231504850175,
+      0.04471805858230728,
+      -0.030098839910019968,
+      0.04839639183066002,
+      -0.05659496635434287,
+      0.04663989624660544,
+      -0.034249048651695944,
+      0.021669779049444275,
+      -0.0023273473821268332,
+      -0.01565553215404632,
+      0.018992102769494246,
+      -0.01057717924775757,
+      0.0028310049978759492
+    ],
+    "x_mean": 0.021219052749756884,
+    "x_scale": 0.7577635624420513,
+    "y_mean": 0.005384765881117914,
+    "y_scale": 0.13356110789298373
+  },
+  "candidates": [
+    {
+      "nx": 1,
+      "ny": 1,
+      "validation_aic_mean": -315.7378967811063,
+      "validation_aic_by_record": [
+        -339.2286888001428,
+        -292.24710476206985
+      ],
+      "effective_rank": 2,
+      "condition_number": 1.0022041614946384,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 2,
+      "validation_aic_mean": -1181.214433267919,
+      "validation_aic_by_record": [
+        -1312.4759085060393,
+        -1049.9529580297988
+      ],
+      "effective_rank": 3,
+      "condition_number": 25.48840063735876,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 3,
+      "validation_aic_mean": -5611.152573501617,
+      "validation_aic_by_record": [
+        -6207.677318724743,
+        -5014.6278282784915
+      ],
+      "effective_rank": 4,
+      "condition_number": 473.0220298485697,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 4,
+      "validation_aic_mean": -5545.119771008554,
+      "validation_aic_by_record": [
+        -6037.6881785732185,
+        -5052.551363443891
+      ],
+      "effective_rank": 5,
+      "condition_number": 2590.3355356684233,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 5,
+      "validation_aic_mean": -4590.357109585663,
+      "validation_aic_by_record": [
+        -5047.264055093296,
+        -4133.450164078031
+      ],
+      "effective_rank": 6,
+      "condition_number": 4770.9323268402495,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 6,
+      "validation_aic_mean": -5057.200535329825,
+      "validation_aic_by_record": [
+        -5549.791998051337,
+        -4564.609072608312
+      ],
+      "effective_rank": 7,
+      "condition_number": 8449.650725930525,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 7,
+      "validation_aic_mean": -4179.403939633419,
+      "validation_aic_by_record": [
+        -4621.094501693165,
+        -3737.713377573673
+      ],
+      "effective_rank": 8,
+      "condition_number": 11675.02596805504,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 8,
+      "validation_aic_mean": -5366.126800123528,
+      "validation_aic_by_record": [
+        -5881.044493793657,
+        -4851.209106453398
+      ],
+      "effective_rank": 9,
+      "condition_number": 15202.376559664695,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 9,
+      "validation_aic_mean": -5558.050092684889,
+      "validation_aic_by_record": [
+        -6097.972862731177,
+        -5018.127322638601
+      ],
+      "effective_rank": 10,
+      "condition_number": 19809.779244107107,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 10,
+      "validation_aic_mean": -6061.6407723803495,
+      "validation_aic_by_record": [
+        -6692.797560587365,
+        -5430.483984173333
+      ],
+      "effective_rank": 11,
+      "condition_number": 23355.944300505485,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 11,
+      "validation_aic_mean": -6051.533859671266,
+      "validation_aic_by_record": [
+        -6688.795446842,
+        -5414.272272500532
+      ],
+      "effective_rank": 12,
+      "condition_number": 28172.183023400514,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 12,
+      "validation_aic_mean": -5814.204309011855,
+      "validation_aic_by_record": [
+        -6447.015919297536,
+        -5181.392698726174
+      ],
+      "effective_rank": 13,
+      "condition_number": 32430.22027623608,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 13,
+      "validation_aic_mean": -5959.5413002162895,
+      "validation_aic_by_record": [
+        -6599.190226841787,
+        -5319.892373590791
+      ],
+      "effective_rank": 14,
+      "condition_number": 37059.49040478656,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 14,
+      "validation_aic_mean": -5867.075391737895,
+      "validation_aic_by_record": [
+        -6499.415760742745,
+        -5234.735022733046
+      ],
+      "effective_rank": 15,
+      "condition_number": 41673.721599793564,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 15,
+      "validation_aic_mean": -6116.630259507083,
+      "validation_aic_by_record": [
+        -6763.241563911064,
+        -5470.018955103102
+      ],
+      "effective_rank": 16,
+      "condition_number": 46142.081234514444,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 16,
+      "validation_aic_mean": -6154.334606368744,
+      "validation_aic_by_record": [
+        -6799.445207536348,
+        -5509.224005201141
+      ],
+      "effective_rank": 17,
+      "condition_number": 51119.81509393538,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 17,
+      "validation_aic_mean": -6033.9014771460315,
+      "validation_aic_by_record": [
+        -6647.902691409606,
+        -5419.900262882456
+      ],
+      "effective_rank": 18,
+      "condition_number": 55286.156579690396,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 18,
+      "validation_aic_mean": -5950.658883558098,
+      "validation_aic_by_record": [
+        -6551.931559304514,
+        -5349.386207811682
+      ],
+      "effective_rank": 19,
+      "condition_number": 60195.36526989317,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 19,
+      "validation_aic_mean": -5757.247180585133,
+      "validation_aic_by_record": [
+        -6326.902471396049,
+        -5187.591889774216
+      ],
+      "effective_rank": 20,
+      "condition_number": 64518.26742063211,
+      "stable_simulation": true
+    },
+    {
+      "nx": 1,
+      "ny": 20,
+      "validation_aic_mean": -5892.594535735918,
+      "validation_aic_by_record": [
+        -6485.462632395963,
+        -5299.726439075874
+      ],
+      "effective_rank": 21,
+      "condition_number": 68900.77764116132,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 1,
+      "validation_aic_mean": -467.67200798601084,
+      "validation_aic_by_record": [
+        -573.4391860971456,
+        -361.9048298748761
+      ],
+      "effective_rank": 3,
+      "condition_number": 2.9205420885094435,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 2,
+      "validation_aic_mean": -1400.9185541927377,
+      "validation_aic_by_record": [
+        -1583.190308868692,
+        -1218.6467995167832
+      ],
+      "effective_rank": 4,
+      "condition_number": 25.51831316328961,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 3,
+      "validation_aic_mean": -5169.184843615911,
+      "validation_aic_by_record": [
+        -5722.208528260452,
+        -4616.161158971369
+      ],
+      "effective_rank": 5,
+      "condition_number": 493.4148247051624,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 4,
+      "validation_aic_mean": -4793.550248902809,
+      "validation_aic_by_record": [
+        -5168.918443389419,
+        -4418.182054416198
+      ],
+      "effective_rank": 6,
+      "condition_number": 2696.4035769878706,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 5,
+      "validation_aic_mean": -4418.862522456531,
+      "validation_aic_by_record": [
+        -4850.498122057353,
+        -3987.2269228557107
+      ],
+      "effective_rank": 7,
+      "condition_number": 4804.202352457899,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 6,
+      "validation_aic_mean": -4890.544459164488,
+      "validation_aic_by_record": [
+        -5350.818212994813,
+        -4430.270705334165
+      ],
+      "effective_rank": 8,
+      "condition_number": 8471.443928594548,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 7,
+      "validation_aic_mean": -4025.772743109571,
+      "validation_aic_by_record": [
+        -4439.873622624617,
+        -3611.671863594525
+      ],
+      "effective_rank": 9,
+      "condition_number": 11689.199514350326,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 8,
+      "validation_aic_mean": -5188.807489057714,
+      "validation_aic_by_record": [
+        -5670.741536845891,
+        -4706.873441269536
+      ],
+      "effective_rank": 10,
+      "condition_number": 15204.84547576521,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 9,
+      "validation_aic_mean": -5374.816674745325,
+      "validation_aic_by_record": [
+        -5881.105574399119,
+        -4868.527775091531
+      ],
+      "effective_rank": 11,
+      "condition_number": 19816.679135916795,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 10,
+      "validation_aic_mean": -5878.193289044616,
+      "validation_aic_by_record": [
+        -6476.105718280375,
+        -5280.280859808857
+      ],
+      "effective_rank": 12,
+      "condition_number": 23356.75548308157,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 11,
+      "validation_aic_mean": -5872.119444678237,
+      "validation_aic_by_record": [
+        -6474.998140539274,
+        -5269.2407488172
+      ],
+      "effective_rank": 13,
+      "condition_number": 28233.017685436273,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 12,
+      "validation_aic_mean": -5694.610441450399,
+      "validation_aic_by_record": [
+        -6303.330871109486,
+        -5085.890011791312
+      ],
+      "effective_rank": 14,
+      "condition_number": 32432.595114280473,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 13,
+      "validation_aic_mean": -5843.4462694910835,
+      "validation_aic_by_record": [
+        -6455.643935773545,
+        -5231.248603208622
+      ],
+      "effective_rank": 15,
+      "condition_number": 37092.018125018105,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 14,
+      "validation_aic_mean": -5752.831501342588,
+      "validation_aic_by_record": [
+        -6358.449304240762,
+        -5147.213698444414
+      ],
+      "effective_rank": 16,
+      "condition_number": 41698.603932891194,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 15,
+      "validation_aic_mean": -6007.829285840786,
+      "validation_aic_by_record": [
+        -6629.442845955769,
+        -5386.215725725801
+      ],
+      "effective_rank": 17,
+      "condition_number": 46143.33807548329,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 16,
+      "validation_aic_mean": -6049.506343809804,
+      "validation_aic_by_record": [
+        -6671.164939995974,
+        -5427.847747623633
+      ],
+      "effective_rank": 18,
+      "condition_number": 51149.8885625888,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 17,
+      "validation_aic_mean": -5938.895208387741,
+      "validation_aic_by_record": [
+        -6531.735237020981,
+        -5346.0551797545
+      ],
+      "effective_rank": 19,
+      "condition_number": 55295.236013731424,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 18,
+      "validation_aic_mean": -5863.004971138056,
+      "validation_aic_by_record": [
+        -6444.737565181502,
+        -5281.272377094611
+      ],
+      "effective_rank": 20,
+      "condition_number": 60230.701074871395,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 19,
+      "validation_aic_mean": -5685.495303063057,
+      "validation_aic_by_record": [
+        -6238.999070812702,
+        -5131.991535313413
+      ],
+      "effective_rank": 21,
+      "condition_number": 64520.4843586687,
+      "stable_simulation": true
+    },
+    {
+      "nx": 2,
+      "ny": 20,
+      "validation_aic_mean": -5826.416358028531,
+      "validation_aic_by_record": [
+        -6403.593629897277,
+        -5249.239086159784
+      ],
+      "effective_rank": 22,
+      "condition_number": 68938.26896876811,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 1,
+      "validation_aic_mean": -773.8198805245113,
+      "validation_aic_by_record": [
+        -1048.1214900413433,
+        -499.51827100767923
+      ],
+      "effective_rank": 4,
+      "condition_number": 8.53277152183307,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 2,
+      "validation_aic_mean": -1430.3246359534123,
+      "validation_aic_by_record": [
+        -1626.6038392162827,
+        -1234.045432690542
+      ],
+      "effective_rank": 5,
+      "condition_number": 27.3971651718401,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 3,
+      "validation_aic_mean": -1785.91776164872,
+      "validation_aic_by_record": [
+        -1901.3669937120362,
+        -1670.468529585404
+      ],
+      "effective_rank": 6,
+      "condition_number": 496.50198141628476,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 4,
+      "validation_aic_mean": -2096.001497681049,
+      "validation_aic_by_record": [
+        -2214.017336735309,
+        -1977.9856586267886
+      ],
+      "effective_rank": 7,
+      "condition_number": 2893.9855392980107,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 5,
+      "validation_aic_mean": -3008.9564279829106,
+      "validation_aic_by_record": [
+        -3227.175675262365,
+        -2790.737180703456
+      ],
+      "effective_rank": 8,
+      "condition_number": 5003.603305125235,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 6,
+      "validation_aic_mean": -2622.7327241966436,
+      "validation_aic_by_record": [
+        -2798.676200008737,
+        -2446.7892483845503
+      ],
+      "effective_rank": 9,
+      "condition_number": 8473.405656680712,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 7,
+      "validation_aic_mean": -2919.00901273524,
+      "validation_aic_by_record": [
+        -3145.981365538802,
+        -2692.036659931678
+      ],
+      "effective_rank": 10,
+      "condition_number": 11855.327678923699,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 8,
+      "validation_aic_mean": -3055.132486047858,
+      "validation_aic_by_record": [
+        -3257.937044765068,
+        -2852.3279273306475
+      ],
+      "effective_rank": 11,
+      "condition_number": 15267.685520346517,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 9,
+      "validation_aic_mean": -3175.7017937635474,
+      "validation_aic_by_record": [
+        -3391.7046536677867,
+        -2959.6989338593085
+      ],
+      "effective_rank": 12,
+      "condition_number": 19854.69038568703,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 10,
+      "validation_aic_mean": -3886.877437956653,
+      "validation_aic_by_record": [
+        -4177.409528076393,
+        -3596.3453478369133
+      ],
+      "effective_rank": 13,
+      "condition_number": 23408.949670520786,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 11,
+      "validation_aic_mean": -3899.964561622879,
+      "validation_aic_by_record": [
+        -4196.55916496212,
+        -3603.3699582836384
+      ],
+      "effective_rank": 14,
+      "condition_number": 28312.691298294074,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 12,
+      "validation_aic_mean": -3990.696367136728,
+      "validation_aic_by_record": [
+        -4314.076028334621,
+        -3667.316705938835
+      ],
+      "effective_rank": 15,
+      "condition_number": 32528.09704772731,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 13,
+      "validation_aic_mean": -3901.865095620793,
+      "validation_aic_by_record": [
+        -4200.732023515533,
+        -3602.9981677260525
+      ],
+      "effective_rank": 16,
+      "condition_number": 37099.919974936216,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 14,
+      "validation_aic_mean": -3907.8475402700524,
+      "validation_aic_by_record": [
+        -4209.39180951731,
+        -3606.3032710227944
+      ],
+      "effective_rank": 17,
+      "condition_number": 41859.13064600711,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 15,
+      "validation_aic_mean": -3869.323425740219,
+      "validation_aic_by_record": [
+        -4148.528139773296,
+        -3590.118711707142
+      ],
+      "effective_rank": 18,
+      "condition_number": 46195.27161820133,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 16,
+      "validation_aic_mean": -3922.059872746563,
+      "validation_aic_by_record": [
+        -4201.304507475174,
+        -3642.815238017952
+      ],
+      "effective_rank": 19,
+      "condition_number": 51184.99978767179,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 17,
+      "validation_aic_mean": -4132.738633053606,
+      "validation_aic_by_record": [
+        -4417.7707919320155,
+        -3847.706474175195
+      ],
+      "effective_rank": 20,
+      "condition_number": 55393.921797560186,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 18,
+      "validation_aic_mean": -4143.78357848874,
+      "validation_aic_by_record": [
+        -4427.815774533442,
+        -3859.751382444038
+      ],
+      "effective_rank": 21,
+      "condition_number": 60278.93511782456,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 19,
+      "validation_aic_mean": -4113.241500485929,
+      "validation_aic_by_record": [
+        -4386.886438667913,
+        -3839.5965623039438
+      ],
+      "effective_rank": 22,
+      "condition_number": 64580.518448158415,
+      "stable_simulation": true
+    },
+    {
+      "nx": 3,
+      "ny": 20,
+      "validation_aic_mean": -4153.231244049511,
+      "validation_aic_by_record": [
+        -4437.395215150538,
+        -3869.0672729484836
+      ],
+      "effective_rank": 23,
+      "condition_number": 68969.53548697152,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 1,
+      "validation_aic_mean": -847.5790079123549,
+      "validation_aic_by_record": [
+        -1171.1573184145725,
+        -524.0006974101373
+      ],
+      "effective_rank": 5,
+      "condition_number": 25.543388795944562,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 2,
+      "validation_aic_mean": -1646.7109274596905,
+      "validation_aic_by_record": [
+        -1873.1289327969118,
+        -1420.292922122469
+      ],
+      "effective_rank": 6,
+      "condition_number": 29.075465769893924,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 3,
+      "validation_aic_mean": -3555.1093708871235,
+      "validation_aic_by_record": [
+        -3773.7545522704922,
+        -3336.464189503755
+      ],
+      "effective_rank": 7,
+      "condition_number": 496.5122278768079,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 4,
+      "validation_aic_mean": -4436.916546570297,
+      "validation_aic_by_record": [
+        -4731.711613254123,
+        -4142.121479886471
+      ],
+      "effective_rank": 8,
+      "condition_number": 2906.50732110218,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 5,
+      "validation_aic_mean": -3935.9203483914307,
+      "validation_aic_by_record": [
+        -4229.7021289669,
+        -3642.138567815961
+      ],
+      "effective_rank": 9,
+      "condition_number": 5153.431925334495,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 6,
+      "validation_aic_mean": -3858.310777801187,
+      "validation_aic_by_record": [
+        -4118.6032354641775,
+        -3598.0183201381974
+      ],
+      "effective_rank": 10,
+      "condition_number": 8479.681038593711,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 7,
+      "validation_aic_mean": -4156.613768093175,
+      "validation_aic_by_record": [
+        -4479.415404797094,
+        -3833.812131389256
+      ],
+      "effective_rank": 11,
+      "condition_number": 11875.88988497048,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 8,
+      "validation_aic_mean": -4076.6520067972897,
+      "validation_aic_by_record": [
+        -4360.666782065873,
+        -3792.637231528706
+      ],
+      "effective_rank": 12,
+      "condition_number": 15410.228845833948,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 9,
+      "validation_aic_mean": -4101.9789006105975,
+      "validation_aic_by_record": [
+        -4393.806389933395,
+        -3810.1514112878003
+      ],
+      "effective_rank": 13,
+      "condition_number": 19857.588206330547,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 10,
+      "validation_aic_mean": -4717.071862172518,
+      "validation_aic_by_record": [
+        -5087.2559370873405,
+        -4346.887787257696
+      ],
+      "effective_rank": 14,
+      "condition_number": 23409.181886872706,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 11,
+      "validation_aic_mean": -4735.403437825031,
+      "validation_aic_by_record": [
+        -5114.03341935849,
+        -4356.77345629157
+      ],
+      "effective_rank": 15,
+      "condition_number": 28321.25911799186,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 12,
+      "validation_aic_mean": -4770.628818227252,
+      "validation_aic_by_record": [
+        -5174.1503896394715,
+        -4367.107246815032
+      ],
+      "effective_rank": 16,
+      "condition_number": 32537.25169905042,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 13,
+      "validation_aic_mean": -4745.43383083525,
+      "validation_aic_by_record": [
+        -5128.636922487115,
+        -4362.230739183385
+      ],
+      "effective_rank": 17,
+      "condition_number": 37101.63916084092,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 14,
+      "validation_aic_mean": -4753.907882319836,
+      "validation_aic_by_record": [
+        -5140.235959849018,
+        -4367.579804790655
+      ],
+      "effective_rank": 18,
+      "condition_number": 41860.545359387565,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 15,
+      "validation_aic_mean": -4642.885051674977,
+      "validation_aic_by_record": [
+        -5000.220306420654,
+        -4285.549796929301
+      ],
+      "effective_rank": 19,
+      "condition_number": 46247.13430810175,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 16,
+      "validation_aic_mean": -4637.091518150427,
+      "validation_aic_by_record": [
+        -4990.643746989224,
+        -4283.53928931163
+      ],
+      "effective_rank": 20,
+      "condition_number": 51193.77032710559,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 17,
+      "validation_aic_mean": -4748.625034086595,
+      "validation_aic_by_record": [
+        -5103.588626686608,
+        -4393.6614414865835
+      ],
+      "effective_rank": 21,
+      "condition_number": 55394.46485007423,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 18,
+      "validation_aic_mean": -4760.325742807259,
+      "validation_aic_by_record": [
+        -5115.015004139757,
+        -4405.636481474761
+      ],
+      "effective_rank": 22,
+      "condition_number": 60291.22028494686,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 19,
+      "validation_aic_mean": -4731.197920304202,
+      "validation_aic_by_record": [
+        -5077.495179031396,
+        -4384.900661577008
+      ],
+      "effective_rank": 23,
+      "condition_number": 64581.037917976784,
+      "stable_simulation": true
+    },
+    {
+      "nx": 4,
+      "ny": 20,
+      "validation_aic_mean": -4777.486461012912,
+      "validation_aic_by_record": [
+        -5133.257738612788,
+        -4421.715183413036
+      ],
+      "effective_rank": 24,
+      "condition_number": 68971.03577569118,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 1,
+      "validation_aic_mean": -816.1881815042683,
+      "validation_aic_by_record": [
+        -1282.744056647019,
+        -349.6323063615175
+      ],
+      "effective_rank": 6,
+      "condition_number": 77.36262085709171,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 2,
+      "validation_aic_mean": -1286.1893610282004,
+      "validation_aic_by_record": [
+        -1593.3206496200667,
+        -979.058072436334
+      ],
+      "effective_rank": 7,
+      "condition_number": 77.59326430337762,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 3,
+      "validation_aic_mean": -5904.121734365339,
+      "validation_aic_by_record": [
+        -6566.907310762126,
+        -5241.3361579685525
+      ],
+      "effective_rank": 8,
+      "condition_number": 502.3816955155378,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 4,
+      "validation_aic_mean": -6511.295749433666,
+      "validation_aic_by_record": [
+        -7182.955598204727,
+        -5839.635900662605
+      ],
+      "effective_rank": 9,
+      "condition_number": 3071.348091314983,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 5,
+      "validation_aic_mean": -4934.714365807182,
+      "validation_aic_by_record": [
+        -5515.975811190002,
+        -4353.452920424362
+      ],
+      "effective_rank": 10,
+      "condition_number": 5270.02336038626,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 6,
+      "validation_aic_mean": -6114.477473617615,
+      "validation_aic_by_record": [
+        -6802.040517987289,
+        -5426.914429247941
+      ],
+      "effective_rank": 11,
+      "condition_number": 8479.765628510871,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 7,
+      "validation_aic_mean": -5678.1604626394565,
+      "validation_aic_by_record": [
+        -6329.917771245777,
+        -5026.403154033137
+      ],
+      "effective_rank": 12,
+      "condition_number": 12057.080713280604,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 8,
+      "validation_aic_mean": -6428.766885367731,
+      "validation_aic_by_record": [
+        -7139.632103949024,
+        -5717.901666786438
+      ],
+      "effective_rank": 13,
+      "condition_number": 15557.09718637243,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 9,
+      "validation_aic_mean": -6382.243507642994,
+      "validation_aic_by_record": [
+        -7095.587531169339,
+        -5668.899484116649
+      ],
+      "effective_rank": 14,
+      "condition_number": 19858.887879831775,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 10,
+      "validation_aic_mean": -6476.924156668049,
+      "validation_aic_by_record": [
+        -7181.130599232106,
+        -5772.717714103993
+      ],
+      "effective_rank": 15,
+      "condition_number": 23573.593702593927,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 11,
+      "validation_aic_mean": -6470.421771346126,
+      "validation_aic_by_record": [
+        -7178.513755050306,
+        -5762.329787641945
+      ],
+      "effective_rank": 16,
+      "condition_number": 28360.834006160974,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 12,
+      "validation_aic_mean": -6315.153278189724,
+      "validation_aic_by_record": [
+        -7040.03610140495,
+        -5590.270454974497
+      ],
+      "effective_rank": 17,
+      "condition_number": 32548.63083538511,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 13,
+      "validation_aic_mean": -6427.43680659494,
+      "validation_aic_by_record": [
+        -7140.530838372342,
+        -5714.342774817539
+      ],
+      "effective_rank": 18,
+      "condition_number": 37156.64105432855,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 14,
+      "validation_aic_mean": -6414.466053580585,
+      "validation_aic_by_record": [
+        -7127.992766695598,
+        -5700.939340465573
+      ],
+      "effective_rank": 19,
+      "condition_number": 41922.01046394401,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 15,
+      "validation_aic_mean": -6491.495741454547,
+      "validation_aic_by_record": [
+        -7192.2317071967755,
+        -5790.7597757123185
+      ],
+      "effective_rank": 20,
+      "condition_number": 46289.092119695764,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 16,
+      "validation_aic_mean": -6472.947382833754,
+      "validation_aic_by_record": [
+        -7166.942700804772,
+        -5778.952064862736
+      ],
+      "effective_rank": 21,
+      "condition_number": 51200.71453749028,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 17,
+      "validation_aic_mean": -6304.121183333593,
+      "validation_aic_by_record": [
+        -6955.989599671286,
+        -5652.2527669959
+      ],
+      "effective_rank": 22,
+      "condition_number": 55510.99577634216,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 18,
+      "validation_aic_mean": -6268.6899806422325,
+      "validation_aic_by_record": [
+        -6914.28253895608,
+        -5623.097422328385
+      ],
+      "effective_rank": 23,
+      "condition_number": 60302.81009923067,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 19,
+      "validation_aic_mean": -6118.50931771872,
+      "validation_aic_by_record": [
+        -6740.508484832614,
+        -5496.510150604826
+      ],
+      "effective_rank": 24,
+      "condition_number": 64592.804495333956,
+      "stable_simulation": true
+    },
+    {
+      "nx": 5,
+      "ny": 20,
+      "validation_aic_mean": -6191.9603922313745,
+      "validation_aic_by_record": [
+        -6823.72555836748,
+        -5560.1952260952685
+      ],
+      "effective_rank": 25,
+      "condition_number": 69042.95002541027,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 1,
+      "validation_aic_mean": -877.9012551530459,
+      "validation_aic_by_record": [
+        -1341.0445167389275,
+        -414.75799356716436
+      ],
+      "effective_rank": 7,
+      "condition_number": 235.92383586757478,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 2,
+      "validation_aic_mean": -2004.173628131285,
+      "validation_aic_by_record": [
+        -2357.9831171356823,
+        -1650.364139126888
+      ],
+      "effective_rank": 8,
+      "condition_number": 236.88554668748057,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 3,
+      "validation_aic_mean": -6071.002009155024,
+      "validation_aic_by_record": [
+        -6763.450542367317,
+        -5378.553475942731
+      ],
+      "effective_rank": 9,
+      "condition_number": 521.1959245187431,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 4,
+      "validation_aic_mean": -6549.868780884448,
+      "validation_aic_by_record": [
+        -7232.213783883181,
+        -5867.5237778857145
+      ],
+      "effective_rank": 10,
+      "condition_number": 3130.1059767097513,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 5,
+      "validation_aic_mean": -5201.95466703111,
+      "validation_aic_by_record": [
+        -5824.4923917066,
+        -4579.416942355621
+      ],
+      "effective_rank": 11,
+      "condition_number": 5282.911108511215,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 6,
+      "validation_aic_mean": -6171.483154471789,
+      "validation_aic_by_record": [
+        -6875.377052745773,
+        -5467.589256197806
+      ],
+      "effective_rank": 12,
+      "condition_number": 8512.95496118308,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 7,
+      "validation_aic_mean": -5768.641430574546,
+      "validation_aic_by_record": [
+        -6436.905002958966,
+        -5100.377858190126
+      ],
+      "effective_rank": 13,
+      "condition_number": 12166.61825257877,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 8,
+      "validation_aic_mean": -6662.248625690339,
+      "validation_aic_by_record": [
+        -7423.745099148598,
+        -5900.752152232082
+      ],
+      "effective_rank": 14,
+      "condition_number": 15569.013097163432,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 9,
+      "validation_aic_mean": -6664.515293890952,
+      "validation_aic_by_record": [
+        -7430.979156620587,
+        -5898.051431161319
+      ],
+      "effective_rank": 15,
+      "condition_number": 19918.622445278805,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 10,
+      "validation_aic_mean": -6694.361941479425,
+      "validation_aic_by_record": [
+        -7452.317571702669,
+        -5936.40631125618
+      ],
+      "effective_rank": 16,
+      "condition_number": 23696.039854383816,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 11,
+      "validation_aic_mean": -6717.166036598024,
+      "validation_aic_by_record": [
+        -7480.7974065349235,
+        -5953.534666661124
+      ],
+      "effective_rank": 17,
+      "condition_number": 28371.008879234956,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 12,
+      "validation_aic_mean": -6558.949602806255,
+      "validation_aic_by_record": [
+        -7327.548748560419,
+        -5790.350457052091
+      ],
+      "effective_rank": 18,
+      "condition_number": 32597.355080212204,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 13,
+      "validation_aic_mean": -6658.7923084122685,
+      "validation_aic_by_record": [
+        -7417.7336214077295,
+        -5899.850995416807
+      ],
+      "effective_rank": 19,
+      "condition_number": 37201.93497260157,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 14,
+      "validation_aic_mean": -6639.024117688778,
+      "validation_aic_by_record": [
+        -7398.99350250798,
+        -5879.054732869575
+      ],
+      "effective_rank": 20,
+      "condition_number": 41923.35074144805,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 15,
+      "validation_aic_mean": -6697.13647520801,
+      "validation_aic_by_record": [
+        -7443.687939310259,
+        -5950.58501110576
+      ],
+      "effective_rank": 21,
+      "condition_number": 46301.5157578875,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 16,
+      "validation_aic_mean": -6679.99738187607,
+      "validation_aic_by_record": [
+        -7419.886602839686,
+        -5940.108160912455
+      ],
+      "effective_rank": 22,
+      "condition_number": 51236.84418344854,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 17,
+      "validation_aic_mean": -6516.974826975265,
+      "validation_aic_by_record": [
+        -7216.173478089651,
+        -5817.7761758608785
+      ],
+      "effective_rank": 23,
+      "condition_number": 55530.84628207797,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 18,
+      "validation_aic_mean": -6494.412113525868,
+      "validation_aic_by_record": [
+        -7189.573537123978,
+        -5799.250689927758
+      ],
+      "effective_rank": 24,
+      "condition_number": 60302.81781146348,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 19,
+      "validation_aic_mean": -6358.66856682734,
+      "validation_aic_by_record": [
+        -7030.914055703678,
+        -5686.423077951003
+      ],
+      "effective_rank": 25,
+      "condition_number": 64648.62555452774,
+      "stable_simulation": true
+    },
+    {
+      "nx": 6,
+      "ny": 20,
+      "validation_aic_mean": -6449.320071736876,
+      "validation_aic_by_record": [
+        -7134.375322274332,
+        -5764.264821199422
+      ],
+      "effective_rank": 26,
+      "condition_number": 69054.9743194995,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 1,
+      "validation_aic_mean": -386.1655424206249,
+      "validation_aic_by_record": [
+        -894.0315864022598,
+        121.70050156101
+      ],
+      "effective_rank": 8,
+      "condition_number": 719.7420047391556,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 2,
+      "validation_aic_mean": -1901.4722436575976,
+      "validation_aic_by_record": [
+        -2308.7502563163903,
+        -1494.1942309988046
+      ],
+      "effective_rank": 9,
+      "condition_number": 724.7244291448436,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 3,
+      "validation_aic_mean": -6026.987914127651,
+      "validation_aic_by_record": [
+        -6699.3335699057925,
+        -5354.642258349508
+      ],
+      "effective_rank": 10,
+      "condition_number": 771.9937075544827,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 4,
+      "validation_aic_mean": -6532.80690573414,
+      "validation_aic_by_record": [
+        -7208.875736771041,
+        -5856.7380746972385
+      ],
+      "effective_rank": 11,
+      "condition_number": 3133.446581148004,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 5,
+      "validation_aic_mean": -5236.270919130182,
+      "validation_aic_by_record": [
+        -5890.790274075224,
+        -4581.75156418514
+      ],
+      "effective_rank": 12,
+      "condition_number": 5301.426752562648,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 6,
+      "validation_aic_mean": -6150.605715448839,
+      "validation_aic_by_record": [
+        -6839.426192406613,
+        -5461.785238491064
+      ],
+      "effective_rank": 13,
+      "condition_number": 8569.67741297976,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 7,
+      "validation_aic_mean": -5765.447336870324,
+      "validation_aic_by_record": [
+        -6434.341418860401,
+        -5096.553254880248
+      ],
+      "effective_rank": 14,
+      "condition_number": 12192.129861897814,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 8,
+      "validation_aic_mean": -6652.197650306318,
+      "validation_aic_by_record": [
+        -7403.279444036069,
+        -5901.115856576567
+      ],
+      "effective_rank": 15,
+      "condition_number": 15580.142825827585,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 9,
+      "validation_aic_mean": -6650.689000013492,
+      "validation_aic_by_record": [
+        -7406.148589853556,
+        -5895.229410173428
+      ],
+      "effective_rank": 16,
+      "condition_number": 20003.677404137863,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 10,
+      "validation_aic_mean": -6761.098796012386,
+      "validation_aic_by_record": [
+        -7579.951560816617,
+        -5942.246031208156
+      ],
+      "effective_rank": 17,
+      "condition_number": 23719.55014340107,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 11,
+      "validation_aic_mean": -6777.563358751875,
+      "validation_aic_by_record": [
+        -7599.279119779523,
+        -5955.847597724228
+      ],
+      "effective_rank": 18,
+      "condition_number": 28371.85150520293,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 12,
+      "validation_aic_mean": -6595.135727998935,
+      "validation_aic_by_record": [
+        -7400.0072523167855,
+        -5790.264203681086
+      ],
+      "effective_rank": 19,
+      "condition_number": 32689.352098712705,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 13,
+      "validation_aic_mean": -6745.959439784572,
+      "validation_aic_by_record": [
+        -7567.141800158785,
+        -5924.77707941036
+      ],
+      "effective_rank": 20,
+      "condition_number": 37218.376362047704,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 14,
+      "validation_aic_mean": -6728.012847152861,
+      "validation_aic_by_record": [
+        -7547.49227937454,
+        -5908.533414931181
+      ],
+      "effective_rank": 21,
+      "condition_number": 41928.50742921022,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 15,
+      "validation_aic_mean": -6777.448898691203,
+      "validation_aic_by_record": [
+        -7576.647170063051,
+        -5978.250627319355
+      ],
+      "effective_rank": 22,
+      "condition_number": 46333.17440278831,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 16,
+      "validation_aic_mean": -6758.091066943907,
+      "validation_aic_by_record": [
+        -7548.092339924254,
+        -5968.0897939635615
+      ],
+      "effective_rank": 23,
+      "condition_number": 51236.90363004355,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 17,
+      "validation_aic_mean": -6595.694558857445,
+      "validation_aic_by_record": [
+        -7343.151344057672,
+        -5848.237773657218
+      ],
+      "effective_rank": 24,
+      "condition_number": 55531.02639305277,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 18,
+      "validation_aic_mean": -6569.020883734965,
+      "validation_aic_by_record": [
+        -7312.033646881763,
+        -5826.008120588166
+      ],
+      "effective_rank": 25,
+      "condition_number": 60317.29899264181,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 19,
+      "validation_aic_mean": -6424.297451597282,
+      "validation_aic_by_record": [
+        -7142.770464167335,
+        -5705.8244390272275
+      ],
+      "effective_rank": 26,
+      "condition_number": 64660.47219824335,
+      "stable_simulation": true
+    },
+    {
+      "nx": 7,
+      "ny": 20,
+      "validation_aic_mean": -6541.978856504764,
+      "validation_aic_by_record": [
+        -7282.132322712056,
+        -5801.825390297472
+      ],
+      "effective_rank": 27,
+      "condition_number": 69060.07996620284,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 1,
+      "validation_aic_mean": -633.9825322065969,
+      "validation_aic_by_record": [
+        -1114.8914983184557,
+        -153.0735660947381
+      ],
+      "effective_rank": 9,
+      "condition_number": 2086.0934333389555,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 2,
+      "validation_aic_mean": -2408.0912449074185,
+      "validation_aic_by_record": [
+        -2866.00566286999,
+        -1950.1768269448476
+      ],
+      "effective_rank": 10,
+      "condition_number": 2100.1926607028654,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 3,
+      "validation_aic_mean": -6067.430833584107,
+      "validation_aic_by_record": [
+        -6743.210087342821,
+        -5391.651579825394
+      ],
+      "effective_rank": 11,
+      "condition_number": 2203.209754178833,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 4,
+      "validation_aic_mean": -6614.508475451976,
+      "validation_aic_by_record": [
+        -7301.738346846736,
+        -5927.278604057216
+      ],
+      "effective_rank": 12,
+      "condition_number": 3136.93451372856,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 5,
+      "validation_aic_mean": -5212.152321196083,
+      "validation_aic_by_record": [
+        -5864.460884219339,
+        -4559.843758172826
+      ],
+      "effective_rank": 13,
+      "condition_number": 5315.161442633375,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 6,
+      "validation_aic_mean": -6112.459913866138,
+      "validation_aic_by_record": [
+        -6791.748448930922,
+        -5433.171378801354
+      ],
+      "effective_rank": 14,
+      "condition_number": 8584.862418863357,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 7,
+      "validation_aic_mean": -5766.355225484202,
+      "validation_aic_by_record": [
+        -6432.193702647563,
+        -5100.516748320841
+      ],
+      "effective_rank": 15,
+      "condition_number": 12215.254545825312,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 8,
+      "validation_aic_mean": -6564.277120397882,
+      "validation_aic_by_record": [
+        -7293.26211148545,
+        -5835.292129310314
+      ],
+      "effective_rank": 16,
+      "condition_number": 15629.575549709632,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 9,
+      "validation_aic_mean": -6576.710999929194,
+      "validation_aic_by_record": [
+        -7312.708938965055,
+        -5840.713060893334
+      ],
+      "effective_rank": 17,
+      "condition_number": 20004.94561764985,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 10,
+      "validation_aic_mean": -6700.916493822253,
+      "validation_aic_by_record": [
+        -7506.015388828335,
+        -5895.817598816172
+      ],
+      "effective_rank": 18,
+      "condition_number": 23763.324580612654,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 11,
+      "validation_aic_mean": -6718.590183065726,
+      "validation_aic_by_record": [
+        -7523.118592631565,
+        -5914.061773499887
+      ],
+      "effective_rank": 19,
+      "condition_number": 28444.174312801606,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 12,
+      "validation_aic_mean": -6567.182224784132,
+      "validation_aic_by_record": [
+        -7363.044856193405,
+        -5771.319593374858
+      ],
+      "effective_rank": 20,
+      "condition_number": 32696.421650280517,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 13,
+      "validation_aic_mean": -6720.90340688002,
+      "validation_aic_by_record": [
+        -7534.169792883392,
+        -5907.637020876648
+      ],
+      "effective_rank": 21,
+      "condition_number": 37246.02744986942,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 14,
+      "validation_aic_mean": -6691.993340733174,
+      "validation_aic_by_record": [
+        -7501.808443373586,
+        -5882.1782380927625
+      ],
+      "effective_rank": 22,
+      "condition_number": 41988.276910719105,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 15,
+      "validation_aic_mean": -6773.9086269437175,
+      "validation_aic_by_record": [
+        -7572.951193391863,
+        -5974.866060495573
+      ],
+      "effective_rank": 23,
+      "condition_number": 46342.43456453248,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 16,
+      "validation_aic_mean": -6755.437687861579,
+      "validation_aic_by_record": [
+        -7545.541209614526,
+        -5965.334166108632
+      ],
+      "effective_rank": 24,
+      "condition_number": 51240.25942578896,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 17,
+      "validation_aic_mean": -6578.117163947263,
+      "validation_aic_by_record": [
+        -7321.361174868527,
+        -5834.873153025999
+      ],
+      "effective_rank": 25,
+      "condition_number": 55540.01914827476,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 18,
+      "validation_aic_mean": -6549.012173760051,
+      "validation_aic_by_record": [
+        -7287.309473956435,
+        -5810.7148735636665
+      ],
+      "effective_rank": 26,
+      "condition_number": 60317.73848809876,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 19,
+      "validation_aic_mean": -6406.324578706893,
+      "validation_aic_by_record": [
+        -7120.735377603991,
+        -5691.9137798097945
+      ],
+      "effective_rank": 27,
+      "condition_number": 64665.07857936072,
+      "stable_simulation": true
+    },
+    {
+      "nx": 8,
+      "ny": 20,
+      "validation_aic_mean": -6522.1631662949785,
+      "validation_aic_by_record": [
+        -7257.451198377262,
+        -5786.875134212696
+      ],
+      "effective_rank": 28,
+      "condition_number": 69060.65639409712,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 1,
+      "validation_aic_mean": -496.5059855875355,
+      "validation_aic_by_record": [
+        -981.2945039272205,
+        -11.717467247850522
+      ],
+      "effective_rank": 10,
+      "condition_number": 4532.024774907771,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 2,
+      "validation_aic_mean": -2530.491606500371,
+      "validation_aic_by_record": [
+        -3025.495889438852,
+        -2035.4873235618893
+      ],
+      "effective_rank": 11,
+      "condition_number": 4555.665046331459,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 3,
+      "validation_aic_mean": -6111.545465276132,
+      "validation_aic_by_record": [
+        -6813.42282145801,
+        -5409.668109094254
+      ],
+      "effective_rank": 12,
+      "condition_number": 4767.329253039091,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 4,
+      "validation_aic_mean": -6703.655923564431,
+      "validation_aic_by_record": [
+        -7429.927747695071,
+        -5977.38409943379
+      ],
+      "effective_rank": 13,
+      "condition_number": 5460.2208438940415,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 5,
+      "validation_aic_mean": -5245.451694228435,
+      "validation_aic_by_record": [
+        -5923.442073137183,
+        -4567.461315319689
+      ],
+      "effective_rank": 14,
+      "condition_number": 6087.1423629873,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 6,
+      "validation_aic_mean": -6219.388523918404,
+      "validation_aic_by_record": [
+        -6946.742820012137,
+        -5492.034227824671
+      ],
+      "effective_rank": 15,
+      "condition_number": 8631.23575933583,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 7,
+      "validation_aic_mean": -5858.46684508785,
+      "validation_aic_by_record": [
+        -6570.784272797585,
+        -5146.149417378115
+      ],
+      "effective_rank": 16,
+      "condition_number": 12244.014157055422,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 8,
+      "validation_aic_mean": -6620.748265263799,
+      "validation_aic_by_record": [
+        -7380.537384107411,
+        -5860.9591464201885
+      ],
+      "effective_rank": 17,
+      "condition_number": 15631.01322463915,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 9,
+      "validation_aic_mean": -6619.364233910652,
+      "validation_aic_by_record": [
+        -7379.327684273255,
+        -5859.400783548048
+      ],
+      "effective_rank": 18,
+      "condition_number": 20123.097567112145,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 10,
+      "validation_aic_mean": -6691.3072432581275,
+      "validation_aic_by_record": [
+        -7492.785678689496,
+        -5889.828807826759
+      ],
+      "effective_rank": 19,
+      "condition_number": 23770.39768978794,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 11,
+      "validation_aic_mean": -6707.260858878701,
+      "validation_aic_by_record": [
+        -7507.111017075349,
+        -5907.410700682053
+      ],
+      "effective_rank": 20,
+      "condition_number": 28445.026114090186,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 12,
+      "validation_aic_mean": -6582.129482429151,
+      "validation_aic_by_record": [
+        -7389.374336945095,
+        -5774.884627913207
+      ],
+      "effective_rank": 21,
+      "condition_number": 32794.14202272854,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 13,
+      "validation_aic_mean": -6714.974322773889,
+      "validation_aic_by_record": [
+        -7525.734440656452,
+        -5904.214204891326
+      ],
+      "effective_rank": 22,
+      "condition_number": 37249.41426235078,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 14,
+      "validation_aic_mean": -6686.517824168146,
+      "validation_aic_by_record": [
+        -7494.154745104086,
+        -5878.880903232206
+      ],
+      "effective_rank": 23,
+      "condition_number": 41989.321148095434,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 15,
+      "validation_aic_mean": -6789.947475299178,
+      "validation_aic_by_record": [
+        -7602.8248745815235,
+        -5977.070076016833
+      ],
+      "effective_rank": 24,
+      "condition_number": 46403.99194269037,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 16,
+      "validation_aic_mean": -6776.578328089339,
+      "validation_aic_by_record": [
+        -7584.191718914712,
+        -5968.964937263967
+      ],
+      "effective_rank": 25,
+      "condition_number": 51252.15069198276,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 17,
+      "validation_aic_mean": -6604.088571607695,
+      "validation_aic_by_record": [
+        -7369.653760167385,
+        -5838.523383048004
+      ],
+      "effective_rank": 26,
+      "condition_number": 55540.42955443125,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 18,
+      "validation_aic_mean": -6577.474904668172,
+      "validation_aic_by_record": [
+        -7338.214434334361,
+        -5816.735375001984
+      ],
+      "effective_rank": 27,
+      "condition_number": 60325.93051083315,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 19,
+      "validation_aic_mean": -6433.208555337998,
+      "validation_aic_by_record": [
+        -7167.332998424293,
+        -5699.084112251703
+      ],
+      "effective_rank": 28,
+      "condition_number": 64666.16059559571,
+      "stable_simulation": true
+    },
+    {
+      "nx": 9,
+      "ny": 20,
+      "validation_aic_mean": -6551.098639900166,
+      "validation_aic_by_record": [
+        -7307.093619340971,
+        -5795.103660459361
+      ],
+      "effective_rank": 29,
+      "condition_number": 69061.01957927059,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 1,
+      "validation_aic_mean": -469.6604015747353,
+      "validation_aic_by_record": [
+        -963.3903027614888,
+        24.069499612018095
+      ],
+      "effective_rank": 11,
+      "condition_number": 6066.67177776099,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 2,
+      "validation_aic_mean": -2660.7385317335456,
+      "validation_aic_by_record": [
+        -3189.191290898178,
+        -2132.285772568913
+      ],
+      "effective_rank": 12,
+      "condition_number": 6084.528832242621,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 3,
+      "validation_aic_mean": -6162.691380722856,
+      "validation_aic_by_record": [
+        -6906.047982043239,
+        -5419.334779402473
+      ],
+      "effective_rank": 13,
+      "condition_number": 6371.666266124849,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 4,
+      "validation_aic_mean": -6771.078066534827,
+      "validation_aic_by_record": [
+        -7545.528177602317,
+        -5996.627955467336
+      ],
+      "effective_rank": 14,
+      "condition_number": 7267.44874635011,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 5,
+      "validation_aic_mean": -5277.017361029495,
+      "validation_aic_by_record": [
+        -5980.773617881538,
+        -4573.2611041774535
+      ],
+      "effective_rank": 15,
+      "condition_number": 8104.497782630167,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 6,
+      "validation_aic_mean": -6263.579342580275,
+      "validation_aic_by_record": [
+        -7023.5771895958305,
+        -5503.581495564719
+      ],
+      "effective_rank": 16,
+      "condition_number": 9011.584383201378,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 7,
+      "validation_aic_mean": -5898.230561335648,
+      "validation_aic_by_record": [
+        -6635.478037972546,
+        -5160.983084698751
+      ],
+      "effective_rank": 17,
+      "condition_number": 12349.76221801622,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 8,
+      "validation_aic_mean": -6655.466102888833,
+      "validation_aic_by_record": [
+        -7435.697202241497,
+        -5875.23500353617
+      ],
+      "effective_rank": 18,
+      "condition_number": 15718.412470454832,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 9,
+      "validation_aic_mean": -6651.774706163343,
+      "validation_aic_by_record": [
+        -7431.961542678076,
+        -5871.58786964861
+      ],
+      "effective_rank": 19,
+      "condition_number": 20134.49943484866,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 10,
+      "validation_aic_mean": -6645.95451876977,
+      "validation_aic_by_record": [
+        -7426.4598622303,
+        -5865.449175309241
+      ],
+      "effective_rank": 20,
+      "condition_number": 23916.69941487193,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 11,
+      "validation_aic_mean": -6666.799339968145,
+      "validation_aic_by_record": [
+        -7449.477456433419,
+        -5884.1212235028715
+      ],
+      "effective_rank": 21,
+      "condition_number": 28456.25314590915,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 12,
+      "validation_aic_mean": -6550.496826170201,
+      "validation_aic_by_record": [
+        -7344.370439515094,
+        -5756.623212825307
+      ],
+      "effective_rank": 22,
+      "condition_number": 32795.73013563165,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 13,
+      "validation_aic_mean": -6658.510488054809,
+      "validation_aic_by_record": [
+        -7440.058207167735,
+        -5876.962768941882
+      ],
+      "effective_rank": 23,
+      "condition_number": 37359.42138498906,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 14,
+      "validation_aic_mean": -6642.494467253495,
+      "validation_aic_by_record": [
+        -7424.138068070668,
+        -5860.850866436323
+      ],
+      "effective_rank": 24,
+      "condition_number": 41991.41326556557,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 15,
+      "validation_aic_mean": -6741.541048594305,
+      "validation_aic_by_record": [
+        -7525.782696992336,
+        -5957.299400196274
+      ],
+      "effective_rank": 25,
+      "condition_number": 46404.99331456002,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 16,
+      "validation_aic_mean": -6735.5286674368945,
+      "validation_aic_by_record": [
+        -7518.946815063698,
+        -5952.110519810091
+      ],
+      "effective_rank": 26,
+      "condition_number": 51331.354037732664,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 17,
+      "validation_aic_mean": -6595.067186496471,
+      "validation_aic_by_record": [
+        -7355.956302611934,
+        -5834.178070381007
+      ],
+      "effective_rank": 27,
+      "condition_number": 55543.138592061085,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 18,
+      "validation_aic_mean": -6569.837891296768,
+      "validation_aic_by_record": [
+        -7326.533769126581,
+        -5813.142013466955
+      ],
+      "effective_rank": 28,
+      "condition_number": 60330.66928523747,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 19,
+      "validation_aic_mean": -6422.229180440283,
+      "validation_aic_by_record": [
+        -7150.008673598313,
+        -5694.449687282253
+      ],
+      "effective_rank": 29,
+      "condition_number": 64689.85246787075,
+      "stable_simulation": true
+    },
+    {
+      "nx": 10,
+      "ny": 20,
+      "validation_aic_mean": -6542.303439629099,
+      "validation_aic_by_record": [
+        -7294.182293887974,
+        -5790.424585370222
+      ],
+      "effective_rank": 30,
+      "condition_number": 69062.52992055465,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 1,
+      "validation_aic_mean": -678.5204688610083,
+      "validation_aic_by_record": [
+        -1188.836422028224,
+        -168.20451569379279
+      ],
+      "effective_rank": 12,
+      "condition_number": 6662.23711372228,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 2,
+      "validation_aic_mean": -2813.557383567366,
+      "validation_aic_by_record": [
+        -3367.4651864495027,
+        -2259.649580685229
+      ],
+      "effective_rank": 13,
+      "condition_number": 6688.879184257529,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 3,
+      "validation_aic_mean": -6157.240951039472,
+      "validation_aic_by_record": [
+        -6903.467845318369,
+        -5411.014056760574
+      ],
+      "effective_rank": 14,
+      "condition_number": 7029.975534593794,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 4,
+      "validation_aic_mean": -6760.006483733505,
+      "validation_aic_by_record": [
+        -7532.846683400054,
+        -5987.166284066956
+      ],
+      "effective_rank": 15,
+      "condition_number": 7979.142487114903,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 5,
+      "validation_aic_mean": -5240.742895011431,
+      "validation_aic_by_record": [
+        -5937.434164345905,
+        -4544.051625676957
+      ],
+      "effective_rank": 16,
+      "condition_number": 8878.343825437098,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 6,
+      "validation_aic_mean": -6233.710462888099,
+      "validation_aic_by_record": [
+        -6985.642188899003,
+        -5481.778736877194
+      ],
+      "effective_rank": 17,
+      "condition_number": 9738.065849191578,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 7,
+      "validation_aic_mean": -5862.013050593089,
+      "validation_aic_by_record": [
+        -6591.522748504643,
+        -5132.503352681536
+      ],
+      "effective_rank": 18,
+      "condition_number": 12362.203151076945,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 8,
+      "validation_aic_mean": -6656.734780382418,
+      "validation_aic_by_record": [
+        -7440.8136653783895,
+        -5872.655895386447
+      ],
+      "effective_rank": 19,
+      "condition_number": 15760.374052425936,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 9,
+      "validation_aic_mean": -6653.027084453437,
+      "validation_aic_by_record": [
+        -7437.07207122038,
+        -5868.982097686493
+      ],
+      "effective_rank": 20,
+      "condition_number": 20174.26804286598,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 10,
+      "validation_aic_mean": -6610.995687128897,
+      "validation_aic_by_record": [
+        -7383.353037798241,
+        -5838.638336459553
+      ],
+      "effective_rank": 21,
+      "condition_number": 23922.641647766875,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 11,
+      "validation_aic_mean": -6642.414715892933,
+      "validation_aic_by_record": [
+        -7417.569270027608,
+        -5867.260161758258
+      ],
+      "effective_rank": 22,
+      "condition_number": 28606.216224622418,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 12,
+      "validation_aic_mean": -6492.047602438343,
+      "validation_aic_by_record": [
+        -7268.545224539188,
+        -5715.549980337499
+      ],
+      "effective_rank": 23,
+      "condition_number": 32815.082634961815,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 13,
+      "validation_aic_mean": -6593.659872503124,
+      "validation_aic_by_record": [
+        -7354.89361585568,
+        -5832.426129150567
+      ],
+      "effective_rank": 24,
+      "condition_number": 37366.502167812585,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 14,
+      "validation_aic_mean": -6586.114635472128,
+      "validation_aic_by_record": [
+        -7348.603367697219,
+        -5823.625903247036
+      ],
+      "effective_rank": 25,
+      "condition_number": 42135.90798056211,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 15,
+      "validation_aic_mean": -6635.842471048407,
+      "validation_aic_by_record": [
+        -7380.546482940477,
+        -5891.1384591563365
+      ],
+      "effective_rank": 26,
+      "condition_number": 46408.144439583186,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 16,
+      "validation_aic_mean": -6628.686451946047,
+      "validation_aic_by_record": [
+        -7371.986850177093,
+        -5885.386053715001
+      ],
+      "effective_rank": 27,
+      "condition_number": 51341.192387635754,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 17,
+      "validation_aic_mean": -6531.285085558152,
+      "validation_aic_by_record": [
+        -7266.874380953214,
+        -5795.695790163089
+      ],
+      "effective_rank": 28,
+      "condition_number": 55654.083538089675,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 18,
+      "validation_aic_mean": -6519.586806313026,
+      "validation_aic_by_record": [
+        -7253.875570425047,
+        -5785.298042201004
+      ],
+      "effective_rank": 29,
+      "condition_number": 60332.02512502508,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 19,
+      "validation_aic_mean": -6383.015315271977,
+      "validation_aic_by_record": [
+        -7092.338387715001,
+        -5673.692242828953
+      ],
+      "effective_rank": 30,
+      "condition_number": 64701.34204544487,
+      "stable_simulation": true
+    },
+    {
+      "nx": 11,
+      "ny": 20,
+      "validation_aic_mean": -6502.991216027347,
+      "validation_aic_by_record": [
+        -7236.9575225989665,
+        -5769.024909455728
+      ],
+      "effective_rank": 31,
+      "condition_number": 69093.33637978528,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 1,
+      "validation_aic_mean": -1046.0527994973309,
+      "validation_aic_by_record": [
+        -1582.5045785549562,
+        -509.6010204397055
+      ],
+      "effective_rank": 13,
+      "condition_number": 7246.197511002062,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 2,
+      "validation_aic_mean": -2956.208027372397,
+      "validation_aic_by_record": [
+        -3529.9112704545882,
+        -2382.504784290205
+      ],
+      "effective_rank": 14,
+      "condition_number": 7294.884278510774,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 3,
+      "validation_aic_mean": -6153.381241713299,
+      "validation_aic_by_record": [
+        -6903.414598310188,
+        -5403.347885116409
+      ],
+      "effective_rank": 15,
+      "condition_number": 7701.547774720829,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 4,
+      "validation_aic_mean": -6766.875228185991,
+      "validation_aic_by_record": [
+        -7547.105952097261,
+        -5986.644504274721
+      ],
+      "effective_rank": 16,
+      "condition_number": 8694.969599952927,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 5,
+      "validation_aic_mean": -5259.263891602581,
+      "validation_aic_by_record": [
+        -5966.551750239475,
+        -4551.976032965687
+      ],
+      "effective_rank": 17,
+      "condition_number": 9657.988349509062,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 6,
+      "validation_aic_mean": -6265.98593349807,
+      "validation_aic_by_record": [
+        -7034.098767005167,
+        -5497.873099990973
+      ],
+      "effective_rank": 18,
+      "condition_number": 10540.858260483337,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 7,
+      "validation_aic_mean": -5895.30190753049,
+      "validation_aic_by_record": [
+        -6639.854593337175,
+        -5150.749221723805
+      ],
+      "effective_rank": 19,
+      "condition_number": 12388.249170638277,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 8,
+      "validation_aic_mean": -6701.215845533245,
+      "validation_aic_by_record": [
+        -7505.5546380501855,
+        -5896.877053016305
+      ],
+      "effective_rank": 20,
+      "condition_number": 15767.363617926128,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 9,
+      "validation_aic_mean": -6701.23082487257,
+      "validation_aic_by_record": [
+        -7505.8217962223625,
+        -5896.639853522778
+      ],
+      "effective_rank": 21,
+      "condition_number": 20210.445896884572,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 10,
+      "validation_aic_mean": -6655.060875092384,
+      "validation_aic_by_record": [
+        -7445.598436738794,
+        -5864.523313445973
+      ],
+      "effective_rank": 22,
+      "condition_number": 23959.630888516807,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 11,
+      "validation_aic_mean": -6693.842615386175,
+      "validation_aic_by_record": [
+        -7488.765158682872,
+        -5898.920072089476
+      ],
+      "effective_rank": 23,
+      "condition_number": 28611.467568461176,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 12,
+      "validation_aic_mean": -6507.800440368643,
+      "validation_aic_by_record": [
+        -7289.458202567842,
+        -5726.1426781694445
+      ],
+      "effective_rank": 24,
+      "condition_number": 32942.384570048365,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 13,
+      "validation_aic_mean": -6647.012553733302,
+      "validation_aic_by_record": [
+        -7422.976854428141,
+        -5871.048253038463
+      ],
+      "effective_rank": 25,
+      "condition_number": 37374.94366849284,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 14,
+      "validation_aic_mean": -6639.439280949484,
+      "validation_aic_by_record": [
+        -7416.671193627883,
+        -5862.207368271085
+      ],
+      "effective_rank": 26,
+      "condition_number": 42139.76109736975,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 15,
+      "validation_aic_mean": -6629.327591756437,
+      "validation_aic_by_record": [
+        -7373.022212890966,
+        -5885.632970621908
+      ],
+      "effective_rank": 27,
+      "condition_number": 46519.511659154276,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 16,
+      "validation_aic_mean": -6606.617737645291,
+      "validation_aic_by_record": [
+        -7344.4444925401385,
+        -5868.790982750442
+      ],
+      "effective_rank": 28,
+      "condition_number": 51349.659898622755,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 17,
+      "validation_aic_mean": -6494.73433765194,
+      "validation_aic_by_record": [
+        -7220.836834573214,
+        -5768.631840730666
+      ],
+      "effective_rank": 29,
+      "condition_number": 55656.48513951546,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 18,
+      "validation_aic_mean": -6486.9522804962935,
+      "validation_aic_by_record": [
+        -7212.451046897257,
+        -5761.45351409533
+      ],
+      "effective_rank": 30,
+      "condition_number": 60402.399340697615,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 19,
+      "validation_aic_mean": -6375.279966106635,
+      "validation_aic_by_record": [
+        -7083.086835810647,
+        -5667.473096402622
+      ],
+      "effective_rank": 31,
+      "condition_number": 64710.66864231799,
+      "stable_simulation": true
+    },
+    {
+      "nx": 12,
+      "ny": 20,
+      "validation_aic_mean": -6488.980007639759,
+      "validation_aic_by_record": [
+        -7219.197542199647,
+        -5758.762473079871
+      ],
+      "effective_rank": 32,
+      "condition_number": 69097.77828644196,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 1,
+      "validation_aic_mean": -1217.0060522814422,
+      "validation_aic_by_record": [
+        -1789.1172903234815,
+        -644.894814239403
+      ],
+      "effective_rank": 14,
+      "condition_number": 8342.82522270311,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 2,
+      "validation_aic_mean": -3008.417260543331,
+      "validation_aic_by_record": [
+        -3594.671829147806,
+        -2422.162691938856
+      ],
+      "effective_rank": 15,
+      "condition_number": 8433.845693051877,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 3,
+      "validation_aic_mean": -6163.953187614815,
+      "validation_aic_by_record": [
+        -6928.109674497886,
+        -5399.796700731744
+      ],
+      "effective_rank": 16,
+      "condition_number": 8945.747114403388,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 4,
+      "validation_aic_mean": -6789.933130237121,
+      "validation_aic_by_record": [
+        -7590.995659401929,
+        -5988.8706010723145
+      ],
+      "effective_rank": 17,
+      "condition_number": 10040.374732200144,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 5,
+      "validation_aic_mean": -5270.640987919483,
+      "validation_aic_by_record": [
+        -5991.981545653706,
+        -4549.30043018526
+      ],
+      "effective_rank": 18,
+      "condition_number": 11128.57562104499,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 6,
+      "validation_aic_mean": -6279.594412411418,
+      "validation_aic_by_record": [
+        -7062.7208305271815,
+        -5496.467994295653
+      ],
+      "effective_rank": 19,
+      "condition_number": 12128.831828632816,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 7,
+      "validation_aic_mean": -5907.048300560797,
+      "validation_aic_by_record": [
+        -6664.162232149427,
+        -5149.934368972166
+      ],
+      "effective_rank": 20,
+      "condition_number": 13067.254254749187,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 8,
+      "validation_aic_mean": -6721.555935620788,
+      "validation_aic_by_record": [
+        -7540.367808314321,
+        -5902.744062927254
+      ],
+      "effective_rank": 21,
+      "condition_number": 15786.936602498969,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 9,
+      "validation_aic_mean": -6722.464422459472,
+      "validation_aic_by_record": [
+        -7541.6322020911775,
+        -5903.296642827768
+      ],
+      "effective_rank": 22,
+      "condition_number": 20220.261885230437,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 10,
+      "validation_aic_mean": -6709.4265377680695,
+      "validation_aic_by_record": [
+        -7530.837676015931,
+        -5888.015399520208
+      ],
+      "effective_rank": 23,
+      "condition_number": 23989.544085902635,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 11,
+      "validation_aic_mean": -6747.951079402741,
+      "validation_aic_by_record": [
+        -7574.213408911851,
+        -5921.688749893631
+      ],
+      "effective_rank": 24,
+      "condition_number": 28635.49474204661,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 12,
+      "validation_aic_mean": -6553.438624855218,
+      "validation_aic_by_record": [
+        -7360.187564100415,
+        -5746.68968561002
+      ],
+      "effective_rank": 25,
+      "condition_number": 32949.30428446245,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 13,
+      "validation_aic_mean": -6742.341037500837,
+      "validation_aic_by_record": [
+        -7564.834972657514,
+        -5919.847102344159
+      ],
+      "effective_rank": 26,
+      "condition_number": 37479.96571941946,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 14,
+      "validation_aic_mean": -6739.378474014472,
+      "validation_aic_by_record": [
+        -7561.066121814082,
+        -5917.690826214862
+      ],
+      "effective_rank": 27,
+      "condition_number": 42145.827170623576,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 15,
+      "validation_aic_mean": -6734.501817697288,
+      "validation_aic_by_record": [
+        -7524.6966790291235,
+        -5944.3069563654535
+      ],
+      "effective_rank": 28,
+      "condition_number": 46524.7659687341,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 16,
+      "validation_aic_mean": -6707.930948958467,
+      "validation_aic_by_record": [
+        -7490.297749374816,
+        -5925.564148542117
+      ],
+      "effective_rank": 29,
+      "condition_number": 51442.18729666173,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 17,
+      "validation_aic_mean": -6546.853991358139,
+      "validation_aic_by_record": [
+        -7296.016267610409,
+        -5797.69171510587
+      ],
+      "effective_rank": 30,
+      "condition_number": 55665.38987057553,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 18,
+      "validation_aic_mean": -6541.606198871166,
+      "validation_aic_by_record": [
+        -7290.391609765961,
+        -5792.820787976372
+      ],
+      "effective_rank": 31,
+      "condition_number": 60408.68428126501,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 19,
+      "validation_aic_mean": -6435.901076146267,
+      "validation_aic_by_record": [
+        -7171.281834974344,
+        -5700.520317318191
+      ],
+      "effective_rank": 32,
+      "condition_number": 64780.00680966092,
+      "stable_simulation": true
+    },
+    {
+      "nx": 13,
+      "ny": 20,
+      "validation_aic_mean": -6523.551876256441,
+      "validation_aic_by_record": [
+        -7272.463360816222,
+        -5774.640391696658
+      ],
+      "effective_rank": 33,
+      "condition_number": 69106.33871673973,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 1,
+      "validation_aic_mean": -1414.1867399532043,
+      "validation_aic_by_record": [
+        -2024.2412530785832,
+        -804.1322268278252
+      ],
+      "effective_rank": 15,
+      "condition_number": 9306.76979193042,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 2,
+      "validation_aic_mean": -3040.7892184359926,
+      "validation_aic_by_record": [
+        -3635.9670627928367,
+        -2445.611374079148
+      ],
+      "effective_rank": 16,
+      "condition_number": 9447.945568155912,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 3,
+      "validation_aic_mean": -6168.061278814658,
+      "validation_aic_by_record": [
+        -6942.130504813364,
+        -5393.992052815953
+      ],
+      "effective_rank": 17,
+      "condition_number": 10062.491903769804,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 4,
+      "validation_aic_mean": -6795.87635202243,
+      "validation_aic_by_record": [
+        -7607.09712280274,
+        -5984.65558124212
+      ],
+      "effective_rank": 18,
+      "condition_number": 11231.16871627265,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 5,
+      "validation_aic_mean": -5263.968686776734,
+      "validation_aic_by_record": [
+        -5983.904523630971,
+        -4544.032849922498
+      ],
+      "effective_rank": 19,
+      "condition_number": 12418.821283036685,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 6,
+      "validation_aic_mean": -6275.010598034694,
+      "validation_aic_by_record": [
+        -7057.9606695919,
+        -5492.0605264774895
+      ],
+      "effective_rank": 20,
+      "condition_number": 13516.70836693132,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 7,
+      "validation_aic_mean": -5901.761888612009,
+      "validation_aic_by_record": [
+        -6658.578309134179,
+        -5144.945468089839
+      ],
+      "effective_rank": 21,
+      "condition_number": 14532.873179955302,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 8,
+      "validation_aic_mean": -6730.079562507396,
+      "validation_aic_by_record": [
+        -7557.552588305822,
+        -5902.60653670897
+      ],
+      "effective_rank": 22,
+      "condition_number": 15861.649822866966,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 9,
+      "validation_aic_mean": -6731.430344877306,
+      "validation_aic_by_record": [
+        -7559.345962955058,
+        -5903.514726799554
+      ],
+      "effective_rank": 23,
+      "condition_number": 20241.162231658956,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 10,
+      "validation_aic_mean": -6729.902827139698,
+      "validation_aic_by_record": [
+        -7567.137311146836,
+        -5892.668343132562
+      ],
+      "effective_rank": 24,
+      "condition_number": 24002.729820771754,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 11,
+      "validation_aic_mean": -6762.316571905018,
+      "validation_aic_by_record": [
+        -7601.707081921427,
+        -5922.926061888609
+      ],
+      "effective_rank": 25,
+      "condition_number": 28688.01355820783,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 12,
+      "validation_aic_mean": -6568.8079103700475,
+      "validation_aic_by_record": [
+        -7388.922514910307,
+        -5748.693305829787
+      ],
+      "effective_rank": 26,
+      "condition_number": 32996.960128918545,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 13,
+      "validation_aic_mean": -6768.2881317771635,
+      "validation_aic_by_record": [
+        -7608.937741432904,
+        -5927.638522121423
+      ],
+      "effective_rank": 27,
+      "condition_number": 37494.594836267104,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 14,
+      "validation_aic_mean": -6769.00774408269,
+      "validation_aic_by_record": [
+        -7610.009731646536,
+        -5928.005756518844
+      ],
+      "effective_rank": 28,
+      "condition_number": 42309.99391540081,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 15,
+      "validation_aic_mean": -6793.765100261217,
+      "validation_aic_by_record": [
+        -7620.056286053335,
+        -5967.4739144691
+      ],
+      "effective_rank": 29,
+      "condition_number": 46547.93610722879,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 16,
+      "validation_aic_mean": -6766.589219961657,
+      "validation_aic_by_record": [
+        -7585.037040017477,
+        -5948.141399905837
+      ],
+      "effective_rank": 30,
+      "condition_number": 51465.22383070106,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 17,
+      "validation_aic_mean": -6587.5885207323245,
+      "validation_aic_by_record": [
+        -7360.876302451889,
+        -5814.300739012759
+      ],
+      "effective_rank": 31,
+      "condition_number": 55812.04494023335,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 18,
+      "validation_aic_mean": -6594.101753593659,
+      "validation_aic_by_record": [
+        -7369.46595041219,
+        -5818.737556775129
+      ],
+      "effective_rank": 32,
+      "condition_number": 60414.41957258675,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 19,
+      "validation_aic_mean": -6482.674219599492,
+      "validation_aic_by_record": [
+        -7240.807335747988,
+        -5724.541103450996
+      ],
+      "effective_rank": 33,
+      "condition_number": 64795.9793123902,
+      "stable_simulation": true
+    },
+    {
+      "nx": 14,
+      "ny": 20,
+      "validation_aic_mean": -6556.005477239683,
+      "validation_aic_by_record": [
+        -7322.630480903588,
+        -5789.3804735757785
+      ],
+      "effective_rank": 34,
+      "condition_number": 69208.72603969018,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 1,
+      "validation_aic_mean": -1685.4755436262333,
+      "validation_aic_by_record": [
+        -2330.750346066393,
+        -1040.2007411860736
+      ],
+      "effective_rank": 16,
+      "condition_number": 9844.646971533099,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 2,
+      "validation_aic_mean": -3056.7068483083126,
+      "validation_aic_by_record": [
+        -3656.211611624348,
+        -2457.2020849922774
+      ],
+      "effective_rank": 17,
+      "condition_number": 10051.872442155705,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 3,
+      "validation_aic_mean": -6163.239883306868,
+      "validation_aic_by_record": [
+        -6938.102389239864,
+        -5388.377377373872
+      ],
+      "effective_rank": 18,
+      "condition_number": 10743.841553034603,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 4,
+      "validation_aic_mean": -6790.13280668257,
+      "validation_aic_by_record": [
+        -7600.499646761409,
+        -5979.765966603731
+      ],
+      "effective_rank": 19,
+      "condition_number": 11930.246131657164,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 5,
+      "validation_aic_mean": -5252.378529464895,
+      "validation_aic_by_record": [
+        -5969.574684839858,
+        -4535.182374089933
+      ],
+      "effective_rank": 20,
+      "condition_number": 13153.284053956755,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 6,
+      "validation_aic_mean": -6271.462727661305,
+      "validation_aic_by_record": [
+        -7055.961870132164,
+        -5486.963585190445
+      ],
+      "effective_rank": 21,
+      "condition_number": 14297.887915733309,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 7,
+      "validation_aic_mean": -5896.88346133593,
+      "validation_aic_by_record": [
+        -6654.9435551704555,
+        -5138.823367501406
+      ],
+      "effective_rank": 22,
+      "condition_number": 15354.693428294442,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 8,
+      "validation_aic_mean": -6727.425208291726,
+      "validation_aic_by_record": [
+        -7555.064062167874,
+        -5899.786354415578
+      ],
+      "effective_rank": 23,
+      "condition_number": 16382.155404248793,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 9,
+      "validation_aic_mean": -6729.0748906262,
+      "validation_aic_by_record": [
+        -7557.2358322047285,
+        -5900.913949047671
+      ],
+      "effective_rank": 24,
+      "condition_number": 20261.079427835837,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 10,
+      "validation_aic_mean": -6733.091774944536,
+      "validation_aic_by_record": [
+        -7571.2598646385995,
+        -5894.923685250473
+      ],
+      "effective_rank": 25,
+      "condition_number": 24020.910939928854,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 11,
+      "validation_aic_mean": -6764.065689082334,
+      "validation_aic_by_record": [
+        -7603.9175940227715,
+        -5924.213784141897
+      ],
+      "effective_rank": 26,
+      "condition_number": 28707.544633214507,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 12,
+      "validation_aic_mean": -6580.583034422492,
+      "validation_aic_by_record": [
+        -7407.167073772671,
+        -5753.998995072313
+      ],
+      "effective_rank": 27,
+      "condition_number": 33029.253580782635,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 13,
+      "validation_aic_mean": -6779.549599284212,
+      "validation_aic_by_record": [
+        -7627.615359184492,
+        -5931.48383938393
+      ],
+      "effective_rank": 28,
+      "condition_number": 37525.23807207392,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 14,
+      "validation_aic_mean": -6781.726803025432,
+      "validation_aic_by_record": [
+        -7630.43438989328,
+        -5933.019216157583
+      ],
+      "effective_rank": 29,
+      "condition_number": 42322.722772835325,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 15,
+      "validation_aic_mean": -6836.0551882444815,
+      "validation_aic_by_record": [
+        -7689.661610939289,
+        -5982.448765549674
+      ],
+      "effective_rank": 30,
+      "condition_number": 46660.00130209885,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 16,
+      "validation_aic_mean": -6807.047753718819,
+      "validation_aic_by_record": [
+        -7653.5679851066325,
+        -5960.5275223310055
+      ],
+      "effective_rank": 31,
+      "condition_number": 51476.29671795738,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 17,
+      "validation_aic_mean": -6627.340498047281,
+      "validation_aic_by_record": [
+        -7429.047287045287,
+        -5825.633709049275
+      ],
+      "effective_rank": 32,
+      "condition_number": 55824.09795473499,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 18,
+      "validation_aic_mean": -6648.764541530729,
+      "validation_aic_by_record": [
+        -7456.550860222312,
+        -5840.978222839146
+      ],
+      "effective_rank": 33,
+      "condition_number": 60511.12142832112,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 19,
+      "validation_aic_mean": -6540.929400880999,
+      "validation_aic_by_record": [
+        -7327.152043085918,
+        -5754.70675867608
+      ],
+      "effective_rank": 34,
+      "condition_number": 64807.20836696967,
+      "stable_simulation": true
+    },
+    {
+      "nx": 15,
+      "ny": 20,
+      "validation_aic_mean": -6625.7579892739,
+      "validation_aic_by_record": [
+        -7424.249500215128,
+        -5827.266478332673
+      ],
+      "effective_rank": 35,
+      "condition_number": 69219.81541752131,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 1,
+      "validation_aic_mean": -2004.8187652133577,
+      "validation_aic_by_record": [
+        -2683.525710125835,
+        -1326.1118203008805
+      ],
+      "effective_rank": 17,
+      "condition_number": 10476.571447227414,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 2,
+      "validation_aic_mean": -3053.5300522346015,
+      "validation_aic_by_record": [
+        -3653.032173377942,
+        -2454.0279310912606
+      ],
+      "effective_rank": 18,
+      "condition_number": 10766.736181068176,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 3,
+      "validation_aic_mean": -6165.122557666708,
+      "validation_aic_by_record": [
+        -6942.9042284865045,
+        -5387.340886846912
+      ],
+      "effective_rank": 19,
+      "condition_number": 11542.545132462876,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 4,
+      "validation_aic_mean": -6791.548480408372,
+      "validation_aic_by_record": [
+        -7605.262248282787,
+        -5977.834712533956
+      ],
+      "effective_rank": 20,
+      "condition_number": 12758.70388849928,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 5,
+      "validation_aic_mean": -5258.99715578778,
+      "validation_aic_by_record": [
+        -5979.351754607479,
+        -4538.6425569680805
+      ],
+      "effective_rank": 21,
+      "condition_number": 14023.54388748497,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 6,
+      "validation_aic_mean": -6279.992130931657,
+      "validation_aic_by_record": [
+        -7070.199734302663,
+        -5489.7845275606505
+      ],
+      "effective_rank": 22,
+      "condition_number": 15216.571647655346,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 7,
+      "validation_aic_mean": -5903.858044290406,
+      "validation_aic_by_record": [
+        -6665.795634759758,
+        -5141.920453821054
+      ],
+      "effective_rank": 23,
+      "condition_number": 16328.080503022624,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 8,
+      "validation_aic_mean": -6738.805749292651,
+      "validation_aic_by_record": [
+        -7573.278592316158,
+        -5904.332906269143
+      ],
+      "effective_rank": 24,
+      "condition_number": 17365.860475739875,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 9,
+      "validation_aic_mean": -6740.765144872319,
+      "validation_aic_by_record": [
+        -7575.811867149521,
+        -5905.718422595118
+      ],
+      "effective_rank": 25,
+      "condition_number": 20304.694184250013,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 10,
+      "validation_aic_mean": -6760.141969074331,
+      "validation_aic_by_record": [
+        -7611.345937024359,
+        -5908.938001124304
+      ],
+      "effective_rank": 26,
+      "condition_number": 24045.5890727319,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 11,
+      "validation_aic_mean": -6789.483232253011,
+      "validation_aic_by_record": [
+        -7642.180433214931,
+        -5936.78603129109
+      ],
+      "effective_rank": 27,
+      "condition_number": 28731.952607689524,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 12,
+      "validation_aic_mean": -6611.3430672515915,
+      "validation_aic_by_record": [
+        -7452.690765008318,
+        -5769.9953694948645
+      ],
+      "effective_rank": 28,
+      "condition_number": 33051.267571720746,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 13,
+      "validation_aic_mean": -6791.728242978652,
+      "validation_aic_by_record": [
+        -7648.352115957716,
+        -5935.104369999587
+      ],
+      "effective_rank": 29,
+      "condition_number": 37570.95534387787,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 14,
+      "validation_aic_mean": -6793.8245916399255,
+      "validation_aic_by_record": [
+        -7651.084565421442,
+        -5936.564617858409
+      ],
+      "effective_rank": 30,
+      "condition_number": 42365.18216735144,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 15,
+      "validation_aic_mean": -6858.146757502337,
+      "validation_aic_by_record": [
+        -7725.589366339771,
+        -5990.704148664903
+      ],
+      "effective_rank": 31,
+      "condition_number": 46678.624347840894,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 16,
+      "validation_aic_mean": -6833.345864812889,
+      "validation_aic_by_record": [
+        -7696.913749849918,
+        -5969.77797977586
+      ],
+      "effective_rank": 32,
+      "condition_number": 51643.80850278192,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 17,
+      "validation_aic_mean": -6657.527673465949,
+      "validation_aic_by_record": [
+        -7482.14138752066,
+        -5832.913959411238
+      ],
+      "effective_rank": 33,
+      "condition_number": 55847.915042145156,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 18,
+      "validation_aic_mean": -6675.197096773802,
+      "validation_aic_by_record": [
+        -7504.900333481526,
+        -5845.493860066078
+      ],
+      "effective_rank": 34,
+      "condition_number": 60546.04995438891,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 19,
+      "validation_aic_mean": -6578.6905130844625,
+      "validation_aic_by_record": [
+        -7387.237189597618,
+        -5770.143836571306
+      ],
+      "effective_rank": 35,
+      "condition_number": 64968.68617393885,
+      "stable_simulation": true
+    },
+    {
+      "nx": 16,
+      "ny": 20,
+      "validation_aic_mean": -6694.566466824508,
+      "validation_aic_by_record": [
+        -7524.951249836088,
+        -5864.181683812929
+      ],
+      "effective_rank": 36,
+      "condition_number": 69230.38561481655,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 1,
+      "validation_aic_mean": -2198.7724752182453,
+      "validation_aic_by_record": [
+        -2908.4055318846763,
+        -1489.1394185518143
+      ],
+      "effective_rank": 18,
+      "condition_number": 11481.59340225493,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 2,
+      "validation_aic_mean": -3037.4643494371567,
+      "validation_aic_by_record": [
+        -3633.2968495514824,
+        -2441.6318493228305
+      ],
+      "effective_rank": 19,
+      "condition_number": 11877.709869475948,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 3,
+      "validation_aic_mean": -6168.615569425669,
+      "validation_aic_by_record": [
+        -6953.66395425601,
+        -5383.5671845953275
+      ],
+      "effective_rank": 20,
+      "condition_number": 12766.079677270367,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 4,
+      "validation_aic_mean": -6795.760081544024,
+      "validation_aic_by_record": [
+        -7618.366579186692,
+        -5973.153583901356
+      ],
+      "effective_rank": 21,
+      "condition_number": 14055.193809497694,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 5,
+      "validation_aic_mean": -5265.318748904949,
+      "validation_aic_by_record": [
+        -5995.216210104643,
+        -4535.421287705254
+      ],
+      "effective_rank": 22,
+      "condition_number": 15400.848425652057,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 6,
+      "validation_aic_mean": -6286.180819796144,
+      "validation_aic_by_record": [
+        -7087.404396274375,
+        -5484.957243317911
+      ],
+      "effective_rank": 23,
+      "condition_number": 16679.684388470374,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 7,
+      "validation_aic_mean": -5909.738762117656,
+      "validation_aic_by_record": [
+        -6681.211064519448,
+        -5138.266459715864
+      ],
+      "effective_rank": 24,
+      "condition_number": 17872.40607828968,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 8,
+      "validation_aic_mean": -6756.087803826715,
+      "validation_aic_by_record": [
+        -7609.09484150664,
+        -5903.080766146791
+      ],
+      "effective_rank": 25,
+      "condition_number": 18991.326416947464,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 9,
+      "validation_aic_mean": -6758.639475640403,
+      "validation_aic_by_record": [
+        -7612.335658389371,
+        -5904.943292891436
+      ],
+      "effective_rank": 26,
+      "condition_number": 20465.754337174676,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 10,
+      "validation_aic_mean": -6784.061253721595,
+      "validation_aic_by_record": [
+        -7656.956773398248,
+        -5911.165734044943
+      ],
+      "effective_rank": 27,
+      "condition_number": 24096.32541763658,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 11,
+      "validation_aic_mean": -6810.013395205016,
+      "validation_aic_by_record": [
+        -7683.443990020201,
+        -5936.582800389831
+      ],
+      "effective_rank": 28,
+      "condition_number": 28762.77797301004,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 12,
+      "validation_aic_mean": -6633.516773975896,
+      "validation_aic_by_record": [
+        -7496.172752539147,
+        -5770.860795412646
+      ],
+      "effective_rank": 29,
+      "condition_number": 33079.87312785529,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 13,
+      "validation_aic_mean": -6807.960663621381,
+      "validation_aic_by_record": [
+        -7683.555573288378,
+        -5932.365753954384
+      ],
+      "effective_rank": 30,
+      "condition_number": 37600.16926679364,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 14,
+      "validation_aic_mean": -6806.3066090195825,
+      "validation_aic_by_record": [
+        -7682.003997294075,
+        -5930.609220745091
+      ],
+      "effective_rank": 31,
+      "condition_number": 42409.465626131874,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 15,
+      "validation_aic_mean": -6869.82808133465,
+      "validation_aic_by_record": [
+        -7755.329344646284,
+        -5984.326818023016
+      ],
+      "effective_rank": 32,
+      "condition_number": 46719.709842076074,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 16,
+      "validation_aic_mean": -6845.4658169374925,
+      "validation_aic_by_record": [
+        -7728.280412520587,
+        -5962.651221354399
+      ],
+      "effective_rank": 33,
+      "condition_number": 51665.05336068644,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 17,
+      "validation_aic_mean": -6672.033793494444,
+      "validation_aic_by_record": [
+        -7526.136903775406,
+        -5817.930683213483
+      ],
+      "effective_rank": 34,
+      "condition_number": 55966.73606842818,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 18,
+      "validation_aic_mean": -6673.028223339426,
+      "validation_aic_by_record": [
+        -7527.916810156483,
+        -5818.13963652237
+      ],
+      "effective_rank": 35,
+      "condition_number": 60563.62568211474,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 19,
+      "validation_aic_mean": -6572.331326933167,
+      "validation_aic_by_record": [
+        -7405.568521911839,
+        -5739.0941319544945
+      ],
+      "effective_rank": 36,
+      "condition_number": 64991.813551466796,
+      "stable_simulation": true
+    },
+    {
+      "nx": 17,
+      "ny": 20,
+      "validation_aic_mean": -6702.795932508841,
+      "validation_aic_by_record": [
+        -7565.382113982392,
+        -5840.20975103529
+      ],
+      "effective_rank": 37,
+      "condition_number": 69331.6630015793,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 1,
+      "validation_aic_mean": -2353.34487983976,
+      "validation_aic_by_record": [
+        -3090.9734324267065,
+        -1615.7163272528132
+      ],
+      "effective_rank": 19,
+      "condition_number": 12277.50262716849,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 2,
+      "validation_aic_mean": -3020.7511968236768,
+      "validation_aic_by_record": [
+        -3611.3131358141595,
+        -2430.1892578331936
+      ],
+      "effective_rank": 20,
+      "condition_number": 12781.030548906137,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 3,
+      "validation_aic_mean": -6176.088050949609,
+      "validation_aic_by_record": [
+        -6976.969771980427,
+        -5375.20632991879
+      ],
+      "effective_rank": 21,
+      "condition_number": 13766.856501219005,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 4,
+      "validation_aic_mean": -6800.918921599948,
+      "validation_aic_by_record": [
+        -7637.817370695739,
+        -5964.020472504157
+      ],
+      "effective_rank": 22,
+      "condition_number": 15106.164183644325,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 5,
+      "validation_aic_mean": -5267.648255987882,
+      "validation_aic_by_record": [
+        -6008.74219849266,
+        -4526.554313483104
+      ],
+      "effective_rank": 23,
+      "condition_number": 16502.551470401366,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 6,
+      "validation_aic_mean": -6287.2525853706775,
+      "validation_aic_by_record": [
+        -7100.021318479318,
+        -5474.4838522620375
+      ],
+      "effective_rank": 24,
+      "condition_number": 17839.055928903417,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 7,
+      "validation_aic_mean": -5910.2821368696605,
+      "validation_aic_by_record": [
+        -6692.598913317561,
+        -5127.96536042176
+      ],
+      "effective_rank": 25,
+      "condition_number": 19090.372549877997,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 8,
+      "validation_aic_mean": -6761.946897408346,
+      "validation_aic_by_record": [
+        -7631.188853603513,
+        -5892.704941213178
+      ],
+      "effective_rank": 26,
+      "condition_number": 20260.829964040753,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 9,
+      "validation_aic_mean": -6766.234963019193,
+      "validation_aic_by_record": [
+        -7636.510166558925,
+        -5895.9597594794595
+      ],
+      "effective_rank": 27,
+      "condition_number": 21446.942416899066,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 10,
+      "validation_aic_mean": -6796.569640305538,
+      "validation_aic_by_record": [
+        -7689.295555910755,
+        -5903.843724700321
+      ],
+      "effective_rank": 28,
+      "condition_number": 24185.966369109992,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 11,
+      "validation_aic_mean": -6821.313210623376,
+      "validation_aic_by_record": [
+        -7714.290528217339,
+        -5928.3358930294135
+      ],
+      "effective_rank": 29,
+      "condition_number": 28826.052186490593,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 12,
+      "validation_aic_mean": -6646.140960784793,
+      "validation_aic_by_record": [
+        -7531.554955689344,
+        -5760.726965880241
+      ],
+      "effective_rank": 30,
+      "condition_number": 33118.1940008915,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 13,
+      "validation_aic_mean": -6817.523354165507,
+      "validation_aic_by_record": [
+        -7715.284931208203,
+        -5919.761777122811
+      ],
+      "effective_rank": 31,
+      "condition_number": 37638.688507062,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 14,
+      "validation_aic_mean": -6814.566851140781,
+      "validation_aic_by_record": [
+        -7712.33121717518,
+        -5916.802485106382
+      ],
+      "effective_rank": 32,
+      "condition_number": 42441.86654393548,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 15,
+      "validation_aic_mean": -6870.921541929429,
+      "validation_aic_by_record": [
+        -7768.1522749547,
+        -5973.690808904156
+      ],
+      "effective_rank": 33,
+      "condition_number": 46780.718346485024,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 16,
+      "validation_aic_mean": -6846.673962931247,
+      "validation_aic_by_record": [
+        -7741.15322850251,
+        -5952.194697359985
+      ],
+      "effective_rank": 34,
+      "condition_number": 51724.490281145525,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 17,
+      "validation_aic_mean": -6675.351002695475,
+      "validation_aic_by_record": [
+        -7545.320018007957,
+        -5805.3819873829925
+      ],
+      "effective_rank": 35,
+      "condition_number": 55997.81172092868,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 18,
+      "validation_aic_mean": -6669.579062511122,
+      "validation_aic_by_record": [
+        -7539.10627335231,
+        -5800.051851669933
+      ],
+      "effective_rank": 36,
+      "condition_number": 60741.93446126116,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 19,
+      "validation_aic_mean": -6557.031764865282,
+      "validation_aic_by_record": [
+        -7406.338703671444,
+        -5707.7248260591205
+      ],
+      "effective_rank": 37,
+      "condition_number": 65023.862517559224,
+      "stable_simulation": true
+    },
+    {
+      "nx": 18,
+      "ny": 20,
+      "validation_aic_mean": -6685.704975064333,
+      "validation_aic_by_record": [
+        -7562.742003653523,
+        -5808.667946475142
+      ],
+      "effective_rank": 38,
+      "condition_number": 69381.59913442003,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 1,
+      "validation_aic_mean": -2496.538982738256,
+      "validation_aic_by_record": [
+        -3256.2320333179578,
+        -1736.8459321585538
+      ],
+      "effective_rank": 20,
+      "condition_number": 12844.759512999826,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 2,
+      "validation_aic_mean": -2996.1838080430534,
+      "validation_aic_by_record": [
+        -3579.1842371560815,
+        -2413.183378930025
+      ],
+      "effective_rank": 21,
+      "condition_number": 13455.961187656676,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 3,
+      "validation_aic_mean": -6176.478946662333,
+      "validation_aic_by_record": [
+        -6981.45087101999,
+        -5371.507022304678
+      ],
+      "effective_rank": 22,
+      "condition_number": 14520.852096586159,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 4,
+      "validation_aic_mean": -6794.943814580198,
+      "validation_aic_by_record": [
+        -7630.539375474828,
+        -5959.348253685567
+      ],
+      "effective_rank": 23,
+      "condition_number": 15888.862726177036,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 5,
+      "validation_aic_mean": -5263.254704897763,
+      "validation_aic_by_record": [
+        -6004.06568735774,
+        -4522.443722437786
+      ],
+      "effective_rank": 24,
+      "condition_number": 17308.677710913096,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 6,
+      "validation_aic_mean": -6282.063433424821,
+      "validation_aic_by_record": [
+        -7094.406821234586,
+        -5469.720045615056
+      ],
+      "effective_rank": 25,
+      "condition_number": 18672.680804539854,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 7,
+      "validation_aic_mean": -5905.623004176539,
+      "validation_aic_by_record": [
+        -6688.013330471068,
+        -5123.232677882012
+      ],
+      "effective_rank": 26,
+      "condition_number": 19955.470094344037,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 8,
+      "validation_aic_mean": -6757.27206964834,
+      "validation_aic_by_record": [
+        -7626.784497410958,
+        -5887.759641885723
+      ],
+      "effective_rank": 27,
+      "condition_number": 21156.38569012556,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 9,
+      "validation_aic_mean": -6761.682878670102,
+      "validation_aic_by_record": [
+        -7632.321667203102,
+        -5891.044090137101
+      ],
+      "effective_rank": 28,
+      "condition_number": 22308.612712165977,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 10,
+      "validation_aic_mean": -6797.693395893555,
+      "validation_aic_by_record": [
+        -7696.998509927165,
+        -5898.388281859944
+      ],
+      "effective_rank": 29,
+      "condition_number": 24309.91300862982,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 11,
+      "validation_aic_mean": -6821.752396752241,
+      "validation_aic_by_record": [
+        -7720.963974787115,
+        -5922.540818717367
+      ],
+      "effective_rank": 30,
+      "condition_number": 28878.94653954565,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 12,
+      "validation_aic_mean": -6648.489859041981,
+      "validation_aic_by_record": [
+        -7541.585498964168,
+        -5755.394219119793
+      ],
+      "effective_rank": 31,
+      "condition_number": 33169.6272012955,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 13,
+      "validation_aic_mean": -6815.421279889918,
+      "validation_aic_by_record": [
+        -7717.36319045685,
+        -5913.479369322986
+      ],
+      "effective_rank": 32,
+      "condition_number": 37684.761596269105,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 14,
+      "validation_aic_mean": -6812.3487596477735,
+      "validation_aic_by_record": [
+        -7714.287002903837,
+        -5910.410516391711
+      ],
+      "effective_rank": 33,
+      "condition_number": 42483.83331898074,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 15,
+      "validation_aic_mean": -6866.478623126772,
+      "validation_aic_by_record": [
+        -7764.8125516006985,
+        -5968.144694652846
+      ],
+      "effective_rank": 34,
+      "condition_number": 46824.606142550314,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 16,
+      "validation_aic_mean": -6840.9091443133675,
+      "validation_aic_by_record": [
+        -7734.282745614236,
+        -5947.535543012498
+      ],
+      "effective_rank": 35,
+      "condition_number": 51774.80646665383,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 17,
+      "validation_aic_mean": -6669.54754303452,
+      "validation_aic_by_record": [
+        -7538.637091732672,
+        -5800.457994336367
+      ],
+      "effective_rank": 36,
+      "condition_number": 56048.09810190923,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 18,
+      "validation_aic_mean": -6663.870459191381,
+      "validation_aic_by_record": [
+        -7532.57892391258,
+        -5795.161994470182
+      ],
+      "effective_rank": 37,
+      "condition_number": 60773.40892656931,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 19,
+      "validation_aic_mean": -6554.100993030063,
+      "validation_aic_by_record": [
+        -7407.19179563346,
+        -5701.010190426667
+      ],
+      "effective_rank": 38,
+      "condition_number": 65155.6820832393,
+      "stable_simulation": true
+    },
+    {
+      "nx": 19,
+      "ny": 20,
+      "validation_aic_mean": -6683.576160079803,
+      "validation_aic_by_record": [
+        -7559.580163054364,
+        -5807.572157105243
+      ],
+      "effective_rank": 39,
+      "condition_number": 69409.64449919366,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 1,
+      "validation_aic_mean": -2634.9440897629934,
+      "validation_aic_by_record": [
+        -3411.5378378125515,
+        -1858.3503417134352
+      ],
+      "effective_rank": 21,
+      "condition_number": 13583.679217773786,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 2,
+      "validation_aic_mean": -2959.3661397765636,
+      "validation_aic_by_record": [
+        -3532.5732941544725,
+        -2386.1589853986543
+      ],
+      "effective_rank": 22,
+      "condition_number": 14314.847301287293,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 3,
+      "validation_aic_mean": -6181.185149037743,
+      "validation_aic_by_record": [
+        -6990.26696151534,
+        -5372.103336560147
+      ],
+      "effective_rank": 23,
+      "condition_number": 15473.255691409508,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 4,
+      "validation_aic_mean": -6792.347678464535,
+      "validation_aic_by_record": [
+        -7629.069841795742,
+        -5955.62551513333
+      ],
+      "effective_rank": 24,
+      "condition_number": 16891.78321430812,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 5,
+      "validation_aic_mean": -5279.249394797802,
+      "validation_aic_by_record": [
+        -6028.552566280168,
+        -4529.946223315436
+      ],
+      "effective_rank": 25,
+      "condition_number": 18353.10969795039,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 6,
+      "validation_aic_mean": -6290.3219698492485,
+      "validation_aic_by_record": [
+        -7110.83981990157,
+        -5469.804119796928
+      ],
+      "effective_rank": 26,
+      "condition_number": 19761.790902795692,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 7,
+      "validation_aic_mean": -5915.697268684911,
+      "validation_aic_by_record": [
+        -6706.246867938788,
+        -5125.147669431034
+      ],
+      "effective_rank": 27,
+      "condition_number": 21089.175000835276,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 8,
+      "validation_aic_mean": -6760.597679601823,
+      "validation_aic_by_record": [
+        -7636.9037286960975,
+        -5884.291630507549
+      ],
+      "effective_rank": 28,
+      "condition_number": 22335.43687590161,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 9,
+      "validation_aic_mean": -6765.06670031086,
+      "validation_aic_by_record": [
+        -7642.524434902355,
+        -5887.608965719365
+      ],
+      "effective_rank": 29,
+      "condition_number": 23516.908442654425,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 10,
+      "validation_aic_mean": -6806.67595928009,
+      "validation_aic_by_record": [
+        -7716.573461898676,
+        -5896.778456661504
+      ],
+      "effective_rank": 30,
+      "condition_number": 24783.302572396133,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 11,
+      "validation_aic_mean": -6828.711810525565,
+      "validation_aic_by_record": [
+        -7738.0916910271,
+        -5919.33193002403
+      ],
+      "effective_rank": 31,
+      "condition_number": 28962.97264511339,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 12,
+      "validation_aic_mean": -6659.008105282388,
+      "validation_aic_by_record": [
+        -7563.493482514685,
+        -5754.52272805009
+      ],
+      "effective_rank": 32,
+      "condition_number": 33232.3934622973,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 13,
+      "validation_aic_mean": -6821.032138529301,
+      "validation_aic_by_record": [
+        -7733.065693949179,
+        -5908.998583109424
+      ],
+      "effective_rank": 33,
+      "condition_number": 37749.36389166655,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 14,
+      "validation_aic_mean": -6816.6196332591735,
+      "validation_aic_by_record": [
+        -7728.607125475955,
+        -5904.632141042392
+      ],
+      "effective_rank": 34,
+      "condition_number": 42536.01670596977,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 15,
+      "validation_aic_mean": -6869.24936227774,
+      "validation_aic_by_record": [
+        -7777.094557176638,
+        -5961.4041673788415
+      ],
+      "effective_rank": 35,
+      "condition_number": 46873.50226370466,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 16,
+      "validation_aic_mean": -6843.775095584908,
+      "validation_aic_by_record": [
+        -7746.083122735709,
+        -5941.467068434105
+      ],
+      "effective_rank": 36,
+      "condition_number": 51823.53228320382,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 17,
+      "validation_aic_mean": -6669.344291719994,
+      "validation_aic_by_record": [
+        -7541.698528942694,
+        -5796.990054497294
+      ],
+      "effective_rank": 37,
+      "condition_number": 56105.19487534841,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 18,
+      "validation_aic_mean": -6663.633229496605,
+      "validation_aic_by_record": [
+        -7535.598258700183,
+        -5791.668200293027
+      ],
+      "effective_rank": 38,
+      "condition_number": 60829.76053714588,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 19,
+      "validation_aic_mean": -6555.167259207894,
+      "validation_aic_by_record": [
+        -7412.7550920148105,
+        -5697.579426400978
+      ],
+      "effective_rank": 39,
+      "condition_number": 65193.98369166315,
+      "stable_simulation": true
+    },
+    {
+      "nx": 20,
+      "ny": 20,
+      "validation_aic_mean": -6680.586858697488,
+      "validation_aic_by_record": [
+        -7556.631717670216,
+        -5804.54199972476
+      ],
+      "effective_rank": 40,
+      "condition_number": 69555.33326053484,
+      "stable_simulation": true
+    }
+  ],
+  "runtime": {
+    "elapsed_seconds": 0.4818110750056803,
+    "dtype": "float64",
+    "device": "cpu"
+  },
+  "status": "COMPLETED",
+  "scientific_role": "DEVELOPMENT_HISTORY_SELECTION_NOT_TEST_EVIDENCE"
+}
