@@ -4,6 +4,7 @@ import numpy as np
 
 from ar_raphu.datasets.base import DynamicDataset
 from ar_raphu.spectral.pb1_development import (
+    bootstrap_external_rank_spectrum,
     fit_pb1_shared_history_spectral,
 )
 
@@ -70,3 +71,11 @@ def test_pb1_spectral_adapter_is_no_test_cpu_fp64_and_rank_after_selection() -> 
     assert len(fit.candidates) == 27
     assert fit.rank_audit["structural_rank_claim_allowed"] is False
     assert fit.rank_audit["predictive_svd_rank_claim_allowed"] is True
+    bootstrap = bootstrap_external_rank_spectrum(
+        fit, replicates=5, seed=12
+    )
+    assert bootstrap.replicates == 5
+    assert bootstrap.maximum_relative_kkt_residual <= 1.0e-8
+    assert sum(
+        bootstrap.spectral_tail_budget_rank_frequencies["0.05"].values()
+    ) == 5

@@ -69,10 +69,24 @@ class PB1SpectralDevelopmentFit:
     ar_block: PB1TensorBlock
     train_target: np.ndarray
     validation_target: np.ndarray
+    train_matrix: np.ndarray
+    train_groups: np.ndarray
     validation_groups: np.ndarray
+    selected_penalty: np.ndarray
     rank_audit: dict[str, object]
     history: tuple[int, int]
     horizon: int
+    elapsed_seconds: float
+
+
+@dataclass(frozen=True, slots=True)
+class PB1RankBootstrap:
+    replicates: int
+    seed: int
+    singular_value_quantiles: dict[str, np.ndarray]
+    normalized_energy_quantiles: dict[str, np.ndarray]
+    spectral_tail_budget_rank_frequencies: dict[str, dict[str, int]]
+    maximum_relative_kkt_residual: float
     elapsed_seconds: float
 
 
@@ -314,6 +328,144 @@ def _rank_audit(
     }
 
 
+def bootstrap_external_rank_spectrum(
+    fit: PB1SpectralDevelopmentFit,
+    *,
+    replicates: int = 250,
+    seed: int = 20240727,
+) -> PB1RankBootstrap:
+    """Cluster bootstrap the frozen external spectrum without retuning."""
+
+    started = time.perf_counter()
+    if replicates <= 0:
+        raise ValueError("Bootstrap replicates must be positive.")
+    matrix = np.asarray(fit.train_matrix, dtype=np.float64)
+    target = np.asarray(fit.train_target, dtype=np.float64)
+    groups = np.asarray(fit.train_groups)
+    unique_groups = np.unique(groups)
+    if len(unique_groups) < 2:
+        raise ValueError("Cluster bootstrap needs at least two training groups.")
+    summaries: dict[
+        object, tuple[int, np.ndarray, float, np.ndarray, np.ndarray]
+    ] = {}
+    for group in unique_groups:
+        mask = groups == group
+        local_x = matrix[mask]
+        local_y = target[mask]
+        summaries[group] = (
+            int(np.sum(mask)),
+            local_x.sum(axis=0),
+            float(local_y.sum()),
+            local_x.T @ local_x,
+            local_x.T @ local_y,
+        )
+    rng = np.random.default_rng(seed)
+    x_slice = fit.x_block.coefficient_slice
+    lag_count = fit.x_block.lag_gram.shape[0]
+    amplitude_count = fit.x_block.amplitude_gram.shape[0]
+    spectrum_width = min(lag_count, amplitude_count)
+    singular_values = np.empty((replicates, spectrum_width))
+    normalized_energy = np.empty_like(singular_values)
+    rank_counts = {
+        "0.1": {},
+        "0.05": {},
+        "0.02": {},
+    }
+    maximum_kkt = 0.0
+    for replicate in range(replicates):
+        sampled = rng.choice(unique_groups, size=len(unique_groups), replace=True)
+        multiplicities = {
+            group: int(np.sum(sampled == group)) for group in unique_groups
+        }
+        n = sum(
+            multiplicities[group] * summaries[group][0]
+            for group in unique_groups
+        )
+        sum_x = sum(
+            (
+                multiplicities[group] * summaries[group][1]
+                for group in unique_groups
+            ),
+            start=np.zeros(matrix.shape[1], dtype=np.float64),
+        )
+        sum_y = sum(
+            multiplicities[group] * summaries[group][2]
+            for group in unique_groups
+        )
+        sum_xx = sum(
+            (
+                multiplicities[group] * summaries[group][3]
+                for group in unique_groups
+            ),
+            start=np.zeros((matrix.shape[1], matrix.shape[1]), dtype=np.float64),
+        )
+        sum_xy = sum(
+            (
+                multiplicities[group] * summaries[group][4]
+                for group in unique_groups
+            ),
+            start=np.zeros(matrix.shape[1], dtype=np.float64),
+        )
+        mean_x = sum_x / n
+        mean_y = sum_y / n
+        gram = sum_xx / n - np.outer(mean_x, mean_x)
+        rhs = sum_xy / n - mean_x * mean_y
+        system_without_jitter = gram + fit.selected_penalty
+        jitter = numerical_jitter(system_without_jitter)
+        system = system_without_jitter + jitter * np.eye(len(gram))
+        factor = scipy.linalg.cho_factor(
+            system, lower=True, check_finite=False
+        )
+        coefficients = scipy.linalg.cho_solve(
+            factor, rhs, check_finite=False
+        )
+        residual = system @ coefficients - rhs
+        relative_kkt = float(
+            np.linalg.norm(residual)
+            / max(np.linalg.norm(rhs), np.finfo(float).eps)
+        )
+        maximum_kkt = max(maximum_kkt, relative_kkt)
+        theta_x = coefficients[x_slice].reshape(
+            lag_count, amplitude_count
+        )
+        spectrum = gram_whitened_svd(
+            theta_x,
+            fit.x_block.lag_gram,
+            fit.x_block.amplitude_gram,
+        )
+        values = spectrum.singular_values
+        energy = values**2
+        energy /= max(float(energy.sum()), np.finfo(float).eps)
+        singular_values[replicate] = values
+        normalized_energy[replicate] = energy
+        for budget in (0.10, 0.05, 0.02):
+            rank = spectrum_width + 1
+            for candidate_rank in range(1, spectrum_width + 1):
+                tail = math.sqrt(float(energy[candidate_rank:].sum()))
+                if tail <= budget:
+                    rank = candidate_rank
+                    break
+            key = str(budget)
+            rank_key = str(rank)
+            rank_counts[key][rank_key] = rank_counts[key].get(rank_key, 0) + 1
+    quantiles = (0.025, 0.5, 0.975)
+    return PB1RankBootstrap(
+        replicates=replicates,
+        seed=seed,
+        singular_value_quantiles={
+            str(quantile): np.quantile(singular_values, quantile, axis=0)
+            for quantile in quantiles
+        },
+        normalized_energy_quantiles={
+            str(quantile): np.quantile(normalized_energy, quantile, axis=0)
+            for quantile in quantiles
+        },
+        spectral_tail_budget_rank_frequencies=rank_counts,
+        maximum_relative_kkt_residual=maximum_kkt,
+        elapsed_seconds=time.perf_counter() - started,
+    )
+
+
 def fit_pb1_shared_history_spectral(
     dataset: DynamicDataset,
     *,
@@ -477,6 +629,18 @@ def fit_pb1_shared_history_spectral(
             )
     if selected is None:
         raise AssertionError("PB1 spectral penalty search produced no candidate.")
+    selected_penalty = sum(
+        weight * component
+        for weight, component in zip(
+            (
+                selected.lag_weight,
+                selected.amplitude_weight,
+                selected.ridge_weight,
+            ),
+            normalized,
+            strict=True,
+        )
+    )
     rank_audit = _rank_audit(
         selected,
         x_block=x_block,
@@ -492,7 +656,12 @@ def fit_pb1_shared_history_spectral(
         ar_block=ar_block,
         train_target=train_target,
         validation_target=validation_target,
+        train_matrix=train_matrix,
+        train_groups=_group_labels(
+            dataset_id, task.sequence_id[train_mask]
+        ),
         validation_groups=validation_groups,
+        selected_penalty=selected_penalty,
         rank_audit=rank_audit,
         history=(L_x, L_y),
         horizon=horizon,
