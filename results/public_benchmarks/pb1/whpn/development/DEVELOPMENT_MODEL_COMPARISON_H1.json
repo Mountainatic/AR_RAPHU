@@ -1,0 +1,131 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "dataset": "whpn",
+  "stage": "development",
+  "horizon": 1,
+  "history": {
+    "L_x": 18,
+    "L_y": 15,
+    "source": "H1_ARX_AIC"
+  },
+  "matched_record_ids": [
+    "0008:estimation-8",
+    "0009:estimation-9"
+  ],
+  "matched_information_set": "X_THROUGH_T_AND_Y_THROUGH_T_TO_TARGET_Y_T_PLUS_1",
+  "target_scale": "TRAIN_ONLY_Z_SCORE",
+  "direct_protocol_metrics": {
+    "persistence": {
+      "mse_by_record": [
+        0.005692537172132032,
+        0.006508127974948794
+      ],
+      "mse_record_mean": 0.006100332573540413,
+      "mse_pooled": 0.006100332573540413,
+      "rmse_pooled": 0.07810462581397093,
+      "record_count": 2,
+      "sample_count": 16348,
+      "skill_vs_persistence": 0.0
+    },
+    "arx": {
+      "mse_by_record": [
+        4.234330774315551e-06,
+        4.27601334288861e-06
+      ],
+      "mse_record_mean": 4.255172058602081e-06,
+      "mse_pooled": 4.255172058602081e-06,
+      "rmse_pooled": 0.0020628068398670005,
+      "record_count": 2,
+      "sample_count": 16348,
+      "skill_vs_persistence": 0.9993024688396402
+    },
+    "pnarx": {
+      "mse_by_record": [
+        4.217525047260613e-06,
+        4.276690824230401e-06
+      ],
+      "mse_record_mean": 4.247107935745508e-06,
+      "mse_pooled": 4.247107935745508e-06,
+      "rmse_pooled": 0.0020608512648285678,
+      "record_count": 2,
+      "sample_count": 16348,
+      "skill_vs_persistence": 0.9993037907549226
+    },
+    "mlpnarx": {
+      "mse_by_record": [
+        7.847290954707853e-05,
+        7.77401154823805e-05
+      ],
+      "mse_record_mean": 7.810651251472951e-05,
+      "mse_pooled": 7.810651251472952e-05,
+      "rmse_pooled": 0.008837788892858299,
+      "record_count": 2,
+      "sample_count": 16348,
+      "skill_vs_persistence": 0.9871963517442461
+    }
+  },
+  "baseline_faithful_free_running_metrics": {
+    "arx": {
+      "mse_by_record": [
+        0.38194880810304593,
+        0.4757152368618239
+      ],
+      "mse_record_mean": 0.4288320224824349,
+      "mse_pooled": 0.42883202248243496,
+      "rmse_pooled": 0.6548526723488536,
+      "record_count": 2,
+      "sample_count": 16348
+    },
+    "pnarx": {
+      "mse_by_record": [
+        0.3827203765804549,
+        0.47961124539530636
+      ],
+      "mse_record_mean": 0.43116581098788065,
+      "mse_pooled": 0.4311658109878806,
+      "rmse_pooled": 0.6566321732811152,
+      "record_count": 2,
+      "sample_count": 16348
+    },
+    "mlpnarx": {
+      "mse_by_record": [
+        2.497533261738046,
+        2.4227790219355123
+      ],
+      "mse_record_mean": 2.460156141836779,
+      "mse_pooled": 2.460156141836779,
+      "rmse_pooled": 1.5684884895455176,
+      "record_count": 2,
+      "sample_count": 16348
+    }
+  },
+  "spectral_h3_pilot_metrics": {
+    "full": {
+      "mse_pooled": 4.23788776202212e-06,
+      "rmse_pooled": 0.0020586130675826673,
+      "skill_vs_persistence": 0.9993053021764087
+    },
+    "rank1": {
+      "mse_pooled": 4.757338184684022e-06,
+      "rmse_pooled": 0.002181132317096792,
+      "skill_vs_persistence": 0.9992201510118779
+    },
+    "rank2": {
+      "mse_pooled": 4.27791428461076e-06,
+      "rmse_pooled": 0.0020683119408374455,
+      "skill_vs_persistence": 0.9992987408091215
+    },
+    "adaptive_primary_5pct": {
+      "rank": 1
+    }
+  },
+  "selection_boundaries": {
+    "arx_pnarx_mlpnarx": "BASELINE_FAITHFUL_VALIDATION_AIC",
+    "spectral": "GROUPED_VALIDATION_ONE_SE_AFTER_NORMALIZED_PENALTY_SEARCH",
+    "official_test_used": false
+  },
+  "official_test_rows_loaded": 0,
+  "official_test_access_count": 0,
+  "status": "COMPLETED"
+}
