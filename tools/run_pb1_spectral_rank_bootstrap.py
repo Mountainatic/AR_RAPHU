@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the frozen 250-cluster development bootstrap for PB1 spectral rank."""
+"""Run frozen-model Repair-V2 rank bootstrap at one direct horizon."""
 
 from __future__ import annotations
 
@@ -14,9 +14,15 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
-from ar_raphu.datasets.loaders import load_pwh, load_whpn
+from ar_raphu.datasets.loaders import (
+    load_cascaded_tanks,
+    load_pwh,
+    load_silverbox,
+    load_whpn,
+)
 from ar_raphu.datasets.pb1_protocol import (
     apply_pb1_development_partition,
+    apply_pb1_repair_v2_partition,
     load_pb1_protocol_freeze,
 )
 from ar_raphu.spectral.pb1_development import (
@@ -25,7 +31,12 @@ from ar_raphu.spectral.pb1_development import (
 )
 
 
-LOADERS = {"pwh": load_pwh, "whpn": load_whpn}
+LOADERS = {
+    "pwh": load_pwh,
+    "whpn": load_whpn,
+    "cascaded_tanks": load_cascaded_tanks,
+    "silverbox": load_silverbox,
+}
 
 
 def _json(path: Path) -> dict:
@@ -41,42 +52,54 @@ def main() -> int:
         default=Path("/root/OPS_UOI_WORKSPACE/data/raw"),
     )
     parser.add_argument("--force-development", action="store_true")
+    parser.add_argument(
+        "--horizon", type=int, choices=(1, 5, 10, 20), required=True
+    )
     args = parser.parse_args()
 
     base = (
-        ROOT / "results/public_benchmarks/pb1" / args.dataset / "development"
+        ROOT
+        / "results/public_benchmarks/pb1_repair_v2"
+        / args.dataset
+        / "development"
     )
     pilot_path = (
-        base / "H3_SHARED_HISTORY/SPECTRAL_PILOT_H1/full_spectral.json"
+        base
+        / f"H3_SHARED_HISTORY/SPECTRAL_PILOT_H{args.horizon}/full_spectral.json"
     )
     pilot = _json(pilot_path)
     if pilot["status"] != "COMPLETED":
         raise RuntimeError("The frozen H3 spectral pilot did not complete.")
-    freeze = load_pb1_protocol_freeze(
-        ROOT / "configs/public_benchmarks/PB1_PROTOCOL_FREEZE.json"
+    config = _json(
+        ROOT / f"configs/public_benchmarks/pb1_{args.dataset}.yaml"
     )
-    audit = (
-        _json(
-            ROOT
-            / "results/public_benchmarks/pb1/protocol_audit"
-            / "whpn_realization_audit.json"
+    raw = LOADERS[args.dataset](args.raw_root, include_test=False)
+    if args.dataset in {"cascaded_tanks", "silverbox"}:
+        dataset = apply_pb1_repair_v2_partition(raw, config)
+    else:
+        freeze = load_pb1_protocol_freeze(
+            ROOT / "configs/public_benchmarks/PB1_PROTOCOL_FREEZE.json"
         )
-        if args.dataset == "whpn"
-        else None
-    )
-    dataset = apply_pb1_development_partition(
-        LOADERS[args.dataset](args.raw_root, include_test=False),
-        freeze,
-        whpn_audit=audit,
-    )
+        audit = (
+            _json(
+                ROOT
+                / "results/public_benchmarks/pb1/protocol_audit"
+                / "whpn_realization_audit.json"
+            )
+            if args.dataset == "whpn"
+            else None
+        )
+        dataset = apply_pb1_development_partition(
+            raw, freeze, whpn_audit=audit
+        )
     fit = fit_pb1_shared_history_spectral(
         dataset,
         L_x=int(pilot["history"]["L_x"]),
         L_y=int(pilot["history"]["L_y"]),
-        horizon=1,
+        horizon=args.horizon,
         lag_kind="discrete_identity",
         amplitude_count=int(pilot["basis"]["amplitude"]["count"]),
-        grid_points=int(pilot["penalty"]["grid_points_per_axis"]),
+        grid_points=int(pilot["penalty"]["positive_grid_points_per_axis"]),
         maximum_expansions=int(pilot["penalty"]["maximum_expansions"]),
     )
     original = pilot["penalty"]["selected"]
@@ -98,18 +121,16 @@ def main() -> int:
         seed=20240727,
     )
     payload = {
-        "schema_version": 6,
+        "schema_version": 7,
         "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
         "dataset": args.dataset,
-        "stage": "development",
+        "stage": "development_repair",
         "lane": "H3_SHARED_HISTORY_FAIRNESS",
         "model": "FULL_SPECTRAL_AR_RAPHU",
+        "horizon": args.horizon,
         "bootstrap_role": "FROZEN_MODEL_EXTERNAL_SPECTRUM_STABILITY",
-        "resampling_unit": (
-            "PHASE_CLUSTER_ALL_AMPLITUDES_AND_BOTH_PERIODS"
-            if args.dataset == "pwh"
-            else "WHOLE_REALIZATION"
-        ),
+        "resampling_unit": config["bootstrap"]["primary_unit"],
+        "automatic_block_length": bootstrap.automatic_block_length,
         "retunes_penalty": False,
         "retunes_resolution": False,
         "replicates": bootstrap.replicates,
@@ -131,6 +152,7 @@ def main() -> int:
         "runtime_seconds": fit.elapsed_seconds + bootstrap.elapsed_seconds,
         "official_test_rows_loaded": 0,
         "official_test_access_count": 0,
+        "confirmation_allowed": False,
         "structural_rank_claim_allowed": False,
         "status": (
             "COMPLETED"

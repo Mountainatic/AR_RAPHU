@@ -1,5 +1,5 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
   "dataset": {
     "id": "cascaded_tanks",
@@ -8,15 +8,18 @@
     "input_columns": ["pump_input"],
     "target_columns": ["lower_tank_level"],
     "sequence_policy": "official_record",
-    "report_overflow_partition": true,
+    "report_overflow_partition": false,
     "development_split": {
-      "status": "BLOCKED_PENDING_USER_FREEZE",
-      "unit": "chronological_tail_of_estimation_record",
-      "validation_fraction": null
+      "status": "FROZEN_LITERATURE_SPLIT",
+      "source": "Champneys2024_associated_code",
+      "unit": "chronological_estimation_record",
+      "train_rows": [0, 700],
+      "validation_rows": [700, "end"]
     },
     "overflow_mask": {
-      "status": "BLOCKED_BY_MISSING_METADATA",
-      "reason": "official benchmark gives no numeric sample-level threshold"
+      "status": "NOT_REQUIRED_FOR_PRIMARY_DEVELOPMENT",
+      "reason": "official benchmark gives no numeric sample-level threshold",
+      "blocking": false
     }
   },
   "task": {
@@ -24,7 +27,21 @@
     "horizons": [1, 5, 10, 20],
     "use_future_x": false,
     "lx_grid": [8, 16, 32, 64],
-    "ly_grid": [1, 4, 8, 16, 32]
+    "ly_grid": [1, 4, 8, 16, 32],
+    "xar_history_selection": {
+      "H1_baseline_faithful": {"history": {"L_x": 9, "L_y": 8}},
+      "H2_native_model": {
+        "selector": "FULL_LX_LY_GRID_ONE_SE",
+        "complexity_key": [
+          "Lx_plus_Ly",
+          "Lx_times_Ly",
+          "max_Lx_Ly",
+          "Lx",
+          "Ly"
+        ]
+      },
+      "H3_shared_history_fairness": {"history": {"L_x": 9, "L_y": 8}}
+    }
   },
   "basis": {
     "lag_candidates": [
@@ -36,24 +53,79 @@
   },
   "models": [
     "persistence",
-    "ar_ridge",
-    "arx_ridge",
-    "narx_mlp",
+    "arx_qr",
+    "pnarx",
+    "mlpnarx_champneys2024",
     "rank1_ar_raphu",
     "fixed_rank2_ar_raphu",
     "full_spectral_ar_raphu",
     "adaptive_spectral_ar_raphu"
   ],
+  "literature_baselines": {
+    "arx": {
+      "nx": 9,
+      "ny": 8,
+      "solver": "PIVOTED_QR_OR_SVD_MINIMUM_NORM",
+      "scientific_ridge": 0.0
+    },
+    "pnarx": {
+      "nx": 9,
+      "ny": 8,
+      "basis": "legendre_univariate",
+      "polynomial_orders": [2, 3, 4, 5, 6, 7],
+      "selector": "VALIDATION_AIC"
+    },
+    "mlpnarx": {
+      "nx": 9,
+      "ny": 8,
+      "hidden_layers": 1,
+      "activation": "tanh",
+      "widths": [2, 5, 7, 10],
+      "optimizer": "Adam",
+      "learning_rate": 0.01,
+      "iterations": 20000,
+      "initializations": 5,
+      "early_stopping": false
+    }
+  },
   "selection": {
     "split": "validation",
     "lepski_enabled": true,
     "rank_budgets": [0.10, 0.05, 0.02],
     "primary_rank_budget": 0.05,
-    "test_access": "once_after_freeze"
+    "test_access": "once_after_freeze",
+    "spectral_penalty": {
+      "normalization": "POSITIVE_GENERALIZED_EIGENVALUE_MEDIAN_RELATIVE_TO_TRAIN_GRAM",
+      "interval": "EXACT_ZERO_PLUS_AUTOMATIC_POSITIVE_INTERVAL",
+      "grid_points_per_positive_axis": 7,
+      "boundary_expansions_max": 2,
+      "risk": "BLOCKED_VALIDATION",
+      "one_se_tie": "LOWEST_EFFECTIVE_DF"
+    }
+  },
+  "bootstrap": {
+    "primary_unit": "AUTOMATIC_TIME_BLOCK",
+    "development_replicates": 250,
+    "confirmation_replicates": 1000,
+    "every_horizon": true,
+    "tune_inside_primary_bootstrap": false
+  },
+  "free_run": {
+    "required": true,
+    "separate_from_direct": true,
+    "development_validation_only": true,
+    "official_initialization": 50
+  },
+  "repair_v2": {
+    "exact_zero_penalty": true,
+    "solver_rescue_ladder": true,
+    "relative_loss_inflation": true
   },
   "solver": {
     "dtype": "float64",
     "device": "cpu",
-    "kkt_relative_residual": 1.0e-8
+    "kkt_relative_residual": 1.0e-8,
+    "numerical_jitter_is_scientific_ridge": false,
+    "maximum_refinement_steps": 5
   }
 }

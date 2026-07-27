@@ -6,6 +6,7 @@ from ar_raphu.datasets.base import DynamicDataset
 from ar_raphu.spectral.pb1_development import (
     bootstrap_external_rank_spectrum,
     fit_pb1_shared_history_spectral,
+    simulate_pb1_free_run,
 )
 
 
@@ -68,9 +69,11 @@ def test_pb1_spectral_adapter_is_no_test_cpu_fp64_and_rank_after_selection() -> 
     )
     assert fit.selected.coefficients.dtype == np.float64
     assert fit.selected.relative_kkt_residual <= 1.0e-8
-    assert len(fit.candidates) == 27
+    assert len(fit.candidates) == 64
     assert fit.rank_audit["structural_rank_claim_allowed"] is False
     assert fit.rank_audit["predictive_svd_rank_claim_allowed"] is True
+    assert "relative_loss_inflation" in fit.rank_audit
+    assert fit.rank_audit["selected_rank_5pct"] >= 1
     bootstrap = bootstrap_external_rank_spectrum(
         fit, replicates=5, seed=12
     )
@@ -97,3 +100,20 @@ def test_pb1_spectral_track_isolation() -> None:
         assert (fit.ar_block is not None) is (track == "AR")
         if track == "AR":
             assert fit.rank_audit["status"] == "NOT_APPLICABLE"
+
+
+def test_pb1_spectral_free_run_is_separate_and_validation_only() -> None:
+    dataset = _dataset()
+    fit = fit_pb1_shared_history_spectral(
+        dataset,
+        L_x=4,
+        L_y=3,
+        amplitude_count=5,
+        grid_points=3,
+        maximum_expansions=0,
+    )
+    result = simulate_pb1_free_run(dataset, fit)
+    assert result.status == "COMPLETED"
+    assert result.initialization_length == 3
+    assert result.scored_samples > 0
+    assert np.isfinite(result.rmse_standardized)

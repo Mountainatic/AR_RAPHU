@@ -1,5 +1,5 @@
 {
-  "schema_version": 6,
+  "schema_version": 7,
   "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
   "dataset": {
     "id": "whpn",
@@ -146,13 +146,37 @@
     "within_record_block": "ONLY_IF_PREDECLARED_NESTED_AUDIT_IS_TRIGGERED",
     "development_replicates": 250,
     "confirmation_replicates": 1000,
-    "shared_fixed_block_length": null
+    "shared_fixed_block_length": null,
+    "every_horizon": true,
+    "tune_inside_primary_bootstrap": false
+  },
+  "free_run": {
+    "required": true,
+    "separate_from_direct": true,
+    "development_validation_only": true,
+    "initialization": "max_Ly_and_official_initialization"
+  },
+  "repair_v2": {
+    "exact_zero_penalty": true,
+    "solver_rescue_ladder": [
+      "symmetric_fp64_primary",
+      "diagonal_equilibration",
+      "iterative_refinement",
+      "svd_minimum_norm"
+    ],
+    "h2_selection_order": [
+      "history",
+      "resolution",
+      "final_penalty"
+    ],
+    "relative_loss_inflation": true
   },
   "solver": {
     "dtype": "float64",
     "device": "cpu",
     "kkt_relative_residual": 1.0e-8,
     "numerical_jitter": "64*machine_epsilon*max(1,norm2(H_plus_P))",
-    "numerical_jitter_is_scientific_ridge": false
+    "numerical_jitter_is_scientific_ridge": false,
+    "maximum_refinement_steps": 5
   }
 }

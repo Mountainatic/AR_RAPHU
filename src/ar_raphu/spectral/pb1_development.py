@@ -7,6 +7,7 @@ import itertools
 import math
 import re
 import time
+import warnings
 
 import numpy as np
 import scipy.linalg
@@ -23,9 +24,14 @@ from .penalty_interval import (
     automatic_penalty_interval,
     expand_penalty_interval,
     normalize_penalty_relative_to_gram,
-    numerical_jitter,
 )
 from .predictive_rank import predictive_rank_profile
+from .pb1_repair import (
+    automatic_time_block_length,
+    positive_lower_expansion_required,
+    solve_pb1_system,
+    zero_inclusive_penalty_grid,
+)
 from .spline_basis import CenteredSplineBasis, clamped_knots, evaluate_basis
 
 
@@ -57,6 +63,7 @@ class PB1PenaltyCandidate:
     index_ridge: int
     coefficients: np.ndarray
     intercept: float
+    solver_diagnostics: dict[str, object]
 
 
 @dataclass(frozen=True, slots=True)
@@ -89,6 +96,19 @@ class PB1RankBootstrap:
     spectral_tail_budget_rank_frequencies: dict[str, dict[str, int]]
     maximum_relative_kkt_residual: float
     elapsed_seconds: float
+    automatic_block_length: int | None
+
+
+@dataclass(frozen=True, slots=True)
+class PB1FreeRunMetrics:
+    initialization_length: int
+    scored_samples: int
+    mse_standardized: float
+    rmse_standardized: float
+    mse_original_units: float
+    rmse_original_units: float
+    mse_by_sequence_standardized: dict[str, float]
+    status: str
 
 
 def _lag_basis(history: int, kind: str, count: int | None) -> np.ndarray:
@@ -157,20 +177,39 @@ def _block_penalties(blocks: tuple[PB1TensorBlock, ...]) -> tuple[np.ndarray, ..
     return lag_penalty, amplitude_penalty, ridge_penalty
 
 
-def _group_labels(dataset_id: str, sequence_ids: np.ndarray) -> np.ndarray:
-    labels: list[str] = []
-    for sequence in map(str, sequence_ids):
-        record = sequence.split(":", 1)[-1]
-        if dataset_id == "pwh":
-            match = re.match(r"Est-phase-(\d+)-amp-\d+$", record)
-            if match is None:
-                raise ValueError(f"Unexpected PWH record {record!r}.")
-            labels.append(f"phase-{match.group(1)}")
-        elif dataset_id == "whpn":
-            labels.append(record)
-        else:
-            raise ValueError("PB1 grouped risk is implemented for PWH/WHPN.")
-    return np.asarray(labels, dtype=object)
+def _group_labels(
+    dataset_id: str,
+    sequence_ids: np.ndarray,
+    target: np.ndarray | None = None,
+) -> np.ndarray:
+    values = np.asarray(sequence_ids, dtype=object)
+    labels = np.empty(len(values), dtype=object)
+    if dataset_id in {"pwh", "whpn"}:
+        for index, sequence in enumerate(map(str, values)):
+            record = sequence.split(":", 1)[-1]
+            if dataset_id == "pwh":
+                match = re.match(r"Est-phase-(\d+)-amp-\d+$", record)
+                if match is None:
+                    raise ValueError(f"Unexpected PWH record {record!r}.")
+                labels[index] = f"phase-{match.group(1)}"
+            else:
+                labels[index] = record
+        return labels
+    if dataset_id not in {"cascaded_tanks", "silverbox"}:
+        raise ValueError(f"Unsupported PB1 grouped-risk dataset {dataset_id!r}.")
+    if target is None:
+        raise ValueError("Time-series grouped risk requires the aligned target.")
+    aligned_target = np.asarray(target, dtype=np.float64)
+    if aligned_target.shape != (len(values),):
+        raise ValueError("Grouped-risk target is not aligned.")
+    for sequence in np.unique(values):
+        indices = np.flatnonzero(values == sequence)
+        block_length = automatic_time_block_length(aligned_target[indices])
+        local_blocks = np.arange(len(indices)) // block_length
+        labels[indices] = [
+            f"{sequence}:blocked-risk-{block}" for block in local_blocks
+        ]
+    return labels
 
 
 def _group_mse(
@@ -210,21 +249,26 @@ def _fit_candidate(
         for weight, component in zip(weights, normalized_penalties, strict=True)
     )
     system_without_jitter = gram + penalty
-    jitter = numerical_jitter(system_without_jitter)
-    system = system_without_jitter + jitter * np.eye(len(gram))
-    factor = scipy.linalg.cho_factor(system, lower=True, check_finite=True)
-    coefficients = scipy.linalg.cho_solve(factor, rhs, check_finite=False)
+    solution = solve_pb1_system(system_without_jitter, rhs)
+    coefficients = solution.coefficients
     intercept = target_mean - float(feature_mean @ coefficients)
     validation_prediction = validation_matrix @ coefficients + intercept
     by_group, mean, se = _group_mse(
         validation_target, validation_prediction, validation_groups
     )
-    residual = system @ coefficients - rhs
-    relative_kkt = float(
-        np.linalg.norm(residual)
-        / max(np.linalg.norm(rhs), np.finfo(np.float64).eps)
-    )
-    influence = scipy.linalg.cho_solve(factor, gram, check_finite=False)
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", scipy.linalg.LinAlgWarning)
+            influence = scipy.linalg.solve(
+                system_without_jitter,
+                gram,
+                assume_a="sym",
+                check_finite=False,
+            )
+    except (np.linalg.LinAlgError, scipy.linalg.LinAlgWarning):
+        influence = scipy.linalg.pinvh(
+            system_without_jitter, check_finite=False
+        ) @ gram
     effective_df = float(np.trace(influence))
     return PB1PenaltyCandidate(
         lag_weight=weights[0],
@@ -234,14 +278,28 @@ def _fit_candidate(
         validation_mse_by_group=by_group,
         validation_mse_se=se,
         effective_df=effective_df,
-        relative_kkt_residual=relative_kkt,
-        numerical_jitter=jitter,
+        relative_kkt_residual=solution.relative_kkt_residual,
+        numerical_jitter=solution.numerical_jitter,
         configuration_order=configuration_order,
         index_lag=indices[0],
         index_amplitude=indices[1],
         index_ridge=indices[2],
         coefficients=coefficients,
         intercept=intercept,
+        solver_diagnostics={
+            "solver_stage": solution.solver_stage,
+            "converged": solution.converged,
+            "diag_equilibration_used": solution.diag_equilibration_used,
+            "iterative_refinement_steps": solution.iterative_refinement_steps,
+            "condition_estimate_before": solution.condition_estimate_before,
+            "condition_estimate_after": solution.condition_estimate_after,
+            "effective_rank": solution.effective_rank,
+            "smallest_retained_singular_value": (
+                solution.smallest_retained_singular_value
+            ),
+            "svd_rcond": solution.svd_rcond,
+            "solution_is_minimum_norm": solution.solution_is_minimum_norm,
+        },
     )
 
 
@@ -307,6 +365,14 @@ def _rank_audit(
         mse = float(np.mean((validation_target - prediction) ** 2))
         rank_mse.append(mse)
         curves.append(math.sqrt(max(mse - full_mse, 0.0) / variance))
+    effective_ranks = predictive_rank_profile(
+        np.asarray(curves), (0.10, 0.05, 0.02)
+    )
+    relative_inflation = [
+        (mse - full_mse) / max(full_mse, np.finfo(float).eps)
+        for mse in rank_mse
+    ]
+    primary_rank = effective_ranks[0.05]
     return {
         "structural_rank_claim_allowed": False,
         "predictive_svd_rank_claim_allowed": True,
@@ -320,15 +386,120 @@ def _rank_audit(
             )
         ).tolist(),
         "full_validation_mse": full_mse,
+        "full_mse": full_mse,
+        "rank1_mse": rank_mse[0],
+        "rank2_mse": rank_mse[1] if len(rank_mse) > 1 else rank_mse[0],
+        "adaptive_mse": rank_mse[primary_rank - 1],
         "rank_validation_mse": rank_mse,
         "normalized_excess_rmse_curve": curves,
+        "output_standardized_predictive_loss": curves,
+        "relative_loss_inflation": relative_inflation,
+        "selected_rank_10pct": effective_ranks[0.10],
+        "selected_rank_5pct": effective_ranks[0.05],
+        "selected_rank_2pct": effective_ranks[0.02],
         "predictive_effective_ranks": {
             str(budget): rank
-            for budget, rank in predictive_rank_profile(
-                np.asarray(curves), (0.10, 0.05, 0.02)
-            ).items()
+            for budget, rank in effective_ranks.items()
         },
     }
+
+
+def _block_history_vector(
+    block: PB1TensorBlock,
+    history: np.ndarray,
+) -> np.ndarray:
+    values = np.asarray(history, dtype=np.float64)
+    if values.shape != (block.lag_basis.shape[0],):
+        raise ValueError("Free-run history length differs from fitted block.")
+    amplitude = block.amplitude_basis.transform(values)
+    return np.einsum(
+        "la,lb->ab", block.lag_basis, amplitude, optimize=True
+    ).reshape(-1)
+
+
+def simulate_pb1_free_run(
+    dataset: DynamicDataset,
+    fit: PB1SpectralDevelopmentFit,
+    *,
+    official_initialization: int = 0,
+) -> PB1FreeRunMetrics:
+    """Run one-step spectral simulation without intermediate true outputs."""
+
+    if np.any(dataset.split == "test"):
+        raise PermissionError("PB1 development free-run refuses test rows.")
+    if fit.horizon != 1:
+        raise ValueError("Free-run simulation requires the frozen one-step model.")
+    standardizer = TrainOnlyStandardizer.fit(dataset)
+    scaled = standardizer.transform(dataset)
+    L_x, L_y = fit.history
+    initialization = max(L_y, int(official_initialization))
+    simulated = np.asarray(scaled.y[:, 0], dtype=np.float64).copy()
+    scored_target: list[float] = []
+    scored_prediction: list[float] = []
+    scored_sequence: list[str] = []
+    for sequence in np.unique(scaled.sequence_id):
+        indices = np.flatnonzero(scaled.sequence_id == sequence)
+        validation_local = np.flatnonzero(scaled.split[indices] == "validation")
+        if not len(validation_local):
+            continue
+        first_validation = int(validation_local[0])
+        start = first_validation + initialization
+        start = max(start, L_x, L_y)
+        for local_target in range(start, int(validation_local[-1]) + 1):
+            target_index = int(indices[local_target])
+            if scaled.split[target_index] != "validation":
+                continue
+            origin_local = local_target - 1
+            x_history = scaled.x[
+                indices[origin_local - np.arange(L_x)], 0
+            ]
+            y_history = simulated[
+                indices[origin_local - np.arange(L_y)]
+            ]
+            prediction = fit.selected.intercept
+            if fit.x_block is not None:
+                prediction += float(
+                    _block_history_vector(fit.x_block, x_history)
+                    @ fit.selected.coefficients[fit.x_block.coefficient_slice]
+                )
+            if fit.ar_block is not None:
+                prediction += float(
+                    _block_history_vector(fit.ar_block, y_history)
+                    @ fit.selected.coefficients[fit.ar_block.coefficient_slice]
+                )
+            simulated[target_index] = prediction
+            scored_target.append(float(scaled.y[target_index, 0]))
+            scored_prediction.append(prediction)
+            scored_sequence.append(str(sequence))
+    if not scored_target:
+        raise ValueError("Free-run simulation has no scorable validation targets.")
+    target = np.asarray(scored_target, dtype=np.float64)
+    prediction = np.asarray(scored_prediction, dtype=np.float64)
+    sequences = np.asarray(scored_sequence, dtype=object)
+    mse = float(np.mean((target - prediction) ** 2))
+    by_sequence = {
+        str(sequence): float(
+            np.mean(
+                (
+                    target[sequences == sequence]
+                    - prediction[sequences == sequence]
+                )
+                ** 2
+            )
+        )
+        for sequence in np.unique(sequences)
+    }
+    scale = float(standardizer.y_scale[0])
+    return PB1FreeRunMetrics(
+        initialization_length=initialization,
+        scored_samples=len(target),
+        mse_standardized=mse,
+        rmse_standardized=math.sqrt(mse),
+        mse_original_units=mse * scale**2,
+        rmse_original_units=math.sqrt(mse) * scale,
+        mse_by_sequence_standardized=by_sequence,
+        status="COMPLETED",
+    )
 
 
 def bootstrap_external_rank_spectrum(
@@ -416,19 +587,9 @@ def bootstrap_external_rank_spectrum(
         gram = sum_xx / n - np.outer(mean_x, mean_x)
         rhs = sum_xy / n - mean_x * mean_y
         system_without_jitter = gram + fit.selected_penalty
-        jitter = numerical_jitter(system_without_jitter)
-        system = system_without_jitter + jitter * np.eye(len(gram))
-        factor = scipy.linalg.cho_factor(
-            system, lower=True, check_finite=False
-        )
-        coefficients = scipy.linalg.cho_solve(
-            factor, rhs, check_finite=False
-        )
-        residual = system @ coefficients - rhs
-        relative_kkt = float(
-            np.linalg.norm(residual)
-            / max(np.linalg.norm(rhs), np.finfo(float).eps)
-        )
+        solution = solve_pb1_system(system_without_jitter, rhs)
+        coefficients = solution.coefficients
+        relative_kkt = solution.relative_kkt_residual
         maximum_kkt = max(maximum_kkt, relative_kkt)
         theta_x = coefficients[x_slice].reshape(
             lag_count, amplitude_count
@@ -468,6 +629,13 @@ def bootstrap_external_rank_spectrum(
         spectral_tail_budget_rank_frequencies=rank_counts,
         maximum_relative_kkt_residual=maximum_kkt,
         elapsed_seconds=time.perf_counter() - started,
+        automatic_block_length=(
+            automatic_time_block_length(target)
+            if len(np.unique(fit.train_groups)) > 1
+            and fit.track in {"X", "XAR"}
+            and all("blocked-risk" in str(group) for group in unique_groups)
+            else None
+        ),
     )
 
 
@@ -558,7 +726,9 @@ def fit_pb1_shared_history_spectral(
     train_target = task.target[train_mask]
     validation_target = task.target[validation_mask]
     validation_groups = _group_labels(
-        dataset_id, task.sequence_id[validation_mask]
+        dataset_id,
+        task.sequence_id[validation_mask],
+        task.target[validation_mask],
     )
     feature_mean = train_matrix.mean(axis=0)
     target_mean = float(train_target.mean())
@@ -581,9 +751,13 @@ def fit_pb1_shared_history_spectral(
     status = "PENALTY_INTERVAL_NOT_CERTIFIED"
     configuration_order = 0
     for expansion_round in range(maximum_expansions + 1):
-        grids = [interval.grid(grid_points) for interval in intervals]
+        grids = [
+            zero_inclusive_penalty_grid(interval, grid_points)
+            for interval in intervals
+        ]
         round_rows: list[PB1PenaltyCandidate] = []
-        for indices in itertools.product(range(grid_points), repeat=3):
+        axis_size = grid_points + 1
+        for indices in itertools.product(range(axis_size), repeat=3):
             weights = tuple(
                 float(grids[axis][indices[axis]]) for axis in range(3)
             )
@@ -607,16 +781,46 @@ def fit_pb1_shared_history_spectral(
             configuration_order += 1
         selected = _select_one_se(round_rows)
         boundary_axes = []
+        axis_statuses: list[str] = []
         selected_indices = (
             selected.index_lag,
             selected.index_amplitude,
             selected.index_ridge,
         )
+        global_minimum = min(
+            round_rows,
+            key=lambda row: (row.validation_mse_mean, row.configuration_order),
+        )
         for axis, index in enumerate(selected_indices):
             if index == 0:
-                boundary_axes.append((axis, "lower"))
-            elif index == grid_points - 1:
+                axis_statuses.append("ZERO_PENALTY_ENDPOINT_CERTIFIED")
+            elif index == axis_size - 1:
                 boundary_axes.append((axis, "upper"))
+                axis_statuses.append("UPPER_BOUNDARY_SELECTED")
+            elif index == 1:
+                zero_rows = [
+                    row
+                    for row in round_rows
+                    if (
+                        row.index_lag,
+                        row.index_amplitude,
+                        row.index_ridge,
+                    )[axis]
+                    == 0
+                ]
+                zero_best = min(row.validation_mse_mean for row in zero_rows)
+                if positive_lower_expansion_required(
+                    selected_index=index,
+                    axis_zero_best_loss=zero_best,
+                    global_minimum_loss=global_minimum.validation_mse_mean,
+                    global_minimum_se=global_minimum.validation_mse_se,
+                ):
+                    boundary_axes.append((axis, "lower"))
+                    axis_statuses.append("POSITIVE_LOWER_EXPANSION_REQUIRED")
+                else:
+                    axis_statuses.append("POSITIVE_LOWER_CERTIFIED_WITH_ZERO")
+            else:
+                axis_statuses.append("POSITIVE_INTERIOR_CERTIFIED")
         interval_history.append(
             {
                 "round": expansion_round,
@@ -629,6 +833,12 @@ def fit_pb1_shared_history_spectral(
                     for interval in intervals
                 ],
                 "selected_indices": list(selected_indices),
+                "selected_weights": [
+                    selected.lag_weight,
+                    selected.amplitude_weight,
+                    selected.ridge_weight,
+                ],
+                "axis_statuses": axis_statuses,
                 "boundary_axes": [
                     {"axis": axis, "side": side}
                     for axis, side in boundary_axes
@@ -639,6 +849,8 @@ def fit_pb1_shared_history_spectral(
             status = "PENALTY_INTERVAL_CERTIFIED"
             break
         if expansion_round == maximum_expansions:
+            if any(side == "upper" for _, side in boundary_axes):
+                status = "PENALTY_UPPER_INTERVAL_NOT_CERTIFIED"
             break
         for axis, side in boundary_axes:
             intervals[axis] = expand_penalty_interval(
@@ -685,7 +897,9 @@ def fit_pb1_shared_history_spectral(
         validation_target=validation_target,
         train_matrix=train_matrix,
         train_groups=_group_labels(
-            dataset_id, task.sequence_id[train_mask]
+            dataset_id,
+            task.sequence_id[train_mask],
+            task.target[train_mask],
         ),
         validation_groups=validation_groups,
         selected_penalty=selected_penalty,

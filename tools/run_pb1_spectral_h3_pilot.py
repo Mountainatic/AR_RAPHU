@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run H3 shared-history spectral development at the first declared resolution."""
+"""Run Repair-V2 H3 shared-history spectral development."""
 
 from __future__ import annotations
 
@@ -14,17 +14,29 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
-from ar_raphu.datasets.loaders import load_pwh, load_whpn
+from ar_raphu.datasets.loaders import (
+    load_cascaded_tanks,
+    load_pwh,
+    load_silverbox,
+    load_whpn,
+)
 from ar_raphu.datasets.pb1_protocol import (
     apply_pb1_development_partition,
+    apply_pb1_repair_v2_partition,
     load_pb1_protocol_freeze,
 )
 from ar_raphu.spectral.pb1_development import (
     fit_pb1_shared_history_spectral,
+    simulate_pb1_free_run,
 )
 
 
-LOADERS = {"pwh": load_pwh, "whpn": load_whpn}
+LOADERS = {
+    "pwh": load_pwh,
+    "whpn": load_whpn,
+    "cascaded_tanks": load_cascaded_tanks,
+    "silverbox": load_silverbox,
+}
 
 
 def _json(path: Path) -> dict:
@@ -33,6 +45,44 @@ def _json(path: Path) -> dict:
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _partition(dataset_name: str, raw_root: Path, config: dict) -> object:
+    raw = LOADERS[dataset_name](raw_root, include_test=False)
+    if dataset_name in {"cascaded_tanks", "silverbox"}:
+        return apply_pb1_repair_v2_partition(raw, config)
+    freeze = load_pb1_protocol_freeze(
+        ROOT / "configs/public_benchmarks/PB1_PROTOCOL_FREEZE.json"
+    )
+    audit = (
+        _json(
+            ROOT
+            / "results/public_benchmarks/pb1/protocol_audit"
+            / "whpn_realization_audit.json"
+        )
+        if dataset_name == "whpn"
+        else None
+    )
+    return apply_pb1_development_partition(raw, freeze, whpn_audit=audit)
+
+
+def _h3_history(dataset_name: str, config: dict) -> tuple[int, int, str, Path | None]:
+    frozen = config["task"]["xar_history_selection"]["H3_shared_history_fairness"]
+    history = frozen.get("history")
+    if isinstance(history, dict):
+        return int(history["L_x"]), int(history["L_y"]), "LITERATURE_FROZEN", None
+    h1_path = (
+        ROOT
+        / "results/public_benchmarks/pb1"
+        / dataset_name
+        / "development/H1_ARX_NO_FUTURE_X/history_selection.json"
+    )
+    selected = _json(h1_path)["selected"]
+    return int(selected["nx"]), int(selected["ny"]), "H1_ARX_AIC", h1_path
+
+
+def _solver_diagnostics(selected: object) -> dict:
+    return dict(selected.solver_diagnostics)
 
 
 def main() -> int:
@@ -52,46 +102,30 @@ def main() -> int:
     parser.add_argument("--force-development", action="store_true")
     args = parser.parse_args()
 
-    preflight_path = (
-        ROOT / "results/public_benchmarks/pb1/PB1_DEVELOPMENT_PREFLIGHT.json"
+    preflight_path = ROOT / (
+        "results/public_benchmarks/pb1_repair_v2/"
+        "PB1_REPAIR_PREFLIGHT_STATUS.json"
     )
     preflight = _json(preflight_path)
-    if preflight.get("overall_status") != "READY_FOR_DEVELOPMENT":
-        raise RuntimeError("PB1 development preflight is not ready.")
-    freeze_path = ROOT / "configs/public_benchmarks/PB1_PROTOCOL_FREEZE.json"
-    freeze = load_pb1_protocol_freeze(freeze_path)
-    audit = (
-        _json(
-            ROOT
-            / "results/public_benchmarks/pb1/protocol_audit"
-            / "whpn_realization_audit.json"
-        )
-        if args.dataset == "whpn"
-        else None
-    )
-    dataset = apply_pb1_development_partition(
-        LOADERS[args.dataset](args.raw_root, include_test=False),
-        freeze,
-        whpn_audit=audit,
-    )
+    if preflight.get("status") != "COMPLETED":
+        raise RuntimeError("PB1 Repair V2 preflight is not complete.")
     config_path = (
         ROOT / f"configs/public_benchmarks/pb1_{args.dataset}.yaml"
     )
     config = _json(config_path)
-    h1_path = (
-        ROOT
-        / "results/public_benchmarks/pb1"
-        / args.dataset
-        / "development/H1_ARX_NO_FUTURE_X/history_selection.json"
-    )
-    h1 = _json(h1_path)
-    L_x = int(h1["selected"]["nx"])
-    L_y = int(h1["selected"]["ny"])
+    dataset = _partition(args.dataset, args.raw_root, config)
+    L_x, L_y, history_source, h1_path = _h3_history(args.dataset, config)
     lag_candidate = config["basis"]["lag_candidates"][0]
     if lag_candidate != {"type": "discrete_identity"}:
         raise ValueError("H3 pilot must use the first declared lag resolution.")
     amplitude_count = int(config["basis"]["amplitude_count_grid"][0])
     penalty = config["selection"]["spectral_penalty"]
+    positive_grid_points = int(
+        penalty.get(
+            "grid_points_per_positive_axis",
+            penalty.get("grid_points_per_axis"),
+        )
+    )
     if args.horizon not in config["task"]["horizons"]:
         raise ValueError("Horizon is not frozen in the dataset config.")
     fit = fit_pb1_shared_history_spectral(
@@ -102,13 +136,13 @@ def main() -> int:
         lag_kind="discrete_identity",
         lag_count=None,
         amplitude_count=amplitude_count,
-        grid_points=int(penalty["grid_points_per_axis"]),
+        grid_points=positive_grid_points,
         maximum_expansions=int(penalty["boundary_expansions_max"]),
         track=args.track,
     )
     output = (
         ROOT
-        / "results/public_benchmarks/pb1"
+        / "results/public_benchmarks/pb1_repair_v2"
         / args.dataset
         / (
             "development/H3_SHARED_HISTORY/"
@@ -124,17 +158,17 @@ def main() -> int:
         raise FileExistsError(f"{output} already exists.")
     selected = fit.selected
     payload = {
-        "schema_version": 6,
+        "schema_version": 7,
         "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
         "dataset": args.dataset,
-        "stage": "development",
+        "stage": "development_repair",
         "lane": "H3_SHARED_HISTORY_FAIRNESS",
         "role": "PENALTY_CERTIFICATION_AT_FIRST_PREDECLARED_RESOLUTION",
         "model": "FULL_SPECTRAL_AR_RAPHU",
         "track": args.track,
         "horizon": args.horizon,
         "use_future_x": False,
-        "history": {"L_x": L_x, "L_y": L_y, "source": "H1_ARX_AIC"},
+        "history": {"L_x": L_x, "L_y": L_y, "source": history_source},
         "basis": {
             "lag": {"type": "discrete_identity"},
             "amplitude": {"type": "cubic_bspline", "count": amplitude_count},
@@ -151,7 +185,8 @@ def main() -> int:
         },
         "penalty": {
             "normalization": "POSITIVE_GENERALIZED_EIGENVALUE_MEDIAN_RELATIVE_TO_TRAIN_GRAM",
-            "grid_points_per_axis": int(penalty["grid_points_per_axis"]),
+            "exact_zero_endpoint": True,
+            "positive_grid_points_per_axis": positive_grid_points,
             "maximum_expansions": int(penalty["boundary_expansions_max"]),
             "selection": "GROUPED_VALIDATION_ONE_SE_LOWEST_EFFECTIVE_DF",
             "status": fit.penalty_status,
@@ -170,6 +205,7 @@ def main() -> int:
                 "numerical_jitter": selected.numerical_jitter,
                 "intercept": selected.intercept,
                 "coefficients": selected.coefficients.tolist(),
+                "solver_diagnostics": _solver_diagnostics(selected),
             },
             "candidate_count": len(fit.candidates),
         },
@@ -186,8 +222,8 @@ def main() -> int:
             ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
         ).strip(),
         "config_sha256": _sha256(config_path),
-        "h1_sha256": _sha256(h1_path),
-        "protocol_freeze_sha256": _sha256(freeze_path),
+        "h1_sha256": None if h1_path is None else _sha256(h1_path),
+        "repair_preflight_sha256": _sha256(preflight_path),
         "runtime": {
             "elapsed_seconds": fit.elapsed_seconds,
             "dtype": "float64",
@@ -199,11 +235,32 @@ def main() -> int:
             and selected.relative_kkt_residual <= 1.0e-8
             else "FAILED"
         ),
-        "confirmation_allowed": (
-            fit.penalty_status == "PENALTY_INTERVAL_CERTIFIED"
-            and selected.relative_kkt_residual <= 1.0e-8
-        ),
+        "confirmation_allowed": False,
     }
+    if args.track == "XAR" and args.horizon == 1:
+        initialization = config["free_run"].get(
+            "official_initialization", 0
+        )
+        free_run = simulate_pb1_free_run(
+            dataset,
+            fit,
+            official_initialization=(
+                int(initialization) if isinstance(initialization, int) else 0
+            ),
+        )
+        payload["free_run_validation"] = {
+            "status": free_run.status,
+            "initialization_length": free_run.initialization_length,
+            "scored_samples": free_run.scored_samples,
+            "mse_standardized": free_run.mse_standardized,
+            "rmse_standardized": free_run.rmse_standardized,
+            "mse_original_units": free_run.mse_original_units,
+            "rmse_original_units": free_run.rmse_original_units,
+            "mse_by_sequence_standardized": (
+                free_run.mse_by_sequence_standardized
+            ),
+            "uses_intermediate_true_outputs": False,
+        }
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n",

@@ -1,0 +1,22 @@
+{
+  "schema_version": "PB1_REPAIR_PREFLIGHT_STATUS_V2",
+  "stage": "development_repair",
+  "datasets": [
+    "pwh",
+    "whpn",
+    "cascaded_tanks",
+    "silverbox"
+  ],
+  "protocol_patch_freeze_status": "DEVELOPMENT_REPAIR_V2",
+  "official_test_access_count": 0,
+  "official_test_access_violations": [],
+  "gates": {
+    "SCHEMA_7_ALL_DATASETS": true,
+    "TANKS_SPLIT_700_REST": true,
+    "SILVERBOX_SPLIT_HALF_HALF": true,
+    "OFFICIAL_TEST_ACCESS_COUNT_ZERO": true,
+    "CONFIRMATION_FORBIDDEN": true
+  },
+  "failures": [],
+  "status": "COMPLETED"
+}

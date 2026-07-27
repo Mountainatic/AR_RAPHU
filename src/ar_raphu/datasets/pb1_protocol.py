@@ -156,3 +156,62 @@ def apply_pb1_development_partition(
         )
 
     raise PermissionError(f"{dataset_id!r} has no implemented PB1 partitioner.")
+
+
+def apply_pb1_repair_v2_partition(
+    dataset: DynamicDataset,
+    config: dict[str, Any],
+) -> DynamicDataset:
+    """Apply schema-7 Tanks/Silverbox literature development partitions."""
+
+    _reject_exposed_test_data(dataset)
+    if config.get("schema_version") != 7:
+        raise ValueError("PB1 Repair V2 requires schema_version 7.")
+    dataset_id = str(dataset.metadata.get("dataset_id", ""))
+    configured_id = str(config.get("dataset", {}).get("id", ""))
+    if dataset_id != configured_id:
+        raise ValueError("PB1 Repair V2 dataset/config identity mismatch.")
+    specification = config["dataset"]["development_split"]
+    if specification.get("status") != "FROZEN_LITERATURE_SPLIT":
+        raise PermissionError("Literature development split is not frozen.")
+    sequences = np.unique(dataset.sequence_id)
+    if len(sequences) != 1:
+        raise ValueError("Tanks/Silverbox development expects one estimation record.")
+    indices = np.flatnonzero(dataset.sequence_id == sequences[0])
+    split = np.full(dataset.n_time, "train", dtype=object)
+    if dataset_id == "cascaded_tanks":
+        if specification.get("source") != "Champneys2024_associated_code":
+            raise ValueError("Tanks split source is not the frozen literature code.")
+        if specification.get("train_rows") != [0, 700]:
+            raise ValueError("Tanks train split must be [0,700).")
+        if specification.get("validation_rows") != [700, "end"]:
+            raise ValueError("Tanks validation split must be [700,end).")
+        if len(indices) <= 700:
+            raise ValueError("Tanks estimation record is shorter than split boundary.")
+        split[indices[700:]] = "validation"
+        split_label = "CHAMPNEYS_ASSOCIATED_CODE_700_REST"
+    elif dataset_id == "silverbox":
+        if specification.get("source") != "Champneys2024_associated_code":
+            raise ValueError("Silverbox split source is not frozen literature code.")
+        if specification.get("train_fraction") != [0.0, 0.5]:
+            raise ValueError("Silverbox train fraction must be [0,0.5).")
+        if specification.get("validation_fraction") != [0.5, 1.0]:
+            raise ValueError("Silverbox validation fraction must be [0.5,1].")
+        boundary = len(indices) // 2
+        if boundary <= 0 or boundary >= len(indices):
+            raise ValueError("Silverbox estimation record cannot be split in half.")
+        split[indices[boundary:]] = "validation"
+        split_label = "CHAMPNEYS_ASSOCIATED_CODE_HALF_HALF"
+    else:
+        raise PermissionError(f"{dataset_id!r} is not a Repair V2 literature split.")
+    metadata = {
+        **dataset.metadata,
+        "validation_status": "FROZEN",
+        "pb1_protocol_applied": True,
+        "pb1_repair_v2": True,
+        "pb1_dataset_status": "FROZEN_LITERATURE_SPLIT",
+        "development_split_label": split_label,
+        "official_test_locked": True,
+        "official_test_access_count": 0,
+    }
+    return replace(dataset, split=split, metadata=metadata)
