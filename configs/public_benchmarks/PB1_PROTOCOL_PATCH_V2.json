@@ -1,0 +1,52 @@
+{
+  "schema_version": 7,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "freeze_status": "DEVELOPMENT_REPAIR_V2",
+  "official_test_access_count_required": 0,
+  "datasets": {
+    "pwh": {
+      "status": "REPAIR_H2_FREE_RUN_BOOTSTRAP",
+      "split": "UNCHANGED"
+    },
+    "whpn": {
+      "status": "REPAIR_ZERO_PENALTY_AND_SOLVER",
+      "split": "UNCHANGED",
+      "alignment": "RAW_UNSHIFTED"
+    },
+    "cascaded_tanks": {
+      "status": "FROZEN_LITERATURE_SPLIT",
+      "train_rows_zero_based": [
+        0,
+        699
+      ],
+      "validation_rows_zero_based": [
+        700,
+        "end"
+      ],
+      "official_test": "LOCKED",
+      "baseline_history": {
+        "nx": 9,
+        "ny": 8
+      }
+    },
+    "silverbox": {
+      "status": "FROZEN_LITERATURE_SPLIT",
+      "train_fraction": [
+        0.0,
+        0.5
+      ],
+      "validation_fraction": [
+        0.5,
+        1.0
+      ],
+      "official_test": "LOCKED",
+      "baseline_history": {
+        "nx": 10,
+        "ny": 10
+      },
+      "license_metadata_blocks_science": false
+    }
+  },
+  "next_allowed_stage": "PB1_DEVELOPMENT_REPAIR_V2",
+  "confirmation_allowed": false
+}

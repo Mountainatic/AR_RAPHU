@@ -917,3 +917,38 @@ loss 选择；rank 输入和 test 均不得参与选择。
   私有 CZ 历史 manifest 而不能执行，且根目录 `return_v034/` 会造成
   重复测试收集。PB1 必须在不读取私有数据的前提下修复测试发现和状态
   分类，再声明 `ALL_LEGACY_REGRESSION_TESTS_PASS`。
+
+## PB1 Development Repair V2（2026-07-28）
+
+- 当前 PB1 development 的活动修复规范升级为
+  `PB1_DEVELOPMENT_REPAIR_AND_TANKS_SILVERBOX_PLAN_v2_0.md`、
+  `PB1_REPAIR_PREFLIGHT_V2.yaml` 与
+  `configs/public_benchmarks/PB1_PROTOCOL_PATCH_V2.json`。发生冲突时，
+  机器可检查的 preflight/patch 约束优先于旧 PB1 development 默认值；
+  已发布的 2026-07-27 开发结果保持只读，不覆盖、不改写。
+- 本轮固定为 `PB1_DEVELOPMENT_REPAIR_V2`，不得进入 PB1 confirmation、
+  PB2 或 CZ；四套公开数据的 official test 在 protocol freeze 前必须保持
+  `official_test_access_count=0`。
+- 全局修复包括：非负 penalty 的精确零端点、FP64 solver rescue ladder、
+  H2 native-history 后 resolution 再 final-penalty 的冻结顺序、
+  relative-loss inflation、每个正式 horizon 的 250 次 development
+  bootstrap，以及与 direct 分栏的 spectral free-run。
+- Tanks development split 固定为 Champneys 2024 配套代码的
+  estimation `[0,700)` / `[700,end)`；Silverbox 固定为 multisine
+  estimation 的 half/half。许可证元数据与 overflow 阈值不再阻塞本轮
+  development，但原始公开数据仍不进入结果包。
+- 修复必须同时适用于 PWH、WHPN、Tanks、Silverbox 及 AR/X/XAR，不得为
+  单个失败任务增加隐藏例外，不得放宽 `1e-8` KKT 门槛，不得用 epsilon
+  替代科学 penalty 的精确零。
+- H3/shared-history 作为公平性对照保留；正式 H2 使用现有 schema-6
+  `lx_grid`、`ly_grid`、lag basis 与 amplitude grid，不得按结果扩候选。
+  history one-SE 复杂度键固定为
+  `(Lx+Ly, Lx*Ly, max(Lx,Ly), Lx, Ly)`；resolution 键固定为
+  `(Mtau*Mx, Mtau, Mx)`。
+- Tanks 文献 history 为 `(9,8)`；Silverbox 为 `(10,10)`。pNARX 只用
+  单变量 Legendre 阶数 2--7；MLP-NARX 固定单层 tanh、宽度
+  2/5/7/10、Adam 0.01、20,000 iterations、5 initializations、无早停。
+- 只有 PWH/WHPN 修复、Tanks/Silverbox development、四数据集 H2、
+  resolution/penalty、所有主 KKT、free-run、全 horizon bootstrap、
+  official-test-zero 与自包含包全部通过后，才允许生成
+  `PB1_PROTOCOL_FREEZE_V2.json`；生成 freeze 仍不等同于访问 official test。

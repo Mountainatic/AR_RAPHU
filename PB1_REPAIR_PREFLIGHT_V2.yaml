@@ -1,0 +1,164 @@
+schema_version: "PB1_REPAIR_PREFLIGHT_V2"
+stage: "development_repair"
+official_test_access_count_required: 0
+datasets: [pwh, whpn, cascaded_tanks, silverbox]
+
+repairs:
+  exact_zero_penalty:
+    required: true
+    penalty_terms: [lag_smoothness, amplitude_smoothness, scientific_ridge]
+    zero_is_certified_endpoint: true
+    zero_triggers_lower_expansion: false
+    max_positive_upper_expansions: 2
+  solver_rescue:
+    kkt_threshold: 1.0e-8
+    stages:
+      - symmetric_fp64_primary
+      - diagonal_equilibration
+      - iterative_refinement
+      - svd_minimum_norm
+    max_refinement_steps: 5
+    recompute_kkt_in_original_coordinates: true
+  h2_selection:
+    history_anchor_lag_basis: discrete_identity
+    history_anchor_amplitude_basis: maximum_preregistered
+    history_rule: one_standard_error
+    history_complexity_key:
+      - lx_plus_ly
+      - lx_times_ly
+      - max_lag
+      - lx
+      - ly
+    resolution_rule: representation_then_validation_then_lepski_one_se
+    resolution_complexity_key:
+      - mtau_times_mx
+      - mtau
+      - mx
+    final_penalty_refit: true
+  rank_reporting:
+    output_standardized_predictive_rank: true
+    relative_loss_inflation: true
+    structural_rank_claim_allowed: false
+  bootstrap:
+    development_replicates: 250
+    confirmation_replicates: 1000
+    every_horizon: true
+    tune_inside_primary_bootstrap: false
+  free_run:
+    required: true
+    separate_from_direct: true
+    official_initialization_metadata_required: true
+
+cascaded_tanks:
+  status: FROZEN_LITERATURE_SPLIT
+  split:
+    source: Champneys2024_associated_code
+    train_rows: [0, 700]
+    validation_rows: [700, end]
+    official_test: locked
+  official_initialization: 50
+  literature_baselines:
+    arx:
+      nx: 9
+      ny: 8
+      solver: qr_or_svd
+      ridge: 0
+    pnarx:
+      nx: 9
+      ny: 8
+      basis: legendre_univariate
+      polynomial_orders: [2, 3, 4, 5, 6, 7]
+      selector: validation_aic
+    mlp_narx:
+      nx: 9
+      ny: 8
+      hidden_layers: 1
+      activation: tanh
+      widths: [2, 5, 7, 10]
+      optimizer: Adam
+      learning_rate: 0.01
+      iterations: 20000
+      initializations: 5
+      early_stopping: false
+  spectral:
+    h3_history: {lx: 9, ly: 8}
+    h2_lx_grid: [8, 16, 32, 64]
+    h2_ly_grid: [1, 4, 8, 16, 32]
+    lag_basis_candidates:
+      - {type: discrete_identity}
+      - {type: cubic_bspline, count: 16}
+      - {type: cubic_bspline, count: 32}
+    amplitude_count_grid: [12, 16, 20, 24, 28]
+  overflow_partition:
+    blocking: false
+    primary_report: overall_rmse
+    appendix_when_metadata_available: true
+
+silverbox:
+  status: FROZEN_LITERATURE_SPLIT
+  license_metadata_blocks_science: false
+  split:
+    source: Champneys2024_associated_code
+    train_fraction: [0.0, 0.5]
+    validation_fraction: [0.5, 1.0]
+    official_test: locked
+  official_initialization: 50
+  official_test_sets:
+    - multisine
+    - arrow_full
+    - arrow_no_extrapolation
+  report_unit: mV
+  literature_baselines:
+    arx:
+      nx: 10
+      ny: 10
+      solver: qr_or_svd
+      ridge: 0
+    pnarx:
+      nx: 10
+      ny: 10
+      basis: legendre_univariate
+      polynomial_orders: [2, 3, 4, 5, 6, 7]
+      selector: validation_aic
+    mlp_narx:
+      nx: 10
+      ny: 10
+      hidden_layers: 1
+      activation: tanh
+      widths: [2, 5, 7, 10]
+      optimizer: Adam
+      learning_rate: 0.01
+      iterations: 20000
+      initializations: 5
+      early_stopping: false
+  spectral:
+    h3_history: {lx: 10, ly: 10}
+    h2_lx_grid: [16, 32, 64, 128]
+    h2_ly_grid: [1, 4, 8, 16, 32, 64]
+    lag_basis_candidates:
+      - {type: discrete_identity}
+      - {type: cubic_bspline, count: 32}
+      - {type: cubic_bspline, count: 48}
+    amplitude_count_grid: [16, 20, 24, 28, 32, 40]
+
+required_gates:
+  - ZERO_PENALTY_IMPLEMENTED
+  - SOLVER_RESCUE_LADDER_IMPLEMENTED
+  - H2_SELECTION_IMPLEMENTED
+  - RELATIVE_LOSS_INFLATION_IMPLEMENTED
+  - ALL_HORIZON_BOOTSTRAP_IMPLEMENTED
+  - SPECTRAL_FREE_RUN_IMPLEMENTED
+  - PWH_DEVELOPMENT_REPAIR_PASS
+  - WHPN_DEVELOPMENT_REPAIR_PASS_OR_EXPLICIT_PARTIAL_FREEZE
+  - TANKS_DEVELOPMENT_PASS
+  - SILVERBOX_DEVELOPMENT_PASS
+  - OFFICIAL_TEST_ACCESS_COUNT_ZERO
+  - SELF_CONTAINED_PACKAGE_PASS
+
+hard_fail:
+  - OFFICIAL_TEST_ACCESSED_DURING_DEVELOPMENT
+  - KKT_THRESHOLD_RELAXED
+  - DATASET_SPECIFIC_HIDDEN_REPAIR
+  - PENALTY_ZERO_REPLACED_BY_EPSILON
+  - DIRECT_RESULT_REPORTED_AS_FREE_RUN
+  - STRUCTURAL_RANK_CLAIMED

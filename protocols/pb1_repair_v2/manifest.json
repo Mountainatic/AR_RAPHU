@@ -1,0 +1,30 @@
+{
+  "title": "PB1 Development Repair V2",
+  "version": "v2.0",
+  "files": [
+    {
+      "path": "PB1_DEVELOPMENT_REPAIR_AND_TANKS_SILVERBOX_PLAN_v2_0.md",
+      "size_bytes": 26877,
+      "sha256": "f68c366fdee7d38fb45805a634d55af54454852aa50e46ef84810a28d3f2032f",
+      "lines": 1621
+    },
+    {
+      "path": "PB1_REPAIR_PREFLIGHT_V2.yaml",
+      "size_bytes": 4413,
+      "sha256": "d82764c5a0afd97a248f953e957afda980a194734acb4577b724122b7fd5e9c8",
+      "lines": 165
+    },
+    {
+      "path": "PB1_PROTOCOL_PATCH_V2.json",
+      "size_bytes": 1152,
+      "sha256": "e11a4e8ee18de1614964497e687aaf6253196ec0c8c5381292acc73e742b398f",
+      "lines": 52
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 405,
+      "sha256": "1c1e2467e343a5041b9ac6f74c4d834c48e7c2feb7a3aea09c92653ddd25c8eb",
+      "lines": 12
+    }
+  ]
+}
