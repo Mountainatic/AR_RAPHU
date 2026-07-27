@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "artifact_scope": "DEVELOPMENT_ONLY",
+  "generated_at_utc": "2026-07-27T13:17:31.438000+00:00",
+  "source_commit_before_packaging": "20469ab0eeaf00c3e65e7ebb880042a976235b2e",
+  "overall_status": "NOT_YET_RUN",
+  "development_overall_status": "FAILED",
+  "development_artifact_delivery_status": "COMPLETED",
+  "running_experiment_processes_at_packaging": 0,
+  "official_test_rows_loaded": 0,
+  "official_test_access_count": 0,
+  "protocol_frozen": false,
+  "datasets": {
+    "pwh": {
+      "development": "COMPLETED",
+      "direct_horizons": [
+        1,
+        5,
+        10,
+        20
+      ],
+      "failed_track_gates": [],
+      "confirmation": "NOT_YET_RUN"
+    },
+    "whpn": {
+      "development": "FAILED",
+      "direct_horizons": [
+        1,
+        5,
+        10,
+        20
+      ],
+      "failed_track_gates": [
+        {
+          "horizon": 10,
+          "track": "AR",
+          "status": "FAILED",
+          "penalty_status": "PENALTY_INTERVAL_NOT_CERTIFIED"
+        },
+        {
+          "horizon": 20,
+          "track": "AR",
+          "status": "FAILED",
+          "penalty_status": "PENALTY_INTERVAL_CERTIFIED"
+        }
+      ],
+      "confirmation": "NOT_YET_RUN"
+    },
+    "cascaded_tanks": {
+      "development": "NOT_YET_RUN",
+      "status": "PENDING_SPLIT_ADEQUACY_AUDIT"
+    },
+    "silverbox": {
+      "development": "NOT_YET_RUN",
+      "status": "BLOCKED_BY_MISSING_METADATA",
+      "reason": "LICENSE_METADATA_UNRESOLVED"
+    }
+  },
+  "completed_components": [
+    "H1 corrected no-future-X ARX history selection",
+    "2024 literature-faithful pNARX development",
+    "2024 literature-faithful MLP-NARX development",
+    "H3 shared-history FP64 spectral X/AR/XAR direct horizons",
+    "H1 frozen-model predictive-rank bootstrap with 250 replicates",
+    "main repository and V20 regression suites"
+  ],
+  "unresolved_prerequisites": [
+    "H2 native-history selection nesting not preregistered",
+    "basis-resolution selection not frozen",
+    "WHPN h10 AR penalty interval not certified",
+    "WHPN h20 AR KKT gate failed",
+    "Tanks overflow split adequacy unresolved",
+    "Silverbox license metadata unresolved",
+    "WHPN process-noise comparator not implemented"
+  ],
+  "claim_boundary": {
+    "predictive_development_evidence_allowed": true,
+    "confirmation_claim_allowed": false,
+    "official_test_claim_allowed": false,
+    "structural_rank_claim_allowed": false,
+    "causal_claim_allowed": false
+  }
+}
