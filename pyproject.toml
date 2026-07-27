@@ -20,6 +20,8 @@ dev = [
 
 [tool.pytest.ini_options]
 pythonpath = [".", "src"]
+testpaths = ["tests"]
+norecursedirs = ["return_*", "evidence_readonly", "data"]
 
 [tool.uv.sources]
 torch = { index = "pytorch-cu128" }
@@ -31,5 +33,5 @@ default = true
 
 [[tool.uv.index]]
 name = "pytorch-cu128"
-url = "https://mirrors.nju.edu.cn/pytorch/whl/cu128"
+url = "https://download.pytorch.org/whl/cu128"
 explicit = true

@@ -5,6 +5,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SOURCE = PROJECT_ROOT / "实验数据1.xlsx"
@@ -28,6 +30,20 @@ AUTHORITATIVE_DOCUMENTS = [
     "AR_RAPHU_three_layer_validation_plan_v2.md",
     "AR_RAPHU_v2_revision_notes.md",
 ]
+
+if not MANIFEST_DIR.exists():
+    protocol = json.loads(
+        (PROJECT_ROOT / "configs" / "protocol_v2.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    if protocol["execution_scope"]["private_CZ"].startswith("EXCLUDED_BY_USER"):
+        pytestmark = pytest.mark.skip(
+            reason=(
+                "NOT_APPLICABLE_PRIVATE_CZ_EXCLUDED: immutable private-CZ "
+                "manifest snapshot is absent from this public worktree"
+            )
+        )
 
 
 def sha256_file(path: Path) -> str:
