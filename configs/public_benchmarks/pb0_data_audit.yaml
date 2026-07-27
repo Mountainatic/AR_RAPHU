@@ -1,0 +1,55 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB0",
+  "stage": "audit",
+  "private_cz_access": "FORBIDDEN",
+  "raw_root": "/root/OPS_UOI_WORKSPACE/data/raw",
+  "manifest_root": "data_manifests/public_benchmarks",
+  "datasets": {
+    "pwh": {
+      "name": "Parallel Wiener-Hammerstein",
+      "official_page": "https://www.nonlinearbenchmark.org/benchmarks/parallel-wiener-hammerstein",
+      "doi": "10.4121/12950081",
+      "repository": "4TU.ResearchData",
+      "version": "1",
+      "license_required": true,
+      "official_split_required": true
+    },
+    "whpn": {
+      "name": "Wiener-Hammerstein Process Noise",
+      "official_page": "https://www.nonlinearbenchmark.org/benchmarks/wiener-hammerstein-process-noise",
+      "doi": "10.4121/12952124",
+      "repository": "4TU.ResearchData",
+      "version": "1",
+      "license_required": true,
+      "official_split_required": true,
+      "process_noise_preservation_required": true
+    },
+    "cascaded_tanks": {
+      "name": "Cascaded Tanks with Overflow",
+      "official_page": "https://www.nonlinearbenchmark.org/benchmarks/cascaded-tanks",
+      "doi": "10.4121/12960104",
+      "repository": "4TU.ResearchData",
+      "version": "1",
+      "license": "CC BY-SA 4.0",
+      "license_required": true,
+      "official_split_required": true
+    },
+    "silverbox": {
+      "name": "Silverbox",
+      "official_page": "https://www.nonlinearbenchmark.org/benchmarks/silverbox",
+      "dataset_citation_doi": "10.23919/ECC.2013.6669201",
+      "repository": "Nonlinear Benchmark official site",
+      "version": "official_2026-07-27",
+      "license_required": true,
+      "official_split_required": true
+    }
+  },
+  "required_gates": [
+    "SOURCE_VERIFIED",
+    "HASH_VERIFIED",
+    "LICENSE_RECORDED",
+    "OFFICIAL_SPLIT_VERIFIED",
+    "TIME_ORDER_VERIFIED"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "dataset": {
+    "id": "pwh",
+    "version": "4tu_12950081_v1",
+    "official_split": true,
+    "input_columns": ["input"],
+    "target_columns": ["output"],
+    "sequence_policy": "official_record"
+  },
+  "task": {
+    "tracks": ["X", "AR", "XAR"],
+    "horizons": [1, 5, 10, 20],
+    "use_future_x": false,
+    "lx_grid": [16, 32, 64, 128],
+    "ly_grid": [1, 4, 8, 16, 32, 64]
+  },
+  "basis": {
+    "lag_candidates": [
+      {"type": "discrete_identity"},
+      {"type": "cubic_bspline", "count": 32},
+      {"type": "cubic_bspline", "count": 48}
+    ],
+    "amplitude_count_grid": [16, 20, 24, 28, 32, 40]
+  },
+  "models": [
+    "persistence",
+    "ar_ridge",
+    "arx_ridge",
+    "narx_mlp",
+    "rank1_ar_raphu",
+    "fixed_rank2_ar_raphu",
+    "full_spectral_ar_raphu",
+    "adaptive_spectral_ar_raphu"
+  ],
+  "selection": {
+    "split": "validation",
+    "lepski_enabled": true,
+    "rank_budgets": [0.10, 0.05, 0.02],
+    "primary_rank_budget": 0.05,
+    "test_access": "once_after_freeze"
+  },
+  "solver": {
+    "dtype": "float64",
+    "device": "cpu",
+    "kkt_relative_residual": 1.0e-8
+  }
+}

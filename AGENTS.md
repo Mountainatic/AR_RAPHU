@@ -883,3 +883,37 @@ loss 选择；rank 输入和 test 均不得参与选择。
 - 冻结结论为 `PRIMARY_FINDING=ADAPTIVE_RANK_PROFILE_VALIDATED`、
   `UNIVERSAL_RANK2_HYPOTHESIS=REJECTED`、
   `NEXT_ALLOWED_STAGE=ALLOW_E2B`。本轮已按停止线暂停，E2B/E3 未运行。
+
+## OPS-UOI 公开基准 PB0/PB1
+
+- 当前活动规范升级为
+  `OPS_UOI_Public_Benchmark_to_CZ_Experiment_Design_and_Code_Reuse_v1_1.md`
+  与 `PROTOCOL_REVISION_PB1.md`；v0.3.4 配置、结果、决策和压缩包保持
+  只读，不覆盖、不重选其合成实验超参数。
+- 新分支固定为 `public-benchmark-pb1`。本分支只实施 PB0 与 PB1：
+  PWH、Wiener–Hammerstein Process Noise、Cascaded Tanks、Silverbox。
+  PB2/TEP/IB、PB3、PB4 和 CZ 均不得混入本轮。
+- 私有 CZ 数据不得读取、复制、下载或进入 PB1 结果包。缺失的历史 CZ
+  manifest 只能按缺失/排除状态处理，不得为通过测试而从私有工作簿重建。
+- 公开数据必须记录官方来源、DOI、license、下载时间、原文件名、字节数、
+  SHA256、loader commit、时间顺序和官方 split；PB0 任一来源 gate 失败，
+  对应数据集不得进入 PB1 confirmation。
+- 通用 `DynamicDataset` 必须支持多独立记录。因果窗口不得跨
+  `sequence_id`；test 不得参与 scaler、history、basis、regularization
+  或 rank 选择；`label_mask=False` 不得视为新标签；OOD 不得静默裁剪。
+- PB1 公开数据只默认报告预测 SVD rank
+  `R_P,svd*`、block-bootstrap 区间和跨记录稳定性。没有 K 层证书时禁止
+  报告 structural rank；truth rank、truth kernel error 只属于 D0。
+- 固定顺序为 PB0 audit → loader/no-leakage tests → 四数据集 smoke →
+  development → `PB1_PROTOCOL_FREEZE.json` → confirmation 一次 test →
+  报告与 `OPS_UOI_PUBLIC_BENCHMARK_PB1_RESULTS_bundle.zip`。
+- PB1 reference 固定 CPU FP64，任务级并行；首包禁止 CUDA/mixed
+  precision、核心正规方程重写、Gram 白化改义、rank-tail 改义，以及把
+  E2B/E3 塞入 public runner。
+- 迁移基线：v0.3.4 commit
+  `e07f0d5598a82c73036f5b7ad2f5686e76a2cf31`，证据包 SHA256
+  `8cb233c646362fb6a65e732c7f135dff4043ea9d672af5ffa71d7dbe2112c8e3`。
+  修改前 151 项仓库测试通过；7 项旧 Phase-0 测试因公开工作树缺少
+  私有 CZ 历史 manifest 而不能执行，且根目录 `return_v034/` 会造成
+  重复测试收集。PB1 必须在不读取私有数据的前提下修复测试发现和状态
+  分类，再声明 `ALL_LEGACY_REGRESSION_TESTS_PASS`。
