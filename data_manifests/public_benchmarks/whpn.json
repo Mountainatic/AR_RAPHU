@@ -1,0 +1,51 @@
+{
+  "schema_version": 6,
+  "dataset_id": "whpn",
+  "official_source": "https://data.4tu.nl/datasets/1f194001-affa-4459-870a-ad9e9d9146f9/2",
+  "doi": "10.4121/12952124.v2",
+  "version": "2",
+  "license": "CC BY-SA 4.0",
+  "downloaded_at_utc": "2026-07-27T07:24:36.296987+00:00",
+  "loader": "project_archive_audit",
+  "loader_dependency": {
+    "name": "nonlinear-benchmarks",
+    "version": "1.0.1"
+  },
+  "raw_root": "/root/OPS_UOI_WORKSPACE/data/raw",
+  "files": [
+    {
+      "path": "WHPN/WienerHammersteinFiles/README.txt",
+      "bytes": 1372,
+      "sha256": "44be64e689199e59ee613f5bb701608344ddcd3f29dbadd26a550d8d33db4a5d"
+    },
+    {
+      "path": "WHPN/WienerHammersteinFiles/WH_EstimationExample.mat",
+      "bytes": 1445139,
+      "sha256": "288177d863d03b87e56257764b7ac1772d8b0036b111b2a85700a4b3bbd54782"
+    },
+    {
+      "path": "WHPN/WienerHammersteinFiles/WH_TestDataset.mat",
+      "bytes": 562777,
+      "sha256": "9d28e9ea38bc49420cd85036f1097bcfd8bf4988c2e1189ce2276c1045ac4d99"
+    },
+    {
+      "path": "WHPN/WienerHammersteinFiles/WienerHammBenchmark.pdf",
+      "bytes": 178334,
+      "sha256": "58cec01a27cc43ab2fabc76f2150d4de88f169beaeaaabc5e75fa04befb67c44"
+    },
+    {
+      "path": "WHPN/WienerHammersteinFiles.zip",
+      "bytes": 423134764,
+      "sha256": "8f3aa4d96784567cbd62598c5456d52263899e392d0cfd54a4e37abe369fbf25"
+    }
+  ],
+  "status": {
+    "SOURCE_VERIFIED": true,
+    "HASH_VERIFIED": true,
+    "LICENSE_RECORDED": true,
+    "OFFICIAL_SPLIT_VERIFIED": false,
+    "TIME_ORDER_VERIFIED": false
+  },
+  "download_return": "/root/OPS_UOI_WORKSPACE/data/raw/WHPN/WienerHammersteinFiles.zip",
+  "new_file_count": 5
+}

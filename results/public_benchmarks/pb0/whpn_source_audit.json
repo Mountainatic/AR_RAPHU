@@ -1,0 +1,168 @@
+{
+  "schema_version": 6,
+  "dataset_id": "whpn",
+  "audit_scope": "SOURCE_AND_SPLIT_ONLY_NO_MODEL_EVALUATION",
+  "shape": {
+    "n_time": 114688,
+    "n_features": 1,
+    "n_targets": 1,
+    "n_sequences": 12
+  },
+  "split_counts": {
+    "warmup": 0,
+    "train": 81920,
+    "validation": 0,
+    "test": 32768
+  },
+  "records": [
+    {
+      "sequence_id": "0000:estimation-0",
+      "split": "train",
+      "n_time": 8192,
+      "start_row": 0,
+      "stop_row_exclusive": 8192
+    },
+    {
+      "sequence_id": "0001:estimation-1",
+      "split": "train",
+      "n_time": 8192,
+      "start_row": 8192,
+      "stop_row_exclusive": 16384
+    },
+    {
+      "sequence_id": "0002:estimation-2",
+      "split": "train",
+      "n_time": 8192,
+      "start_row": 16384,
+      "stop_row_exclusive": 24576
+    },
+    {
+      "sequence_id": "0003:estimation-3",
+      "split": "train",
+      "n_time": 8192,
+      "start_row": 24576,
+      "stop_row_exclusive": 32768
+    },
+    {
+      "sequence_id": "0004:estimation-4",
+      "split": "train",
+      "n_time": 8192,
+      "start_row": 32768,
+      "stop_row_exclusive": 40960
+    },
+    {
+      "sequence_id": "0005:estimation-5",
+      "split": "train",
+      "n_time": 8192,
+      "start_row": 40960,
+      "stop_row_exclusive": 49152
+    },
+    {
+      "sequence_id": "0006:estimation-6",
+      "split": "train",
+      "n_time": 8192,
+      "start_row": 49152,
+      "stop_row_exclusive": 57344
+    },
+    {
+      "sequence_id": "0007:estimation-7",
+      "split": "train",
+      "n_time": 8192,
+      "start_row": 57344,
+      "stop_row_exclusive": 65536
+    },
+    {
+      "sequence_id": "0008:estimation-8",
+      "split": "train",
+      "n_time": 8192,
+      "start_row": 65536,
+      "stop_row_exclusive": 73728
+    },
+    {
+      "sequence_id": "0009:estimation-9",
+      "split": "train",
+      "n_time": 8192,
+      "start_row": 73728,
+      "stop_row_exclusive": 81920
+    },
+    {
+      "sequence_id": "0010:official_noiseless_test-0",
+      "split": "test",
+      "n_time": 16384,
+      "start_row": 81920,
+      "stop_row_exclusive": 98304
+    },
+    {
+      "sequence_id": "0011:official_noiseless_test-1",
+      "split": "test",
+      "n_time": 16384,
+      "start_row": 98304,
+      "stop_row_exclusive": 114688
+    }
+  ],
+  "validation_status": "NOT_YET_DEFINED",
+  "official_test_status": "LOCKED_NOT_EVALUATED",
+  "quality": {
+    "invalid_x_or_y_cells": 0,
+    "unobserved_labels": 0
+  },
+  "status": {
+    "OFFICIAL_SPLIT_VERIFIED": true,
+    "TIME_ORDER_VERIFIED": true
+  },
+  "metadata": {
+    "doi": "10.4121/12952124.v2",
+    "process_noise_preserved": true,
+    "outlier_cleaning": "NONE",
+    "channel_alignment": "RAW_UNSHIFTED",
+    "channel_alignment_warning": "Archive README reports a possible one-sample shift.",
+    "test_records_exposed": true,
+    "dataset_id": "whpn",
+    "sequence_count": 12,
+    "sampling_time_by_sequence": {
+      "estimation-0": 1.28e-05,
+      "estimation-1": 1.28e-05,
+      "estimation-2": 1.28e-05,
+      "estimation-3": 1.28e-05,
+      "estimation-4": 1.28e-05,
+      "estimation-5": 1.28e-05,
+      "estimation-6": 1.28e-05,
+      "estimation-7": 1.28e-05,
+      "estimation-8": 1.28e-05,
+      "estimation-9": 1.28e-05,
+      "official_noiseless_test-0": 1.28e-05,
+      "official_noiseless_test-1": 1.28e-05
+    },
+    "validation_status": "NOT_YET_DEFINED",
+    "official_test_locked": true
+  },
+  "archive_audit": {
+    "archive": "/root/OPS_UOI_WORKSPACE/data/raw/WHPN/WienerHammersteinFiles.zip",
+    "member_count": 22,
+    "members": [
+      "WienerHammersteinFiles/README.txt",
+      "WienerHammersteinFiles/WH_CombinedZeroMultisineSinesweep.csv",
+      "WienerHammersteinFiles/WH_CombinedZeroMultisineSinesweep.mat",
+      "WienerHammersteinFiles/WH_EstimationExample.csv",
+      "WienerHammersteinFiles/WH_EstimationExample.mat",
+      "WienerHammersteinFiles/WH_MultisineFadeOut.csv",
+      "WienerHammersteinFiles/WH_MultisineFadeOut.mat",
+      "WienerHammersteinFiles/WH_SineInput_meas.csv",
+      "WienerHammersteinFiles/WH_SineInput_meas.mat",
+      "WienerHammersteinFiles/WH_SineSweepInput_meas.csv",
+      "WienerHammersteinFiles/WH_SineSweepInput_meas.mat",
+      "WienerHammersteinFiles/WH_TestDataset.csv",
+      "WienerHammersteinFiles/WH_TestDataset.mat",
+      "WienerHammersteinFiles/WH_Triangle2_meas.csv",
+      "WienerHammersteinFiles/WH_Triangle2_meas.mat",
+      "WienerHammersteinFiles/WH_Triangle_meas.csv",
+      "WienerHammersteinFiles/WH_Triangle_meas.mat",
+      "WienerHammersteinFiles/WH_ZeroMeas.csv",
+      "WienerHammersteinFiles/WH_ZeroMeas.mat",
+      "WienerHammersteinFiles/WH_pics.zip",
+      "WienerHammersteinFiles/WienerH_plus_schema.pdf",
+      "WienerHammersteinFiles/WienerHammBenchmark.pdf"
+    ],
+    "loader_status": "OFFICIAL_EXAMPLE_AND_NOISELESS_TEST_MAPPED"
+  }
+}

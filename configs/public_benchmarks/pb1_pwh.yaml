@@ -7,7 +7,12 @@
     "official_split": true,
     "input_columns": ["input"],
     "target_columns": ["output"],
-    "sequence_policy": "official_record"
+    "sequence_policy": "official_record",
+    "development_split": {
+      "status": "BLOCKED_PENDING_USER_FREEZE",
+      "unit": "whole_estimation_record",
+      "validation_fraction": null
+    }
   },
   "task": {
     "tracks": ["X", "AR", "XAR"],

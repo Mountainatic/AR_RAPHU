@@ -63,6 +63,20 @@ def _download_whpn(raw_root: Path) -> str:
         temporary = target.with_suffix(".zip.part")
         urllib.request.urlretrieve(WHPN_URL, temporary)
         temporary.replace(target)
+    required_members = (
+        "WienerHammersteinFiles/README.txt",
+        "WienerHammersteinFiles/WH_EstimationExample.mat",
+        "WienerHammersteinFiles/WH_TestDataset.mat",
+        "WienerHammersteinFiles/WienerHammBenchmark.pdf",
+    )
+    with zipfile.ZipFile(target) as handle:
+        damaged = handle.testzip()
+        if damaged is not None:
+            raise zipfile.BadZipFile(f"First damaged WHPN member: {damaged}")
+        for member in required_members:
+            extracted = target_dir / member
+            if not extracted.is_file():
+                handle.extract(member, target_dir)
     return str(target)
 
 

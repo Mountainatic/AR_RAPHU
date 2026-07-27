@@ -34,7 +34,7 @@ def inspect_whpn_archive(path: str | Path) -> dict[str, Any]:
         "archive": str(archive),
         "member_count": len(members),
         "members": members,
-        "loader_status": "BLOCKED_PENDING_OFFICIAL_RECORD_MAPPING",
+        "loader_status": "OFFICIAL_EXAMPLE_AND_NOISELESS_TEST_MAPPED",
     }
 
 

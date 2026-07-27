@@ -8,7 +8,16 @@
     "input_columns": ["pump_input"],
     "target_columns": ["lower_tank_level"],
     "sequence_policy": "official_record",
-    "report_overflow_partition": true
+    "report_overflow_partition": true,
+    "development_split": {
+      "status": "BLOCKED_PENDING_USER_FREEZE",
+      "unit": "chronological_tail_of_estimation_record",
+      "validation_fraction": null
+    },
+    "overflow_mask": {
+      "status": "BLOCKED_BY_MISSING_METADATA",
+      "reason": "official benchmark gives no numeric sample-level threshold"
+    }
   },
   "task": {
     "tracks": ["X", "AR", "XAR"],

@@ -8,7 +8,17 @@
     "input_columns": ["V1"],
     "target_columns": ["V2"],
     "sequence_policy": "official_record",
-    "report_arrow_partition": true
+    "report_arrow_partition": true,
+    "development_split": {
+      "status": "BLOCKED_PENDING_USER_FREEZE",
+      "unit": "chronological_tail_of_multisine_estimation_record",
+      "validation_fraction": null
+    },
+    "license": {
+      "status": "BLOCKED_BY_MISSING_METADATA",
+      "official_page": "does not state an explicit data license",
+      "redistribute_raw": false
+    }
   },
   "task": {
     "tracks": ["X", "AR", "XAR"],

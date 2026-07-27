@@ -8,7 +8,17 @@
     "input_columns": ["input"],
     "target_columns": ["output"],
     "sequence_policy": "official_record",
-    "preserve_process_noise": true
+    "preserve_process_noise": true,
+    "development_split": {
+      "status": "BLOCKED_PENDING_USER_FREEZE",
+      "unit": "whole_estimation_record",
+      "validation_fraction": null
+    },
+    "channel_alignment": {
+      "status": "BLOCKED_PENDING_USER_FREEZE",
+      "archive_warning": "possible one-sample inter-channel shift",
+      "implemented_primary": "raw_unshifted"
+    }
   },
   "task": {
     "tracks": ["X", "AR", "XAR"],
