@@ -1,0 +1,24 @@
+{
+  "schema_version": 6,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "stage": "SMOKE",
+  "scientific_evidence": false,
+  "dataset": "pwh",
+  "official_test_accessed": false,
+  "track": "X",
+  "horizon": 1,
+  "history": 16,
+  "record": "0000:Est-phase-0-amp-0",
+  "n_samples": 4080,
+  "design_shape": [
+    4080,
+    256
+  ],
+  "dtype": "float64",
+  "device": "cpu",
+  "relative_kkt_residual": 4.4067989004909433e-16,
+  "condition_number": 4253805711.5596495,
+  "train_rmse_standardized": 0.958585218497374,
+  "wall_seconds": 9.34883753489703,
+  "status": "COMPLETED"
+}

@@ -3,7 +3,7 @@
   "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
   "dataset": {
     "id": "whpn",
-    "version": "4tu_12952124_v1",
+    "version": "4tu_12952124_v2",
     "official_split": true,
     "input_columns": ["input"],
     "target_columns": ["output"],

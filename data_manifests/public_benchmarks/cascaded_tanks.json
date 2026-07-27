@@ -1,0 +1,66 @@
+{
+  "schema_version": 6,
+  "dataset_id": "cascaded_tanks",
+  "official_source": "https://data.4tu.nl/articles/dataset/12960104/1",
+  "doi": "10.4121/12960104.v1",
+  "version": "1",
+  "license": "CC BY-SA 4.0",
+  "downloaded_at_utc": "2026-07-27T06:52:39.983172+00:00",
+  "loader": "nonlinear_benchmarks.Cascaded_Tanks",
+  "loader_dependency": {
+    "name": "nonlinear-benchmarks",
+    "version": "1.0.1"
+  },
+  "raw_root": "/root/OPS_UOI_WORKSPACE/data/raw",
+  "files": [
+    {
+      "path": "Cascaded_Tanks/CascadedTanksFiles/PicsVideo/CascadedTanksOverflow.MOV",
+      "bytes": 1521149,
+      "sha256": "4e5f555938344b1fbfd5de747c87bff97a8a541ad1ac96982fe75c9ba09974ae"
+    },
+    {
+      "path": "Cascaded_Tanks/CascadedTanksFiles/PicsVideo/CascadedTanksSetup1.JPG",
+      "bytes": 1985905,
+      "sha256": "6658de11c06b98fe82464a0cc73a9ab25fe5672a8774904f47f8002b5266499d"
+    },
+    {
+      "path": "Cascaded_Tanks/CascadedTanksFiles/PicsVideo/CascadedTanksSetup2.JPG",
+      "bytes": 1852315,
+      "sha256": "9988337c0050d357b16d0f53537d1f4db0991e1ebef4ad25b914e1a51922bd65"
+    },
+    {
+      "path": "Cascaded_Tanks/CascadedTanksFiles/PicsVideo/Thumbs.db",
+      "bytes": 42496,
+      "sha256": "19dac1b7282e36376e164b9e471ddd7057e579a5479e91992074e49231ddc3d6"
+    },
+    {
+      "path": "Cascaded_Tanks/CascadedTanksFiles/TanksBenchmark.pdf",
+      "bytes": 2169671,
+      "sha256": "91597add858efdec98cc1bfabd7b87867c5c3cb8a0ec10976ceed9acdee81b39"
+    },
+    {
+      "path": "Cascaded_Tanks/CascadedTanksFiles/dataBenchmark.csv",
+      "bytes": 30014,
+      "sha256": "ef2388ed822f3aef4aa80d6b0f2b466dd80b361786b3eafc7a2957c31ea323a7"
+    },
+    {
+      "path": "Cascaded_Tanks/CascadedTanksFiles/dataBenchmark.mat",
+      "bytes": 24401,
+      "sha256": "cb2f88d4388be4d3f2a24c6402fba804976aac5f2e1f26cda59ea0a38d016eab"
+    },
+    {
+      "path": "Cascaded_Tanks/CascadedTanksFiles.zip",
+      "bytes": 7520592,
+      "sha256": "eb0fa05851e8a7136846c2e3b61fbef87def78d0852c86ab91b02ac5db541b51"
+    }
+  ],
+  "status": {
+    "SOURCE_VERIFIED": true,
+    "HASH_VERIFIED": true,
+    "LICENSE_RECORDED": true,
+    "OFFICIAL_SPLIT_VERIFIED": false,
+    "TIME_ORDER_VERIFIED": false
+  },
+  "download_return": "/root/OPS_UOI_WORKSPACE/data/raw/Cascaded_Tanks/CascadedTanksFiles/dataBenchmark.mat",
+  "new_file_count": 0
+}

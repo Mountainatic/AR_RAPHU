@@ -1,0 +1,57 @@
+{
+  "schema_version": 6,
+  "dataset_id": "cascaded_tanks",
+  "audit_scope": "SOURCE_AND_SPLIT_ONLY_NO_MODEL_EVALUATION",
+  "shape": {
+    "n_time": 2048,
+    "n_features": 1,
+    "n_targets": 1,
+    "n_sequences": 2
+  },
+  "split_counts": {
+    "warmup": 0,
+    "train": 1024,
+    "validation": 0,
+    "test": 1024
+  },
+  "records": [
+    {
+      "sequence_id": "0000:estimation",
+      "split": "train",
+      "n_time": 1024,
+      "start_row": 0,
+      "stop_row_exclusive": 1024
+    },
+    {
+      "sequence_id": "0001:official_test",
+      "split": "test",
+      "n_time": 1024,
+      "start_row": 1024,
+      "stop_row_exclusive": 2048
+    }
+  ],
+  "validation_status": "NOT_YET_DEFINED",
+  "official_test_status": "LOCKED_NOT_EVALUATED",
+  "quality": {
+    "invalid_x_or_y_cells": 0,
+    "unobserved_labels": 0
+  },
+  "status": {
+    "OFFICIAL_SPLIT_VERIFIED": true,
+    "TIME_ORDER_VERIFIED": true
+  },
+  "metadata": {
+    "doi": "10.4121/12960104.v1",
+    "official_loader": "nonlinear-benchmarks.Cascaded_Tanks",
+    "test_state_initialization_window_length": 50,
+    "test_records_exposed": true,
+    "dataset_id": "cascaded_tanks",
+    "sequence_count": 2,
+    "sampling_time_by_sequence": {
+      "estimation": 4.0,
+      "official_test": 4.0
+    },
+    "validation_status": "NOT_YET_DEFINED",
+    "official_test_locked": true
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schema_version": 6,
+  "dataset_id": "silverbox",
+  "audit_scope": "SOURCE_AND_SPLIT_ONLY_NO_MODEL_EVALUATION",
+  "shape": {
+    "n_time": 159225,
+    "n_features": 1,
+    "n_targets": 1,
+    "n_sequences": 4
+  },
+  "split_counts": {
+    "warmup": 0,
+    "train": 65062,
+    "validation": 0,
+    "test": 94163
+  },
+  "records": [
+    {
+      "sequence_id": "0000:multisine_estimation",
+      "split": "train",
+      "n_time": 65062,
+      "start_row": 0,
+      "stop_row_exclusive": 65062
+    },
+    {
+      "sequence_id": "0001:test_multisine",
+      "split": "test",
+      "n_time": 21688,
+      "start_row": 65062,
+      "stop_row_exclusive": 86750
+    },
+    {
+      "sequence_id": "0002:test_arrow_full",
+      "split": "test",
+      "n_time": 40475,
+      "start_row": 86750,
+      "stop_row_exclusive": 127225
+    },
+    {
+      "sequence_id": "0003:test_arrow_no_extrapolation",
+      "split": "test",
+      "n_time": 32000,
+      "start_row": 127225,
+      "stop_row_exclusive": 159225
+    }
+  ],
+  "validation_status": "NOT_YET_DEFINED",
+  "official_test_status": "LOCKED_NOT_EVALUATED",
+  "quality": {
+    "invalid_x_or_y_cells": 0,
+    "unobserved_labels": 0
+  },
+  "status": {
+    "OFFICIAL_SPLIT_VERIFIED": true,
+    "TIME_ORDER_VERIFIED": true
+  },
+  "metadata": {
+    "citation_doi": "10.23919/ECC.2013.6669201",
+    "official_loader": "nonlinear-benchmarks.Silverbox",
+    "test_state_initialization_window_length": 50,
+    "test_records_exposed": true,
+    "test_arrow_no_extrapolation_is_subset_of_test_arrow_full": true,
+    "dataset_id": "silverbox",
+    "sequence_count": 4,
+    "sampling_time_by_sequence": {
+      "multisine_estimation": 0.0016384041943147375,
+      "test_multisine": 0.0016384041943147375,
+      "test_arrow_full": 0.0016384041943147375,
+      "test_arrow_no_extrapolation": 0.0016384041943147375
+    },
+    "validation_status": "NOT_YET_DEFINED",
+    "official_test_locked": true
+  }
+}

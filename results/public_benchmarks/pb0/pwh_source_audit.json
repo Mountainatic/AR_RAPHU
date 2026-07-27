@@ -1,0 +1,880 @@
+{
+  "schema_version": 6,
+  "dataset_id": "pwh",
+  "audit_scope": "SOURCE_AND_SPLIT_ONLY_NO_MODEL_EVALUATION",
+  "shape": {
+    "n_time": 3440640,
+    "n_features": 1,
+    "n_targets": 1,
+    "n_sequences": 105
+  },
+  "split_counts": {
+    "warmup": 0,
+    "train": 3276800,
+    "validation": 0,
+    "test": 163840
+  },
+  "records": [
+    {
+      "sequence_id": "0000:Est-phase-0-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 0,
+      "stop_row_exclusive": 32768
+    },
+    {
+      "sequence_id": "0001:Est-phase-0-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 32768,
+      "stop_row_exclusive": 65536
+    },
+    {
+      "sequence_id": "0002:Est-phase-0-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 65536,
+      "stop_row_exclusive": 98304
+    },
+    {
+      "sequence_id": "0003:Est-phase-0-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 98304,
+      "stop_row_exclusive": 131072
+    },
+    {
+      "sequence_id": "0004:Est-phase-0-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 131072,
+      "stop_row_exclusive": 163840
+    },
+    {
+      "sequence_id": "0005:Est-phase-1-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 163840,
+      "stop_row_exclusive": 196608
+    },
+    {
+      "sequence_id": "0006:Est-phase-1-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 196608,
+      "stop_row_exclusive": 229376
+    },
+    {
+      "sequence_id": "0007:Est-phase-1-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 229376,
+      "stop_row_exclusive": 262144
+    },
+    {
+      "sequence_id": "0008:Est-phase-1-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 262144,
+      "stop_row_exclusive": 294912
+    },
+    {
+      "sequence_id": "0009:Est-phase-1-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 294912,
+      "stop_row_exclusive": 327680
+    },
+    {
+      "sequence_id": "0010:Est-phase-2-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 327680,
+      "stop_row_exclusive": 360448
+    },
+    {
+      "sequence_id": "0011:Est-phase-2-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 360448,
+      "stop_row_exclusive": 393216
+    },
+    {
+      "sequence_id": "0012:Est-phase-2-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 393216,
+      "stop_row_exclusive": 425984
+    },
+    {
+      "sequence_id": "0013:Est-phase-2-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 425984,
+      "stop_row_exclusive": 458752
+    },
+    {
+      "sequence_id": "0014:Est-phase-2-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 458752,
+      "stop_row_exclusive": 491520
+    },
+    {
+      "sequence_id": "0015:Est-phase-3-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 491520,
+      "stop_row_exclusive": 524288
+    },
+    {
+      "sequence_id": "0016:Est-phase-3-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 524288,
+      "stop_row_exclusive": 557056
+    },
+    {
+      "sequence_id": "0017:Est-phase-3-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 557056,
+      "stop_row_exclusive": 589824
+    },
+    {
+      "sequence_id": "0018:Est-phase-3-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 589824,
+      "stop_row_exclusive": 622592
+    },
+    {
+      "sequence_id": "0019:Est-phase-3-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 622592,
+      "stop_row_exclusive": 655360
+    },
+    {
+      "sequence_id": "0020:Est-phase-4-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 655360,
+      "stop_row_exclusive": 688128
+    },
+    {
+      "sequence_id": "0021:Est-phase-4-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 688128,
+      "stop_row_exclusive": 720896
+    },
+    {
+      "sequence_id": "0022:Est-phase-4-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 720896,
+      "stop_row_exclusive": 753664
+    },
+    {
+      "sequence_id": "0023:Est-phase-4-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 753664,
+      "stop_row_exclusive": 786432
+    },
+    {
+      "sequence_id": "0024:Est-phase-4-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 786432,
+      "stop_row_exclusive": 819200
+    },
+    {
+      "sequence_id": "0025:Est-phase-5-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 819200,
+      "stop_row_exclusive": 851968
+    },
+    {
+      "sequence_id": "0026:Est-phase-5-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 851968,
+      "stop_row_exclusive": 884736
+    },
+    {
+      "sequence_id": "0027:Est-phase-5-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 884736,
+      "stop_row_exclusive": 917504
+    },
+    {
+      "sequence_id": "0028:Est-phase-5-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 917504,
+      "stop_row_exclusive": 950272
+    },
+    {
+      "sequence_id": "0029:Est-phase-5-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 950272,
+      "stop_row_exclusive": 983040
+    },
+    {
+      "sequence_id": "0030:Est-phase-6-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 983040,
+      "stop_row_exclusive": 1015808
+    },
+    {
+      "sequence_id": "0031:Est-phase-6-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1015808,
+      "stop_row_exclusive": 1048576
+    },
+    {
+      "sequence_id": "0032:Est-phase-6-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1048576,
+      "stop_row_exclusive": 1081344
+    },
+    {
+      "sequence_id": "0033:Est-phase-6-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1081344,
+      "stop_row_exclusive": 1114112
+    },
+    {
+      "sequence_id": "0034:Est-phase-6-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1114112,
+      "stop_row_exclusive": 1146880
+    },
+    {
+      "sequence_id": "0035:Est-phase-7-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1146880,
+      "stop_row_exclusive": 1179648
+    },
+    {
+      "sequence_id": "0036:Est-phase-7-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1179648,
+      "stop_row_exclusive": 1212416
+    },
+    {
+      "sequence_id": "0037:Est-phase-7-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1212416,
+      "stop_row_exclusive": 1245184
+    },
+    {
+      "sequence_id": "0038:Est-phase-7-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1245184,
+      "stop_row_exclusive": 1277952
+    },
+    {
+      "sequence_id": "0039:Est-phase-7-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1277952,
+      "stop_row_exclusive": 1310720
+    },
+    {
+      "sequence_id": "0040:Est-phase-8-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1310720,
+      "stop_row_exclusive": 1343488
+    },
+    {
+      "sequence_id": "0041:Est-phase-8-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1343488,
+      "stop_row_exclusive": 1376256
+    },
+    {
+      "sequence_id": "0042:Est-phase-8-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1376256,
+      "stop_row_exclusive": 1409024
+    },
+    {
+      "sequence_id": "0043:Est-phase-8-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1409024,
+      "stop_row_exclusive": 1441792
+    },
+    {
+      "sequence_id": "0044:Est-phase-8-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1441792,
+      "stop_row_exclusive": 1474560
+    },
+    {
+      "sequence_id": "0045:Est-phase-9-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1474560,
+      "stop_row_exclusive": 1507328
+    },
+    {
+      "sequence_id": "0046:Est-phase-9-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1507328,
+      "stop_row_exclusive": 1540096
+    },
+    {
+      "sequence_id": "0047:Est-phase-9-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1540096,
+      "stop_row_exclusive": 1572864
+    },
+    {
+      "sequence_id": "0048:Est-phase-9-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1572864,
+      "stop_row_exclusive": 1605632
+    },
+    {
+      "sequence_id": "0049:Est-phase-9-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1605632,
+      "stop_row_exclusive": 1638400
+    },
+    {
+      "sequence_id": "0050:Est-phase-10-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1638400,
+      "stop_row_exclusive": 1671168
+    },
+    {
+      "sequence_id": "0051:Est-phase-10-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1671168,
+      "stop_row_exclusive": 1703936
+    },
+    {
+      "sequence_id": "0052:Est-phase-10-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1703936,
+      "stop_row_exclusive": 1736704
+    },
+    {
+      "sequence_id": "0053:Est-phase-10-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1736704,
+      "stop_row_exclusive": 1769472
+    },
+    {
+      "sequence_id": "0054:Est-phase-10-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1769472,
+      "stop_row_exclusive": 1802240
+    },
+    {
+      "sequence_id": "0055:Est-phase-11-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1802240,
+      "stop_row_exclusive": 1835008
+    },
+    {
+      "sequence_id": "0056:Est-phase-11-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1835008,
+      "stop_row_exclusive": 1867776
+    },
+    {
+      "sequence_id": "0057:Est-phase-11-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1867776,
+      "stop_row_exclusive": 1900544
+    },
+    {
+      "sequence_id": "0058:Est-phase-11-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1900544,
+      "stop_row_exclusive": 1933312
+    },
+    {
+      "sequence_id": "0059:Est-phase-11-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1933312,
+      "stop_row_exclusive": 1966080
+    },
+    {
+      "sequence_id": "0060:Est-phase-12-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1966080,
+      "stop_row_exclusive": 1998848
+    },
+    {
+      "sequence_id": "0061:Est-phase-12-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 1998848,
+      "stop_row_exclusive": 2031616
+    },
+    {
+      "sequence_id": "0062:Est-phase-12-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2031616,
+      "stop_row_exclusive": 2064384
+    },
+    {
+      "sequence_id": "0063:Est-phase-12-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2064384,
+      "stop_row_exclusive": 2097152
+    },
+    {
+      "sequence_id": "0064:Est-phase-12-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2097152,
+      "stop_row_exclusive": 2129920
+    },
+    {
+      "sequence_id": "0065:Est-phase-13-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2129920,
+      "stop_row_exclusive": 2162688
+    },
+    {
+      "sequence_id": "0066:Est-phase-13-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2162688,
+      "stop_row_exclusive": 2195456
+    },
+    {
+      "sequence_id": "0067:Est-phase-13-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2195456,
+      "stop_row_exclusive": 2228224
+    },
+    {
+      "sequence_id": "0068:Est-phase-13-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2228224,
+      "stop_row_exclusive": 2260992
+    },
+    {
+      "sequence_id": "0069:Est-phase-13-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2260992,
+      "stop_row_exclusive": 2293760
+    },
+    {
+      "sequence_id": "0070:Est-phase-14-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2293760,
+      "stop_row_exclusive": 2326528
+    },
+    {
+      "sequence_id": "0071:Est-phase-14-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2326528,
+      "stop_row_exclusive": 2359296
+    },
+    {
+      "sequence_id": "0072:Est-phase-14-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2359296,
+      "stop_row_exclusive": 2392064
+    },
+    {
+      "sequence_id": "0073:Est-phase-14-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2392064,
+      "stop_row_exclusive": 2424832
+    },
+    {
+      "sequence_id": "0074:Est-phase-14-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2424832,
+      "stop_row_exclusive": 2457600
+    },
+    {
+      "sequence_id": "0075:Est-phase-15-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2457600,
+      "stop_row_exclusive": 2490368
+    },
+    {
+      "sequence_id": "0076:Est-phase-15-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2490368,
+      "stop_row_exclusive": 2523136
+    },
+    {
+      "sequence_id": "0077:Est-phase-15-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2523136,
+      "stop_row_exclusive": 2555904
+    },
+    {
+      "sequence_id": "0078:Est-phase-15-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2555904,
+      "stop_row_exclusive": 2588672
+    },
+    {
+      "sequence_id": "0079:Est-phase-15-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2588672,
+      "stop_row_exclusive": 2621440
+    },
+    {
+      "sequence_id": "0080:Est-phase-16-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2621440,
+      "stop_row_exclusive": 2654208
+    },
+    {
+      "sequence_id": "0081:Est-phase-16-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2654208,
+      "stop_row_exclusive": 2686976
+    },
+    {
+      "sequence_id": "0082:Est-phase-16-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2686976,
+      "stop_row_exclusive": 2719744
+    },
+    {
+      "sequence_id": "0083:Est-phase-16-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2719744,
+      "stop_row_exclusive": 2752512
+    },
+    {
+      "sequence_id": "0084:Est-phase-16-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2752512,
+      "stop_row_exclusive": 2785280
+    },
+    {
+      "sequence_id": "0085:Est-phase-17-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2785280,
+      "stop_row_exclusive": 2818048
+    },
+    {
+      "sequence_id": "0086:Est-phase-17-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2818048,
+      "stop_row_exclusive": 2850816
+    },
+    {
+      "sequence_id": "0087:Est-phase-17-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2850816,
+      "stop_row_exclusive": 2883584
+    },
+    {
+      "sequence_id": "0088:Est-phase-17-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2883584,
+      "stop_row_exclusive": 2916352
+    },
+    {
+      "sequence_id": "0089:Est-phase-17-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2916352,
+      "stop_row_exclusive": 2949120
+    },
+    {
+      "sequence_id": "0090:Est-phase-18-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2949120,
+      "stop_row_exclusive": 2981888
+    },
+    {
+      "sequence_id": "0091:Est-phase-18-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 2981888,
+      "stop_row_exclusive": 3014656
+    },
+    {
+      "sequence_id": "0092:Est-phase-18-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 3014656,
+      "stop_row_exclusive": 3047424
+    },
+    {
+      "sequence_id": "0093:Est-phase-18-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 3047424,
+      "stop_row_exclusive": 3080192
+    },
+    {
+      "sequence_id": "0094:Est-phase-18-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 3080192,
+      "stop_row_exclusive": 3112960
+    },
+    {
+      "sequence_id": "0095:Est-phase-19-amp-0",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 3112960,
+      "stop_row_exclusive": 3145728
+    },
+    {
+      "sequence_id": "0096:Est-phase-19-amp-1",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 3145728,
+      "stop_row_exclusive": 3178496
+    },
+    {
+      "sequence_id": "0097:Est-phase-19-amp-2",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 3178496,
+      "stop_row_exclusive": 3211264
+    },
+    {
+      "sequence_id": "0098:Est-phase-19-amp-3",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 3211264,
+      "stop_row_exclusive": 3244032
+    },
+    {
+      "sequence_id": "0099:Est-phase-19-amp-4",
+      "split": "train",
+      "n_time": 32768,
+      "start_row": 3244032,
+      "stop_row_exclusive": 3276800
+    },
+    {
+      "sequence_id": "0100:Val-amp-0",
+      "split": "test",
+      "n_time": 32768,
+      "start_row": 3276800,
+      "stop_row_exclusive": 3309568
+    },
+    {
+      "sequence_id": "0101:Val-amp-1",
+      "split": "test",
+      "n_time": 32768,
+      "start_row": 3309568,
+      "stop_row_exclusive": 3342336
+    },
+    {
+      "sequence_id": "0102:Val-amp-2",
+      "split": "test",
+      "n_time": 32768,
+      "start_row": 3342336,
+      "stop_row_exclusive": 3375104
+    },
+    {
+      "sequence_id": "0103:Val-amp-3",
+      "split": "test",
+      "n_time": 32768,
+      "start_row": 3375104,
+      "stop_row_exclusive": 3407872
+    },
+    {
+      "sequence_id": "0104:Val-amp-4",
+      "split": "test",
+      "n_time": 32768,
+      "start_row": 3407872,
+      "stop_row_exclusive": 3440640
+    }
+  ],
+  "validation_status": "NOT_YET_DEFINED",
+  "official_test_status": "LOCKED_NOT_EVALUATED",
+  "quality": {
+    "invalid_x_or_y_cells": 0,
+    "unobserved_labels": 0
+  },
+  "status": {
+    "OFFICIAL_SPLIT_VERIFIED": true,
+    "TIME_ORDER_VERIFIED": true
+  },
+  "metadata": {
+    "doi": "10.4121/12950081.v1",
+    "loader_semantics_reference": "nonlinear-benchmarks.ParWH@1.0.1",
+    "test_records_exposed": true,
+    "dataset_id": "pwh",
+    "sequence_count": 105,
+    "sampling_time_by_sequence": {
+      "Est-phase-0-amp-0": 1.28e-05,
+      "Est-phase-0-amp-1": 1.28e-05,
+      "Est-phase-0-amp-2": 1.28e-05,
+      "Est-phase-0-amp-3": 1.28e-05,
+      "Est-phase-0-amp-4": 1.28e-05,
+      "Est-phase-1-amp-0": 1.28e-05,
+      "Est-phase-1-amp-1": 1.28e-05,
+      "Est-phase-1-amp-2": 1.28e-05,
+      "Est-phase-1-amp-3": 1.28e-05,
+      "Est-phase-1-amp-4": 1.28e-05,
+      "Est-phase-2-amp-0": 1.28e-05,
+      "Est-phase-2-amp-1": 1.28e-05,
+      "Est-phase-2-amp-2": 1.28e-05,
+      "Est-phase-2-amp-3": 1.28e-05,
+      "Est-phase-2-amp-4": 1.28e-05,
+      "Est-phase-3-amp-0": 1.28e-05,
+      "Est-phase-3-amp-1": 1.28e-05,
+      "Est-phase-3-amp-2": 1.28e-05,
+      "Est-phase-3-amp-3": 1.28e-05,
+      "Est-phase-3-amp-4": 1.28e-05,
+      "Est-phase-4-amp-0": 1.28e-05,
+      "Est-phase-4-amp-1": 1.28e-05,
+      "Est-phase-4-amp-2": 1.28e-05,
+      "Est-phase-4-amp-3": 1.28e-05,
+      "Est-phase-4-amp-4": 1.28e-05,
+      "Est-phase-5-amp-0": 1.28e-05,
+      "Est-phase-5-amp-1": 1.28e-05,
+      "Est-phase-5-amp-2": 1.28e-05,
+      "Est-phase-5-amp-3": 1.28e-05,
+      "Est-phase-5-amp-4": 1.28e-05,
+      "Est-phase-6-amp-0": 1.28e-05,
+      "Est-phase-6-amp-1": 1.28e-05,
+      "Est-phase-6-amp-2": 1.28e-05,
+      "Est-phase-6-amp-3": 1.28e-05,
+      "Est-phase-6-amp-4": 1.28e-05,
+      "Est-phase-7-amp-0": 1.28e-05,
+      "Est-phase-7-amp-1": 1.28e-05,
+      "Est-phase-7-amp-2": 1.28e-05,
+      "Est-phase-7-amp-3": 1.28e-05,
+      "Est-phase-7-amp-4": 1.28e-05,
+      "Est-phase-8-amp-0": 1.28e-05,
+      "Est-phase-8-amp-1": 1.28e-05,
+      "Est-phase-8-amp-2": 1.28e-05,
+      "Est-phase-8-amp-3": 1.28e-05,
+      "Est-phase-8-amp-4": 1.28e-05,
+      "Est-phase-9-amp-0": 1.28e-05,
+      "Est-phase-9-amp-1": 1.28e-05,
+      "Est-phase-9-amp-2": 1.28e-05,
+      "Est-phase-9-amp-3": 1.28e-05,
+      "Est-phase-9-amp-4": 1.28e-05,
+      "Est-phase-10-amp-0": 1.28e-05,
+      "Est-phase-10-amp-1": 1.28e-05,
+      "Est-phase-10-amp-2": 1.28e-05,
+      "Est-phase-10-amp-3": 1.28e-05,
+      "Est-phase-10-amp-4": 1.28e-05,
+      "Est-phase-11-amp-0": 1.28e-05,
+      "Est-phase-11-amp-1": 1.28e-05,
+      "Est-phase-11-amp-2": 1.28e-05,
+      "Est-phase-11-amp-3": 1.28e-05,
+      "Est-phase-11-amp-4": 1.28e-05,
+      "Est-phase-12-amp-0": 1.28e-05,
+      "Est-phase-12-amp-1": 1.28e-05,
+      "Est-phase-12-amp-2": 1.28e-05,
+      "Est-phase-12-amp-3": 1.28e-05,
+      "Est-phase-12-amp-4": 1.28e-05,
+      "Est-phase-13-amp-0": 1.28e-05,
+      "Est-phase-13-amp-1": 1.28e-05,
+      "Est-phase-13-amp-2": 1.28e-05,
+      "Est-phase-13-amp-3": 1.28e-05,
+      "Est-phase-13-amp-4": 1.28e-05,
+      "Est-phase-14-amp-0": 1.28e-05,
+      "Est-phase-14-amp-1": 1.28e-05,
+      "Est-phase-14-amp-2": 1.28e-05,
+      "Est-phase-14-amp-3": 1.28e-05,
+      "Est-phase-14-amp-4": 1.28e-05,
+      "Est-phase-15-amp-0": 1.28e-05,
+      "Est-phase-15-amp-1": 1.28e-05,
+      "Est-phase-15-amp-2": 1.28e-05,
+      "Est-phase-15-amp-3": 1.28e-05,
+      "Est-phase-15-amp-4": 1.28e-05,
+      "Est-phase-16-amp-0": 1.28e-05,
+      "Est-phase-16-amp-1": 1.28e-05,
+      "Est-phase-16-amp-2": 1.28e-05,
+      "Est-phase-16-amp-3": 1.28e-05,
+      "Est-phase-16-amp-4": 1.28e-05,
+      "Est-phase-17-amp-0": 1.28e-05,
+      "Est-phase-17-amp-1": 1.28e-05,
+      "Est-phase-17-amp-2": 1.28e-05,
+      "Est-phase-17-amp-3": 1.28e-05,
+      "Est-phase-17-amp-4": 1.28e-05,
+      "Est-phase-18-amp-0": 1.28e-05,
+      "Est-phase-18-amp-1": 1.28e-05,
+      "Est-phase-18-amp-2": 1.28e-05,
+      "Est-phase-18-amp-3": 1.28e-05,
+      "Est-phase-18-amp-4": 1.28e-05,
+      "Est-phase-19-amp-0": 1.28e-05,
+      "Est-phase-19-amp-1": 1.28e-05,
+      "Est-phase-19-amp-2": 1.28e-05,
+      "Est-phase-19-amp-3": 1.28e-05,
+      "Est-phase-19-amp-4": 1.28e-05,
+      "Val-amp-0": 1.28e-05,
+      "Val-amp-1": 1.28e-05,
+      "Val-amp-2": 1.28e-05,
+      "Val-amp-3": 1.28e-05,
+      "Val-amp-4": 1.28e-05
+    },
+    "validation_status": "NOT_YET_DEFINED",
+    "official_test_locked": true
+  }
+}

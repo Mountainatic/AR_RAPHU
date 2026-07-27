@@ -1,0 +1,106 @@
+{
+  "schema_version": 6,
+  "dataset_id": "pwh",
+  "official_source": "https://data.4tu.nl/articles/dataset/12950081/1",
+  "doi": "10.4121/12950081.v1",
+  "version": "1",
+  "license": "CC BY-SA 4.0",
+  "downloaded_at_utc": "2026-07-27T06:52:39.967854+00:00",
+  "loader": "nonlinear_benchmarks.ParWH",
+  "loader_dependency": {
+    "name": "nonlinear-benchmarks",
+    "version": "1.0.1"
+  },
+  "raw_root": "/root/OPS_UOI_WORKSPACE/data/raw",
+  "files": [
+    {
+      "path": "ParWH/ParWHFiles/ParWHData.mat",
+      "bytes": 34713406,
+      "sha256": "1ce2e67e3377d872f8b664cf6abcb693630c481418c30dc1536b2028f7270531"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParWHData_Estimation_Level1.csv",
+      "bytes": 12468853,
+      "sha256": "708c6e4593805e6f269079a9700d9e0e5266059ec9abb739c358850bb1c6442e"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParWHData_Estimation_Level2.csv",
+      "bytes": 11736039,
+      "sha256": "95c0981dd59f6a65892a08b8ccfe4398de66659dca320a1f0c788ddf4fd1aa9e"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParWHData_Estimation_Level3.csv",
+      "bytes": 11466738,
+      "sha256": "7347610f0245de3d0a2adcb14ecd72148bd8199fc7d82bd4415ab4a51f3aa6ad"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParWHData_Estimation_Level4.csv",
+      "bytes": 11281394,
+      "sha256": "0b5ffd79edae182bddbd35c3e7243c2d3ae8864c4047faa84097e05067e95b19"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParWHData_Estimation_Level5.csv",
+      "bytes": 11146137,
+      "sha256": "38867870d7e2e05878e9f14e8673422f15772a9de9f5f4642755b3e4e32cd19e"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParWHData_ValidationArrow.csv",
+      "bytes": 687560,
+      "sha256": "744e14e6339ad4d9dd9b30d0172bd7e446e8e2d1e256517f81b65bf62d9a0ef3"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParWHData_Validation_Level1.csv",
+      "bytes": 762246,
+      "sha256": "68c078a40bc8db5bb24d932a1d4e71200c594d8b7d3d73f0891c68d29dfe387e"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParWHData_Validation_Level2.csv",
+      "bytes": 725718,
+      "sha256": "8f986633fd66f091180ef922373899f17af1d4250f3f675b3ba0b6f8c4de8a25"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParWHData_Validation_Level3.csv",
+      "bytes": 713016,
+      "sha256": "0e8e1fa7eeabb9859fb178a6469c19e36c255e6d18ecc0b08de07aeaaa442c91"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParWHData_Validation_Level4.csv",
+      "bytes": 702404,
+      "sha256": "13ea85985f9a362185c50dd0311ad8cbc23a90260904548981a0a8fd162eb650"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParWHData_Validation_Level5.csv",
+      "bytes": 696730,
+      "sha256": "a8786fd72efe05e6f9e9853abfb7eb934360fde036119c9d79d4ac95c9c9844e"
+    },
+    {
+      "path": "ParWH/ParWHFiles/ParallelWH.png",
+      "bytes": 44266,
+      "sha256": "df8569466c77d71cdad1b340cf740e76f447291c995599fab31dcd8215d99afd"
+    },
+    {
+      "path": "ParWH/ParWHFiles/README_CSV.txt",
+      "bytes": 1699,
+      "sha256": "55f0a612e8348cceac5f6caddb0e6c3dabab9db369410002d51c1befdfa6feb4"
+    },
+    {
+      "path": "ParWH/ParWHFiles/README_MAT.m",
+      "bytes": 1107,
+      "sha256": "26d9a5a09c23110a63b692a95b71b90dac32e7fd3f6e799adc95e720fb935bca"
+    },
+    {
+      "path": "ParWH/ParWHFiles.zip",
+      "bytes": 58203304,
+      "sha256": "9d01efe9264a921f83b326ee72fdd1ba0e87063cb67265b750efb8e04a4b385d"
+    }
+  ],
+  "status": {
+    "SOURCE_VERIFIED": true,
+    "HASH_VERIFIED": true,
+    "LICENSE_RECORDED": true,
+    "OFFICIAL_SPLIT_VERIFIED": false,
+    "TIME_ORDER_VERIFIED": false
+  },
+  "download_return": "/root/OPS_UOI_WORKSPACE/data/raw/ParWH/ParWHFiles/ParWHData.mat",
+  "new_file_count": 0
+}

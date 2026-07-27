@@ -19,8 +19,10 @@
       "name": "Wiener-Hammerstein Process Noise",
       "official_page": "https://www.nonlinearbenchmark.org/benchmarks/wiener-hammerstein-process-noise",
       "doi": "10.4121/12952124",
+      "version_doi": "10.4121/12952124.v2",
       "repository": "4TU.ResearchData",
-      "version": "1",
+      "version": "2",
+      "license": "CC BY-SA 4.0",
       "license_required": true,
       "official_split_required": true,
       "process_noise_preservation_required": true
