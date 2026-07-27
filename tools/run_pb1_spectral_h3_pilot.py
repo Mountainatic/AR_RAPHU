@@ -43,6 +43,9 @@ def main() -> int:
         type=Path,
         default=Path("/root/OPS_UOI_WORKSPACE/data/raw"),
     )
+    parser.add_argument(
+        "--horizon", type=int, choices=(1, 5, 10, 20), default=1
+    )
     parser.add_argument("--force-development", action="store_true")
     args = parser.parse_args()
 
@@ -86,11 +89,13 @@ def main() -> int:
         raise ValueError("H3 pilot must use the first declared lag resolution.")
     amplitude_count = int(config["basis"]["amplitude_count_grid"][0])
     penalty = config["selection"]["spectral_penalty"]
+    if args.horizon not in config["task"]["horizons"]:
+        raise ValueError("Horizon is not frozen in the dataset config.")
     fit = fit_pb1_shared_history_spectral(
         dataset,
         L_x=L_x,
         L_y=L_y,
-        horizon=1,
+        horizon=args.horizon,
         lag_kind="discrete_identity",
         lag_count=None,
         amplitude_count=amplitude_count,
@@ -101,7 +106,10 @@ def main() -> int:
         ROOT
         / "results/public_benchmarks/pb1"
         / args.dataset
-        / "development/H3_SHARED_HISTORY/SPECTRAL_PILOT_H1"
+        / (
+            "development/H3_SHARED_HISTORY/"
+            f"SPECTRAL_PILOT_H{args.horizon}"
+        )
         / "full_spectral.json"
     )
     if output.exists() and not args.force_development:
@@ -116,7 +124,7 @@ def main() -> int:
         "role": "PENALTY_CERTIFICATION_AT_FIRST_PREDECLARED_RESOLUTION",
         "model": "FULL_SPECTRAL_AR_RAPHU",
         "track": "XAR",
-        "horizon": 1,
+        "horizon": args.horizon,
         "use_future_x": False,
         "history": {"L_x": L_x, "L_y": L_y, "source": "H1_ARX_AIC"},
         "basis": {
