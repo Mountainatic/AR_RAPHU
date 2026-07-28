@@ -306,6 +306,16 @@ def _fit_candidate(
 def _select_one_se(
     candidates: list[PB1PenaltyCandidate],
 ) -> PB1PenaltyCandidate:
+    candidates = [
+        row
+        for row in candidates
+        if bool(row.solver_diagnostics["converged"])
+        and row.relative_kkt_residual <= 1.0e-8
+    ]
+    if not candidates:
+        raise RuntimeError(
+            "No penalty candidate passed the frozen original-coordinate KKT."
+        )
     minimum = min(
         candidates,
         key=lambda row: (row.validation_mse_mean, row.configuration_order),
@@ -787,8 +797,14 @@ def fit_pb1_shared_history_spectral(
             selected.index_amplitude,
             selected.index_ridge,
         )
+        valid_round_rows = [
+            row
+            for row in round_rows
+            if bool(row.solver_diagnostics["converged"])
+            and row.relative_kkt_residual <= 1.0e-8
+        ]
         global_minimum = min(
-            round_rows,
+            valid_round_rows,
             key=lambda row: (row.validation_mse_mean, row.configuration_order),
         )
         for axis, index in enumerate(selected_indices):
@@ -800,7 +816,7 @@ def fit_pb1_shared_history_spectral(
             elif index == 1:
                 zero_rows = [
                     row
-                    for row in round_rows
+                    for row in valid_round_rows
                     if (
                         row.index_lag,
                         row.index_amplitude,
@@ -808,7 +824,10 @@ def fit_pb1_shared_history_spectral(
                     )[axis]
                     == 0
                 ]
-                zero_best = min(row.validation_mse_mean for row in zero_rows)
+                zero_best = min(
+                    (row.validation_mse_mean for row in zero_rows),
+                    default=float("inf"),
+                )
                 if positive_lower_expansion_required(
                     selected_index=index,
                     axis_zero_best_loss=zero_best,

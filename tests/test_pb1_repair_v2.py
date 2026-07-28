@@ -2,6 +2,10 @@ import numpy as np
 
 from ar_raphu.datasets.base import DynamicDataset
 from ar_raphu.datasets.pb1_protocol import apply_pb1_repair_v2_partition
+from ar_raphu.spectral.pb1_development import (
+    PB1PenaltyCandidate,
+    _select_one_se,
+)
 from ar_raphu.spectral.pb1_repair import (
     iterative_refine_pb1,
     positive_lower_expansion_required,
@@ -128,6 +132,33 @@ def test_solver_does_not_change_selected_penalties() -> None:
         np.linalg.solve(gram + penalty, rhs),
         atol=1.0e-13,
     )
+
+
+def test_one_se_excludes_candidates_that_fail_frozen_kkt() -> None:
+    def candidate(loss: float, converged: bool, order: int) -> PB1PenaltyCandidate:
+        return PB1PenaltyCandidate(
+            lag_weight=float(order),
+            amplitude_weight=0.0,
+            ridge_weight=0.0,
+            validation_mse_mean=loss,
+            validation_mse_by_group=(loss, loss),
+            validation_mse_se=0.0,
+            effective_df=float(order + 1),
+            relative_kkt_residual=1.0e-12 if converged else 1.0e-4,
+            numerical_jitter=0.0,
+            configuration_order=order,
+            index_lag=order,
+            index_amplitude=0,
+            index_ridge=0,
+            coefficients=np.zeros(1),
+            intercept=0.0,
+            solver_diagnostics={"converged": converged},
+        )
+
+    selected = _select_one_se(
+        [candidate(0.1, False, 0), candidate(0.2, True, 1)]
+    )
+    assert selected.validation_mse_mean == 0.2
 
 
 def test_kkt_is_recomputed_in_original_coordinates() -> None:
