@@ -115,7 +115,7 @@ def _aggregate(output: Path) -> dict[str, object]:
             "selected_validation_MSE_mean": selected["validation_loss"],
             "selected_validation_MSE_SE": selected["validation_se"],
             "selected_penalty": selected["penalty"]["selected"][
-                "scientific_penalty_weight"
+                "scientific_penalty_weights"
             ],
             "history_selected_at_grid_edge": (
                 int(selected["history"]["L_x"]) in {min(LX_GRID), max(LX_GRID)}

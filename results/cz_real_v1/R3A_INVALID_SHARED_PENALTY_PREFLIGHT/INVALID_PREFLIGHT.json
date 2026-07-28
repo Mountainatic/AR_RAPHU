@@ -1,0 +1,11 @@
+{
+  "schema": "CZ_R3A_INVALID_PREFLIGHT_V1",
+  "status": "FAILED",
+  "reason": "The preflight implementation bound lag, amplitude, and ridge penalties to one shared multiplier. The frozen PB1 Repair V2 interpretation requires independent axes.",
+  "scientific_use_forbidden": true,
+  "selection_use_forbidden": true,
+  "confirmation_use_forbidden": true,
+  "retained_for_audit_only": true,
+  "completed_candidate_files_before_stop": 18,
+  "replacement_namespace": "results/cz_real_v1/R3A"
+}

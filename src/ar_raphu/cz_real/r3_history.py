@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import itertools
 import time
 
 import numpy as np
@@ -30,22 +31,51 @@ class FoldSystem:
     fold: int
     gram: np.ndarray
     rhs: np.ndarray
-    normalized_penalty: np.ndarray
-    normalized_penalty_values: np.ndarray
+    normalized_penalties: tuple[np.ndarray, np.ndarray, np.ndarray]
+    normalized_penalty_values: tuple[np.ndarray, np.ndarray, np.ndarray]
     feature_mean: np.ndarray
     target_mean: float
     validation_matrix: np.ndarray
     validation_target: np.ndarray
 
 
-def _ar_penalty(
+def _tensor_penalty_components(
+    lag_gram: np.ndarray,
+    amplitude_grams: list[np.ndarray],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    return (
+        tensor_penalty(
+            lag_gram,
+            amplitude_grams,
+            lag_smoothness=1.0,
+            amplitude_smoothness=0.0,
+            ridge_weight=0.0,
+        ),
+        tensor_penalty(
+            lag_gram,
+            amplitude_grams,
+            lag_smoothness=0.0,
+            amplitude_smoothness=1.0,
+            ridge_weight=0.0,
+        ),
+        tensor_penalty(
+            lag_gram,
+            amplitude_grams,
+            lag_smoothness=0.0,
+            amplitude_smoothness=0.0,
+            ridge_weight=1.0,
+        ),
+    )
+
+
+def _ar_penalty_components(
     y: np.ndarray,
     *,
     train_stop: int,
     L_y: int,
     M_tau: int,
     M_x: int,
-) -> np.ndarray:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     lag_knots = clamped_knots(0.0, float(L_y - 1), M_tau, 3)
     lag_basis = evaluate_basis(np.arange(L_y), lag_knots, 3)
     lag_gram = lag_basis.T @ lag_basis / L_y
@@ -59,13 +89,7 @@ def _ar_penalty(
     )
     evaluated = amplitude.transform(y_train)
     amplitude_gram = evaluated.T @ evaluated / len(evaluated)
-    return tensor_penalty(
-        lag_gram,
-        [amplitude_gram],
-        lag_smoothness=1.0,
-        amplitude_smoothness=1.0,
-        ridge_weight=1.0,
-    )
+    return _tensor_penalty_components(lag_gram, [amplitude_gram])
 
 
 def _normalize_penalty(
@@ -206,28 +230,32 @@ def _build_fold_system(
     centered_target = train_target - target_mean
     gram = centered_matrix.T @ centered_matrix / len(centered_matrix)
     rhs = centered_matrix.T @ centered_target / len(centered_matrix)
-    external_penalty = tensor_penalty(
+    external_penalties = _tensor_penalty_components(
         train_x.lag_gram,
         train_x.amplitude_grams,
-        lag_smoothness=1.0,
-        amplitude_smoothness=1.0,
-        ridge_weight=1.0,
     )
-    ar_penalty = _ar_penalty(
+    ar_penalties = _ar_penalty_components(
         y,
         train_stop=fold.effective_train_stop,
         L_y=L_y,
         M_tau=M_tau,
         M_x=M_x,
     )
-    penalty = scipy.linalg.block_diag(external_penalty, ar_penalty)
-    normalized, values, _ = _normalize_penalty(penalty, gram)
+    penalties = tuple(
+        scipy.linalg.block_diag(external, ar)
+        for external, ar in zip(
+            external_penalties, ar_penalties, strict=True
+        )
+    )
+    normalized_rows = tuple(
+        _normalize_penalty(penalty, gram) for penalty in penalties
+    )
     return FoldSystem(
         fold=fold.fold,
         gram=gram,
         rhs=rhs,
-        normalized_penalty=normalized,
-        normalized_penalty_values=values,
+        normalized_penalties=tuple(row[0] for row in normalized_rows),
+        normalized_penalty_values=tuple(row[1] for row in normalized_rows),
         feature_mean=feature_mean,
         target_mean=target_mean,
         validation_matrix=validation_matrix,
@@ -237,16 +265,28 @@ def _build_fold_system(
 
 def _candidate_rows(
     systems: list[FoldSystem],
-    grid: np.ndarray,
+    grids: tuple[np.ndarray, np.ndarray, np.ndarray],
 ) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
-    for index, weight in enumerate(grid):
+    names = ("lag", "amplitude", "ridge")
+    for order, indices in enumerate(
+        itertools.product(*(range(len(grid)) for grid in grids))
+    ):
+        weights = tuple(
+            float(grids[axis][indices[axis]]) for axis in range(3)
+        )
         fold_rows: list[dict[str, float | int]] = []
         for system in systems:
+            scientific_penalty = sum(
+                weight * component
+                for weight, component in zip(
+                    weights, system.normalized_penalties, strict=True
+                )
+            )
             coefficients, kkt, jitter, refinement = _solve_system(
                 system.gram,
                 system.rhs,
-                weight * system.normalized_penalty,
+                scientific_penalty,
             )
             intercept = system.target_mean - float(
                 system.feature_mean @ coefficients
@@ -267,8 +307,13 @@ def _candidate_rows(
         )
         rows.append(
             {
-                "index": index,
-                "scientific_penalty_weight": float(weight),
+                "configuration_order": order,
+                "indices": {
+                    name: int(indices[axis]) for axis, name in enumerate(names)
+                },
+                "scientific_penalty_weights": {
+                    name: float(weights[axis]) for axis, name in enumerate(names)
+                },
                 "validation_MSE_mean": float(losses.mean()),
                 "validation_MSE_SE": float(losses.std(ddof=1) / np.sqrt(len(losses))),
                 "folds": fold_rows,
@@ -293,7 +338,7 @@ def _select_penalty(rows: list[dict[str, object]]) -> dict[str, object]:
         valid,
         key=lambda row: (
             float(row["validation_MSE_mean"]),
-            int(row["index"]),
+            int(row["configuration_order"]),
         ),
     )
     threshold = float(minimum["validation_MSE_mean"]) + float(
@@ -302,12 +347,15 @@ def _select_penalty(rows: list[dict[str, object]]) -> dict[str, object]:
     eligible = [
         row for row in valid if float(row["validation_MSE_mean"]) <= threshold
     ]
-    # PB1 one-SE tie: lower EDF, represented here by stronger shared smoothing.
+    # Deterministic PB1 lexical tie after one-SE: stronger roughness control,
+    # then less scientific ridge, then the predeclared configuration order.
     return max(
         eligible,
         key=lambda row: (
-            float(row["scientific_penalty_weight"]),
-            -int(row["index"]),
+            float(row["scientific_penalty_weights"]["lag"])
+            + float(row["scientific_penalty_weights"]["amplitude"]),
+            -float(row["scientific_penalty_weights"]["ridge"]),
+            -int(row["configuration_order"]),
         ),
     )
 
@@ -345,50 +393,83 @@ def run_history_candidate(
         )
         for fold in folds
     ]
-    bounds = [_automatic_bounds(system.normalized_penalty_values) for system in systems]
-    lower = min(item[0] for item in bounds)
-    upper = max(item[1] for item in bounds)
+    names = ("lag", "amplitude", "ridge")
+    bounds_by_axis = [
+        [
+            _automatic_bounds(system.normalized_penalty_values[axis])
+            for system in systems
+        ]
+        for axis in range(3)
+    ]
+    lowers = [min(item[0] for item in bounds) for bounds in bounds_by_axis]
+    uppers = [max(item[1] for item in bounds) for bounds in bounds_by_axis]
     interval_history: list[dict[str, object]] = []
     all_rows: list[dict[str, object]] = []
     selected: dict[str, object] | None = None
     status = "PENALTY_INTERVAL_NOT_CERTIFIED"
     for expansion in range(maximum_edge_expansions + 1):
-        positive = np.geomspace(lower, upper, positive_grid_points)
-        grid = np.concatenate((np.zeros(1, dtype=np.float64), positive))
-        rows = _candidate_rows(systems, grid)
+        grids = tuple(
+            np.concatenate(
+                (
+                    np.zeros(1, dtype=np.float64),
+                    np.geomspace(lowers[axis], uppers[axis], positive_grid_points),
+                )
+            )
+            for axis in range(3)
+        )
+        rows = _candidate_rows(systems, grids)
         all_rows.extend(rows)
         selected = _select_penalty(rows)
-        index = int(selected["index"])
-        boundary = None
-        if index == len(grid) - 1:
-            boundary = "upper"
-        elif index == 1:
-            zero = rows[0]
-            minimum = min(rows, key=lambda row: float(row["validation_MSE_mean"]))
-            if float(zero["validation_MSE_mean"]) > float(
-                minimum["validation_MSE_mean"]
-            ) + float(minimum["validation_MSE_SE"]):
-                boundary = "lower"
+        selected_indices = [
+            int(selected["indices"][name]) for name in names
+        ]
+        minimum = min(rows, key=lambda row: float(row["validation_MSE_mean"]))
+        boundaries: list[dict[str, int | str]] = []
+        for axis, index in enumerate(selected_indices):
+            if index == len(grids[axis]) - 1:
+                boundaries.append({"axis": axis, "side": "upper"})
+            elif index == 1:
+                zero_best = min(
+                    (
+                        float(row["validation_MSE_mean"])
+                        for row in rows
+                        if int(row["indices"][names[axis]]) == 0
+                    ),
+                    default=float("inf"),
+                )
+                if zero_best > float(minimum["validation_MSE_mean"]) + float(
+                    minimum["validation_MSE_SE"]
+                ):
+                    boundaries.append({"axis": axis, "side": "lower"})
         interval_history.append(
             {
                 "expansion_round": expansion,
-                "lower": lower,
-                "upper": upper,
-                "selected_index": index,
-                "selected_weight": selected["scientific_penalty_weight"],
-                "boundary": boundary,
+                "lower_by_axis": {
+                    name: lowers[axis] for axis, name in enumerate(names)
+                },
+                "upper_by_axis": {
+                    name: uppers[axis] for axis, name in enumerate(names)
+                },
+                "selected_indices": {
+                    name: selected_indices[axis]
+                    for axis, name in enumerate(names)
+                },
+                "selected_weights": selected["scientific_penalty_weights"],
+                "boundaries": boundaries,
             }
         )
-        if boundary is None:
+        if not boundaries:
             status = "PENALTY_INTERVAL_CERTIFIED"
             break
         if expansion == maximum_edge_expansions:
             break
-        width = np.log(upper) - np.log(lower)
-        if boundary == "upper":
-            upper = float(np.exp(np.log(upper) + width))
-        else:
-            lower = float(np.exp(np.log(lower) - width))
+        for boundary in boundaries:
+            axis = int(boundary["axis"])
+            width = np.log(uppers[axis]) - np.log(lowers[axis])
+            if boundary["side"] == "upper":
+                uppers[axis] = float(np.exp(np.log(uppers[axis]) + width))
+            else:
+                lowers[axis] = float(np.exp(np.log(lowers[axis]) - width))
     if selected is None:
         raise AssertionError("Penalty search produced no selected row.")
     return {
@@ -411,7 +492,11 @@ def run_history_candidate(
             "positive_grid_points": positive_grid_points,
             "automatic_interval": True,
             "maximum_edge_expansions": maximum_edge_expansions,
-            "shared_normalized_smoothing_multiplier": True,
+            "independent_penalty_axes": list(names),
+            "one_se_tie": (
+                "STRONGER_LAG_PLUS_AMPLITUDE_THEN_SMALLER_RIDGE_"
+                "THEN_CONFIGURATION_ORDER"
+            ),
             "normalization": "POSITIVE_GENERALIZED_EIGENVALUE_MEDIAN_RELATIVE_TO_TRAIN_GRAM",
             "selected": selected,
             "interval_history": interval_history,
