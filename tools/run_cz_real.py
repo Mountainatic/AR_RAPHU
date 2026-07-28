@@ -44,6 +44,8 @@ from ar_raphu.cz_real.protocol import (
     file_sha256,
     load_furnace_a,
 )
+from ar_raphu.cz_real.spectral import fit_shared_history_smoke
+from ar_raphu.spectral.amplitude_domain import AmplitudeOutOfDomainError
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -339,9 +341,132 @@ def run_r1(args: argparse.Namespace) -> None:
     )
 
 
+def run_r2(args: argparse.Namespace) -> None:
+    start = time.monotonic()
+    raw_dir = Path(args.raw_dir).resolve()
+    output = Path(args.output).resolve() / "R2"
+    data = load_furnace_a(raw_dir / "实验数据1.xlsx")
+    fold = build_development_folds(L_x=32, L_y=32)[0]
+    try:
+        result = fit_shared_history_smoke(
+            data.inputs,
+            data.target,
+            fold=fold,
+            horizon=1,
+            L_shared=32,
+            lag_basis_count=16,
+            amplitude_basis_count=16,
+            smoothness_weight=1.0e-3,
+            ridge_weight=1.0e-8,
+        )
+    except AmplitudeOutOfDomainError as error:
+        blocked = {
+            "stage": "CZ_R2_H3_SPECTRAL_SMOKE",
+            "status": "BLOCKED_BY_MISSING_METADATA",
+            "elapsed_seconds": time.monotonic() - start,
+            "reason": str(error),
+            "missing_prerequisite": (
+                "The protocol names v4.1 bounded C1 continuation but does not "
+                "freeze its continuation length/bound or provide an implementation."
+            ),
+            "why_not_clipped": (
+                "Silent clipping or an invented continuation scale would change "
+                "validation predictions and violate the interpretation firewall."
+            ),
+            "furnace_B_lock": "LOCKED_UNTIL_R7",
+            "furnace_A_confirmation_lock": "LOCKED_UNTIL_R6",
+        }
+        _write_json(output / "R2_STATUS.json", blocked)
+        _write_json(
+            output / "R2_H3_SPECTRAL_SMOKE_BLOCKER.json",
+            {
+                "schema": "CZ_R2_H3_SPECTRAL_SMOKE_BLOCKER_V1",
+                **blocked,
+                "attempted_configuration": {
+                    "fold": 1,
+                    "horizon_samples": 1,
+                    "L_x": 32,
+                    "L_y": 32,
+                    "lag_basis_count": 16,
+                    "amplitude_basis_count": 16,
+                    "pilot_smoothness_weight": 1.0e-3,
+                    "pilot_ridge_weight": 1.0e-8,
+                },
+                "scientific_data_opened": {
+                    "furnace_A_development": True,
+                    "furnace_A_confirmation": False,
+                    "furnace_B": False,
+                },
+            },
+        )
+        print(json.dumps(blocked, ensure_ascii=False, indent=2), flush=True)
+        return
+    kkt_passed = result.relative_kkt_residual <= 1.0e-8
+    payload = {
+        "schema": "CZ_R2_H3_SPECTRAL_SMOKE_V1",
+        "protocol_schema": PROTOCOL_SCHEMA,
+        "status": "COMPLETED" if kkt_passed else "FAILED",
+        "scope": "FURNACE_A_DEVELOPMENT_FOLD1_H1_ENGINEERING_SMOKE_ONLY",
+        "runtime": {
+            **_runtime(),
+            "elapsed_seconds": time.monotonic() - start,
+        },
+        "configuration": {
+            "history_policy": "H3_SHARED",
+            "L_x": 32,
+            "L_y": 32,
+            "lag_basis_count": 16,
+            "amplitude_basis_count": 16,
+            "pilot_smoothness_weight": 1.0e-3,
+            "pilot_ridge_weight": 1.0e-8,
+            "hyperparameter_selection": False,
+            "scientific_evidence": False,
+            "furnace_A_confirmation_accessed": False,
+            "furnace_B_accessed": False,
+        },
+        "result": {
+            "metrics": result.metrics,
+            "relative_kkt_residual": result.relative_kkt_residual,
+            "kkt_threshold": 1.0e-8,
+            "kkt_passed": kkt_passed,
+            "coefficients": result.coefficients,
+            "train_target_count": result.train_target_count,
+            "validation_target_count": result.validation_target_count,
+        },
+        "gates": {
+            "NO_RANDOM_SPLIT": True,
+            "TRAIN_ONLY_BASIS": True,
+            "PURGE_PASS": True,
+            "FURNACE_B_NOT_USED_IN_TUNING": True,
+            "R2_KKT_PASS": kkt_passed,
+        },
+    }
+    _write_json(output / "R2_H3_SPECTRAL_SMOKE_RESULTS.json", payload)
+    _write_json(
+        output / "R2_STATUS.json",
+        {
+            "stage": "CZ_R2_H3_SPECTRAL_SMOKE",
+            "status": payload["status"],
+            "elapsed_seconds": payload["runtime"]["elapsed_seconds"],
+            "next_stage": (
+                "CZ_R3_H2_NATIVE_SELECTION" if kkt_passed else "BLOCKED"
+            ),
+            "furnace_B_lock": "LOCKED_UNTIL_R7",
+            "furnace_A_confirmation_lock": "LOCKED_UNTIL_R6",
+        },
+    )
+    print(
+        f"R2 H3 smoke RMSE={result.metrics['RMSE_mm']:.6f} "
+        f"KKT={result.relative_kkt_residual:.3e}",
+        flush=True,
+    )
+    if not kkt_passed:
+        raise RuntimeError("R2 original-coordinate KKT gate failed.")
+
+
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
-    result.add_argument("stage", choices=("r0", "r1"))
+    result.add_argument("stage", choices=("r0", "r1", "r2"))
     result.add_argument("--raw-dir", required=True)
     result.add_argument("--output", required=True)
     return result
@@ -351,8 +476,10 @@ def main() -> None:
     args = parser().parse_args()
     if args.stage == "r0":
         run_r0(args)
-    else:
+    elif args.stage == "r1":
         run_r1(args)
+    else:
+        run_r2(args)
 
 
 if __name__ == "__main__":
