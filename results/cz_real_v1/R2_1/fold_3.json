@@ -1,0 +1,173 @@
+{
+  "fold": 3,
+  "configuration": {
+    "horizon_samples": 1,
+    "L_x": 32,
+    "L_y": 32,
+    "M_tau": 16,
+    "M_x": 32,
+    "CONTINUATION_SCALE_COEFFICIENT": 1.0,
+    "scientific_penalty": "EXACT_ZERO",
+    "numerical_jitter": "NONE_LSTSQ_MINIMUM_RESIDUAL"
+  },
+  "split": {
+    "fold": 3,
+    "nominal_train_start": 0,
+    "nominal_train_stop": 12061,
+    "effective_train_stop": 11970,
+    "validation_start": 12061,
+    "validation_stop": 14072,
+    "purge_gap": 91
+  },
+  "alignment": {
+    "minimum_target_index": 12061,
+    "minimum_origin_index": 12060,
+    "maximum_target_index": 14071,
+    "maximum_origin_index": 14070,
+    "maximum_input_index_equals_origin": true,
+    "target_is_strictly_after_origin": true
+  },
+  "training": {
+    "AR": {
+      "MSE_mm2": 0.0004867081597006764,
+      "relative_kkt_residual": 2.4767968068054057e-15,
+      "effective_rank": -1,
+      "coefficient_count": 512,
+      "solver_stage": "DIAGONAL_EQUILIBRATION_CHOLESKY_REFINEMENT",
+      "numerical_jitter_relative": 1e-14,
+      "numerical_jitter_is_scientific_ridge": false,
+      "iterative_refinement_steps": 0
+    },
+    "X_only": {
+      "MSE_mm2": 0.006159497903150753,
+      "relative_kkt_residual": 5.5047580965799235e-11,
+      "effective_rank": -1,
+      "coefficient_count": 2560,
+      "solver_stage": "DIAGONAL_EQUILIBRATION_CHOLESKY_REFINEMENT",
+      "numerical_jitter_relative": 1e-12,
+      "numerical_jitter_is_scientific_ridge": false,
+      "iterative_refinement_steps": 0
+    },
+    "XAR_H3": {
+      "MSE_mm2": 5.180465494270178e-05,
+      "relative_kkt_residual": 4.4396982395733305e-11,
+      "effective_rank": -1,
+      "coefficient_count": 3072,
+      "solver_stage": "DIAGONAL_EQUILIBRATION_CHOLESKY_REFINEMENT",
+      "numerical_jitter_relative": 1e-12,
+      "numerical_jitter_is_scientific_ridge": false,
+      "iterative_refinement_steps": 0
+    }
+  },
+  "validation": {
+    "AR": {
+      "RMSE_mm": 0.00746178912074372,
+      "MAE_mm": 0.005814575191782808,
+      "R2": 0.9990863144940081,
+      "P50_abs_error_mm": 0.004849904974946639,
+      "P90_abs_error_mm": 0.011522911990027751,
+      "P95_abs_error_mm": 0.012977033036094099,
+      "max_abs_error_mm": 0.027373096452492973,
+      "NRMSE_by_output_std": 0.030227231199564573,
+      "MSE_mm2": 5.5678296882449334e-05
+    },
+    "X_only": {
+      "RMSE_mm": 23.67863710576796,
+      "MAE_mm": 14.40915825475886,
+      "R2": -9199.77047069601,
+      "P50_abs_error_mm": 5.345939450418427,
+      "P90_abs_error_mm": 51.10713349120681,
+      "P95_abs_error_mm": 63.11200531276788,
+      "max_abs_error_mm": 68.58567868483789,
+      "NRMSE_by_output_std": 95.92064673831182,
+      "MSE_mm2": 560.6778551866514
+    },
+    "XAR_H3": {
+      "RMSE_mm": 2.8951721200221967,
+      "MAE_mm": 2.5726322159603945,
+      "R2": -136.54967518423027,
+      "P50_abs_error_mm": 3.397285197615929,
+      "P90_abs_error_mm": 3.460442739167945,
+      "P95_abs_error_mm": 3.467815656371698,
+      "max_abs_error_mm": 3.7597792087940434,
+      "NRMSE_by_output_std": 11.728157365256925,
+      "MSE_mm2": 8.382021604553822
+    }
+  },
+  "nestedness": {
+    "AR_train_MSE_minus_XAR_train_MSE": 0.0004349035047579746,
+    "absolute_tolerance": 1e-10
+  },
+  "continuation": {
+    "in_support_max_absolute_difference": 0.0,
+    "total_calls": 386112,
+    "out_of_domain_calls": 43760,
+    "out_of_domain_fraction": 0.11333499088347422,
+    "by_variable": [
+      {
+        "variable_index": 0,
+        "source": "RECORDED_EXTERNAL_INPUT",
+        "total_calls": 64352,
+        "out_of_domain_calls": 0,
+        "out_of_domain_fraction": 0.0,
+        "maximum_normalized_distance": 0.0,
+        "variable": "主加热功率"
+      },
+      {
+        "variable_index": 1,
+        "source": "RECORDED_EXTERNAL_INPUT",
+        "total_calls": 64352,
+        "out_of_domain_calls": 0,
+        "out_of_domain_fraction": 0.0,
+        "maximum_normalized_distance": 0.0,
+        "variable": "晶升速度"
+      },
+      {
+        "variable_index": 2,
+        "source": "RECORDED_EXTERNAL_INPUT",
+        "total_calls": 64352,
+        "out_of_domain_calls": 43760,
+        "out_of_domain_fraction": 0.6800099453008454,
+        "maximum_normalized_distance": 0.2276666580517446,
+        "variable": "晶转速度"
+      },
+      {
+        "variable_index": 3,
+        "source": "RECORDED_EXTERNAL_INPUT",
+        "total_calls": 64352,
+        "out_of_domain_calls": 0,
+        "out_of_domain_fraction": 0.0,
+        "maximum_normalized_distance": 0.0,
+        "variable": "埚升速度"
+      },
+      {
+        "variable_index": 4,
+        "source": "RECORDED_EXTERNAL_INPUT",
+        "total_calls": 64352,
+        "out_of_domain_calls": 0,
+        "out_of_domain_fraction": 0.0,
+        "maximum_normalized_distance": 0.0,
+        "variable": "埚转速度"
+      },
+      {
+        "variable": "晶体直径",
+        "source": "TEACHER_FORCED_OUTPUT_HISTORY",
+        "total_calls": 64352,
+        "out_of_domain_calls": 0,
+        "out_of_domain_fraction": 0.0,
+        "maximum_normalized_distance": 0.0,
+        "recursive_y_out_of_domain_calls": 0
+      }
+    ]
+  },
+  "gates": {
+    "XAR_TRAINING_NESTEDNESS_PASS": true,
+    "TARGET_ALIGNMENT_PASS": true,
+    "NO_FUTURE_X_PASS": true,
+    "PURGE_PASS": true,
+    "CONTINUATION_IN_SUPPORT_IDENTITY_PASS": true,
+    "KKT_PASS": true,
+    "FURNACE_B_NOT_ACCESSED": true
+  },
+  "status": "COMPLETED"
+}

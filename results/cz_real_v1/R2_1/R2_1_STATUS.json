@@ -1,0 +1,15 @@
+{
+  "stage": "R2.1_NESTEDNESS_AND_ALIGNMENT_AUDIT",
+  "status": "COMPLETED",
+  "next_stage": "R3A_NATIVE_HISTORY_SELECTION",
+  "elapsed_seconds": 19.971250055008568,
+  "gates": {
+    "XAR_TRAINING_NESTEDNESS_PASS": true,
+    "TARGET_ALIGNMENT_PASS": true,
+    "NO_FUTURE_X_PASS": true,
+    "PURGE_PASS": true,
+    "CONTINUATION_IN_SUPPORT_IDENTITY_PASS": true,
+    "KKT_PASS": true,
+    "FURNACE_B_NOT_ACCESSED": true
+  }
+}
