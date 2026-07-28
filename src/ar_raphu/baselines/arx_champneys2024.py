@@ -43,16 +43,16 @@ def _record_arrays(
     records: list[tuple[str, np.ndarray, np.ndarray]] = []
     for sequence in np.unique(dataset.sequence_id):
         indices = np.flatnonzero(dataset.sequence_id == sequence)
-        values = np.unique(dataset.split[indices])
-        if len(values) != 1:
-            raise ValueError(f"{sequence}: ARX baseline requires record-atomic splits.")
-        if str(values[0]) != split:
+        selected = indices[dataset.split[indices] == split]
+        if not len(selected):
             continue
+        if len(selected) > 1 and np.any(np.diff(selected) != 1):
+            raise ValueError(f"{sequence}: {split} rows are not contiguous.")
         records.append(
             (
-                str(sequence),
-                np.asarray(dataset.x[indices, 0], dtype=np.float64),
-                np.asarray(dataset.y[indices, 0], dtype=np.float64),
+                f"{sequence}:{split}",
+                np.asarray(dataset.x[selected, 0], dtype=np.float64),
+                np.asarray(dataset.y[selected, 0], dtype=np.float64),
             )
         )
     if not records:
@@ -324,5 +324,71 @@ def fit_and_select_arx_history(
         y_mean=y_mean,
         y_scale=y_scale,
         candidates=tuple(candidates),
+        elapsed_seconds=float(time.perf_counter() - started),
+    )
+
+
+def fit_arx_fixed_history(
+    dataset: DynamicDataset,
+    *,
+    nx: int,
+    ny: int,
+) -> ARXHistorySelection:
+    """Fit the literature-frozen ARX history without searching shorter lags."""
+
+    started = time.perf_counter()
+    if nx <= 0 or ny <= 0:
+        raise ValueError("Fixed ARX histories must be positive.")
+    if dataset.n_features != 1 or dataset.n_targets != 1:
+        raise ValueError("Champneys 2024 ARX profile is SISO.")
+    if np.any(dataset.split == "test"):
+        raise PermissionError("ARX development fit refuses test rows.")
+    train_records = _record_arrays(dataset, "train")
+    validation_records = _record_arrays(dataset, "validation")
+    x_mean, x_scale, y_mean, y_scale = _fit_scaler(train_records)
+    r_factor, projected_target = _streaming_qr(
+        train_records,
+        max_nx=nx,
+        max_ny=ny,
+        x_mean=x_mean,
+        x_scale=x_scale,
+        y_mean=y_mean,
+        y_scale=y_scale,
+    )
+    coefficients_y, coefficients_x, rank, condition = _fit_subset(
+        r_factor,
+        projected_target,
+        nx=nx,
+        ny=ny,
+        max_ny=ny,
+    )
+    scores, stable = _validation_aic(
+        validation_records,
+        coefficients_y=coefficients_y,
+        coefficients_x=coefficients_x,
+        x_mean=x_mean,
+        x_scale=x_scale,
+        y_mean=y_mean,
+        y_scale=y_scale,
+    )
+    candidate = ARXHistoryCandidate(
+        nx=nx,
+        ny=ny,
+        validation_aic_mean=float(np.mean(scores)),
+        validation_aic_by_record=scores,
+        effective_rank=rank,
+        condition_number=condition,
+        stable_simulation=stable,
+    )
+    return ARXHistorySelection(
+        selected_nx=nx,
+        selected_ny=ny,
+        coefficients_y=coefficients_y,
+        coefficients_x=coefficients_x,
+        x_mean=x_mean,
+        x_scale=x_scale,
+        y_mean=y_mean,
+        y_scale=y_scale,
+        candidates=(candidate,),
         elapsed_seconds=float(time.perf_counter() - started),
     )

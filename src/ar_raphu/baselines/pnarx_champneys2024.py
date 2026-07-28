@@ -39,17 +39,18 @@ def _records(
     result: list[tuple[str, np.ndarray, np.ndarray]] = []
     for sequence in np.unique(dataset.sequence_id):
         indices = np.flatnonzero(dataset.sequence_id == sequence)
-        split_values = np.unique(dataset.split[indices])
-        if len(split_values) != 1:
-            raise ValueError(f"{sequence}: pNARX requires record-atomic splits.")
-        if str(split_values[0]) == split:
-            result.append(
-                (
-                    str(sequence),
-                    np.asarray(dataset.x[indices, 0], dtype=np.float64),
-                    np.asarray(dataset.y[indices, 0], dtype=np.float64),
-                )
+        selected = indices[dataset.split[indices] == split]
+        if not len(selected):
+            continue
+        if len(selected) > 1 and np.any(np.diff(selected) != 1):
+            raise ValueError(f"{sequence}: {split} rows are not contiguous.")
+        result.append(
+            (
+                f"{sequence}:{split}",
+                np.asarray(dataset.x[selected, 0], dtype=np.float64),
+                np.asarray(dataset.y[selected, 0], dtype=np.float64),
             )
+        )
     if not result:
         raise ValueError(f"No {split} records.")
     return result

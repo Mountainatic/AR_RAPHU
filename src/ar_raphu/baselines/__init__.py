@@ -3,6 +3,7 @@
 from .arx_champneys2024 import (
     ARXHistorySelection,
     fit_and_select_arx_history,
+    fit_arx_fixed_history,
 )
 from .pnarx_champneys2024 import (
     PNARXSelection,
@@ -29,6 +30,7 @@ __all__ = [
     "LinearDirectForecaster",
     "LinearKind",
     "fit_and_select_arx_history",
+    "fit_arx_fixed_history",
     "fit_and_select_pnarx",
     "linear_design",
     "persistence_predict",

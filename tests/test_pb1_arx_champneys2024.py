@@ -4,6 +4,7 @@ import numpy as np
 
 from ar_raphu.baselines.arx_champneys2024 import (
     fit_and_select_arx_history,
+    fit_arx_fixed_history,
     simulate_arx,
 )
 from ar_raphu.datasets.base import DynamicDataset
@@ -81,3 +82,25 @@ def test_arx_aic_selection_runs_without_test_and_recovers_small_history() -> Non
     )
     assert selected.stable_simulation is True
     assert np.isfinite(selected.validation_aic_mean)
+
+
+def test_fixed_arx_accepts_one_contiguous_chronological_split() -> None:
+    x, y = _arx_sequence(22, n=800)
+    split = np.full(800, "train", dtype=object)
+    split[600:] = "validation"
+    dataset = DynamicDataset(
+        x=x[:, None],
+        y=y[:, None],
+        timestamps=np.arange(800, dtype=np.float64),
+        sequence_id=np.full(800, "0000:estimation", dtype=object),
+        split=split,
+        label_mask=np.ones((800, 1), dtype=bool),
+        quality_mask=np.ones((800, 2), dtype=bool),
+        feature_names=("input",),
+        target_names=("output",),
+        metadata={"dataset_id": "fixture"},
+    )
+    selection = fit_arx_fixed_history(dataset, nx=2, ny=2)
+    assert (selection.selected_nx, selection.selected_ny) == (2, 2)
+    assert len(selection.candidates) == 1
+    assert np.isfinite(selection.candidates[0].validation_aic_mean)

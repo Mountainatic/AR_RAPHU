@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 import subprocess
 import sys
@@ -29,6 +30,7 @@ from ar_raphu.spectral.pb1_development import (
     fit_pb1_shared_history_spectral,
     simulate_pb1_free_run,
 )
+from ar_raphu.spectral.amplitude_domain import AmplitudeOutOfDomainError
 
 
 LOADERS = {
@@ -82,7 +84,14 @@ def _h3_history(dataset_name: str, config: dict) -> tuple[int, int, str, Path | 
 
 
 def _solver_diagnostics(selected: object) -> dict:
-    return dict(selected.solver_diagnostics)
+    return {
+        key: (
+            value
+            if not isinstance(value, float) or math.isfinite(value)
+            else None
+        )
+        for key, value in selected.solver_diagnostics.items()
+    }
 
 
 def main() -> int:
@@ -241,26 +250,35 @@ def main() -> int:
         initialization = config["free_run"].get(
             "official_initialization", 0
         )
-        free_run = simulate_pb1_free_run(
-            dataset,
-            fit,
-            official_initialization=(
-                int(initialization) if isinstance(initialization, int) else 0
-            ),
-        )
-        payload["free_run_validation"] = {
-            "status": free_run.status,
-            "initialization_length": free_run.initialization_length,
-            "scored_samples": free_run.scored_samples,
-            "mse_standardized": free_run.mse_standardized,
-            "rmse_standardized": free_run.rmse_standardized,
-            "mse_original_units": free_run.mse_original_units,
-            "rmse_original_units": free_run.rmse_original_units,
-            "mse_by_sequence_standardized": (
-                free_run.mse_by_sequence_standardized
-            ),
-            "uses_intermediate_true_outputs": False,
-        }
+        try:
+            free_run = simulate_pb1_free_run(
+                dataset,
+                fit,
+                official_initialization=(
+                    int(initialization)
+                    if isinstance(initialization, int)
+                    else 0
+                ),
+            )
+            payload["free_run_validation"] = {
+                "status": free_run.status,
+                "initialization_length": free_run.initialization_length,
+                "scored_samples": free_run.scored_samples,
+                "mse_standardized": free_run.mse_standardized,
+                "rmse_standardized": free_run.rmse_standardized,
+                "mse_original_units": free_run.mse_original_units,
+                "rmse_original_units": free_run.rmse_original_units,
+                "mse_by_sequence_standardized": (
+                    free_run.mse_by_sequence_standardized
+                ),
+                "uses_intermediate_true_outputs": False,
+            }
+        except AmplitudeOutOfDomainError as error:
+            payload["free_run_validation"] = {
+                "status": "FAILED_REPRESENTATION_COVERAGE",
+                "failure": str(error),
+                "uses_intermediate_true_outputs": False,
+            }
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n",

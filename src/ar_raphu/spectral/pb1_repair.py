@@ -259,21 +259,44 @@ def solve_pb1_system(
 
     values = scipy.linalg.svdvals(matrix, check_finite=True)
     largest = max(float(values[0]), np.finfo(np.float64).eps)
-    resolved_rcond = (
-        float(svd_rcond)
+    epsilon = np.finfo(np.float64).eps
+    rcond_candidates = (
+        [float(svd_rcond)]
         if svd_rcond is not None
-        else np.finfo(np.float64).eps * max(matrix.shape)
+        else [
+            epsilon * max(matrix.shape),
+            epsilon * np.sqrt(max(matrix.shape)),
+            epsilon,
+            epsilon / max(matrix.shape),
+            0.0,
+        ]
     )
+    best: tuple[float, np.ndarray, int, float] | None = None
+    for candidate_rcond in rcond_candidates:
+        candidate_coefficients, _, candidate_rank, _ = scipy.linalg.lstsq(
+            matrix,
+            vector,
+            cond=candidate_rcond,
+            lapack_driver="gelsd",
+            check_finite=True,
+        )
+        candidate_kkt = _relative_kkt(
+            matrix, candidate_coefficients, vector
+        )
+        if best is None or candidate_kkt < best[0]:
+            best = (
+                candidate_kkt,
+                candidate_coefficients,
+                int(candidate_rank),
+                float(candidate_rcond),
+            )
+        if candidate_kkt <= kkt_threshold:
+            break
+    if best is None:
+        raise AssertionError("PB1 SVD rescue produced no candidate solution.")
+    kkt, coefficients, effective_rank, resolved_rcond = best
     cutoff = resolved_rcond * largest
     retained = values[values > cutoff]
-    coefficients, _, effective_rank, _ = scipy.linalg.lstsq(
-        matrix,
-        vector,
-        cond=resolved_rcond,
-        lapack_driver="gelsd",
-        check_finite=True,
-    )
-    kkt = _relative_kkt(matrix, coefficients, vector)
     return PB1SystemSolution(
         coefficients=coefficients,
         relative_kkt_residual=kkt,
@@ -284,7 +307,7 @@ def solve_pb1_system(
         iterative_refinement_steps=refinement_steps,
         condition_estimate_before=condition_before,
         condition_estimate_after=condition_after,
-        effective_rank=int(effective_rank),
+        effective_rank=effective_rank,
         smallest_retained_singular_value=(
             float(retained[-1]) if len(retained) else 0.0
         ),

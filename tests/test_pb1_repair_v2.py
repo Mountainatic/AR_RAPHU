@@ -108,6 +108,16 @@ def test_svd_fallback_handles_zero_penalty_semidefinite_case() -> None:
     assert result.relative_kkt_residual <= 1.0e-8
 
 
+def test_svd_cutoff_tightens_until_original_coordinate_kkt_passes() -> None:
+    matrix = np.diag([1.0, 1.0e-16, 0.0])
+    rhs = np.array([0.0, 1.0e-16, 0.0])
+    result = solve_pb1_system(matrix, rhs)
+    assert result.solver_stage == "SVD_MINIMUM_NORM"
+    assert result.converged is True
+    assert result.relative_kkt_residual <= 1.0e-8
+    np.testing.assert_allclose(matrix @ result.coefficients, rhs)
+
+
 def test_solver_does_not_change_selected_penalties() -> None:
     gram = np.array([[2.0, 0.1], [0.1, 1.0]])
     rhs = np.array([1.0, 0.5])

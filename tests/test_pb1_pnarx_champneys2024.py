@@ -81,3 +81,26 @@ def test_pnarx_selects_a_finite_low_order_without_test() -> None:
     assert selection.order in {2, 3, 4}
     assert all(np.isfinite(row.validation_aic_mean) for row in selection.candidates)
     assert all(row.stable_simulation for row in selection.candidates)
+
+
+def test_pnarx_accepts_one_contiguous_chronological_split() -> None:
+    x, y = _record(31, n=800)
+    split = np.full(800, "train", dtype=object)
+    split[600:] = "validation"
+    dataset = DynamicDataset(
+        x=x[:, None],
+        y=y[:, None],
+        timestamps=np.arange(800, dtype=np.float64),
+        sequence_id=np.full(800, "0000:estimation", dtype=object),
+        split=split,
+        label_mask=np.ones((800, 1), dtype=bool),
+        quality_mask=np.ones((800, 2), dtype=bool),
+        feature_names=("input",),
+        target_names=("output",),
+        metadata={"dataset_id": "fixture"},
+    )
+    selection = fit_and_select_pnarx(
+        dataset, nx=2, ny=2, orders=(2, 3)
+    )
+    assert selection.order in {2, 3}
+    assert all(row.stable_simulation for row in selection.candidates)
