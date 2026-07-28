@@ -1,0 +1,92 @@
+{
+  "date": "2026-07-28",
+  "files": {
+    "实验数据1(3).xlsx": {
+      "sha256": "c46e0d35d26903386fd80408f36660c4f8925a5dbc56c92527f020e433ef04de",
+      "sheets": {
+        "Sheet1": {
+          "rows_excluding_header": 20103,
+          "columns": 10
+        }
+      }
+    },
+    "实验数据1-张.xlsx": {
+      "sha256": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+      "sheets": {
+        "Sheet1": {
+          "rows_excluding_header": 20103,
+          "columns": 10
+        },
+        "Sheet2": {
+          "rows_excluding_header": 20627,
+          "columns": 7
+        }
+      }
+    }
+  },
+  "deduplication": {
+    "file_a_Sheet1_equals_file_b_Sheet1": true,
+    "unique_sequences": 2
+  },
+  "sequence_A": {
+    "source": "实验数据1(3).xlsx/Sheet1",
+    "role": "development furnace/rod",
+    "samples": 20103,
+    "inferred_sampling_period_seconds": 1.9968,
+    "inferred_duration_hours": 11.15,
+    "columns": [
+      "加热元件温度(°C)",
+      "主加热功率(kW)",
+      "晶升速度(mm/min)",
+      "晶转速度(rpm)",
+      "埚升速度(mm/min)",
+      "埚转速度(rpm)",
+      "氩气流量设定(L/min)",
+      "晶体长度(mm)",
+      "炉压(Torr)",
+      "晶体直径(mm)"
+    ],
+    "constant_or_low_information": {
+      "氩气流量设定": "exactly constant at 130 L/min",
+      "炉压": "near-constant/quantized; 22.66–23.64 Torr, std 0.044 Torr",
+      "晶体长度": "monotone process coordinate; 1–385 mm, not a causal manipulator"
+    }
+  },
+  "sequence_B": {
+    "source": "实验数据1-张.xlsx/Sheet2",
+    "role": "untouched cross-furnace outer sequence",
+    "samples": 20627,
+    "provisional_sampling_period_seconds": 2.0,
+    "provisional_duration_hours": 11.46,
+    "columns": [
+      "加热元件温度(°C)",
+      "晶升速度(mm/min)",
+      "晶转速度(rpm)",
+      "埚升速度(mm/min)",
+      "埚转速度(rpm)",
+      "主加热功率(kW)",
+      "晶体直径(mm)"
+    ]
+  },
+  "primary_inputs": [
+    "主加热功率",
+    "晶升速度",
+    "晶转速度",
+    "埚升速度",
+    "埚转速度"
+  ],
+  "primary_target": "晶体直径",
+  "sensitivity_input": "加热元件温度",
+  "excluded_primary_inputs": {
+    "氩气流量设定": "constant and unavailable on sequence B",
+    "炉压": "correct unit Torr; low variation and unavailable on sequence B",
+    "晶体长度": "monotone process coordinate; leakage/time-index risk",
+    "加热元件温度": "not a manipulated input; retained only as measured-state sensitivity branch"
+  },
+  "distribution_shift_A_to_B": {
+    "主加热功率_standardized_mean_difference": 0.622,
+    "晶转速度_standardized_mean_difference": -0.239,
+    "加热元件温度_standardized_mean_difference": 0.2,
+    "晶体直径_standardized_mean_difference": -0.046
+  }
+}

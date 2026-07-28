@@ -1,0 +1,161 @@
+schema_version: CZ_REAL_DATA_PROTOCOL_V1
+date: 2026-07-28
+scope: fixed_equal_diameter_stage
+target:
+  name: 晶体直径
+  unit: mm
+
+sampling:
+  provisional_period_seconds: 2.0
+  evidence: inferred_from_crystal_length_and_pull_speed_in_furnace_A
+  confirmation_required: true
+
+datasets:
+  furnace_A:
+    source: 实验数据1(3).xlsx/Sheet1
+    samples: 20103
+    role: development_and_internal_confirmation
+  furnace_B:
+    source: 实验数据1-张.xlsx/Sheet2
+    samples: 20627
+    role: untouched_cross_furnace_outer_test
+  duplicate:
+    source: 实验数据1-张.xlsx/Sheet1
+    equals: furnace_A
+    use_as_independent_sequence: false
+
+primary_inputs:
+  - 主加热功率
+  - 晶升速度
+  - 晶转速度
+  - 埚升速度
+  - 埚转速度
+
+feature_policy:
+  加热元件温度:
+    primary: false
+    sensitivity_branch: true
+    reason: measured_state_not_main_manipulated_input
+  氩气流量设定:
+    primary: false
+    reason: constant
+  炉压:
+    unit: Torr
+    primary: false
+    furnace_A_ablation: true
+    reason: low_variation_and_missing_in_furnace_B
+  晶体长度:
+    primary: false
+    diagnostic_only: true
+    reason: monotone_process_coordinate_and_time_leakage_risk
+
+splits:
+  random_split_forbidden: true
+  furnace_A:
+    development_fraction: 0.8
+    internal_confirmation_fraction: 0.2
+    expanding_folds:
+      - {train: [0.0, 0.4], validation: [0.4, 0.5]}
+      - {train: [0.0, 0.5], validation: [0.5, 0.6]}
+      - {train: [0.0, 0.6], validation: [0.6, 0.7]}
+      - {train: [0.0, 0.7], validation: [0.7, 0.8]}
+  furnace_B:
+    access_before_freeze: false
+    zero_shot_primary: true
+    few_shot_calibration_fractions: [0.05, 0.10]
+  purge:
+    formula: max(Lx-1,Ly-1)+hmax
+
+tasks:
+  direct_horizons_samples: [1, 5, 15, 30, 60]
+  exploratory_horizon_samples: [150]
+  free_run:
+    required: true
+    uses_recorded_input_sequence: true
+    uses_intermediate_true_y: false
+    online_refit: false
+
+H2:
+  Lx_grid: [32, 64, 128, 256, 512]
+  Ly_grid: [8, 16, 32, 64, 128]
+  Mtau_grid: [16, 32, 48, 64]
+  Mx_grid: [16, 20, 24, 28, 32]
+  selection_order:
+    - history
+    - resolution
+    - penalty
+    - simulation_closure
+    - rank
+  one_standard_error_rule: true
+  exact_zero_penalty: true
+  original_coordinate_kkt_threshold: 1.0e-8
+
+models:
+  minimum:
+    - mean
+    - persistence
+    - AR
+    - X_only
+    - ARX
+  nonlinear:
+    - pNARX
+    - MLP_NARX
+    - GRU_or_LSTM
+    - AKGNN_reference
+    - Stage1TargetDelayKAN_if_reproducible
+  ours:
+    - spectral_rank1
+    - spectral_rank2
+    - spectral_full
+    - spectral_adaptive_rank
+    - H3_shared_history
+    - H2_native_history
+
+metrics:
+  raw_unit:
+    - RMSE_mm
+    - MAE_mm
+    - R2
+    - P50_abs_error_mm
+    - P90_abs_error_mm
+    - P95_abs_error_mm
+    - max_abs_error_mm
+  normalized:
+    - NRMSE_by_output_std
+  incremental:
+    - relative_MSE_reduction_vs_AR
+    - RMSE_delta_y
+  free_run:
+    - full_trajectory_RMSE
+    - drift_slope
+    - maximum_continuous_bias
+    - initial_condition_sensitivity
+    - continuation_usage
+    - maximum_normalized_extrapolation_distance
+
+bootstrap:
+  development_replicates: 250
+  confirmation_replicates: 1000
+  sequence_aware_blocks: true
+
+hard_gates:
+  - NO_RANDOM_SPLIT
+  - TRAIN_ONLY_SCALER
+  - PURGE_PASS
+  - FURNACE_B_NOT_USED_IN_TUNING
+  - ALL_PRIMARY_KKT_PASS
+  - H2_NATIVE_COMPLETE
+  - FREE_RUN_COMPLETE
+  - INTERPRETATION_FIREWALL_PASS
+
+execution_order:
+  - CZ_R0_DATA_AUDIT
+  - CZ_R1_LINEAR_SMOKE
+  - CZ_R2_H3_SPECTRAL_SMOKE
+  - CZ_R3_H2_NATIVE_SELECTION
+  - CZ_R4_RANK_CONTINUATION_FREE_RUN
+  - CZ_R5_COMPLETE_BASELINES
+  - CZ_R6_FURNACE_A_CONFIRMATION
+  - CZ_R7_FURNACE_B_ZERO_SHOT
+  - CZ_R8_FEW_SHOT_CALIBRATION
+  - CZ_R9_INTERPRETABILITY_AUDIT

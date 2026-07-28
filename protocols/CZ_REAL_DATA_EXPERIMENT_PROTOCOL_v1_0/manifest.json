@@ -1,0 +1,25 @@
+{
+  "package": "CZ_REAL_DATA_EXPERIMENT_PROTOCOL_V1",
+  "files": [
+    {
+      "path": "CZ_DATA_AUDIT_SUMMARY.json",
+      "bytes": 2828,
+      "sha256": "cc4556d98c3508e9ac0c3af67f4db215e0d57b942848ddda1121ff2fb78aef8d"
+    },
+    {
+      "path": "CZ_REAL_DATA_EXPERIMENT_PROTOCOL_v1_0.md",
+      "bytes": 12716,
+      "sha256": "278599fd830ea9eb9a114a966bffb714f0d6eb6c6092ecef2bc7d92a1cd676e9"
+    },
+    {
+      "path": "CZ_REAL_DATA_EXPERIMENT_PROTOCOL_v1_0.yaml",
+      "bytes": 3701,
+      "sha256": "f0e6574db021e8d862276ccf97efffac2e3b1827b5b9bd57d5180e7038981035"
+    },
+    {
+      "path": "README.md",
+      "bytes": 399,
+      "sha256": "34c337c1c06468e83306f508c2660af4409fa716d3f616a87fc547554b5c128f"
+    }
+  ]
+}
