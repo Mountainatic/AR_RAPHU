@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from ar_raphu.cz_real.linear import TrainScaler, target_indices, window_designs
+from ar_raphu.cz_real.audit import fit_exact_zero
 from ar_raphu.cz_real.protocol import (
     FurnaceBLockedError,
     build_development_folds,
@@ -118,3 +119,13 @@ def test_v41_bounded_c1_continuation_is_interior_exact_and_bounded() -> None:
         rtol=1.0e-6,
         atol=1.0e-8,
     )
+
+
+def test_exact_zero_rescue_certifies_collinear_design() -> None:
+    rng = np.random.default_rng(42)
+    primitive = rng.normal(size=(300, 8))
+    matrix = np.column_stack((primitive, primitive[:, :3], primitive[:, 0]))
+    target = primitive @ np.arange(1.0, 9.0) + 0.01 * rng.normal(size=300)
+    fit = fit_exact_zero(matrix, target)
+    assert fit.relative_kkt_residual <= 1.0e-8
+    assert fit.solver_stage == "DIAGONAL_EQUILIBRATION_CHOLESKY_REFINEMENT"

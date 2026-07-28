@@ -22,13 +22,16 @@ class ExactZeroFit:
     train_mse: float
     relative_kkt_residual: float
     effective_rank: int
+    solver_stage: str
+    numerical_jitter_relative: float
+    iterative_refinement_steps: int
 
     def predict(self, matrix: np.ndarray) -> np.ndarray:
         return np.asarray(matrix, dtype=np.float64) @ self.coefficients + self.intercept
 
 
 def fit_exact_zero(matrix: np.ndarray, target: np.ndarray) -> ExactZeroFit:
-    """Minimum-residual FP64 least squares with no scientific ridge."""
+    """FP64 exact-zero fit with diagonal equilibration and KKT rescue."""
 
     x = np.asarray(matrix, dtype=np.float64)
     y = np.asarray(target, dtype=np.float64)
@@ -36,17 +39,53 @@ def fit_exact_zero(matrix: np.ndarray, target: np.ndarray) -> ExactZeroFit:
     y_mean = float(y.mean())
     centered_x = x - x_mean
     centered_y = y - y_mean
-    coefficients, _, rank, _ = scipy.linalg.lstsq(
-        centered_x,
-        centered_y,
-        cond=None,
-        lapack_driver="gelsy",
-        check_finite=True,
-    )
-    intercept = y_mean - float(x_mean @ coefficients)
-    prediction = x @ coefficients + intercept
     gram = centered_x.T @ centered_x / len(centered_x)
     rhs = centered_x.T @ centered_y / len(centered_x)
+    column_scale = np.sqrt(np.maximum(np.diag(gram), np.finfo(np.float64).eps))
+    equilibrated = gram / np.outer(column_scale, column_scale)
+    equilibrated_rhs = rhs / column_scale
+    coefficients: np.ndarray | None = None
+    selected_jitter = float("nan")
+    selected_steps = 0
+    selected_kkt = float("inf")
+    for jitter in (0.0, 1.0e-14, 1.0e-13, 1.0e-12, 1.0e-11, 1.0e-10):
+        try:
+            factor = scipy.linalg.cho_factor(
+                equilibrated + jitter * np.eye(len(equilibrated)),
+                lower=True,
+                check_finite=True,
+            )
+        except (np.linalg.LinAlgError, ValueError):
+            continue
+        z = scipy.linalg.cho_solve(
+            factor, equilibrated_rhs, check_finite=False
+        )
+        candidate = z / column_scale
+        steps = 0
+        for step in range(6):
+            residual = rhs - gram @ candidate
+            kkt = float(
+                np.linalg.norm(residual)
+                / max(np.linalg.norm(rhs), np.finfo(np.float64).eps)
+            )
+            if kkt <= 1.0e-8 or step == 5:
+                break
+            correction_z = scipy.linalg.cho_solve(
+                factor, residual / column_scale, check_finite=False
+            )
+            candidate += correction_z / column_scale
+            steps += 1
+        if kkt < selected_kkt:
+            coefficients = candidate
+            selected_kkt = kkt
+            selected_jitter = jitter
+            selected_steps = steps
+        if kkt <= 1.0e-8:
+            break
+    if coefficients is None:
+        raise np.linalg.LinAlgError("Exact-zero rescue produced no solution.")
+    intercept = y_mean - float(x_mean @ coefficients)
+    prediction = x @ coefficients + intercept
     residual = gram @ coefficients - rhs
     kkt = float(
         np.linalg.norm(residual)
@@ -57,7 +96,10 @@ def fit_exact_zero(matrix: np.ndarray, target: np.ndarray) -> ExactZeroFit:
         intercept=intercept,
         train_mse=float(np.mean((prediction - y) ** 2)),
         relative_kkt_residual=kkt,
-        effective_rank=int(rank),
+        effective_rank=-1,
+        solver_stage="DIAGONAL_EQUILIBRATION_CHOLESKY_REFINEMENT",
+        numerical_jitter_relative=selected_jitter,
+        iterative_refinement_steps=selected_steps,
     )
 
 
@@ -268,6 +310,10 @@ def audit_fold_h1(
                 "relative_kkt_residual": fit.relative_kkt_residual,
                 "effective_rank": fit.effective_rank,
                 "coefficient_count": int(len(fit.coefficients)),
+                "solver_stage": fit.solver_stage,
+                "numerical_jitter_relative": fit.numerical_jitter_relative,
+                "numerical_jitter_is_scientific_ridge": False,
+                "iterative_refinement_steps": fit.iterative_refinement_steps,
             }
             for model, fit in fits.items()
         },

@@ -481,8 +481,13 @@ def run_r21(args: argparse.Namespace) -> None:
     records: list[dict[str, object]] = []
     for fold in folds:
         checkpoint = output / f"fold_{fold.fold}.json"
-        if checkpoint.exists():
-            record = json.loads(checkpoint.read_text(encoding="utf-8"))
+        existing = (
+            json.loads(checkpoint.read_text(encoding="utf-8"))
+            if checkpoint.exists()
+            else None
+        )
+        if existing is not None and existing.get("status") == "COMPLETED":
+            record = existing
         else:
             record = audit_fold_h1(
                 data.inputs,
