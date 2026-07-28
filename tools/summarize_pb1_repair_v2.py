@@ -161,8 +161,46 @@ def baseline_record(results_root: Path, dataset: str) -> dict[str, Any]:
     if not path.exists():
         return {"status": "NOT_YET_RUN"}
     payload = load_json(path)
+    arx = payload.get("arx") or {}
+    pnarx = payload.get("pnarx") or {}
+    selected_order = pnarx.get("selected_order")
+    selected_candidate = next(
+        (
+            row
+            for row in pnarx.get("candidates", [])
+            if row.get("order") == selected_order
+        ),
+        {},
+    )
     return {
         "status": payload.get("status", "FAILED"),
+        "arx_history": arx.get("history"),
+        "arx_validation_aic": arx.get("validation_aic_mean"),
+        "arx_stable_simulation": arx.get("stable_simulation"),
+        "pnarx_history": pnarx.get("history"),
+        "pnarx_selected_order": selected_order,
+        "pnarx_validation_aic": selected_candidate.get("validation_aic_mean"),
+        "pnarx_stable_simulation": selected_candidate.get("stable_simulation"),
+        "source_commit": payload.get("source_commit"),
+        "sha256": sha256(path),
+    }
+
+
+def dependency_track_record(
+    results_root: Path, dataset: str, horizon: int, track: str
+) -> dict[str, Any]:
+    path = spectral_path(results_root, dataset, horizon).with_name(
+        f"spectral_{track}.json"
+    )
+    if not path.exists():
+        return {"status": "NOT_YET_RUN"}
+    payload = load_json(path)
+    selected = (payload.get("penalty") or {}).get("selected") or {}
+    return {
+        "status": payload.get("status", "FAILED"),
+        "validation_mse": selected.get("validation_mse_mean"),
+        "effective_df": selected.get("effective_df"),
+        "relative_kkt_residual": selected.get("relative_kkt_residual"),
         "source_commit": payload.get("source_commit"),
         "sha256": sha256(path),
     }
@@ -191,6 +229,12 @@ def build_status(results_root: Path) -> dict[str, Any]:
             "h3_shared_history_direct": direct,
             "every_horizon_bootstrap": bootstrap,
             "literature_baseline": baseline_record(results_root, dataset),
+            "dependency_ar_track": {
+                str(horizon): dependency_track_record(
+                    results_root, dataset, horizon, "AR"
+                )
+                for horizon in HORIZONS
+            },
         }
 
     coverage_path = results_root / "amplitude_coverage_audit.json"
@@ -330,23 +374,69 @@ def build_report(status: dict[str, Any]) -> str:
             "",
             "## 文献基线与覆盖审计",
             "",
-            "| 数据集 | 文献基线 | H3 spectral | 说明 |",
-            "|---|---|---|---|",
+            "| 数据集 | ARX history | ARX AIC | pNARX order | pNARX AIC | 状态 |",
+            "|---|---|---:|---:|---:|---|",
+        ]
+    )
+    for dataset in ("cascaded_tanks", "silverbox"):
+        baseline = status["datasets"][dataset]["literature_baseline"]
+        arx_history = baseline.get("arx_history") or {}
+        lines.append(
+            "| {dataset} | nx={nx}, ny={ny} | {arx_aic} | {order} | "
+            "{pnarx_aic} | {status} |".format(
+                dataset=dataset,
+                nx=arx_history.get("nx", "—"),
+                ny=arx_history.get("ny", "—"),
+                arx_aic=fmt(baseline.get("arx_validation_aic")),
+                order=fmt(baseline.get("pnarx_selected_order")),
+                pnarx_aic=fmt(baseline.get("pnarx_validation_aic")),
+                status=baseline["status"],
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "| 数据集 | H3 spectral | 覆盖审计说明 |",
+            "|---|---|---|",
             (
-                "| pwh | NOT_APPLICABLE | 已运行 | train-fitted 幅值域覆盖 validation；"
+                "| pwh | 已运行 | train-fitted 幅值域覆盖 validation；"
                 "H1 free-run 递推后越界，按协议失败。 |"
             ),
             (
-                "| whpn | NOT_APPLICABLE | 已运行 | train-fitted 幅值域覆盖 validation；"
+                "| whpn | 已运行 | train-fitted 幅值域覆盖 validation；"
                 "H1 free-run 递推后越界，按协议失败。 |"
             ),
             (
-                "| cascaded_tanks | COMPLETED | BLOCKED | X validation 中 "
+                "| cascaded_tanks | BLOCKED | X validation 中 "
                 "13/324 点超出 train-fitted 域；未裁剪、未使用 validation 扩域。 |"
             ),
             (
-                "| silverbox | COMPLETED | 已运行 | 幅值域覆盖；H1 free-run COMPLETED。 |"
+                "| silverbox | 已运行 | 幅值域覆盖；H1 free-run COMPLETED。 |"
             ),
+            "",
+            "## WHPN AR-only 依赖轨道复核",
+            "",
+            "| h | 状态 | validation MSE | EDF | KKT |",
+            "|---:|---|---:|---:|---:|",
+        ]
+    )
+    whpn_ar = status["datasets"]["whpn"]["dependency_ar_track"]
+    for horizon in (10, 20):
+        record = whpn_ar[str(horizon)]
+        lines.append(
+            "| {horizon} | {status} | {mse} | {edf} | {kkt} |".format(
+                horizon=horizon,
+                status=record["status"],
+                mse=fmt(record.get("validation_mse")),
+                edf=fmt(record.get("effective_df")),
+                kkt=fmt(record.get("relative_kkt_residual")),
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "修复后的 h20 AR-only 候选通过原坐标 KKT 门槛；该轨道仅用于依赖"
+            "完整性复核，不改变已经冻结的 XAR penalty 或 rank bootstrap。",
             "",
             "## 停止线与尚缺的冻结项",
             "",
