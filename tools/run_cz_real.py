@@ -45,6 +45,7 @@ from ar_raphu.cz_real.protocol import (
     load_furnace_a,
 )
 from ar_raphu.cz_real.spectral import fit_shared_history_smoke
+from ar_raphu.cz_real.audit import audit_fold_h1
 from ar_raphu.spectral.amplitude_domain import AmplitudeOutOfDomainError
 
 
@@ -423,7 +424,7 @@ def run_r2(args: argparse.Namespace) -> None:
             "pilot_smoothness_weight": 1.0e-3,
             "pilot_ridge_weight": 1.0e-8,
             "pilot_continuation_family": "v4.1_bounded_C1_tanh",
-            "pilot_continuation_scale_factor": 1.0,
+            "CONTINUATION_SCALE_COEFFICIENT": 1.0,
             "pilot_scale_status": "ENGINEERING_SMOKE_ANCHOR_NOT_R3_SELECTION",
             "hyperparameter_selection": False,
             "scientific_evidence": False,
@@ -470,9 +471,80 @@ def run_r2(args: argparse.Namespace) -> None:
         raise RuntimeError("R2 original-coordinate KKT gate failed.")
 
 
+def run_r21(args: argparse.Namespace) -> None:
+    start = time.monotonic()
+    raw_dir = Path(args.raw_dir).resolve()
+    output = Path(args.output).resolve() / "R2_1"
+    output.mkdir(parents=True, exist_ok=True)
+    data = load_furnace_a(raw_dir / "实验数据1.xlsx")
+    folds = build_development_folds(L_x=32, L_y=32)
+    records: list[dict[str, object]] = []
+    for fold in folds:
+        checkpoint = output / f"fold_{fold.fold}.json"
+        if checkpoint.exists():
+            record = json.loads(checkpoint.read_text(encoding="utf-8"))
+        else:
+            record = audit_fold_h1(
+                data.inputs,
+                data.target,
+                fold=fold,
+                L_x=32,
+                L_y=32,
+                lag_basis_count=16,
+                amplitude_basis_count=32,
+                continuation_scale_coefficient=1.0,
+            )
+            _write_json(checkpoint, record)
+        records.append(record)
+        print(
+            f"R2.1 fold={fold.fold} status={record['status']} "
+            f"nested_margin={record['nestedness']['AR_train_MSE_minus_XAR_train_MSE']:.3e} "
+            f"ood={100.0*record['continuation']['out_of_domain_fraction']:.3f}%",
+            flush=True,
+        )
+        if record["status"] != "COMPLETED":
+            break
+    all_gates = {
+        key: all(bool(record["gates"][key]) for record in records)
+        for key in records[0]["gates"]
+    }
+    passed = len(records) == len(folds) and all(all_gates.values())
+    status = {
+        "stage": "R2.1_NESTEDNESS_AND_ALIGNMENT_AUDIT",
+        "status": "COMPLETED" if passed else "FAILED",
+        "runtime": {**_runtime(), "elapsed_seconds": time.monotonic() - start},
+        "configuration": {
+            "folds": 4,
+            "horizon_samples": 1,
+            "M_tau": 16,
+            "M_x": 32,
+            "CONTINUATION_SCALE_COEFFICIENT": 1.0,
+            "scientific_penalty": "EXACT_ZERO",
+        },
+        "fold_records": records,
+        "gates": all_gates,
+        "next_stage": "R3A_NATIVE_HISTORY_SELECTION" if passed else "HARD_STOP",
+        "furnace_A_confirmation_accessed": False,
+        "furnace_B_accessed": False,
+    }
+    _write_json(output / "R2_1_AUDIT_RESULTS.json", status)
+    _write_json(
+        output / "R2_1_STATUS.json",
+        {
+            "stage": status["stage"],
+            "status": status["status"],
+            "next_stage": status["next_stage"],
+            "elapsed_seconds": status["runtime"]["elapsed_seconds"],
+            "gates": all_gates,
+        },
+    )
+    if not passed:
+        raise RuntimeError("R2.1 hard gate failed; R3-A is forbidden.")
+
+
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser()
-    result.add_argument("stage", choices=("r0", "r1", "r2"))
+    result.add_argument("stage", choices=("r0", "r1", "r2", "r21"))
     result.add_argument("--raw-dir", required=True)
     result.add_argument("--output", required=True)
     return result
@@ -484,8 +556,10 @@ def main() -> None:
         run_r0(args)
     elif args.stage == "r1":
         run_r1(args)
-    else:
+    elif args.stage == "r2":
         run_r2(args)
+    else:
+        run_r21(args)
 
 
 if __name__ == "__main__":

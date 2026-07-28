@@ -20,6 +20,7 @@ class SpectralDesign:
     amplitude_grams: list[np.ndarray]
     target_indices: np.ndarray
     origin_indices: np.ndarray
+    continuation_diagnostics: list[dict[str, float | int | str]]
 
 
 def build_ar_nuisance_design(
@@ -43,10 +44,16 @@ def build_ar_nuisance_design(
         raise ValueError("AR history precedes sequence start.")
     lag_knots = clamped_knots(0.0, float(L_y - 1), lag_basis_count, degree)
     lag_basis = evaluate_basis(np.arange(L_y), lag_knots, degree)
+    ar_domain = (
+        AmplitudeDomain.fit(y[:train_target_stop], padding_fraction=0.10)
+        if continuation_scale_factor is not None
+        else None
+    )
     amplitude_basis = CenteredSplineBasis.fit(
         y[:train_target_stop],
         n_basis=amplitude_basis_count,
         degree=degree,
+        domain=ar_domain,
     )
     offsets = np.arange(L_y, dtype=np.int64)
     windows = y[origins[:, None] - offsets[None, :]]
@@ -115,6 +122,7 @@ def build_spectral_design(
     matrix = np.empty((len(targets), x.shape[1] * block_width), dtype=np.float64)
     slices: dict[int, slice] = {}
     amplitude_grams: list[np.ndarray] = []
+    continuation_diagnostics: list[dict[str, float | int | str]] = []
     lag_offsets = np.arange(L_x, dtype=np.int64)
     for variable, basis in enumerate(bases):
         train_eval = basis.transform(train_x[:, variable])
@@ -122,11 +130,31 @@ def build_spectral_design(
         window_values = x[origins[:, None] - lag_offsets[None, :], variable]
         if continuation_scale_factor is None:
             amplitude_eval = basis.transform(window_values.reshape(-1))
+            in_domain = np.ones(window_values.size, dtype=bool)
         else:
-            amplitude_eval, _ = basis.bounded_c1_transform(
+            amplitude_eval, in_domain = basis.bounded_c1_transform(
                 window_values.reshape(-1),
                 scale_factor=continuation_scale_factor,
             )
+        flattened = window_values.reshape(-1)
+        train_range = max(
+            float(np.ptp(train_x[:, variable])),
+            np.finfo(np.float64).eps,
+        )
+        below = np.maximum(basis.lower - flattened, 0.0)
+        above = np.maximum(flattened - basis.upper, 0.0)
+        continuation_diagnostics.append(
+            {
+                "variable_index": variable,
+                "source": "RECORDED_EXTERNAL_INPUT",
+                "total_calls": int(flattened.size),
+                "out_of_domain_calls": int(np.count_nonzero(~in_domain)),
+                "out_of_domain_fraction": float(np.mean(~in_domain)),
+                "maximum_normalized_distance": float(
+                    np.max(np.maximum(below, above)) / train_range
+                ),
+            }
+        )
         amplitude_eval = amplitude_eval.reshape(
             len(targets), L_x, amplitude_basis_count
         )
@@ -143,4 +171,5 @@ def build_spectral_design(
         amplitude_grams=amplitude_grams,
         target_indices=targets,
         origin_indices=origins,
+        continuation_diagnostics=continuation_diagnostics,
     )
