@@ -241,6 +241,8 @@ def build_status(results_root: Path) -> dict[str, Any]:
     coverage = load_json(coverage_path) if coverage_path.exists() else {}
     preflight_path = results_root / "PB1_REPAIR_PREFLIGHT_STATUS.json"
     preflight = load_json(preflight_path) if preflight_path.exists() else {}
+    regression_path = results_root / "FINAL_REGRESSION_STATUS.json"
+    regression = load_json(regression_path) if regression_path.exists() else {}
 
     completed_direct = sum(
         record["status"] == "COMPLETED"
@@ -265,6 +267,8 @@ def build_status(results_root: Path) -> dict[str, Any]:
         "official_test_access_count": test_count,
         "official_test_rows_loaded": 0,
         "preflight_status": preflight.get("status", "NOT_YET_RUN"),
+        "regression_status": regression.get("status", "NOT_YET_RUN"),
+        "regression": regression,
         "completed_h3_direct_count": completed_direct,
         "completed_every_horizon_bootstrap_count": completed_bootstrap,
         "expected_h3_direct_count_without_tanks": 12,
@@ -457,6 +461,18 @@ def build_report(status: dict[str, Any]) -> str:
             "",
             f"- 汇总源码提交：`{status['source_commit']}`",
             f"- 生成时间（UTC）：`{status['generated_at_utc']}`",
+            (
+                "- 主项目回归："
+                f"{status['regression'].get('main_repository', {}).get('passed', '—')} "
+                "passed，"
+                f"{status['regression'].get('main_repository', {}).get('skipped', '—')} "
+                "skipped。"
+            ),
+            (
+                "- V20 回归："
+                f"{status['regression'].get('v20_regression', {}).get('passed', '—')} "
+                "passed。"
+            ),
             "- 机器可读状态：`PB1_DEVELOPMENT_REPAIR_V2_STATUS.json`",
         ]
     )
