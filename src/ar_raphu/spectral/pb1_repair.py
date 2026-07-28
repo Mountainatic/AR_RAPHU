@@ -324,13 +324,17 @@ def solve_pb1_system(
             )
         if candidate_kkt <= kkt_threshold:
             break
-    try:
-        eigenvalues, eigenvectors = scipy.linalg.eigh(
-            svd_matrix, check_finite=True, driver="evd"
-        )
-    except np.linalg.LinAlgError:
+    if best is not None and best[0] <= kkt_threshold:
         eigenvalues = np.empty(0, dtype=np.float64)
         eigenvectors = np.empty((len(matrix), 0), dtype=np.float64)
+    else:
+        try:
+            eigenvalues, eigenvectors = scipy.linalg.eigh(
+                svd_matrix, check_finite=True, driver="evd"
+            )
+        except np.linalg.LinAlgError:
+            eigenvalues = np.empty(0, dtype=np.float64)
+            eigenvectors = np.empty((len(matrix), 0), dtype=np.float64)
     largest_eigenvalue = (
         max(float(np.max(np.abs(eigenvalues))), np.finfo(float).eps)
         if len(eigenvalues)
