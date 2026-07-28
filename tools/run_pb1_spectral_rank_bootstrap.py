@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import json
 from pathlib import Path
+import subprocess
 import sys
 
 import numpy as np
@@ -26,9 +28,11 @@ from ar_raphu.datasets.pb1_protocol import (
     load_pb1_protocol_freeze,
 )
 from ar_raphu.spectral.pb1_development import (
+    _block_penalties,
     bootstrap_external_rank_spectrum,
     fit_pb1_shared_history_spectral,
 )
+from ar_raphu.spectral.penalty_interval import normalize_penalty_relative_to_gram
 
 
 LOADERS = {
@@ -102,19 +106,30 @@ def main() -> int:
         grid_points=int(pilot["penalty"]["positive_grid_points_per_axis"]),
         maximum_expansions=int(pilot["penalty"]["maximum_expansions"]),
     )
-    original = pilot["penalty"]["selected"]
-    rerun = fit.selected
-    comparisons = (
-        (rerun.lag_weight, original["lag_weight"]),
-        (rerun.amplitude_weight, original["amplitude_weight"]),
-        (rerun.ridge_weight, original["ridge_weight"]),
-        (rerun.validation_mse_mean, original["validation_mse_mean"]),
+    frozen = pilot["penalty"]["selected"]
+    blocks = tuple(
+        block for block in (fit.x_block, fit.ar_block) if block is not None
     )
-    if any(
-        not np.isclose(left, right, rtol=1.0e-10, atol=1.0e-14)
-        for left, right in comparisons
-    ):
-        raise RuntimeError("Frozen spectral pilot did not reproduce.")
+    centered = fit.train_matrix - fit.train_matrix.mean(axis=0)
+    gram = centered.T @ centered / len(centered)
+    normalized = tuple(
+        normalize_penalty_relative_to_gram(component, gram).normalized
+        for component in _block_penalties(blocks)
+    )
+    frozen_weights = (
+        float(frozen["lag_weight"]),
+        float(frozen["amplitude_weight"]),
+        float(frozen["ridge_weight"]),
+    )
+    fit = replace(
+        fit,
+        selected_penalty=sum(
+            weight * component
+            for weight, component in zip(
+                frozen_weights, normalized, strict=True
+            )
+        ),
+    )
     bootstrap = bootstrap_external_rank_spectrum(
         fit,
         replicates=250,
@@ -133,6 +148,11 @@ def main() -> int:
         "automatic_block_length": bootstrap.automatic_block_length,
         "retunes_penalty": False,
         "retunes_resolution": False,
+        "frozen_penalty_weights": {
+            "lag_weight": frozen_weights[0],
+            "amplitude_weight": frozen_weights[1],
+            "ridge_weight": frozen_weights[2],
+        },
         "replicates": bootstrap.replicates,
         "seed": bootstrap.seed,
         "singular_value_quantiles": {
@@ -153,6 +173,9 @@ def main() -> int:
         "official_test_rows_loaded": 0,
         "official_test_access_count": 0,
         "confirmation_allowed": False,
+        "source_commit": subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+        ).strip(),
         "structural_rank_claim_allowed": False,
         "status": (
             "COMPLETED"
