@@ -280,13 +280,16 @@ def solve_pb1_system(
     )
     best: tuple[float, np.ndarray, int, float, int] | None = None
     for candidate_rcond in rcond_candidates:
-        candidate_z, _, candidate_rank, _ = scipy.linalg.lstsq(
-            svd_matrix,
-            svd_rhs,
-            cond=candidate_rcond,
-            lapack_driver="gelsd",
-            check_finite=True,
-        )
+        try:
+            candidate_z, _, candidate_rank, _ = scipy.linalg.lstsq(
+                svd_matrix,
+                svd_rhs,
+                cond=candidate_rcond,
+                lapack_driver="gelsd",
+                check_finite=True,
+            )
+        except np.linalg.LinAlgError:
+            continue
         candidate_coefficients = svd_scale * candidate_z
         candidate_kkt = _relative_kkt(
             matrix, candidate_coefficients, vector
@@ -296,13 +299,18 @@ def solve_pb1_system(
         for step in range(1, maximum_refinement_steps + 1):
             if candidate_kkt <= kkt_threshold:
                 break
-            correction_z, _, _, _ = scipy.linalg.lstsq(
-                svd_matrix,
-                svd_scale * (vector - matrix @ candidate_coefficients),
-                cond=candidate_rcond,
-                lapack_driver="gelsd",
-                check_finite=True,
-            )
+            try:
+                correction_z, _, _, _ = scipy.linalg.lstsq(
+                    svd_matrix,
+                    svd_scale * (
+                        vector - matrix @ candidate_coefficients
+                    ),
+                    cond=candidate_rcond,
+                    lapack_driver="gelsd",
+                    check_finite=True,
+                )
+            except np.linalg.LinAlgError:
+                break
             candidate_coefficients += svd_scale * correction_z
             candidate_refinement_steps = step
             candidate_kkt = _relative_kkt(
