@@ -1,0 +1,113 @@
+{
+  "schema": "CZ_R0_DATA_AUDIT_V1",
+  "protocol_schema": "CZ_REAL_DATA_PROTOCOL_V1",
+  "status": "COMPLETED",
+  "runtime": {
+    "timestamp_utc": "2026-07-28T14:16:59.319399+00:00",
+    "hostname": "autodl-container-f1274a9a78-01f2580e",
+    "python": "3.10.20",
+    "numpy": "2.2.6",
+    "pid": 2763
+  },
+  "private_sources": {
+    "furnace_A": {
+      "filename": "实验数据1.xlsx",
+      "sha256": "c46e0d35d26903386fd80408f36660c4f8925a5dbc56c92527f020e433ef04de",
+      "sheet": "Sheet1",
+      "samples": 20103,
+      "columns": 10,
+      "missing_or_nonfinite_cells": 0,
+      "values_opened": true
+    },
+    "furnace_B": {
+      "filename": "实验数据1-张.xlsx",
+      "sha256": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+      "sheet_reserved": "Sheet2",
+      "expected_samples_from_frozen_audit": 20627,
+      "expected_columns_from_frozen_audit": 7,
+      "values_opened": false,
+      "lock_state": "LOCKED_UNTIL_R7"
+    }
+  },
+  "deduplication": {
+    "furnace_B_Sheet1_equals_A": "VERIFIED_BY_FROZEN_PROTOCOL_AUDIT",
+    "unique_sequences": 2
+  },
+  "canonical_schema": {
+    "primary_inputs": [
+      "主加热功率",
+      "晶升速度",
+      "晶转速度",
+      "埚升速度",
+      "埚转速度"
+    ],
+    "target": "晶体直径",
+    "all_A_headers": [
+      "加热元件温度",
+      "主加热功率",
+      "晶升速度",
+      "晶转速度",
+      "埚升速度",
+      "埚转速度",
+      "氩气流量设定",
+      "晶体长度",
+      "炉压",
+      "晶体直径"
+    ]
+  },
+  "split_index_rule": "floor(N*fraction), 0-based, left-closed/right-open",
+  "furnace_A_development_folds_R1_Lx32_Ly32": [
+    {
+      "fold": 1,
+      "nominal_train_start": 0,
+      "nominal_train_stop": 8041,
+      "effective_train_stop": 7950,
+      "validation_start": 8041,
+      "validation_stop": 10051,
+      "purge_gap": 91
+    },
+    {
+      "fold": 2,
+      "nominal_train_start": 0,
+      "nominal_train_stop": 10051,
+      "effective_train_stop": 9960,
+      "validation_start": 10051,
+      "validation_stop": 12061,
+      "purge_gap": 91
+    },
+    {
+      "fold": 3,
+      "nominal_train_start": 0,
+      "nominal_train_stop": 12061,
+      "effective_train_stop": 11970,
+      "validation_start": 12061,
+      "validation_stop": 14072,
+      "purge_gap": 91
+    },
+    {
+      "fold": 4,
+      "nominal_train_start": 0,
+      "nominal_train_stop": 14072,
+      "effective_train_stop": 13981,
+      "validation_start": 14072,
+      "validation_stop": 16082,
+      "purge_gap": 91
+    }
+  ],
+  "furnace_A_internal_confirmation": {
+    "interval": [
+      16082,
+      20103
+    ],
+    "values_opened_by_modeling": false,
+    "lock_state": "LOCKED_UNTIL_R6"
+  },
+  "gates": {
+    "NO_RANDOM_SPLIT": true,
+    "TRAIN_ONLY_SCALER": "ENFORCED_BY_R1_IMPLEMENTATION",
+    "PURGE_PASS": true,
+    "FURNACE_B_NOT_USED_IN_TUNING": true,
+    "FURNACE_B_VALUES_OPENED": false
+  },
+  "physical_time_labels": "PROVISIONAL_PENDING_SAMPLING_CONFIRMATION"
+}

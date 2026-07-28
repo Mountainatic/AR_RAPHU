@@ -1,0 +1,14 @@
+{
+  "stage": "CZ_R0_DATA_AUDIT",
+  "status": "COMPLETED",
+  "next_stage": "CZ_R1_LINEAR_SMOKE",
+  "furnace_B_lock": "LOCKED_UNTIL_R7",
+  "furnace_A_confirmation_lock": "LOCKED_UNTIL_R6",
+  "gates": {
+    "NO_RANDOM_SPLIT": true,
+    "TRAIN_ONLY_SCALER": "ENFORCED_BY_R1_IMPLEMENTATION",
+    "PURGE_PASS": true,
+    "FURNACE_B_NOT_USED_IN_TUNING": true,
+    "FURNACE_B_VALUES_OPENED": false
+  }
+}

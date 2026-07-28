@@ -1,0 +1,8 @@
+{
+  "stage": "CZ_R1_LINEAR_SMOKE",
+  "status": "COMPLETED",
+  "elapsed_seconds": 8.81649086298421,
+  "next_stage": "CZ_R2_H3_SPECTRAL_SMOKE",
+  "furnace_B_lock": "LOCKED_UNTIL_R7",
+  "furnace_A_confirmation_lock": "LOCKED_UNTIL_R6"
+}

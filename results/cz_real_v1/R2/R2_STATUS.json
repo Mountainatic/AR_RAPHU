@@ -1,0 +1,10 @@
+{
+  "stage": "CZ_R2_H3_SPECTRAL_SMOKE",
+  "status": "BLOCKED_BY_MISSING_METADATA",
+  "elapsed_seconds": 2.00999274791684,
+  "reason": "37136 amplitude values are outside the fitted domain.",
+  "missing_prerequisite": "The protocol names v4.1 bounded C1 continuation but does not freeze its continuation length/bound or provide an implementation.",
+  "why_not_clipped": "Silent clipping or an invented continuation scale would change validation predictions and violate the interpretation firewall.",
+  "furnace_B_lock": "LOCKED_UNTIL_R7",
+  "furnace_A_confirmation_lock": "LOCKED_UNTIL_R6"
+}
