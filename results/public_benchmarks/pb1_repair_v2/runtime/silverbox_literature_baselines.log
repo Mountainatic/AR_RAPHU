@@ -1,0 +1,8 @@
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/polynomial/legendre.py:1147: RuntimeWarning: overflow encountered in multiply
+  v[i] = (v[i-1]*x*(2*i - 1) - v[i-2]*(i - 1))/i
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/polynomial/legendre.py:1147: RuntimeWarning: invalid value encountered in subtract
+  v[i] = (v[i-1]*x*(2*i - 1) - v[i-2]*(i - 1))/i
+/root/OPS_UOI_WORKSPACE/repo/src/ar_raphu/baselines/pnarx_champneys2024.py:217: RuntimeWarning: overflow encountered in matmul
+  rss = float(residual @ residual)
+/root/OPS_UOI_WORKSPACE/repo/results/public_benchmarks/pb1_repair_v2/silverbox/development/LITERATURE_BASELINES/baseline_selection.json
+status=FAILED arx_aic=-125217.69 pnarx_order=5

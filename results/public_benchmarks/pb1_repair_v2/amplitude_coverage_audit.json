@@ -1,0 +1,129 @@
+{
+  "schema_version": "PB1_REPAIR_AMPLITUDE_COVERAGE_V2",
+  "stage": "development_repair",
+  "basis_domain": {
+    "fit_partition": "train_only",
+    "padding_fraction": 0.1,
+    "core_quantiles": [
+      0.01,
+      0.99
+    ],
+    "silent_clipping": false
+  },
+  "datasets": {
+    "pwh": {
+      "x": {
+        "train_min": -6.958744346875328,
+        "train_max": 7.298796240254319,
+        "fitted_lower": -8.384498405588293,
+        "fitted_upper": 8.724550298967284,
+        "validation_min": -6.83695867298995,
+        "validation_max": 6.638374410990011,
+        "validation_count": 655360,
+        "validation_ood_count": 0,
+        "validation_ood_rate": 0.0,
+        "coverage_gate_passed": true
+      },
+      "y": {
+        "train_min": -4.988215239692588,
+        "train_max": 4.736250891266181,
+        "fitted_lower": -5.960661852788465,
+        "fitted_upper": 5.708697504362058,
+        "validation_min": -4.872208431466851,
+        "validation_max": 4.731451756217789,
+        "validation_count": 655360,
+        "validation_ood_count": 0,
+        "validation_ood_rate": 0.0,
+        "coverage_gate_passed": true
+      },
+      "official_test_rows_loaded": 0,
+      "official_test_access_count": 0
+    },
+    "whpn": {
+      "x": {
+        "train_min": -3.975426455582672,
+        "train_max": 4.333887465663435,
+        "fitted_lower": -4.806357847707282,
+        "fitted_upper": 5.164818857788045,
+        "validation_min": -3.3584280325938582,
+        "validation_max": 3.801102359850686,
+        "validation_count": 16384,
+        "validation_ood_count": 0,
+        "validation_ood_rate": 0.0,
+        "coverage_gate_passed": true
+      },
+      "y": {
+        "train_min": -2.38328734784974,
+        "train_max": 2.3774010929918394,
+        "fitted_lower": -2.8593561919338977,
+        "fitted_upper": 2.8534699370759973,
+        "validation_min": -2.3669843174222955,
+        "validation_max": 2.4414692998340826,
+        "validation_count": 16384,
+        "validation_ood_count": 0,
+        "validation_ood_rate": 0.0,
+        "coverage_gate_passed": true
+      },
+      "official_test_rows_loaded": 0,
+      "official_test_access_count": 0
+    },
+    "cascaded_tanks": {
+      "x": {
+        "train_min": -1.7250355470176273,
+        "train_max": 3.8956376255655583,
+        "fitted_lower": -2.287102864275946,
+        "fitted_upper": 4.457704942823876,
+        "validation_min": -2.5802770509386206,
+        "validation_max": 2.663233206880281,
+        "validation_count": 324,
+        "validation_ood_count": 13,
+        "validation_ood_rate": 0.04012345679012341,
+        "coverage_gate_passed": false
+      },
+      "y": {
+        "train_min": -1.2447023419849823,
+        "train_max": 2.242079481100862,
+        "fitted_lower": -1.5933805242935668,
+        "fitted_upper": 2.5907576634094465,
+        "validation_min": -1.2442519891426327,
+        "validation_max": 2.242079481100862,
+        "validation_count": 324,
+        "validation_ood_count": 0,
+        "validation_ood_rate": 0.0,
+        "coverage_gate_passed": true
+      },
+      "official_test_rows_loaded": 0,
+      "official_test_access_count": 0
+    },
+    "silverbox": {
+      "x": {
+        "train_min": -4.3056796264179775,
+        "train_max": 4.287856457562674,
+        "fitted_lower": -5.165033234816043,
+        "fitted_upper": 5.1472100659607385,
+        "validation_min": -4.017473696668597,
+        "validation_max": 4.0023306571507655,
+        "validation_count": 32531,
+        "validation_ood_count": 0,
+        "validation_ood_rate": 0.0,
+        "coverage_gate_passed": true
+      },
+      "y": {
+        "train_min": -3.9022932670588535,
+        "train_max": 3.9422478995985455,
+        "fitted_lower": -4.686747383724594,
+        "fitted_upper": 4.726702016264285,
+        "validation_min": -3.928549877339304,
+        "validation_max": 3.9145909219613984,
+        "validation_count": 32531,
+        "validation_ood_count": 0,
+        "validation_ood_rate": 0.0,
+        "coverage_gate_passed": true
+      },
+      "official_test_rows_loaded": 0,
+      "official_test_access_count": 0
+    }
+  },
+  "official_test_access_count": 0,
+  "status": "COMPLETED"
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 7,
+  "dataset": "cascaded_tanks",
+  "stage": "development_repair",
+  "lane": "H2_NATIVE_HISTORY",
+  "horizon": 1,
+  "history": {
+    "L_x": 8,
+    "L_y": 1
+  },
+  "official_test_rows_loaded": 0,
+  "official_test_access_count": 0,
+  "confirmation_allowed": false,
+  "status": "FAILED_REPRESENTATION_COVERAGE",
+  "failure": "104 amplitude values are outside the fitted domain.",
+  "source_commit": "a4933888d3d7ab23f518656b81dc21b3ae6d323a"
+}

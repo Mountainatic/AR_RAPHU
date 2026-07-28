@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "artifact": "PB1_DEVELOPMENT_REPAIR_V2",
+  "generated_at_utc": "2026-07-28T02:04:46+00:00",
+  "source_commit": "325b3eb8879d76940b96dcb7344307d6d549ff54",
+  "runtime": {
+    "manager": "uv",
+    "python": "/root/AR_RAPHU_AUTODL/.venv/bin/python",
+    "device": "cpu",
+    "numerical_dtype": "float64"
+  },
+  "main_repository": {
+    "command": "python -m pytest -q",
+    "passed": 213,
+    "skipped": 16,
+    "status": "COMPLETED"
+  },
+  "v20_regression": {
+    "working_directory": "STAGE1_DUAL_SOLVER_V20_bundle",
+    "command": "python -m pytest -q tests",
+    "passed": 118,
+    "skipped": 0,
+    "status": "COMPLETED"
+  },
+  "official_test_access_count": 0,
+  "status": "COMPLETED"
+}

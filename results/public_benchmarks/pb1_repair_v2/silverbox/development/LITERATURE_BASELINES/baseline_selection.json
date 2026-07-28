@@ -1,0 +1,127 @@
+{
+  "schema_version": 7,
+  "suite": "OPS_UOI_PUBLIC_BENCHMARK_PB1",
+  "dataset": "silverbox",
+  "stage": "development_repair",
+  "source_commit": "a4933888d3d7ab23f518656b81dc21b3ae6d323a",
+  "split": {
+    "status": "FROZEN_LITERATURE_SPLIT",
+    "source": "Champneys2024_associated_code",
+    "unit": "chronological_half_of_multisine_estimation_record",
+    "train_fraction": [
+      0.0,
+      0.5
+    ],
+    "validation_fraction": [
+      0.5,
+      1.0
+    ]
+  },
+  "official_test_rows_loaded": 0,
+  "official_test_access_count": 0,
+  "confirmation_allowed": false,
+  "arx": {
+    "profile_source": "CHAMPNEYS2024_ASSOCIATED_CODE",
+    "history": {
+      "nx": 10,
+      "ny": 10
+    },
+    "scientific_ridge": 0.0,
+    "solver": "PIVOTED_QR_OR_SVD_MINIMUM_NORM",
+    "validation_aic_mean": -125217.6899435573,
+    "validation_aic_by_record": [
+      -125217.6899435573
+    ],
+    "effective_rank": 20,
+    "condition_number": 4789.961690395183,
+    "stable_simulation": true,
+    "elapsed_seconds": 0.10834603710100055
+  },
+  "pnarx": {
+    "profile_source": "CHAMPNEYS2024_PEER_REVIEWED",
+    "history": {
+      "nx": 10,
+      "ny": 10
+    },
+    "basis": "legendre_univariate",
+    "order_candidates": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "selected_order": 5,
+    "candidates": [
+      {
+        "order": 2,
+        "validation_aic_mean": -125129.18949147996,
+        "validation_aic_by_record": [
+          -125129.18949147996
+        ],
+        "effective_rank": 40,
+        "condition_number": 12736.383735047582,
+        "stable_simulation": true,
+        "status": "COMPLETED"
+      },
+      {
+        "order": 3,
+        "validation_aic_mean": -294250.48696486035,
+        "validation_aic_by_record": [
+          -294250.48696486035
+        ],
+        "effective_rank": 60,
+        "condition_number": 84742.75637467671,
+        "stable_simulation": true,
+        "status": "COMPLETED"
+      },
+      {
+        "order": 4,
+        "validation_aic_mean": -294231.058722999,
+        "validation_aic_by_record": [
+          -294231.058722999
+        ],
+        "effective_rank": 80,
+        "condition_number": 408958.28771992587,
+        "stable_simulation": true,
+        "status": "COMPLETED"
+      },
+      {
+        "order": 5,
+        "validation_aic_mean": -294315.49978866894,
+        "validation_aic_by_record": [
+          -294315.49978866894
+        ],
+        "effective_rank": 100,
+        "condition_number": 1905538.3541096859,
+        "stable_simulation": true,
+        "status": "COMPLETED"
+      },
+      {
+        "order": 6,
+        "validation_aic_mean": -289161.7102299997,
+        "validation_aic_by_record": [
+          -289161.7102299997
+        ],
+        "effective_rank": 120,
+        "condition_number": 11195318.811363876,
+        "stable_simulation": true,
+        "status": "COMPLETED"
+      },
+      {
+        "order": 7,
+        "validation_aic_mean": null,
+        "validation_aic_by_record": [
+          Infinity
+        ],
+        "effective_rank": 140,
+        "condition_number": 63353338.11348381,
+        "stable_simulation": false,
+        "status": "FAILED_UNSTABLE_SIMULATION"
+      }
+    ],
+    "elapsed_seconds": 5.604439930990338
+  },
+  "status": "COMPLETED"
+}
