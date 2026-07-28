@@ -257,7 +257,14 @@ def solve_pb1_system(
                 solution_is_minimum_norm=False,
             )
 
-    values = scipy.linalg.svdvals(matrix, check_finite=True)
+    epsilon_d = max(np.finfo(np.float64).eps, jitter)
+    svd_scale = 1.0 / np.sqrt(
+        np.maximum(np.abs(np.diag(matrix)), epsilon_d)
+    )
+    svd_matrix = (svd_scale[:, None] * matrix) * svd_scale[None, :]
+    svd_rhs = svd_scale * vector
+    condition_after = _condition_estimate(svd_matrix)
+    values = scipy.linalg.svdvals(svd_matrix, check_finite=True)
     largest = max(float(values[0]), np.finfo(np.float64).eps)
     epsilon = np.finfo(np.float64).eps
     rcond_candidates = (
@@ -271,30 +278,117 @@ def solve_pb1_system(
             0.0,
         ]
     )
-    best: tuple[float, np.ndarray, int, float] | None = None
+    best: tuple[float, np.ndarray, int, float, int] | None = None
     for candidate_rcond in rcond_candidates:
-        candidate_coefficients, _, candidate_rank, _ = scipy.linalg.lstsq(
-            matrix,
-            vector,
+        candidate_z, _, candidate_rank, _ = scipy.linalg.lstsq(
+            svd_matrix,
+            svd_rhs,
             cond=candidate_rcond,
             lapack_driver="gelsd",
             check_finite=True,
         )
+        candidate_coefficients = svd_scale * candidate_z
         candidate_kkt = _relative_kkt(
             matrix, candidate_coefficients, vector
         )
+        candidate_refinement_steps = 0
+        previous_kkt = candidate_kkt
+        for step in range(1, maximum_refinement_steps + 1):
+            if candidate_kkt <= kkt_threshold:
+                break
+            correction_z, _, _, _ = scipy.linalg.lstsq(
+                svd_matrix,
+                svd_scale * (vector - matrix @ candidate_coefficients),
+                cond=candidate_rcond,
+                lapack_driver="gelsd",
+                check_finite=True,
+            )
+            candidate_coefficients += svd_scale * correction_z
+            candidate_refinement_steps = step
+            candidate_kkt = _relative_kkt(
+                matrix, candidate_coefficients, vector
+            )
+            improvement = (previous_kkt - candidate_kkt) / max(
+                previous_kkt, np.finfo(float).eps
+            )
+            if improvement < minimum_refinement_improvement:
+                break
+            previous_kkt = candidate_kkt
         if best is None or candidate_kkt < best[0]:
             best = (
                 candidate_kkt,
                 candidate_coefficients,
                 int(candidate_rank),
                 float(candidate_rcond),
+                candidate_refinement_steps,
+            )
+        if candidate_kkt <= kkt_threshold:
+            break
+    try:
+        eigenvalues, eigenvectors = scipy.linalg.eigh(
+            svd_matrix, check_finite=True, driver="evd"
+        )
+    except np.linalg.LinAlgError:
+        eigenvalues = np.empty(0, dtype=np.float64)
+        eigenvectors = np.empty((len(matrix), 0), dtype=np.float64)
+    largest_eigenvalue = (
+        max(float(np.max(np.abs(eigenvalues))), np.finfo(float).eps)
+        if len(eigenvalues)
+        else 0.0
+    )
+    for candidate_rcond in rcond_candidates:
+        retained_mask = eigenvalues > candidate_rcond * largest_eigenvalue
+        if not np.any(retained_mask):
+            continue
+        retained_vectors = eigenvectors[:, retained_mask]
+        retained_values = eigenvalues[retained_mask]
+
+        def eigen_minimum_norm(local_rhs: np.ndarray) -> np.ndarray:
+            return retained_vectors @ (
+                (retained_vectors.T @ local_rhs) / retained_values
+            )
+
+        candidate_coefficients = svd_scale * eigen_minimum_norm(svd_rhs)
+        candidate_kkt = _relative_kkt(
+            matrix, candidate_coefficients, vector
+        )
+        candidate_refinement_steps = 0
+        previous_kkt = candidate_kkt
+        for step in range(1, maximum_refinement_steps + 1):
+            if candidate_kkt <= kkt_threshold:
+                break
+            candidate_coefficients += svd_scale * eigen_minimum_norm(
+                svd_scale * (vector - matrix @ candidate_coefficients)
+            )
+            candidate_refinement_steps = step
+            candidate_kkt = _relative_kkt(
+                matrix, candidate_coefficients, vector
+            )
+            improvement = (previous_kkt - candidate_kkt) / max(
+                previous_kkt, np.finfo(float).eps
+            )
+            if improvement < minimum_refinement_improvement:
+                break
+            previous_kkt = candidate_kkt
+        if best is None or candidate_kkt < best[0]:
+            best = (
+                candidate_kkt,
+                candidate_coefficients,
+                int(np.count_nonzero(retained_mask)),
+                float(candidate_rcond),
+                candidate_refinement_steps,
             )
         if candidate_kkt <= kkt_threshold:
             break
     if best is None:
         raise AssertionError("PB1 SVD rescue produced no candidate solution.")
-    kkt, coefficients, effective_rank, resolved_rcond = best
+    (
+        kkt,
+        coefficients,
+        effective_rank,
+        resolved_rcond,
+        refinement_steps,
+    ) = best
     cutoff = resolved_rcond * largest
     retained = values[values > cutoff]
     return PB1SystemSolution(
@@ -303,7 +397,7 @@ def solve_pb1_system(
         solver_stage="SVD_MINIMUM_NORM",
         converged=kkt <= kkt_threshold,
         numerical_jitter=jitter,
-        diag_equilibration_used=equilibration_used,
+        diag_equilibration_used=True,
         iterative_refinement_steps=refinement_steps,
         condition_estimate_before=condition_before,
         condition_estimate_after=condition_after,
