@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import replace
 import json
 from pathlib import Path
 import subprocess
@@ -28,11 +27,9 @@ from ar_raphu.datasets.pb1_protocol import (
     load_pb1_protocol_freeze,
 )
 from ar_raphu.spectral.pb1_development import (
-    _block_penalties,
     bootstrap_external_rank_spectrum,
     fit_pb1_shared_history_spectral,
 )
-from ar_raphu.spectral.penalty_interval import normalize_penalty_relative_to_gram
 
 
 LOADERS = {
@@ -96,6 +93,12 @@ def main() -> int:
         dataset = apply_pb1_development_partition(
             raw, freeze, whpn_audit=audit
         )
+    frozen = pilot["penalty"]["selected"]
+    frozen_weights = (
+        float(frozen["lag_weight"]),
+        float(frozen["amplitude_weight"]),
+        float(frozen["ridge_weight"]),
+    )
     fit = fit_pb1_shared_history_spectral(
         dataset,
         L_x=int(pilot["history"]["L_x"]),
@@ -105,30 +108,7 @@ def main() -> int:
         amplitude_count=int(pilot["basis"]["amplitude"]["count"]),
         grid_points=int(pilot["penalty"]["positive_grid_points_per_axis"]),
         maximum_expansions=int(pilot["penalty"]["maximum_expansions"]),
-    )
-    frozen = pilot["penalty"]["selected"]
-    blocks = tuple(
-        block for block in (fit.x_block, fit.ar_block) if block is not None
-    )
-    centered = fit.train_matrix - fit.train_matrix.mean(axis=0)
-    gram = centered.T @ centered / len(centered)
-    normalized = tuple(
-        normalize_penalty_relative_to_gram(component, gram).normalized
-        for component in _block_penalties(blocks)
-    )
-    frozen_weights = (
-        float(frozen["lag_weight"]),
-        float(frozen["amplitude_weight"]),
-        float(frozen["ridge_weight"]),
-    )
-    fit = replace(
-        fit,
-        selected_penalty=sum(
-            weight * component
-            for weight, component in zip(
-                frozen_weights, normalized, strict=True
-            )
-        ),
+        frozen_penalty_weights=frozen_weights,
     )
     bootstrap = bootstrap_external_rank_spectrum(
         fit,

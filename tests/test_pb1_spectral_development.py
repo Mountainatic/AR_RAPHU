@@ -84,6 +84,55 @@ def test_pb1_spectral_adapter_is_no_test_cpu_fp64_and_rank_after_selection() -> 
     ) == 5
 
 
+def test_frozen_penalty_replay_is_numerically_identical_without_reselection() -> None:
+    dataset = _dataset()
+    selected = fit_pb1_shared_history_spectral(
+        dataset,
+        L_x=4,
+        L_y=3,
+        amplitude_count=5,
+        grid_points=3,
+        maximum_expansions=0,
+    )
+    weights = (
+        selected.selected.lag_weight,
+        selected.selected.amplitude_weight,
+        selected.selected.ridge_weight,
+    )
+    replay = fit_pb1_shared_history_spectral(
+        dataset,
+        L_x=4,
+        L_y=3,
+        amplitude_count=5,
+        grid_points=3,
+        maximum_expansions=0,
+        frozen_penalty_weights=weights,
+    )
+    assert replay.penalty_status == "FROZEN_PENALTY_REPLAY"
+    assert len(replay.candidates) == 1
+    assert replay.interval_history[0]["selection_performed"] is False
+    np.testing.assert_allclose(
+        replay.selected.coefficients,
+        selected.selected.coefficients,
+        rtol=1.0e-12,
+        atol=1.0e-12,
+    )
+    np.testing.assert_allclose(
+        replay.selected_penalty,
+        selected.selected_penalty,
+        rtol=1.0e-12,
+        atol=1.0e-12,
+    )
+    assert (
+        abs(
+            replay.selected.validation_mse_mean
+            - selected.selected.validation_mse_mean
+        )
+        <= 1.0e-14
+    )
+    assert replay.selected.relative_kkt_residual <= 1.0e-8
+
+
 def test_pb1_spectral_track_isolation() -> None:
     for track in ("X", "AR"):
         fit = fit_pb1_shared_history_spectral(

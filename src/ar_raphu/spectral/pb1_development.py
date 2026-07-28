@@ -661,8 +661,14 @@ def fit_pb1_shared_history_spectral(
     grid_points: int = 7,
     maximum_expansions: int = 2,
     track: str = "XAR",
+    frozen_penalty_weights: tuple[float, float, float] | None = None,
 ) -> PB1SpectralDevelopmentFit:
-    """Fit H3 full spectral XAR at one preregistered resolution."""
+    """Fit H3 full spectral XAR at one preregistered resolution.
+
+    ``frozen_penalty_weights`` replays an already selected, normalized penalty
+    without repeating validation selection.  It is intended for fixed-model
+    bootstrap and never creates a new selection path.
+    """
 
     started = time.perf_counter()
     if np.any(dataset.split == "test"):
@@ -751,130 +757,178 @@ def fit_pb1_shared_history_spectral(
         normalize_penalty_relative_to_gram(component, gram).normalized
         for component in raw_penalties
     )
-    intervals = [
-        automatic_penalty_interval(component, gram)
-        for component in normalized
-    ]
     all_rows: list[PB1PenaltyCandidate] = []
     interval_history: list[dict[str, object]] = []
     selected: PB1PenaltyCandidate | None = None
     status = "PENALTY_INTERVAL_NOT_CERTIFIED"
     configuration_order = 0
-    for expansion_round in range(maximum_expansions + 1):
-        grids = [
-            zero_inclusive_penalty_grid(interval, grid_points)
-            for interval in intervals
-        ]
-        round_rows: list[PB1PenaltyCandidate] = []
-        axis_size = grid_points + 1
-        for indices in itertools.product(range(axis_size), repeat=3):
-            weights = tuple(
-                float(grids[axis][indices[axis]]) for axis in range(3)
+    if frozen_penalty_weights is not None:
+        weights = tuple(float(value) for value in frozen_penalty_weights)
+        if len(weights) != 3 or not all(
+            np.isfinite(value) and value >= 0.0 for value in weights
+        ):
+            raise ValueError(
+                "Frozen normalized penalty weights must be three finite "
+                "nonnegative values."
             )
-            row = _fit_candidate(
-                train_matrix_centered=centered_matrix,
-                validation_matrix=validation_matrix,
-                train_target_centered=centered_target,
-                validation_target=validation_target,
-                validation_groups=validation_groups,
-                gram=gram,
-                rhs=rhs,
-                feature_mean=feature_mean,
-                target_mean=target_mean,
-                normalized_penalties=normalized,
-                weights=weights,
-                indices=indices,
-                configuration_order=configuration_order,
+        selected = _fit_candidate(
+            train_matrix_centered=centered_matrix,
+            validation_matrix=validation_matrix,
+            train_target_centered=centered_target,
+            validation_target=validation_target,
+            validation_groups=validation_groups,
+            gram=gram,
+            rhs=rhs,
+            feature_mean=feature_mean,
+            target_mean=target_mean,
+            normalized_penalties=normalized,
+            weights=weights,
+            indices=(-1, -1, -1),
+            configuration_order=0,
+        )
+        if (
+            not bool(selected.solver_diagnostics["converged"])
+            or selected.relative_kkt_residual > 1.0e-8
+        ):
+            raise RuntimeError(
+                "Frozen penalty replay failed the original-coordinate KKT gate."
             )
-            round_rows.append(row)
-            all_rows.append(row)
-            configuration_order += 1
-        selected = _select_one_se(round_rows)
-        boundary_axes = []
-        axis_statuses: list[str] = []
-        selected_indices = (
-            selected.index_lag,
-            selected.index_amplitude,
-            selected.index_ridge,
-        )
-        valid_round_rows = [
-            row
-            for row in round_rows
-            if bool(row.solver_diagnostics["converged"])
-            and row.relative_kkt_residual <= 1.0e-8
-        ]
-        global_minimum = min(
-            valid_round_rows,
-            key=lambda row: (row.validation_mse_mean, row.configuration_order),
-        )
-        for axis, index in enumerate(selected_indices):
-            if index == 0:
-                axis_statuses.append("ZERO_PENALTY_ENDPOINT_CERTIFIED")
-            elif index == axis_size - 1:
-                boundary_axes.append((axis, "upper"))
-                axis_statuses.append("UPPER_BOUNDARY_SELECTED")
-            elif index == 1:
-                zero_rows = [
-                    row
-                    for row in valid_round_rows
-                    if (
-                        row.index_lag,
-                        row.index_amplitude,
-                        row.index_ridge,
-                    )[axis]
-                    == 0
-                ]
-                zero_best = min(
-                    (row.validation_mse_mean for row in zero_rows),
-                    default=float("inf"),
-                )
-                if positive_lower_expansion_required(
-                    selected_index=index,
-                    axis_zero_best_loss=zero_best,
-                    global_minimum_loss=global_minimum.validation_mse_mean,
-                    global_minimum_se=global_minimum.validation_mse_se,
-                ):
-                    boundary_axes.append((axis, "lower"))
-                    axis_statuses.append("POSITIVE_LOWER_EXPANSION_REQUIRED")
-                else:
-                    axis_statuses.append("POSITIVE_LOWER_CERTIFIED_WITH_ZERO")
-            else:
-                axis_statuses.append("POSITIVE_INTERIOR_CERTIFIED")
+        all_rows.append(selected)
         interval_history.append(
             {
-                "round": expansion_round,
-                "intervals": [
-                    {
-                        "lower": interval.lower,
-                        "upper": interval.upper,
-                        "expansion_count": interval.expansion_count,
-                    }
-                    for interval in intervals
-                ],
-                "selected_indices": list(selected_indices),
-                "selected_weights": [
-                    selected.lag_weight,
-                    selected.amplitude_weight,
-                    selected.ridge_weight,
-                ],
-                "axis_statuses": axis_statuses,
-                "boundary_axes": [
-                    {"axis": axis, "side": side}
-                    for axis, side in boundary_axes
-                ],
+                "round": "FROZEN_REPLAY",
+                "selected_weights": list(weights),
+                "selection_performed": False,
             }
         )
-        if not boundary_axes:
-            status = "PENALTY_INTERVAL_CERTIFIED"
-            break
-        if expansion_round == maximum_expansions:
-            if any(side == "upper" for _, side in boundary_axes):
-                status = "PENALTY_UPPER_INTERVAL_NOT_CERTIFIED"
-            break
-        for axis, side in boundary_axes:
-            intervals[axis] = expand_penalty_interval(
-                intervals[axis], boundary=side
+        status = "FROZEN_PENALTY_REPLAY"
+    else:
+        intervals = [
+            automatic_penalty_interval(component, gram)
+            for component in normalized
+        ]
+        for expansion_round in range(maximum_expansions + 1):
+            grids = [
+                zero_inclusive_penalty_grid(interval, grid_points)
+                for interval in intervals
+            ]
+            round_rows: list[PB1PenaltyCandidate] = []
+            axis_size = grid_points + 1
+            for indices in itertools.product(range(axis_size), repeat=3):
+                weights = tuple(
+                    float(grids[axis][indices[axis]]) for axis in range(3)
+                )
+                row = _fit_candidate(
+                    train_matrix_centered=centered_matrix,
+                    validation_matrix=validation_matrix,
+                    train_target_centered=centered_target,
+                    validation_target=validation_target,
+                    validation_groups=validation_groups,
+                    gram=gram,
+                    rhs=rhs,
+                    feature_mean=feature_mean,
+                    target_mean=target_mean,
+                    normalized_penalties=normalized,
+                    weights=weights,
+                    indices=indices,
+                    configuration_order=configuration_order,
+                )
+                round_rows.append(row)
+                all_rows.append(row)
+                configuration_order += 1
+            selected = _select_one_se(round_rows)
+            boundary_axes = []
+            axis_statuses: list[str] = []
+            selected_indices = (
+                selected.index_lag,
+                selected.index_amplitude,
+                selected.index_ridge,
             )
+            valid_round_rows = [
+                row
+                for row in round_rows
+                if bool(row.solver_diagnostics["converged"])
+                and row.relative_kkt_residual <= 1.0e-8
+            ]
+            global_minimum = min(
+                valid_round_rows,
+                key=lambda row: (
+                    row.validation_mse_mean,
+                    row.configuration_order,
+                ),
+            )
+            for axis, index in enumerate(selected_indices):
+                if index == 0:
+                    axis_statuses.append("ZERO_PENALTY_ENDPOINT_CERTIFIED")
+                elif index == axis_size - 1:
+                    boundary_axes.append((axis, "upper"))
+                    axis_statuses.append("UPPER_BOUNDARY_SELECTED")
+                elif index == 1:
+                    zero_rows = [
+                        row
+                        for row in valid_round_rows
+                        if (
+                            row.index_lag,
+                            row.index_amplitude,
+                            row.index_ridge,
+                        )[axis]
+                        == 0
+                    ]
+                    zero_best = min(
+                        (row.validation_mse_mean for row in zero_rows),
+                        default=float("inf"),
+                    )
+                    if positive_lower_expansion_required(
+                        selected_index=index,
+                        axis_zero_best_loss=zero_best,
+                        global_minimum_loss=global_minimum.validation_mse_mean,
+                        global_minimum_se=global_minimum.validation_mse_se,
+                    ):
+                        boundary_axes.append((axis, "lower"))
+                        axis_statuses.append(
+                            "POSITIVE_LOWER_EXPANSION_REQUIRED"
+                        )
+                    else:
+                        axis_statuses.append(
+                            "POSITIVE_LOWER_CERTIFIED_WITH_ZERO"
+                        )
+                else:
+                    axis_statuses.append("POSITIVE_INTERIOR_CERTIFIED")
+            interval_history.append(
+                {
+                    "round": expansion_round,
+                    "intervals": [
+                        {
+                            "lower": interval.lower,
+                            "upper": interval.upper,
+                            "expansion_count": interval.expansion_count,
+                        }
+                        for interval in intervals
+                    ],
+                    "selected_indices": list(selected_indices),
+                    "selected_weights": [
+                        selected.lag_weight,
+                        selected.amplitude_weight,
+                        selected.ridge_weight,
+                    ],
+                    "axis_statuses": axis_statuses,
+                    "boundary_axes": [
+                        {"axis": axis, "side": side}
+                        for axis, side in boundary_axes
+                    ],
+                }
+            )
+            if not boundary_axes:
+                status = "PENALTY_INTERVAL_CERTIFIED"
+                break
+            if expansion_round == maximum_expansions:
+                if any(side == "upper" for _, side in boundary_axes):
+                    status = "PENALTY_UPPER_INTERVAL_NOT_CERTIFIED"
+                break
+            for axis, side in boundary_axes:
+                intervals[axis] = expand_penalty_interval(
+                    intervals[axis], boundary=side
+                )
     if selected is None:
         raise AssertionError("PB1 spectral penalty search produced no candidate.")
     selected_penalty = sum(
