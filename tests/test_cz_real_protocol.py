@@ -11,6 +11,8 @@ from ar_raphu.cz_real.protocol import (
     load_furnace_b,
     purge_gap,
 )
+from ar_raphu.spectral.amplitude_domain import AmplitudeDomain
+from ar_raphu.spectral.spline_basis import CenteredSplineBasis
 
 
 def test_frozen_split_indices_and_purge() -> None:
@@ -73,3 +75,46 @@ def test_direct_windows_stop_at_prediction_origin() -> None:
     recovered_current_y = y_design[0, 0] * scaler.y_scale + scaler.y_mean
     assert recovered_current_y == y[first_origin]
     assert first_origin < targets[0]
+
+
+def test_v41_bounded_c1_continuation_is_interior_exact_and_bounded() -> None:
+    from scipy.interpolate import BSpline
+
+    train = np.linspace(-2.0, 3.0, 401)
+    domain = AmplitudeDomain.fit(train, padding_fraction=0.10)
+    basis = CenteredSplineBasis.fit(
+        train,
+        n_basis=16,
+        degree=3,
+        domain=domain,
+    )
+    interior = np.linspace(domain.fit_lower, domain.fit_upper, 101)
+    strict = basis.transform(interior)
+    continued, inside = basis.bounded_c1_transform(interior, scale_factor=1.0)
+    np.testing.assert_allclose(continued, strict, rtol=0.0, atol=0.0)
+    assert inside.all()
+
+    extreme_basis, extreme_inside = basis.bounded_c1_transform(
+        np.array([-1.0e12, 1.0e12]),
+        scale_factor=1.0,
+    )
+    assert np.isfinite(extreme_basis).all()
+    assert not extreme_inside.any()
+
+    epsilon = 1.0e-10
+    left_derivatives = basis.bounded_c1_derivative(
+        np.array([domain.fit_lower - epsilon, domain.fit_lower + epsilon]),
+        scale_factor=1.0,
+    )
+    expected_derivative = BSpline(
+        basis.knots,
+        np.eye(len(basis.train_mean), dtype=np.float64),
+        basis.degree,
+        extrapolate=False,
+    )(domain.fit_lower, nu=1)
+    np.testing.assert_allclose(
+        left_derivatives,
+        np.vstack((expected_derivative, expected_derivative)),
+        rtol=1.0e-6,
+        atol=1.0e-8,
+    )

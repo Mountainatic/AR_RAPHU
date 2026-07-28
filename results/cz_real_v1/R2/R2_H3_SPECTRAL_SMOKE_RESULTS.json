@@ -1,0 +1,56 @@
+{
+  "schema": "CZ_R2_H3_SPECTRAL_SMOKE_V1",
+  "protocol_schema": "CZ_REAL_DATA_PROTOCOL_V1",
+  "status": "COMPLETED",
+  "scope": "FURNACE_A_DEVELOPMENT_FOLD1_H1_ENGINEERING_SMOKE_ONLY",
+  "runtime": {
+    "timestamp_utc": "2026-07-28T14:31:50.565369+00:00",
+    "hostname": "autodl-container-f1274a9a78-01f2580e",
+    "python": "3.10.20",
+    "numpy": "2.2.6",
+    "pid": 4616,
+    "elapsed_seconds": 2.9295368960592896
+  },
+  "configuration": {
+    "history_policy": "H3_SHARED",
+    "L_x": 32,
+    "L_y": 32,
+    "lag_basis_count": 16,
+    "amplitude_basis_count": 16,
+    "pilot_smoothness_weight": 0.001,
+    "pilot_ridge_weight": 1e-08,
+    "pilot_continuation_family": "v4.1_bounded_C1_tanh",
+    "pilot_continuation_scale_factor": 1.0,
+    "pilot_scale_status": "ENGINEERING_SMOKE_ANCHOR_NOT_R3_SELECTION",
+    "hyperparameter_selection": false,
+    "scientific_evidence": false,
+    "furnace_A_confirmation_accessed": false,
+    "furnace_B_accessed": false
+  },
+  "result": {
+    "metrics": {
+      "RMSE_mm": 0.01463298644939105,
+      "MAE_mm": 0.011729373034579911,
+      "R2": 0.9987604952665687,
+      "P50_abs_error_mm": 0.009866873086451733,
+      "P90_abs_error_mm": 0.024625179395468426,
+      "P95_abs_error_mm": 0.028574468720961473,
+      "max_abs_error_mm": 0.048547454316690164,
+      "NRMSE_by_output_std": 0.03520660070826546,
+      "MSE_mm2": 0.00021412429242806207
+    },
+    "relative_kkt_residual": 1.629299562957346e-15,
+    "kkt_threshold": 1e-08,
+    "kkt_passed": true,
+    "coefficients": 1536,
+    "train_target_count": 7918,
+    "validation_target_count": 2010
+  },
+  "gates": {
+    "NO_RANDOM_SPLIT": true,
+    "TRAIN_ONLY_BASIS": true,
+    "PURGE_PASS": true,
+    "FURNACE_B_NOT_USED_IN_TUNING": true,
+    "R2_KKT_PASS": true
+  }
+}

@@ -32,6 +32,7 @@ def build_ar_nuisance_design(
     lag_basis_count: int,
     amplitude_basis_count: int,
     degree: int = 3,
+    continuation_scale_factor: float | None = None,
 ) -> np.ndarray:
     """Build the AR-history nuisance design using only data through each origin."""
 
@@ -49,11 +50,16 @@ def build_ar_nuisance_design(
     )
     offsets = np.arange(L_y, dtype=np.int64)
     windows = y[origins[:, None] - offsets[None, :]]
-    amplitude = amplitude_basis.legacy_transform_for_audit(
-        windows.reshape(-1)
-    ).reshape(
-        len(targets), L_y, amplitude_basis_count
-    )
+    if continuation_scale_factor is None:
+        amplitude = amplitude_basis.legacy_transform_for_audit(
+            windows.reshape(-1)
+        )
+    else:
+        amplitude, _ = amplitude_basis.bounded_c1_transform(
+            windows.reshape(-1),
+            scale_factor=continuation_scale_factor,
+        )
+    amplitude = amplitude.reshape(len(targets), L_y, amplitude_basis_count)
     tensor = np.einsum("la,nlb->nab", lag_basis, amplitude, optimize=True)
     return tensor.reshape(len(targets), lag_basis_count * amplitude_basis_count)
 
@@ -70,6 +76,7 @@ def build_spectral_design(
     degree: int = 3,
     amplitude_quantiles: tuple[float, float] = (0.01, 0.99),
     amplitude_domains: list[AmplitudeDomain] | None = None,
+    continuation_scale_factor: float | None = None,
 ) -> SpectralDesign:
     x = np.asarray(x, dtype=np.float64)
     targets = np.asarray(target_indices, dtype=np.int64)
@@ -113,7 +120,14 @@ def build_spectral_design(
         train_eval = basis.transform(train_x[:, variable])
         amplitude_grams.append(train_eval.T @ train_eval / len(train_eval))
         window_values = x[origins[:, None] - lag_offsets[None, :], variable]
-        amplitude_eval = basis.transform(window_values.reshape(-1)).reshape(
+        if continuation_scale_factor is None:
+            amplitude_eval = basis.transform(window_values.reshape(-1))
+        else:
+            amplitude_eval, _ = basis.bounded_c1_transform(
+                window_values.reshape(-1),
+                scale_factor=continuation_scale_factor,
+            )
+        amplitude_eval = amplitude_eval.reshape(
             len(targets), L_x, amplitude_basis_count
         )
         tensor = np.einsum("la,nlb->nab", lag_basis, amplitude_eval, optimize=True)

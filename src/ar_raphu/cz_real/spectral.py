@@ -35,6 +35,7 @@ def fit_shared_history_smoke(
     amplitude_basis_count: int = 16,
     smoothness_weight: float = 1.0e-3,
     ridge_weight: float = 1.0e-8,
+    continuation_scale_factor: float = 1.0,
 ) -> SpectralSmokeResult:
     """Fit one full spectral XAR model without selecting any hyperparameter."""
 
@@ -58,6 +59,7 @@ def fit_shared_history_smoke(
         L_x=L_shared,
         lag_basis_count=lag_basis_count,
         amplitude_basis_count=amplitude_basis_count,
+        continuation_scale_factor=continuation_scale_factor,
     )
     validation_external = build_spectral_design(
         x,
@@ -67,6 +69,7 @@ def fit_shared_history_smoke(
         L_x=L_shared,
         lag_basis_count=lag_basis_count,
         amplitude_basis_count=amplitude_basis_count,
+        continuation_scale_factor=continuation_scale_factor,
     )
     train_ar = build_ar_nuisance_design(
         y,
@@ -76,6 +79,7 @@ def fit_shared_history_smoke(
         L_y=L_shared,
         lag_basis_count=lag_basis_count,
         amplitude_basis_count=amplitude_basis_count,
+        continuation_scale_factor=continuation_scale_factor,
     )
     validation_ar = build_ar_nuisance_design(
         y,
@@ -85,6 +89,7 @@ def fit_shared_history_smoke(
         L_y=L_shared,
         lag_basis_count=lag_basis_count,
         amplitude_basis_count=amplitude_basis_count,
+        continuation_scale_factor=continuation_scale_factor,
     )
     external_penalty = tensor_penalty(
         train_external.lag_gram,

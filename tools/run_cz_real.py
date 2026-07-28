@@ -358,6 +358,7 @@ def run_r2(args: argparse.Namespace) -> None:
             amplitude_basis_count=16,
             smoothness_weight=1.0e-3,
             ridge_weight=1.0e-8,
+            continuation_scale_factor=1.0,
         )
     except AmplitudeOutOfDomainError as error:
         blocked = {
@@ -391,6 +392,8 @@ def run_r2(args: argparse.Namespace) -> None:
                     "amplitude_basis_count": 16,
                     "pilot_smoothness_weight": 1.0e-3,
                     "pilot_ridge_weight": 1.0e-8,
+                    "pilot_continuation_family": "v4.1_bounded_C1_tanh",
+                    "pilot_continuation_scale_factor": 1.0,
                 },
                 "scientific_data_opened": {
                     "furnace_A_development": True,
@@ -419,6 +422,9 @@ def run_r2(args: argparse.Namespace) -> None:
             "amplitude_basis_count": 16,
             "pilot_smoothness_weight": 1.0e-3,
             "pilot_ridge_weight": 1.0e-8,
+            "pilot_continuation_family": "v4.1_bounded_C1_tanh",
+            "pilot_continuation_scale_factor": 1.0,
+            "pilot_scale_status": "ENGINEERING_SMOKE_ANCHOR_NOT_R3_SELECTION",
             "hyperparameter_selection": False,
             "scientific_evidence": False,
             "furnace_A_confirmation_accessed": False,
