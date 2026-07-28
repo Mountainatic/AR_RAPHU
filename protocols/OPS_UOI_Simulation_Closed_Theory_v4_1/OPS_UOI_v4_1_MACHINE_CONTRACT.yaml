@@ -1,0 +1,87 @@
+schema_version: "OPS_UOI_V4_1"
+title: "Simulation-Closed OPS-UOI / PS-AR-RAPHU"
+theory_completion_percent: 88
+scope:
+  included:
+    - fixed_stage_system_identification
+    - operator_first_Q_K_identification
+    - native_H2_model_selection
+    - globally_defined_free_run_simulation
+    - bounded_C1_continuation
+    - support_interpretation_firewall
+    - predictive_and_structural_rank
+  excluded:
+    - active_dual_control
+    - knowledge_trajectory_planner
+    - tube_mpc
+    - online_domain_expansion
+    - multi_stage_unified_plant_model
+    - causal_plant_claim_without_extra_assumptions
+
+domain_hierarchy:
+  required_relation: "certified_support subset train_support subset model_domain"
+  model_domain: real_line
+  per_channel: true
+  validation_can_change_domain: false
+  test_can_change_domain: false
+
+continuation:
+  primary_family: bounded_C1_tanh
+  formula:
+    left: "f(a)+rho_minus*fprime(a)*tanh((u-a)/rho_minus)"
+    interior: "f(u)"
+    right: "f(b)+rho_plus*fprime(b)*tanh((u-b)/rho_plus)"
+  linear_continuation_role: ablation_only
+  clipping_role: ablation_only
+  hard_failure_role: ablation_only
+  continuation_is_physical_identification: false
+  continuation_changes_structural_spectrum: false
+  parameter_selection:
+    source: train_knot_geometry_plus_development_validation
+    official_test_use: forbidden
+
+simulation:
+  free_run_uses_intermediate_true_y: false
+  online_refit_during_evaluation: false
+  global_finite_value_certificate: required
+  global_incremental_stability:
+    sufficient_condition: "spectral_radius(A_AR) < 1"
+    failure_means_divergence: false
+
+H2:
+  primary: true
+  selection_order:
+    - history
+    - resolution
+    - penalty
+    - simulation_closure
+    - rank
+  H3_role: shared_history_fairness_ablation
+
+interpretation:
+  outside_train_support:
+    numerical_computation: allowed
+    Q_identification_claim: forbidden
+    K_interpretation: forbidden
+  train_but_not_certified:
+    predictive_reporting: allowed
+    K_interpretation: forbidden
+  certified:
+    K_interpretation: allowed_only_if_Gram_Schur_source_conditions_pass
+
+required_experiments:
+  - E_SIM_SUPPORT
+  - E_CONT_C1
+  - E_FR_CLOSURE
+  - E_FR_STAB
+  - E_H2_NATIVE
+  - E_INTERP_FIREWALL
+  - PB1_V4_1_UNIFIED
+
+remaining_12_percent:
+  - dependent_block_bootstrap_simultaneous_radius_theorem
+  - Lepski_crossing_regularities
+  - multi_variable_Schur_public_evidence
+  - complete_four_dataset_H2_and_free_run
+  - official_test_confirmation
+  - multi_boule_CZ_outer_validation

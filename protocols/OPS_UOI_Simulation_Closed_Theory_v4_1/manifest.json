@@ -1,0 +1,43 @@
+{
+  "package": "OPS_UOI_SIMULATION_CLOSED_THEORY_V4_1",
+  "version": "4.1",
+  "theory_completion_percent": 88,
+  "files": [
+    {
+      "path": "OPS_UOI_Simulation_Closed_Operator_First_Theory_v4_1.md",
+      "bytes": 33970,
+      "lines": 2092,
+      "sha256": "0c5cceca6f2157d65dc0db42c0c9f70a7b6771c93fd9e4f13caf93f93119c82c"
+    },
+    {
+      "path": "OPS_UOI_Simulation_Closure_Proof_Appendix_v4_1.md",
+      "bytes": 5928,
+      "lines": 443,
+      "sha256": "e0ab6281d321817fc883725ce5f98b0473c768522fb6f5abc57dbb01cf1b91a4"
+    },
+    {
+      "path": "OPS_UOI_Theorem_to_Experiment_Contracts_v4_1.md",
+      "bytes": 16147,
+      "lines": 958,
+      "sha256": "e0551cbd4c4c697d8901deacd67ebdfa5c3f79d0d73bedf2d29b0271a73ecbeb"
+    },
+    {
+      "path": "OPS_UOI_v4_1_MACHINE_CONTRACT.yaml",
+      "bytes": 2495,
+      "lines": 88,
+      "sha256": "959f697104b77d2e9fa708b278286aa70b229c26b655f7bb94fefec8672539e5"
+    },
+    {
+      "path": "OPS_UOI_v4_1_88_PERCENT_COMPLETION_AUDIT.md",
+      "bytes": 2203,
+      "lines": 91,
+      "sha256": "81a6edbf871756c0b2d31c6d569e58073b7340c0f3c69ac2bc84ed4269ae3985"
+    },
+    {
+      "path": "README.md",
+      "bytes": 637,
+      "lines": 21,
+      "sha256": "e6e91bdab589af23c42874b22daff398cf0ae192a22d2858b573cce51be35635"
+    }
+  ]
+}
