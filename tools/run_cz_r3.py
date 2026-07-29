@@ -194,6 +194,8 @@ def _run_history(
                 existing.get("status") == "COMPLETED"
                 and identity.get("config_hash") == config_hash
                 and identity.get("data_hash") == data.source_sha256
+                and identity.get("source_commit") == source_commit
+                and identity.get("solver_version") == "ORSS_V1"
             ):
                 print(
                     f"R3A {index}/{len(specifications)} resumed "
