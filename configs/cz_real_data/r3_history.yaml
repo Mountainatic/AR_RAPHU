@@ -1,0 +1,82 @@
+{
+  "schema": "CZ_R3_HISTORY_ORSS_V1",
+  "runtime": {
+    "backend": "torch",
+    "device": "cuda:0",
+    "primary_dtype": "float32",
+    "certification_dtype": "float64",
+    "real_cuda_dispatch_required": true,
+    "silent_cpu_fallback_forbidden": true
+  },
+  "data": {
+    "furnace_a_filename": "实验数据1.xlsx",
+    "furnace_a_sheet": "Sheet1",
+    "furnace_a_sha256": "c46e0d35d26903386fd80408f36660c4f8925a5dbc56c92527f020e433ef04de",
+    "furnace_b_filename": "实验数据1-张.xlsx",
+    "furnace_b_sheet": "Sheet2",
+    "furnace_b_sha256": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+    "furnace_b_access_count_required_before_freeze": 0
+  },
+  "cuda": {
+    "allow_tf32_operator": true,
+    "allow_tf32_projected": false,
+    "usable_vram_fraction": 0.78,
+    "one_active_task": true,
+    "operator_chunk_time": 2048,
+    "operator_chunk_lag": 64,
+    "reduced_candidate_batch": 512,
+    "cache_basis_on_device": true,
+    "cache_windows_on_device": true,
+    "cache_dr_transform_on_device": true
+  },
+  "krylov": {
+    "method": "lsqr",
+    "maximum_iterations": 1000,
+    "relative_tolerance_development": 1e-5,
+    "relative_tolerance_confirmation": 1e-8,
+    "warm_start": true
+  },
+  "preconditioner": {
+    "type": "kronecker_schur",
+    "rebuild_per_resolution": true,
+    "update_diagonal_per_penalty": true
+  },
+  "reduced_basis": {
+    "enabled": true,
+    "initial_anchors": 8,
+    "maximum_dimension": 128,
+    "residual_tolerance_development": 1e-5,
+    "residual_tolerance_confirmation": 1e-7,
+    "greedy_enrichment": true,
+    "full_solve_fallback": true
+  },
+  "mixed_precision": {
+    "enabled": true,
+    "operator_dtype": "float32",
+    "residual_dtype": "float64",
+    "projected_dtype": "float64",
+    "maximum_refinement_steps": 5,
+    "final_kkt_threshold": 1e-8
+  },
+  "penalty": {
+    "exact_zero_endpoint": true,
+    "positive_grid_points": 7,
+    "maximum_edge_expansions": 2
+  },
+  "history": {
+    "Lx": [32, 64, 128, 256, 512],
+    "Ly": [8, 16, 32, 64, 128],
+    "anchor_Mtau": 16,
+    "anchor_Mx": 32,
+    "continuation_scale_coefficient": 1.0
+  },
+  "horizons": [1, 5, 15, 30, 60],
+  "checkpoint": {
+    "every_task": true,
+    "every_anchor": true,
+    "every_greedy_iteration": true,
+    "resume": true,
+    "verify_config_hash": true,
+    "verify_source_commit": true
+  }
+}
