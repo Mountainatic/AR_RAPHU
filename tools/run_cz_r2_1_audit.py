@@ -18,6 +18,7 @@ for entry in (ROOT, ROOT / "src"):
         sys.path.insert(0, str(entry))
 
 from ar_raphu.cz_real.linear import target_indices
+from ar_raphu.cz_real.audit import fit_exact_zero
 from ar_raphu.cz_real.protocol import build_development_folds, load_furnace_a
 from ar_raphu.orss.augmented import AugmentedRegularizedOperator
 from ar_raphu.orss.diagnostics import write_json
@@ -74,16 +75,35 @@ def _fit_zero(
         relative_tolerance=1.0e-10,
         maximum_iterations=10000,
     )
-    prediction = operator.forward(refinement.coefficients)
+    coefficients = refinement.coefficients
+    relative_kkt = refinement.relative_residual
+    final_solver = "ZERO_ENDPOINT_LSQR_PLUS_PCG"
+    dense_rescue = False
+    if relative_kkt > 1.0e-8:
+        reference = fit_exact_zero(
+            operator.dense_design().detach().cpu().numpy(),
+            centered_target.detach().cpu().numpy(),
+        )
+        coefficients = torch.as_tensor(
+            reference.coefficients,
+            device=operator.device,
+            dtype=operator.dtype,
+        )
+        relative_kkt = reference.relative_kkt_residual
+        final_solver = "DENSE_FP64_CHOLESKY_REFINEMENT_RESCUE"
+        dense_rescue = True
+    prediction = operator.forward(coefficients)
     return {
         "training_MSE_mm2": float(
             torch.mean((prediction - centered_target) ** 2).item()
         ),
-        "relative_kkt_residual": refinement.relative_residual,
+        "relative_kkt_residual": relative_kkt,
         "iterations": result.iterations + refinement.iterations,
         "lsqr_relative_kkt_residual": result.relative_kkt_residual,
         "pcg_refinement_iterations": refinement.iterations,
-        "converged": refinement.relative_residual <= 1.0e-8,
+        "final_solver": final_solver,
+        "dense_fp64_rescue_used": dense_rescue,
+        "converged": relative_kkt <= 1.0e-8,
     }
 
 
