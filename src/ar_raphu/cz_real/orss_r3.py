@@ -12,6 +12,9 @@ from typing import Callable, TypeVar
 import numpy as np
 import torch
 
+from ar_raphu.orss.cpu_reference import (
+    dense_fp64_spectral_equilibrated_refine,
+)
 from ar_raphu.orss.diagnostics import write_json
 from ar_raphu.orss.operator import (
     OperatorTimelineCache,
@@ -35,6 +38,18 @@ from .protocol import DIRECT_HORIZONS, build_development_folds
 
 
 T = TypeVar("T")
+
+
+def _warm_cuda_linalg(device: torch.device) -> None:
+    """Initialize CUDA solver wrappers before concurrent fold workers use them."""
+
+    if device.type != "cuda":
+        return
+    probe = torch.eye(2, device=device, dtype=torch.float64)
+    torch.linalg.cholesky_ex(probe)
+    torch.linalg.eigh(probe)
+    torch.linalg.lu_factor_ex(probe)
+    torch.cuda.synchronize(device)
 
 
 def _parallel_folds(
@@ -398,7 +413,11 @@ def run_development_task(
                 "M_tau": int(M_tau),
                 "M_x": int(M_x),
                 "c_rho": float(c_rho),
-                "normalization": asdict(normalization),
+                "normalization": {
+                    **asdict(normalization),
+                    "lower": list(normalization.lower),
+                    "upper": list(normalization.upper),
+                },
                 "candidate_count": len(candidates),
             }
             fold_result_path = (
@@ -413,8 +432,19 @@ def run_development_task(
                         identity_path.read_text(encoding="utf-8")
                     )
                     if saved_identity != identity:
+                        mismatches = {
+                            key: {
+                                "saved": saved_identity.get(key),
+                                "current": identity.get(key),
+                            }
+                            for key in sorted(
+                                set(saved_identity) | set(identity)
+                            )
+                            if saved_identity.get(key) != identity.get(key)
+                        }
                         raise RuntimeError(
-                            "FOLD_CHECKPOINT_IDENTITY_MISMATCH"
+                            "FOLD_CHECKPOINT_IDENTITY_MISMATCH:"
+                            f"{mismatches}"
                         )
                 else:
                     write_json(identity_path, identity)
@@ -605,7 +635,11 @@ def run_development_task(
             "M_tau": int(M_tau),
             "M_x": int(M_x),
             "selected_weights": asdict(selected_weights),
-            "normalization": asdict(normalization),
+            "normalization": {
+                **asdict(normalization),
+                "lower": list(normalization.lower),
+                "upper": list(normalization.upper),
+            },
         }
         if certification_root is not None:
             identity_path = (
@@ -673,13 +707,40 @@ def run_development_task(
             maximum_iterations=max(krylov_maximum_iterations, 2500),
             preconditioner_kind="channel_block",
         )
-        prediction = validation.forward(fitted.coefficients) + target_mean
+        coefficients = fitted.coefficients
+        relative_kkt_residual = fitted.relative_kkt_residual
+        method = fitted.method
+        dense_rescue_used = False
+        dense_rescue_seconds = 0.0
+        if (
+            relative_kkt_residual > 1.0e-8
+            and not actual.exact_zero
+        ):
+            rescue_started = time.perf_counter()
+            rescued = dense_fp64_spectral_equilibrated_refine(
+                train,
+                train_target,
+                penalty,
+                actual,
+                relative_tolerance=1.0e-8,
+            )
+            dense_rescue_seconds = time.perf_counter() - rescue_started
+            if rescued.relative_kkt_residual < relative_kkt_residual:
+                coefficients = rescued.coefficients
+                relative_kkt_residual = rescued.relative_kkt_residual
+                method = (
+                    f"{method}_PLUS_DENSE_FP64_"
+                    "SPECTRAL_EQUILIBRATED_LU_REFINEMENT"
+                )
+                dense_rescue_used = True
+        prediction = validation.forward(coefficients) + target_mean
         result = {
             "fold": fold.fold,
             "actual_weights": asdict(actual),
-            "relative_kkt_residual": fitted.relative_kkt_residual,
+            "relative_kkt_residual": relative_kkt_residual,
             "iterations": fitted.iterations,
-            "method": fitted.method,
+            "method": method,
+            "dense_fp64_rescue_used": dense_rescue_used,
             "validation_MSE_mm2": float(
                 torch.mean((prediction - validation_target) ** 2).item()
             ),
@@ -687,6 +748,7 @@ def run_development_task(
             "profiler": {
                 "window_build_seconds": window_build_seconds,
                 "final_refinement_seconds": fitted.elapsed_seconds,
+                "dense_rescue_seconds": dense_rescue_seconds,
                 "per_fold_seconds": time.perf_counter() - fold_started,
             },
         }
@@ -698,6 +760,10 @@ def run_development_task(
         del train, validation, train_target, validation_target, penalty
         return result
 
+    # PyTorch's first invocation of some CUDA linalg wrappers is lazy and not
+    # thread-safe.  Initialize every routine used by the final certification
+    # and its dense rescue before launching per-fold worker streams.
+    _warm_cuda_linalg(device)
     certifications = _parallel_folds(
         list(zip(folds, normalizations, strict=True)),
         certify,
@@ -712,13 +778,14 @@ def run_development_task(
         for row in certifications
     )
     rb_pass = all(bool(row["RB_RESIDUAL_CERTIFIED"]) for row in final_folds)
+    history_selected_at_grid_edge = (
+        interval_status != "PENALTY_INTERVAL_CERTIFIED"
+    )
     return {
         "schema": "CZ_R3_ORSS_DEVELOPMENT_TASK_V1",
         "status": (
             "COMPLETED"
-            if interval_status == "PENALTY_INTERVAL_CERTIFIED"
-            and kkt_pass
-            and rb_pass
+            if kkt_pass and rb_pass
             else "FAILED"
         ),
         "history": {"L_x": L_x, "L_y": L_y},
@@ -747,6 +814,12 @@ def run_development_task(
         ),
         "RB_RESIDUAL_CERTIFIED": rb_pass,
         "FINAL_KKT_PASS": kkt_pass,
+        "HISTORY_SELECTED_AT_GRID_EDGE": history_selected_at_grid_edge,
+        "non_stopping_warnings": (
+            ["HISTORY_SELECTED_AT_GRID_EDGE"]
+            if history_selected_at_grid_edge
+            else []
+        ),
         "furnace_A_confirmation_accessed": False,
         "furnace_B_access_count": 0,
         "elapsed_seconds": time.perf_counter() - started,

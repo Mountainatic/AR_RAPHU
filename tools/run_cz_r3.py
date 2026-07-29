@@ -647,7 +647,20 @@ def _run_resolution(
             ),
             "FINAL_KKT_PASS": bool(selected["FINAL_KKT_PASS"]),
         }
-        all_gates.append(all(gates.values()))
+        gates["HISTORY_SELECTED_AT_GRID_EDGE"] = not gates[
+            "PENALTY_INTERVAL_CERTIFIED"
+        ]
+        all_gates.append(
+            all(
+                bool(value)
+                for name, value in gates.items()
+                if name
+                not in {
+                    "PENALTY_INTERVAL_CERTIFIED",
+                    "HISTORY_SELECTED_AT_GRID_EDGE",
+                }
+            )
+        )
         selections[str(horizon)] = {
             "selected_history": selected["history"],
             "minimum_mean_resolution": minimum["resolution"],

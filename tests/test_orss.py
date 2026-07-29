@@ -6,6 +6,9 @@ import torch
 
 from ar_raphu.cz_real.orss_r3 import _expanded_bounds
 from ar_raphu.orss.augmented import AugmentedRegularizedOperator
+from ar_raphu.orss.cpu_reference import (
+    dense_fp64_spectral_equilibrated_refine,
+)
 from ar_raphu.orss.dr_basis import (
     generalized_dr_basis,
     tensor_from_dr,
@@ -104,6 +107,43 @@ def test_operator_batched_forward_adjoint_and_normal_match_scalar() -> None:
         rtol=1.0e-12,
         atol=1.0e-12,
     )
+
+
+def test_spectral_equilibrated_dense_rescue_certifies_extreme_penalty() -> None:
+    operator = _random_operator()
+    target = torch.linspace(
+        -0.7, 0.9, operator.observations, dtype=torch.float64
+    )
+    penalty = SeparablePenalty(
+        channels=operator.channels,
+        m_tau=operator.m_tau,
+        m_x=operator.m_x,
+        device=operator.device,
+        dtype=operator.dtype,
+    )
+    weights = PenaltyWeights(
+        lag=2.0e-4,
+        amplitude=2.0e7,
+        ridge=0.0,
+    )
+    rescued = dense_fp64_spectral_equilibrated_refine(
+        operator,
+        target,
+        penalty,
+        weights,
+        relative_tolerance=1.0e-10,
+    )
+    rhs = operator.rhs(target)
+    residual = (
+        operator.normal(rescued.coefficients)
+        + penalty.normal(rescued.coefficients, weights)
+        - rhs
+    )
+    relative = torch.linalg.vector_norm(
+        residual
+    ) / torch.linalg.vector_norm(rhs)
+    assert float(relative.item()) <= 1.0e-8
+    assert rescued.relative_kkt_residual <= 1.0e-8
 
 
 def test_operator_builder_matches_frozen_dense_design() -> None:
