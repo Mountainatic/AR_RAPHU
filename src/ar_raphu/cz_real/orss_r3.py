@@ -260,13 +260,19 @@ def _expanded_bounds(
     lower: list[float],
     upper: list[float],
     boundaries: list[tuple[int, str]],
+    *,
+    positive_grid_points: int,
 ) -> tuple[list[float], list[float]]:
+    if positive_grid_points < 2:
+        raise ValueError("Edge expansion requires at least two positive points.")
     for axis, side in boundaries:
-        width = np.log(upper[axis]) - np.log(lower[axis])
+        step = (
+            np.log(upper[axis]) - np.log(lower[axis])
+        ) / (positive_grid_points - 1)
         if side == "upper":
-            upper[axis] = float(np.exp(np.log(upper[axis]) + width))
+            upper[axis] = float(np.exp(np.log(upper[axis]) + step))
         else:
-            lower[axis] = float(np.exp(np.log(lower[axis]) - width))
+            lower[axis] = float(np.exp(np.log(lower[axis]) - step))
     return lower, upper
 
 
@@ -452,6 +458,32 @@ def run_development_task(
                     else None
                 ),
             )
+            (
+                fallback_train,
+                fallback_validation,
+                fallback_train_target,
+                fallback_validation_target,
+                _,
+                _,
+            ) = _fold_operators(
+                x,
+                y,
+                fold=fold,
+                horizon=horizon,
+                L_x=L_x,
+                L_y=L_y,
+                M_tau=M_tau,
+                M_x=M_x,
+                c_rho=c_rho,
+                device=device,
+                dtype=torch.float64,
+                chunk_time=chunk_time,
+                timeline_cache=(
+                    certification_timeline_caches.get(fold.fold)
+                    if certification_timeline_caches is not None
+                    else None
+                ),
+            )
             window_build_seconds = time.perf_counter() - window_started
             result = reduced_sweep(
                 train,
@@ -469,6 +501,10 @@ def run_development_task(
                 candidate_batch_size=candidate_batch_size,
                 checkpoint_dir=fold_root,
                 resume=resume,
+                fallback_train_operator=fallback_train,
+                fallback_validation_operator=fallback_validation,
+                fallback_train_target=fallback_train_target,
+                fallback_validation_target=fallback_validation_target,
             )
             result["fold"] = fold.fold
             result["penalty_normalization"] = asdict(normalization)
@@ -484,7 +520,16 @@ def run_development_task(
                 (fold_root / "DONE").write_text(
                     "COMPLETED\n", encoding="utf-8"
                 )
-            del train, validation, train_target, validation_target
+            del (
+                train,
+                validation,
+                train_target,
+                validation_target,
+                fallback_train,
+                fallback_validation,
+                fallback_train_target,
+                fallback_validation_target,
+            )
             return result
 
         fold_results = _parallel_folds(
@@ -523,7 +568,12 @@ def run_development_task(
             interval_status = "PENALTY_INTERVAL_CERTIFIED"
             break
         if expansion < maximum_edge_expansions:
-            lower, upper = _expanded_bounds(lower, upper, requests)
+            lower, upper = _expanded_bounds(
+                lower,
+                upper,
+                requests,
+                positive_grid_points=positive_grid_points,
+            )
     if final_selection is None:
         raise AssertionError("Penalty sweep produced no selection.")
     all_rows = final_selection.pop("_all_rows")
@@ -621,6 +671,7 @@ def run_development_task(
             actual,
             relative_tolerance=1.0e-10,
             maximum_iterations=max(krylov_maximum_iterations, 2500),
+            preconditioner_kind="channel_block",
         )
         prediction = validation.forward(fitted.coefficients) + target_mean
         result = {
@@ -981,6 +1032,7 @@ def evaluate_frozen_configuration(
             actual,
             relative_tolerance=1.0e-10,
             maximum_iterations=max(2500, maximum_iterations),
+            preconditioner_kind="channel_block",
         )
         teacher_prediction = validation.forward(
             fitted.coefficients
@@ -1190,6 +1242,7 @@ def rank_profile_configuration(
             actual,
             relative_tolerance=1.0e-10,
             maximum_iterations=max(2500, maximum_iterations),
+            preconditioner_kind="channel_block",
         )
         full_prediction = validation.forward(
             fitted.coefficients

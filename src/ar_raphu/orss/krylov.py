@@ -146,13 +146,17 @@ def pcg_normal(
     preconditioner=None,
     relative_tolerance: float = 1.0e-10,
     maximum_iterations: int = 500,
+    residual_recompute_interval: int = 25,
+    restart_interval: int = 100,
 ) -> PCGResult:
-    """Preconditioned CG refinement on an SPD normal operator."""
+    """Preconditioned CG with explicit residual refresh and best-iterate return."""
 
     x = torch.zeros_like(rhs) if initial is None else initial.clone()
     residual = rhs - apply(x)
     denominator = _safe_norm(rhs)
     relative = float(torch.linalg.vector_norm(residual).item() / denominator.item())
+    best_x = x.clone()
+    best_relative = relative
     if relative <= relative_tolerance:
         return PCGResult(x, 0, True, relative)
     z = (
@@ -168,13 +172,35 @@ def pcg_normal(
         image = apply(direction)
         curvature = torch.dot(direction, image)
         if float(curvature.item()) <= 0.0:
-            break
+            residual = rhs - apply(x)
+            z = (
+                residual.clone()
+                if preconditioner is None
+                else preconditioner.solve(residual)
+            )
+            direction = z.clone()
+            rz = torch.dot(residual, z)
+            continue
         alpha = rz / curvature
         x = x + alpha * direction
         residual = residual - alpha * image
+        residual_was_recomputed = (
+            iteration % residual_recompute_interval == 0
+        )
+        if residual_was_recomputed:
+            residual = rhs - apply(x)
         relative = float(
             torch.linalg.vector_norm(residual).item() / denominator.item()
         )
+        if relative <= relative_tolerance and not residual_was_recomputed:
+            residual = rhs - apply(x)
+            relative = float(
+                torch.linalg.vector_norm(residual).item()
+                / denominator.item()
+            )
+        if relative < best_relative:
+            best_relative = relative
+            best_x = x.clone()
         if relative <= relative_tolerance:
             converged = True
             break
@@ -184,9 +210,21 @@ def pcg_normal(
             else preconditioner.solve(residual)
         )
         next_rz = torch.dot(residual, z)
-        direction = z + (next_rz / rz) * direction
+        if iteration % restart_interval == 0:
+            direction = z.clone()
+        else:
+            direction = z + (next_rz / rz) * direction
         rz = next_rz
-    return PCGResult(x, iteration, converged, relative)
+    final_relative = float(
+        torch.linalg.vector_norm(rhs - apply(best_x)).item()
+        / denominator.item()
+    )
+    return PCGResult(
+        best_x,
+        iteration,
+        converged or final_relative <= relative_tolerance,
+        final_relative,
+    )
 
 
 def pcg_normal_batch(
@@ -194,11 +232,14 @@ def pcg_normal_batch(
     rhs: torch.Tensor,
     *,
     initial: torch.Tensor | None = None,
+    preconditioner=None,
     preconditioner_diagonal: torch.Tensor | None = None,
     relative_tolerance: float = 1.0e-10,
     maximum_iterations: int = 500,
+    residual_recompute_interval: int = 25,
+    restart_interval: int = 100,
 ) -> BatchedPCGResult:
-    """Vectorized independent PCG solves with one CUDA launch per iteration."""
+    """Vectorized independent PCG solves with stable active-set restarts."""
 
     if rhs.ndim != 2:
         raise ValueError("Batched PCG rhs must have shape (batch, dimension).")
@@ -210,8 +251,14 @@ def pcg_normal_batch(
         and preconditioner_diagonal.shape != rhs.shape
     ):
         raise ValueError("Batched PCG preconditioner shape mismatch.")
+    if preconditioner is not None and preconditioner_diagonal is not None:
+        raise ValueError("Specify one batched PCG preconditioner.")
+    if residual_recompute_interval < 1 or restart_interval < 1:
+        raise ValueError("PCG refresh and restart intervals must be positive.")
 
     def precondition(residual: torch.Tensor) -> torch.Tensor:
+        if preconditioner is not None:
+            return preconditioner.solve(residual)
         if preconditioner_diagonal is None:
             return residual.clone()
         return residual / preconditioner_diagonal.clamp_min(
@@ -224,6 +271,8 @@ def pcg_normal_batch(
         torch.finfo(rhs.dtype).tiny
     )
     relative = torch.linalg.vector_norm(residual, dim=1) / denominator
+    best_relative = relative.clone()
+    best_x = x.clone()
     active = relative > relative_tolerance
     iteration_counts = torch.zeros(
         rhs.shape[0], device=rhs.device, dtype=torch.int64
@@ -238,7 +287,11 @@ def pcg_normal_batch(
         image = apply(direction)
         operator_calls += 1
         curvature = torch.sum(direction * image, dim=1)
-        positive = curvature > 0
+        scale = (
+            torch.linalg.vector_norm(direction, dim=1)
+            * torch.linalg.vector_norm(image, dim=1)
+        ).clamp_min(torch.finfo(rhs.dtype).tiny)
+        positive = curvature > torch.finfo(rhs.dtype).eps * scale
         progressing = active & positive
         alpha = torch.where(
             progressing,
@@ -247,12 +300,65 @@ def pcg_normal_batch(
         )
         x = x + alpha[:, None] * direction
         residual = residual - alpha[:, None] * image
-        relative = torch.linalg.vector_norm(residual, dim=1) / denominator
-        finished = active & (
-            (relative <= relative_tolerance) | (~positive)
+        residual_was_recomputed = (
+            iteration % residual_recompute_interval == 0
         )
-        iteration_counts[finished] = iteration
+        if residual_was_recomputed:
+            residual = rhs - apply(x)
+            operator_calls += 1
+        relative = torch.linalg.vector_norm(residual, dim=1) / denominator
+        apparently_converged = active & (
+            relative <= relative_tolerance
+        )
+        if (
+            bool(torch.any(apparently_converged))
+            and not residual_was_recomputed
+        ):
+            residual = rhs - apply(x)
+            operator_calls += 1
+            relative = (
+                torch.linalg.vector_norm(residual, dim=1) / denominator
+            )
+        improved = active & (relative < best_relative)
+        best_x = torch.where(improved[:, None], x, best_x)
+        best_relative = torch.where(improved, relative, best_relative)
+        finished = active & (relative <= relative_tolerance)
+        iteration_counts[
+            active & (relative <= relative_tolerance)
+        ] = iteration
         next_active = active & (~finished)
+        forced_restart = next_active & (~positive)
+        if iteration % restart_interval == 0 or bool(torch.any(forced_restart)):
+            z = precondition(residual)
+            restarted_direction = torch.where(
+                next_active[:, None], z, torch.zeros_like(z)
+            )
+            restarted_rz = torch.sum(residual * z, dim=1)
+            if iteration % restart_interval == 0:
+                direction = restarted_direction
+                rz = restarted_rz
+            else:
+                next_rz = restarted_rz
+                beta = torch.where(
+                    next_active & positive,
+                    next_rz
+                    / rz.clamp_min(torch.finfo(rhs.dtype).tiny),
+                    torch.zeros_like(rz),
+                )
+                continued = z + beta[:, None] * direction
+                direction = torch.where(
+                    forced_restart[:, None],
+                    restarted_direction,
+                    continued,
+                )
+                direction = torch.where(
+                    next_active[:, None],
+                    direction,
+                    torch.zeros_like(direction),
+                )
+                rz = next_rz
+            active = next_active
+            continue
         z = precondition(residual)
         next_rz = torch.sum(residual * z, dim=1)
         beta = torch.where(
@@ -267,9 +373,14 @@ def pcg_normal_batch(
         rz = next_rz
         active = next_active
     iteration_counts[active] = maximum_iterations
-    converged = relative <= relative_tolerance
+    final_residual = rhs - apply(best_x)
+    operator_calls += 1
+    best_relative = (
+        torch.linalg.vector_norm(final_residual, dim=1) / denominator
+    )
+    converged = best_relative <= relative_tolerance
     return BatchedPCGResult(
-        coefficients=x,
+        coefficients=best_x,
         iterations=tuple(
             int(value)
             for value in iteration_counts.detach().cpu().tolist()
@@ -278,7 +389,8 @@ def pcg_normal_batch(
             bool(value) for value in converged.detach().cpu().tolist()
         ),
         relative_residuals=tuple(
-            float(value) for value in relative.detach().cpu().tolist()
+            float(value)
+            for value in best_relative.detach().cpu().tolist()
         ),
         operator_calls=operator_calls,
     )

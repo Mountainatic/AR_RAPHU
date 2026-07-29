@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 import torch
 
+from ar_raphu.cz_real.orss_r3 import _expanded_bounds
 from ar_raphu.orss.augmented import AugmentedRegularizedOperator
 from ar_raphu.orss.dr_basis import (
     generalized_dr_basis,
@@ -19,11 +20,19 @@ from ar_raphu.orss.operator import (
     build_urysohn_operator,
 )
 from ar_raphu.orss.penalties import PenaltyWeights, SeparablePenalty
+from ar_raphu.orss.preconditioner import (
+    build_batched_spectral_diagonal_preconditioner,
+    build_channel_block_preconditioner,
+    build_spectral_diagonal_preconditioner,
+    data_normal_channel_blocks,
+    data_normal_diagonal,
+)
 from ar_raphu.orss.reduced_basis import ParametricReducedBasis
 from ar_raphu.orss.sweep import (
     candidate_grid,
     diagonal_spectral_normalization,
     reduced_sweep,
+    solve_full_batch,
 )
 from ar_raphu.spectral.design import (
     build_ar_nuisance_design,
@@ -399,6 +408,23 @@ def test_matrix_free_penalty_sweep_has_complete_grid() -> None:
     assert result["maximum_relative_residual"] <= 1.0e-5
 
 
+def test_edge_expansion_adds_one_log_grid_step() -> None:
+    lower = [1.0e-6, 1.0e-4, 1.0e-2]
+    upper = [1.0e6, 1.0e4, 1.0e2]
+    expanded_lower, expanded_upper = _expanded_bounds(
+        lower.copy(),
+        upper.copy(),
+        [(0, "upper"), (1, "lower")],
+        positive_grid_points=7,
+    )
+    assert expanded_upper[0] == pytest.approx(1.0e8)
+    assert expanded_lower[1] == pytest.approx(
+        1.0e-4 / (1.0e8 ** (1.0 / 6.0))
+    )
+    assert expanded_lower[0] == lower[0]
+    assert expanded_upper[1] == upper[1]
+
+
 def test_batched_full_fallback_has_complete_certified_grid() -> None:
     torch.manual_seed(171)
     observations, lag_count, m_tau, m_x = 52, 4, 3, 3
@@ -503,6 +529,37 @@ def test_batched_pcg_matches_independent_dense_systems() -> None:
     )
 
 
+def test_scaled_batched_full_solve_handles_extreme_penalties() -> None:
+    operator = _random_operator()
+    penalty = SeparablePenalty(
+        channels=operator.channels,
+        m_tau=operator.m_tau,
+        m_x=operator.m_x,
+        device=operator.device,
+        dtype=operator.dtype,
+    )
+    weights = [
+        PenaltyWeights(1.0e-8, 1.0e8, 0.0),
+        PenaltyWeights(1.0e4, 1.0e-8, 1.0e-8),
+        PenaltyWeights(1.0e-5, 1.0e5, 1.0e2),
+    ]
+    target = torch.randn(
+        operator.observations,
+        generator=torch.Generator().manual_seed(741),
+        dtype=torch.float64,
+    )
+    target -= target.mean()
+    results = solve_full_batch(
+        operator,
+        target,
+        penalty,
+        weights,
+        relative_tolerance=2.0e-7,
+        maximum_iterations=2500,
+    )
+    assert max(row.relative_kkt_residual for row in results) <= 2.0e-7
+
+
 def test_penalty_batched_diagonal_matches_scalar() -> None:
     penalty = SeparablePenalty(
         channels=3,
@@ -521,6 +578,95 @@ def test_penalty_batched_diagonal_matches_scalar() -> None:
         torch.stack([penalty.diagonal(row) for row in weights]),
         rtol=1.0e-12,
         atol=1.0e-12,
+    )
+
+
+def test_spectral_preconditioner_batch_matches_scalar() -> None:
+    operator = _random_operator()
+    penalty = SeparablePenalty(
+        channels=operator.channels,
+        m_tau=operator.m_tau,
+        m_x=operator.m_x,
+        device=operator.device,
+        dtype=operator.dtype,
+    )
+    weights = [
+        PenaltyWeights(1.0e-4, 3.0, 0.0),
+        PenaltyWeights(2.0e-3, 200.0, 1.0e-6),
+        PenaltyWeights(0.0, 40.0, 1.0e-4),
+    ]
+    diagonal = data_normal_diagonal(operator)
+    batched = build_batched_spectral_diagonal_preconditioner(
+        operator, penalty, weights, data_diagonal=diagonal
+    )
+    generator = torch.Generator().manual_seed(617)
+    residuals = torch.randn(
+        len(weights),
+        operator.dimension,
+        generator=generator,
+        dtype=torch.float64,
+    )
+    expected = torch.stack(
+        [
+            build_spectral_diagonal_preconditioner(
+                operator,
+                penalty,
+                row,
+                data_diagonal=diagonal,
+            ).solve(residual)
+            for row, residual in zip(weights, residuals, strict=True)
+        ]
+    )
+    torch.testing.assert_close(
+        batched.solve(residuals), expected, rtol=1.0e-11, atol=1.0e-11
+    )
+    torch.testing.assert_close(
+        batched.scaled_to_coefficients(
+            batched.coefficients_to_scaled(residuals)
+        ),
+        residuals,
+        rtol=1.0e-11,
+        atol=1.0e-11,
+    )
+
+
+def test_channel_block_preconditioner_solves_its_block_system() -> None:
+    operator = _random_operator()
+    penalty = SeparablePenalty(
+        channels=operator.channels,
+        m_tau=operator.m_tau,
+        m_x=operator.m_x,
+        device=operator.device,
+        dtype=operator.dtype,
+    )
+    weights = PenaltyWeights(0.03, 8.0, 1.0e-4)
+    blocks = data_normal_channel_blocks(operator)
+    preconditioner = build_channel_block_preconditioner(
+        operator, penalty, weights, data_blocks=blocks
+    )
+    identity_tau = torch.eye(penalty.m_tau, dtype=torch.float64)
+    identity_x = torch.eye(penalty.m_x, dtype=torch.float64)
+    penalty_block = (
+        weights.lag * torch.kron(penalty.lag_normal_matrix, identity_x)
+        + weights.amplitude
+        * torch.kron(identity_tau, penalty.amplitude_normal_matrix)
+        + weights.ridge
+        * torch.eye(penalty.m_tau * penalty.m_x, dtype=torch.float64)
+    )
+    systems = blocks + penalty_block[None, ...]
+    residual = torch.randn(
+        operator.dimension,
+        generator=torch.Generator().manual_seed(811),
+        dtype=torch.float64,
+    )
+    resolved = preconditioner.solve(residual).reshape(
+        operator.channels, -1
+    )
+    torch.testing.assert_close(
+        torch.einsum("cij,cj->ci", systems, resolved),
+        residual.reshape(operator.channels, -1),
+        rtol=1.0e-9,
+        atol=1.0e-9,
     )
 
 
