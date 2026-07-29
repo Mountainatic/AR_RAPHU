@@ -10,7 +10,7 @@ from ar_raphu.orss.dr_basis import (
     tensor_from_dr,
     tensor_to_dr,
 )
-from ar_raphu.orss.krylov import lsqr
+from ar_raphu.orss.krylov import lsqr, pcg_normal_batch
 from ar_raphu.orss.mixed_precision import iterative_refinement
 from ar_raphu.orss.operator import (
     BranchCache,
@@ -399,6 +399,55 @@ def test_matrix_free_penalty_sweep_has_complete_grid() -> None:
     assert result["maximum_relative_residual"] <= 1.0e-5
 
 
+def test_batched_full_fallback_has_complete_certified_grid() -> None:
+    torch.manual_seed(171)
+    observations, lag_count, m_tau, m_x = 52, 4, 3, 3
+    branch = BranchCache(
+        amplitude=torch.randn(
+            observations, lag_count, m_x, dtype=torch.float64
+        ),
+        lag_basis=torch.randn(lag_count, m_tau, dtype=torch.float64),
+        out_of_domain_fraction=0.0,
+    )
+    train = UrysohnLinearOperator([branch], chunk_time=13)
+    validation = UrysohnLinearOperator(
+        [branch], feature_mean=train.feature_mean, chunk_time=11
+    )
+    penalty = SeparablePenalty(
+        channels=1,
+        m_tau=m_tau,
+        m_x=m_x,
+        device=torch.device("cpu"),
+        dtype=torch.float64,
+    )
+    normalization = diagonal_spectral_normalization(train, penalty)
+    candidates, grids = candidate_grid(
+        normalization.lower,
+        normalization.upper,
+        positive_points=2,
+    )
+    target = torch.randn(observations, dtype=torch.float64)
+    target -= target.mean()
+    result = reduced_sweep(
+        train,
+        validation,
+        target,
+        target,
+        target_mean=0.0,
+        candidates=candidates,
+        grids=grids,
+        normalization=normalization,
+        residual_tolerance=1.0e-7,
+        maximum_dimension=8,
+        krylov_tolerance=1.0e-11,
+        maximum_iterations=750,
+    )
+    assert result["full_orss_fallback"]
+    assert len(result["candidate_rows"]) == len(candidates) == 27
+    assert result["maximum_relative_residual"] <= 1.0e-7
+    assert result["profiler"]["batched_full_solve_count"] > 0
+
+
 def test_iterative_refinement_reaches_fp64_kkt() -> None:
     matrix = torch.tensor(
         [[4.0, 1.0], [1.0, 3.0]], dtype=torch.float64
@@ -420,6 +469,59 @@ def test_iterative_refinement_reaches_fp64_kkt() -> None:
     )
     assert result.converged
     assert result.relative_kkt_residual <= 1e-8
+
+
+def test_batched_pcg_matches_independent_dense_systems() -> None:
+    generator = torch.Generator().manual_seed(1221)
+    batch, dimension = 9, 12
+    factors = torch.randn(
+        batch, dimension, dimension, generator=generator, dtype=torch.float64
+    )
+    systems = (
+        factors.transpose(1, 2) @ factors
+        + 0.5 * torch.eye(dimension, dtype=torch.float64)[None, ...]
+    )
+    rhs = torch.randn(
+        batch, dimension, generator=generator, dtype=torch.float64
+    )
+    result = pcg_normal_batch(
+        lambda rows: torch.einsum("kij,kj->ki", systems, rows),
+        rhs,
+        preconditioner_diagonal=torch.diagonal(
+            systems, dim1=1, dim2=2
+        ),
+        relative_tolerance=1.0e-11,
+        maximum_iterations=200,
+    )
+    reference = torch.linalg.solve(systems, rhs[..., None]).squeeze(-1)
+    assert all(result.converged)
+    torch.testing.assert_close(
+        result.coefficients,
+        reference,
+        rtol=1.0e-9,
+        atol=1.0e-9,
+    )
+
+
+def test_penalty_batched_diagonal_matches_scalar() -> None:
+    penalty = SeparablePenalty(
+        channels=3,
+        m_tau=5,
+        m_x=6,
+        device=torch.device("cpu"),
+        dtype=torch.float64,
+    )
+    weights = [
+        PenaltyWeights(0.01, 0.02, 0.03),
+        PenaltyWeights(0.04, 0.05, 0.06),
+        PenaltyWeights(0.2, 0.1, 0.02),
+    ]
+    torch.testing.assert_close(
+        penalty.diagonal_batch(weights),
+        torch.stack([penalty.diagonal(row) for row in weights]),
+        rtol=1.0e-12,
+        atol=1.0e-12,
+    )
 
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA is required")

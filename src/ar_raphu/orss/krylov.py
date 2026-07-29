@@ -28,6 +28,15 @@ class PCGResult:
     relative_residual: float
 
 
+@dataclass(frozen=True, slots=True)
+class BatchedPCGResult:
+    coefficients: torch.Tensor
+    iterations: tuple[int, ...]
+    converged: tuple[bool, ...]
+    relative_residuals: tuple[float, ...]
+    operator_calls: int
+
+
 def _safe_norm(vector: torch.Tensor) -> torch.Tensor:
     return torch.linalg.vector_norm(vector).clamp_min(
         torch.finfo(vector.dtype).tiny
@@ -178,3 +187,98 @@ def pcg_normal(
         direction = z + (next_rz / rz) * direction
         rz = next_rz
     return PCGResult(x, iteration, converged, relative)
+
+
+def pcg_normal_batch(
+    apply,
+    rhs: torch.Tensor,
+    *,
+    initial: torch.Tensor | None = None,
+    preconditioner_diagonal: torch.Tensor | None = None,
+    relative_tolerance: float = 1.0e-10,
+    maximum_iterations: int = 500,
+) -> BatchedPCGResult:
+    """Vectorized independent PCG solves with one CUDA launch per iteration."""
+
+    if rhs.ndim != 2:
+        raise ValueError("Batched PCG rhs must have shape (batch, dimension).")
+    x = torch.zeros_like(rhs) if initial is None else initial.clone()
+    if x.shape != rhs.shape:
+        raise ValueError("Batched PCG initial shape mismatch.")
+    if (
+        preconditioner_diagonal is not None
+        and preconditioner_diagonal.shape != rhs.shape
+    ):
+        raise ValueError("Batched PCG preconditioner shape mismatch.")
+
+    def precondition(residual: torch.Tensor) -> torch.Tensor:
+        if preconditioner_diagonal is None:
+            return residual.clone()
+        return residual / preconditioner_diagonal.clamp_min(
+            torch.finfo(residual.dtype).tiny
+        )
+
+    residual = rhs - apply(x)
+    operator_calls = 1
+    denominator = torch.linalg.vector_norm(rhs, dim=1).clamp_min(
+        torch.finfo(rhs.dtype).tiny
+    )
+    relative = torch.linalg.vector_norm(residual, dim=1) / denominator
+    active = relative > relative_tolerance
+    iteration_counts = torch.zeros(
+        rhs.shape[0], device=rhs.device, dtype=torch.int64
+    )
+    z = precondition(residual)
+    direction = z.clone()
+    rz = torch.sum(residual * z, dim=1)
+    iteration = 0
+    for iteration in range(1, maximum_iterations + 1):
+        if not bool(torch.any(active)):
+            break
+        image = apply(direction)
+        operator_calls += 1
+        curvature = torch.sum(direction * image, dim=1)
+        positive = curvature > 0
+        progressing = active & positive
+        alpha = torch.where(
+            progressing,
+            rz / curvature.clamp_min(torch.finfo(rhs.dtype).tiny),
+            torch.zeros_like(rz),
+        )
+        x = x + alpha[:, None] * direction
+        residual = residual - alpha[:, None] * image
+        relative = torch.linalg.vector_norm(residual, dim=1) / denominator
+        finished = active & (
+            (relative <= relative_tolerance) | (~positive)
+        )
+        iteration_counts[finished] = iteration
+        next_active = active & (~finished)
+        z = precondition(residual)
+        next_rz = torch.sum(residual * z, dim=1)
+        beta = torch.where(
+            next_active,
+            next_rz / rz.clamp_min(torch.finfo(rhs.dtype).tiny),
+            torch.zeros_like(rz),
+        )
+        direction = z + beta[:, None] * direction
+        direction = torch.where(
+            next_active[:, None], direction, torch.zeros_like(direction)
+        )
+        rz = next_rz
+        active = next_active
+    iteration_counts[active] = maximum_iterations
+    converged = relative <= relative_tolerance
+    return BatchedPCGResult(
+        coefficients=x,
+        iterations=tuple(
+            int(value)
+            for value in iteration_counts.detach().cpu().tolist()
+        ),
+        converged=tuple(
+            bool(value) for value in converged.detach().cpu().tolist()
+        ),
+        relative_residuals=tuple(
+            float(value) for value in relative.detach().cpu().tolist()
+        ),
+        operator_calls=operator_calls,
+    )

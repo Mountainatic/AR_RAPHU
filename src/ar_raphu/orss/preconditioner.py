@@ -44,8 +44,11 @@ def build_diagonal_preconditioner(
     operator: UrysohnLinearOperator,
     penalty: SeparablePenalty,
     weights: PenaltyWeights,
+    *,
+    data_diagonal: torch.Tensor | None = None,
 ) -> DiagonalPreconditioner:
-    diagonal = data_normal_diagonal(operator) + penalty.diagonal(weights)
+    if data_diagonal is None:
+        data_diagonal = data_normal_diagonal(operator)
+    diagonal = data_diagonal + penalty.diagonal(weights)
     floor = diagonal.abs().max().clamp_min(1.0) * 1.0e-12
     return DiagonalPreconditioner(diagonal.clamp_min(floor))
-

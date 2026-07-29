@@ -163,3 +163,37 @@ class SeparablePenalty:
             + weights.ridge
         )
         return block.expand(self.channels, -1, -1).reshape(-1)
+
+    def diagonal_batch(
+        self,
+        weights: list[PenaltyWeights] | tuple[PenaltyWeights, ...],
+    ) -> torch.Tensor:
+        lag_diagonal = torch.diagonal(self.lag_normal_matrix)[None, :, None]
+        amplitude_diagonal = torch.diagonal(
+            self.amplitude_normal_matrix
+        )[None, None, :]
+        lag_weights = torch.as_tensor(
+            [row.lag for row in weights],
+            device=self.device,
+            dtype=self.dtype,
+        )
+        amplitude_weights = torch.as_tensor(
+            [row.amplitude for row in weights],
+            device=self.device,
+            dtype=self.dtype,
+        )
+        ridge_weights = torch.as_tensor(
+            [row.ridge for row in weights],
+            device=self.device,
+            dtype=self.dtype,
+        )
+        block = (
+            lag_weights[:, None, None] * lag_diagonal
+            + amplitude_weights[:, None, None] * amplitude_diagonal
+            + ridge_weights[:, None, None]
+        )
+        return (
+            block[:, None, ...]
+            .expand(-1, self.channels, -1, -1)
+            .reshape(len(weights), -1)
+        )

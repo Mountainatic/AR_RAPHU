@@ -13,7 +13,7 @@ import numpy as np
 import torch
 
 from .augmented import AugmentedRegularizedOperator
-from .krylov import KrylovResult, lsqr, pcg_normal
+from .krylov import KrylovResult, lsqr, pcg_normal, pcg_normal_batch
 from .operator import UrysohnLinearOperator
 from .penalties import PenaltyWeights, SeparablePenalty
 from .preconditioner import (
@@ -162,6 +162,7 @@ def solve_full(
     relative_tolerance: float,
     maximum_iterations: int,
     initial: torch.Tensor | None = None,
+    data_diagonal: torch.Tensor | None = None,
 ) -> FullSolve:
     started = time.perf_counter()
     forward_before = operator.operator_forward_calls
@@ -178,7 +179,10 @@ def solve_full(
         )
         preconditioner_started = time.perf_counter()
         preconditioner = build_diagonal_preconditioner(
-            operator, penalty, weights
+            operator,
+            penalty,
+            weights,
+            data_diagonal=data_diagonal,
         )
         preconditioner_seconds += (
             time.perf_counter() - preconditioner_started
@@ -199,7 +203,10 @@ def solve_full(
         rhs = operator.rhs(centered_target)
         preconditioner_started = time.perf_counter()
         preconditioner = build_diagonal_preconditioner(
-            operator, penalty, weights
+            operator,
+            penalty,
+            weights,
+            data_diagonal=data_diagonal,
         )
         preconditioner_seconds += (
             time.perf_counter() - preconditioner_started
@@ -231,6 +238,66 @@ def solve_full(
             operator.operator_adjoint_calls - adjoint_before
         ),
     )
+
+
+def solve_full_batch(
+    operator: UrysohnLinearOperator,
+    centered_target: torch.Tensor,
+    penalty: SeparablePenalty,
+    weights: list[PenaltyWeights],
+    *,
+    relative_tolerance: float,
+    maximum_iterations: int,
+    initial: torch.Tensor | None = None,
+    data_diagonal: torch.Tensor | None = None,
+) -> list[FullSolve]:
+    if not weights:
+        return []
+    if any(row.exact_zero for row in weights):
+        raise ValueError("Exact-zero endpoint requires the LSQR path.")
+    started = time.perf_counter()
+    forward_before = operator.operator_forward_calls
+    adjoint_before = operator.operator_adjoint_calls
+    rhs = operator.rhs(centered_target)
+    rhs_batch = rhs[None, :].expand(len(weights), -1)
+    preconditioner_started = time.perf_counter()
+    if data_diagonal is None:
+        data_diagonal = data_normal_diagonal(operator)
+    data_diagonal = data_diagonal.to(operator.dtype)
+    preconditioner_diagonal = (
+        data_diagonal[None, :] + penalty.diagonal_batch(weights)
+    )
+    preconditioner_seconds = (
+        time.perf_counter() - preconditioner_started
+    )
+    result = pcg_normal_batch(
+        lambda vectors: operator.normal_batch(vectors)
+        + penalty.normal_batch(vectors, weights),
+        rhs_batch,
+        initial=initial,
+        preconditioner_diagonal=preconditioner_diagonal,
+        relative_tolerance=relative_tolerance,
+        maximum_iterations=maximum_iterations,
+    )
+    elapsed = time.perf_counter() - started
+    forward_calls = operator.operator_forward_calls - forward_before
+    adjoint_calls = operator.operator_adjoint_calls - adjoint_before
+    count = len(weights)
+    return [
+        FullSolve(
+            coefficients=result.coefficients[index],
+            relative_kkt_residual=result.relative_residuals[index],
+            iterations=result.iterations[index],
+            method="BATCHED_DIAGONAL_PRECONDITIONED_NORMAL_PCG",
+            elapsed_seconds=elapsed / count,
+            preconditioner_build_seconds=(
+                preconditioner_seconds / count
+            ),
+            operator_forward_calls=max(1, forward_calls // count),
+            operator_adjoint_calls=max(1, adjoint_calls // count),
+        )
+        for index in range(count)
+    ]
 
 
 def _actual(
@@ -292,6 +359,11 @@ def reduced_sweep(
         device=train_operator.device,
         dtype=train_operator.dtype,
     )
+    preconditioner_started = time.perf_counter()
+    shared_data_diagonal = data_normal_diagonal(train_operator)
+    shared_preconditioner_build_seconds = (
+        time.perf_counter() - preconditioner_started
+    )
     right = train_operator.rhs(train_target)
     reduced = ParametricReducedBasis(
         train_operator,
@@ -350,6 +422,7 @@ def reduced_sweep(
                 actual,
                 relative_tolerance=krylov_tolerance,
                 maximum_iterations=maximum_iterations,
+                data_diagonal=shared_data_diagonal,
             )
             if anchor_file is not None:
                 anchor_file.parent.mkdir(parents=True, exist_ok=True)
@@ -458,6 +531,7 @@ def reduced_sweep(
             relative_tolerance=krylov_tolerance,
             maximum_iterations=maximum_iterations,
             initial=worst.coefficients.to(train_operator.dtype),
+            data_diagonal=shared_data_diagonal,
         )
         added = reduced.add_anchor(normalized, solved.coefficients)
         diagnostics = {
@@ -503,12 +577,20 @@ def reduced_sweep(
             break
 
     candidate_rows: list[dict[str, object]] = []
+    full_fallback_seconds = 0.0
+    batched_full_solve_count = 0
+    batched_full_solve_batches = 0
+    exact_zero_full_solve_count = 0
     if fallback:
-        full_rows: list[tuple[PenaltyWeights, FullSolve]] = []
-        warm: torch.Tensor | None = None
-        for normalized in candidates:
+        fallback_started = time.perf_counter()
+        full_rows_by_index: dict[int, tuple[PenaltyWeights, FullSolve]] = {}
+        pending_indices: list[int] = []
+        for index, normalized in enumerate(candidates):
             solved = cached.get(normalized)
-            if solved is None:
+            if solved is not None:
+                full_rows_by_index[index] = (normalized, solved)
+            elif normalized.exact_zero:
+                exact_zero_full_solve_count += 1
                 solved = solve_full(
                     train_operator,
                     train_target,
@@ -516,14 +598,53 @@ def reduced_sweep(
                     _actual(normalized, normalization),
                     relative_tolerance=krylov_tolerance,
                     maximum_iterations=maximum_iterations,
-                    initial=warm,
+                    initial=rows[index].coefficients.to(
+                        train_operator.dtype
+                    ),
+                    data_diagonal=shared_data_diagonal,
                 )
-            warm = solved.coefficients
-            full_rows.append((normalized, solved))
+                full_rows_by_index[index] = (normalized, solved)
+            else:
+                pending_indices.append(index)
+        for start in range(0, len(pending_indices), candidate_batch_size):
+            batched_full_solve_batches += 1
+            block_indices = pending_indices[
+                start : start + candidate_batch_size
+            ]
+            batched_full_solve_count += len(block_indices)
+            block_normalized = [candidates[index] for index in block_indices]
+            block_actual = [
+                _actual(row, normalization) for row in block_normalized
+            ]
+            block_initial = torch.stack(
+                [rows[index].coefficients for index in block_indices],
+                dim=0,
+            ).to(train_operator.dtype)
+            block_solved = solve_full_batch(
+                train_operator,
+                train_target,
+                penalty,
+                block_actual,
+                relative_tolerance=krylov_tolerance,
+                maximum_iterations=maximum_iterations,
+                initial=block_initial,
+                data_diagonal=shared_data_diagonal,
+            )
+            for index, normalized, solved in zip(
+                block_indices,
+                block_normalized,
+                block_solved,
+                strict=True,
+            ):
+                full_rows_by_index[index] = (normalized, solved)
+        full_rows = [
+            full_rows_by_index[index] for index in range(len(candidates))
+        ]
         resolved = [
             (normalized, solved.coefficients, solved.relative_kkt_residual)
             for normalized, solved in full_rows
         ]
+        full_fallback_seconds = time.perf_counter() - fallback_started
     else:
         batch_started = time.perf_counter()
         rb_rows = batched_scan(
@@ -595,7 +716,13 @@ def reduced_sweep(
             "reduced_batch_seconds": reduced_batch_seconds,
             "validation_batch_seconds": validation_batch_seconds,
             "candidate_batch_size": candidate_batch_size,
+            "full_fallback_seconds": full_fallback_seconds,
+            "batched_full_solve_count": batched_full_solve_count,
+            "batched_full_solve_batches": batched_full_solve_batches,
+            "exact_zero_full_solve_count": exact_zero_full_solve_count,
             "preconditioner_build_seconds": float(
+                shared_preconditioner_build_seconds
+                +
                 sum(
                     float(row["preconditioner_build_seconds"])
                     for row in anchors + greedy
