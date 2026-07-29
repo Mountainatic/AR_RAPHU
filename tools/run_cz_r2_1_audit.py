@@ -21,9 +21,10 @@ from ar_raphu.cz_real.linear import target_indices
 from ar_raphu.cz_real.protocol import build_development_folds, load_furnace_a
 from ar_raphu.orss.augmented import AugmentedRegularizedOperator
 from ar_raphu.orss.diagnostics import write_json
-from ar_raphu.orss.krylov import lsqr
+from ar_raphu.orss.krylov import lsqr, pcg_normal
 from ar_raphu.orss.operator import UrysohnLinearOperator, build_urysohn_operator
 from ar_raphu.orss.penalties import PenaltyWeights, SeparablePenalty
+from ar_raphu.orss.preconditioner import build_diagonal_preconditioner
 
 
 def _furnace_a(raw_dir: Path) -> Path:
@@ -62,14 +63,27 @@ def _fit_zero(
         relative_tolerance=1.0e-10,
         maximum_iterations=2500,
     )
-    prediction = operator.forward(result.coefficients)
+    weights = PenaltyWeights(0.0, 0.0, 0.0)
+    refinement = pcg_normal(
+        operator.normal,
+        operator.rhs(centered_target),
+        initial=result.coefficients,
+        preconditioner=build_diagonal_preconditioner(
+            operator, penalty, weights
+        ),
+        relative_tolerance=1.0e-10,
+        maximum_iterations=10000,
+    )
+    prediction = operator.forward(refinement.coefficients)
     return {
         "training_MSE_mm2": float(
             torch.mean((prediction - centered_target) ** 2).item()
         ),
-        "relative_kkt_residual": result.relative_kkt_residual,
-        "iterations": result.iterations,
-        "converged": result.relative_kkt_residual <= 1.0e-8,
+        "relative_kkt_residual": refinement.relative_residual,
+        "iterations": result.iterations + refinement.iterations,
+        "lsqr_relative_kkt_residual": result.relative_kkt_residual,
+        "pcg_refinement_iterations": refinement.iterations,
+        "converged": refinement.relative_residual <= 1.0e-8,
     }
 
 
@@ -200,4 +214,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
