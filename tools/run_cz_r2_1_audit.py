@@ -73,7 +73,7 @@ def _fit_zero(
             operator, penalty, weights
         ),
         relative_tolerance=1.0e-10,
-        maximum_iterations=10000,
+        maximum_iterations=1000,
     )
     coefficients = refinement.coefficients
     relative_kkt = refinement.relative_residual
