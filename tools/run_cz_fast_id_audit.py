@@ -19,6 +19,13 @@ from typing import Any, Callable
 import numpy as np
 import torch
 
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
 from ar_raphu.cz_fast_audit.conditional_gram import conditional_gram_audit
 from ar_raphu.cz_fast_audit.decision import RuntimeGate, decide_go_nogo
 from ar_raphu.cz_fast_audit.fast_coarse_xar import coarse_xar_audit
@@ -37,8 +44,6 @@ from ar_raphu.cz_real.protocol import (
     load_furnace_a,
 )
 
-
-ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "results" / "cz_real_data" / "fast_go_nogo_v1"
 DEFAULT_RAW = Path("/root/OPS_UOI_WORKSPACE/data/private/cz_real_v1/raw")
 
