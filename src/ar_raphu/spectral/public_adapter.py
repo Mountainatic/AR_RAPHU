@@ -88,4 +88,5 @@ def build_spectral_design_from_windows(
         amplitude_grams=amplitude_grams,
         target_indices=np.asarray(task.target_index, dtype=np.int64),
         origin_indices=np.asarray(task.origin_index, dtype=np.int64),
+        continuation_diagnostics=[],
     )
