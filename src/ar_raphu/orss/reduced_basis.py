@@ -137,7 +137,10 @@ class ParametricReducedBasis:
         if weights.exact_zero:
             coordinates = torch.linalg.lstsq(system, right).solution
         else:
-            coordinates = torch.linalg.solve(system, right)
+            try:
+                coordinates = torch.linalg.solve(system, right)
+            except torch.linalg.LinAlgError:
+                coordinates = torch.linalg.lstsq(system, right).solution
         coefficients = self.basis @ coordinates
         residual = self.full_residual(coefficients, weights)
         return ReducedCandidate(
@@ -173,4 +176,3 @@ class ParametricReducedBasis:
     ) -> ReducedCandidate:
         rows = self.scan(candidates)
         return max(rows, key=lambda row: row.relative_residual)
-
