@@ -20,6 +20,14 @@ class KrylovResult:
     operator_adjoint_calls: int
 
 
+@dataclass(frozen=True, slots=True)
+class PCGResult:
+    coefficients: torch.Tensor
+    iterations: int
+    converged: bool
+    relative_residual: float
+
+
 def _safe_norm(vector: torch.Tensor) -> torch.Tensor:
     return torch.linalg.vector_norm(vector).clamp_min(
         torch.finfo(vector.dtype).tiny
@@ -119,3 +127,54 @@ def lsqr(
         operator_forward_calls=forward_calls,
         operator_adjoint_calls=adjoint_calls,
     )
+
+
+def pcg_normal(
+    apply,
+    rhs: torch.Tensor,
+    *,
+    initial: torch.Tensor | None = None,
+    preconditioner=None,
+    relative_tolerance: float = 1.0e-10,
+    maximum_iterations: int = 500,
+) -> PCGResult:
+    """Preconditioned CG refinement on an SPD normal operator."""
+
+    x = torch.zeros_like(rhs) if initial is None else initial.clone()
+    residual = rhs - apply(x)
+    denominator = _safe_norm(rhs)
+    relative = float(torch.linalg.vector_norm(residual).item() / denominator.item())
+    if relative <= relative_tolerance:
+        return PCGResult(x, 0, True, relative)
+    z = (
+        residual.clone()
+        if preconditioner is None
+        else preconditioner.solve(residual)
+    )
+    direction = z.clone()
+    rz = torch.dot(residual, z)
+    converged = False
+    iteration = 0
+    for iteration in range(1, maximum_iterations + 1):
+        image = apply(direction)
+        curvature = torch.dot(direction, image)
+        if float(curvature.item()) <= 0.0:
+            break
+        alpha = rz / curvature
+        x = x + alpha * direction
+        residual = residual - alpha * image
+        relative = float(
+            torch.linalg.vector_norm(residual).item() / denominator.item()
+        )
+        if relative <= relative_tolerance:
+            converged = True
+            break
+        z = (
+            residual.clone()
+            if preconditioner is None
+            else preconditioner.solve(residual)
+        )
+        next_rz = torch.dot(residual, z)
+        direction = z + (next_rz / rz) * direction
+        rz = next_rz
+    return PCGResult(x, iteration, converged, relative)
