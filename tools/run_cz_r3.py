@@ -20,6 +20,7 @@ import torch
 
 from ar_raphu.cz_real.orss_r3 import (
     evaluate_frozen_configuration,
+    prepare_history_group_timeline_caches,
     rank_profile_configuration,
     run_development_task,
 )
@@ -65,6 +66,66 @@ def _history_specs(config: dict[str, object]):
         for L_x in config["history"]["Lx"]
         for L_y in config["history"]["Ly"]
     ]
+
+
+def _history_groups(config: dict[str, object]):
+    return [
+        (L_x, L_y)
+        for L_x in config["history"]["Lx"]
+        for L_y in config["history"]["Ly"]
+    ]
+
+
+def _fold_concurrency(
+    *,
+    config: dict[str, object],
+    data,
+    L_x: int,
+    L_y: int,
+    M_x: int,
+    device: torch.device,
+) -> tuple[int, dict[str, object]]:
+    scheduler = config["scheduler"]
+    initial = int(scheduler["concurrent_folds_initial"])
+    if device.type != "cuda":
+        return 1, {
+            "policy": "CPU_SINGLE_FOLD",
+            "selected": 1,
+        }
+    free_bytes, total_bytes = torch.cuda.mem_get_info(device)
+    usable = min(
+        int(free_bytes),
+        int(
+            float(config["cuda"]["usable_vram_fraction"])
+            * int(total_bytes)
+        ),
+    )
+    target_rows = len(data.target)
+    history_width = int(data.inputs.shape[1]) * int(L_x) + int(L_y)
+    raw_window_bytes = (
+        target_rows
+        * history_width
+        * int(M_x)
+        * torch.tensor([], dtype=torch.float32).element_size()
+    )
+    estimated_per_fold = max(
+        1,
+        int(
+            float(scheduler["window_memory_safety_factor"])
+            * raw_window_bytes
+        ),
+    )
+    selected = max(1, min(initial, usable // estimated_per_fold))
+    return int(selected), {
+        "policy": "VRAM_BOUNDED_AUTO_FOLD_CONCURRENCY",
+        "initial": initial,
+        "selected": int(selected),
+        "usable_vram_bytes": int(usable),
+        "estimated_per_fold_bytes": int(estimated_per_fold),
+        "window_memory_safety_factor": float(
+            scheduler["window_memory_safety_factor"]
+        ),
+    }
 
 
 def _task_path(output: Path, horizon: int, L_x: int, L_y: int) -> Path:
@@ -190,83 +251,175 @@ def _run_history(
     started = time.perf_counter()
     source_commit = _source_commit()
     config_hash = _hash_file(config_path)
-    for index, (horizon, L_x, L_y) in enumerate(specifications, start=1):
-        destination = _task_path(output, horizon, L_x, L_y)
-        if resume and destination.exists():
-            existing = json.loads(destination.read_text(encoding="utf-8"))
-            identity = existing.get("checkpoint_identity", {})
-            if (
-                existing.get("status") == "COMPLETED"
-                and identity.get("config_hash") == config_hash
-                and identity.get("data_hash") == data.source_sha256
-                and identity.get("source_commit") == source_commit
-                and identity.get("solver_version") == "ORSS_V1"
-            ):
-                print(
-                    f"R3A {index}/{len(specifications)} resumed "
-                    f"h={horizon} Lx={L_x} Ly={L_y}",
-                    flush=True,
+    completed_before = 0
+    for destination in (
+        _task_path(output, horizon, L_x, L_y)
+        for horizon, L_x, L_y in specifications
+    ):
+        if destination.exists():
+            completed_before += 1
+    completed_now = completed_before
+    for group_index, (L_x, L_y) in enumerate(
+        _history_groups(config), start=1
+    ):
+        pending: list[int] = []
+        for horizon in config["horizons"]:
+            destination = _task_path(output, horizon, L_x, L_y)
+            if resume and destination.exists():
+                existing = json.loads(
+                    destination.read_text(encoding="utf-8")
                 )
-                continue
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        payload = run_development_task(
+                identity = existing.get("checkpoint_identity", {})
+                if (
+                    existing.get("status") == "COMPLETED"
+                    and identity.get("config_hash") == config_hash
+                    and identity.get("data_hash") == data.source_sha256
+                    and identity.get("source_commit") == source_commit
+                    and identity.get("solver_version") == "ORSS_V2_BATCHED"
+                ):
+                    print(
+                        f"R3A resumed h={horizon} Lx={L_x} Ly={L_y}",
+                        flush=True,
+                    )
+                    continue
+            pending.append(int(horizon))
+        if not pending:
+            continue
+
+        concurrent_folds, concurrency_profile = _fold_concurrency(
+            config=config,
+            data=data,
+            L_x=L_x,
+            L_y=L_y,
+            M_x=int(config["history"]["anchor_Mx"]),
+            device=device,
+        )
+        caches, cache_profile = prepare_history_group_timeline_caches(
             data.inputs,
             data.target,
-            horizon=horizon,
             L_x=L_x,
             L_y=L_y,
             M_tau=int(config["history"]["anchor_Mtau"]),
             M_x=int(config["history"]["anchor_Mx"]),
-            c_rho=float(config["history"]["continuation_scale_coefficient"]),
+            c_rho=float(
+                config["history"]["continuation_scale_coefficient"]
+            ),
             device=device,
-            primary_dtype=torch.float32,
-            chunk_time=int(config["cuda"]["operator_chunk_time"]),
-            positive_grid_points=int(config["penalty"]["positive_grid_points"]),
-            maximum_edge_expansions=int(
-                config["penalty"]["maximum_edge_expansions"]
-            ),
-            rb_tolerance=float(
-                config["reduced_basis"]["residual_tolerance_development"]
-            ),
-            rb_maximum_dimension=int(
-                config["reduced_basis"]["maximum_dimension"]
-            ),
-            krylov_tolerance=float(
-                config["krylov"]["relative_tolerance_development"]
-            ),
-            krylov_maximum_iterations=int(
-                config["krylov"]["maximum_iterations"]
-            ),
+            dtypes=(torch.float32, torch.float64),
         )
-        payload["checkpoint_identity"] = {
-            "dataset": "CZ_REAL_V1",
-            "furnace": "A",
-            "fold": "ALL_DEVELOPMENT",
-            "horizon": horizon,
-            "Lx": L_x,
-            "Ly": L_y,
-            "Mtau": int(config["history"]["anchor_Mtau"]),
-            "Mx": int(config["history"]["anchor_Mx"]),
-            "solver": "ORSS",
-            "source_commit": source_commit,
-            "config_hash": config_hash,
-            "data_hash": data.source_sha256,
-            "solver_version": "ORSS_V1",
-        }
-        write_json(destination, payload)
-        marker = destination.parent / (
-            "DONE" if payload["status"] == "COMPLETED" else "FAILED"
-        )
-        marker.write_text(payload["status"] + "\n", encoding="utf-8")
+        group_started = time.perf_counter()
         print(
-            f"R3A {index}/{len(specifications)} h={horizon} "
-            f"Lx={L_x} Ly={L_y} status={payload['status']} "
-            f"loss={float(payload['validation_loss']):.8g} "
-            f"elapsed={float(payload['elapsed_seconds']):.1f}s",
+            f"R3A group {group_index}/{len(_history_groups(config))} "
+            f"Lx={L_x} Ly={L_y} pending_horizons={pending} "
+            f"concurrent_folds={concurrent_folds}",
             flush=True,
         )
-        if payload["status"] != "COMPLETED":
-            raise RuntimeError(f"R3A_TASK_FAILED:{destination}")
+        for horizon in pending:
+            destination = _task_path(output, horizon, L_x, L_y)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            identity = {
+                "dataset": "CZ_REAL_V1",
+                "furnace": "A",
+                "fold": "ALL_DEVELOPMENT",
+                "horizon": horizon,
+                "Lx": L_x,
+                "Ly": L_y,
+                "Mtau": int(config["history"]["anchor_Mtau"]),
+                "Mx": int(config["history"]["anchor_Mx"]),
+                "solver": "ORSS",
+                "source_commit": source_commit,
+                "config_hash": config_hash,
+                "data_hash": data.source_sha256,
+                "solver_version": "ORSS_V2_BATCHED",
+            }
+            payload = run_development_task(
+                data.inputs,
+                data.target,
+                horizon=horizon,
+                L_x=L_x,
+                L_y=L_y,
+                M_tau=int(config["history"]["anchor_Mtau"]),
+                M_x=int(config["history"]["anchor_Mx"]),
+                c_rho=float(
+                    config["history"]["continuation_scale_coefficient"]
+                ),
+                device=device,
+                primary_dtype=torch.float32,
+                chunk_time=int(config["cuda"]["operator_chunk_time"]),
+                positive_grid_points=int(
+                    config["penalty"]["positive_grid_points"]
+                ),
+                maximum_edge_expansions=int(
+                    config["penalty"]["maximum_edge_expansions"]
+                ),
+                rb_tolerance=float(
+                    config["reduced_basis"][
+                        "residual_tolerance_development"
+                    ]
+                ),
+                rb_maximum_dimension=int(
+                    config["reduced_basis"]["maximum_dimension"]
+                ),
+                krylov_tolerance=float(
+                    config["krylov"][
+                        "relative_tolerance_development"
+                    ]
+                ),
+                krylov_maximum_iterations=int(
+                    config["krylov"]["maximum_iterations"]
+                ),
+                candidate_batch_size=int(
+                    config["cuda"]["reduced_candidate_batch"]
+                ),
+                concurrent_folds=concurrent_folds,
+                timeline_caches=caches[torch.float32],
+                certification_timeline_caches=caches[torch.float64],
+                checkpoint_root=destination.parent,
+                checkpoint_identity=identity,
+                resume=resume,
+                shared_cache_profiler={
+                    **cache_profile,
+                    "basis_build_seconds_amortized": (
+                        float(cache_profile["basis_build_seconds"])
+                        / len(pending)
+                    ),
+                    "concurrency": concurrency_profile,
+                },
+            )
+            payload["checkpoint_identity"] = identity
+            write_json(destination, payload)
+            marker = destination.parent / (
+                "DONE" if payload["status"] == "COMPLETED" else "FAILED"
+            )
+            marker.write_text(payload["status"] + "\n", encoding="utf-8")
+            completed_now += 1
+            print(
+                f"R3A {completed_now}/{len(specifications)} h={horizon} "
+                f"Lx={L_x} Ly={L_y} status={payload['status']} "
+                f"loss={float(payload['validation_loss']):.8g} "
+                f"elapsed={float(payload['elapsed_seconds']):.1f}s",
+                flush=True,
+            )
+            if payload["status"] != "COMPLETED":
+                raise RuntimeError(f"R3A_TASK_FAILED:{destination}")
+        write_json(
+            output
+            / "R3A"
+            / "groups"
+            / f"Lx_{L_x:03d}_Ly_{L_y:03d}"
+            / "group_runtime.json",
+            {
+                "status": "COMPLETED",
+                "L_x": L_x,
+                "L_y": L_y,
+                "horizons": pending,
+                "elapsed_seconds": time.perf_counter() - group_started,
+                "cache": cache_profile,
+                "concurrency": concurrency_profile,
+            },
+        )
+        del caches
+        torch.cuda.empty_cache()
     selection = _aggregate_history(output, config)
     write_json(
         output / "R3A" / "history_runtime_profile.json",

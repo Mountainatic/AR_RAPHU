@@ -2,13 +2,23 @@
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict
+import json
+from pathlib import Path
 import time
+from typing import Callable, TypeVar
 
 import numpy as np
 import torch
 
-from ar_raphu.orss.operator import _bounded_c1_basis, build_urysohn_operator
+from ar_raphu.orss.diagnostics import write_json
+from ar_raphu.orss.operator import (
+    OperatorTimelineCache,
+    _bounded_c1_basis,
+    build_operator_timeline_cache,
+    build_urysohn_operator,
+)
 from ar_raphu.orss.penalties import PenaltyWeights, SeparablePenalty
 from ar_raphu.orss.sweep import (
     PenaltyNormalization,
@@ -22,6 +32,90 @@ from ar_raphu.orss.sweep import (
 
 from .linear import target_indices
 from .protocol import DIRECT_HORIZONS, build_development_folds
+
+
+T = TypeVar("T")
+
+
+def _parallel_folds(
+    rows,
+    worker: Callable[[object], T],
+    *,
+    maximum_workers: int,
+    device: torch.device,
+) -> list[T]:
+    if maximum_workers <= 1:
+        return [worker(row) for row in rows]
+
+    def streamed(row):
+        if device.type != "cuda":
+            return worker(row)
+        stream = torch.cuda.Stream(device=device)
+        with torch.cuda.stream(stream):
+            result = worker(row)
+        stream.synchronize()
+        return result
+
+    ordered: dict[int, T] = {}
+    with ThreadPoolExecutor(max_workers=maximum_workers) as executor:
+        futures = {
+            executor.submit(streamed, row): index
+            for index, row in enumerate(rows)
+        }
+        for future in as_completed(futures):
+            ordered[futures[future]] = future.result()
+    return [ordered[index] for index in range(len(rows))]
+
+
+def prepare_history_group_timeline_caches(
+    x: np.ndarray,
+    y: np.ndarray,
+    *,
+    L_x: int,
+    L_y: int,
+    M_tau: int,
+    M_x: int,
+    c_rho: float,
+    device: torch.device,
+    dtypes: tuple[torch.dtype, ...],
+) -> tuple[
+    dict[torch.dtype, dict[int, OperatorTimelineCache]],
+    dict[str, object],
+]:
+    """Create fold-local timeline bases once for every horizon in a group."""
+
+    folds = build_development_folds(
+        L_x=L_x, L_y=L_y, h_max=max(DIRECT_HORIZONS)
+    )
+    started = time.perf_counter()
+    caches: dict[torch.dtype, dict[int, OperatorTimelineCache]] = {}
+    per_dtype: dict[str, float] = {}
+    for dtype in dtypes:
+        dtype_started = time.perf_counter()
+        fold_caches: dict[int, OperatorTimelineCache] = {}
+        for fold in folds:
+            fold_caches[fold.fold] = build_operator_timeline_cache(
+                x,
+                y,
+                train_target_stop=fold.effective_train_stop,
+                L_x=L_x,
+                L_y=L_y,
+                lag_basis_count=M_tau,
+                amplitude_basis_count=M_x,
+                continuation_scale_coefficient=c_rho,
+                device=device,
+                dtype=dtype,
+            )
+        caches[dtype] = fold_caches
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+        per_dtype[str(dtype)] = time.perf_counter() - dtype_started
+    return caches, {
+        "basis_build_seconds": time.perf_counter() - started,
+        "basis_build_seconds_by_dtype": per_dtype,
+        "horizon_shared_timeline_cache": True,
+        "fold_cache_count": len(folds),
+    }
 
 
 def _fold_operators(
@@ -38,6 +132,7 @@ def _fold_operators(
     device: torch.device,
     dtype: torch.dtype,
     chunk_time: int,
+    timeline_cache: OperatorTimelineCache | None = None,
 ):
     train_indices = target_indices(
         start=0,
@@ -65,6 +160,7 @@ def _fold_operators(
         device=device,
         dtype=dtype,
         chunk_time=chunk_time,
+        timeline_cache=timeline_cache,
     )
     validation_operator, _ = build_urysohn_operator(
         x,
@@ -82,6 +178,7 @@ def _fold_operators(
         chunk_time=chunk_time,
         basis_state=state,
         feature_mean=train_operator.feature_mean,
+        timeline_cache=timeline_cache,
     )
     target_mean = float(np.mean(y[train_indices]))
     train_target = torch.as_tensor(
@@ -114,9 +211,10 @@ def _normalizations(
     device: torch.device,
     dtype: torch.dtype,
     chunk_time: int,
+    timeline_caches: dict[int, OperatorTimelineCache] | None = None,
+    concurrent_folds: int = 1,
 ) -> list[PenaltyNormalization]:
-    rows: list[PenaltyNormalization] = []
-    for fold in folds:
+    def normalize(fold) -> PenaltyNormalization:
         train, validation, *_ = _fold_operators(
             x,
             y,
@@ -130,6 +228,11 @@ def _normalizations(
             device=device,
             dtype=dtype,
             chunk_time=chunk_time,
+            timeline_cache=(
+                timeline_caches.get(fold.fold)
+                if timeline_caches is not None
+                else None
+            ),
         )
         penalty = SeparablePenalty(
             channels=train.channels,
@@ -138,10 +241,18 @@ def _normalizations(
             device=device,
             dtype=dtype,
         )
-        rows.append(diagonal_spectral_normalization(train, penalty))
+        result = diagonal_spectral_normalization(train, penalty)
         del train, validation, penalty
-        if device.type == "cuda":
-            torch.cuda.empty_cache()
+        return result
+
+    rows = _parallel_folds(
+        list(folds),
+        normalize,
+        maximum_workers=concurrent_folds,
+        device=device,
+    )
+    if device.type == "cuda":
+        torch.cuda.empty_cache()
     return rows
 
 
@@ -207,11 +318,26 @@ def run_development_task(
     rb_maximum_dimension: int,
     krylov_tolerance: float,
     krylov_maximum_iterations: int,
+    candidate_batch_size: int = 512,
+    concurrent_folds: int = 1,
+    timeline_caches: dict[int, OperatorTimelineCache] | None = None,
+    certification_timeline_caches: (
+        dict[int, OperatorTimelineCache] | None
+    ) = None,
+    checkpoint_root: Path | None = None,
+    checkpoint_identity: dict[str, object] | None = None,
+    resume: bool = False,
+    shared_cache_profiler: dict[str, object] | None = None,
 ) -> dict[str, object]:
+    if concurrent_folds < 1:
+        raise ValueError("concurrent_folds must be positive.")
     started = time.perf_counter()
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats(device)
     folds = build_development_folds(
         L_x=L_x, L_y=L_y, h_max=max(DIRECT_HORIZONS)
     )
+    normalization_started = time.perf_counter()
     normalizations = _normalizations(
         x,
         y,
@@ -225,7 +351,10 @@ def run_development_task(
         device=device,
         dtype=primary_dtype,
         chunk_time=chunk_time,
+        timeline_caches=timeline_caches,
+        concurrent_folds=concurrent_folds,
     )
+    normalization_seconds = time.perf_counter() - normalization_started
     lower = [
         min(row.lower[axis] for row in normalizations) for axis in range(3)
     ]
@@ -243,8 +372,60 @@ def run_development_task(
             upper,
             positive_points=positive_grid_points,
         )
-        fold_results: list[dict[str, object]] = []
-        for fold, normalization in zip(folds, normalizations, strict=True):
+        def run_fold(pair) -> dict[str, object]:
+            fold, normalization = pair
+            fold_started = time.perf_counter()
+            fold_root = (
+                checkpoint_root
+                / f"fold_{fold.fold}"
+                / f"expansion_{expansion}"
+                if checkpoint_root is not None
+                else None
+            )
+            identity = {
+                **(checkpoint_identity or {}),
+                "fold": int(fold.fold),
+                "expansion": int(expansion),
+                "horizon": int(horizon),
+                "L_x": int(L_x),
+                "L_y": int(L_y),
+                "M_tau": int(M_tau),
+                "M_x": int(M_x),
+                "c_rho": float(c_rho),
+                "normalization": asdict(normalization),
+                "candidate_count": len(candidates),
+            }
+            fold_result_path = (
+                fold_root / "fold_result.json"
+                if fold_root is not None
+                else None
+            )
+            if fold_root is not None:
+                identity_path = fold_root / "checkpoint_identity.json"
+                if identity_path.exists():
+                    saved_identity = json.loads(
+                        identity_path.read_text(encoding="utf-8")
+                    )
+                    if saved_identity != identity:
+                        raise RuntimeError(
+                            "FOLD_CHECKPOINT_IDENTITY_MISMATCH"
+                        )
+                else:
+                    write_json(identity_path, identity)
+            if (
+                resume
+                and fold_result_path is not None
+                and fold_result_path.exists()
+            ):
+                existing = json.loads(
+                    fold_result_path.read_text(encoding="utf-8")
+                )
+                if existing.get("checkpoint_identity") != identity:
+                    raise RuntimeError(
+                        "FOLD_CHECKPOINT_IDENTITY_MISMATCH"
+                    )
+                return existing
+            window_started = time.perf_counter()
             (
                 train,
                 validation,
@@ -265,7 +446,13 @@ def run_development_task(
                 device=device,
                 dtype=primary_dtype,
                 chunk_time=chunk_time,
+                timeline_cache=(
+                    timeline_caches.get(fold.fold)
+                    if timeline_caches is not None
+                    else None
+                ),
             )
+            window_build_seconds = time.perf_counter() - window_started
             result = reduced_sweep(
                 train,
                 validation,
@@ -279,13 +466,35 @@ def run_development_task(
                 maximum_dimension=rb_maximum_dimension,
                 krylov_tolerance=krylov_tolerance,
                 maximum_iterations=krylov_maximum_iterations,
+                candidate_batch_size=candidate_batch_size,
+                checkpoint_dir=fold_root,
+                resume=resume,
             )
             result["fold"] = fold.fold
             result["penalty_normalization"] = asdict(normalization)
-            fold_results.append(result)
+            result["checkpoint_identity"] = identity
+            result["profiler"]["window_build_seconds"] = (
+                window_build_seconds
+            )
+            result["profiler"]["per_fold_seconds"] = (
+                time.perf_counter() - fold_started
+            )
+            if fold_result_path is not None:
+                write_json(fold_result_path, result)
+                (fold_root / "DONE").write_text(
+                    "COMPLETED\n", encoding="utf-8"
+                )
             del train, validation, train_target, validation_target
-            if device.type == "cuda":
-                torch.cuda.empty_cache()
+            return result
+
+        fold_results = _parallel_folds(
+            list(zip(folds, normalizations, strict=True)),
+            run_fold,
+            maximum_workers=concurrent_folds,
+            device=device,
+        )
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
         rows = aggregate_folds(fold_results, candidates)
         selection = select_one_se(rows)
         selection["_all_rows"] = rows
@@ -302,6 +511,11 @@ def run_development_task(
                 ],
             }
         )
+        if checkpoint_root is not None:
+            write_json(
+                checkpoint_root / f"expansion_{expansion:02d}.json",
+                interval_history[-1],
+            )
         final_folds = fold_results
         final_candidates = candidates
         final_selection = selection
@@ -318,8 +532,53 @@ def run_development_task(
     )
 
     # Refit the frozen candidate in FP64 on every fold and certify the KKT.
-    certifications: list[dict[str, object]] = []
-    for fold, normalization in zip(folds, normalizations, strict=True):
+    def certify(pair) -> dict[str, object]:
+        fold, normalization = pair
+        fold_started = time.perf_counter()
+        certification_root = (
+            checkpoint_root / "certification" / f"fold_{fold.fold}"
+            if checkpoint_root is not None
+            else None
+        )
+        result_path = (
+            certification_root / "fold_result.json"
+            if certification_root is not None
+            else None
+        )
+        identity = {
+            **(checkpoint_identity or {}),
+            "fold": int(fold.fold),
+            "stage": "FINAL_FP64_CERTIFICATION",
+            "horizon": int(horizon),
+            "L_x": int(L_x),
+            "L_y": int(L_y),
+            "M_tau": int(M_tau),
+            "M_x": int(M_x),
+            "selected_weights": asdict(selected_weights),
+            "normalization": asdict(normalization),
+        }
+        if certification_root is not None:
+            identity_path = (
+                certification_root / "checkpoint_identity.json"
+            )
+            if identity_path.exists():
+                saved_identity = json.loads(
+                    identity_path.read_text(encoding="utf-8")
+                )
+                if saved_identity != identity:
+                    raise RuntimeError(
+                        "CERTIFICATION_CHECKPOINT_IDENTITY_MISMATCH"
+                    )
+            else:
+                write_json(identity_path, identity)
+        if resume and result_path is not None and result_path.exists():
+            existing = json.loads(result_path.read_text(encoding="utf-8"))
+            if existing.get("checkpoint_identity") != identity:
+                raise RuntimeError(
+                    "CERTIFICATION_CHECKPOINT_IDENTITY_MISMATCH"
+                )
+            return existing
+        window_started = time.perf_counter()
         (
             train,
             validation,
@@ -340,7 +599,13 @@ def run_development_task(
             device=device,
             dtype=torch.float64,
             chunk_time=chunk_time,
+            timeline_cache=(
+                certification_timeline_caches.get(fold.fold)
+                if certification_timeline_caches is not None
+                else None
+            ),
         )
+        window_build_seconds = time.perf_counter() - window_started
         penalty = SeparablePenalty(
             channels=train.channels,
             m_tau=train.m_tau,
@@ -358,21 +623,38 @@ def run_development_task(
             maximum_iterations=max(krylov_maximum_iterations, 2500),
         )
         prediction = validation.forward(fitted.coefficients) + target_mean
-        certifications.append(
-            {
-                "fold": fold.fold,
-                "actual_weights": asdict(actual),
-                "relative_kkt_residual": fitted.relative_kkt_residual,
-                "iterations": fitted.iterations,
-                "method": fitted.method,
-                "validation_MSE_mm2": float(
-                    torch.mean((prediction - validation_target) ** 2).item()
-                ),
-            }
-        )
+        result = {
+            "fold": fold.fold,
+            "actual_weights": asdict(actual),
+            "relative_kkt_residual": fitted.relative_kkt_residual,
+            "iterations": fitted.iterations,
+            "method": fitted.method,
+            "validation_MSE_mm2": float(
+                torch.mean((prediction - validation_target) ** 2).item()
+            ),
+            "checkpoint_identity": identity,
+            "profiler": {
+                "window_build_seconds": window_build_seconds,
+                "final_refinement_seconds": fitted.elapsed_seconds,
+                "per_fold_seconds": time.perf_counter() - fold_started,
+            },
+        }
+        if result_path is not None:
+            write_json(result_path, result)
+            (certification_root / "DONE").write_text(
+                "COMPLETED\n", encoding="utf-8"
+            )
         del train, validation, train_target, validation_target, penalty
-        if device.type == "cuda":
-            torch.cuda.empty_cache()
+        return result
+
+    certifications = _parallel_folds(
+        list(zip(folds, normalizations, strict=True)),
+        certify,
+        maximum_workers=concurrent_folds,
+        device=device,
+    )
+    if device.type == "cuda":
+        torch.cuda.empty_cache()
 
     kkt_pass = all(
         float(row["relative_kkt_residual"]) <= 1.0e-8
@@ -417,6 +699,93 @@ def run_development_task(
         "furnace_A_confirmation_accessed": False,
         "furnace_B_access_count": 0,
         "elapsed_seconds": time.perf_counter() - started,
+        "profiler": {
+            **(shared_cache_profiler or {}),
+            "normalization_seconds": normalization_seconds,
+            "concurrent_folds": concurrent_folds,
+            "candidate_batch_size": candidate_batch_size,
+            "per_fold_seconds": [
+                float(row["profiler"]["per_fold_seconds"])
+                for row in final_folds
+            ],
+            "full_anchor_count": int(
+                sum(
+                    int(row["profiler"]["full_anchor_count"])
+                    for row in final_folds
+                )
+            ),
+            "full_anchor_seconds": float(
+                sum(
+                    float(row["profiler"]["full_anchor_seconds"])
+                    for row in final_folds
+                )
+            ),
+            "krylov_iterations_per_anchor": [
+                int(value)
+                for row in final_folds
+                for value in row["profiler"][
+                    "krylov_iterations_per_anchor"
+                ]
+            ],
+            "rb_dimension": [
+                int(row["profiler"]["rb_dimension"])
+                for row in final_folds
+            ],
+            "rb_greedy_iterations": [
+                int(row["profiler"]["rb_greedy_iterations"])
+                for row in final_folds
+            ],
+            "reduced_batch_seconds": float(
+                sum(
+                    float(row["profiler"]["reduced_batch_seconds"])
+                    for row in final_folds
+                )
+            ),
+            "preconditioner_build_seconds": float(
+                sum(
+                    float(
+                        row["profiler"][
+                            "preconditioner_build_seconds"
+                        ]
+                    )
+                    for row in final_folds
+                )
+            ),
+            "operator_forward_calls": int(
+                sum(
+                    int(row["profiler"]["operator_forward_calls"])
+                    for row in final_folds
+                )
+            ),
+            "operator_adjoint_calls": int(
+                sum(
+                    int(row["profiler"]["operator_adjoint_calls"])
+                    for row in final_folds
+                )
+            ),
+            "dr_build_seconds": 0.0,
+            "dr_build_status": "NOT_USED_BY_ORSS_V2_BATCHED",
+            "cpu_gpu_sync_count": 0,
+            "cpu_gpu_sync_count_status": "NOT_INSTRUMENTED",
+            "gpu_kernel_active_fraction": None,
+            "gpu_kernel_active_fraction_status": (
+                "EXTERNAL_TELEMETRY_REQUIRED"
+            ),
+            "effective_df_seconds": 0.0,
+            "final_refinement_seconds": float(
+                sum(
+                    float(
+                        row["profiler"]["final_refinement_seconds"]
+                    )
+                    for row in certifications
+                )
+            ),
+            "peak_vram_bytes": (
+                int(torch.cuda.max_memory_allocated(device))
+                if device.type == "cuda"
+                else 0
+            ),
+        },
     }
 
 

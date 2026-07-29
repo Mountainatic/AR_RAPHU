@@ -124,36 +124,81 @@ class ParametricReducedBasis:
         return self._projected
 
     def solve(self, weights: PenaltyWeights) -> ReducedCandidate:
+        return self.solve_many([weights])[0]
+
+    def solve_many(
+        self, weights: list[PenaltyWeights] | tuple[PenaltyWeights, ...]
+    ) -> list[ReducedCandidate]:
+        if not weights:
+            return []
         h0, lag, amplitude, right = self.project_operators()
-        system = (
-            h0
-            + weights.lag * lag
-            + weights.amplitude * amplitude
-            + weights.ridge
-            * torch.eye(
-                self.dimension, device=h0.device, dtype=h0.dtype
+        lag_weights = torch.as_tensor(
+            [row.lag for row in weights], device=h0.device, dtype=h0.dtype
+        )
+        amplitude_weights = torch.as_tensor(
+            [row.amplitude for row in weights],
+            device=h0.device,
+            dtype=h0.dtype,
+        )
+        ridge_weights = torch.as_tensor(
+            [row.ridge for row in weights], device=h0.device, dtype=h0.dtype
+        )
+        identity = torch.eye(
+            self.dimension, device=h0.device, dtype=h0.dtype
+        )
+        systems = (
+            h0[None, ...]
+            + lag_weights[:, None, None] * lag[None, ...]
+            + amplitude_weights[:, None, None] * amplitude[None, ...]
+            + ridge_weights[:, None, None] * identity[None, ...]
+        )
+        rights = right[None, :].expand(len(weights), -1)
+        coordinates = torch.empty_like(rights)
+        exact_zero = torch.as_tensor(
+            [row.exact_zero for row in weights],
+            device=h0.device,
+            dtype=torch.bool,
+        )
+        regular = ~exact_zero
+        if bool(torch.any(regular)):
+            solved, info = torch.linalg.solve_ex(
+                systems[regular], rights[regular], check_errors=False
             )
+            regular_indices = torch.nonzero(regular, as_tuple=False).flatten()
+            coordinates[regular] = solved
+            failed = torch.nonzero(info != 0, as_tuple=False).flatten()
+            for failed_index in failed.detach().cpu().tolist():
+                row_index = int(regular_indices[failed_index].item())
+                coordinates[row_index] = torch.linalg.lstsq(
+                    systems[row_index], rights[row_index]
+                ).solution
+        for row_index in (
+            torch.nonzero(exact_zero, as_tuple=False)
+            .flatten()
+            .detach()
+            .cpu()
+            .tolist()
+        ):
+            coordinates[row_index] = torch.linalg.lstsq(
+                systems[row_index], rights[row_index]
+            ).solution
+        coefficients = coordinates @ self.basis.T
+        residuals = self.full_residual_many(coefficients, weights)
+        denominator = torch.linalg.vector_norm(self.rhs).clamp_min(
+            torch.finfo(torch.float64).eps
         )
-        if weights.exact_zero:
-            coordinates = torch.linalg.lstsq(system, right).solution
-        else:
-            try:
-                coordinates = torch.linalg.solve(system, right)
-            except torch.linalg.LinAlgError:
-                coordinates = torch.linalg.lstsq(system, right).solution
-        coefficients = self.basis @ coordinates
-        residual = self.full_residual(coefficients, weights)
-        return ReducedCandidate(
-            weights=weights,
-            coefficients=coefficients,
-            reduced_coordinates=coordinates,
-            relative_residual=float(
-                torch.linalg.vector_norm(residual).item()
-                / torch.linalg.vector_norm(self.rhs).clamp_min(
-                    torch.finfo(torch.float64).eps
-                ).item()
-            ),
-        )
+        relative = (
+            torch.linalg.vector_norm(residuals, dim=1) / denominator
+        ).detach().cpu().tolist()
+        return [
+            ReducedCandidate(
+                weights=row,
+                coefficients=coefficients[index],
+                reduced_coordinates=coordinates[index],
+                relative_residual=float(relative[index]),
+            )
+            for index, row in enumerate(weights)
+        ]
 
     def full_residual(
         self, coefficients: torch.Tensor, weights: PenaltyWeights
@@ -166,10 +211,22 @@ class ParametricReducedBasis:
         )
         return self.rhs.to(applied) - applied
 
+    def full_residual_many(
+        self,
+        coefficients: torch.Tensor,
+        weights: list[PenaltyWeights] | tuple[PenaltyWeights, ...],
+    ) -> torch.Tensor:
+        working = coefficients.to(
+            device=self.operator.device, dtype=self.operator.dtype
+        )
+        applied = self.operator.normal_batch(working)
+        applied = applied + self.penalty.normal_batch(working, weights)
+        return self.rhs.to(applied)[None, :] - applied
+
     def scan(
         self, candidates: Iterable[PenaltyWeights]
     ) -> list[ReducedCandidate]:
-        return [self.solve(weights) for weights in candidates]
+        return self.solve_many(list(candidates))
 
     def worst_candidate(
         self, candidates: Iterable[PenaltyWeights]

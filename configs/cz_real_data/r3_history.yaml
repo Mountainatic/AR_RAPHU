@@ -21,13 +21,21 @@
     "allow_tf32_operator": true,
     "allow_tf32_projected": false,
     "usable_vram_fraction": 0.78,
-    "one_active_task": true,
+    "one_active_task": false,
+    "one_active_history_group": true,
     "operator_chunk_time": 2048,
     "operator_chunk_lag": 64,
     "reduced_candidate_batch": 512,
     "cache_basis_on_device": true,
     "cache_windows_on_device": true,
     "cache_dr_transform_on_device": true
+  },
+  "scheduler": {
+    "active_history_groups": 1,
+    "concurrent_folds": "auto",
+    "concurrent_folds_initial": 4,
+    "window_memory_safety_factor": 2.5,
+    "vram_limit_fraction": 0.78
   },
   "krylov": {
     "method": "lsqr",

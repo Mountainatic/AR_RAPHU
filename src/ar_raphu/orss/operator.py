@@ -153,6 +153,21 @@ class BranchCache:
     out_of_domain_fraction: float
 
 
+@dataclass(slots=True)
+class OperatorTimelineCache:
+    external_amplitude: tuple[torch.Tensor, ...]
+    external_inside: tuple[torch.Tensor, ...]
+    ar_amplitude: torch.Tensor
+    ar_inside: torch.Tensor
+    external_lag: torch.Tensor
+    ar_lag: torch.Tensor
+    basis_state: OperatorBasisState
+    train_target_stop: int
+    L_x: int
+    L_y: int
+    continuation_scale_coefficient: float
+
+
 class UrysohnLinearOperator:
     """Centered design operator represented by branch-local basis caches."""
 
@@ -186,6 +201,8 @@ class UrysohnLinearOperator:
         self.device = branches[0].amplitude.device
         self.dtype = branches[0].amplitude.dtype
         self.chunk_time = int(chunk_time)
+        self.operator_forward_calls = 0
+        self.operator_adjoint_calls = 0
         if self.chunk_time < 1:
             raise ValueError("chunk_time must be positive.")
         if feature_mean is None:
@@ -203,6 +220,13 @@ class UrysohnLinearOperator:
 
     def reshape_theta(self, theta: torch.Tensor) -> torch.Tensor:
         return theta.reshape(self.channels, self.m_tau, self.m_x)
+
+    def reshape_theta_batch(self, theta: torch.Tensor) -> torch.Tensor:
+        if theta.ndim != 2 or theta.shape[1] != self.dimension:
+            raise ValueError(
+                "Batched coefficients must have shape (batch, dimension)."
+            )
+        return theta.reshape(-1, self.channels, self.m_tau, self.m_x)
 
     def _raw_forward(self, theta: torch.Tensor) -> torch.Tensor:
         coefficients = self.reshape_theta(theta)
@@ -242,18 +266,91 @@ class UrysohnLinearOperator:
                 )
         return result
 
+    def _raw_forward_batch(self, theta: torch.Tensor) -> torch.Tensor:
+        coefficients = self.reshape_theta_batch(theta)
+        batch = coefficients.shape[0]
+        output = torch.zeros(
+            (self.observations, batch),
+            device=self.device,
+            dtype=self.dtype,
+        )
+        for start in range(0, self.observations, self.chunk_time):
+            stop = min(start + self.chunk_time, self.observations)
+            chunk = torch.zeros(
+                (stop - start, batch),
+                device=self.device,
+                dtype=self.dtype,
+            )
+            for channel, branch in enumerate(self.branches):
+                chunk += torch.einsum(
+                    "nlb,la,kab->nk",
+                    branch.amplitude[start:stop],
+                    branch.lag_basis,
+                    coefficients[:, channel],
+                )
+            output[start:stop] = chunk
+        return output
+
+    def _raw_adjoint_batch(self, residual: torch.Tensor) -> torch.Tensor:
+        if residual.ndim != 2 or residual.shape[0] != self.observations:
+            raise ValueError(
+                "Batched residuals must have shape (observations, batch)."
+            )
+        batch = residual.shape[1]
+        result = torch.zeros(
+            (batch, self.channels, self.m_tau, self.m_x),
+            device=self.device,
+            dtype=self.dtype,
+        )
+        for start in range(0, self.observations, self.chunk_time):
+            stop = min(start + self.chunk_time, self.observations)
+            local = residual[start:stop]
+            for channel, branch in enumerate(self.branches):
+                result[:, channel] += torch.einsum(
+                    "nlb,la,nk->kab",
+                    branch.amplitude[start:stop],
+                    branch.lag_basis,
+                    local,
+                )
+        return result
+
     def forward(self, theta: torch.Tensor) -> torch.Tensor:
+        self.operator_forward_calls += 1
         coefficients = self.reshape_theta(theta)
         centered_offset = torch.sum(self.feature_mean * coefficients)
         return self._raw_forward(theta) - centered_offset
 
     def adjoint(self, residual: torch.Tensor) -> torch.Tensor:
+        self.operator_adjoint_calls += 1
         centered = self._raw_adjoint(residual)
         centered -= self.feature_mean * residual.sum()
         return centered.reshape(-1)
 
     def normal(self, theta: torch.Tensor) -> torch.Tensor:
         return self.adjoint(self.forward(theta)) / self.observations
+
+    def forward_batch(self, theta: torch.Tensor) -> torch.Tensor:
+        self.operator_forward_calls += 1
+        coefficients = self.reshape_theta_batch(theta)
+        centered_offset = torch.einsum(
+            "cab,kcab->k", self.feature_mean, coefficients
+        )
+        return self._raw_forward_batch(theta) - centered_offset[None, :]
+
+    def adjoint_batch(self, residual: torch.Tensor) -> torch.Tensor:
+        self.operator_adjoint_calls += 1
+        centered = self._raw_adjoint_batch(residual)
+        centered -= (
+            residual.sum(dim=0)[:, None, None, None]
+            * self.feature_mean[None, ...]
+        )
+        return centered.reshape(residual.shape[1], -1)
+
+    def normal_batch(self, theta: torch.Tensor) -> torch.Tensor:
+        return (
+            self.adjoint_batch(self.forward_batch(theta))
+            / self.observations
+        )
 
     def rhs(self, centered_target: torch.Tensor) -> torch.Tensor:
         return self.adjoint(centered_target) / self.observations
@@ -281,13 +378,11 @@ def _device_array(
     return host.to(device=device, dtype=dtype, non_blocking=True)
 
 
-def build_urysohn_operator(
+def build_operator_timeline_cache(
     x: np.ndarray,
     y: np.ndarray,
     *,
-    target_indices: np.ndarray,
     train_target_stop: int,
-    horizon: int,
     L_x: int,
     L_y: int,
     lag_basis_count: int,
@@ -295,16 +390,17 @@ def build_urysohn_operator(
     continuation_scale_coefficient: float,
     device: torch.device,
     dtype: torch.dtype,
-    chunk_time: int,
     basis_state: OperatorBasisState | None = None,
-    feature_mean: torch.Tensor | None = None,
-) -> tuple[UrysohnLinearOperator, OperatorBasisState]:
+) -> OperatorTimelineCache:
+    """Evaluate amplitude bases once on the complete timeline.
+
+    Window assembly for different horizons then becomes an indexed gather.
+    The fitted bases remain fold-local and depend only on the fold training
+    prefix, so this cache does not change the leakage boundary.
+    """
+
     x_array = np.asarray(x, dtype=np.float64)
     y_array = np.asarray(y, dtype=np.float64)
-    targets = np.asarray(target_indices, dtype=np.int64)
-    origins = targets - int(horizon)
-    if origins.min() - max(L_x, L_y) + 1 < 0:
-        raise ValueError("History precedes sequence start.")
     degree = 3
     if basis_state is None:
         train_x = x_array[:train_target_stop]
@@ -342,14 +438,28 @@ def build_urysohn_operator(
             lag_basis_count=lag_basis_count,
             amplitude_basis_count=amplitude_basis_count,
         )
+    if basis_state.lag_basis_count != lag_basis_count:
+        raise ValueError("Timeline cache lag basis count mismatch.")
+    if basis_state.amplitude_basis_count != amplitude_basis_count:
+        raise ValueError("Timeline cache amplitude basis count mismatch.")
+
     x_tensor = _device_array(x_array, device=device, dtype=dtype)
     y_tensor = _device_array(y_array, device=device, dtype=dtype)
-    target_host = torch.from_numpy(targets)
-    if device.type == "cuda":
-        target_host = target_host.pin_memory()
-    target_tensor = target_host.to(device=device, non_blocking=True)
-    origin_tensor = target_tensor - int(horizon)
-
+    external_amplitude: list[torch.Tensor] = []
+    external_inside: list[torch.Tensor] = []
+    for variable, basis in enumerate(basis_state.external_bases):
+        amplitude, inside = _bounded_c1_basis(
+            basis,
+            x_tensor[:, variable],
+            scale_factor=continuation_scale_coefficient,
+        )
+        external_amplitude.append(amplitude)
+        external_inside.append(inside)
+    ar_amplitude, ar_inside = _bounded_c1_basis(
+        basis_state.ar_basis,
+        y_tensor,
+        scale_factor=continuation_scale_coefficient,
+    )
     external_lag = _torch_bspline_basis(
         torch.arange(L_x, device=device, dtype=dtype),
         basis_state.external_lag_knots,
@@ -360,35 +470,102 @@ def build_urysohn_operator(
         basis_state.ar_lag_knots,
         degree,
     )
+    return OperatorTimelineCache(
+        external_amplitude=tuple(external_amplitude),
+        external_inside=tuple(external_inside),
+        ar_amplitude=ar_amplitude,
+        ar_inside=ar_inside,
+        external_lag=external_lag,
+        ar_lag=ar_lag,
+        basis_state=basis_state,
+        train_target_stop=int(train_target_stop),
+        L_x=int(L_x),
+        L_y=int(L_y),
+        continuation_scale_coefficient=float(
+            continuation_scale_coefficient
+        ),
+    )
+
+
+def build_urysohn_operator(
+    x: np.ndarray,
+    y: np.ndarray,
+    *,
+    target_indices: np.ndarray,
+    train_target_stop: int,
+    horizon: int,
+    L_x: int,
+    L_y: int,
+    lag_basis_count: int,
+    amplitude_basis_count: int,
+    continuation_scale_coefficient: float,
+    device: torch.device,
+    dtype: torch.dtype,
+    chunk_time: int,
+    basis_state: OperatorBasisState | None = None,
+    feature_mean: torch.Tensor | None = None,
+    timeline_cache: OperatorTimelineCache | None = None,
+) -> tuple[UrysohnLinearOperator, OperatorBasisState]:
+    x_array = np.asarray(x, dtype=np.float64)
+    y_array = np.asarray(y, dtype=np.float64)
+    targets = np.asarray(target_indices, dtype=np.int64)
+    origins = targets - int(horizon)
+    if origins.min() - max(L_x, L_y) + 1 < 0:
+        raise ValueError("History precedes sequence start.")
+    if timeline_cache is None:
+        timeline_cache = build_operator_timeline_cache(
+            x_array,
+            y_array,
+            train_target_stop=train_target_stop,
+            L_x=L_x,
+            L_y=L_y,
+            lag_basis_count=lag_basis_count,
+            amplitude_basis_count=amplitude_basis_count,
+            continuation_scale_coefficient=(
+                continuation_scale_coefficient
+            ),
+            device=device,
+            dtype=dtype,
+            basis_state=basis_state,
+        )
+    if timeline_cache.train_target_stop != int(train_target_stop):
+        raise ValueError("Timeline cache fold boundary mismatch.")
+    if timeline_cache.L_x != int(L_x) or timeline_cache.L_y != int(L_y):
+        raise ValueError("Timeline cache history mismatch.")
+    if (
+        timeline_cache.continuation_scale_coefficient
+        != float(continuation_scale_coefficient)
+    ):
+        raise ValueError("Timeline cache continuation mismatch.")
+    basis_state = timeline_cache.basis_state
+    target_host = torch.from_numpy(targets)
+    if device.type == "cuda":
+        target_host = target_host.pin_memory()
+    target_tensor = target_host.to(device=device, non_blocking=True)
+    origin_tensor = target_tensor - int(horizon)
     external_offsets = torch.arange(L_x, device=device, dtype=torch.int64)
     ar_offsets = torch.arange(L_y, device=device, dtype=torch.int64)
     external_indices = origin_tensor[:, None] - external_offsets[None, :]
     ar_indices = origin_tensor[:, None] - ar_offsets[None, :]
     branches: list[BranchCache] = []
-    for variable, basis in enumerate(basis_state.external_bases):
-        windows = x_tensor[external_indices, variable]
-        amplitude, inside = _bounded_c1_basis(
-            basis,
-            windows,
-            scale_factor=continuation_scale_coefficient,
-        )
+    for variable in range(len(basis_state.external_bases)):
+        amplitude = timeline_cache.external_amplitude[variable][
+            external_indices
+        ]
+        inside = timeline_cache.external_inside[variable][external_indices]
         branches.append(
             BranchCache(
                 amplitude=amplitude,
-                lag_basis=external_lag,
+                lag_basis=timeline_cache.external_lag,
                 out_of_domain_fraction=float((~inside).float().mean().item()),
             )
         )
-    ar_windows = y_tensor[ar_indices]
-    ar_amplitude, ar_inside = _bounded_c1_basis(
-        basis_state.ar_basis,
-        ar_windows,
-        scale_factor=continuation_scale_coefficient,
-    )
+    ar_amplitude = timeline_cache.ar_amplitude[ar_indices]
+    ar_inside = timeline_cache.ar_inside[ar_indices]
     branches.append(
         BranchCache(
             amplitude=ar_amplitude,
-            lag_basis=ar_lag,
+            lag_basis=timeline_cache.ar_lag,
             out_of_domain_fraction=float((~ar_inside).float().mean().item()),
         )
     )
@@ -396,4 +573,3 @@ def build_urysohn_operator(
         branches, feature_mean=feature_mean, chunk_time=chunk_time
     )
     return operator, basis_state
-

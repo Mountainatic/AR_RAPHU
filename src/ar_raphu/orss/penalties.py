@@ -53,6 +53,10 @@ class SeparablePenalty:
         self.amplitude_factor = normalized_second_difference_factor(
             m_x, device=device, dtype=dtype
         )
+        self.lag_normal_matrix = self.lag_factor.T @ self.lag_factor
+        self.amplitude_normal_matrix = (
+            self.amplitude_factor.T @ self.amplitude_factor
+        )
 
     def reshape(self, theta: torch.Tensor) -> torch.Tensor:
         return theta.reshape(self.channels, self.m_tau, self.m_x)
@@ -99,6 +103,53 @@ class SeparablePenalty:
             )
         return result
 
+    def normal_batch(
+        self,
+        theta: torch.Tensor,
+        weights: list[PenaltyWeights] | tuple[PenaltyWeights, ...],
+    ) -> torch.Tensor:
+        if theta.ndim != 2 or theta.shape[1] != self.dimension:
+            raise ValueError(
+                "Batched coefficients must have shape (batch, dimension)."
+            )
+        if len(weights) != theta.shape[0]:
+            raise ValueError("One penalty weight is required per batch row.")
+        coefficients = theta.reshape(
+            -1, self.channels, self.m_tau, self.m_x
+        )
+        lag_weights = torch.as_tensor(
+            [row.lag for row in weights],
+            device=theta.device,
+            dtype=theta.dtype,
+        )
+        amplitude_weights = torch.as_tensor(
+            [row.amplitude for row in weights],
+            device=theta.device,
+            dtype=theta.dtype,
+        )
+        ridge_weights = torch.as_tensor(
+            [row.ridge for row in weights],
+            device=theta.device,
+            dtype=theta.dtype,
+        )
+        result = ridge_weights[:, None, None, None] * coefficients
+        if bool(torch.any(lag_weights != 0)):
+            lagged = torch.einsum(
+                "ij,kcjb->kcib", self.lag_normal_matrix, coefficients
+            )
+            result = result + lag_weights[:, None, None, None] * lagged
+        if bool(torch.any(amplitude_weights != 0)):
+            amplitude = torch.einsum(
+                "ij,kcaj->kcai",
+                self.amplitude_normal_matrix,
+                coefficients,
+            )
+            result = (
+                result
+                + amplitude_weights[:, None, None, None] * amplitude
+            )
+        return result.reshape(theta.shape)
+
     def diagonal(self, weights: PenaltyWeights) -> torch.Tensor:
         lag_diagonal = torch.diagonal(
             self.lag_factor.T @ self.lag_factor
@@ -112,4 +163,3 @@ class SeparablePenalty:
             + weights.ridge
         )
         return block.expand(self.channels, -1, -1).reshape(-1)
-
