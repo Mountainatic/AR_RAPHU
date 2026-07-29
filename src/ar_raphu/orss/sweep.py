@@ -367,8 +367,7 @@ def reduced_sweep(
             for row in candidate_rows
         ),
         "RB_RESIDUAL_CERTIFIED": (
-            not fallback
-            and max(
+            max(
                 float(row["relative_residual_certificate"])
                 for row in candidate_rows
             )
