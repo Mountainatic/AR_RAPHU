@@ -98,12 +98,10 @@ mkdir -p "$LOGS" environment
   git rev-parse HEAD
 } > environment/CZ_5090_RUNTIME.txt
 
-git add -f \
-  src tools tests configs \
-  "$ROOT" \
-  environment \
+git add src tools tests configs environment \
   CZ_COMPLETE_5090_REPORT.md \
   CZ_COMPLETE_5090_STATUS.json
+git add -f "$ROOT"
 git commit -m "Add complete CZ 5090 ORSS experiment results"
 
 bash tools/package_cz_complete.sh \
