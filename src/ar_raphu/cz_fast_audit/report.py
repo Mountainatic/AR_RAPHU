@@ -91,6 +91,7 @@ def build_markdown_report(
     ]
     if decision == "AUDIT_INCOMPLETE":
         lines[10:10] = [
+            "",
             "**未闭合原因：** 三个固定任务的线性和粗非线性 XAR 增量均为负，"
             "但条件输入能量与条件 Gram 又不弱；现有快速证据既不满足继续完整"
             " K 的 GO 条件，也不满足“激励和条件谱均弱”的 NO-GO 条件。",

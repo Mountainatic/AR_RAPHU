@@ -1,0 +1,560 @@
+{
+  "short": {
+    "1": {
+      "0": {
+        "block": "主加热功率",
+        "ridge_alpha": 0.01,
+        "trace": 52.432126705404116,
+        "effective_rank": 4.397478954984283,
+        "entropy_rank": 6.108853029408068,
+        "lambda1_fraction": 0.37319511556930257,
+        "lambda10_over_lambda1": 0.016965311666999168,
+        "condition_estimate": 16846027419.991816,
+        "coercive_dimension": {
+          "0.01": 11,
+          "0.001": 21,
+          "0.0001": 32
+        }
+      },
+      "1": {
+        "block": "晶升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 35.99623011501868,
+        "effective_rank": 6.312258447388216,
+        "entropy_rank": 9.854470456530773,
+        "lambda1_fraction": 0.27446111991928257,
+        "lambda10_over_lambda1": 0.06741995055185626,
+        "condition_estimate": 146319.1081988886,
+        "coercive_dimension": {
+          "0.01": 20,
+          "0.001": 36,
+          "0.0001": 48
+        }
+      },
+      "2": {
+        "block": "晶转速度",
+        "ridge_alpha": 0.01,
+        "trace": 51.15350040825851,
+        "effective_rank": 3.897402660269251,
+        "entropy_rank": 4.8091413803550465,
+        "lambda1_fraction": 0.35248837722071086,
+        "lambda10_over_lambda1": 0.0034805180248758264,
+        "condition_estimate": 1477341.4902090903,
+        "coercive_dimension": {
+          "0.01": 8,
+          "0.001": 15,
+          "0.0001": 27
+        }
+      },
+      "3": {
+        "block": "埚升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 36.1397818543573,
+        "effective_rank": 6.284311831635887,
+        "entropy_rank": 9.777745769022685,
+        "lambda1_fraction": 0.2744349723982393,
+        "lambda10_over_lambda1": 0.06836556560656114,
+        "condition_estimate": 156015.16614378997,
+        "coercive_dimension": {
+          "0.01": 20,
+          "0.001": 35,
+          "0.0001": 48
+        }
+      },
+      "4": {
+        "block": "埚转速度",
+        "ridge_alpha": 0.01,
+        "trace": 61.82704670980125,
+        "effective_rank": 23.933366212345675,
+        "entropy_rank": 30.989895035533475,
+        "lambda1_fraction": 0.08294246296395959,
+        "lambda10_over_lambda1": 0.4416343865040704,
+        "condition_estimate": 686.3335612185476,
+        "coercive_dimension": {
+          "0.01": 51,
+          "0.001": 56,
+          "0.0001": 56
+        }
+      },
+      "joint": {
+        "block": "JOINT_EXTERNAL",
+        "ridge_alpha": 0.01,
+        "trace": 238.6289536081757,
+        "effective_rank": 15.75763275006694,
+        "entropy_rank": 31.516927165883445,
+        "lambda1_fraction": 0.1537079731957649,
+        "lambda10_over_lambda1": 0.1369410247531841,
+        "condition_estimate": 38029026941.877365,
+        "coercive_dimension": {
+          "0.01": 59,
+          "0.001": 107,
+          "0.0001": 151
+        }
+      }
+    },
+    "2": {
+      "0": {
+        "block": "主加热功率",
+        "ridge_alpha": 0.01,
+        "trace": 52.84053884356089,
+        "effective_rank": 4.489567444972664,
+        "entropy_rank": 6.211900023491236,
+        "lambda1_fraction": 0.3650741449807183,
+        "lambda10_over_lambda1": 0.017150296508291665,
+        "condition_estimate": 16477435315.25402,
+        "coercive_dimension": {
+          "0.01": 11,
+          "0.001": 22,
+          "0.0001": 33
+        }
+      },
+      "1": {
+        "block": "晶升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 39.523644802047,
+        "effective_rank": 6.053565816104814,
+        "entropy_rank": 9.47194775803529,
+        "lambda1_fraction": 0.2796733419917415,
+        "lambda10_over_lambda1": 0.0640012567487612,
+        "condition_estimate": 147491.38243174684,
+        "coercive_dimension": {
+          "0.01": 20,
+          "0.001": 35,
+          "0.0001": 48
+        }
+      },
+      "2": {
+        "block": "晶转速度",
+        "ridge_alpha": 0.01,
+        "trace": 52.26228631336152,
+        "effective_rank": 3.697074133084729,
+        "entropy_rank": 4.481421616988406,
+        "lambda1_fraction": 0.40200883021275496,
+        "lambda10_over_lambda1": 0.0014141952612804008,
+        "condition_estimate": 3305316.0318461168,
+        "coercive_dimension": {
+          "0.01": 7,
+          "0.001": 10,
+          "0.0001": 22
+        }
+      },
+      "3": {
+        "block": "埚升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 39.75840932487116,
+        "effective_rank": 6.03130392376309,
+        "entropy_rank": 9.39333018857196,
+        "lambda1_fraction": 0.27914790022742725,
+        "lambda10_over_lambda1": 0.0649902964526561,
+        "condition_estimate": 157686.59114176186,
+        "coercive_dimension": {
+          "0.01": 19,
+          "0.001": 34,
+          "0.0001": 48
+        }
+      },
+      "4": {
+        "block": "埚转速度",
+        "ridge_alpha": 0.01,
+        "trace": 62.65001479556829,
+        "effective_rank": 23.630617290405876,
+        "entropy_rank": 30.574082759648434,
+        "lambda1_fraction": 0.08513978968371975,
+        "lambda10_over_lambda1": 0.4456162916364544,
+        "condition_estimate": 736.4520533459287,
+        "coercive_dimension": {
+          "0.01": 51,
+          "0.001": 56,
+          "0.0001": 56
+        }
+      },
+      "joint": {
+        "block": "JOINT_EXTERNAL",
+        "ridge_alpha": 0.01,
+        "trace": 247.97555726235188,
+        "effective_rank": 16.276629241749838,
+        "entropy_rank": 31.521718497016778,
+        "lambda1_fraction": 0.15428888892751,
+        "lambda10_over_lambda1": 0.1431219808765684,
+        "condition_estimate": 38295171863.819016,
+        "coercive_dimension": {
+          "0.01": 59,
+          "0.001": 106,
+          "0.0001": 148
+        }
+      }
+    }
+  },
+  "medium": {
+    "1": {
+      "0": {
+        "block": "主加热功率",
+        "ridge_alpha": 1e-08,
+        "trace": 41.89060836472276,
+        "effective_rank": 4.358859451140721,
+        "entropy_rank": 6.269652388303886,
+        "lambda1_fraction": 0.39434312205361466,
+        "lambda10_over_lambda1": 0.02778479439047664,
+        "condition_estimate": 7516145313.550297,
+        "coercive_dimension": {
+          "0.01": 11,
+          "0.001": 19,
+          "0.0001": 32
+        }
+      },
+      "1": {
+        "block": "晶升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 37.893737119860695,
+        "effective_rank": 6.8232772064019445,
+        "entropy_rank": 11.039798941056183,
+        "lambda1_fraction": 0.2907105031632519,
+        "lambda10_over_lambda1": 0.06401494244086829,
+        "condition_estimate": 746620.4147318742,
+        "coercive_dimension": {
+          "0.01": 22,
+          "0.001": 37,
+          "0.0001": 49
+        }
+      },
+      "2": {
+        "block": "晶转速度",
+        "ridge_alpha": 0.01,
+        "trace": 48.831739257376974,
+        "effective_rank": 3.787220816020881,
+        "entropy_rank": 4.804082959480013,
+        "lambda1_fraction": 0.36889269601140434,
+        "lambda10_over_lambda1": 0.00657456418096639,
+        "condition_estimate": 1055443.8668422403,
+        "coercive_dimension": {
+          "0.01": 9,
+          "0.001": 15,
+          "0.0001": 31
+        }
+      },
+      "3": {
+        "block": "埚升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 38.065430830247095,
+        "effective_rank": 6.810681992481149,
+        "entropy_rank": 10.981422001434797,
+        "lambda1_fraction": 0.2909052835148395,
+        "lambda10_over_lambda1": 0.06400375131316957,
+        "condition_estimate": 914058.9806704881,
+        "coercive_dimension": {
+          "0.01": 22,
+          "0.001": 37,
+          "0.0001": 49
+        }
+      },
+      "4": {
+        "block": "埚转速度",
+        "ridge_alpha": 0.0001,
+        "trace": 55.215102145977625,
+        "effective_rank": 20.608883696274532,
+        "entropy_rank": 28.62967758731549,
+        "lambda1_fraction": 0.10987453837563084,
+        "lambda10_over_lambda1": 0.2832753020760408,
+        "condition_estimate": 1051.208211331916,
+        "coercive_dimension": {
+          "0.01": 49,
+          "0.001": 55,
+          "0.0001": 56
+        }
+      },
+      "joint": {
+        "block": "JOINT_EXTERNAL",
+        "ridge_alpha": 1e-08,
+        "trace": 221.58678898153488,
+        "effective_rank": 13.686841894075148,
+        "entropy_rank": 28.17555858622139,
+        "lambda1_fraction": 0.17091780232197704,
+        "lambda10_over_lambda1": 0.14887847739788973,
+        "condition_estimate": 683439818006.8053,
+        "coercive_dimension": {
+          "0.01": 56,
+          "0.001": 98,
+          "0.0001": 139
+        }
+      }
+    },
+    "2": {
+      "0": {
+        "block": "主加热功率",
+        "ridge_alpha": 1e-08,
+        "trace": 42.61682216964225,
+        "effective_rank": 4.410288326581089,
+        "entropy_rank": 6.359832339582117,
+        "lambda1_fraction": 0.3909935058571845,
+        "lambda10_over_lambda1": 0.02712578873868374,
+        "condition_estimate": 7488073669.69324,
+        "coercive_dimension": {
+          "0.01": 11,
+          "0.001": 19,
+          "0.0001": 32
+        }
+      },
+      "1": {
+        "block": "晶升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 42.614326740710176,
+        "effective_rank": 6.3360500732960965,
+        "entropy_rank": 10.343439699359084,
+        "lambda1_fraction": 0.30439370365231017,
+        "lambda10_over_lambda1": 0.05453986380349639,
+        "condition_estimate": 785277.297533877,
+        "coercive_dimension": {
+          "0.01": 22,
+          "0.001": 37,
+          "0.0001": 48
+        }
+      },
+      "2": {
+        "block": "晶转速度",
+        "ridge_alpha": 0.01,
+        "trace": 51.56839676825578,
+        "effective_rank": 3.568053234842463,
+        "entropy_rank": 4.420196669371061,
+        "lambda1_fraction": 0.41810793881130237,
+        "lambda10_over_lambda1": 0.0026999551490377704,
+        "condition_estimate": 2597407.002315957,
+        "coercive_dimension": {
+          "0.01": 7,
+          "0.001": 11,
+          "0.0001": 23
+        }
+      },
+      "3": {
+        "block": "埚升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 42.83624383040148,
+        "effective_rank": 6.335435832047038,
+        "entropy_rank": 10.288861060546504,
+        "lambda1_fraction": 0.3036730157403165,
+        "lambda10_over_lambda1": 0.05459949396846276,
+        "condition_estimate": 930991.8444340423,
+        "coercive_dimension": {
+          "0.01": 22,
+          "0.001": 37,
+          "0.0001": 48
+        }
+      },
+      "4": {
+        "block": "埚转速度",
+        "ridge_alpha": 0.0001,
+        "trace": 58.80360969142484,
+        "effective_rank": 20.94950292486726,
+        "entropy_rank": 28.626190952688784,
+        "lambda1_fraction": 0.10525539530454059,
+        "lambda10_over_lambda1": 0.3203204113612242,
+        "condition_estimate": 986.7686674178939,
+        "coercive_dimension": {
+          "0.01": 49,
+          "0.001": 56,
+          "0.0001": 56
+        }
+      },
+      "joint": {
+        "block": "JOINT_EXTERNAL",
+        "ridge_alpha": 1e-08,
+        "trace": 238.2562533883263,
+        "effective_rank": 14.086127573938533,
+        "entropy_rank": 28.58132950003519,
+        "lambda1_fraction": 0.179533219336113,
+        "lambda10_over_lambda1": 0.1443761605019234,
+        "condition_estimate": 578706863413.5038,
+        "coercive_dimension": {
+          "0.01": 56,
+          "0.001": 101,
+          "0.0001": 136
+        }
+      }
+    }
+  },
+  "long": {
+    "1": {
+      "0": {
+        "block": "主加热功率",
+        "ridge_alpha": 0.01,
+        "trace": 47.76482975127656,
+        "effective_rank": 4.858921364356581,
+        "entropy_rank": 6.573372578081001,
+        "lambda1_fraction": 0.3405996200086211,
+        "lambda10_over_lambda1": 0.01673894515260895,
+        "condition_estimate": 4926656798.058315,
+        "coercive_dimension": {
+          "0.01": 11,
+          "0.001": 19,
+          "0.0001": 28
+        }
+      },
+      "1": {
+        "block": "晶升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 38.89512489910611,
+        "effective_rank": 6.063415843430221,
+        "entropy_rank": 9.444933062669907,
+        "lambda1_fraction": 0.3216573986535983,
+        "lambda10_over_lambda1": 0.0582754669823267,
+        "condition_estimate": 38684297.18059603,
+        "coercive_dimension": {
+          "0.01": 17,
+          "0.001": 31,
+          "0.0001": 43
+        }
+      },
+      "2": {
+        "block": "晶转速度",
+        "ridge_alpha": 0.01,
+        "trace": 46.68866478355054,
+        "effective_rank": 3.7204223077336187,
+        "entropy_rank": 4.696206292170434,
+        "lambda1_fraction": 0.38345514797190766,
+        "lambda10_over_lambda1": 0.004977611837262143,
+        "condition_estimate": 1345543.0011043765,
+        "coercive_dimension": {
+          "0.01": 8,
+          "0.001": 15,
+          "0.0001": 27
+        }
+      },
+      "3": {
+        "block": "埚升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 39.079206917497345,
+        "effective_rank": 6.060817055934086,
+        "entropy_rank": 9.422322382225216,
+        "lambda1_fraction": 0.3222083478171542,
+        "lambda10_over_lambda1": 0.05828587672129718,
+        "condition_estimate": 48302554.41368597,
+        "coercive_dimension": {
+          "0.01": 17,
+          "0.001": 31,
+          "0.0001": 43
+        }
+      },
+      "4": {
+        "block": "埚转速度",
+        "ridge_alpha": 0.01,
+        "trace": 48.124234301316505,
+        "effective_rank": 17.02328140929782,
+        "entropy_rank": 24.816050555078277,
+        "lambda1_fraction": 0.13997710016919618,
+        "lambda10_over_lambda1": 0.2347972616497143,
+        "condition_estimate": 1283.9667237113044,
+        "coercive_dimension": {
+          "0.01": 43,
+          "0.001": 54,
+          "0.0001": 56
+        }
+      },
+      "joint": {
+        "block": "JOINT_EXTERNAL",
+        "ridge_alpha": 0.01,
+        "trace": 221.98273110059512,
+        "effective_rank": 11.432524515383529,
+        "entropy_rank": 21.439165026253747,
+        "lambda1_fraction": 0.19611789490692155,
+        "lambda10_over_lambda1": 0.14721384307130966,
+        "condition_estimate": 727176302071.016,
+        "coercive_dimension": {
+          "0.01": 42,
+          "0.001": 77,
+          "0.0001": 108
+        }
+      }
+    },
+    "2": {
+      "0": {
+        "block": "主加热功率",
+        "ridge_alpha": 0.01,
+        "trace": 48.460842894076755,
+        "effective_rank": 4.894331944114609,
+        "entropy_rank": 6.750040566821825,
+        "lambda1_fraction": 0.3417092553324137,
+        "lambda10_over_lambda1": 0.02790655856916591,
+        "condition_estimate": 4992909303.422253,
+        "coercive_dimension": {
+          "0.01": 11,
+          "0.001": 20,
+          "0.0001": 30
+        }
+      },
+      "1": {
+        "block": "晶升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 44.77166386000802,
+        "effective_rank": 5.741334300472949,
+        "entropy_rank": 8.970127849457876,
+        "lambda1_fraction": 0.323003922628083,
+        "lambda10_over_lambda1": 0.04845112299438034,
+        "condition_estimate": 18285642.763431866,
+        "coercive_dimension": {
+          "0.01": 17,
+          "0.001": 32,
+          "0.0001": 43
+        }
+      },
+      "2": {
+        "block": "晶转速度",
+        "ridge_alpha": 0.01,
+        "trace": 51.045180578891895,
+        "effective_rank": 3.4606690942566094,
+        "entropy_rank": 4.349693056023657,
+        "lambda1_fraction": 0.4275701124893635,
+        "lambda10_over_lambda1": 0.002461855621377394,
+        "condition_estimate": 3717435.825935745,
+        "coercive_dimension": {
+          "0.01": 8,
+          "0.001": 12,
+          "0.0001": 21
+        }
+      },
+      "3": {
+        "block": "埚升速度",
+        "ridge_alpha": 1e-08,
+        "trace": 44.95910143067471,
+        "effective_rank": 5.758424960542242,
+        "entropy_rank": 8.96002816155437,
+        "lambda1_fraction": 0.3223710107086636,
+        "lambda10_over_lambda1": 0.0490564214287647,
+        "condition_estimate": 23555886.323632553,
+        "coercive_dimension": {
+          "0.01": 17,
+          "0.001": 32,
+          "0.0001": 43
+        }
+      },
+      "4": {
+        "block": "埚转速度",
+        "ridge_alpha": 0.01,
+        "trace": 54.12951213718166,
+        "effective_rank": 17.298152376160377,
+        "entropy_rank": 25.466036859878294,
+        "lambda1_fraction": 0.1507166240643061,
+        "lambda10_over_lambda1": 0.2404109657745945,
+        "condition_estimate": 1573.145485382516,
+        "coercive_dimension": {
+          "0.01": 43,
+          "0.001": 55,
+          "0.0001": 56
+        }
+      },
+      "joint": {
+        "block": "JOINT_EXTERNAL",
+        "ridge_alpha": 0.01,
+        "trace": 244.4908212852502,
+        "effective_rank": 11.810686841277715,
+        "entropy_rank": 22.58457893745991,
+        "lambda1_fraction": 0.19399354849281444,
+        "lambda10_over_lambda1": 0.13914333892692668,
+        "condition_estimate": 655200219193.1533,
+        "coercive_dimension": {
+          "0.01": 45,
+          "0.001": 84,
+          "0.0001": 116
+        }
+      }
+    }
+  }
+}

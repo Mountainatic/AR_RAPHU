@@ -1,0 +1,38 @@
+{
+  "status": "AUDIT_INCOMPLETE",
+  "furnace_b_access_count": 0,
+  "runtime_seconds": 74.45001244544983,
+  "positive_increment_horizons": [],
+  "conditional_energy_summary": {
+    "maximum_ratio": 1.890663394938762,
+    "threshold": 0.05,
+    "has_at_least_one_input_at_threshold": true
+  },
+  "conditional_gram_summary": {
+    "joint_median_effective_rank": 13.88648473400684,
+    "joint_median_coercive_dimension_1e-3": 99.5,
+    "moderate_for_full_go": true,
+    "supports_low_dimensional_subspace": true
+  },
+  "q_stability_summary": {
+    "by_task": {},
+    "medium_or_long_predictive_gain_with_moderate_stability": false
+  },
+  "k_low_order_summary": {
+    "stable_mode_count": 0,
+    "stable_modes": []
+  },
+  "increment_summary": {
+    "mean_delta_by_task": {
+      "long": -740.1096459134936,
+      "medium": -812.7318232635621,
+      "short": -834.1732738514714
+    },
+    "two_fold_direction_consistent": {
+      "long": false,
+      "medium": false,
+      "short": false
+    }
+  },
+  "next_allowed_stage": "NONE_AMBIGUOUS_FAST_EVIDENCE"
+}

@@ -1,0 +1,63 @@
+{
+  "schema": "CZ_FAST_GO_NOGO_IDENTIFIABILITY_AUDIT_V1",
+  "started_utc": "2026-07-29T15:32:28.911907+00:00",
+  "device": "cuda:0",
+  "device_name": "NVIDIA GeForce RTX 5090",
+  "solver": "dense_batched",
+  "primary_dtype": "float64",
+  "allow_tf32": false,
+  "torch_version": "2.8.0+cu128",
+  "cuda_version": "12.8",
+  "python_version": "3.10.20",
+  "git_commit": "421f55c2acbadc4ebf8a79b5ec12d385050e0f88",
+  "git_branch": "cz-fast-go-nogo-v1",
+  "environment_threads": {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1"
+  },
+  "stages": {
+    "FAST_A": {
+      "status": "COMPLETED",
+      "elapsed_seconds": 8.22634785529226,
+      "maximum_seconds": 1200.0
+    },
+    "FAST_B": {
+      "status": "COMPLETED",
+      "elapsed_seconds": 6.5065677016973495,
+      "maximum_seconds": 900.0
+    },
+    "FAST_C": {
+      "status": "COMPLETED",
+      "elapsed_seconds": 26.329556639306247,
+      "maximum_seconds": 1200.0
+    },
+    "FAST_D": {
+      "status": "COMPLETED",
+      "elapsed_seconds": 2.2713115280494094,
+      "maximum_seconds": 1200.0
+    },
+    "FAST_E": {
+      "status": "COMPLETED",
+      "elapsed_seconds": 30.278405158780515,
+      "maximum_seconds": 2700.0
+    },
+    "FAST_F_G": {
+      "status": "COMPLETED",
+      "elapsed_seconds": 7.69682228565216e-05,
+      "maximum_seconds": 900.0
+    }
+  },
+  "data": {
+    "source_file": "实验数据1.xlsx",
+    "source_sha256": "c46e0d35d26903386fd80408f36660c4f8925a5dbc56c92527f020e433ef04de",
+    "source_sheet": "Sheet1",
+    "total_samples": 20103,
+    "development_samples_used": 16082,
+    "furnace_b_access_count": 0
+  },
+  "completed_utc": "2026-07-29T15:33:43.361943+00:00",
+  "elapsed_seconds": 74.45001244544983,
+  "status": "AUDIT_INCOMPLETE"
+}

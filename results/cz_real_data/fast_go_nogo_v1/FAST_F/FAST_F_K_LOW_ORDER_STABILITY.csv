@@ -1,0 +1,16 @@
+task,input,input_index,status
+short,主加热功率,0,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+short,晶升速度,1,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+short,晶转速度,2,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+short,埚升速度,3,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+short,埚转速度,4,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+medium,主加热功率,0,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+medium,晶升速度,1,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+medium,晶转速度,2,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+medium,埚升速度,3,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+medium,埚转速度,4,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+long,主加热功率,0,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+long,晶升速度,1,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+long,晶转速度,2,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+long,埚升速度,3,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
+long,埚转速度,4,K_NOT_TESTED_DUE_TO_NO_Q_GAIN
