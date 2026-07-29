@@ -19,6 +19,11 @@ from ar_raphu.orss.operator import (
 )
 from ar_raphu.orss.penalties import PenaltyWeights, SeparablePenalty
 from ar_raphu.orss.reduced_basis import ParametricReducedBasis
+from ar_raphu.orss.sweep import (
+    candidate_grid,
+    diagonal_spectral_normalization,
+    reduced_sweep,
+)
 from ar_raphu.spectral.design import (
     build_ar_nuisance_design,
     build_spectral_design,
@@ -211,6 +216,54 @@ def test_reduced_basis_recovers_anchor_solution() -> None:
     assert candidate.relative_residual <= 1.0e-9
 
 
+def test_matrix_free_penalty_sweep_has_complete_grid() -> None:
+    torch.manual_seed(17)
+    observations, lag_count, m_tau, m_x = 48, 4, 3, 3
+    branch = BranchCache(
+        amplitude=torch.randn(
+            observations, lag_count, m_x, dtype=torch.float64
+        ),
+        lag_basis=torch.randn(lag_count, m_tau, dtype=torch.float64),
+        out_of_domain_fraction=0.0,
+    )
+    train = UrysohnLinearOperator([branch], chunk_time=13)
+    validation = UrysohnLinearOperator(
+        [branch], feature_mean=train.feature_mean, chunk_time=11
+    )
+    penalty = SeparablePenalty(
+        channels=1,
+        m_tau=m_tau,
+        m_x=m_x,
+        device=torch.device("cpu"),
+        dtype=torch.float64,
+    )
+    normalization = diagonal_spectral_normalization(train, penalty)
+    candidates, grids = candidate_grid(
+        normalization.lower,
+        normalization.upper,
+        positive_points=2,
+    )
+    target = torch.randn(observations, dtype=torch.float64)
+    target -= target.mean()
+    result = reduced_sweep(
+        train,
+        validation,
+        target,
+        target,
+        target_mean=0.0,
+        candidates=candidates,
+        grids=grids,
+        normalization=normalization,
+        residual_tolerance=1.0e-5,
+        maximum_dimension=9,
+        krylov_tolerance=1.0e-10,
+        maximum_iterations=500,
+    )
+    assert len(candidates) == 27
+    assert len(result["candidate_rows"]) == 27
+    assert result["maximum_relative_residual"] <= 1.0e-5
+
+
 def test_iterative_refinement_reaches_fp64_kkt() -> None:
     matrix = torch.tensor(
         [[4.0, 1.0], [1.0, 3.0]], dtype=torch.float64
@@ -254,4 +307,3 @@ def test_real_cuda_dispatch() -> None:
         )
     )
     assert result.is_cuda
-
