@@ -169,10 +169,20 @@ def solve_full(
             maximum_iterations=maximum_iterations,
             initial=initial,
         )
-        coefficients = result.coefficients
-        relative = result.relative_kkt_residual
-        iterations = result.iterations
-        method = "ZERO_ENDPOINT_LSQR_MINIMUM_NORM"
+        refinement = pcg_normal(
+            operator.normal,
+            operator.rhs(centered_target),
+            initial=result.coefficients,
+            preconditioner=build_diagonal_preconditioner(
+                operator, penalty, weights
+            ),
+            relative_tolerance=relative_tolerance,
+            maximum_iterations=max(maximum_iterations, 2500),
+        )
+        coefficients = refinement.coefficients
+        relative = refinement.relative_residual
+        iterations = result.iterations + refinement.iterations
+        method = "ZERO_ENDPOINT_LSQR_MINIMUM_NORM_PLUS_PCG_REFINEMENT"
     else:
         rhs = operator.rhs(centered_target)
         preconditioner = build_diagonal_preconditioner(
