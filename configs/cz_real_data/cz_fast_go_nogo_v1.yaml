@@ -1,0 +1,65 @@
+{
+  "schema": "CZ_FAST_GO_NOGO_IDENTIFIABILITY_AUDIT_V1",
+  "runtime": {
+    "device": "cuda:0",
+    "solver": "dense_batched",
+    "primary_dtype": "float64",
+    "allow_tf32": false,
+    "max_total_minutes": 120,
+    "stage_max_minutes": {
+      "FAST_A": 20,
+      "FAST_B": 15,
+      "FAST_C": 20,
+      "FAST_D": 20,
+      "FAST_E": 45,
+      "FAST_F_G": 15
+    }
+  },
+  "data": {
+    "furnace_a_only": true,
+    "furnace_b_access_count_required": 0,
+    "development_fraction": 0.8
+  },
+  "history_tasks": [
+    {"name": "short", "Lx": 64, "Ly": 16, "h": 1, "max_correlation_lag": 50},
+    {"name": "medium", "Lx": 256, "Ly": 32, "h": 15, "max_correlation_lag": 150},
+    {"name": "long", "Lx": 512, "Ly": 64, "h": 60, "max_correlation_lag": 300}
+  ],
+  "folds": [
+    {"train": [0.0, 0.5], "validation": [0.5, 0.6]},
+    {"train": [0.0, 0.7], "validation": [0.7, 0.8]}
+  ],
+  "coarse_xar": {
+    "Mtau": 8,
+    "Mx": 8,
+    "continuation_c_rho": 1.0,
+    "penalty_path": [0.0, 1.0e-6, 1.0e-4, 1.0e-2, 1.0],
+    "penalty_coupled": true,
+    "penalty_expansion": false
+  },
+  "conditional_energy": {
+    "ridge_grid": [1.0e-8, 1.0e-6, 1.0e-4, 1.0e-2]
+  },
+  "linear": {
+    "ridge_grid": [0.0, 1.0e-8, 1.0e-6, 1.0e-4, 1.0e-2, 1.0]
+  },
+  "conditional_gram": {
+    "top_eigenvalues": 20,
+    "coercivity_ratios": [1.0e-2, 1.0e-3, 1.0e-4]
+  },
+  "bootstrap": {
+    "development_replicates": 100,
+    "block_length_mode": "automatic",
+    "random_seed": 20260729
+  },
+  "gates": {
+    "minimum_positive_horizons_for_full_go": 2,
+    "minimum_conditional_energy_ratio": 0.05,
+    "minimum_joint_effective_rank_for_full_go": 3.0,
+    "minimum_joint_coercive_dimension_for_full_go": 5,
+    "minimum_joint_coercive_dimension_for_partial_k": 2,
+    "q_stability_high": 0.8,
+    "q_stability_moderate": 0.5,
+    "k_mode_correlation_threshold": 0.8
+  }
+}
