@@ -1,0 +1,41 @@
+{
+  "schema": "CZ_R4_BASELINES_V1",
+  "runtime": {"device": "cuda:0"},
+  "data": {
+    "furnace_a_filename": "实验数据1.xlsx",
+    "furnace_a_sha256": "c46e0d35d26903386fd80408f36660c4f8925a5dbc56c92527f020e433ef04de"
+  },
+  "horizons": [1, 5, 15, 30, 60],
+  "compressed_lag_taps": 8,
+  "sequence_taps": 16,
+  "pNARX": {
+    "polynomial_degree": 2,
+    "ridge_weight": 0.0001
+  },
+  "MLP_NARX": {
+    "hidden": 64,
+    "epochs": 300,
+    "batch_size": 2048,
+    "learning_rate": 0.001,
+    "validation_interval": 5,
+    "patience": 30,
+    "seed": 2401
+  },
+  "GRU": {
+    "hidden": 32,
+    "epochs": 200,
+    "batch_size": 2048,
+    "learning_rate": 0.001,
+    "validation_interval": 5,
+    "patience": 30,
+    "seed": 2402
+  },
+  "AKGNN": {
+    "status": "NOT_APPLICABLE",
+    "reason": "No reproducible multivariate CZ implementation is present."
+  },
+  "Stage1TargetDelayKAN": {
+    "status": "NOT_APPLICABLE",
+    "reason": "No protocol-compatible checkpoint or implementation is present."
+  }
+}

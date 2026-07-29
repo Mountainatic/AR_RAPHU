@@ -1,0 +1,44 @@
+{
+  "schema": "CZ_R3_RESOLUTION_ORSS_V1",
+  "runtime": {"device": "cuda:0"},
+  "data": {
+    "furnace_a_filename": "实验数据1.xlsx",
+    "furnace_a_sha256": "c46e0d35d26903386fd80408f36660c4f8925a5dbc56c92527f020e433ef04de"
+  },
+  "cuda": {
+    "allow_tf32_operator": true,
+    "operator_chunk_time": 2048,
+    "one_active_task": true
+  },
+  "krylov": {
+    "maximum_iterations": 1000,
+    "relative_tolerance_development": 1e-5,
+    "relative_tolerance_confirmation": 1e-8
+  },
+  "reduced_basis": {
+    "maximum_dimension": 128,
+    "residual_tolerance_development": 1e-5,
+    "residual_tolerance_confirmation": 1e-7
+  },
+  "penalty": {
+    "exact_zero_endpoint": true,
+    "positive_grid_points": 7,
+    "maximum_edge_expansions": 2
+  },
+  "resolution": {
+    "Mtau": [16, 32, 48, 64],
+    "Mx": [16, 20, 24, 28, 32],
+    "representation_gate_primary_relative_error": 0.05,
+    "representation_gate_sensitivity": [0.02, 0.10],
+    "lepski_multiplier": 4.0,
+    "simultaneous_confidence": 0.95,
+    "bootstrap_replicates": 250
+  },
+  "continuation_scale_coefficient": 1.0,
+  "horizons": [1, 5, 15, 30, 60],
+  "checkpoint": {
+    "resume": true,
+    "verify_config_hash": true,
+    "verify_source_commit": true
+  }
+}

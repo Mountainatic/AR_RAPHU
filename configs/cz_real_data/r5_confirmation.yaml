@@ -1,0 +1,11 @@
+{
+  "schema": "CZ_R5_CONFIRMATION_ORSS_V1",
+  "runtime": {"device": "cuda:0"},
+  "data": {
+    "furnace_a_filename": "实验数据1.xlsx",
+    "furnace_a_sha256": "c46e0d35d26903386fd80408f36660c4f8925a5dbc56c92527f020e433ef04de"
+  },
+  "cuda": {"operator_chunk_time": 2048},
+  "protocol_frozen": true,
+  "retuning_forbidden": true
+}
