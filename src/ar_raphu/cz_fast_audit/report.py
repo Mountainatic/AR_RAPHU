@@ -61,6 +61,10 @@ def build_markdown_report(
     stable_k = [
         row for row in k_rows if row.get("status") == "K_LOW_ORDER_STABLE"
     ]
+    k_not_tested = any(
+        row.get("status") == "K_NOT_TESTED_DUE_TO_NO_Q_GAIN"
+        for row in k_rows
+    )
     generated = datetime.now(timezone.utc).isoformat()
     decision = str(status["status"])
     next_stage = str(status["next_allowed_stage"])
@@ -85,6 +89,13 @@ def build_markdown_report(
         "| 尺度 | horizon | 线性 Δ(X|AR) 两折均值 | 粗非线性 Δ(X|AR) 两折均值 | 两折方向一致 |",
         "|---|---:|---:|---:|---|",
     ]
+    if decision == "AUDIT_INCOMPLETE":
+        lines[10:10] = [
+            "**未闭合原因：** 三个固定任务的线性和粗非线性 XAR 增量均为负，"
+            "但条件输入能量与条件 Gram 又不弱；现有快速证据既不满足继续完整"
+            " K 的 GO 条件，也不满足“激励和条件谱均弱”的 NO-GO 条件。",
+            "",
+        ]
     horizons = {"short": 1, "medium": 15, "long": 60}
     for task in ("short", "medium", "long"):
         coarse_values = coarse_by_task.get(task, [])
@@ -124,7 +135,12 @@ def build_markdown_report(
         f"`{_fmt(status['conditional_gram_summary'].get('joint_median_effective_rank', 0.0))}`。",
         f"- `1e-3` 相对谱阈值下的中位 coercive dimension："
         f"`{_fmt(status['conditional_gram_summary'].get('joint_median_coercive_dimension_1e-3', 0.0))}`。",
-        f"- 跨折稳定的低阶 K mode 数量：`{len(stable_k)}`。",
+        (
+            "- 低阶 K 稳定性：`K_NOT_TESTED_DUE_TO_NO_Q_GAIN`；FAST-E "
+            "没有正的 Q 增量，因此合同禁止将其解释为 K 不稳定。"
+            if k_not_tested
+            else f"- 跨折稳定的低阶 K mode 数量：`{len(stable_k)}`。"
+        ),
     ]
     if stable_k:
         lines += [
