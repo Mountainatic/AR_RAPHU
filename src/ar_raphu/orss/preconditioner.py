@@ -136,6 +136,50 @@ class ChannelBlockPreconditioner:
         )
 
 
+@dataclass(slots=True)
+class BatchedChannelBlockPreconditioner:
+    channels: int
+    block_dimension: int
+    factors: torch.Tensor
+    numerical_jitter: tuple[tuple[float, ...], ...]
+
+    def _reshape(self, vector: torch.Tensor) -> torch.Tensor:
+        return vector.to(self.factors.dtype).reshape(
+            -1, self.channels, self.block_dimension, 1
+        )
+
+    def solve(self, vector: torch.Tensor) -> torch.Tensor:
+        shaped = self._reshape(vector)
+        return (
+            torch.cholesky_solve(shaped, self.factors)
+            .reshape(vector.shape)
+            .to(vector.dtype)
+        )
+
+    def coefficients_to_scaled(self, vector: torch.Tensor) -> torch.Tensor:
+        shaped = self._reshape(vector)
+        scaled = self.factors.transpose(-1, -2) @ shaped
+        return scaled.reshape(vector.shape).to(vector.dtype)
+
+    def scaled_to_coefficients(self, vector: torch.Tensor) -> torch.Tensor:
+        shaped = self._reshape(vector)
+        coefficients = torch.linalg.solve_triangular(
+            self.factors.transpose(-1, -2),
+            shaped,
+            upper=True,
+        )
+        return coefficients.reshape(vector.shape).to(vector.dtype)
+
+    def gradient_to_scaled(self, vector: torch.Tensor) -> torch.Tensor:
+        shaped = self._reshape(vector)
+        scaled = torch.linalg.solve_triangular(
+            self.factors,
+            shaped,
+            upper=False,
+        )
+        return scaled.reshape(vector.shape).to(vector.dtype)
+
+
 def spectral_penalty_coordinates(
     penalty: SeparablePenalty,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -356,6 +400,95 @@ def build_channel_block_preconditioner(
         factors=factors,
         numerical_jitter=tuple(
             float(value) for value in jitters.detach().cpu().tolist()
+        ),
+    )
+
+
+def build_batched_channel_block_preconditioner(
+    operator: UrysohnLinearOperator,
+    penalty: SeparablePenalty,
+    weights: list[PenaltyWeights],
+    *,
+    data_blocks: torch.Tensor | None = None,
+) -> BatchedChannelBlockPreconditioner:
+    if not weights:
+        raise ValueError("Batched channel-block preconditioner is empty.")
+    if data_blocks is None:
+        data_blocks = data_normal_channel_blocks(operator)
+    factor_dtype = torch.float64
+    data_blocks = data_blocks.to(factor_dtype)
+    identity_tau = torch.eye(
+        penalty.m_tau, device=operator.device, dtype=factor_dtype
+    )
+    identity_x = torch.eye(
+        penalty.m_x, device=operator.device, dtype=factor_dtype
+    )
+    lag_block = torch.kron(
+        penalty.lag_normal_matrix.to(factor_dtype), identity_x
+    )
+    amplitude_block = torch.kron(
+        identity_tau, penalty.amplitude_normal_matrix.to(factor_dtype)
+    )
+    ridge_block = torch.eye(
+        penalty.m_tau * penalty.m_x,
+        device=operator.device,
+        dtype=factor_dtype,
+    )
+    lag_weights = torch.as_tensor(
+        [row.lag for row in weights],
+        device=operator.device,
+        dtype=factor_dtype,
+    )
+    amplitude_weights = torch.as_tensor(
+        [row.amplitude for row in weights],
+        device=operator.device,
+        dtype=factor_dtype,
+    )
+    ridge_weights = torch.as_tensor(
+        [row.ridge for row in weights],
+        device=operator.device,
+        dtype=factor_dtype,
+    )
+    penalty_blocks = (
+        lag_weights[:, None, None] * lag_block[None, ...]
+        + amplitude_weights[:, None, None] * amplitude_block[None, ...]
+        + ridge_weights[:, None, None] * ridge_block[None, ...]
+    )
+    systems = data_blocks[None, ...] + penalty_blocks[:, None, ...]
+    factors, info = torch.linalg.cholesky_ex(systems)
+    jitters = torch.zeros(
+        (len(weights), operator.channels),
+        device=operator.device,
+        dtype=factor_dtype,
+    )
+    if bool(torch.any(info != 0)):
+        identity = ridge_block
+        scale = torch.diagonal(
+            systems, dim1=-2, dim2=-1
+        ).abs().amax(dim=-1)
+        unresolved = info != 0
+        for multiplier in (1.0e-12, 1.0e-10, 1.0e-8, 1.0e-6):
+            trial_jitter = scale * multiplier
+            trial, trial_info = torch.linalg.cholesky_ex(
+                systems + trial_jitter[..., None, None] * identity
+            )
+            accepted = unresolved & (trial_info == 0)
+            factors[accepted] = trial[accepted]
+            jitters[accepted] = trial_jitter[accepted]
+            unresolved = unresolved & (~accepted)
+            if not bool(torch.any(unresolved)):
+                break
+        if bool(torch.any(unresolved)):
+            raise RuntimeError(
+                "BATCHED_CHANNEL_BLOCK_PRECONDITIONER_CHOLESKY_FAILED"
+            )
+    return BatchedChannelBlockPreconditioner(
+        channels=operator.channels,
+        block_dimension=penalty.m_tau * penalty.m_x,
+        factors=factors,
+        numerical_jitter=tuple(
+            tuple(float(value) for value in row)
+            for row in jitters.detach().cpu().tolist()
         ),
     )
 

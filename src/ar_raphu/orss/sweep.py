@@ -17,9 +17,11 @@ from .krylov import KrylovResult, lsqr, pcg_normal, pcg_normal_batch
 from .operator import UrysohnLinearOperator
 from .penalties import PenaltyWeights, SeparablePenalty
 from .preconditioner import (
+    build_batched_channel_block_preconditioner,
     build_batched_spectral_diagonal_preconditioner,
     build_channel_block_preconditioner,
     build_spectral_diagonal_preconditioner,
+    data_normal_channel_blocks,
     data_normal_diagonal,
 )
 from .reduced_basis import ParametricReducedBasis, ReducedCandidate
@@ -275,11 +277,14 @@ def solve_full_batch(
     maximum_iterations: int,
     initial: torch.Tensor | None = None,
     data_diagonal: torch.Tensor | None = None,
+    channel_block_rescue_batch_size: int = 64,
 ) -> list[FullSolve]:
     if not weights:
         return []
     if any(row.exact_zero for row in weights):
         raise ValueError("Exact-zero endpoint requires the LSQR path.")
+    if channel_block_rescue_batch_size < 1:
+        raise ValueError("Channel-block rescue batch size must be positive.")
     started = time.perf_counter()
     forward_before = operator.operator_forward_calls
     adjoint_before = operator.operator_adjoint_calls
@@ -333,6 +338,124 @@ def solve_full_batch(
             torch.finfo(rhs_batch.dtype).tiny
         )
     )
+    iteration_counts = list(result.iterations)
+    methods = [
+        "BATCHED_SPECTRAL_SCALED_NORMAL_PCG" for _ in weights
+    ]
+    if (
+        bool(torch.any(true_relative > relative_tolerance))
+        and operator.dtype == torch.float64
+    ):
+        rescue_preconditioner_started = time.perf_counter()
+        channel_blocks = data_normal_channel_blocks(operator)
+        preconditioner_seconds += (
+            time.perf_counter() - rescue_preconditioner_started
+        )
+        for rescue_round, rescue_budget in enumerate(
+            (maximum_iterations, max(maximum_iterations, 10000)),
+            start=1,
+        ):
+            unresolved = torch.nonzero(
+                true_relative > relative_tolerance, as_tuple=False
+            ).reshape(-1)
+            if not len(unresolved):
+                break
+            unresolved_indices = [
+                int(value)
+                for value in unresolved.detach().cpu().tolist()
+            ]
+            for start in range(
+                0,
+                len(unresolved_indices),
+                channel_block_rescue_batch_size,
+            ):
+                indices = unresolved_indices[
+                    start : start + channel_block_rescue_batch_size
+                ]
+                rescue_weights = [weights[index] for index in indices]
+                rescue_preconditioner_started = time.perf_counter()
+                rescue_preconditioner = (
+                    build_batched_channel_block_preconditioner(
+                        operator,
+                        penalty,
+                        rescue_weights,
+                        data_blocks=channel_blocks,
+                    )
+                )
+                preconditioner_seconds += (
+                    time.perf_counter() - rescue_preconditioner_started
+                )
+                rescue_rhs = rhs_batch[indices]
+
+                def apply_rescue(vectors: torch.Tensor) -> torch.Tensor:
+                    return operator.normal_batch(
+                        vectors
+                    ) + penalty.normal_batch(
+                        vectors, rescue_weights
+                    )
+
+                rescue = pcg_normal_batch(
+                    apply_rescue,
+                    rescue_rhs,
+                    initial=coefficients[indices],
+                    preconditioner=rescue_preconditioner,
+                    relative_tolerance=relative_tolerance,
+                    maximum_iterations=rescue_budget,
+                )
+                rescue_coefficients = rescue.coefficients
+                rescue_residual = (
+                    operator.normal_batch(rescue_coefficients)
+                    + penalty.normal_batch(
+                        rescue_coefficients, rescue_weights
+                    )
+                    - rescue_rhs
+                )
+                rescue_relative = (
+                    torch.linalg.vector_norm(rescue_residual, dim=1)
+                    / torch.linalg.vector_norm(
+                        rescue_rhs, dim=1
+                    ).clamp_min(torch.finfo(rescue_rhs.dtype).tiny)
+                )
+                for local, index in enumerate(indices):
+                    if rescue_relative[local] < true_relative[index]:
+                        coefficients[index] = rescue_coefficients[local]
+                        true_relative[index] = rescue_relative[local]
+                        iteration_counts[index] += (
+                            rescue.iterations[local]
+                        )
+                        methods[index] = (
+                            "BATCHED_SPECTRAL_THEN_CHANNEL_BLOCK_"
+                            f"PCG_RESCUE_{rescue_round}"
+                        )
+                del rescue_preconditioner
+        # A handful of highly anisotropic candidates can remain coupled in
+        # batched PCG even after the channel-block rescue.  Certify only those
+        # candidates independently with the same FP64 objective and
+        # preconditioner used by the selected-model KKT check.  This is a
+        # numerical rescue, not a different scientific estimator.
+        unresolved = torch.nonzero(
+            true_relative > relative_tolerance, as_tuple=False
+        ).reshape(-1)
+        for unresolved_index in unresolved.detach().cpu().tolist():
+            index = int(unresolved_index)
+            rescued = solve_full(
+                operator,
+                centered_target,
+                penalty,
+                weights[index],
+                relative_tolerance=relative_tolerance,
+                maximum_iterations=max(maximum_iterations, 10000),
+                initial=coefficients[index],
+                preconditioner_kind="channel_block",
+            )
+            preconditioner_seconds += rescued.preconditioner_build_seconds
+            if rescued.relative_kkt_residual < true_relative[index]:
+                coefficients[index] = rescued.coefficients
+                true_relative[index] = rescued.relative_kkt_residual
+                iteration_counts[index] += rescued.iterations
+                methods[index] = (
+                    "BATCHED_THEN_INDEPENDENT_CHANNEL_BLOCK_PCG_RESCUE"
+                )
     elapsed = time.perf_counter() - started
     forward_calls = operator.operator_forward_calls - forward_before
     adjoint_calls = operator.operator_adjoint_calls - adjoint_before
@@ -341,8 +464,8 @@ def solve_full_batch(
         FullSolve(
             coefficients=coefficients[index],
             relative_kkt_residual=float(true_relative[index].item()),
-            iterations=result.iterations[index],
-            method="BATCHED_DIAGONAL_PRECONDITIONED_NORMAL_PCG",
+            iterations=iteration_counts[index],
+            method=methods[index],
             elapsed_seconds=elapsed / count,
             preconditioner_build_seconds=(
                 preconditioner_seconds / count

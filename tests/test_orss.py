@@ -21,6 +21,7 @@ from ar_raphu.orss.operator import (
 )
 from ar_raphu.orss.penalties import PenaltyWeights, SeparablePenalty
 from ar_raphu.orss.preconditioner import (
+    build_batched_channel_block_preconditioner,
     build_batched_spectral_diagonal_preconditioner,
     build_channel_block_preconditioner,
     build_spectral_diagonal_preconditioner,
@@ -665,6 +666,34 @@ def test_channel_block_preconditioner_solves_its_block_system() -> None:
     torch.testing.assert_close(
         torch.einsum("cij,cj->ci", systems, resolved),
         residual.reshape(operator.channels, -1),
+        rtol=1.0e-9,
+        atol=1.0e-9,
+    )
+    batched = build_batched_channel_block_preconditioner(
+        operator,
+        penalty,
+        [weights, PenaltyWeights(0.02, 2.0, 1.0e-3)],
+        data_blocks=blocks,
+    )
+    batched_residual = torch.stack([residual, 0.5 * residual])
+    expected = torch.stack(
+        [
+            build_channel_block_preconditioner(
+                operator,
+                penalty,
+                row,
+                data_blocks=blocks,
+            ).solve(local)
+            for row, local in zip(
+                [weights, PenaltyWeights(0.02, 2.0, 1.0e-3)],
+                batched_residual,
+                strict=True,
+            )
+        ]
+    )
+    torch.testing.assert_close(
+        batched.solve(batched_residual),
+        expected,
         rtol=1.0e-9,
         atol=1.0e-9,
     )
