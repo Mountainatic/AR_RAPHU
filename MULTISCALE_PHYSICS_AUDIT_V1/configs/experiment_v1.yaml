@@ -1,0 +1,143 @@
+{
+  "schema": "MULTISCALE_PHYSICS_AUDIT_V1",
+  "random_seed": 20260730,
+  "data": {
+    "required_sheets": ["Sheet1", "Sheet2"],
+    "required_columns": [
+      "主加热功率",
+      "晶升速度",
+      "埚升速度",
+      "晶转速度",
+      "埚转速度",
+      "晶体直径"
+    ],
+    "diameter_break_threshold_mm": 0.20,
+    "frozen_breakpoints": {
+      "Sheet1": [334, 688, 734],
+      "Sheet2": [745]
+    },
+    "main_segment": "after_last_breakpoint",
+    "timestamp_relative_tolerance": 0.05
+  },
+  "branches": {
+    "joint_lift": {
+      "cadence_sec": 10,
+      "variants": ["pc1"],
+      "lag_blocks_min": [
+        [0, 2, 0.1666666667],
+        [2, 10, 0.5],
+        [10, 40, 2]
+      ]
+    },
+    "crystal_rotation": {
+      "cadence_sec": 30,
+      "variants": ["raw", "innovation"],
+      "innovation_ema_min": 10,
+      "lag_blocks_min": [
+        [0, 10, 0.5],
+        [10, 30, 1],
+        [30, 120, 5]
+      ]
+    },
+    "crucible_rotation": {
+      "cadence_sec": 30,
+      "variants": ["raw", "midband", "lowpass"],
+      "midband_fast_ema_min": 2,
+      "midband_slow_ema_min": 20,
+      "lowpass_ema_min": 20,
+      "lag_blocks_min": [
+        [0, 10, 0.5],
+        [10, 30, 1],
+        [30, 120, 5]
+      ]
+    },
+    "heater_power": {
+      "cadence_sec": 120,
+      "variants": ["raw_plus_thermal_states"],
+      "lag_blocks_min": [
+        [0, 10, 0.5],
+        [10, 30, 2],
+        [30, 120, 5],
+        [120, 240, 10]
+      ],
+      "thermal_tau_min": [5, 10, 20, 40, 60, 90, 120, 180]
+    }
+  },
+  "profiles": [
+    {"id": "L1", "channel": "joint_lift", "horizon_min": 0.5, "target_window_min": 0.5, "history_min": 10, "confirmatory": true},
+    {"id": "L2", "channel": "joint_lift", "horizon_min": 1, "target_window_min": 0.5, "history_min": 10, "confirmatory": true},
+    {"id": "L3", "channel": "joint_lift", "horizon_min": 2, "target_window_min": 1, "history_min": 20, "confirmatory": true},
+    {"id": "L4", "channel": "joint_lift", "horizon_min": 5, "target_window_min": 1, "history_min": 20, "confirmatory": true},
+    {"id": "L5", "channel": "joint_lift", "horizon_min": 10, "target_window_min": 2, "history_min": 40, "confirmatory": true},
+    {"id": "L6", "channel": "joint_lift", "horizon_min": 20, "target_window_min": 2, "history_min": 40, "confirmatory": true},
+
+    {"id": "R1", "channel": "crystal_rotation", "horizon_min": 2, "target_window_min": 1, "history_min": 30, "confirmatory": true},
+    {"id": "R2", "channel": "crystal_rotation", "horizon_min": 5, "target_window_min": 2, "history_min": 30, "confirmatory": true},
+    {"id": "R3", "channel": "crystal_rotation", "horizon_min": 10, "target_window_min": 2, "history_min": 60, "confirmatory": true},
+    {"id": "R4", "channel": "crystal_rotation", "horizon_min": 20, "target_window_min": 5, "history_min": 60, "confirmatory": true},
+    {"id": "R5", "channel": "crystal_rotation", "horizon_min": 40, "target_window_min": 5, "history_min": 120, "confirmatory": true},
+    {"id": "R6", "channel": "crystal_rotation", "horizon_min": 60, "target_window_min": 10, "history_min": 120, "confirmatory": true},
+
+    {"id": "C1", "channel": "crucible_rotation", "horizon_min": 2, "target_window_min": 1, "history_min": 30, "confirmatory": true},
+    {"id": "C2", "channel": "crucible_rotation", "horizon_min": 5, "target_window_min": 2, "history_min": 30, "confirmatory": true},
+    {"id": "C3", "channel": "crucible_rotation", "horizon_min": 10, "target_window_min": 2, "history_min": 60, "confirmatory": true},
+    {"id": "C4", "channel": "crucible_rotation", "horizon_min": 20, "target_window_min": 5, "history_min": 60, "confirmatory": true},
+    {"id": "C5", "channel": "crucible_rotation", "horizon_min": 40, "target_window_min": 5, "history_min": 120, "confirmatory": true},
+    {"id": "C6", "channel": "crucible_rotation", "horizon_min": 60, "target_window_min": 10, "history_min": 120, "confirmatory": true},
+
+    {"id": "P1", "channel": "heater_power", "horizon_min": 10, "target_window_min": 5, "history_min": 60, "confirmatory": true},
+    {"id": "P2", "channel": "heater_power", "horizon_min": 20, "target_window_min": 5, "history_min": 60, "confirmatory": true},
+    {"id": "P3", "channel": "heater_power", "horizon_min": 40, "target_window_min": 10, "history_min": 120, "confirmatory": true},
+    {"id": "P4", "channel": "heater_power", "horizon_min": 60, "target_window_min": 10, "history_min": 120, "confirmatory": true},
+    {"id": "P5", "channel": "heater_power", "horizon_min": 90, "target_window_min": 15, "history_min": 180, "confirmatory": true},
+    {"id": "P6", "channel": "heater_power", "horizon_min": 120, "target_window_min": 15, "history_min": 180, "confirmatory": true},
+    {"id": "P7", "channel": "heater_power", "horizon_min": 180, "target_window_min": 20, "history_min": 240, "confirmatory": false}
+  ],
+  "validation": {
+    "outer_directions": [["Sheet1", "Sheet2"], ["Sheet2", "Sheet1"]],
+    "inner_validation_fractions": [[0.50, 0.60], [0.60, 0.70], [0.70, 0.80], [0.80, 0.90]],
+    "ridge_grid": [0.0, 1.0e-8, 1.0e-6, 1.0e-4, 1.0e-2, 1.0, 100.0, 10000.0],
+    "stage1_bootstrap_replicates": 100,
+    "stage2_bootstrap_replicates": 500,
+    "bootstrap_min_block_min": 10,
+    "common_support_quantiles": [0.01, 0.99],
+    "placebo_shift_multipliers": [-2, -1, 1, 2],
+    "regularization_sensitivity_multipliers": [0.1, 1.0, 10.0],
+    "resolution_sensitivity_multipliers": [0.6, 1.0, 2.0]
+  },
+  "ar": {
+    "raw_lag_blocks_min": [
+      [0, 2, 0.1666666667],
+      [2, 10, 0.5],
+      [10, 30, 2],
+      [30, 120, 5],
+      [120, 240, 10]
+    ]
+  },
+  "gates": {
+    "s1_min_direction_improvement": 0.0,
+    "s1_min_pooled_improvement": 0.01,
+    "s1_min_bootstrap_positive_probability": 0.80,
+    "s2_min_pooled_improvement": 0.03,
+    "s2_min_bootstrap_positive_probability": 0.95,
+    "s2_min_kernel_correlation": 0.60,
+    "s2_min_support_jaccard": 0.25,
+    "s2_max_common_support_drop": 0.01,
+    "conditional_min_pooled_improvement": 0.005,
+    "conditional_min_bootstrap_positive_probability": 0.90,
+    "nonlinear_min_pooled_improvement": 0.005,
+    "nonlinear_min_bootstrap_positive_probability": 0.90,
+    "maximum_stage2_candidates_per_channel": 2
+  },
+  "nonlinear": {
+    "orders": [2, 3],
+    "penalty_grid": [1.0e-4, 1.0e-2, 1.0, 100.0, 10000.0],
+    "include_exact_linear_submodel": true
+  },
+  "runtime": {
+    "primary_dtype": "float64",
+    "linear_algebra": "CPU_FP64",
+    "default_n_jobs": 12,
+    "blas_threads_per_job": 2
+  }
+}

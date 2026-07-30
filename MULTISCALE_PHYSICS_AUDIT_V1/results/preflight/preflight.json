@@ -1,0 +1,295 @@
+{
+  "common_amplitude_domains": {
+    "主加热功率": [
+      93.8000030517578,
+      97.9899978637695
+    ],
+    "埚升速度": [
+      0.064300000667572,
+      0.127399995923042
+    ],
+    "埚转速度": [
+      11.9139995574951,
+      12.0249996185303
+    ],
+    "晶升速度": [
+      0.404300004243851,
+      0.806400001049042
+    ],
+    "晶转速度": [
+      5.76109981536865,
+      6.46999979019165
+    ]
+  },
+  "config_sha256": "3e437a5bc7e9f4b2002b618eb1314396cc95f0c28409ce5085e4a8914e5a947f",
+  "data_sha256": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+  "preflight_pass": true,
+  "sample_period_sec": 2.0,
+  "schema": "MULTISCALE_PHYSICS_AUDIT_V1",
+  "sheets": {
+    "Sheet1": {
+      "channels": {
+        "主加热功率": {
+          "acf_decay_sec": 4392.0,
+          "diff_median_abs": 0.05999755859369316,
+          "diff_p95_abs": 0.16999816894539777,
+          "lag_at_max_abs_correlation_min": 40.0,
+          "max_abs_lag_correlation": 0.18049910142465508,
+          "median_hold_sec": 2.0,
+          "median_update_interval_sec": 2.0,
+          "nonzero_update_fraction": 0.9552847627407446,
+          "range": [
+            93.0800018310547,
+            97.9899978637695
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.03228416316814606,
+            "gt_60min": 0.9430765213296965,
+            "lt_10min": 0.024639315502157616
+          }
+        },
+        "埚升速度": {
+          "acf_decay_sec": 2032.0,
+          "diff_median_abs": 0.0002000033855437955,
+          "diff_p95_abs": 0.002100005745887938,
+          "lag_at_max_abs_correlation_min": 10.0,
+          "max_abs_lag_correlation": -0.5275621539292548,
+          "median_hold_sec": 2.0,
+          "median_update_interval_sec": 2.0,
+          "nonzero_update_fraction": 0.841224763773429,
+          "range": [
+            0.0573999993503094,
+            0.127399995923042
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.18882956292189473,
+            "gt_60min": 0.7283263557165052,
+            "lt_10min": 0.08284408136159986
+          }
+        },
+        "埚转速度": {
+          "acf_decay_sec": 2.0,
+          "diff_median_abs": 0.024600028991700995,
+          "diff_p95_abs": 0.07369995117189987,
+          "lag_at_max_abs_correlation_min": 5.0,
+          "max_abs_lag_correlation": -0.01216257660705762,
+          "median_hold_sec": 2.0,
+          "median_update_interval_sec": 2.0,
+          "nonzero_update_fraction": 0.9924614034181856,
+          "range": [
+            11.9083995819092,
+            12.0291996002197
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.0030658989050529883,
+            "gt_60min": 0.0005972980570583882,
+            "lt_10min": 0.9963368030378887
+          }
+        },
+        "晶体直径": {
+          "acf_decay_sec": 876.0,
+          "diff_median_abs": 0.0,
+          "diff_p95_abs": 0.010009765625,
+          "median_hold_sec": 4.0,
+          "median_update_interval_sec": 4.0,
+          "nonzero_update_fraction": 0.48670418753549854,
+          "range": [
+            316.339996337891,
+            319.519989013672
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.366132098875446,
+            "gt_60min": 0.6301198571749063,
+            "lt_10min": 0.003748043949647756
+          }
+        },
+        "晶升速度": {
+          "acf_decay_sec": 4290.0,
+          "diff_median_abs": 0.001699984073638916,
+          "diff_p95_abs": 0.011700034141539972,
+          "lag_at_max_abs_correlation_min": 10.0,
+          "max_abs_lag_correlation": -0.504851843793011,
+          "median_hold_sec": 2.0,
+          "median_update_interval_sec": 2.0,
+          "nonzero_update_fraction": 0.913719213094439,
+          "range": [
+            0.345600008964539,
+            0.806400001049042
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.18207322656369843,
+            "gt_60min": 0.7397689777711729,
+            "lt_10min": 0.07815779566512876
+          }
+        },
+        "晶转速度": {
+          "acf_decay_sec": 8806.0,
+          "diff_median_abs": 0.002799987792969638,
+          "diff_p95_abs": 0.007700443267820489,
+          "lag_at_max_abs_correlation_min": 180.0,
+          "max_abs_lag_correlation": -0.08217330965348836,
+          "median_hold_sec": 2.0,
+          "median_update_interval_sec": 2.0,
+          "nonzero_update_fraction": 0.9280218929106212,
+          "range": [
+            5.76109981536865,
+            6.47139978408813
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.20614736470390627,
+            "gt_60min": 0.7434177114807194,
+            "lt_10min": 0.05043492381537404
+          }
+        }
+      },
+      "detected_breakpoints": [
+        334,
+        688,
+        734
+      ],
+      "frozen_breakpoints": [
+        334,
+        688,
+        734
+      ],
+      "frozen_breakpoints_verified": true,
+      "main_stable_duration_hours": 10.76,
+      "main_stable_segment": [
+        735,
+        20103
+      ],
+      "samples": 20103
+    },
+    "Sheet2": {
+      "channels": {
+        "主加热功率": {
+          "acf_decay_sec": 4544.0,
+          "diff_median_abs": 0.05000305175779829,
+          "diff_p95_abs": 0.16000366210940342,
+          "lag_at_max_abs_correlation_min": 60.0,
+          "max_abs_lag_correlation": 0.3558724511988962,
+          "median_hold_sec": 2.0,
+          "median_update_interval_sec": 2.0,
+          "nonzero_update_fraction": 0.9505533199195171,
+          "range": [
+            93.8000030517578,
+            99.5199966430664
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.009014546203447975,
+            "gt_60min": 0.9732630928610456,
+            "lt_10min": 0.017722360935505985
+          }
+        },
+        "埚升速度": {
+          "acf_decay_sec": 2864.0,
+          "diff_median_abs": 0.00020000338554380936,
+          "diff_p95_abs": 0.0018000006675721048,
+          "lag_at_max_abs_correlation_min": 10.0,
+          "max_abs_lag_correlation": -0.37840561474137396,
+          "median_hold_sec": 2.0,
+          "median_update_interval_sec": 2.0,
+          "nonzero_update_fraction": 0.8596579476861167,
+          "range": [
+            0.064300000667572,
+            0.156000003218651
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.2598151773126456,
+            "gt_60min": 0.6051916895022154,
+            "lt_10min": 0.13499313318513906
+          }
+        },
+        "埚转速度": {
+          "acf_decay_sec": 2.0,
+          "diff_median_abs": 0.021100044250500716,
+          "diff_p95_abs": 0.0625,
+          "lag_at_max_abs_correlation_min": 20.0,
+          "max_abs_lag_correlation": -0.009395945941025009,
+          "median_hold_sec": 2.0,
+          "median_update_interval_sec": 2.0,
+          "nonzero_update_fraction": 0.9924044265593561,
+          "range": [
+            11.9139995574951,
+            12.0249996185303
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.0041514538182802355,
+            "gt_60min": 0.0009423649659495484,
+            "lt_10min": 0.9949061812157701
+          }
+        },
+        "晶体直径": {
+          "acf_decay_sec": 930.0,
+          "diff_median_abs": 0.0,
+          "diff_p95_abs": 0.010009765625,
+          "median_hold_sec": 4.0,
+          "median_update_interval_sec": 4.0,
+          "nonzero_update_fraction": 0.45311871227364187,
+          "range": [
+            316.809997558594,
+            318.709991455078
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.20429434251450035,
+            "gt_60min": 0.7836880076738324,
+            "lt_10min": 0.012017649811667338
+          }
+        },
+        "晶升速度": {
+          "acf_decay_sec": 2882.0,
+          "diff_median_abs": 0.001300036907196045,
+          "diff_p95_abs": 0.01130502521991743,
+          "lag_at_max_abs_correlation_min": 10.0,
+          "max_abs_lag_correlation": -0.3696803489049303,
+          "median_hold_sec": 2.0,
+          "median_update_interval_sec": 2.0,
+          "nonzero_update_fraction": 0.9123239436619718,
+          "range": [
+            0.404300004243851,
+            0.995899975299835
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.24692278453928304,
+            "gt_60min": 0.6277860157415073,
+            "lt_10min": 0.12529119971920935
+          }
+        },
+        "晶转速度": {
+          "acf_decay_sec": 8606.0,
+          "diff_median_abs": 0.002799987792969638,
+          "diff_p95_abs": 0.007700443267819601,
+          "lag_at_max_abs_correlation_min": 60.0,
+          "max_abs_lag_correlation": 0.09006178958798555,
+          "median_hold_sec": 2.0,
+          "median_update_interval_sec": 2.0,
+          "nonzero_update_fraction": 0.9232897384305835,
+          "range": [
+            5.76109981536865,
+            6.46999979019165
+          ],
+          "spectral_energy_fraction": {
+            "10_to_60min": 0.038634447816735924,
+            "gt_60min": 0.9526335231737352,
+            "lt_10min": 0.008732029009528816
+          }
+        }
+      },
+      "detected_breakpoints": [
+        745
+      ],
+      "frozen_breakpoints": [
+        745
+      ],
+      "frozen_breakpoints_verified": true,
+      "main_stable_duration_hours": 11.045,
+      "main_stable_segment": [
+        746,
+        20627
+      ],
+      "samples": 20627
+    }
+  },
+  "status": "COMPLETED",
+  "timestamp_status": "NOT_AVAILABLE"
+}
