@@ -226,9 +226,15 @@ def run_stage1(
     data_path: Path,
     sample_period_sec: float,
     n_jobs: int,
+    task_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     config, _ = load_config(config_path)
     tasks = task_payloads(root, config_path, data_path, sample_period_sec)
+    if task_ids:
+        tasks = [task for task in tasks if task["task_id"] in task_ids]
+        missing = task_ids - {task["task_id"] for task in tasks}
+        if missing:
+            raise ValueError(f"UNKNOWN_TASK_IDS:{sorted(missing)}")
     with ProcessPoolExecutor(max_workers=n_jobs) as executor:
         future_map = {executor.submit(_run_one, task): task for task in tasks}
         for future in as_completed(future_map):

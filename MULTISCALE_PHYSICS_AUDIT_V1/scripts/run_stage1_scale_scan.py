@@ -17,6 +17,7 @@ def main() -> int:
     parser.add_argument("--data", required=True)
     parser.add_argument("--sample-period-sec", required=True, type=float)
     parser.add_argument("--n-jobs", type=int, default=12)
+    parser.add_argument("--task-id", action="append", default=[])
     parser.add_argument(
         "--config", default=str(ROOT / "configs" / "experiment_v1.yaml")
     )
@@ -27,6 +28,7 @@ def main() -> int:
         data_path=Path(args.data).resolve(),
         sample_period_sec=args.sample_period_sec,
         n_jobs=args.n_jobs,
+        task_ids=set(args.task_id) or None,
     )
     print("STAGE1_SUMMARY=" + json.dumps(summary, ensure_ascii=False), flush=True)
     return 0 if summary["failed_tasks"] == 0 else 2
