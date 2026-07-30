@@ -6,6 +6,7 @@ import json
 import os
 import time
 import traceback
+import warnings
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
@@ -25,6 +26,9 @@ from .common import (
     write_csv,
 )
 from .models import model_factory, parameter_count
+
+
+RUNNER_VERSION = "2"
 
 
 GROUP_SIMPLE = "SIMPLE_BASELINES"
@@ -376,6 +380,7 @@ def evaluate_model_task(payload: dict[str, Any]) -> dict[str, Any]:
         started = time.perf_counter()
         process = psutil.Process(os.getpid())
         peak_rss = process.memory_info().rss
+        convergence_warnings: set[str] = set()
         for config_index, parameters in enumerate(configs):
             matrix = _feature_matrix(name, train, metadata, parameters)
             fold_losses = []
@@ -384,7 +389,10 @@ def evaluate_model_task(payload: dict[str, Any]) -> dict[str, Any]:
                 model = model_factory(
                     MODEL_SPECS[name]["factory"], parameters
                 )
-                model.fit(matrix[fit_indices], target[fit_indices])
+                with warnings.catch_warnings(record=True) as caught:
+                    warnings.simplefilter("always")
+                    model.fit(matrix[fit_indices], target[fit_indices])
+                convergence_warnings.update(str(item.message) for item in caught)
                 prediction = np.asarray(
                     model.predict(matrix[fold.validation_indices])
                 ).reshape(-1)
@@ -427,16 +435,22 @@ def evaluate_model_task(payload: dict[str, Any]) -> dict[str, Any]:
         model = model_factory(
             MODEL_SPECS[name]["factory"], selected["parameters"]
         )
-        model.fit(train_matrix[full_indices], target[full_indices])
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            model.fit(train_matrix[full_indices], target[full_indices])
+        convergence_warnings.update(str(item.message) for item in caught)
+        fit_elapsed = time.perf_counter() - started
+        inference_started = time.perf_counter()
         prediction = np.asarray(model.predict(test_matrix)).reshape(-1).astype(np.float64)
+        inference_elapsed = time.perf_counter() - inference_started
         mask = np.asarray(test["evaluation_mask"], dtype=bool)
         metrics = regression_metrics(test["target_z"][mask], prediction[mask])
         persistence_loss = np.asarray(test["target_z"][mask], dtype=np.float64) ** 2
         model_loss = (
             np.asarray(test["target_z"][mask], dtype=np.float64) - prediction[mask]
         ) ** 2
-        elapsed = time.perf_counter() - started
         result = {
+            "runner_version": RUNNER_VERSION,
             "status": "COMPLETED",
             "name": name,
             "group": MODEL_SPECS[name]["group"],
@@ -453,8 +467,12 @@ def evaluate_model_task(payload: dict[str, Any]) -> dict[str, Any]:
             },
             "metrics": metrics,
             "relative_persistence": improvement(persistence_loss, model_loss),
-            "train_seconds": float(elapsed),
-            "inference_seconds": float(0.0),
+            "train_seconds": float(fit_elapsed),
+            "inference_seconds": float(inference_elapsed),
+            "convergence_status": (
+                "WARNING" if convergence_warnings else "PASS"
+            ),
+            "convergence_warnings": sorted(convergence_warnings),
             "peak_rss_bytes": int(peak_rss),
             "parameter_count": int(parameter_count(model)),
             "prediction_sha256": sha256_array(prediction),
@@ -671,7 +689,11 @@ def _residual_history_design(
         history = values[
             end - maximum_history_rows + 1 : end + 1
         ][::-1]
-        if len(history) == maximum_history_rows and np.all(np.isfinite(history)):
+        if (
+            np.isfinite(values[current])
+            and len(history) == maximum_history_rows
+            and np.all(np.isfinite(history))
+        ):
             rows.append(current)
             features.append(history)
     if not rows:
@@ -1199,7 +1221,10 @@ def run_cpu_benchmark(
         )
         if task_file.is_file() and prediction_file.is_file():
             stored = json.loads(task_file.read_text(encoding="utf-8"))
-            if stored.get("status") == "COMPLETED":
+            if (
+                stored.get("status") == "COMPLETED"
+                and stored.get("runner_version") == RUNNER_VERSION
+            ):
                 raw_results.append(stored)
                 all_rows.append(stored)
                 print(
