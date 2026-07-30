@@ -1,0 +1,787 @@
+{
+  "config_sha256": "357841c8cd64df2a70b605f212faa00afb78bdda7593fc01633094e058fcb9a8",
+  "data_sha256": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+  "directions": {
+    "sheet1_to_sheet2": {
+      "evaluation_samples": 3233,
+      "target_sha256": {
+        "test": "dd8b31d0daf5d4f5e1b69156940c721916b611b6df2ce11e9770b30ca5aa4bc1",
+        "train": "6c310178adc9b0ba73794822b85c461c672e24cdd6ea358b11ecce420d028183"
+      },
+      "test_sample_id_sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+      "test_samples": 3605,
+      "train_sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+      "train_samples": 3502
+    },
+    "sheet2_to_sheet1": {
+      "evaluation_samples": 3130,
+      "target_sha256": {
+        "test": "6c310178adc9b0ba73794822b85c461c672e24cdd6ea358b11ecce420d028183",
+        "train": "dd8b31d0daf5d4f5e1b69156940c721916b611b6df2ce11e9770b30ca5aa4bc1"
+      },
+      "test_sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+      "test_samples": 3502,
+      "train_sample_id_sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+      "train_samples": 3605
+    }
+  },
+  "files": [
+    {
+      "arrays": {
+        "current_y_mean": {
+          "dtype": "float64",
+          "sha256": "98cf515349c66830d37ce74a01ce661cbb1d0e06f764f8a23150dc5704ee449f",
+          "shape": [
+            3502
+          ]
+        },
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "d18832f105751a9d8d6fa68164f9e485aa02c07b47d7f865c687c04828752b46",
+          "shape": [
+            3502
+          ]
+        },
+        "future_left_raw_index": {
+          "dtype": "int64",
+          "sha256": "5eacd0e7b5a41f2228b919f1c72b75d619233b85eda6f43da6bd7998543013b3",
+          "shape": [
+            3502
+          ]
+        },
+        "future_right_raw_index": {
+          "dtype": "int64",
+          "sha256": "e2afaedea2354a5352c972d025345634759ac15bfed3e3f79aff52a24131585c",
+          "shape": [
+            3502
+          ]
+        },
+        "future_y_mean": {
+          "dtype": "float64",
+          "sha256": "372f65ffe18a30ddc0e49cd97f0492fe2df570d904c0eaeb67eb5a3f36c2ad46",
+          "shape": [
+            3502
+          ]
+        },
+        "local_trend_prediction": {
+          "dtype": "float64",
+          "sha256": "a4c7c18999b49bdbce7d545628c3dc866cb8f74eaa6e6e3a1d863c2875d99397",
+          "shape": [
+            3502
+          ]
+        },
+        "multiresolution_u": {
+          "dtype": "float64",
+          "sha256": "203cec2eae5244faef007dde0b06fe318b63c973f52bd0ab8378000b8c184129",
+          "shape": [
+            3502,
+            172
+          ]
+        },
+        "origin_raw_index": {
+          "dtype": "int64",
+          "sha256": "985e9c96abde3851f813afb545ea80d953e1445810b91b3b91c4111af9b8ffcd",
+          "shape": [
+            3502
+          ]
+        },
+        "persistence_prediction": {
+          "dtype": "float64",
+          "sha256": "8a14c2858dd89184b012a707082fa2f16feba547cf8e8656c037e2dab2cd0e06",
+          "shape": [
+            3502
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+          "shape": [
+            3502
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "6c310178adc9b0ba73794822b85c461c672e24cdd6ea358b11ecce420d028183",
+          "shape": [
+            3502
+          ]
+        }
+      },
+      "direction": "sheet1_to_sheet2",
+      "file": "sheet1_to_sheet2/multiresolution_tabular_view/train.npz",
+      "file_sha256": "719821e6323bb0102252e68c45850379857bc1591acd7fea1c73613a2dbcf8eb",
+      "role": "train",
+      "view": "multiresolution_tabular_view"
+    },
+    {
+      "arrays": {
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "d18832f105751a9d8d6fa68164f9e485aa02c07b47d7f865c687c04828752b46",
+          "shape": [
+            3502
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+          "shape": [
+            3502
+          ]
+        },
+        "sequence_u": {
+          "dtype": "float32",
+          "sha256": "a0bbcdcfe57d0928701ee424f6d04ecbde59b2fe289b8ff6fb21058d3427373c",
+          "shape": [
+            3502,
+            240,
+            4
+          ]
+        },
+        "sequence_y": {
+          "dtype": "float32",
+          "sha256": "b77b604f68942f9648a9e9f2f457846eacafdb926f750ecb834d5c04c7abecf1",
+          "shape": [
+            3502,
+            240
+          ]
+        },
+        "sequence_y_centered": {
+          "dtype": "float32",
+          "sha256": "b8e1301d7cb6797687b9c3edf2de6a222f6fcede400d089956e11bfc5fa9ddbf",
+          "shape": [
+            3502,
+            240
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "6c310178adc9b0ba73794822b85c461c672e24cdd6ea358b11ecce420d028183",
+          "shape": [
+            3502
+          ]
+        }
+      },
+      "direction": "sheet1_to_sheet2",
+      "file": "sheet1_to_sheet2/sequence_view/train.npz",
+      "file_sha256": "29e33a75c8ca66f84ddabd798e23f32d9ab11388d5645d51c55f74c260122449",
+      "role": "train",
+      "view": "sequence_view"
+    },
+    {
+      "arrays": {
+        "adjacency": {
+          "dtype": "float32",
+          "sha256": "d3f7cc33a56a469eca2058d70cb0d8c267a38d17b647a395997e9dd01b8ecd75",
+          "shape": [
+            4,
+            4
+          ]
+        },
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "d18832f105751a9d8d6fa68164f9e485aa02c07b47d7f865c687c04828752b46",
+          "shape": [
+            3502
+          ]
+        },
+        "node_sequence": {
+          "dtype": "float32",
+          "sha256": "d9b63cf71fd15750aeb803a21fb1dd8dd1adc793789e894c50bbaef733a0267a",
+          "shape": [
+            3502,
+            4,
+            240
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+          "shape": [
+            3502
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "6c310178adc9b0ba73794822b85c461c672e24cdd6ea358b11ecce420d028183",
+          "shape": [
+            3502
+          ]
+        }
+      },
+      "direction": "sheet1_to_sheet2",
+      "file": "sheet1_to_sheet2/graph_view/train.npz",
+      "file_sha256": "2bdbca6437e6a3fcbd07a7e2101c78d28dc806695d2ad3ad8edb9c1a78cda241",
+      "role": "train",
+      "view": "graph_view"
+    },
+    {
+      "arrays": {
+        "current_y_mean": {
+          "dtype": "float64",
+          "sha256": "ccc902868538234e4ffbaf6bbd90206d2833862f37437dc5ac9f17007c39f4f7",
+          "shape": [
+            3605
+          ]
+        },
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "360febd0477844b2b589a41a97d01c984f66294be98470a4c6436b780b848b7d",
+          "shape": [
+            3605
+          ]
+        },
+        "future_left_raw_index": {
+          "dtype": "int64",
+          "sha256": "345cbea588105eae13e38f23b0a32b0a52a9fec22ab94b1dbe5e54e8e98a2463",
+          "shape": [
+            3605
+          ]
+        },
+        "future_right_raw_index": {
+          "dtype": "int64",
+          "sha256": "bf7b66ccac9d0ebc3b512a8e4f89d5522131151da1d9c0f828f1c53ab91f152c",
+          "shape": [
+            3605
+          ]
+        },
+        "future_y_mean": {
+          "dtype": "float64",
+          "sha256": "f78222c9ed8df6b0646b0be559bfce9d2613279d11152c3a5d79039349ef6a6f",
+          "shape": [
+            3605
+          ]
+        },
+        "local_trend_prediction": {
+          "dtype": "float64",
+          "sha256": "8a5058e4c267a661797443c3f85f1bab1f12ace1f7683ff336ba53f9e15c3caa",
+          "shape": [
+            3605
+          ]
+        },
+        "multiresolution_u": {
+          "dtype": "float64",
+          "sha256": "08c247dd139ce8849ae43b2c4b7c7e8ee9e4ed6c8ed70a703df39ee92c07b42e",
+          "shape": [
+            3605,
+            172
+          ]
+        },
+        "origin_raw_index": {
+          "dtype": "int64",
+          "sha256": "e5b6327302b8bbb40113a9a9d542ea45fd3354a06e397a6591e87bc5277d6f36",
+          "shape": [
+            3605
+          ]
+        },
+        "persistence_prediction": {
+          "dtype": "float64",
+          "sha256": "fdce59dfe94c1a07b1389fe194d0f3eb0e58396ec47a5999594c9f5534cc4439",
+          "shape": [
+            3605
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+          "shape": [
+            3605
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "dd8b31d0daf5d4f5e1b69156940c721916b611b6df2ce11e9770b30ca5aa4bc1",
+          "shape": [
+            3605
+          ]
+        }
+      },
+      "direction": "sheet1_to_sheet2",
+      "file": "sheet1_to_sheet2/multiresolution_tabular_view/test.npz",
+      "file_sha256": "9445006e1fe687418dfedb5e68882514e0a149addc15026448dee8262ad86499",
+      "role": "test",
+      "view": "multiresolution_tabular_view"
+    },
+    {
+      "arrays": {
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "360febd0477844b2b589a41a97d01c984f66294be98470a4c6436b780b848b7d",
+          "shape": [
+            3605
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+          "shape": [
+            3605
+          ]
+        },
+        "sequence_u": {
+          "dtype": "float32",
+          "sha256": "d91638aa5a980d89222ff148be2b8799d40c7f7a02017166cc8b9fceedadb732",
+          "shape": [
+            3605,
+            240,
+            4
+          ]
+        },
+        "sequence_y": {
+          "dtype": "float32",
+          "sha256": "ec9cc99eddff9b5ed3fd22c84e590e4f9fe8ffb0d91c0f88e4b648fd80bc4ba1",
+          "shape": [
+            3605,
+            240
+          ]
+        },
+        "sequence_y_centered": {
+          "dtype": "float32",
+          "sha256": "e5d76d6271040a008ae58396a94e4efaf8a40218c249f5dd7b060ac97683beb1",
+          "shape": [
+            3605,
+            240
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "dd8b31d0daf5d4f5e1b69156940c721916b611b6df2ce11e9770b30ca5aa4bc1",
+          "shape": [
+            3605
+          ]
+        }
+      },
+      "direction": "sheet1_to_sheet2",
+      "file": "sheet1_to_sheet2/sequence_view/test.npz",
+      "file_sha256": "4dc3b3d4d631b3ae6cf76294f9426a80350c49dd85cfc203289c941f2b026d4e",
+      "role": "test",
+      "view": "sequence_view"
+    },
+    {
+      "arrays": {
+        "adjacency": {
+          "dtype": "float32",
+          "sha256": "d3f7cc33a56a469eca2058d70cb0d8c267a38d17b647a395997e9dd01b8ecd75",
+          "shape": [
+            4,
+            4
+          ]
+        },
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "360febd0477844b2b589a41a97d01c984f66294be98470a4c6436b780b848b7d",
+          "shape": [
+            3605
+          ]
+        },
+        "node_sequence": {
+          "dtype": "float32",
+          "sha256": "ea027037ea4eaff280f56f7dac42215145e35060660461a1669fd030f8c2f9a9",
+          "shape": [
+            3605,
+            4,
+            240
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+          "shape": [
+            3605
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "dd8b31d0daf5d4f5e1b69156940c721916b611b6df2ce11e9770b30ca5aa4bc1",
+          "shape": [
+            3605
+          ]
+        }
+      },
+      "direction": "sheet1_to_sheet2",
+      "file": "sheet1_to_sheet2/graph_view/test.npz",
+      "file_sha256": "f32efbd45e2959f70caeeaa5b8efa51f5a56833556e91453b3a37354d7bd354a",
+      "role": "test",
+      "view": "graph_view"
+    },
+    {
+      "arrays": {
+        "current_y_mean": {
+          "dtype": "float64",
+          "sha256": "ccc902868538234e4ffbaf6bbd90206d2833862f37437dc5ac9f17007c39f4f7",
+          "shape": [
+            3605
+          ]
+        },
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "360febd0477844b2b589a41a97d01c984f66294be98470a4c6436b780b848b7d",
+          "shape": [
+            3605
+          ]
+        },
+        "future_left_raw_index": {
+          "dtype": "int64",
+          "sha256": "345cbea588105eae13e38f23b0a32b0a52a9fec22ab94b1dbe5e54e8e98a2463",
+          "shape": [
+            3605
+          ]
+        },
+        "future_right_raw_index": {
+          "dtype": "int64",
+          "sha256": "bf7b66ccac9d0ebc3b512a8e4f89d5522131151da1d9c0f828f1c53ab91f152c",
+          "shape": [
+            3605
+          ]
+        },
+        "future_y_mean": {
+          "dtype": "float64",
+          "sha256": "f78222c9ed8df6b0646b0be559bfce9d2613279d11152c3a5d79039349ef6a6f",
+          "shape": [
+            3605
+          ]
+        },
+        "local_trend_prediction": {
+          "dtype": "float64",
+          "sha256": "8a5058e4c267a661797443c3f85f1bab1f12ace1f7683ff336ba53f9e15c3caa",
+          "shape": [
+            3605
+          ]
+        },
+        "multiresolution_u": {
+          "dtype": "float64",
+          "sha256": "5126b044e7175b5a86ce095638b14cedf55821e9c2e48c8a33ec59a1e28e5252",
+          "shape": [
+            3605,
+            172
+          ]
+        },
+        "origin_raw_index": {
+          "dtype": "int64",
+          "sha256": "e5b6327302b8bbb40113a9a9d542ea45fd3354a06e397a6591e87bc5277d6f36",
+          "shape": [
+            3605
+          ]
+        },
+        "persistence_prediction": {
+          "dtype": "float64",
+          "sha256": "fdce59dfe94c1a07b1389fe194d0f3eb0e58396ec47a5999594c9f5534cc4439",
+          "shape": [
+            3605
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+          "shape": [
+            3605
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "dd8b31d0daf5d4f5e1b69156940c721916b611b6df2ce11e9770b30ca5aa4bc1",
+          "shape": [
+            3605
+          ]
+        }
+      },
+      "direction": "sheet2_to_sheet1",
+      "file": "sheet2_to_sheet1/multiresolution_tabular_view/train.npz",
+      "file_sha256": "079bbcd8f9d2453382c6e24e559a7553826470f86393a4afe806009c00cecb30",
+      "role": "train",
+      "view": "multiresolution_tabular_view"
+    },
+    {
+      "arrays": {
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "360febd0477844b2b589a41a97d01c984f66294be98470a4c6436b780b848b7d",
+          "shape": [
+            3605
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+          "shape": [
+            3605
+          ]
+        },
+        "sequence_u": {
+          "dtype": "float32",
+          "sha256": "a818f906e6b65a527065c418f4a5ae12e93b1980dc1fa7077db96ea059c802d3",
+          "shape": [
+            3605,
+            240,
+            4
+          ]
+        },
+        "sequence_y": {
+          "dtype": "float32",
+          "sha256": "ec9cc99eddff9b5ed3fd22c84e590e4f9fe8ffb0d91c0f88e4b648fd80bc4ba1",
+          "shape": [
+            3605,
+            240
+          ]
+        },
+        "sequence_y_centered": {
+          "dtype": "float32",
+          "sha256": "e5d76d6271040a008ae58396a94e4efaf8a40218c249f5dd7b060ac97683beb1",
+          "shape": [
+            3605,
+            240
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "dd8b31d0daf5d4f5e1b69156940c721916b611b6df2ce11e9770b30ca5aa4bc1",
+          "shape": [
+            3605
+          ]
+        }
+      },
+      "direction": "sheet2_to_sheet1",
+      "file": "sheet2_to_sheet1/sequence_view/train.npz",
+      "file_sha256": "43519af36ce34cf690332c51114a6505c660c8e4e93bc2cba0485cb8aa866d12",
+      "role": "train",
+      "view": "sequence_view"
+    },
+    {
+      "arrays": {
+        "adjacency": {
+          "dtype": "float32",
+          "sha256": "d3f7cc33a56a469eca2058d70cb0d8c267a38d17b647a395997e9dd01b8ecd75",
+          "shape": [
+            4,
+            4
+          ]
+        },
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "360febd0477844b2b589a41a97d01c984f66294be98470a4c6436b780b848b7d",
+          "shape": [
+            3605
+          ]
+        },
+        "node_sequence": {
+          "dtype": "float32",
+          "sha256": "0ea65b0fd538161007635eab867bbb045a145bcdf0cc05946986801097a930a9",
+          "shape": [
+            3605,
+            4,
+            240
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+          "shape": [
+            3605
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "dd8b31d0daf5d4f5e1b69156940c721916b611b6df2ce11e9770b30ca5aa4bc1",
+          "shape": [
+            3605
+          ]
+        }
+      },
+      "direction": "sheet2_to_sheet1",
+      "file": "sheet2_to_sheet1/graph_view/train.npz",
+      "file_sha256": "d2eacd944125286700c1fc23254dda712fab549959dc8e838a0eb901cc42fe0c",
+      "role": "train",
+      "view": "graph_view"
+    },
+    {
+      "arrays": {
+        "current_y_mean": {
+          "dtype": "float64",
+          "sha256": "98cf515349c66830d37ce74a01ce661cbb1d0e06f764f8a23150dc5704ee449f",
+          "shape": [
+            3502
+          ]
+        },
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "d18832f105751a9d8d6fa68164f9e485aa02c07b47d7f865c687c04828752b46",
+          "shape": [
+            3502
+          ]
+        },
+        "future_left_raw_index": {
+          "dtype": "int64",
+          "sha256": "5eacd0e7b5a41f2228b919f1c72b75d619233b85eda6f43da6bd7998543013b3",
+          "shape": [
+            3502
+          ]
+        },
+        "future_right_raw_index": {
+          "dtype": "int64",
+          "sha256": "e2afaedea2354a5352c972d025345634759ac15bfed3e3f79aff52a24131585c",
+          "shape": [
+            3502
+          ]
+        },
+        "future_y_mean": {
+          "dtype": "float64",
+          "sha256": "372f65ffe18a30ddc0e49cd97f0492fe2df570d904c0eaeb67eb5a3f36c2ad46",
+          "shape": [
+            3502
+          ]
+        },
+        "local_trend_prediction": {
+          "dtype": "float64",
+          "sha256": "a4c7c18999b49bdbce7d545628c3dc866cb8f74eaa6e6e3a1d863c2875d99397",
+          "shape": [
+            3502
+          ]
+        },
+        "multiresolution_u": {
+          "dtype": "float64",
+          "sha256": "0c67b150dc9fef028f181d796aa6bda240c1921bec498339abc90047556be97c",
+          "shape": [
+            3502,
+            172
+          ]
+        },
+        "origin_raw_index": {
+          "dtype": "int64",
+          "sha256": "985e9c96abde3851f813afb545ea80d953e1445810b91b3b91c4111af9b8ffcd",
+          "shape": [
+            3502
+          ]
+        },
+        "persistence_prediction": {
+          "dtype": "float64",
+          "sha256": "8a14c2858dd89184b012a707082fa2f16feba547cf8e8656c037e2dab2cd0e06",
+          "shape": [
+            3502
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+          "shape": [
+            3502
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "6c310178adc9b0ba73794822b85c461c672e24cdd6ea358b11ecce420d028183",
+          "shape": [
+            3502
+          ]
+        }
+      },
+      "direction": "sheet2_to_sheet1",
+      "file": "sheet2_to_sheet1/multiresolution_tabular_view/test.npz",
+      "file_sha256": "844a39cbdbc8c10a4c6aa9ea490422ae786e01e1fba8cfbd8f7b636bf51cc512",
+      "role": "test",
+      "view": "multiresolution_tabular_view"
+    },
+    {
+      "arrays": {
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "d18832f105751a9d8d6fa68164f9e485aa02c07b47d7f865c687c04828752b46",
+          "shape": [
+            3502
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+          "shape": [
+            3502
+          ]
+        },
+        "sequence_u": {
+          "dtype": "float32",
+          "sha256": "5e317022686a665c4fb8738aeeb602230dbcb173951b4c234b4899930c995279",
+          "shape": [
+            3502,
+            240,
+            4
+          ]
+        },
+        "sequence_y": {
+          "dtype": "float32",
+          "sha256": "b77b604f68942f9648a9e9f2f457846eacafdb926f750ecb834d5c04c7abecf1",
+          "shape": [
+            3502,
+            240
+          ]
+        },
+        "sequence_y_centered": {
+          "dtype": "float32",
+          "sha256": "b8e1301d7cb6797687b9c3edf2de6a222f6fcede400d089956e11bfc5fa9ddbf",
+          "shape": [
+            3502,
+            240
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "6c310178adc9b0ba73794822b85c461c672e24cdd6ea358b11ecce420d028183",
+          "shape": [
+            3502
+          ]
+        }
+      },
+      "direction": "sheet2_to_sheet1",
+      "file": "sheet2_to_sheet1/sequence_view/test.npz",
+      "file_sha256": "6f32a5f5f2410899dbb01fb3ea73b6c39066109e9df1ec0743d243fde592f742",
+      "role": "test",
+      "view": "sequence_view"
+    },
+    {
+      "arrays": {
+        "adjacency": {
+          "dtype": "float32",
+          "sha256": "d3f7cc33a56a469eca2058d70cb0d8c267a38d17b647a395997e9dd01b8ecd75",
+          "shape": [
+            4,
+            4
+          ]
+        },
+        "evaluation_mask": {
+          "dtype": "bool",
+          "sha256": "d18832f105751a9d8d6fa68164f9e485aa02c07b47d7f865c687c04828752b46",
+          "shape": [
+            3502
+          ]
+        },
+        "node_sequence": {
+          "dtype": "float32",
+          "sha256": "14c9126ad4f22dd8039c4240b4a4747767b5c29ac5728b48810418d10c722361",
+          "shape": [
+            3502,
+            4,
+            240
+          ]
+        },
+        "sample_id": {
+          "dtype": "<U80",
+          "sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+          "shape": [
+            3502
+          ]
+        },
+        "target_z": {
+          "dtype": "float64",
+          "sha256": "6c310178adc9b0ba73794822b85c461c672e24cdd6ea358b11ecce420d028183",
+          "shape": [
+            3502
+          ]
+        }
+      },
+      "direction": "sheet2_to_sheet1",
+      "file": "sheet2_to_sheet1/graph_view/test.npz",
+      "file_sha256": "1fa0d2261fd5c1f8eb809bb3e6db65e8393d0defac044510b74f354fedd2cc2e",
+      "role": "test",
+      "view": "graph_view"
+    }
+  ],
+  "schema": "PHYSICS_FIRST_FULL_BENCHMARK_V1"
+}

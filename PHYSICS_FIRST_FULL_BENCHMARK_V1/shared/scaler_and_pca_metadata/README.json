@@ -1,0 +1,4 @@
+{
+  "rule": "PCA and all preprocessing are fit on the training rod only.",
+  "status": "EMBEDDED_IN_DIRECTION_METADATA"
+}

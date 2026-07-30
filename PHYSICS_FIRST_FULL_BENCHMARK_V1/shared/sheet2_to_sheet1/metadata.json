@@ -1,0 +1,424 @@
+{
+  "lag_blocks": [
+    {
+      "midpoint_min": 0.08333333335,
+      "start_min": 0.0,
+      "stop_min": 0.1666666667
+    },
+    {
+      "midpoint_min": 0.25000000005,
+      "start_min": 0.1666666667,
+      "stop_min": 0.3333333334
+    },
+    {
+      "midpoint_min": 0.41666666674999997,
+      "start_min": 0.3333333334,
+      "stop_min": 0.5000000001
+    },
+    {
+      "midpoint_min": 0.5833333334499999,
+      "start_min": 0.5000000001,
+      "stop_min": 0.6666666668
+    },
+    {
+      "midpoint_min": 0.75000000015,
+      "start_min": 0.6666666668,
+      "stop_min": 0.8333333334999999
+    },
+    {
+      "midpoint_min": 0.91666666685,
+      "start_min": 0.8333333334999999,
+      "stop_min": 1.0000000002
+    },
+    {
+      "midpoint_min": 1.0833333335500002,
+      "start_min": 1.0000000002,
+      "stop_min": 1.1666666669
+    },
+    {
+      "midpoint_min": 1.25000000025,
+      "start_min": 1.1666666669,
+      "stop_min": 1.3333333336000002
+    },
+    {
+      "midpoint_min": 1.4166666669500003,
+      "start_min": 1.3333333336000002,
+      "stop_min": 1.5000000003000002
+    },
+    {
+      "midpoint_min": 1.5833333336500002,
+      "start_min": 1.5000000003000002,
+      "stop_min": 1.6666666670000003
+    },
+    {
+      "midpoint_min": 1.7500000003500005,
+      "start_min": 1.6666666670000003,
+      "stop_min": 1.8333333337000004
+    },
+    {
+      "midpoint_min": 1.9166666668500003,
+      "start_min": 1.8333333337000004,
+      "stop_min": 2.0
+    },
+    {
+      "midpoint_min": 2.25,
+      "start_min": 2.0,
+      "stop_min": 2.5
+    },
+    {
+      "midpoint_min": 2.75,
+      "start_min": 2.5,
+      "stop_min": 3.0
+    },
+    {
+      "midpoint_min": 3.25,
+      "start_min": 3.0,
+      "stop_min": 3.5
+    },
+    {
+      "midpoint_min": 3.75,
+      "start_min": 3.5,
+      "stop_min": 4.0
+    },
+    {
+      "midpoint_min": 4.25,
+      "start_min": 4.0,
+      "stop_min": 4.5
+    },
+    {
+      "midpoint_min": 4.75,
+      "start_min": 4.5,
+      "stop_min": 5.0
+    },
+    {
+      "midpoint_min": 5.25,
+      "start_min": 5.0,
+      "stop_min": 5.5
+    },
+    {
+      "midpoint_min": 5.75,
+      "start_min": 5.5,
+      "stop_min": 6.0
+    },
+    {
+      "midpoint_min": 6.25,
+      "start_min": 6.0,
+      "stop_min": 6.5
+    },
+    {
+      "midpoint_min": 6.75,
+      "start_min": 6.5,
+      "stop_min": 7.0
+    },
+    {
+      "midpoint_min": 7.25,
+      "start_min": 7.0,
+      "stop_min": 7.5
+    },
+    {
+      "midpoint_min": 7.75,
+      "start_min": 7.5,
+      "stop_min": 8.0
+    },
+    {
+      "midpoint_min": 8.25,
+      "start_min": 8.0,
+      "stop_min": 8.5
+    },
+    {
+      "midpoint_min": 8.75,
+      "start_min": 8.5,
+      "stop_min": 9.0
+    },
+    {
+      "midpoint_min": 9.25,
+      "start_min": 9.0,
+      "stop_min": 9.5
+    },
+    {
+      "midpoint_min": 9.75,
+      "start_min": 9.5,
+      "stop_min": 10.0
+    },
+    {
+      "midpoint_min": 11.0,
+      "start_min": 10.0,
+      "stop_min": 12.0
+    },
+    {
+      "midpoint_min": 13.0,
+      "start_min": 12.0,
+      "stop_min": 14.0
+    },
+    {
+      "midpoint_min": 15.0,
+      "start_min": 14.0,
+      "stop_min": 16.0
+    },
+    {
+      "midpoint_min": 17.0,
+      "start_min": 16.0,
+      "stop_min": 18.0
+    },
+    {
+      "midpoint_min": 19.0,
+      "start_min": 18.0,
+      "stop_min": 20.0
+    },
+    {
+      "midpoint_min": 21.0,
+      "start_min": 20.0,
+      "stop_min": 22.0
+    },
+    {
+      "midpoint_min": 23.0,
+      "start_min": 22.0,
+      "stop_min": 24.0
+    },
+    {
+      "midpoint_min": 25.0,
+      "start_min": 24.0,
+      "stop_min": 26.0
+    },
+    {
+      "midpoint_min": 27.0,
+      "start_min": 26.0,
+      "stop_min": 28.0
+    },
+    {
+      "midpoint_min": 29.0,
+      "start_min": 28.0,
+      "stop_min": 30.0
+    },
+    {
+      "midpoint_min": 31.0,
+      "start_min": 30.0,
+      "stop_min": 32.0
+    },
+    {
+      "midpoint_min": 33.0,
+      "start_min": 32.0,
+      "stop_min": 34.0
+    },
+    {
+      "midpoint_min": 35.0,
+      "start_min": 34.0,
+      "stop_min": 36.0
+    },
+    {
+      "midpoint_min": 37.0,
+      "start_min": 36.0,
+      "stop_min": 38.0
+    },
+    {
+      "midpoint_min": 39.0,
+      "start_min": 38.0,
+      "stop_min": 40.0
+    }
+  ],
+  "maturity_rows": 132,
+  "max_residual_history_rows": 240,
+  "multiresolution_columns": [
+    "joint_lift:lag=0-0.166667min",
+    "joint_lift:lag=0.166667-0.333333min",
+    "joint_lift:lag=0.333333-0.5min",
+    "joint_lift:lag=0.5-0.666667min",
+    "joint_lift:lag=0.666667-0.833333min",
+    "joint_lift:lag=0.833333-1min",
+    "joint_lift:lag=1-1.16667min",
+    "joint_lift:lag=1.16667-1.33333min",
+    "joint_lift:lag=1.33333-1.5min",
+    "joint_lift:lag=1.5-1.66667min",
+    "joint_lift:lag=1.66667-1.83333min",
+    "joint_lift:lag=1.83333-2min",
+    "joint_lift:lag=2-2.5min",
+    "joint_lift:lag=2.5-3min",
+    "joint_lift:lag=3-3.5min",
+    "joint_lift:lag=3.5-4min",
+    "joint_lift:lag=4-4.5min",
+    "joint_lift:lag=4.5-5min",
+    "joint_lift:lag=5-5.5min",
+    "joint_lift:lag=5.5-6min",
+    "joint_lift:lag=6-6.5min",
+    "joint_lift:lag=6.5-7min",
+    "joint_lift:lag=7-7.5min",
+    "joint_lift:lag=7.5-8min",
+    "joint_lift:lag=8-8.5min",
+    "joint_lift:lag=8.5-9min",
+    "joint_lift:lag=9-9.5min",
+    "joint_lift:lag=9.5-10min",
+    "joint_lift:lag=10-12min",
+    "joint_lift:lag=12-14min",
+    "joint_lift:lag=14-16min",
+    "joint_lift:lag=16-18min",
+    "joint_lift:lag=18-20min",
+    "joint_lift:lag=20-22min",
+    "joint_lift:lag=22-24min",
+    "joint_lift:lag=24-26min",
+    "joint_lift:lag=26-28min",
+    "joint_lift:lag=28-30min",
+    "joint_lift:lag=30-32min",
+    "joint_lift:lag=32-34min",
+    "joint_lift:lag=34-36min",
+    "joint_lift:lag=36-38min",
+    "joint_lift:lag=38-40min",
+    "heater_power:lag=0-0.166667min",
+    "heater_power:lag=0.166667-0.333333min",
+    "heater_power:lag=0.333333-0.5min",
+    "heater_power:lag=0.5-0.666667min",
+    "heater_power:lag=0.666667-0.833333min",
+    "heater_power:lag=0.833333-1min",
+    "heater_power:lag=1-1.16667min",
+    "heater_power:lag=1.16667-1.33333min",
+    "heater_power:lag=1.33333-1.5min",
+    "heater_power:lag=1.5-1.66667min",
+    "heater_power:lag=1.66667-1.83333min",
+    "heater_power:lag=1.83333-2min",
+    "heater_power:lag=2-2.5min",
+    "heater_power:lag=2.5-3min",
+    "heater_power:lag=3-3.5min",
+    "heater_power:lag=3.5-4min",
+    "heater_power:lag=4-4.5min",
+    "heater_power:lag=4.5-5min",
+    "heater_power:lag=5-5.5min",
+    "heater_power:lag=5.5-6min",
+    "heater_power:lag=6-6.5min",
+    "heater_power:lag=6.5-7min",
+    "heater_power:lag=7-7.5min",
+    "heater_power:lag=7.5-8min",
+    "heater_power:lag=8-8.5min",
+    "heater_power:lag=8.5-9min",
+    "heater_power:lag=9-9.5min",
+    "heater_power:lag=9.5-10min",
+    "heater_power:lag=10-12min",
+    "heater_power:lag=12-14min",
+    "heater_power:lag=14-16min",
+    "heater_power:lag=16-18min",
+    "heater_power:lag=18-20min",
+    "heater_power:lag=20-22min",
+    "heater_power:lag=22-24min",
+    "heater_power:lag=24-26min",
+    "heater_power:lag=26-28min",
+    "heater_power:lag=28-30min",
+    "heater_power:lag=30-32min",
+    "heater_power:lag=32-34min",
+    "heater_power:lag=34-36min",
+    "heater_power:lag=36-38min",
+    "heater_power:lag=38-40min",
+    "crystal_rotation:lag=0-0.166667min",
+    "crystal_rotation:lag=0.166667-0.333333min",
+    "crystal_rotation:lag=0.333333-0.5min",
+    "crystal_rotation:lag=0.5-0.666667min",
+    "crystal_rotation:lag=0.666667-0.833333min",
+    "crystal_rotation:lag=0.833333-1min",
+    "crystal_rotation:lag=1-1.16667min",
+    "crystal_rotation:lag=1.16667-1.33333min",
+    "crystal_rotation:lag=1.33333-1.5min",
+    "crystal_rotation:lag=1.5-1.66667min",
+    "crystal_rotation:lag=1.66667-1.83333min",
+    "crystal_rotation:lag=1.83333-2min",
+    "crystal_rotation:lag=2-2.5min",
+    "crystal_rotation:lag=2.5-3min",
+    "crystal_rotation:lag=3-3.5min",
+    "crystal_rotation:lag=3.5-4min",
+    "crystal_rotation:lag=4-4.5min",
+    "crystal_rotation:lag=4.5-5min",
+    "crystal_rotation:lag=5-5.5min",
+    "crystal_rotation:lag=5.5-6min",
+    "crystal_rotation:lag=6-6.5min",
+    "crystal_rotation:lag=6.5-7min",
+    "crystal_rotation:lag=7-7.5min",
+    "crystal_rotation:lag=7.5-8min",
+    "crystal_rotation:lag=8-8.5min",
+    "crystal_rotation:lag=8.5-9min",
+    "crystal_rotation:lag=9-9.5min",
+    "crystal_rotation:lag=9.5-10min",
+    "crystal_rotation:lag=10-12min",
+    "crystal_rotation:lag=12-14min",
+    "crystal_rotation:lag=14-16min",
+    "crystal_rotation:lag=16-18min",
+    "crystal_rotation:lag=18-20min",
+    "crystal_rotation:lag=20-22min",
+    "crystal_rotation:lag=22-24min",
+    "crystal_rotation:lag=24-26min",
+    "crystal_rotation:lag=26-28min",
+    "crystal_rotation:lag=28-30min",
+    "crystal_rotation:lag=30-32min",
+    "crystal_rotation:lag=32-34min",
+    "crystal_rotation:lag=34-36min",
+    "crystal_rotation:lag=36-38min",
+    "crystal_rotation:lag=38-40min",
+    "crucible_rotation:lag=0-0.166667min",
+    "crucible_rotation:lag=0.166667-0.333333min",
+    "crucible_rotation:lag=0.333333-0.5min",
+    "crucible_rotation:lag=0.5-0.666667min",
+    "crucible_rotation:lag=0.666667-0.833333min",
+    "crucible_rotation:lag=0.833333-1min",
+    "crucible_rotation:lag=1-1.16667min",
+    "crucible_rotation:lag=1.16667-1.33333min",
+    "crucible_rotation:lag=1.33333-1.5min",
+    "crucible_rotation:lag=1.5-1.66667min",
+    "crucible_rotation:lag=1.66667-1.83333min",
+    "crucible_rotation:lag=1.83333-2min",
+    "crucible_rotation:lag=2-2.5min",
+    "crucible_rotation:lag=2.5-3min",
+    "crucible_rotation:lag=3-3.5min",
+    "crucible_rotation:lag=3.5-4min",
+    "crucible_rotation:lag=4-4.5min",
+    "crucible_rotation:lag=4.5-5min",
+    "crucible_rotation:lag=5-5.5min",
+    "crucible_rotation:lag=5.5-6min",
+    "crucible_rotation:lag=6-6.5min",
+    "crucible_rotation:lag=6.5-7min",
+    "crucible_rotation:lag=7-7.5min",
+    "crucible_rotation:lag=7.5-8min",
+    "crucible_rotation:lag=8-8.5min",
+    "crucible_rotation:lag=8.5-9min",
+    "crucible_rotation:lag=9-9.5min",
+    "crucible_rotation:lag=9.5-10min",
+    "crucible_rotation:lag=10-12min",
+    "crucible_rotation:lag=12-14min",
+    "crucible_rotation:lag=14-16min",
+    "crucible_rotation:lag=16-18min",
+    "crucible_rotation:lag=18-20min",
+    "crucible_rotation:lag=20-22min",
+    "crucible_rotation:lag=22-24min",
+    "crucible_rotation:lag=24-26min",
+    "crucible_rotation:lag=26-28min",
+    "crucible_rotation:lag=28-30min",
+    "crucible_rotation:lag=30-32min",
+    "crucible_rotation:lag=32-34min",
+    "crucible_rotation:lag=34-36min",
+    "crucible_rotation:lag=36-38min",
+    "crucible_rotation:lag=38-40min"
+  ],
+  "pca": {
+    "explained_fraction": 0.9946485650713291,
+    "mean": [
+      0.566856476061781,
+      0.091083542028907
+    ],
+    "scale": [
+      0.06594519125331867,
+      0.010013705544159144
+    ],
+    "sign_rule": "sum_of_loadings_positive",
+    "vector": [
+      0.7071067811865575,
+      0.7071067811865377
+    ]
+  },
+  "sequence_control_order": [
+    "joint_lift",
+    "heater_power",
+    "crystal_rotation",
+    "crucible_rotation"
+  ],
+  "sequence_steps": 240,
+  "stable_starts_raw": {
+    "Sheet1": 735,
+    "Sheet2": 746
+  },
+  "test_sheet": "Sheet1",
+  "train_sheet": "Sheet2"
+}

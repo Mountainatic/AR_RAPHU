@@ -1,0 +1,22 @@
+{
+  "schema": "PHYSICS_FIRST_CPU_MODEL_POOL_V1",
+  "ridge_alphas": [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0],
+  "elastic_net": {
+    "alpha": [0.0001, 0.001, 0.01, 0.1],
+    "l1_ratio": [0.1, 0.5, 0.9]
+  },
+  "latent_components": [2, 4, 8, 12, 16],
+  "kernel_gamma": [0.001, 0.01, 0.1],
+  "kernel_alpha": [0.01, 1.0, 100.0],
+  "tree_depth": [3, 6, null],
+  "tree_estimators": [100, 300],
+  "state_orders": [2, 4, 6, 8, 12, 16],
+  "ar_history_min": [2.0, 5.0, 10.0, 20.0, 40.0],
+  "polynomial_degree": [2, 3],
+  "maximum_configs_per_model": 30,
+  "one_se": true,
+  "one_se_complexity_preference": "lower_dimension_then_stronger_regularization",
+  "n_jobs_default": 20,
+  "heavy_job_limit": 6,
+  "bootstrap_jobs": 16
+}

@@ -1,0 +1,4 @@
+{
+  "target": "future 2-minute mean diameter at +20 minutes minus current 2-minute mean",
+  "unit": "source diameter unit"
+}
