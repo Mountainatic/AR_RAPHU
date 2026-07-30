@@ -1,0 +1,123 @@
+{
+  "bootstrap_500": {
+    "block_lengths": [
+      38,
+      31
+    ],
+    "lower_95": 0.002149804144496787,
+    "median": 0.020385075570721056,
+    "positive_probability": 0.978,
+    "replicates": 500,
+    "upper_95": 0.03469954549568961
+  },
+  "common_support": {
+    "bounds": [
+      -0.10274041388248868,
+      0.005566569043998146
+    ],
+    "counts": [
+      958,
+      854
+    ],
+    "direction_improvements": [
+      -0.0004760744277620965,
+      0.01910530171454572
+    ],
+    "drop_from_full": 0.006307817021071971,
+    "pooled_improvement": 0.014765207783202117
+  },
+  "conditional_bootstrap_500": {
+    "block_lengths": [
+      38,
+      31
+    ],
+    "lower_95": -0.3327611319381203,
+    "median": -0.17676141689938019,
+    "positive_probability": 0.01,
+    "replicates": 500,
+    "upper_95": -0.03792263914070651
+  },
+  "conditional_direction_improvements": [
+    -0.6714287938335062,
+    -0.009051305321993386
+  ],
+  "direction_improvements": [
+    0.002785675691648559,
+    0.025449366553079722
+  ],
+  "gates": {
+    "C_AR_conditional_gain": false,
+    "S2_stable_structure": false
+  },
+  "kernel_structure": {
+    "correlation": 0.6830592020685687,
+    "peak_overlap": false,
+    "support_jaccard": 0.6724137931034483
+  },
+  "pooled_conditional_improvement": -0.1761128085444008,
+  "pooled_q_improvement": 0.021073024804274088,
+  "prediction_shift_placebo": {
+    "-1": [
+      -0.0018786460098643154,
+      -0.01893338848127435
+    ],
+    "-2": [
+      -0.0020777162255039006,
+      -0.008801290821882413
+    ],
+    "1": [
+      0.007523598617107274,
+      -0.012344907372662917
+    ],
+    "2": [
+      0.007098072138288503,
+      0.0017488747307357055
+    ]
+  },
+  "profile": {
+    "channel": "crystal_rotation",
+    "confirmatory": true,
+    "history_min": 120,
+    "horizon_min": 40,
+    "id": "R5",
+    "target_window_min": 5
+  },
+  "regularization_sensitivity": {
+    "d1": {
+      "0.1": {
+        "MSE": 0.11454464925475072,
+        "alpha": 1000.0
+      },
+      "1.0": {
+        "MSE": 0.11840463626336827,
+        "alpha": 10000.0
+      },
+      "10.0": {
+        "MSE": 0.11880929218660521,
+        "alpha": 100000.0
+      }
+    },
+    "d2": {
+      "0.1": {
+        "MSE": 0.46829990598482696,
+        "alpha": 10.0
+      },
+      "1.0": {
+        "MSE": 0.5006202368510424,
+        "alpha": 100.0
+      },
+      "10.0": {
+        "MSE": 0.5120688842947547,
+        "alpha": 1000.0
+      }
+    }
+  },
+  "resolution_sensitivity": {
+    "0.6": 0.0014578837608922868,
+    "1.0": 0.021073024804274088,
+    "2.0": 0.01182225034838602
+  },
+  "status": "COMPLETED",
+  "task_id": "R5__innovation",
+  "variant": "innovation"
+}

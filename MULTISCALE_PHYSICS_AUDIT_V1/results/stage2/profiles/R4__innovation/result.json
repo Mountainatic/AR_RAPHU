@@ -1,0 +1,123 @@
+{
+  "bootstrap_500": {
+    "block_lengths": [
+      25,
+      25
+    ],
+    "lower_95": -0.006652561673465451,
+    "median": 0.02197773776586126,
+    "positive_probability": 0.93,
+    "replicates": 500,
+    "upper_95": 0.050813641369756773
+  },
+  "common_support": {
+    "bounds": [
+      -0.09487822238179158,
+      0.00543790269804304
+    ],
+    "counts": [
+      1113,
+      1009
+    ],
+    "direction_improvements": [
+      0.06992921450663081,
+      0.00018311710914198365
+    ],
+    "drop_from_full": 0.0024184855453451837,
+    "pooled_improvement": 0.019888751380809144
+  },
+  "conditional_bootstrap_500": {
+    "block_lengths": [
+      25,
+      25
+    ],
+    "lower_95": -0.009438512162799062,
+    "median": 0.05857448483347877,
+    "positive_probability": 0.956,
+    "replicates": 500,
+    "upper_95": 0.13795935992869174
+  },
+  "conditional_direction_improvements": [
+    0.20280104078050176,
+    -0.004209608769368156
+  ],
+  "direction_improvements": [
+    0.08633044095974218,
+    0.0002050757482190413
+  ],
+  "gates": {
+    "C_AR_conditional_gain": false,
+    "S2_stable_structure": false
+  },
+  "kernel_structure": {
+    "correlation": 0.8646906623789131,
+    "peak_overlap": false,
+    "support_jaccard": 0.9782608695652174
+  },
+  "pooled_conditional_improvement": 0.054373546308728926,
+  "pooled_q_improvement": 0.022307236926154328,
+  "prediction_shift_placebo": {
+    "-1": [
+      0.03309682291487048,
+      8.179551233800098e-05
+    ],
+    "-2": [
+      -0.03012720430210991,
+      -0.00020428783360304514
+    ],
+    "1": [
+      0.07353886829749967,
+      4.762869817764859e-06
+    ],
+    "2": [
+      -0.01576760885120576,
+      -0.00011270896908044392
+    ]
+  },
+  "profile": {
+    "channel": "crystal_rotation",
+    "confirmatory": true,
+    "history_min": 60,
+    "horizon_min": 20,
+    "id": "R4",
+    "target_window_min": 5
+  },
+  "regularization_sensitivity": {
+    "d1": {
+      "0.1": {
+        "MSE": 0.23819060786153584,
+        "alpha": 10.0
+      },
+      "1.0": {
+        "MSE": 0.1553170957858244,
+        "alpha": 100.0
+      },
+      "10.0": {
+        "MSE": 0.16734624235359197,
+        "alpha": 1000.0
+      }
+    },
+    "d2": {
+      "0.1": {
+        "MSE": 0.506324036309355,
+        "alpha": 1000.0
+      },
+      "1.0": {
+        "MSE": 0.5072343697586783,
+        "alpha": 10000.0
+      },
+      "10.0": {
+        "MSE": 0.5073279815008054,
+        "alpha": 100000.0
+      }
+    }
+  },
+  "resolution_sensitivity": {
+    "0.6": 0.022841399525962203,
+    "1.0": 0.022307236926154328,
+    "2.0": 0.015729337579253322
+  },
+  "status": "COMPLETED",
+  "task_id": "R4__innovation",
+  "variant": "innovation"
+}

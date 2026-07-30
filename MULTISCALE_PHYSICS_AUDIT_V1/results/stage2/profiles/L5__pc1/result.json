@@ -1,0 +1,123 @@
+{
+  "bootstrap_500": {
+    "block_lengths": [
+      69,
+      70
+    ],
+    "lower_95": 0.29182135246327906,
+    "median": 0.42237016058110455,
+    "positive_probability": 1.0,
+    "replicates": 500,
+    "upper_95": 0.5323546525507776
+  },
+  "common_support": {
+    "bounds": [
+      -2.6157802590723476,
+      2.49761327800533
+    ],
+    "counts": [
+      3591,
+      3282
+    ],
+    "direction_improvements": [
+      0.3455232353416928,
+      0.4480932257613983
+    ],
+    "drop_from_full": 0.005324074788814248,
+    "pooled_improvement": 0.41613142458479324
+  },
+  "conditional_bootstrap_500": {
+    "block_lengths": [
+      69,
+      70
+    ],
+    "lower_95": -0.07939537448400841,
+    "median": 0.1115928470498373,
+    "positive_probability": 0.882,
+    "replicates": 500,
+    "upper_95": 0.27030264544773785
+  },
+  "conditional_direction_improvements": [
+    0.16567344345962176,
+    0.09317731941975149
+  ],
+  "direction_improvements": [
+    0.37567651642413313,
+    0.44255013458512116
+  ],
+  "gates": {
+    "C_AR_conditional_gain": false,
+    "S2_stable_structure": true
+  },
+  "kernel_structure": {
+    "correlation": 0.8893991596543597,
+    "peak_overlap": false,
+    "support_jaccard": 0.8125
+  },
+  "pooled_conditional_improvement": 0.11085863096621007,
+  "pooled_q_improvement": 0.4214554993736075,
+  "prediction_shift_placebo": {
+    "-1": [
+      0.06540769625601595,
+      -0.02861127906748062
+    ],
+    "-2": [
+      -0.7070022667261755,
+      -0.604574668727718
+    ],
+    "1": [
+      0.052039401017288656,
+      0.3100778440349332
+    ],
+    "2": [
+      -0.49514396716217535,
+      -0.15525556353300574
+    ]
+  },
+  "profile": {
+    "channel": "joint_lift",
+    "confirmatory": true,
+    "history_min": 40,
+    "horizon_min": 10,
+    "id": "L5",
+    "target_window_min": 2
+  },
+  "regularization_sensitivity": {
+    "d1": {
+      "0.1": {
+        "MSE": 0.055360969346712356,
+        "alpha": 0.1
+      },
+      "1.0": {
+        "MSE": 0.055674592438505234,
+        "alpha": 1.0
+      },
+      "10.0": {
+        "MSE": 0.06942220138449849,
+        "alpha": 10.0
+      }
+    },
+    "d2": {
+      "0.1": {
+        "MSE": 0.09165676183001614,
+        "alpha": 0.1
+      },
+      "1.0": {
+        "MSE": 0.11100112354073459,
+        "alpha": 1.0
+      },
+      "10.0": {
+        "MSE": 0.16079685279578013,
+        "alpha": 10.0
+      }
+    }
+  },
+  "resolution_sensitivity": {
+    "0.6": 0.45357056611195623,
+    "1.0": 0.4214554993736075,
+    "2.0": 0.36119670487193123
+  },
+  "status": "COMPLETED",
+  "task_id": "L5__pc1",
+  "variant": "pc1"
+}

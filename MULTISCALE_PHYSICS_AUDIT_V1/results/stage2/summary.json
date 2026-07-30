@@ -1,0 +1,629 @@
+{
+  "conditional_gain_tasks": [
+    "L6__pc1"
+  ],
+  "config_sha256": "3e437a5bc7e9f4b2002b618eb1314396cc95f0c28409ce5085e4a8914e5a947f",
+  "confirmed_tasks": [
+    "L6__pc1",
+    "L5__pc1"
+  ],
+  "data_sha256": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+  "results": [
+    {
+      "bootstrap_500": {
+        "block_lengths": [
+          80,
+          84
+        ],
+        "lower_95": 0.3448102503979891,
+        "median": 0.4745073251799659,
+        "positive_probability": 1.0,
+        "replicates": 500,
+        "upper_95": 0.5954573316880885
+      },
+      "common_support": {
+        "bounds": [
+          -2.6162780123174607,
+          2.5013946064947254
+        ],
+        "counts": [
+          3531,
+          3225
+        ],
+        "direction_improvements": [
+          0.3870997052354388,
+          0.5131945356750869
+        ],
+        "drop_from_full": 0.006125191810675057,
+        "pooled_improvement": 0.47447121681780124
+      },
+      "conditional_bootstrap_500": {
+        "block_lengths": [
+          80,
+          84
+        ],
+        "lower_95": 0.06961053066403264,
+        "median": 0.21134477056669848,
+        "positive_probability": 0.996,
+        "replicates": 500,
+        "upper_95": 0.3660457310291428
+      },
+      "conditional_direction_improvements": [
+        0.29807008683823955,
+        0.18131139139884733
+      ],
+      "direction_improvements": [
+        0.4361042839451327,
+        0.500899190394794
+      ],
+      "gates": {
+        "C_AR_conditional_gain": true,
+        "S2_stable_structure": true
+      },
+      "kernel_structure": {
+        "correlation": 0.8128696221440682,
+        "peak_overlap": false,
+        "support_jaccard": 0.8823529411764706
+      },
+      "pooled_conditional_improvement": 0.2107981090466351,
+      "pooled_q_improvement": 0.4805964086284763,
+      "prediction_shift_placebo": {
+        "-1": [
+          -0.7744344825146252,
+          -0.6612791541526033
+        ],
+        "-2": [
+          -0.769149569801516,
+          -0.5470488291108475
+        ],
+        "1": [
+          -0.4837379978740759,
+          -0.22786607025555772
+        ],
+        "2": [
+          -0.9047896331624892,
+          -0.7412607288309985
+        ]
+      },
+      "profile": {
+        "channel": "joint_lift",
+        "confirmatory": true,
+        "history_min": 40,
+        "horizon_min": 20,
+        "id": "L6",
+        "target_window_min": 2
+      },
+      "regularization_sensitivity": {
+        "d1": {
+          "0.1": {
+            "MSE": 0.12392279887335739,
+            "alpha": 0.1
+          },
+          "1.0": {
+            "MSE": 0.12073827446989442,
+            "alpha": 1.0
+          },
+          "10.0": {
+            "MSE": 0.1446800776958391,
+            "alpha": 10.0
+          }
+        },
+        "d2": {
+          "0.1": {
+            "MSE": 0.22638527855538096,
+            "alpha": 0.1
+          },
+          "1.0": {
+            "MSE": 0.2410744421263448,
+            "alpha": 1.0
+          },
+          "10.0": {
+            "MSE": 0.3601443453216702,
+            "alpha": 10.0
+          }
+        }
+      },
+      "resolution_sensitivity": {
+        "0.6": 0.4956548010525845,
+        "1.0": 0.4805964086284763,
+        "2.0": 0.43551598681797177
+      },
+      "status": "COMPLETED",
+      "task_id": "L6__pc1",
+      "variant": "pc1"
+    },
+    {
+      "bootstrap_500": {
+        "block_lengths": [
+          69,
+          70
+        ],
+        "lower_95": 0.29182135246327906,
+        "median": 0.42237016058110455,
+        "positive_probability": 1.0,
+        "replicates": 500,
+        "upper_95": 0.5323546525507776
+      },
+      "common_support": {
+        "bounds": [
+          -2.6157802590723476,
+          2.49761327800533
+        ],
+        "counts": [
+          3591,
+          3282
+        ],
+        "direction_improvements": [
+          0.3455232353416928,
+          0.4480932257613983
+        ],
+        "drop_from_full": 0.005324074788814248,
+        "pooled_improvement": 0.41613142458479324
+      },
+      "conditional_bootstrap_500": {
+        "block_lengths": [
+          69,
+          70
+        ],
+        "lower_95": -0.07939537448400841,
+        "median": 0.1115928470498373,
+        "positive_probability": 0.882,
+        "replicates": 500,
+        "upper_95": 0.27030264544773785
+      },
+      "conditional_direction_improvements": [
+        0.16567344345962176,
+        0.09317731941975149
+      ],
+      "direction_improvements": [
+        0.37567651642413313,
+        0.44255013458512116
+      ],
+      "gates": {
+        "C_AR_conditional_gain": false,
+        "S2_stable_structure": true
+      },
+      "kernel_structure": {
+        "correlation": 0.8893991596543597,
+        "peak_overlap": false,
+        "support_jaccard": 0.8125
+      },
+      "pooled_conditional_improvement": 0.11085863096621007,
+      "pooled_q_improvement": 0.4214554993736075,
+      "prediction_shift_placebo": {
+        "-1": [
+          0.06540769625601595,
+          -0.02861127906748062
+        ],
+        "-2": [
+          -0.7070022667261755,
+          -0.604574668727718
+        ],
+        "1": [
+          0.052039401017288656,
+          0.3100778440349332
+        ],
+        "2": [
+          -0.49514396716217535,
+          -0.15525556353300574
+        ]
+      },
+      "profile": {
+        "channel": "joint_lift",
+        "confirmatory": true,
+        "history_min": 40,
+        "horizon_min": 10,
+        "id": "L5",
+        "target_window_min": 2
+      },
+      "regularization_sensitivity": {
+        "d1": {
+          "0.1": {
+            "MSE": 0.055360969346712356,
+            "alpha": 0.1
+          },
+          "1.0": {
+            "MSE": 0.055674592438505234,
+            "alpha": 1.0
+          },
+          "10.0": {
+            "MSE": 0.06942220138449849,
+            "alpha": 10.0
+          }
+        },
+        "d2": {
+          "0.1": {
+            "MSE": 0.09165676183001614,
+            "alpha": 0.1
+          },
+          "1.0": {
+            "MSE": 0.11100112354073459,
+            "alpha": 1.0
+          },
+          "10.0": {
+            "MSE": 0.16079685279578013,
+            "alpha": 10.0
+          }
+        }
+      },
+      "resolution_sensitivity": {
+        "0.6": 0.45357056611195623,
+        "1.0": 0.4214554993736075,
+        "2.0": 0.36119670487193123
+      },
+      "status": "COMPLETED",
+      "task_id": "L5__pc1",
+      "variant": "pc1"
+    },
+    {
+      "bootstrap_500": {
+        "block_lengths": [
+          25,
+          25
+        ],
+        "lower_95": -0.006652561673465451,
+        "median": 0.02197773776586126,
+        "positive_probability": 0.93,
+        "replicates": 500,
+        "upper_95": 0.050813641369756773
+      },
+      "common_support": {
+        "bounds": [
+          -0.09487822238179158,
+          0.00543790269804304
+        ],
+        "counts": [
+          1113,
+          1009
+        ],
+        "direction_improvements": [
+          0.06992921450663081,
+          0.00018311710914198365
+        ],
+        "drop_from_full": 0.0024184855453451837,
+        "pooled_improvement": 0.019888751380809144
+      },
+      "conditional_bootstrap_500": {
+        "block_lengths": [
+          25,
+          25
+        ],
+        "lower_95": -0.009438512162799062,
+        "median": 0.05857448483347877,
+        "positive_probability": 0.956,
+        "replicates": 500,
+        "upper_95": 0.13795935992869174
+      },
+      "conditional_direction_improvements": [
+        0.20280104078050176,
+        -0.004209608769368156
+      ],
+      "direction_improvements": [
+        0.08633044095974218,
+        0.0002050757482190413
+      ],
+      "gates": {
+        "C_AR_conditional_gain": false,
+        "S2_stable_structure": false
+      },
+      "kernel_structure": {
+        "correlation": 0.8646906623789131,
+        "peak_overlap": false,
+        "support_jaccard": 0.9782608695652174
+      },
+      "pooled_conditional_improvement": 0.054373546308728926,
+      "pooled_q_improvement": 0.022307236926154328,
+      "prediction_shift_placebo": {
+        "-1": [
+          0.03309682291487048,
+          8.179551233800098e-05
+        ],
+        "-2": [
+          -0.03012720430210991,
+          -0.00020428783360304514
+        ],
+        "1": [
+          0.07353886829749967,
+          4.762869817764859e-06
+        ],
+        "2": [
+          -0.01576760885120576,
+          -0.00011270896908044392
+        ]
+      },
+      "profile": {
+        "channel": "crystal_rotation",
+        "confirmatory": true,
+        "history_min": 60,
+        "horizon_min": 20,
+        "id": "R4",
+        "target_window_min": 5
+      },
+      "regularization_sensitivity": {
+        "d1": {
+          "0.1": {
+            "MSE": 0.23819060786153584,
+            "alpha": 10.0
+          },
+          "1.0": {
+            "MSE": 0.1553170957858244,
+            "alpha": 100.0
+          },
+          "10.0": {
+            "MSE": 0.16734624235359197,
+            "alpha": 1000.0
+          }
+        },
+        "d2": {
+          "0.1": {
+            "MSE": 0.506324036309355,
+            "alpha": 1000.0
+          },
+          "1.0": {
+            "MSE": 0.5072343697586783,
+            "alpha": 10000.0
+          },
+          "10.0": {
+            "MSE": 0.5073279815008054,
+            "alpha": 100000.0
+          }
+        }
+      },
+      "resolution_sensitivity": {
+        "0.6": 0.022841399525962203,
+        "1.0": 0.022307236926154328,
+        "2.0": 0.015729337579253322
+      },
+      "status": "COMPLETED",
+      "task_id": "R4__innovation",
+      "variant": "innovation"
+    },
+    {
+      "bootstrap_500": {
+        "block_lengths": [
+          38,
+          31
+        ],
+        "lower_95": 0.002149804144496787,
+        "median": 0.020385075570721056,
+        "positive_probability": 0.978,
+        "replicates": 500,
+        "upper_95": 0.03469954549568961
+      },
+      "common_support": {
+        "bounds": [
+          -0.10274041388248868,
+          0.005566569043998146
+        ],
+        "counts": [
+          958,
+          854
+        ],
+        "direction_improvements": [
+          -0.0004760744277620965,
+          0.01910530171454572
+        ],
+        "drop_from_full": 0.006307817021071971,
+        "pooled_improvement": 0.014765207783202117
+      },
+      "conditional_bootstrap_500": {
+        "block_lengths": [
+          38,
+          31
+        ],
+        "lower_95": -0.3327611319381203,
+        "median": -0.17676141689938019,
+        "positive_probability": 0.01,
+        "replicates": 500,
+        "upper_95": -0.03792263914070651
+      },
+      "conditional_direction_improvements": [
+        -0.6714287938335062,
+        -0.009051305321993386
+      ],
+      "direction_improvements": [
+        0.002785675691648559,
+        0.025449366553079722
+      ],
+      "gates": {
+        "C_AR_conditional_gain": false,
+        "S2_stable_structure": false
+      },
+      "kernel_structure": {
+        "correlation": 0.6830592020685687,
+        "peak_overlap": false,
+        "support_jaccard": 0.6724137931034483
+      },
+      "pooled_conditional_improvement": -0.1761128085444008,
+      "pooled_q_improvement": 0.021073024804274088,
+      "prediction_shift_placebo": {
+        "-1": [
+          -0.0018786460098643154,
+          -0.01893338848127435
+        ],
+        "-2": [
+          -0.0020777162255039006,
+          -0.008801290821882413
+        ],
+        "1": [
+          0.007523598617107274,
+          -0.012344907372662917
+        ],
+        "2": [
+          0.007098072138288503,
+          0.0017488747307357055
+        ]
+      },
+      "profile": {
+        "channel": "crystal_rotation",
+        "confirmatory": true,
+        "history_min": 120,
+        "horizon_min": 40,
+        "id": "R5",
+        "target_window_min": 5
+      },
+      "regularization_sensitivity": {
+        "d1": {
+          "0.1": {
+            "MSE": 0.11454464925475072,
+            "alpha": 1000.0
+          },
+          "1.0": {
+            "MSE": 0.11840463626336827,
+            "alpha": 10000.0
+          },
+          "10.0": {
+            "MSE": 0.11880929218660521,
+            "alpha": 100000.0
+          }
+        },
+        "d2": {
+          "0.1": {
+            "MSE": 0.46829990598482696,
+            "alpha": 10.0
+          },
+          "1.0": {
+            "MSE": 0.5006202368510424,
+            "alpha": 100.0
+          },
+          "10.0": {
+            "MSE": 0.5120688842947547,
+            "alpha": 1000.0
+          }
+        }
+      },
+      "resolution_sensitivity": {
+        "0.6": 0.0014578837608922868,
+        "1.0": 0.021073024804274088,
+        "2.0": 0.01182225034838602
+      },
+      "status": "COMPLETED",
+      "task_id": "R5__innovation",
+      "variant": "innovation"
+    },
+    {
+      "bootstrap_500": {
+        "block_lengths": [
+          12,
+          9
+        ],
+        "lower_95": 0.0019247049982521977,
+        "median": 0.037735437629512536,
+        "positive_probability": 0.978,
+        "replicates": 500,
+        "upper_95": 0.07733301998290742
+      },
+      "common_support": {
+        "bounds": [
+          94.08440002441407,
+          97.1728015136719
+        ],
+        "counts": [
+          231,
+          181
+        ],
+        "direction_improvements": [
+          0.11039747865855298,
+          -0.019123421153594666
+        ],
+        "drop_from_full": 0.0025841193231284088,
+        "pooled_improvement": 0.034278459378314974
+      },
+      "conditional_bootstrap_500": {
+        "block_lengths": [
+          12,
+          9
+        ],
+        "lower_95": -1.3047663514697379,
+        "median": -0.6447233362432532,
+        "positive_probability": 0.0,
+        "replicates": 500,
+        "upper_95": -0.14061370436974976
+      },
+      "conditional_direction_improvements": [
+        -1.9762238680091744,
+        -0.007382465362707036
+      ],
+      "direction_improvements": [
+        0.10965690647194626,
+        0.002398037100710515
+      ],
+      "gates": {
+        "C_AR_conditional_gain": false,
+        "S2_stable_structure": false
+      },
+      "kernel_structure": {
+        "correlation": -0.011208068960607786,
+        "peak_overlap": false,
+        "support_jaccard": 0.8333333333333334
+      },
+      "pooled_conditional_improvement": -0.6448961780124018,
+      "pooled_q_improvement": 0.03686257870144338,
+      "prediction_shift_placebo": {
+        "-1": [
+          0.032430310020555075,
+          -0.00015907333532383383
+        ],
+        "-2": [
+          -0.032086396648371096,
+          0.021567886481166476
+        ],
+        "1": [
+          -0.06165706601527732,
+          0.005325528107922417
+        ],
+        "2": [
+          -0.14933636627761682,
+          -0.007252096113792517
+        ]
+      },
+      "profile": {
+        "channel": "heater_power",
+        "confirmatory": true,
+        "history_min": 120,
+        "horizon_min": 60,
+        "id": "P4",
+        "target_window_min": 10
+      },
+      "regularization_sensitivity": {
+        "d1": {
+          "0.1": {
+            "MSE": 0.11313289695550212,
+            "alpha": 10.0
+          },
+          "1.0": {
+            "MSE": 0.12309304810771804,
+            "alpha": 100.0
+          },
+          "10.0": {
+            "MSE": 0.13557692623527118,
+            "alpha": 1000.0
+          }
+        },
+        "d2": {
+          "0.1": {
+            "MSE": 0.2995743462117972,
+            "alpha": 1000.0
+          },
+          "1.0": {
+            "MSE": 0.3028112174282367,
+            "alpha": 10000.0
+          },
+          "10.0": {
+            "MSE": 0.3031610645015945,
+            "alpha": 100000.0
+          }
+        }
+      },
+      "resolution_sensitivity": {
+        "0.6": 0.04622769977417329,
+        "1.0": 0.03686257870144338,
+        "2.0": 0.026597492503078413
+      },
+      "status": "COMPLETED",
+      "task_id": "P4__raw_plus_thermal_states",
+      "variant": "raw_plus_thermal_states"
+    }
+  ],
+  "status": "COMPLETED"
+}

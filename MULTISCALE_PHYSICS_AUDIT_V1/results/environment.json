@@ -1,0 +1,17 @@
+{
+  "cpu_count": 192,
+  "executable": "/root/AR_RAPHU_AUTODL/.venv/bin/python",
+  "git_commit": "34a1473af3be7b72daf51411a98441ae007484c8",
+  "machine": "x86_64",
+  "mkl_num_threads": null,
+  "omp_num_threads": null,
+  "openblas_num_threads": null,
+  "packages": {
+    "numpy": "2.2.6",
+    "openpyxl": "3.1.5",
+    "scipy": "1.15.3"
+  },
+  "platform": "Linux-5.15.0-84-generic-x86_64-with-glibc2.35",
+  "processor": "x86_64",
+  "python": "3.10.20 (main, Jul 18 2026, 17:02:35) [Clang 22.1.3 ]"
+}

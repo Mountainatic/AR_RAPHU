@@ -1,0 +1,17 @@
+{
+  "config_sha256": "3e437a5bc7e9f4b2002b618eb1314396cc95f0c28409ce5085e4a8914e5a947f",
+  "data_sha256": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+  "profile": {
+    "channel": "heater_power",
+    "confirmatory": false,
+    "history_min": 240,
+    "horizon_min": 180,
+    "id": "P7",
+    "target_window_min": 20
+  },
+  "reason": "INSUFFICIENT_INNER_FOLD_GEOMETRY",
+  "sample_period_sec": 2.0,
+  "status": "NOT_APPLICABLE",
+  "task_id": "P7__raw_plus_thermal_states",
+  "variant": "raw_plus_thermal_states"
+}

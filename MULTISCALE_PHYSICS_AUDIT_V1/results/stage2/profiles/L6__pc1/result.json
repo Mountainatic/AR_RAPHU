@@ -1,0 +1,123 @@
+{
+  "bootstrap_500": {
+    "block_lengths": [
+      80,
+      84
+    ],
+    "lower_95": 0.3448102503979891,
+    "median": 0.4745073251799659,
+    "positive_probability": 1.0,
+    "replicates": 500,
+    "upper_95": 0.5954573316880885
+  },
+  "common_support": {
+    "bounds": [
+      -2.6162780123174607,
+      2.5013946064947254
+    ],
+    "counts": [
+      3531,
+      3225
+    ],
+    "direction_improvements": [
+      0.3870997052354388,
+      0.5131945356750869
+    ],
+    "drop_from_full": 0.006125191810675057,
+    "pooled_improvement": 0.47447121681780124
+  },
+  "conditional_bootstrap_500": {
+    "block_lengths": [
+      80,
+      84
+    ],
+    "lower_95": 0.06961053066403264,
+    "median": 0.21134477056669848,
+    "positive_probability": 0.996,
+    "replicates": 500,
+    "upper_95": 0.3660457310291428
+  },
+  "conditional_direction_improvements": [
+    0.29807008683823955,
+    0.18131139139884733
+  ],
+  "direction_improvements": [
+    0.4361042839451327,
+    0.500899190394794
+  ],
+  "gates": {
+    "C_AR_conditional_gain": true,
+    "S2_stable_structure": true
+  },
+  "kernel_structure": {
+    "correlation": 0.8128696221440682,
+    "peak_overlap": false,
+    "support_jaccard": 0.8823529411764706
+  },
+  "pooled_conditional_improvement": 0.2107981090466351,
+  "pooled_q_improvement": 0.4805964086284763,
+  "prediction_shift_placebo": {
+    "-1": [
+      -0.7744344825146252,
+      -0.6612791541526033
+    ],
+    "-2": [
+      -0.769149569801516,
+      -0.5470488291108475
+    ],
+    "1": [
+      -0.4837379978740759,
+      -0.22786607025555772
+    ],
+    "2": [
+      -0.9047896331624892,
+      -0.7412607288309985
+    ]
+  },
+  "profile": {
+    "channel": "joint_lift",
+    "confirmatory": true,
+    "history_min": 40,
+    "horizon_min": 20,
+    "id": "L6",
+    "target_window_min": 2
+  },
+  "regularization_sensitivity": {
+    "d1": {
+      "0.1": {
+        "MSE": 0.12392279887335739,
+        "alpha": 0.1
+      },
+      "1.0": {
+        "MSE": 0.12073827446989442,
+        "alpha": 1.0
+      },
+      "10.0": {
+        "MSE": 0.1446800776958391,
+        "alpha": 10.0
+      }
+    },
+    "d2": {
+      "0.1": {
+        "MSE": 0.22638527855538096,
+        "alpha": 0.1
+      },
+      "1.0": {
+        "MSE": 0.2410744421263448,
+        "alpha": 1.0
+      },
+      "10.0": {
+        "MSE": 0.3601443453216702,
+        "alpha": 10.0
+      }
+    }
+  },
+  "resolution_sensitivity": {
+    "0.6": 0.4956548010525845,
+    "1.0": 0.4805964086284763,
+    "2.0": 0.43551598681797177
+  },
+  "status": "COMPLETED",
+  "task_id": "L6__pc1",
+  "variant": "pc1"
+}

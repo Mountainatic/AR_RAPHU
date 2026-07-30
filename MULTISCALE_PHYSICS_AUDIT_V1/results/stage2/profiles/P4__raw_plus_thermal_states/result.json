@@ -1,0 +1,123 @@
+{
+  "bootstrap_500": {
+    "block_lengths": [
+      12,
+      9
+    ],
+    "lower_95": 0.0019247049982521977,
+    "median": 0.037735437629512536,
+    "positive_probability": 0.978,
+    "replicates": 500,
+    "upper_95": 0.07733301998290742
+  },
+  "common_support": {
+    "bounds": [
+      94.08440002441407,
+      97.1728015136719
+    ],
+    "counts": [
+      231,
+      181
+    ],
+    "direction_improvements": [
+      0.11039747865855298,
+      -0.019123421153594666
+    ],
+    "drop_from_full": 0.0025841193231284088,
+    "pooled_improvement": 0.034278459378314974
+  },
+  "conditional_bootstrap_500": {
+    "block_lengths": [
+      12,
+      9
+    ],
+    "lower_95": -1.3047663514697379,
+    "median": -0.6447233362432532,
+    "positive_probability": 0.0,
+    "replicates": 500,
+    "upper_95": -0.14061370436974976
+  },
+  "conditional_direction_improvements": [
+    -1.9762238680091744,
+    -0.007382465362707036
+  ],
+  "direction_improvements": [
+    0.10965690647194626,
+    0.002398037100710515
+  ],
+  "gates": {
+    "C_AR_conditional_gain": false,
+    "S2_stable_structure": false
+  },
+  "kernel_structure": {
+    "correlation": -0.011208068960607786,
+    "peak_overlap": false,
+    "support_jaccard": 0.8333333333333334
+  },
+  "pooled_conditional_improvement": -0.6448961780124018,
+  "pooled_q_improvement": 0.03686257870144338,
+  "prediction_shift_placebo": {
+    "-1": [
+      0.032430310020555075,
+      -0.00015907333532383383
+    ],
+    "-2": [
+      -0.032086396648371096,
+      0.021567886481166476
+    ],
+    "1": [
+      -0.06165706601527732,
+      0.005325528107922417
+    ],
+    "2": [
+      -0.14933636627761682,
+      -0.007252096113792517
+    ]
+  },
+  "profile": {
+    "channel": "heater_power",
+    "confirmatory": true,
+    "history_min": 120,
+    "horizon_min": 60,
+    "id": "P4",
+    "target_window_min": 10
+  },
+  "regularization_sensitivity": {
+    "d1": {
+      "0.1": {
+        "MSE": 0.11313289695550212,
+        "alpha": 10.0
+      },
+      "1.0": {
+        "MSE": 0.12309304810771804,
+        "alpha": 100.0
+      },
+      "10.0": {
+        "MSE": 0.13557692623527118,
+        "alpha": 1000.0
+      }
+    },
+    "d2": {
+      "0.1": {
+        "MSE": 0.2995743462117972,
+        "alpha": 1000.0
+      },
+      "1.0": {
+        "MSE": 0.3028112174282367,
+        "alpha": 10000.0
+      },
+      "10.0": {
+        "MSE": 0.3031610645015945,
+        "alpha": 100000.0
+      }
+    }
+  },
+  "resolution_sensitivity": {
+    "0.6": 0.04622769977417329,
+    "1.0": 0.03686257870144338,
+    "2.0": 0.026597492503078413
+  },
+  "status": "COMPLETED",
+  "task_id": "P4__raw_plus_thermal_states",
+  "variant": "raw_plus_thermal_states"
+}
