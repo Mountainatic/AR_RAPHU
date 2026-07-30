@@ -1664,6 +1664,33 @@ def aggregate_results(
     primary = next(
         row for row in pooled if row["name"] == "K-to-Residual-AR"
     )
+    direction_k_gains = {
+        direction: float(audit["directions"][direction]["G_K"])
+        for direction in directions
+    }
+    bidirectional_k_positive = all(
+        value > 0.0 for value in direction_k_gains.values()
+    )
+    residual_ar_exact_zero = all(
+        abs(float(audit["directions"][direction]["G_AR_given_K"]))
+        <= np.finfo(float).eps
+        for direction in directions
+    )
+    timed_generic_runs = [
+        row
+        for row in completed
+        if row.get("runner_version") == RUNNER_VERSION
+        and float(row.get("inference_seconds", 0.0)) > 0.0
+    ]
+    convergence_warning_runs = [
+        {
+            "name": row["name"],
+            "direction": row["direction"],
+            "warning_count": len(row.get("convergence_warnings", [])),
+        }
+        for row in completed
+        if row.get("convergence_status") == "WARNING"
+    ]
     decision = {
         "schema": protocol["schema"],
         "status": "COMPLETED" if not failed else "COMPLETED_WITH_MODEL_FAILURES",
@@ -1689,6 +1716,32 @@ def aggregate_results(
             "pooled_R2": primary["R2"],
             "physics_audit": audit,
         },
+        "scientific_result_registration": {
+            "physical_K": (
+                "BIDIRECTIONALLY_STABLE"
+                if bidirectional_k_positive
+                else "NOT_BIDIRECTIONALLY_STABLE"
+            ),
+            "direction_G_K": direction_k_gains,
+            "pooled_G_K": float(audit["pooled"]["G_K"]),
+            "pooled_positive_bootstrap_probability": float(
+                audit["pooled"]["bootstrap_K_vs_persistence"][
+                    "positive_probability"
+                ]
+            ),
+            "interpretation": (
+                "Pooled gain is positive but does not certify transferable "
+                "physical structure when either cross-rod direction is non-positive."
+            ),
+            "residual_AR": (
+                "EXACT_ZERO_SELECTED_BOTH_DIRECTIONS"
+                if residual_ar_exact_zero
+                else "NONZERO_IN_AT_LEAST_ONE_DIRECTION"
+            ),
+            "dynamic_winner_role": (
+                "PREDICTIVE_CONTROL_NOT_PHYSICAL_CERTIFICATION"
+            ),
+        },
         "residual_AR_selected": {
             direction: physics_details[direction]["kernel"][
                 "residual_ar_parameters"
@@ -1709,6 +1762,29 @@ def aggregate_results(
                 "PASS"
                 if audit["kernel_structure"]["relative_kkt_max"] <= 1.0e-8
                 else "FAIL"
+            ),
+        },
+        "engineering_registry": {
+            "runner_version": RUNNER_VERSION,
+            "generic_model_direction_runs_with_inference_timing": len(
+                timed_generic_runs
+            ),
+            "inference_timing_status": (
+                "PASS"
+                if len(timed_generic_runs) == len(MODEL_SPECS) * len(directions)
+                else "INCOMPLETE"
+            ),
+            "inference_seconds_min": min(
+                (float(row["inference_seconds"]) for row in timed_generic_runs),
+                default=None,
+            ),
+            "inference_seconds_max": max(
+                (float(row["inference_seconds"]) for row in timed_generic_runs),
+                default=None,
+            ),
+            "convergence_warning_runs": convergence_warning_runs,
+            "convergence_warning_policy": (
+                "RETAINED_WITHOUT_RETRY_UNDER_FROZEN_BUDGET"
             ),
         },
         "failed_models": [

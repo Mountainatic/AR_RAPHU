@@ -30,10 +30,22 @@ def main() -> int:
         "nonlinear_exact_zero": decision["nonlinear_K"]
         == "EXACT_ZERO_BOTH_DIRECTIONS",
     }
+    scientific_registration = {
+        "bidirectional_K_positive": all(
+            float(values["G_K"]) > 0.0
+            for values in audit["directions"].values()
+        ),
+        "pooled_K_positive": float(audit["pooled"]["G_K"]) > 0.0,
+        "residual_AR_exact_zero_both_directions": all(
+            abs(float(values["G_AR_given_K"])) <= 1.0e-15
+            for values in audit["directions"].values()
+        ),
+    }
     status = "PASS" if all(checks.values()) else "FAIL"
     output = {
         "status": status,
         "checks": checks,
+        "scientific_registration": scientific_registration,
         "physics_audit": audit,
     }
     (root / "CPU_STAGE2_CONFIRMATION.json").write_text(

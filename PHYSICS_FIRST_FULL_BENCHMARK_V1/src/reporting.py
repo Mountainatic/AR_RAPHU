@@ -149,6 +149,11 @@ def build_report(results_root: Path) -> Path:
     _plot_physics(audit, plots / "physics_gain_decomposition.png")
     primary = decision["formal_primary_model"]
     pooled = audit["pooled"]
+    registration = decision["scientific_result_registration"]
+    direction_names = list(audit["directions"])
+    first_direction, second_direction = direction_names
+    first_gain = audit["directions"][first_direction]["G_K"]
+    second_gain = audit["directions"][second_direction]["G_K"]
     input_winner = decision["input_driven_winner"]
     dynamic_winner = decision["dynamic_identification_winner"]
     lines = [
@@ -163,6 +168,17 @@ def build_report(results_root: Path) -> Path:
         f"MSE by `{pooled['G_K']:.2%}`; the strictly matured residual AR changed "
         f"the remaining K error by `{pooled['G_AR_given_K']:.2%}`. Total pooled "
         f"gain was `{pooled['G_total']:.2%}`.",
+        "",
+        f"The decisive transfer result is `{registration['physical_K']}`: "
+        f"K changed persistence MSE by `{first_gain:+.2%}` in "
+        f"`{first_direction}` and `{second_gain:+.2%}` in "
+        f"`{second_direction}`. Therefore the positive pooled gain and pooled "
+        "bootstrap interval are not registered as bidirectionally stable "
+        "physical evidence. They are dominated by one transfer direction.",
+        "",
+        f"Residual AR registration is `{registration['residual_AR']}`. The "
+        "formal K→Residual-AR model consequently reduces exactly to K-only in "
+        "both directions under the frozen one-SE rule.",
         "",
         f"The input-only winner was `{input_winner['name']}` "
         f"(MSE `{input_winner['MSE']:.6g}`), while the dynamic leaderboard winner "
@@ -181,8 +197,9 @@ def build_report(results_root: Path) -> Path:
         "",
         f"The pooled physics attribution ratio is `{pooled['rho_phys']}`. "
         f"The nonlinear K block remained `{decision['nonlinear_K']}`; this run "
-        "therefore supports a linear amplitude subspace rather than a forced "
-        "two-dimensional Urysohn surface.",
+        "therefore found no validation-selected nonlinear increment over the "
+        "linear amplitude subspace. This does not rescue or override the failed "
+        "bidirectional stability registration of linear K.",
         "",
         "## Input-only models are ranked without historical diameter",
         "",
@@ -230,6 +247,13 @@ def build_report(results_root: Path) -> Path:
         f"FP64 certification status: "
         f"`{decision['FP64_certification']['status']}`.",
         "",
+        f"Inference timing was recorded for "
+        f"`{decision['engineering_registry']['generic_model_direction_runs_with_inference_timing']}` "
+        "generic model-direction runs. Three retained comparison runs emitted "
+        "frozen-budget convergence warnings: Sheet1→Sheet2 Elastic-Net and both "
+        "MLP-small directions. They were not retried or given extra optimization "
+        "budget after results were observed.",
+        "",
         "Methods without a reliable paper-faithful Python implementation are "
         "explicitly labeled `ADAPTED_IMPLEMENTATION` in the result registry. "
         "They remain comparison controls and are not presented as full original-"
@@ -250,6 +274,11 @@ def build_report(results_root: Path) -> Path:
         "establish cross-furnace, cross-stage, or unrestricted industrial "
         "generalization. Adapted classical models should be interpreted as "
         "equation-level controlled baselines.",
+        "",
+        f"`{dynamic_winner['name']}` is the best dynamic predictive control in "
+        "this benchmark, but it is a jointly fitted model. It is not evidence "
+        "that the frozen physical K is stable across rods and is not used to "
+        "override the physical registration above.",
         "",
         "## Recommended next steps",
         "",
