@@ -85,7 +85,7 @@ def task_is_complete(
     except (OSError, json.JSONDecodeError):
         return False
     return bool(
-        payload.get("status") == "COMPLETED"
+        payload.get("status") in {"COMPLETED", "NOT_APPLICABLE"}
         and payload.get("config_sha256") == config_sha256
         and payload.get("data_sha256") == data_sha256
         and float(payload.get("sample_period_sec", -1.0))

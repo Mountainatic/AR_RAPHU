@@ -31,12 +31,40 @@ def rolling_origin_folds(
     purge_samples: int,
 ) -> list[Fold]:
     points = np.asarray(origins, dtype=np.int64)
+    specifications = [
+        [
+            int(np.floor(len(points) * float(start_fraction))),
+            int(np.floor(len(points) * float(stop_fraction))),
+        ]
+        for start_fraction, stop_fraction in fractions
+    ]
+    # Slow profiles can have a large physical purge relative to their eligible
+    # origin span. If only the first requested fold is slightly too early,
+    # shift all four blocks right by the minimum deterministic amount. This
+    # uses indices only (never target values) and preserves block widths/order.
+    minimum_train_rows = 20
+    first_start = specifications[0][0]
+    while first_start < len(points):
+        validation_start_origin = int(points[first_start])
+        train_count = int(
+            np.sum(points < validation_start_origin - int(purge_samples))
+        )
+        if train_count >= minimum_train_rows:
+            break
+        first_start += 1
+    shift = first_start - specifications[0][0]
+    if shift:
+        shifted = [[start + shift, stop + shift] for start, stop in specifications]
+        if shifted[-1][1] > len(points):
+            raise ValueError(
+                "INSUFFICIENT_INNER_FOLD_GEOMETRY:"
+                f"n={len(points)}:purge={purge_samples}:shift={shift}"
+            )
+        specifications = shifted
     folds: list[Fold] = []
-    for fold, (start_fraction, stop_fraction) in enumerate(
-        fractions, start=1
+    for fold, (validation_start_index, validation_stop_index) in enumerate(
+        specifications, start=1
     ):
-        validation_start_index = int(np.floor(len(points) * float(start_fraction)))
-        validation_stop_index = int(np.floor(len(points) * float(stop_fraction)))
         validation_start_origin = int(points[validation_start_index])
         train_mask = points < validation_start_origin - int(purge_samples)
         validation = np.arange(
@@ -45,7 +73,7 @@ def rolling_origin_folds(
             dtype=np.int64,
         )
         train = np.flatnonzero(train_mask)
-        if len(train) < 20 or len(validation) < 5:
+        if len(train) < minimum_train_rows or len(validation) < 5:
             raise ValueError(f"INSUFFICIENT_INNER_FOLD:{fold}")
         if int(points[train].max()) >= validation_start_origin - purge_samples:
             raise AssertionError("PURGE_VIOLATION")

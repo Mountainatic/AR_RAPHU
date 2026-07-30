@@ -118,6 +118,18 @@ def test_rolling_folds_apply_physical_purge():
         )
 
 
+def test_rolling_folds_shift_right_using_geometry_only():
+    origins = np.arange(0, 330, 2)
+    folds = rolling_origin_folds(
+        origins,
+        [[0.5, 0.6], [0.6, 0.7], [0.7, 0.8], [0.8, 0.9]],
+        purge_samples=135,
+    )
+    assert len(folds) == 4
+    assert len(folds[0].train_indices) >= 20
+    assert folds[-1].validation_indices[-1] < len(origins)
+
+
 def test_checkpoint_identity_is_strict(tmp_path):
     config_path = ROOT / "configs" / "experiment_v1.yaml"
     _, config_hash = load_config(config_path)

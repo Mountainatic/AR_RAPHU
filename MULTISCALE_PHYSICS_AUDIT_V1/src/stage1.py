@@ -67,6 +67,25 @@ def _run_one(payload: dict[str, Any]) -> dict[str, Any]:
         atomic_json(result_json, result)
         return {"task_id": payload["task_id"], "status": "COMPLETED"}
     except Exception as exc:  # isolate profile failures by design
+        if (
+            not bool(payload["profile"]["confirmatory"])
+            and "INSUFFICIENT_INNER_FOLD" in str(exc)
+        ):
+            ineligible = {
+                "task_id": payload["task_id"],
+                "profile": payload["profile"],
+                "variant": payload["variant"],
+                "status": "NOT_APPLICABLE",
+                "reason": "INSUFFICIENT_INNER_FOLD_GEOMETRY",
+                "config_sha256": config_sha,
+                "data_sha256": workbook.sha256,
+                "sample_period_sec": payload["sample_period_sec"],
+            }
+            atomic_json(result_json, ineligible)
+            return {
+                "task_id": payload["task_id"],
+                "status": "NOT_APPLICABLE",
+            }
         failure = {
             "task_id": payload["task_id"],
             "status": "FAILED",
@@ -105,12 +124,17 @@ def task_payloads(
 def aggregate_stage1(root: Path, config: dict[str, Any]) -> dict[str, Any]:
     profile_root = root / "results" / "stage1" / "profiles"
     results = []
+    not_applicable = []
     failures = []
     for task_dir in sorted(profile_root.glob("*")):
         result_file = task_dir / "result.json"
         failure_file = task_dir / "failure.json"
         if result_file.is_file():
-            results.append(json.loads(result_file.read_text(encoding="utf-8")))
+            payload = json.loads(result_file.read_text(encoding="utf-8"))
+            if payload.get("status") == "COMPLETED":
+                results.append(payload)
+            elif payload.get("status") == "NOT_APPLICABLE":
+                not_applicable.append(payload)
         elif failure_file.is_file():
             failures.append(json.loads(failure_file.read_text(encoding="utf-8")))
     rows: list[dict[str, Any]] = []
@@ -176,6 +200,8 @@ def aggregate_stage1(root: Path, config: dict[str, Any]) -> dict[str, Any]:
         "status": "COMPLETED" if not failures else "COMPLETED_WITH_FAILURES",
         "completed_tasks": len(results),
         "failed_tasks": len(failures),
+        "not_applicable_tasks": len(not_applicable),
+        "not_applicable": not_applicable,
         "failures": failures,
         "stage2_candidates": candidates,
     }
