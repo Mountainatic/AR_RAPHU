@@ -1,0 +1,175 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SYSTEM_IDENTIFICATION",
+  "implementation_note": "PCA latent state extraction from causal U/Y history followed by ridge output map.",
+  "implementation_status": "ADAPTED_IMPLEMENTATION",
+  "inference_seconds": 0.010807104408740997,
+  "metrics": {
+    "MAE": 0.5248867514139464,
+    "MSE": 0.41733566651904674,
+    "R2": 0.033320871255192896,
+    "RMSE": 0.6460152215846363
+  },
+  "name": "N4SID-adapted",
+  "parameter_count": 587,
+  "peak_rss_bytes": 266199040,
+  "prediction_sha256": "c436298f0b5f461e27499913acfd6949abd7bcb17ae6aa2175bfd4483cbecc0d",
+  "relative_persistence": 0.036223981424117535,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 1.0,
+    "components": 2,
+    "history_min": 20.0
+  },
+  "selection": {
+    "minimum_mean_mse": 0.0737102538640002,
+    "minimum_se": 0.040021670520971706,
+    "one_se_threshold": 0.1137319243849719,
+    "records": [
+      {
+        "complexity": [
+          2,
+          292,
+          -1.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.19347138687603044,
+          0.02666962147088214,
+          0.040599900019688676,
+          0.03410010708939953
+        ],
+        "index": 0,
+        "mean_mse": 0.0737102538640002,
+        "parameters": {
+          "alpha": 1.0,
+          "components": 2,
+          "history_min": 20.0
+        },
+        "se": 0.040021670520971706
+      },
+      {
+        "complexity": [
+          4,
+          292,
+          -1.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.16628624633229788,
+          0.06838812130909179,
+          0.0515039794779355,
+          0.08977829004112109
+        ],
+        "index": 1,
+        "mean_mse": 0.09398915929011156,
+        "parameters": {
+          "alpha": 1.0,
+          "components": 4,
+          "history_min": 20.0
+        },
+        "se": 0.025339369671185764
+      },
+      {
+        "complexity": [
+          6,
+          292,
+          -1.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.10280930843099566,
+          0.11773097561356906,
+          0.1253109282821659,
+          0.12555718356244477
+        ],
+        "index": 2,
+        "mean_mse": 0.11785209897229385,
+        "parameters": {
+          "alpha": 1.0,
+          "components": 6,
+          "history_min": 20.0
+        },
+        "se": 0.005333093859357394
+      },
+      {
+        "complexity": [
+          8,
+          292,
+          -1.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.07451151492656782,
+          0.08933559947361083,
+          0.08671762688569946,
+          0.09422150668034542
+        ],
+        "index": 3,
+        "mean_mse": 0.08619656199155588,
+        "parameters": {
+          "alpha": 1.0,
+          "components": 8,
+          "history_min": 20.0
+        },
+        "se": 0.0041938956343990025
+      },
+      {
+        "complexity": [
+          12,
+          292,
+          -1.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.07854150034467088,
+          0.10547942914229107,
+          0.06922087248317103,
+          0.08701758743990912
+        ],
+        "index": 4,
+        "mean_mse": 0.08506484735251052,
+        "parameters": {
+          "alpha": 1.0,
+          "components": 12,
+          "history_min": 20.0
+        },
+        "se": 0.007714455799263726
+      },
+      {
+        "complexity": [
+          16,
+          292,
+          -1.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.09328702085232603,
+          0.10158085608068099,
+          0.06632433311685347,
+          0.09187554902953929
+        ],
+        "index": 5,
+        "mean_mse": 0.08826693976984995,
+        "parameters": {
+          "alpha": 1.0,
+          "components": 16,
+          "history_min": 20.0
+        },
+        "se": 0.007621032460258081
+      }
+    ],
+    "selected_complexity": [
+      2,
+      292,
+      -1.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 1.6367922946810722
+}

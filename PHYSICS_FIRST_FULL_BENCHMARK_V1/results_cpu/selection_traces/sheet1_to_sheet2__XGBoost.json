@@ -1,0 +1,131 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet1_to_sheet2",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "",
+  "implementation_status": "STANDARD",
+  "inference_seconds": 0.015374243259429932,
+  "metrics": {
+    "MAE": 0.2345219176311361,
+    "MSE": 0.0847737613371544,
+    "R2": 0.13862388487223587,
+    "RMSE": 0.29115934011663513
+  },
+  "name": "XGBoost",
+  "parameter_count": 1,
+  "peak_rss_bytes": 260837376,
+  "prediction_sha256": "065275d5fe12f23bcd520afd8eb4c6dc77300c548ce99a6450bbdd8fc9891991",
+  "relative_persistence": 0.1424060167145792,
+  "runner_version": "2",
+  "sample_id_sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+  "selected_parameters": {
+    "alpha": 1.0,
+    "depth": 3,
+    "estimators": 100,
+    "learning_rate": 0.05
+  },
+  "selection": {
+    "minimum_mean_mse": 0.48342374057943066,
+    "minimum_se": 0.2182438120202188,
+    "one_se_threshold": 0.7016675525996494,
+    "records": [
+      {
+        "complexity": [
+          100,
+          3
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.08428937814818213,
+          0.2621845865271781,
+          0.5013112640589336,
+          1.085909733583429
+        ],
+        "index": 0,
+        "mean_mse": 0.48342374057943066,
+        "parameters": {
+          "alpha": 1.0,
+          "depth": 3,
+          "estimators": 100,
+          "learning_rate": 0.05
+        },
+        "se": 0.2182438120202188
+      },
+      {
+        "complexity": [
+          100,
+          6
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.059146681342120824,
+          0.1785515067737235,
+          1.0421672492461098,
+          1.1965138495570338
+        ],
+        "index": 1,
+        "mean_mse": 0.619094821729747,
+        "parameters": {
+          "alpha": 1.0,
+          "depth": 6,
+          "estimators": 100,
+          "learning_rate": 0.05
+        },
+        "se": 0.29155093107059926
+      },
+      {
+        "complexity": [
+          300,
+          3
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.065583924803063,
+          0.25109505203067306,
+          0.680521811874718,
+          1.093823976532736
+        ],
+        "index": 2,
+        "mean_mse": 0.5227561913102976,
+        "parameters": {
+          "alpha": 1.0,
+          "depth": 3,
+          "estimators": 300,
+          "learning_rate": 0.05
+        },
+        "se": 0.22982142745491974
+      },
+      {
+        "complexity": [
+          300,
+          6
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.05621482741101066,
+          0.17789091716957314,
+          1.0553348293644806,
+          1.1902862239059613
+        ],
+        "index": 3,
+        "mean_mse": 0.6199316994627564,
+        "parameters": {
+          "alpha": 1.0,
+          "depth": 6,
+          "estimators": 300,
+          "learning_rate": 0.05
+        },
+        "se": 0.29269679051412373
+      }
+    ],
+    "selected_complexity": [
+      100,
+      3
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3233,
+  "train_seconds": 132.81346944719553
+}

@@ -1,0 +1,168 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet1_to_sheet2",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "Separable degree-2/3 polynomial static maps followed by a shared linear dynamic readout.",
+  "implementation_status": "ADAPTED_IMPLEMENTATION",
+  "inference_seconds": 0.025112785398960114,
+  "metrics": {
+    "MAE": 0.47364599280541686,
+    "MSE": 0.28010533457596115,
+    "R2": -1.8461170192038914,
+    "RMSE": 0.5292497846725694
+  },
+  "name": "Parallel-Hammerstein",
+  "parameter_count": 0,
+  "peak_rss_bytes": 248692736,
+  "prediction_sha256": "6053f556d2087c19043d60a02039a9947f18dba99d56e505f26af3fc0326414c",
+  "relative_persistence": -1.8336202833224124,
+  "runner_version": "2",
+  "sample_id_sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+  "selected_parameters": {
+    "alpha": 100.0,
+    "degree": 2
+  },
+  "selection": {
+    "minimum_mean_mse": 0.44637158592769155,
+    "minimum_se": 0.2469245184763511,
+    "one_se_threshold": 0.6932961044040427,
+    "records": [
+      {
+        "complexity": [
+          2,
+          172,
+          -0.01
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.7660699219197475,
+          0.6099260182663919,
+          1.0781747468419856,
+          2.904561010032656
+        ],
+        "index": 0,
+        "mean_mse": 1.3396829242651953,
+        "parameters": {
+          "alpha": 0.01,
+          "degree": 2
+        },
+        "se": 0.5306291052834634
+      },
+      {
+        "complexity": [
+          2,
+          172,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.1718159635621553,
+          0.31815373813113423,
+          0.8156761210285167,
+          1.6012936122622616
+        ],
+        "index": 1,
+        "mean_mse": 0.726734858746017,
+        "parameters": {
+          "alpha": 1.0,
+          "degree": 2
+        },
+        "se": 0.32244341542913685
+      },
+      {
+        "complexity": [
+          2,
+          172,
+          -100.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.04256517712726215,
+          0.0191827718799689,
+          1.0047575892233784,
+          0.7189808054801569
+        ],
+        "index": 2,
+        "mean_mse": 0.44637158592769155,
+        "parameters": {
+          "alpha": 100.0,
+          "degree": 2
+        },
+        "se": 0.2469245184763511
+      },
+      {
+        "complexity": [
+          3,
+          172,
+          -0.01
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.40761335370994906,
+          8.034764502447912,
+          2.943479527792922,
+          2.1800818446886376
+        ],
+        "index": 3,
+        "mean_mse": 3.3914848071598556,
+        "parameters": {
+          "alpha": 0.01,
+          "degree": 3
+        },
+        "se": 1.6363511503548651
+      },
+      {
+        "complexity": [
+          3,
+          172,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.45467268849656356,
+          0.7606124694182248,
+          3.5021395499895323,
+          1.598499692251848
+        ],
+        "index": 4,
+        "mean_mse": 1.5789811000390421,
+        "parameters": {
+          "alpha": 1.0,
+          "degree": 3
+        },
+        "se": 0.6851226179127418
+      },
+      {
+        "complexity": [
+          3,
+          172,
+          -100.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.05240043559608111,
+          0.02114142943899803,
+          2.112144234450087,
+          0.9430978510666391
+        ],
+        "index": 5,
+        "mean_mse": 0.7821959876379514,
+        "parameters": {
+          "alpha": 100.0,
+          "degree": 3
+        },
+        "se": 0.4921430463788789
+      }
+    ],
+    "selected_complexity": [
+      2,
+      172,
+      -100.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3233,
+  "train_seconds": 1.9628677889704704
+}

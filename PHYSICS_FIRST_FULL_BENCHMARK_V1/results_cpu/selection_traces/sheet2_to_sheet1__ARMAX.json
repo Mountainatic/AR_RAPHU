@@ -1,0 +1,231 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SYSTEM_IDENTIFICATION",
+  "implementation_note": "Regularized ARX augmented by mature output-difference proxy terms; not an innovations-MLE reproduction.",
+  "implementation_status": "ADAPTED_IMPLEMENTATION",
+  "inference_seconds": 0.009479120373725891,
+  "metrics": {
+    "MAE": 0.3182918612124656,
+    "MSE": 0.18179186623193147,
+    "R2": 0.5789135294192361,
+    "RMSE": 0.4263705738344656
+  },
+  "name": "ARMAX",
+  "parameter_count": 232,
+  "peak_rss_bytes": 292458496,
+  "prediction_sha256": "d0a6d7568155f13f9d9d7db26959ecef9d2b48abbc01b48dd0f81c94cbc63fa4",
+  "relative_persistence": 0.5801781273384308,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 100.0,
+    "history_min": 5.0
+  },
+  "selection": {
+    "minimum_mean_mse": 0.02219674171065543,
+    "minimum_se": 0.004077365607445897,
+    "one_se_threshold": 0.026274107318101328,
+    "records": [
+      {
+        "complexity": [
+          5.0,
+          231,
+          -0.01
+        ],
+        "dimension": 231,
+        "fold_mse": [
+          0.17633903624788055,
+          0.04129195633686781,
+          0.03570908404542835,
+          0.0170927819933655
+        ],
+        "index": 0,
+        "mean_mse": 0.06760821465588555,
+        "parameters": {
+          "alpha": 0.01,
+          "history_min": 5.0
+        },
+        "se": 0.03661090512261809
+      },
+      {
+        "complexity": [
+          5.0,
+          231,
+          -1.0
+        ],
+        "dimension": 231,
+        "fold_mse": [
+          0.12803914915770132,
+          0.03891450719586198,
+          0.03383514809696636,
+          0.01710787031097954
+        ],
+        "index": 1,
+        "mean_mse": 0.0544741686903773,
+        "parameters": {
+          "alpha": 1.0,
+          "history_min": 5.0
+        },
+        "se": 0.02496016633661037
+      },
+      {
+        "complexity": [
+          5.0,
+          231,
+          -100.0
+        ],
+        "dimension": 231,
+        "fold_mse": [
+          0.03428369260852742,
+          0.017642212634183394,
+          0.01696558759326741,
+          0.019895474006643488
+        ],
+        "index": 2,
+        "mean_mse": 0.02219674171065543,
+        "parameters": {
+          "alpha": 100.0,
+          "history_min": 5.0
+        },
+        "se": 0.004077365607445897
+      },
+      {
+        "complexity": [
+          20.0,
+          411,
+          -0.01
+        ],
+        "dimension": 411,
+        "fold_mse": [
+          0.21597694799495348,
+          0.03928159154928933,
+          0.03342155280815014,
+          0.02083146033554266
+        ],
+        "index": 3,
+        "mean_mse": 0.0773778881719839,
+        "parameters": {
+          "alpha": 0.01,
+          "history_min": 20.0
+        },
+        "se": 0.04635972131050753
+      },
+      {
+        "complexity": [
+          20.0,
+          411,
+          -1.0
+        ],
+        "dimension": 411,
+        "fold_mse": [
+          0.1605252847067849,
+          0.037076861675720246,
+          0.03126660082813878,
+          0.020379559144656743
+        ],
+        "index": 4,
+        "mean_mse": 0.06231207658882517,
+        "parameters": {
+          "alpha": 1.0,
+          "history_min": 20.0
+        },
+        "se": 0.032920115310836315
+      },
+      {
+        "complexity": [
+          20.0,
+          411,
+          -100.0
+        ],
+        "dimension": 411,
+        "fold_mse": [
+          0.0335182684198029,
+          0.022216435576347556,
+          0.017356771162384668,
+          0.0208667719187299
+        ],
+        "index": 5,
+        "mean_mse": 0.023489561769316256,
+        "parameters": {
+          "alpha": 100.0,
+          "history_min": 20.0
+        },
+        "se": 0.003496259365540371
+      },
+      {
+        "complexity": [
+          40.0,
+          651,
+          -0.01
+        ],
+        "dimension": 651,
+        "fold_mse": [
+          0.3328335683242048,
+          0.03385873716192963,
+          0.027016496993604908,
+          0.023684139222781706
+        ],
+        "index": 6,
+        "mean_mse": 0.10434823542563026,
+        "parameters": {
+          "alpha": 0.01,
+          "history_min": 40.0
+        },
+        "se": 0.07619121280282386
+      },
+      {
+        "complexity": [
+          40.0,
+          651,
+          -1.0
+        ],
+        "dimension": 651,
+        "fold_mse": [
+          0.23373520330636635,
+          0.03027097272211751,
+          0.023876478316678475,
+          0.023645460714210698
+        ],
+        "index": 7,
+        "mean_mse": 0.07788202876484326,
+        "parameters": {
+          "alpha": 1.0,
+          "history_min": 40.0
+        },
+        "se": 0.05197373492551647
+      },
+      {
+        "complexity": [
+          40.0,
+          651,
+          -100.0
+        ],
+        "dimension": 651,
+        "fold_mse": [
+          0.022328678299850767,
+          0.03204707385628116,
+          0.01335980294866445,
+          0.030161939057777698
+        ],
+        "index": 8,
+        "mean_mse": 0.024474373540643517,
+        "parameters": {
+          "alpha": 100.0,
+          "history_min": 40.0
+        },
+        "se": 0.004260593455265346
+      }
+    ],
+    "selected_complexity": [
+      5.0,
+      231,
+      -100.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 2.548791326582432
+}

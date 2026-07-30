@@ -1,0 +1,187 @@
+{
+  "convergence_status": "WARNING",
+  "convergence_warnings": [
+    "Stochastic Optimizer: Maximum iterations (500) reached and the optimization hasn't converged yet."
+  ],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "",
+  "implementation_status": "CPU_BASELINE",
+  "inference_seconds": 0.0064549073576927185,
+  "metrics": {
+    "MAE": 0.3909290748370348,
+    "MSE": 0.2594879117714903,
+    "R2": 0.39894533682367284,
+    "RMSE": 0.5093995600424978
+  },
+  "name": "MLP-small",
+  "parameter_count": 0,
+  "peak_rss_bytes": 237977600,
+  "prediction_sha256": "6166f03f82bc0e653d199cdfd39d098e00f3200906e9099542bf202d373dc771",
+  "relative_persistence": 0.4007504113855004,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 0.1,
+    "hidden": [
+      32,
+      16
+    ],
+    "learning_rate": 0.001
+  },
+  "selection": {
+    "minimum_mean_mse": 0.06135316880652657,
+    "minimum_se": 0.0134994006729038,
+    "one_se_threshold": 0.07485256947943036,
+    "records": [
+      {
+        "complexity": [
+          172,
+          -0.001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.22567868376871603,
+          0.049945499130302155,
+          0.047708182058860335,
+          0.022418768896136983
+        ],
+        "index": 0,
+        "mean_mse": 0.08643778346350388,
+        "parameters": {
+          "alpha": 0.001,
+          "hidden": [
+            16
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.046831374263414986
+      },
+      {
+        "complexity": [
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.18567745251002957,
+          0.05828490129611027,
+          0.07660076086168262,
+          0.023240735338401406
+        ],
+        "index": 1,
+        "mean_mse": 0.08595096250155597,
+        "parameters": {
+          "alpha": 0.1,
+          "hidden": [
+            16
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.03503662680395378
+      },
+      {
+        "complexity": [
+          172,
+          -0.001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.4582753954372124,
+          0.08728006673112135,
+          0.03547192755817159,
+          0.06987127249641202
+        ],
+        "index": 2,
+        "mean_mse": 0.16272466555572934,
+        "parameters": {
+          "alpha": 0.001,
+          "hidden": [
+            32
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.0991031169017851
+      },
+      {
+        "complexity": [
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.277256064408876,
+          0.06667228058159093,
+          0.021171737658579978,
+          0.04576015239515121
+        ],
+        "index": 3,
+        "mean_mse": 0.10271505876104953,
+        "parameters": {
+          "alpha": 0.1,
+          "hidden": [
+            32
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.05891860139705241
+      },
+      {
+        "complexity": [
+          172,
+          -0.001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.10466082325761812,
+          0.1032698665777222,
+          0.036193729089782696,
+          0.01881051003147763
+        ],
+        "index": 4,
+        "mean_mse": 0.06573373223915016,
+        "parameters": {
+          "alpha": 0.001,
+          "hidden": [
+            32,
+            16
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.02235822064450171
+      },
+      {
+        "complexity": [
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.0982074638918104,
+          0.06444185809621168,
+          0.03811780206720577,
+          0.04464555117087844
+        ],
+        "index": 5,
+        "mean_mse": 0.06135316880652657,
+        "parameters": {
+          "alpha": 0.1,
+          "hidden": [
+            32,
+            16
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.0134994006729038
+      }
+    ],
+    "selected_complexity": [
+      172,
+      -0.1
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 51.98788792639971
+}

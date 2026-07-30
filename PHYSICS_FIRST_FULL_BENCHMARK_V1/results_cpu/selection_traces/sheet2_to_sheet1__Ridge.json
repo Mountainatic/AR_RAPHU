@@ -1,0 +1,154 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "",
+  "implementation_status": "STANDARD",
+  "inference_seconds": 0.00596318393945694,
+  "metrics": {
+    "MAE": 0.34959480063840004,
+    "MSE": 0.22620749547735447,
+    "R2": 0.476033125882822,
+    "RMSE": 0.47561275790011615
+  },
+  "name": "Ridge",
+  "parameter_count": 173,
+  "peak_rss_bytes": 238940160,
+  "prediction_sha256": "b25219627f07a3fd10b8747f41c52e98da0b7b67688c50b65e51fac407deac95",
+  "relative_persistence": 0.47760669203853745,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 100.0
+  },
+  "selection": {
+    "minimum_mean_mse": 0.028028578866260874,
+    "minimum_se": 0.009321600962664791,
+    "one_se_threshold": 0.03735017982892566,
+    "records": [
+      {
+        "complexity": [
+          172,
+          -0.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.12307819510021072,
+          0.031385115547847224,
+          0.026739417989135053,
+          0.023165291737919518
+        ],
+        "index": 0,
+        "mean_mse": 0.05109200509377813,
+        "parameters": {
+          "alpha": 0.0
+        },
+        "se": 0.02405431850480501
+      },
+      {
+        "complexity": [
+          172,
+          -0.0001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.12307744405905556,
+          0.031384908501801964,
+          0.026739198802895735,
+          0.02316527998633339
+        ],
+        "index": 1,
+        "mean_mse": 0.05109170783752166,
+        "parameters": {
+          "alpha": 0.0001
+        },
+        "se": 0.024054164968919177
+      },
+      {
+        "complexity": [
+          172,
+          -0.01
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.12300318757107295,
+          0.031364495409719056,
+          0.02671753618851989,
+          0.023164122949829415
+        ],
+        "index": 2,
+        "mean_mse": 0.05106233552978533,
+        "parameters": {
+          "alpha": 0.01
+        },
+        "se": 0.024038979834747943
+      },
+      {
+        "complexity": [
+          172,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.11601993027092625,
+          0.029832026977214196,
+          0.02487780534685076,
+          0.023072365886375856
+        ],
+        "index": 3,
+        "mean_mse": 0.048450532120341755,
+        "parameters": {
+          "alpha": 1.0
+        },
+        "se": 0.022568409095336014
+      },
+      {
+        "complexity": [
+          172,
+          -100.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.05536680574559655,
+          0.020066771673053325,
+          0.013638502826062509,
+          0.023042235220331123
+        ],
+        "index": 4,
+        "mean_mse": 0.028028578866260874,
+        "parameters": {
+          "alpha": 100.0
+        },
+        "se": 0.009321600962664791
+      },
+      {
+        "complexity": [
+          172,
+          -10000.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.06981954384894012,
+          0.023500803058117574,
+          0.021100125490649296,
+          0.04003828050845268
+        ],
+        "index": 5,
+        "mean_mse": 0.03861468822653992,
+        "parameters": {
+          "alpha": 10000.0
+        },
+        "se": 0.011221107573503565
+      }
+    ],
+    "selected_complexity": [
+      172,
+      -100.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 0.46730485558509827
+}

@@ -1,0 +1,219 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SYSTEM_IDENTIFICATION",
+  "implementation_note": "PCA-reduced causal U/Y history with cubic spline regression.",
+  "implementation_status": "ADAPTED_IMPLEMENTATION",
+  "inference_seconds": 0.01750866323709488,
+  "metrics": {
+    "MAE": 0.4025403901983668,
+    "MSE": 0.2950496650378449,
+    "R2": 0.31657326220352167,
+    "RMSE": 0.5431847430090843
+  },
+  "name": "Spline-NARX",
+  "parameter_count": 0,
+  "peak_rss_bytes": 257699840,
+  "prediction_sha256": "aae7221d5e1864368e8ce4132e400522b98c2ba4faa1d4cc2397876389265c10",
+  "relative_persistence": 0.31862571482530133,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 10.0,
+    "components": 8,
+    "knots": 4
+  },
+  "selection": {
+    "minimum_mean_mse": 0.06536661797622116,
+    "minimum_se": 0.016919113476503538,
+    "one_se_threshold": 0.08228573145272469,
+    "records": [
+      {
+        "complexity": [
+          4,
+          292,
+          -0.1
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.11768128074008972,
+          0.10195358499005233,
+          0.1556109166278551,
+          0.043655164922460035
+        ],
+        "index": 0,
+        "mean_mse": 0.1047252368201143,
+        "parameters": {
+          "alpha": 0.1,
+          "components": 4,
+          "knots": 4
+        },
+        "se": 0.023263790209615453
+      },
+      {
+        "complexity": [
+          4,
+          292,
+          -10.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.1632086495044067,
+          0.07195137899892205,
+          0.08221461469139928,
+          0.04832086737489057
+        ],
+        "index": 1,
+        "mean_mse": 0.09142387764240464,
+        "parameters": {
+          "alpha": 10.0,
+          "components": 4,
+          "knots": 4
+        },
+        "se": 0.02495815112830926
+      },
+      {
+        "complexity": [
+          4,
+          292,
+          -0.1
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.12453671178118082,
+          0.07871547180889403,
+          0.3896503275548036,
+          0.05848301881236189
+        ],
+        "index": 2,
+        "mean_mse": 0.16284638248931008,
+        "parameters": {
+          "alpha": 0.1,
+          "components": 4,
+          "knots": 6
+        },
+        "se": 0.07685342227086128
+      },
+      {
+        "complexity": [
+          4,
+          292,
+          -10.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.15955024966318238,
+          0.06556812510152042,
+          0.12193907535022226,
+          0.0531949568530409
+        ],
+        "index": 3,
+        "mean_mse": 0.10006310174199148,
+        "parameters": {
+          "alpha": 10.0,
+          "components": 4,
+          "knots": 6
+        },
+        "se": 0.024839158278586328
+      },
+      {
+        "complexity": [
+          8,
+          292,
+          -0.1
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.17600193590270846,
+          0.0868104102851122,
+          0.03397947678100537,
+          0.02844686012423784
+        ],
+        "index": 4,
+        "mean_mse": 0.08130967077326598,
+        "parameters": {
+          "alpha": 0.1,
+          "components": 8,
+          "knots": 4
+        },
+        "se": 0.034194915830161356
+      },
+      {
+        "complexity": [
+          8,
+          292,
+          -10.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.10998943578730175,
+          0.07400173063141902,
+          0.04072385007299685,
+          0.04074436615543855
+        ],
+        "index": 5,
+        "mean_mse": 0.06636484566178903,
+        "parameters": {
+          "alpha": 10.0,
+          "components": 8,
+          "knots": 4
+        },
+        "se": 0.016520937474858298
+      },
+      {
+        "complexity": [
+          8,
+          292,
+          -0.1
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.14166675213334734,
+          0.08912632899630733,
+          0.03915814264961702,
+          0.03330078843543651
+        ],
+        "index": 6,
+        "mean_mse": 0.07581300305367705,
+        "parameters": {
+          "alpha": 0.1,
+          "components": 8,
+          "knots": 6
+        },
+        "se": 0.025273220508559652
+      },
+      {
+        "complexity": [
+          8,
+          292,
+          -10.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.11218687976149501,
+          0.0680740302494615,
+          0.04273756036034229,
+          0.03846800153358584
+        ],
+        "index": 7,
+        "mean_mse": 0.06536661797622116,
+        "parameters": {
+          "alpha": 10.0,
+          "components": 8,
+          "knots": 6
+        },
+        "se": 0.016919113476503538
+      }
+    ],
+    "selected_complexity": [
+      8,
+      292,
+      -10.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 2.2148257941007614
+}

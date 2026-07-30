@@ -1,0 +1,136 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "",
+  "implementation_status": "STANDARD",
+  "inference_seconds": 0.04385972023010254,
+  "metrics": {
+    "MAE": 0.4600697522244544,
+    "MSE": 0.3052388221344951,
+    "R2": 0.292972007158659,
+    "RMSE": 0.5524842279508937
+  },
+  "name": "HistGradientBoosting",
+  "parameter_count": 0,
+  "peak_rss_bytes": 252960768,
+  "prediction_sha256": "339bfe8cd3cb80d68b5c3b444620d8825ad372bd77ee97124b2b7b80c4cbf905",
+  "relative_persistence": 0.2950953385668763,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 1.0,
+    "depth": 3,
+    "iterations": 100,
+    "learning_rate": 0.05
+  },
+  "selection": {
+    "minimum_mean_mse": 0.042597899464452915,
+    "minimum_se": 0.020594447495051942,
+    "one_se_threshold": 0.06319234695950486,
+    "records": [
+      {
+        "complexity": [
+          100,
+          3,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.09886679943084514,
+          0.015339833057196913,
+          0.032922126238479024,
+          0.030391418094017495
+        ],
+        "index": 0,
+        "mean_mse": 0.044380044205134646,
+        "parameters": {
+          "alpha": 1.0,
+          "depth": 3,
+          "iterations": 100,
+          "learning_rate": 0.05
+        },
+        "se": 0.018572169822861608
+      },
+      {
+        "complexity": [
+          100,
+          6,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.11459873173778774,
+          0.021566775440505354,
+          0.0320971038252795,
+          0.024365818090839705
+        ],
+        "index": 1,
+        "mean_mse": 0.048157107273603075,
+        "parameters": {
+          "alpha": 1.0,
+          "depth": 6,
+          "iterations": 100,
+          "learning_rate": 0.05
+        },
+        "se": 0.022258864077358845
+      },
+      {
+        "complexity": [
+          300,
+          3,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.10376642106583923,
+          0.01463153083683178,
+          0.028705874597188128,
+          0.023287771357952517
+        ],
+        "index": 2,
+        "mean_mse": 0.042597899464452915,
+        "parameters": {
+          "alpha": 1.0,
+          "depth": 3,
+          "iterations": 300,
+          "learning_rate": 0.05
+        },
+        "se": 0.020594447495051942
+      },
+      {
+        "complexity": [
+          300,
+          6,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.11489863418033776,
+          0.021041786802509104,
+          0.03224198871400094,
+          0.022472618247450997
+        ],
+        "index": 3,
+        "mean_mse": 0.0476637569860747,
+        "parameters": {
+          "alpha": 1.0,
+          "depth": 6,
+          "iterations": 300,
+          "learning_rate": 0.05
+        },
+        "se": 0.022549357742827947
+      }
+    ],
+    "selected_complexity": [
+      100,
+      3,
+      -1.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 35.66608668118715
+}

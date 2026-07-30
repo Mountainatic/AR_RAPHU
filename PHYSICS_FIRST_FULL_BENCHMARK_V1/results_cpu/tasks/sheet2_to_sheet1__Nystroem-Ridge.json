@@ -1,0 +1,131 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "",
+  "implementation_status": "STANDARD",
+  "inference_seconds": 0.026505082845687866,
+  "metrics": {
+    "MAE": 0.48227698923554585,
+    "MSE": 0.354184700980444,
+    "R2": 0.17959813735955954,
+    "RMSE": 0.5951341873732713
+  },
+  "name": "Nystroem-Ridge",
+  "parameter_count": 22145,
+  "peak_rss_bytes": 241565696,
+  "prediction_sha256": "533655229f8c88c2a7961a3a233bae3d73f99f34c5eeab0cd79587b41942387c",
+  "relative_persistence": 0.18206195075866405,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 10.0,
+    "components": 128,
+    "gamma": 0.01
+  },
+  "selection": {
+    "minimum_mean_mse": 0.05727230527051318,
+    "minimum_se": 0.02003443881459896,
+    "one_se_threshold": 0.07730674408511214,
+    "records": [
+      {
+        "complexity": [
+          128,
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.16491955436420755,
+          0.10388567902884321,
+          0.04003775268260141,
+          0.029755047385425906
+        ],
+        "index": 0,
+        "mean_mse": 0.08464950836526951,
+        "parameters": {
+          "alpha": 0.1,
+          "components": 128,
+          "gamma": 0.01
+        },
+        "se": 0.03138062185732277
+      },
+      {
+        "complexity": [
+          128,
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.13816109242224878,
+          0.018855514480391026,
+          0.03598833105935036,
+          0.039344122038229186
+        ],
+        "index": 1,
+        "mean_mse": 0.05808726500005484,
+        "parameters": {
+          "alpha": 0.1,
+          "components": 128,
+          "gamma": 0.1
+        },
+        "se": 0.02706568611156861
+      },
+      {
+        "complexity": [
+          128,
+          172,
+          -10.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.11636548120681565,
+          0.04789410103948188,
+          0.033047867885699585,
+          0.03178177095005559
+        ],
+        "index": 2,
+        "mean_mse": 0.05727230527051318,
+        "parameters": {
+          "alpha": 10.0,
+          "components": 128,
+          "gamma": 0.01
+        },
+        "se": 0.02003443881459896
+      },
+      {
+        "complexity": [
+          128,
+          172,
+          -10.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.13909359911691624,
+          0.01885692460104876,
+          0.03606723211837176,
+          0.039832830536950636
+        ],
+        "index": 3,
+        "mean_mse": 0.05846264659332185,
+        "parameters": {
+          "alpha": 10.0,
+          "components": 128,
+          "gamma": 0.1
+        },
+        "se": 0.02726198261803176
+      }
+    ],
+    "selected_complexity": [
+      128,
+      172,
+      -10.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 0.6004896834492683
+}

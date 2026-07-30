@@ -1,0 +1,297 @@
+{
+  "convergence_status": "WARNING",
+  "convergence_warnings": [
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 1.048e+01, tolerance: 7.787e-02",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 1.148e+01, tolerance: 7.787e-02",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 1.614e+01, tolerance: 8.923e-02",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 1.806e+00, tolerance: 1.032e-01",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 1.867e+01, tolerance: 9.573e-02",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 2.636e+00, tolerance: 9.573e-02",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 3.042e-01, tolerance: 9.573e-02",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 3.067e+01, tolerance: 1.032e-01",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 4.298e-01, tolerance: 1.032e-01",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 4.538e+00, tolerance: 8.923e-02",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 6.702e+00, tolerance: 8.923e-02",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 7.512e+00, tolerance: 7.787e-02",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 7.998e-01, tolerance: 1.032e-01",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 8.505e+00, tolerance: 7.787e-02",
+    "Objective did not converge. You might want to increase the number of iterations, check the scale of the features or consider increasing regularisation. Duality gap: 9.885e+00, tolerance: 8.923e-02"
+  ],
+  "direction": "sheet1_to_sheet2",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "",
+  "implementation_status": "STANDARD",
+  "inference_seconds": 0.004524514079093933,
+  "metrics": {
+    "MAE": 0.3474674934995701,
+    "MSE": 0.1545913031441071,
+    "R2": -0.5707838608837088,
+    "RMSE": 0.393181005573905
+  },
+  "name": "Elastic-Net",
+  "parameter_count": 173,
+  "peak_rss_bytes": 235491328,
+  "prediction_sha256": "d1a42c0c0c5d938a496ac001d75354c1c0acc8f6cd065eb939edf87a10fa2f03",
+  "relative_persistence": -0.5638868601968416,
+  "runner_version": "2",
+  "sample_id_sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+  "selected_parameters": {
+    "alpha": 0.1,
+    "l1_ratio": 0.1
+  },
+  "selection": {
+    "minimum_mean_mse": 0.23211144400908276,
+    "minimum_se": 0.12090371974759583,
+    "one_se_threshold": 0.3530151637566786,
+    "records": [
+      {
+        "complexity": [
+          172,
+          -0.0001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.08592614772237812,
+          0.3505327290174227,
+          0.8979194023512646,
+          1.036879317074817
+        ],
+        "index": 0,
+        "mean_mse": 0.5928143990414706,
+        "parameters": {
+          "alpha": 0.0001,
+          "l1_ratio": 0.1
+        },
+        "se": 0.22470699837558855
+      },
+      {
+        "complexity": [
+          172,
+          -0.0001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.07446083418004368,
+          0.2967409683033652,
+          0.7844854029409037,
+          0.887727011225929
+        ],
+        "index": 1,
+        "mean_mse": 0.5108535541625604,
+        "parameters": {
+          "alpha": 0.0001,
+          "l1_ratio": 0.5
+        },
+        "se": 0.19433450473813604
+      },
+      {
+        "complexity": [
+          172,
+          -0.0001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.06153767897526452,
+          0.22626442510279873,
+          0.6735166535560867,
+          0.7182100688459206
+        ],
+        "index": 2,
+        "mean_mse": 0.41988220662001763,
+        "parameters": {
+          "alpha": 0.0001,
+          "l1_ratio": 0.9
+        },
+        "se": 0.16310236863838862
+      },
+      {
+        "complexity": [
+          172,
+          -0.001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.03141073938116586,
+          0.051546515668979866,
+          0.5536342885416771,
+          0.6288579807931998
+        ],
+        "index": 3,
+        "mean_mse": 0.31636238109625564,
+        "parameters": {
+          "alpha": 0.001,
+          "l1_ratio": 0.1
+        },
+        "se": 0.15949825981048177
+      },
+      {
+        "complexity": [
+          172,
+          -0.001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.0209291927043269,
+          0.04337316380953136,
+          0.46044011694100356,
+          0.6424773766401334
+        ],
+        "index": 4,
+        "mean_mse": 0.29180496252374877,
+        "parameters": {
+          "alpha": 0.001,
+          "l1_ratio": 0.5
+        },
+        "se": 0.15451564069029558
+      },
+      {
+        "complexity": [
+          172,
+          -0.001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.020968547213157187,
+          0.042921217155184835,
+          0.45561472396209135,
+          0.6280803799502057
+        ],
+        "index": 5,
+        "mean_mse": 0.2868962170701598,
+        "parameters": {
+          "alpha": 0.001,
+          "l1_ratio": 0.9
+        },
+        "se": 0.15141386268191329
+      },
+      {
+        "complexity": [
+          172,
+          -0.01
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.022464465992817293,
+          0.03959191724969022,
+          0.4620218482454482,
+          0.5842180214085415
+        ],
+        "index": 6,
+        "mean_mse": 0.2770740632241243,
+        "parameters": {
+          "alpha": 0.01,
+          "l1_ratio": 0.1
+        },
+        "se": 0.14427026457670677
+      },
+      {
+        "complexity": [
+          172,
+          -0.01
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.03359314118033422,
+          0.03430791350695688,
+          0.37122069969370647,
+          0.5152192450693113
+        ],
+        "index": 7,
+        "mean_mse": 0.2385852498625772,
+        "parameters": {
+          "alpha": 0.01,
+          "l1_ratio": 0.5
+        },
+        "se": 0.12174752722556803
+      },
+      {
+        "complexity": [
+          172,
+          -0.01
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.03332386208990581,
+          0.03175458902755364,
+          0.341975801689299,
+          0.5213915232295726
+        ],
+        "index": 8,
+        "mean_mse": 0.23211144400908276,
+        "parameters": {
+          "alpha": 0.01,
+          "l1_ratio": 0.9
+        },
+        "se": 0.12090371974759583
+      },
+      {
+        "complexity": [
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.0469436584286749,
+          0.02916986996491941,
+          0.3450492949465709,
+          0.5297811122337017
+        ],
+        "index": 9,
+        "mean_mse": 0.23773598389346673,
+        "parameters": {
+          "alpha": 0.1,
+          "l1_ratio": 0.1
+        },
+        "se": 0.1213493713250998
+      },
+      {
+        "complexity": [
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.06103426595009095,
+          0.04370639967554604,
+          0.28287484696668136,
+          0.7806279837248794
+        ],
+        "index": 10,
+        "mean_mse": 0.2920608740792994,
+        "parameters": {
+          "alpha": 0.1,
+          "l1_ratio": 0.5
+        },
+        "se": 0.1717157152441212
+      },
+      {
+        "complexity": [
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.14314039912372356,
+          0.11728477928368572,
+          0.2591162074684499,
+          0.984626972922098
+        ],
+        "index": 11,
+        "mean_mse": 0.37604208969948927,
+        "parameters": {
+          "alpha": 0.1,
+          "l1_ratio": 0.9
+        },
+        "se": 0.20519213865489858
+      }
+    ],
+    "selected_complexity": [
+      172,
+      -0.1
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3233,
+  "train_seconds": 95.02733588963747
+}

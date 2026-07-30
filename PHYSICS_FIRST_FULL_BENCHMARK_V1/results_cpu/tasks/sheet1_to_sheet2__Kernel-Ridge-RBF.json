@@ -1,0 +1,121 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet1_to_sheet2",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "Exact RBF kernel ridge with deterministic maximum 1500-row training subset per fit.",
+  "implementation_status": "STANDARD_SUBSAMPLED_FIT",
+  "inference_seconds": 0.21599653363227844,
+  "metrics": {
+    "MAE": 0.3161859322046217,
+    "MSE": 0.14008158339192647,
+    "R2": -0.42335232269798717,
+    "RMSE": 0.37427474319265314
+  },
+  "name": "Kernel-Ridge-RBF",
+  "parameter_count": 0,
+  "peak_rss_bytes": 249282560,
+  "prediction_sha256": "e02b307163cb58f1a404e46f15e2dcaa93e78cdc1921bd46920f1b27add659b1",
+  "relative_persistence": -0.4171026646821612,
+  "runner_version": "2",
+  "sample_id_sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+  "selected_parameters": {
+    "alpha": 10.0,
+    "gamma": 0.01
+  },
+  "selection": {
+    "minimum_mean_mse": 0.36425343191661774,
+    "minimum_se": 0.11231614345863886,
+    "one_se_threshold": 0.47656957537525657,
+    "records": [
+      {
+        "complexity": [
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.1664728518072321,
+          0.1886837191977121,
+          0.474306484562161,
+          0.6275506720993657
+        ],
+        "index": 0,
+        "mean_mse": 0.36425343191661774,
+        "parameters": {
+          "alpha": 0.1,
+          "gamma": 0.01
+        },
+        "se": 0.11231614345863886
+      },
+      {
+        "complexity": [
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.23210484037970505,
+          0.15113808494378375,
+          0.18762995669408156,
+          1.1227211555773526
+        ],
+        "index": 1,
+        "mean_mse": 0.42339850939873075,
+        "parameters": {
+          "alpha": 0.1,
+          "gamma": 0.1
+        },
+        "se": 0.23369459778984042
+      },
+      {
+        "complexity": [
+          172,
+          -10.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.18974867827955372,
+          0.17806212563376234,
+          0.28146223401056053,
+          0.9064173032597223
+        ],
+        "index": 2,
+        "mean_mse": 0.38892258529589974,
+        "parameters": {
+          "alpha": 10.0,
+          "gamma": 0.01
+        },
+        "se": 0.174040438046236
+      },
+      {
+        "complexity": [
+          172,
+          -10.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.23210339625922205,
+          0.15089026910711087,
+          0.18688869690398552,
+          1.1227293524282902
+        ],
+        "index": 3,
+        "mean_mse": 0.42315292867465215,
+        "parameters": {
+          "alpha": 10.0,
+          "gamma": 0.1
+        },
+        "se": 0.233783168683622
+      }
+    ],
+    "selected_complexity": [
+      172,
+      -10.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3233,
+  "train_seconds": 3.6450343802571297
+}

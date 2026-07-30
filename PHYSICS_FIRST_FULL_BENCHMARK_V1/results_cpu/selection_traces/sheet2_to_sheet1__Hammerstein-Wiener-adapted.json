@@ -1,0 +1,97 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "Separable cubic input map with train-only isotonic output calibration.",
+  "implementation_status": "ADAPTED_IMPLEMENTATION",
+  "inference_seconds": 0.05784360319375992,
+  "metrics": {
+    "MAE": 0.38340619538510673,
+    "MSE": 0.24784268548503496,
+    "R2": 0.4259193007183044,
+    "RMSE": 0.49783801128985217
+  },
+  "name": "Hammerstein-Wiener-adapted",
+  "parameter_count": 0,
+  "peak_rss_bytes": 258162688,
+  "prediction_sha256": "893c74a1109ecefab1fe2f38d869b3988345d01b5d03b7f85d0e594da2c0861d",
+  "relative_persistence": 0.42764336764631616,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 100.0
+  },
+  "selection": {
+    "minimum_mean_mse": 0.027493342057312655,
+    "minimum_se": 0.010200241320642732,
+    "one_se_threshold": 0.037693583377955385,
+    "records": [
+      {
+        "complexity": [
+          172,
+          -0.01
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.7835106481560016,
+          0.15180107694098297,
+          0.02364688472253714,
+          0.007348234482197137
+        ],
+        "index": 0,
+        "mean_mse": 0.24157671107542972,
+        "parameters": {
+          "alpha": 0.01
+        },
+        "se": 0.1835094105455448
+      },
+      {
+        "complexity": [
+          172,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          1.263948177657315,
+          0.028168287079448195,
+          0.05795947019143714,
+          0.004995863998376128
+        ],
+        "index": 1,
+        "mean_mse": 0.3387679497316441,
+        "parameters": {
+          "alpha": 1.0
+        },
+        "se": 0.30858383679597146
+      },
+      {
+        "complexity": [
+          172,
+          -100.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.044523808041898406,
+          0.016927592178402884,
+          0.04458302815206057,
+          0.003938939856888752
+        ],
+        "index": 2,
+        "mean_mse": 0.027493342057312655,
+        "parameters": {
+          "alpha": 100.0
+        },
+        "se": 0.010200241320642732
+      }
+    ],
+    "selected_complexity": [
+      172,
+      -100.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 1.6471650004386902
+}

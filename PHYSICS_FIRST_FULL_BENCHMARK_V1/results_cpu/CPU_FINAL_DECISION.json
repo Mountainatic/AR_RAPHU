@@ -1,0 +1,376 @@
+{
+  "FP64_certification": {
+    "KKT_max": 2.6451153034188123e-16,
+    "condition_number_max": 36.15669989298267,
+    "predictions_float64": true,
+    "status": "PASS"
+  },
+  "completed_model_direction_runs": 82,
+  "cpu_config_sha256": "5116f011e707131f256db2c66fdcf8feb5eb5a9f229770eca1407d23202d53e6",
+  "dynamic_identification_winner": {
+    "MSE": 0.12365224168564098,
+    "name": "Joint-K+AR"
+  },
+  "engineering_registry": {
+    "convergence_warning_policy": "RETAINED_WITHOUT_RETRY_UNDER_FROZEN_BUDGET",
+    "convergence_warning_runs": [
+      {
+        "direction": "sheet1_to_sheet2",
+        "name": "Elastic-Net",
+        "warning_count": 15
+      },
+      {
+        "direction": "sheet1_to_sheet2",
+        "name": "MLP-small",
+        "warning_count": 1
+      },
+      {
+        "direction": "sheet2_to_sheet1",
+        "name": "MLP-small",
+        "warning_count": 1
+      }
+    ],
+    "generic_model_direction_runs_with_inference_timing": 58,
+    "inference_seconds_max": 2.181556358933449,
+    "inference_seconds_min": 0.0005586668848991394,
+    "inference_timing_status": "PASS",
+    "runner_version": "2"
+  },
+  "failed_model_direction_runs": 0,
+  "failed_models": [],
+  "formal_primary_model": {
+    "name": "K-to-Residual-AR",
+    "physics_audit": {
+      "directions": {
+        "sheet1_to_sheet2": {
+          "G_AR_given_K": 0.0,
+          "G_K": -0.06954710275026477,
+          "G_total": -0.06954710275026477,
+          "OOD": {
+            "G_AR_given_K": 0.0,
+            "G_K": -0.24619031760451127,
+            "rows": 24
+          },
+          "common_support": {
+            "G_AR_given_K": 0.0,
+            "G_K": -0.06598978894004581,
+            "bounds": [
+              -2.740905991578021,
+              2.6263635982728677
+            ],
+            "rows": 3209
+          },
+          "first_half": {
+            "G_AR_given_K": 0.0,
+            "G_K": -0.03851967950621793
+          },
+          "relative_AR": 0.23240227211635567,
+          "rho_phys": "NOT_DEFINED",
+          "second_half": {
+            "G_AR_given_K": 0.0,
+            "G_K": -0.2032716191770556
+          },
+          "time_shift_placebo_rows": {
+            "-120": -0.06782946696063896,
+            "-60": -0.06777565420478737,
+            "120": -0.04412573163523703,
+            "60": -0.05808653239544559
+          }
+        },
+        "sheet2_to_sheet1": {
+          "G_AR_given_K": 0.0,
+          "G_K": 0.45381242386863285,
+          "G_total": 0.45381242386863285,
+          "OOD": {
+            "G_AR_given_K": 0.0,
+            "G_K": 0.15071544210855203,
+            "rows": 151
+          },
+          "common_support": {
+            "G_AR_given_K": 0.0,
+            "G_K": 0.4637486914847745,
+            "bounds": [
+              -2.9313006896498752,
+              2.7125036676755503
+            ],
+            "rows": 2979
+          },
+          "first_half": {
+            "G_AR_given_K": 0.0,
+            "G_K": 0.5597843548512315
+          },
+          "relative_AR": 0.45089898916625704,
+          "rho_phys": 1.0,
+          "second_half": {
+            "G_AR_given_K": 0.0,
+            "G_K": 0.37707480942168736
+          },
+          "time_shift_placebo_rows": {
+            "-120": -0.7186835916412393,
+            "-60": -0.011148893860456921,
+            "120": -0.2562385032013115,
+            "60": 0.2524940646781447
+          }
+        }
+      },
+      "kernel_structure": {
+        "condition_number_max": 36.15669989298267,
+        "correlation": 0.8237741359043425,
+        "nonlinear_blocks": [
+          "EXACT_ZERO",
+          "EXACT_ZERO"
+        ],
+        "peak_indices": [
+          16,
+          39
+        ],
+        "relative_kkt_max": 2.6451153034188123e-16,
+        "sign_agreement_fraction": 0.8837209302325582,
+        "support_jaccard": 0.7209302325581395
+      },
+      "pooled": {
+        "G_AR_given_K": 0.0,
+        "G_K": 0.3539537122612467,
+        "G_total": 0.3539537122612467,
+        "bootstrap_AR_given_K": {
+          "block_length": 60,
+          "lower_95": 0.0,
+          "median": 0.0,
+          "positive_probability": 0.0,
+          "replicates": 500,
+          "upper_95": 0.0
+        },
+        "bootstrap_K_vs_persistence": {
+          "block_length": 60,
+          "lower_95": 0.23631341507636883,
+          "median": 0.3522940073700179,
+          "positive_probability": 1.0,
+          "replicates": 500,
+          "upper_95": 0.44950157728924967
+        },
+        "bootstrap_total": {
+          "block_length": 60,
+          "lower_95": 0.22742171770079098,
+          "median": 0.3535596457336233,
+          "positive_probability": 1.0,
+          "replicates": 500,
+          "upper_95": 0.43671202165510214
+        },
+        "relative_AR": 0.3966484892230163,
+        "rho_phys": 1.0
+      }
+    },
+    "pooled_MSE": 0.1700596651646898,
+    "pooled_R2": 0.3538280926001932,
+    "pooled_RMSE": 0.4123829108543294
+  },
+  "implementation_registry": {
+    "AR": {
+      "factory": "AR",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "",
+      "status": "STANDARD_RIDGE_AR"
+    },
+    "ARMAX": {
+      "factory": "ARMAX",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "Regularized ARX augmented by mature output-difference proxy terms; not an innovations-MLE reproduction.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "ARX": {
+      "factory": "ARX",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "",
+      "status": "STANDARD_RIDGE_ARX"
+    },
+    "Box-Jenkins": {
+      "factory": "Box-Jenkins",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "Regularized input, output, and output-difference blocks; not a full polynomial noise-model search.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "DC-kernel": {
+      "factory": "Ridge",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "Finite multiresolution lag basis transformed by a diagonal-correlated prior covariance.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "Differenced-AR": {
+      "factory": "Differenced-AR",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "",
+      "status": "STANDARD_RIDGE_AR"
+    },
+    "Dynamic-PLS": {
+      "factory": "Dynamic-PLS",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "PLS on multiresolution block levels plus within-channel block differences.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "Elastic-Net": {
+      "factory": "Elastic-Net",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "",
+      "status": "STANDARD"
+    },
+    "Extra-Trees": {
+      "factory": "Extra-Trees",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "",
+      "status": "STANDARD"
+    },
+    "FIR-Ridge": {
+      "factory": "FIR-Ridge",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "",
+      "status": "STANDARD"
+    },
+    "First-order-stable-spline": {
+      "factory": "Ridge",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "Finite multiresolution lag basis transformed by a first-order stable-spline covariance.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "Hammerstein-Wiener-adapted": {
+      "factory": "Hammerstein-Wiener-adapted",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "Separable cubic input map with train-only isotonic output calibration.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "HistGradientBoosting": {
+      "factory": "HistGradientBoosting",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "",
+      "status": "STANDARD"
+    },
+    "Kernel-Ridge-RBF": {
+      "factory": "Kernel-Ridge-RBF",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "Exact RBF kernel ridge with deterministic maximum 1500-row training subset per fit.",
+      "status": "STANDARD_SUBSAMPLED_FIT"
+    },
+    "MLP-small": {
+      "factory": "MLP-small",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "",
+      "status": "CPU_BASELINE"
+    },
+    "N4SID-adapted": {
+      "factory": "N4SID-adapted",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "PCA latent state extraction from causal U/Y history followed by ridge output map.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "Nystroem-Ridge": {
+      "factory": "Nystroem-Ridge",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "",
+      "status": "STANDARD"
+    },
+    "Output-Error": {
+      "factory": "Output-Error",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "Regularized input-only multiresolution OE surrogate.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "PCR": {
+      "factory": "PCR",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "",
+      "status": "STANDARD"
+    },
+    "PLS": {
+      "factory": "PLS",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "",
+      "status": "STANDARD"
+    },
+    "PNLSS-adapted": {
+      "factory": "PNLSS-adapted",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "PCA latent state surrogate with polynomial state/output map; not a full PNLSS optimizer.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "Parallel-Hammerstein": {
+      "factory": "Parallel-Hammerstein",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "Separable degree-2/3 polynomial static maps followed by a shared linear dynamic readout.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "Polynomial-NARX": {
+      "factory": "Polynomial-NARX",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "PCA-reduced causal U/Y history with polynomial regression.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "Random-Forest": {
+      "factory": "Random-Forest",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "",
+      "status": "STANDARD"
+    },
+    "Ridge": {
+      "factory": "Ridge",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "",
+      "status": "STANDARD"
+    },
+    "SVR-RBF": {
+      "factory": "SVR-RBF",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "",
+      "status": "STANDARD"
+    },
+    "Spline-NARX": {
+      "factory": "Spline-NARX",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "PCA-reduced causal U/Y history with cubic spline regression.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "TC-kernel": {
+      "factory": "Ridge",
+      "group": "SYSTEM_IDENTIFICATION",
+      "note": "Finite multiresolution lag basis transformed by a tuned-correlated prior covariance.",
+      "status": "ADAPTED_IMPLEMENTATION"
+    },
+    "XGBoost": {
+      "factory": "XGBoost",
+      "group": "SOFT_SENSOR_CLASSICAL",
+      "note": "",
+      "status": "STANDARD"
+    }
+  },
+  "input_driven_winner": {
+    "MSE": 0.15970259172662174,
+    "name": "Dynamic-PLS"
+  },
+  "nonlinear_K": "EXACT_ZERO_BOTH_DIRECTIONS",
+  "not_applicable_model_direction_runs": 0,
+  "protocol_sha256": "357841c8cd64df2a70b605f212faa00afb78bdda7593fc01633094e058fcb9a8",
+  "residual_AR_selected": {
+    "sheet1_to_sheet2": {
+      "alpha": null,
+      "exact_zero": true,
+      "history_min": 0.0
+    },
+    "sheet2_to_sheet1": {
+      "alpha": null,
+      "exact_zero": true,
+      "history_min": 0.0
+    }
+  },
+  "schema": "PHYSICS_FIRST_FULL_BENCHMARK_V1",
+  "scientific_result_registration": {
+    "direction_G_K": {
+      "sheet1_to_sheet2": -0.06954710275026477,
+      "sheet2_to_sheet1": 0.45381242386863285
+    },
+    "dynamic_winner_role": "PREDICTIVE_CONTROL_NOT_PHYSICAL_CERTIFICATION",
+    "interpretation": "Pooled gain is positive but does not certify transferable physical structure when either cross-rod direction is non-positive.",
+    "physical_K": "NOT_BIDIRECTIONALLY_STABLE",
+    "pooled_G_K": 0.3539537122612467,
+    "pooled_positive_bootstrap_probability": 1.0,
+    "residual_AR": "EXACT_ZERO_SELECTED_BOTH_DIRECTIONS"
+  },
+  "status": "COMPLETED"
+}

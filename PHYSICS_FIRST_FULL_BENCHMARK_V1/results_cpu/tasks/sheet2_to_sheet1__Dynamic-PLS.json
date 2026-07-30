@@ -1,0 +1,147 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "PLS on multiresolution block levels plus within-channel block differences.",
+  "implementation_status": "ADAPTED_IMPLEMENTATION",
+  "inference_seconds": 0.016440078616142273,
+  "metrics": {
+    "MAE": 0.3461397163831038,
+    "MSE": 0.21562985060532672,
+    "R2": 0.5005342393734351,
+    "RMSE": 0.46435961345203863
+  },
+  "name": "Dynamic-PLS",
+  "parameter_count": 1701,
+  "peak_rss_bytes": 274894848,
+  "prediction_sha256": "82d69a85efdd1079645ad31c4f1f0e3cba8cc6c3926ec34abf346037d5e5c168",
+  "relative_persistence": 0.5020342243069955,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 1.0,
+    "components": 4
+  },
+  "selection": {
+    "minimum_mean_mse": 0.04195713831746106,
+    "minimum_se": 0.022013766773300317,
+    "one_se_threshold": 0.06397090509076138,
+    "records": [
+      {
+        "complexity": [
+          2,
+          340,
+          -1.0
+        ],
+        "dimension": 340,
+        "fold_mse": [
+          0.07426699343685358,
+          0.19333036751485935,
+          0.1273142889105031,
+          0.1650960018694186
+        ],
+        "index": 0,
+        "mean_mse": 0.14000191293290867,
+        "parameters": {
+          "alpha": 1.0,
+          "components": 2
+        },
+        "se": 0.02574828928320516
+      },
+      {
+        "complexity": [
+          4,
+          340,
+          -1.0
+        ],
+        "dimension": 340,
+        "fold_mse": [
+          0.10712940108899208,
+          0.02509466012361634,
+          0.010167244980139628,
+          0.02543724707709622
+        ],
+        "index": 1,
+        "mean_mse": 0.04195713831746106,
+        "parameters": {
+          "alpha": 1.0,
+          "components": 4
+        },
+        "se": 0.022013766773300317
+      },
+      {
+        "complexity": [
+          8,
+          340,
+          -1.0
+        ],
+        "dimension": 340,
+        "fold_mse": [
+          0.11177399847491261,
+          0.029937577587016536,
+          0.020121292495938404,
+          0.023311132708001933
+        ],
+        "index": 2,
+        "mean_mse": 0.046286000316467374,
+        "parameters": {
+          "alpha": 1.0,
+          "components": 8
+        },
+        "se": 0.02192484379553158
+      },
+      {
+        "complexity": [
+          12,
+          340,
+          -1.0
+        ],
+        "dimension": 340,
+        "fold_mse": [
+          0.11517817031241728,
+          0.030372252109175598,
+          0.025007278152031725,
+          0.023247053290333976
+        ],
+        "index": 3,
+        "mean_mse": 0.04845118846598964,
+        "parameters": {
+          "alpha": 1.0,
+          "components": 12
+        },
+        "se": 0.02229387697494696
+      },
+      {
+        "complexity": [
+          16,
+          340,
+          -1.0
+        ],
+        "dimension": 340,
+        "fold_mse": [
+          0.1249130877033286,
+          0.03129010585324068,
+          0.02628828390528138,
+          0.02313426850753893
+        ],
+        "index": 4,
+        "mean_mse": 0.0514064364923474,
+        "parameters": {
+          "alpha": 1.0,
+          "components": 16
+        },
+        "se": 0.024559674947942388
+      }
+    ],
+    "selected_complexity": [
+      4,
+      340,
+      -1.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 1.2444112747907639
+}

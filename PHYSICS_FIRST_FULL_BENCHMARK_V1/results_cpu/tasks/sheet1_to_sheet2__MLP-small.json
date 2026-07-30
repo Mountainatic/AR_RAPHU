@@ -1,0 +1,186 @@
+{
+  "convergence_status": "WARNING",
+  "convergence_warnings": [
+    "Stochastic Optimizer: Maximum iterations (500) reached and the optimization hasn't converged yet."
+  ],
+  "direction": "sheet1_to_sheet2",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "",
+  "implementation_status": "CPU_BASELINE",
+  "inference_seconds": 0.007977046072483063,
+  "metrics": {
+    "MAE": 0.7472741979466838,
+    "MSE": 0.7089855323449779,
+    "R2": -6.2039177441269135,
+    "RMSE": 0.8420127863310496
+  },
+  "name": "MLP-small",
+  "parameter_count": 0,
+  "peak_rss_bytes": 231849984,
+  "prediction_sha256": "b998519d175d67ff7652c8ee3cd598af9bcd41a99f039c4f2662686bb72506ee",
+  "relative_persistence": -6.172286768747892,
+  "runner_version": "2",
+  "sample_id_sha256": "2ca66b33aa363b1f4a68c47dac5f94bf68d714df40c547d455334aafe0b40efc",
+  "selected_parameters": {
+    "alpha": 0.1,
+    "hidden": [
+      16
+    ],
+    "learning_rate": 0.001
+  },
+  "selection": {
+    "minimum_mean_mse": 0.26671518912455294,
+    "minimum_se": 0.09535651628500982,
+    "one_se_threshold": 0.3620717054095628,
+    "records": [
+      {
+        "complexity": [
+          172,
+          -0.001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.11636922136949496,
+          0.17670636592306505,
+          0.2845479555794254,
+          0.8905831093408749
+        ],
+        "index": 0,
+        "mean_mse": 0.36705166305321507,
+        "parameters": {
+          "alpha": 0.001,
+          "hidden": [
+            16
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.17794312193016584
+      },
+      {
+        "complexity": [
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.10478580725291262,
+          0.09956706516253537,
+          0.4513631426216639,
+          0.41114474146109997
+        ],
+        "index": 1,
+        "mean_mse": 0.26671518912455294,
+        "parameters": {
+          "alpha": 0.1,
+          "hidden": [
+            16
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.09535651628500982
+      },
+      {
+        "complexity": [
+          172,
+          -0.001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          1.659753650493471,
+          0.060965341275424995,
+          0.2892848370237152,
+          1.241051017427352
+        ],
+        "index": 2,
+        "mean_mse": 0.8127637115549908,
+        "parameters": {
+          "alpha": 0.001,
+          "hidden": [
+            32
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.3807944430912341
+      },
+      {
+        "complexity": [
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.8522111052658649,
+          0.09994689595277895,
+          0.27965926423848536,
+          0.5898693933215347
+        ],
+        "index": 3,
+        "mean_mse": 0.45542166469466594,
+        "parameters": {
+          "alpha": 0.1,
+          "hidden": [
+            32
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.16652647049542052
+      },
+      {
+        "complexity": [
+          172,
+          -0.001
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.764278215170315,
+          0.24574615764628172,
+          1.0030675489970384,
+          1.06736095912555
+        ],
+        "index": 4,
+        "mean_mse": 0.7701132202347963,
+        "parameters": {
+          "alpha": 0.001,
+          "hidden": [
+            32,
+            16
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.18655178038472814
+      },
+      {
+        "complexity": [
+          172,
+          -0.1
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.5198017586833383,
+          0.06652367863793841,
+          0.6943554874315344,
+          1.0769097148921438
+        ],
+        "index": 5,
+        "mean_mse": 0.5893976599112387,
+        "parameters": {
+          "alpha": 0.1,
+          "hidden": [
+            32,
+            16
+          ],
+          "learning_rate": 0.001
+        },
+        "se": 0.2095481128265059
+      }
+    ],
+    "selected_complexity": [
+      172,
+      -0.1
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3233,
+  "train_seconds": 50.969879262149334
+}

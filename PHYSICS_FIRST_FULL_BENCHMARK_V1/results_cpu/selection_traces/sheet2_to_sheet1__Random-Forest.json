@@ -1,0 +1,121 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "",
+  "implementation_status": "STANDARD",
+  "inference_seconds": 0.01714276522397995,
+  "metrics": {
+    "MAE": 0.4893417480747243,
+    "MSE": 0.3383484059904612,
+    "R2": 0.21627991912805755,
+    "RMSE": 0.5816772352348518
+  },
+  "name": "Random-Forest",
+  "parameter_count": 0,
+  "peak_rss_bytes": 243449856,
+  "prediction_sha256": "5e715345980571783f1b146628fd2d80027cba4024c7f0f80a56767ca4513b5a",
+  "relative_persistence": 0.2186335705814867,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "depth": 6,
+    "estimators": 100
+  },
+  "selection": {
+    "minimum_mean_mse": 0.05494523481371322,
+    "minimum_se": 0.023798388379529235,
+    "one_se_threshold": 0.07874362319324245,
+    "records": [
+      {
+        "complexity": [
+          100,
+          6
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.12569535081542021,
+          0.02859495673744273,
+          0.05058495110666216,
+          0.03815337565815965
+        ],
+        "index": 0,
+        "mean_mse": 0.06075715857942119,
+        "parameters": {
+          "depth": 6,
+          "estimators": 100
+        },
+        "se": 0.02210916259047384
+      },
+      {
+        "complexity": [
+          100,
+          999
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.12589801703142775,
+          0.02285714136871309,
+          0.03545075965427272,
+          0.03703985510024169
+        ],
+        "index": 1,
+        "mean_mse": 0.05531144328866381,
+        "parameters": {
+          "depth": null,
+          "estimators": 100
+        },
+        "se": 0.02374174206470997
+      },
+      {
+        "complexity": [
+          300,
+          6
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.12814796946644655,
+          0.026671524616652266,
+          0.05087584399563183,
+          0.038315211768870636
+        ],
+        "index": 2,
+        "mean_mse": 0.06100263746190032,
+        "parameters": {
+          "depth": 6,
+          "estimators": 300
+        },
+        "se": 0.022920864130160062
+      },
+      {
+        "complexity": [
+          300,
+          999
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.12573097267243505,
+          0.02258088344696293,
+          0.03542951699653494,
+          0.03603956613891994
+        ],
+        "index": 3,
+        "mean_mse": 0.05494523481371322,
+        "parameters": {
+          "depth": null,
+          "estimators": 300
+        },
+        "se": 0.023798388379529235
+      }
+    ],
+    "selected_complexity": [
+      100,
+      6
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 532.2957660481334
+}

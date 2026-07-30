@@ -1,0 +1,219 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SYSTEM_IDENTIFICATION",
+  "implementation_note": "PCA latent state surrogate with polynomial state/output map; not a full PNLSS optimizer.",
+  "implementation_status": "ADAPTED_IMPLEMENTATION",
+  "inference_seconds": 0.01247437298297882,
+  "metrics": {
+    "MAE": 0.43637654440782847,
+    "MSE": 0.2778158537294427,
+    "R2": 0.356492126171019,
+    "RMSE": 0.5270823974763743
+  },
+  "name": "PNLSS-adapted",
+  "parameter_count": 0,
+  "peak_rss_bytes": 267452416,
+  "prediction_sha256": "04378861d3451277ed0d34bf9da1800ca9e8df4d82842ba8396525cf0d1bb853",
+  "relative_persistence": 0.3584246953108139,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 10.0,
+    "components": 4,
+    "degree": 2
+  },
+  "selection": {
+    "minimum_mean_mse": 0.15302062661296953,
+    "minimum_se": 0.025072037996620923,
+    "one_se_threshold": 0.17809266460959045,
+    "records": [
+      {
+        "complexity": [
+          4,
+          292,
+          -0.1
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.17239145253117358,
+          0.23134966921662017,
+          0.25300911191584907,
+          0.09649157812353831
+        ],
+        "index": 0,
+        "mean_mse": 0.18831045294679527,
+        "parameters": {
+          "alpha": 0.1,
+          "components": 4,
+          "degree": 2
+        },
+        "se": 0.03502666955044896
+      },
+      {
+        "complexity": [
+          4,
+          292,
+          -10.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.12966552836491532,
+          0.2091117856382976,
+          0.17736980081318204,
+          0.09593539163548313
+        ],
+        "index": 1,
+        "mean_mse": 0.15302062661296953,
+        "parameters": {
+          "alpha": 10.0,
+          "components": 4,
+          "degree": 2
+        },
+        "se": 0.025072037996620923
+      },
+      {
+        "complexity": [
+          4,
+          292,
+          -0.1
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.21203402038032051,
+          0.5139786312962541,
+          0.383789907975889,
+          0.053658274480734784
+        ],
+        "index": 2,
+        "mean_mse": 0.2908652085332996,
+        "parameters": {
+          "alpha": 0.1,
+          "components": 4,
+          "degree": 3
+        },
+        "se": 0.10037267430752118
+      },
+      {
+        "complexity": [
+          4,
+          292,
+          -10.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.16769002010561365,
+          0.4308637257478235,
+          0.09534744095485884,
+          0.07838161076248801
+        ],
+        "index": 3,
+        "mean_mse": 0.193070699392696,
+        "parameters": {
+          "alpha": 10.0,
+          "components": 4,
+          "degree": 3
+        },
+        "se": 0.08159510021785422
+      },
+      {
+        "complexity": [
+          8,
+          292,
+          -0.1
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.6005449439578386,
+          0.7206565434415371,
+          0.2166061561034294,
+          0.043629070062091636
+        ],
+        "index": 4,
+        "mean_mse": 0.3953591783912242,
+        "parameters": {
+          "alpha": 0.1,
+          "components": 8,
+          "degree": 2
+        },
+        "se": 0.1590561447471925
+      },
+      {
+        "complexity": [
+          8,
+          292,
+          -10.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.6977464956982702,
+          0.5651483195290931,
+          0.07822598435094097,
+          0.04142112840210002
+        ],
+        "index": 5,
+        "mean_mse": 0.345635481995101,
+        "parameters": {
+          "alpha": 10.0,
+          "components": 8,
+          "degree": 2
+        },
+        "se": 0.1673873412616198
+      },
+      {
+        "complexity": [
+          8,
+          292,
+          -0.1
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          1.8878342947332485,
+          3.6000186418870608,
+          6.7518560726697885,
+          0.22735520126503717
+        ],
+        "index": 6,
+        "mean_mse": 3.116766052638784,
+        "parameters": {
+          "alpha": 0.1,
+          "components": 8,
+          "degree": 3
+        },
+        "se": 1.3936277854449195
+      },
+      {
+        "complexity": [
+          8,
+          292,
+          -10.0
+        ],
+        "dimension": 292,
+        "fold_mse": [
+          0.738828202890763,
+          0.506418227677581,
+          0.15261236134150985,
+          0.037339906843725096
+        ],
+        "index": 7,
+        "mean_mse": 0.3587996746883947,
+        "parameters": {
+          "alpha": 10.0,
+          "components": 8,
+          "degree": 3
+        },
+        "se": 0.1612613070873468
+      }
+    ],
+    "selected_complexity": [
+      4,
+      292,
+      -10.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 2.7747250497341156
+}

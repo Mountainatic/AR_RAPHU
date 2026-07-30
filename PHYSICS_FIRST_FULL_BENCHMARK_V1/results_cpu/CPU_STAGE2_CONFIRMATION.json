@@ -1,0 +1,136 @@
+{
+  "status": "PASS",
+  "checks": {
+    "two_directions": true,
+    "bootstrap_K_500": true,
+    "bootstrap_residual_AR_500": true,
+    "KKT": true,
+    "FP64": true,
+    "nonlinear_exact_zero": true
+  },
+  "scientific_registration": {
+    "bidirectional_K_positive": false,
+    "pooled_K_positive": true,
+    "residual_AR_exact_zero_both_directions": true
+  },
+  "physics_audit": {
+    "directions": {
+      "sheet1_to_sheet2": {
+        "G_AR_given_K": 0.0,
+        "G_K": -0.06954710275026477,
+        "G_total": -0.06954710275026477,
+        "OOD": {
+          "G_AR_given_K": 0.0,
+          "G_K": -0.24619031760451127,
+          "rows": 24
+        },
+        "common_support": {
+          "G_AR_given_K": 0.0,
+          "G_K": -0.06598978894004581,
+          "bounds": [
+            -2.740905991578021,
+            2.6263635982728677
+          ],
+          "rows": 3209
+        },
+        "first_half": {
+          "G_AR_given_K": 0.0,
+          "G_K": -0.03851967950621793
+        },
+        "relative_AR": 0.23240227211635567,
+        "rho_phys": "NOT_DEFINED",
+        "second_half": {
+          "G_AR_given_K": 0.0,
+          "G_K": -0.2032716191770556
+        },
+        "time_shift_placebo_rows": {
+          "-120": -0.06782946696063896,
+          "-60": -0.06777565420478737,
+          "120": -0.04412573163523703,
+          "60": -0.05808653239544559
+        }
+      },
+      "sheet2_to_sheet1": {
+        "G_AR_given_K": 0.0,
+        "G_K": 0.45381242386863285,
+        "G_total": 0.45381242386863285,
+        "OOD": {
+          "G_AR_given_K": 0.0,
+          "G_K": 0.15071544210855203,
+          "rows": 151
+        },
+        "common_support": {
+          "G_AR_given_K": 0.0,
+          "G_K": 0.4637486914847745,
+          "bounds": [
+            -2.9313006896498752,
+            2.7125036676755503
+          ],
+          "rows": 2979
+        },
+        "first_half": {
+          "G_AR_given_K": 0.0,
+          "G_K": 0.5597843548512315
+        },
+        "relative_AR": 0.45089898916625704,
+        "rho_phys": 1.0,
+        "second_half": {
+          "G_AR_given_K": 0.0,
+          "G_K": 0.37707480942168736
+        },
+        "time_shift_placebo_rows": {
+          "-120": -0.7186835916412393,
+          "-60": -0.011148893860456921,
+          "120": -0.2562385032013115,
+          "60": 0.2524940646781447
+        }
+      }
+    },
+    "kernel_structure": {
+      "condition_number_max": 36.15669989298267,
+      "correlation": 0.8237741359043425,
+      "nonlinear_blocks": [
+        "EXACT_ZERO",
+        "EXACT_ZERO"
+      ],
+      "peak_indices": [
+        16,
+        39
+      ],
+      "relative_kkt_max": 2.6451153034188123e-16,
+      "sign_agreement_fraction": 0.8837209302325582,
+      "support_jaccard": 0.7209302325581395
+    },
+    "pooled": {
+      "G_AR_given_K": 0.0,
+      "G_K": 0.3539537122612467,
+      "G_total": 0.3539537122612467,
+      "bootstrap_AR_given_K": {
+        "block_length": 60,
+        "lower_95": 0.0,
+        "median": 0.0,
+        "positive_probability": 0.0,
+        "replicates": 500,
+        "upper_95": 0.0
+      },
+      "bootstrap_K_vs_persistence": {
+        "block_length": 60,
+        "lower_95": 0.23631341507636883,
+        "median": 0.3522940073700179,
+        "positive_probability": 1.0,
+        "replicates": 500,
+        "upper_95": 0.44950157728924967
+      },
+      "bootstrap_total": {
+        "block_length": 60,
+        "lower_95": 0.22742171770079098,
+        "median": 0.3535596457336233,
+        "positive_probability": 1.0,
+        "replicates": 500,
+        "upper_95": 0.43671202165510214
+      },
+      "relative_AR": 0.3966484892230163,
+      "rho_phys": 1.0
+    }
+  }
+}

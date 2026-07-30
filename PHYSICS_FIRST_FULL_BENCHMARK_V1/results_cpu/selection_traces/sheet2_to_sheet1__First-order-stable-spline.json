@@ -1,0 +1,161 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SYSTEM_IDENTIFICATION",
+  "implementation_note": "Finite multiresolution lag basis transformed by a first-order stable-spline covariance.",
+  "implementation_status": "ADAPTED_IMPLEMENTATION",
+  "inference_seconds": 0.005201369524002075,
+  "metrics": {
+    "MAE": 0.34622194359701064,
+    "MSE": 0.20645079632425647,
+    "R2": 0.5217957823159223,
+    "RMSE": 0.45436856881199045
+  },
+  "name": "First-order-stable-spline",
+  "parameter_count": 173,
+  "peak_rss_bytes": 256970752,
+  "prediction_sha256": "c96932e0677b44bbcf89ef8d2e1e202c9dfb24c7bced92191594c66b99b3b004",
+  "relative_persistence": 0.5232319150365945,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 100.0,
+    "beta": 0.8
+  },
+  "selection": {
+    "minimum_mean_mse": 0.04623385862389629,
+    "minimum_se": 0.023776648479784022,
+    "one_se_threshold": 0.07001050710368031,
+    "records": [
+      {
+        "complexity": [
+          172,
+          -0.01
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.1230780869093636,
+          0.031377737137085,
+          0.026736386005755973,
+          0.023164435975438033
+        ],
+        "index": 0,
+        "mean_mse": 0.051089161506910646,
+        "parameters": {
+          "alpha": 0.01,
+          "beta": 0.8
+        },
+        "se": 0.02405513389747431
+      },
+      {
+        "complexity": [
+          172,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.12289743550367135,
+          0.030857064223039257,
+          0.026343652653634614,
+          0.02314794092936203
+        ],
+        "index": 1,
+        "mean_mse": 0.05081152332742682,
+        "parameters": {
+          "alpha": 1.0,
+          "beta": 0.8
+        },
+        "se": 0.024080610559178546
+      },
+      {
+        "complexity": [
+          172,
+          -100.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.1172367564962509,
+          0.026435815303268453,
+          0.016181399620878216,
+          0.025081463075187566
+        ],
+        "index": 2,
+        "mean_mse": 0.04623385862389629,
+        "parameters": {
+          "alpha": 100.0,
+          "beta": 0.8
+        },
+        "se": 0.023776648479784022
+      },
+      {
+        "complexity": [
+          172,
+          -0.01
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.1230664053225342,
+          0.03138667443898153,
+          0.02674056670058606,
+          0.023165255534827386
+        ],
+        "index": 3,
+        "mean_mse": 0.0510897254992323,
+        "parameters": {
+          "alpha": 0.01,
+          "beta": 0.95
+        },
+        "se": 0.02405117844732978
+      },
+      {
+        "complexity": [
+          172,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.12204529050661472,
+          0.031633503425810894,
+          0.026889949249608948,
+          0.02316907103584899
+        ],
+        "index": 4,
+        "mean_mse": 0.05093445355447089,
+        "parameters": {
+          "alpha": 1.0,
+          "beta": 0.95
+        },
+        "se": 0.02376680539038872
+      },
+      {
+        "complexity": [
+          172,
+          -100.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.09810436046802806,
+          0.05533785013872582,
+          0.030202179278401044,
+          0.029803139875524173
+        ],
+        "index": 5,
+        "mean_mse": 0.053361882440169775,
+        "parameters": {
+          "alpha": 100.0,
+          "beta": 0.95
+        },
+        "se": 0.016065439070116747
+      }
+    ],
+    "selected_complexity": [
+      172,
+      -100.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 0.5136221721768379
+}

@@ -1,0 +1,168 @@
+{
+  "convergence_status": "PASS",
+  "convergence_warnings": [],
+  "direction": "sheet2_to_sheet1",
+  "fp64_prediction": true,
+  "group": "SOFT_SENSOR_CLASSICAL",
+  "implementation_note": "Separable degree-2/3 polynomial static maps followed by a shared linear dynamic readout.",
+  "implementation_status": "ADAPTED_IMPLEMENTATION",
+  "inference_seconds": 0.022056490182876587,
+  "metrics": {
+    "MAE": 0.37196158108879057,
+    "MSE": 0.20788521765360995,
+    "R2": 0.5184732166400047,
+    "RMSE": 0.455944314202524
+  },
+  "name": "Parallel-Hammerstein",
+  "parameter_count": 0,
+  "peak_rss_bytes": 252952576,
+  "prediction_sha256": "7172c9fed8e783e334b871ca66416dff6727c6c70232b49ddf1799ea328dd15a",
+  "relative_persistence": 0.5199193276191433,
+  "runner_version": "2",
+  "sample_id_sha256": "956fcc32a008c7ea152e4f1954353f3d01eeb45da309aebe46132d8cbf985722",
+  "selected_parameters": {
+    "alpha": 100.0,
+    "degree": 2
+  },
+  "selection": {
+    "minimum_mean_mse": 0.02603613558878386,
+    "minimum_se": 0.008538106402488017,
+    "one_se_threshold": 0.034574241991271876,
+    "records": [
+      {
+        "complexity": [
+          2,
+          172,
+          -0.01
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.10667399332127785,
+          0.04676712243460125,
+          0.016479890250358623,
+          0.042256736653712115
+        ],
+        "index": 0,
+        "mean_mse": 0.053044435664987455,
+        "parameters": {
+          "alpha": 0.01,
+          "degree": 2
+        },
+        "se": 0.019080693879630625
+      },
+      {
+        "complexity": [
+          2,
+          172,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.08381195546299967,
+          0.022215440371957707,
+          0.02422605729096908,
+          0.02007564265412492
+        ],
+        "index": 1,
+        "mean_mse": 0.037582273945012845,
+        "parameters": {
+          "alpha": 1.0,
+          "degree": 2
+        },
+        "se": 0.015433172307784833
+      },
+      {
+        "complexity": [
+          2,
+          172,
+          -100.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.0525456997929654,
+          0.024117324925095503,
+          0.01511356747936148,
+          0.01817835227544746
+        ],
+        "index": 2,
+        "mean_mse": 0.027488736118217463,
+        "parameters": {
+          "alpha": 100.0,
+          "degree": 2
+        },
+        "se": 0.008558844782692069
+      },
+      {
+        "complexity": [
+          3,
+          172,
+          -0.01
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.7815771407254763,
+          0.15007031550865688,
+          0.0236841064127373,
+          0.007124397186046261
+        ],
+        "index": 3,
+        "mean_mse": 0.24061398995822922,
+        "parameters": {
+          "alpha": 0.01,
+          "degree": 3
+        },
+        "se": 0.18312455956234588
+      },
+      {
+        "complexity": [
+          3,
+          172,
+          -1.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          1.276757694592814,
+          0.027819541113828086,
+          0.055616732936485114,
+          0.005068807856789218
+        ],
+        "index": 4,
+        "mean_mse": 0.34131569412497914,
+        "parameters": {
+          "alpha": 1.0,
+          "degree": 3
+        },
+        "se": 0.3119852345786701
+      },
+      {
+        "complexity": [
+          3,
+          172,
+          -100.0
+        ],
+        "dimension": 172,
+        "fold_mse": [
+          0.03760764508892852,
+          0.020728751119283854,
+          0.04151997136045912,
+          0.004288174786463935
+        ],
+        "index": 5,
+        "mean_mse": 0.02603613558878386,
+        "parameters": {
+          "alpha": 100.0,
+          "degree": 3
+        },
+        "se": 0.008538106402488017
+      }
+    ],
+    "selected_complexity": [
+      2,
+      172,
+      -100.0
+    ]
+  },
+  "status": "COMPLETED",
+  "test_rows": 3130,
+  "train_seconds": 1.6333715543150902
+}
