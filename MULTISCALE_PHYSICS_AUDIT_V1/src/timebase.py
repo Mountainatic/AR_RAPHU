@@ -17,7 +17,10 @@ class Timebase:
     def samples_for_seconds(self, seconds: float, *, minimum: int = 1) -> int:
         value = float(seconds) / self.sample_period_sec
         rounded = int(round(value))
-        if abs(value - rounded) > 1.0e-8:
+        # JSON decimal representations of fractions such as 1/6 minute can
+        # accumulate ~1e-8 sample error over repeated lag blocks. This tolerance
+        # accepts only round-off around an integer, never a half-sample cadence.
+        if abs(value - rounded) > 1.0e-6:
             raise ValueError(
                 f"PHYSICAL_TIME_NOT_ALIGNED:{seconds}s/{self.sample_period_sec}s"
             )
