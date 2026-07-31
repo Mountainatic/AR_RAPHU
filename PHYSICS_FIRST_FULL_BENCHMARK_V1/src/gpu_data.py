@@ -329,6 +329,13 @@ def matured_residual_history(
         left = right - history_rows
         if left < 0 or right <= 0:
             continue
-        history[row, :, 0] = residual[left:right].astype(np.float32)
+        window = residual[left:right]
+        # Rolling OOF predictions are intentionally unavailable before the
+        # first expanding validation block.  A residual row is usable only
+        # when both its target correction and every matured history value are
+        # finite; silently replacing unavailable OOF values would leak.
+        if not np.isfinite(residual[row]) or not np.all(np.isfinite(window)):
+            continue
+        history[row, :, 0] = window.astype(np.float32)
         available[row] = True
     return history, available

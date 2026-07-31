@@ -45,3 +45,20 @@ def test_residual_history_uses_only_matured_rows():
     assert not available[:6].any()
     assert available[6]
     np.testing.assert_array_equal(history[6, :, 0], np.array([0., 1., 2., 3.], dtype=np.float32))
+
+
+def test_residual_history_rejects_unavailable_oof_rows():
+    target = np.arange(24, dtype=float)
+    prediction = np.zeros(24, dtype=float)
+    prediction[:8] = np.nan
+    history, available = matured_residual_history(
+        target, prediction, maturity_rows=3, history_rows=4
+    )
+    # The first usable row needs four finite residuals that have all matured.
+    assert not available[:14].any()
+    assert available[14]
+    prediction[14] = np.nan
+    _, available_with_missing_target = matured_residual_history(
+        target, prediction, maturity_rows=3, history_rows=4
+    )
+    assert not available_with_missing_target[14]

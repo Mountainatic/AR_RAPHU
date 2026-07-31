@@ -1,23 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_DIR="${ENV_DIR:-$ROOT/.venv-gpu}"
-PYTHON_BIN="${PYTHON_BIN:-python3}"
+REPO_ROOT="$(cd "$ROOT/.." && pwd)"
+ENV_DIR="${ENV_DIR:-$REPO_ROOT/.venv}"
+UV_BIN="${UV_BIN:-$(command -v uv || true)}"
 
+if [[ -z "$UV_BIN" ]]; then
+  echo "uv is required; set UV_BIN=/absolute/path/to/uv" >&2
+  exit 2
+fi
+export UV_PROJECT_ENVIRONMENT="$ENV_DIR"
+"$UV_BIN" sync --frozen --group dev --project "$REPO_ROOT"
+PYTHON_BIN="$ENV_DIR/bin/python"
 "$PYTHON_BIN" - <<'PY'
 import sys
-if sys.version_info < (3, 10):
-    raise SystemExit(f"Python >=3.10 required, found {sys.version}")
-PY
-
-if [[ ! -d "$ENV_DIR" ]]; then
-  "$PYTHON_BIN" -m venv --system-site-packages "$ENV_DIR"
-fi
-source "$ENV_DIR/bin/activate"
-python -m pip install --upgrade pip
-python -m pip install -r "$ROOT/requirements_gpu.txt"
-python - <<'PY'
 import torch
+if sys.version_info[:2] != (3, 10):
+    raise SystemExit(f"Frozen lock requires Python 3.10, found {sys.version}")
 print('torch=', torch.__version__)
 print('cuda_runtime=', torch.version.cuda)
 print('cuda_available=', torch.cuda.is_available())
@@ -28,3 +27,4 @@ print('capability=', torch.cuda.get_device_capability(0))
 print('bf16=', torch.cuda.is_bf16_supported())
 PY
 printf 'GPU_ENV_READY=%s\n' "$ENV_DIR"
+printf 'UV_BIN=%s\n' "$UV_BIN"
