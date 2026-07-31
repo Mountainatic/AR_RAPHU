@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
-from scipy.linalg import eigh
+from scipy.linalg import cho_factor, cho_solve, eigh
 from scipy.optimize import minimize_scalar
 
 
@@ -74,10 +74,11 @@ def fit_gcv(
     selected_log = float(result.x)
     selected_lambda = float(10.0**selected_log)
     gcv, df, _ = statistics(selected_log)
-    coefficient = vectors @ (projected_rhs / (eigenvalues + selected_lambda))
+    hessian = gram + selected_lambda * penalty
+    factor = cho_factor(hessian, lower=True, check_finite=False)
+    coefficient = cho_solve(factor, rhs, check_finite=False)
     intercept = y_mean - float(x_mean @ coefficient)
     prediction = intercept + matrix @ coefficient
-    hessian = gram + selected_lambda * penalty
     residual = hessian @ coefficient - rhs
     kkt = float(np.linalg.norm(residual) / max(np.linalg.norm(rhs), 1e-30))
     condition = float(np.linalg.cond(hessian))
