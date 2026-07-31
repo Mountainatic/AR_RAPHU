@@ -49,8 +49,13 @@ def main() -> int:
     rows = []
     for model_id, by_run in traces.items():
         directions = {key[0] for key in by_run}
-        seeds = {key[1] for key in by_run}
-        if len(directions) < 2 or len(seeds) < args.minimum_seeds:
+        seeds_by_direction = {
+            direction: {seed for (candidate_direction, seed) in by_run if candidate_direction == direction}
+            for direction in directions
+        }
+        if len(directions) < 2 or any(
+            len(seeds) < args.minimum_seeds for seeds in seeds_by_direction.values()
+        ):
             continue
         values = [statistics.mean(run_values) for run_values in by_run.values()]
         rows.append(
@@ -59,7 +64,10 @@ def main() -> int:
                 "mode": specs[model_id]["mode"],
                 "validation_mse_scaled_median": float(statistics.median(values)),
                 "directions": len(directions),
-                "seeds": len(seeds),
+                "seeds_per_direction": {
+                    direction: len(seeds)
+                    for direction, seeds in sorted(seeds_by_direction.items())
+                },
             }
         )
     quotas = {"input": 3, "dynamic": 2, "residual": 1}
