@@ -30,7 +30,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seeds", required=True)
     parser.add_argument("--models")
     parser.add_argument("--directions")
-    parser.add_argument("--parallel-workers", type=int, default=8)
+    parser.add_argument("--parallel-workers", type=int, default=12)
     parser.add_argument("--loader-workers", type=int, default=0)
     parser.add_argument("--train-fraction", type=float, default=1.0)
     parser.add_argument("--python-bin", default=sys.executable)
