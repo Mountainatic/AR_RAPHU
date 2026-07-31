@@ -40,17 +40,27 @@ for stage in ("core", "frontier", "finalists"):
 checkpoint = root / "checkpoints" / "latest.json"
 if checkpoint.is_file():
     value = json.loads(checkpoint.read_text())
+    def count(field):
+        item = value.get(field, [])
+        return len(item) if isinstance(item, list) else int(item or 0)
     print(
         "LATEST_STAGE={stage} STATUS={status} COMPLETED={completed} FAILED={failed}".format(
             stage=value.get("stage"),
             status=value.get("status"),
-            completed=len(value.get("completed", [])),
-            failed=len(value.get("failed", [])),
+            completed=count("completed"),
+            failed=count("failed"),
         )
     )
 PY
 
 echo "GPU=$(nvidia-smi --query-gpu=utilization.gpu,memory.used,power.draw --format=csv,noheader)"
+active_shards="$(pgrep -af 'run_gpu_stage[123]_|run_gpu_parallel_stage.py' | grep -v GPU_STATUS.sh || true)"
+if [[ -n "$active_shards" ]]; then
+  echo "ACTIVE_GPU_WORKERS=$(printf '%s\n' "$active_shards" | wc -l)"
+  printf '%s\n' "$active_shards" | cut -c1-500
+else
+  echo "ACTIVE_GPU_WORKERS=0"
+fi
 for log in core_resume frontier finalists postprocess; do
   path="$RESULTS/logs/$log.log"
   if [[ -f "$path" ]]; then
