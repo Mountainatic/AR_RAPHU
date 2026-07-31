@@ -1,0 +1,69 @@
+{
+  "active_channels": {
+    "sheet1_to_sheet2": [
+      "joint_lift",
+      "heater_power",
+      "crucible_rotation"
+    ],
+    "sheet2_to_sheet1": [
+      "joint_lift",
+      "heater_power",
+      "crystal_rotation",
+      "crucible_rotation"
+    ]
+  },
+  "comparison_vs_Joint_K_AR": {
+    "relative_MSE_improvement": -0.9448029903032397
+  },
+  "comparison_vs_NLinear": {
+    "relative_MSE_improvement": -0.9666239061135888
+  },
+  "comparison_vs_old_K": {
+    "bootstrap_positive_probability_40min": 0.006,
+    "relative_MSE_improvement": -0.5478767063272375
+  },
+  "direction_metrics": {
+    "sheet1_to_sheet2": {
+      "dynamic_RMSE": 0.3144053038226239,
+      "input_RMSE": 0.3144053038226239
+    },
+    "sheet2_to_sheet1": {
+      "dynamic_RMSE": 0.6219070861970281,
+      "input_RMSE": 0.6580436358127549
+    }
+  },
+  "mother_space": "V0",
+  "nonlinear_channel": null,
+  "nonlinear_exact_zero": true,
+  "physical_registration": "REJECTED",
+  "pooled_metrics": {
+    "dynamic": {
+      "model": "Shared-Private-K-to-Residual",
+      "pooled_MAE": 0.3754747252192372,
+      "pooled_MSE": 0.2404792493879335,
+      "pooled_R2": 0.08625637292305288,
+      "pooled_RMSE": 0.4903868364749746,
+      "sheet1_to_sheet2_RMSE": 0.3144053038226239,
+      "sheet2_to_sheet1_RMSE": 0.6219070861970281
+    },
+    "input": {
+      "model": "Shared-Private-K",
+      "pooled_MAE": 0.3913075350111396,
+      "pooled_MSE": 0.2632313943942329,
+      "pooled_R2": -0.00019444374720145596,
+      "pooled_RMSE": 0.5130608096456334,
+      "sheet1_to_sheet2_RMSE": 0.3144053038226239,
+      "sheet2_to_sheet1_RMSE": 0.6580436358127549
+    }
+  },
+  "private_certification": "PRIVATE_EXACT_ZERO",
+  "private_channel": null,
+  "private_rank": 0,
+  "residual_model": {
+    "sheet1_to_sheet2": "A0",
+    "sheet2_to_sheet1": "AR:2"
+  },
+  "shared_certification": "PREDICTIVE_SHARED_LOW_RANK_NOT_CERTIFIED",
+  "shared_rank": 0,
+  "success_level": "LEVEL_D_REJECTED"
+}

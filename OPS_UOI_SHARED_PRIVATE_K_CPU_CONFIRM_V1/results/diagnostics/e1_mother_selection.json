@@ -1,0 +1,42 @@
+{
+  "direction_hyperparameters": {
+    "V0": {
+      "sheet1_to_sheet2": {
+        "lambda_0": 0.0001,
+        "lambda_2": 10000.0,
+        "oof_mse": 0.21115146355809128,
+        "oof_se": 0.08808038357914867
+      },
+      "sheet2_to_sheet1": {
+        "lambda_0": 0.01,
+        "lambda_2": 1.0,
+        "oof_mse": 0.01187261524904653,
+        "oof_se": 0.0017572363442821188
+      }
+    },
+    "V1": {
+      "sheet1_to_sheet2": {
+        "lambda_0": 0.0001,
+        "lambda_2": 10000.0,
+        "oof_mse": 0.21949158125428203,
+        "oof_se": 0.08727477023712796
+      },
+      "sheet2_to_sheet1": {
+        "lambda_0": 0.01,
+        "lambda_2": 0.01,
+        "oof_mse": 0.01166228199253027,
+        "oof_se": 0.001919583688048443
+      }
+    }
+  },
+  "mean_oof_mse": {
+    "V0": 0.11151203940356891,
+    "V1": 0.11557693162340615
+  },
+  "nested_max_abs_error": 1.3322676295501878e-15,
+  "selected_mother_space": "V0",
+  "selection_reason": "ONE_SE_OR_STABILITY_PREFERS_V0",
+  "status": "PASS",
+  "v1_fold_median_abs_correlation": 0.9819278023404716,
+  "v1_relative_improvement": -0.036452496444138664
+}

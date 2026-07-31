@@ -1,0 +1,129 @@
+{
+  "cross_direction_private_correlation": 1.0,
+  "directions": {
+    "sheet1_to_sheet2": {
+      "condition_number": 1.0,
+      "kkt_relative": 0.0,
+      "loadings": [],
+      "orthogonality_error": 0.0,
+      "private_channel": null,
+      "private_mode": null,
+      "rank": 0,
+      "shared_modes": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "support": [
+        0,
+        1,
+        3
+      ]
+    },
+    "sheet2_to_sheet1": {
+      "condition_number": 1.0,
+      "kkt_relative": 0.0,
+      "loadings": [],
+      "orthogonality_error": 0.0,
+      "private_channel": null,
+      "private_mode": null,
+      "rank": 0,
+      "shared_modes": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "support": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "inner_aggregate": [
+    {
+      "candidate_channel": null,
+      "candidate_channel_index": null,
+      "combined_oof_mse": 0.23981087792462008,
+      "combined_oof_se": 0.12904530100450515,
+      "inner_gate_pass": true
+    },
+    {
+      "candidate_channel": "joint_lift",
+      "candidate_channel_index": 0,
+      "combined_oof_mse": 0.18524441664489846,
+      "combined_oof_se": 0.08249857782480544,
+      "inner_gate_pass": false
+    },
+    {
+      "candidate_channel": "heater_power",
+      "candidate_channel_index": 1,
+      "combined_oof_mse": 0.23972692711917726,
+      "combined_oof_se": 0.125100793799653,
+      "inner_gate_pass": false
+    },
+    {
+      "candidate_channel": "crystal_rotation",
+      "candidate_channel_index": 2,
+      "combined_oof_mse": 0.2406334163801837,
+      "combined_oof_se": 0.12894377147979968,
+      "inner_gate_pass": false
+    },
+    {
+      "candidate_channel": "crucible_rotation",
+      "candidate_channel_index": 3,
+      "combined_oof_mse": 0.2395937569153406,
+      "combined_oof_se": 0.12518552055961968,
+      "inner_gate_pass": false
+    }
+  ],
+  "inner_selected_candidate": null,
+  "outer_bootstrap": {
+    "sheet1_to_sheet2": {
+      "lower_95": 0.0,
+      "mean_difference": 0.0,
+      "median": 0.0,
+      "positive_probability": 0.0,
+      "upper_95": 0.0
+    },
+    "sheet2_to_sheet1": {
+      "lower_95": 0.0,
+      "mean_difference": 0.0,
+      "median": 0.0,
+      "positive_probability": 0.0,
+      "upper_95": 0.0
+    }
+  },
+  "outer_direction_gains": {
+    "sheet1_to_sheet2": 0.0,
+    "sheet2_to_sheet1": 0.0
+  },
+  "outer_gate_pass": true,
+  "private_certification": "PRIVATE_EXACT_ZERO",
+  "selected_private_channel": null,
+  "selected_private_channel_index": null,
+  "status": "PASS"
+}

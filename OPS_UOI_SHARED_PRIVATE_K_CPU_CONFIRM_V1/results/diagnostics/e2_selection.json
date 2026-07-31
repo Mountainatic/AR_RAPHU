@@ -1,0 +1,117 @@
+{
+  "directions": {
+    "sheet1_to_sheet2": {
+      "fit": {
+        "coefficient_hash": "df4a7000898c572be30bac7ea111a1fa1dbbe543c33d7852309bc41abf697c27",
+        "condition_number": 111687563788.1814,
+        "kkt_relative": 1.1889990290310544e-12,
+        "test_metrics": {
+          "MAE": 0.43085757815061926,
+          "MSE": 0.23556270005494953,
+          "R2": -1.393524602917544,
+          "RMSE": 0.4853480195230527,
+          "rows": 3233
+        }
+      },
+      "selected": {
+        "lambda_0": 1e-06,
+        "lambda_2": 10000.0,
+        "oof_mse": 0.17363716083975345,
+        "oof_se": 0.08671908083147975,
+        "support": [
+          0,
+          1,
+          3
+        ],
+        "support_mask": 11
+      },
+      "trace": {
+        "candidate_count": 31,
+        "minimum": {
+          "lambda_0": 0.0001,
+          "lambda_2": 10000.0,
+          "mother_space": "V0",
+          "oof_mse": 0.17131157433772243,
+          "oof_se": 0.08575428665918114,
+          "support": [
+            0,
+            1,
+            3
+          ]
+        },
+        "one_se_threshold": 0.25706586099690354,
+        "selected": {
+          "lambda_0": 1e-06,
+          "lambda_2": 10000.0,
+          "mother_space": "V0",
+          "oof_mse": 0.17363716083975345,
+          "oof_se": 0.08671908083147975,
+          "support": [
+            0,
+            1,
+            3
+          ]
+        }
+      }
+    },
+    "sheet2_to_sheet1": {
+      "fit": {
+        "coefficient_hash": "47f08185a1404c180e33a7bc03acbd57ec3caf4872b612adb6b9e0f6c4842a2c",
+        "condition_number": 176232243.14560556,
+        "kkt_relative": 5.263454280595321e-13,
+        "test_metrics": {
+          "MAE": 0.33690892148990625,
+          "MSE": 0.21923623688070096,
+          "R2": 0.4921807277465132,
+          "RMSE": 0.4682266939001887,
+          "rows": 3130
+        }
+      },
+      "selected": {
+        "lambda_0": 0.01,
+        "lambda_2": 1.0,
+        "oof_mse": 0.01187261524904653,
+        "oof_se": 0.0017572363442821188,
+        "support": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "support_mask": 15
+      },
+      "trace": {
+        "candidate_count": 4,
+        "minimum": {
+          "lambda_0": 0.01,
+          "lambda_2": 1.0,
+          "mother_space": "V0",
+          "oof_mse": 0.01187261524904653,
+          "oof_se": 0.0017572363442821188,
+          "support": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        "one_se_threshold": 0.013629851593328648,
+        "selected": {
+          "lambda_0": 0.01,
+          "lambda_2": 1.0,
+          "mother_space": "V0",
+          "oof_mse": 0.01187261524904653,
+          "oof_se": 0.0017572363442821188,
+          "support": [
+            0,
+            1,
+            2,
+            3
+          ]
+        }
+      }
+    }
+  },
+  "mother_space": "V0",
+  "status": "PASS"
+}

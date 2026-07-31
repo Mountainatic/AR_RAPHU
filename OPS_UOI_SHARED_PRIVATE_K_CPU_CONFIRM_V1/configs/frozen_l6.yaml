@@ -1,0 +1,67 @@
+{
+  "schema": "OPS_UOI_SHARED_PRIVATE_K_CPU_CONFIRM_V1",
+  "protocol_frozen": true,
+  "shared_dataset_sha256": "fb2e3a3957c2bc4b4dcb30f0c5d425fd6e75068e945aace835e1a3698a6206db",
+  "cadence_sec": 10.0,
+  "history_min": 40.0,
+  "horizon_min": 20.0,
+  "target_window_min": 2.0,
+  "purge_min": 22.0,
+  "controls": [
+    "joint_lift",
+    "heater_power",
+    "crystal_rotation",
+    "crucible_rotation"
+  ],
+  "outer_directions": [
+    "sheet1_to_sheet2",
+    "sheet2_to_sheet1"
+  ],
+  "mother_spaces": {
+    "V0": {
+      "boundary_min": [0.0, 40.0],
+      "internal_knots_min": [0.5, 1.0, 2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 30.0]
+    },
+    "V1": {
+      "boundary_min": [0.0, 40.0],
+      "internal_knots_min": [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 15.0, 18.0, 20.0, 25.0, 30.0, 35.0]
+    }
+  },
+  "ridge_grid": [1e-6, 1e-4, 1e-2, 1.0, 1e2, 1e4, 1e6],
+  "smooth_grid": [0.0, 1e-4, 1e-2, 1.0, 1e2, 1e4],
+  "mother_v1_min_improvement": 0.01,
+  "fold_stability_min_abs_correlation": 0.6,
+  "shared_rank_candidates": [0, 1, 2],
+  "shared_min_participation": 1.8,
+  "shared_min_channel_fraction": 0.1,
+  "shared_min_channels": 2,
+  "shared_min_loo_correlation": 0.6,
+  "shared_max_median_principal_angle_deg": 35.0,
+  "shared_min_oof_improvement": 0.005,
+  "private_min_channel_energy_fraction": 0.7,
+  "private_min_fold_correlation": 0.6,
+  "private_min_oof_improvement": 0.005,
+  "private_min_cross_direction_correlation": 0.6,
+  "private_min_bootstrap_positive_probability": 0.9,
+  "orthogonality_tolerance": 1e-10,
+  "kkt_tolerance": 1e-8,
+  "bootstrap_replicates": 500,
+  "bootstrap_block_lengths_min": [10, 22, 40, 60],
+  "bootstrap_primary_block_min": 40,
+  "residual_history_candidates_min": [0, 2, 5, 10, 20, 40],
+  "residual_state_dimensions": [2, 4],
+  "random_seed": 20260731,
+  "expected_evaluation_rows": {
+    "sheet1_to_sheet2": 3233,
+    "sheet2_to_sheet1": 3130,
+    "pooled": 6363
+  },
+  "expected_baseline_mse": {
+    "Persistence": 0.263231,
+    "K-only": 0.170060,
+    "Dynamic-PLS": 0.159703,
+    "NLinear-U": 0.156264,
+    "Temporal Autoencoder": 0.147665,
+    "Joint-K+AR": 0.123652
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "directions": {
+    "sheet1_to_sheet2": {
+      "coefficient_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "condition_number": 1.0,
+      "kkt_relative": 0.0,
+      "loadings": [],
+      "orthogonality_error": 0.0,
+      "private_channel": null,
+      "private_mode": null,
+      "rank": 0,
+      "shared_modes": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "support": [
+        0,
+        1,
+        3
+      ],
+      "test_metrics": {
+        "MAE": 0.24701602321050214,
+        "MSE": 0.09885069507179642,
+        "R2": -0.004410166018019579,
+        "RMSE": 0.3144053038226239,
+        "rows": 3233
+      }
+    },
+    "sheet2_to_sheet1": {
+      "coefficient_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "condition_number": 1.0,
+      "kkt_relative": 0.0,
+      "loadings": [],
+      "orthogonality_error": 0.0,
+      "private_channel": null,
+      "private_mode": null,
+      "rank": 0,
+      "shared_modes": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      ],
+      "support": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "test_metrics": {
+        "MAE": 0.5403472978390823,
+        "MSE": 0.43302142663366966,
+        "R2": -0.0030122249495421194,
+        "RMSE": 0.6580436358127549,
+        "rows": 3130
+      }
+    }
+  },
+  "fp64_prediction": true,
+  "kkt_certification": "PASS",
+  "mother_space": "V0",
+  "orthogonality_certification": "PASS",
+  "private_channel": null,
+  "shared_rank": 0,
+  "status": "PASS"
+}
