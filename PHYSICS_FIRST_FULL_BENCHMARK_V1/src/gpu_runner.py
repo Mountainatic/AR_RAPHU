@@ -621,7 +621,8 @@ def run_benchmark(args: argparse.Namespace) -> int:
         "completed": [],
         "failed": [],
     }
-    atomic_json(results_root / "checkpoints" / "latest.json", latest)
+    checkpoint_path = results_root / "checkpoints" / args.checkpoint_name
+    atomic_json(checkpoint_path, latest)
     for direction_name in directions:
         for spec in specs:
             for seed in seeds:
@@ -665,11 +666,11 @@ def run_benchmark(args: argparse.Namespace) -> int:
                     latest["failed"].append(failure)
                     print("TASK_FAIL=" + json.dumps(failure, ensure_ascii=False), flush=True)
                 finally:
-                    atomic_json(results_root / "checkpoints" / "latest.json", latest)
-    summaries = aggregate_results(results_root)
+                    atomic_json(checkpoint_path, latest)
+    summaries = [] if args.skip_aggregate else aggregate_results(results_root)
     latest["status"] = "PASS" if not latest["failed"] else "PARTIAL"
     latest["summary_rows"] = len(summaries)
-    atomic_json(results_root / "checkpoints" / "latest.json", latest)
+    atomic_json(checkpoint_path, latest)
     print("GPU_STAGE_RESULT=" + json.dumps(latest, ensure_ascii=False), flush=True)
     return 0 if latest["status"] == "PASS" else 2
 
@@ -692,6 +693,8 @@ def build_parser(default_stage: str | None = None) -> argparse.ArgumentParser:
     parser.add_argument("--workers", type=int, default=None)
     parser.add_argument("--strict-folds", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--train-fraction", type=float, default=1.0)
+    parser.add_argument("--checkpoint-name", default="latest.json")
+    parser.add_argument("--skip-aggregate", action="store_true")
     parser.add_argument("--force", action="store_true")
     return parser
 
