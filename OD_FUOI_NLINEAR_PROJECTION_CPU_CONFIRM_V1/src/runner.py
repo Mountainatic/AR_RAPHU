@@ -480,14 +480,35 @@ class Experiment:
         maximum_derivative_jump = 0.0
         for spec in artifact["amplitude"]:
             for boundary, band in ((spec.lower, spec.left_band), (spec.upper, spec.right_band)):
-                epsilon = max(band * 1e-6, 1e-8)
-                xi = np.array([boundary - 2 * epsilon, boundary - epsilon, boundary, boundary + epsilon, boundary + 2 * epsilon])
-                values = spec.mean + spec.scale * xi
-                feature, _ = _hermite_nonlinear_features(spec, values)
-                left_derivative = (feature[2] - feature[0]) / (2 * epsilon)
-                right_derivative = (feature[4] - feature[2]) / (2 * epsilon)
-                maximum_value_jump = max(maximum_value_jump, float(np.max(np.abs((feature[1] + feature[3]) / 2 - feature[2]))))
-                maximum_derivative_jump = max(maximum_derivative_jump, float(np.max(np.abs(left_derivative - right_derivative))))
+                value = (_spline_matrix(spec.knots, spec.degree, np.array([boundary]), 0) - spec.raw_mean) @ spec.transform
+                value = value[0] - boundary * spec.linear_coordinate
+                derivative = (_spline_matrix(spec.knots, spec.degree, np.array([boundary]), 1) @ spec.transform)[0] - spec.linear_coordinate
+                is_left = boundary == spec.lower
+                constant = value - band * derivative if is_left else value + band * derivative
+                inner_s = 1.0 if is_left else 0.0
+                outer_s = 0.0 if is_left else 1.0
+
+                def hermite(s: float) -> tuple[np.ndarray, np.ndarray]:
+                    h00 = 2*s**3 - 3*s**2 + 1
+                    h10 = s**3 - 2*s**2 + s
+                    h01 = -2*s**3 + 3*s**2
+                    h11 = s**3 - s**2
+                    d00 = 6*s**2 - 6*s
+                    d10 = 3*s**2 - 4*s + 1
+                    d01 = -6*s**2 + 6*s
+                    d11 = 3*s**2 - 2*s
+                    if is_left:
+                        current = h00*constant + h01*value + h11*band*derivative
+                        current_derivative = (d00*constant + d01*value + d11*band*derivative) / band
+                    else:
+                        current = h00*value + h10*band*derivative + h01*constant
+                        current_derivative = (d00*value + d10*band*derivative + d01*constant) / band
+                    return current, current_derivative
+
+                inner_value, inner_derivative = hermite(inner_s)
+                outer_value, outer_derivative = hermite(outer_s)
+                maximum_value_jump = max(maximum_value_jump, float(np.max(np.abs(inner_value - value))), float(np.max(np.abs(outer_value - constant))))
+                maximum_derivative_jump = max(maximum_derivative_jump, float(np.max(np.abs(inner_derivative - derivative))), float(np.max(np.abs(outer_derivative))))
         return {"maximum_value_continuity_residual": maximum_value_jump, "maximum_derivative_continuity_residual": maximum_derivative_jump, "pass": maximum_value_jump < 1e-5 and maximum_derivative_jump < 1e-3}
 
     def stage_e6_e7(self) -> dict[str, Any]:
