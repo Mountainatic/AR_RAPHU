@@ -28,6 +28,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--seeds", required=True)
     parser.add_argument("--models")
+    parser.add_argument("--directions")
     parser.add_argument("--parallel-workers", type=int, default=6)
     parser.add_argument("--loader-workers", type=int, default=0)
     parser.add_argument("--train-fraction", type=float, default=1.0)
@@ -101,6 +102,8 @@ def main() -> int:
         ]
         if args.cpu_results:
             command.extend(["--cpu-results", str(Path(args.cpu_results).resolve())])
+        if args.directions:
+            command.extend(["--directions", args.directions])
         if args.force:
             command.append("--force")
         env = os.environ.copy()
@@ -152,6 +155,7 @@ def main() -> int:
         "cpu_threads_per_shard": cpu_threads,
         "mps_active_thread_percentage_per_shard": mps_share,
         "train_fraction": args.train_fraction,
+        "directions": args.directions,
         "return_codes": return_codes,
     }
     (checkpoint_root / "latest.json").write_text(
