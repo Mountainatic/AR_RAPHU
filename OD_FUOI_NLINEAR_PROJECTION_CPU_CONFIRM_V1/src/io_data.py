@@ -247,6 +247,23 @@ def published_mse(root: Path, model: str) -> float:
     return float(max(counts, key=counts.get))
 
 
+def gpu_published_summary(root: Path, model: str) -> dict[str, Any]:
+    model_id = _gpu_id(model)
+    files = [path for path in root.rglob("GPU_FINALISTS.csv") if "ABLATIONS" not in path.parts]
+    if len(files) != 1:
+        raise RuntimeError(f"GPU_FINALISTS_NOT_UNIQUE:{len(files)}")
+    with files[0].open("r", encoding="utf-8-sig", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if row.get("model_id") == model_id:
+                return {
+                    "pooled_mse": float(row["pooled_MSE_seed_median"]),
+                    "pooled_rmse": float(row["pooled_RMSE_seed_median"]),
+                    "direction_mse": {key: float(value) for key, value in json.loads(row["direction_MSE_json"]).items()},
+                    "metric_basis": "published median pooled MSE across 10 seeds",
+                }
+    raise RuntimeError(f"GPU_FINALISTS_MODEL_MISSING:{model}")
+
+
 def validate_alignment(reference: dict[str, np.ndarray], candidate: dict[str, np.ndarray], label: str) -> None:
     for key in ("sample_id", "target_z", "evaluation_mask"):
         if not np.array_equal(reference[key], candidate[key]):

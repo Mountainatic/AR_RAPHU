@@ -21,6 +21,7 @@ from .io_data import (
     atomic_json,
     atomic_npz,
     find_named_root,
+    gpu_published_summary,
     inner_folds,
     load_cpu_prediction,
     load_direction,
@@ -668,6 +669,15 @@ class Experiment:
         dynamic_order = ["Temporal Autoencoder", "Joint-K+AR", "FULL-UOI-PSAR"]
         input_rows = [self._leaderboard_row(model, models[model]) for model in input_order]
         dynamic_rows = [self._leaderboard_row(model, models[model]) for model in dynamic_order]
+        _, _, gpu_root = self._roots()
+        temporal_summary = gpu_published_summary(gpu_root, "Temporal Autoencoder")
+        temporal_row = next(row for row in dynamic_rows if row["model"] == "Temporal Autoencoder")
+        temporal_row["metric_basis"] = temporal_summary["metric_basis"]
+        temporal_row["pooled_MSE"] = temporal_summary["pooled_mse"]
+        temporal_row["pooled_RMSE"] = temporal_summary["pooled_rmse"]
+        for direction, mse in temporal_summary["direction_mse"].items():
+            temporal_row[f"{direction}_MSE"] = mse
+            temporal_row[f"{direction}_RMSE"] = float(np.sqrt(mse))
         _write_csv(self.results / "FINAL_INPUT_LEADERBOARD.csv", input_rows)
         _write_csv(self.results / "FINAL_DYNAMIC_LEADERBOARD.csv", dynamic_rows)
         pairwise = self._pairwise_bootstrap(models)
