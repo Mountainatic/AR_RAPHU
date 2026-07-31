@@ -1,0 +1,16 @@
+{
+  "sheet1_to_sheet2": {
+    "d_1se": 1.0673590630734835,
+    "d_min": 7.423156546086551,
+    "d_min_hits_upper_bound": false,
+    "one_se_hits_lower_complexity_bound": false,
+    "one_se_threshold": 0.4170859535695976
+  },
+  "sheet2_to_sheet1": {
+    "d_1se": 17.744388168425616,
+    "d_min": 26.39074012336085,
+    "d_min_hits_upper_bound": false,
+    "one_se_hits_lower_complexity_bound": false,
+    "one_se_threshold": 0.03871632228372082
+  }
+}

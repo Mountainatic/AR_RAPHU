@@ -1,0 +1,49 @@
+{
+  "channel_sign_agreement": 0.25,
+  "directions": [
+    {
+      "channel_coordinates": [
+        -0.07889258633778058,
+        -0.12890426136317168,
+        0.8989830378675037,
+        -0.4110828977832391
+      ],
+      "direction": "sheet1_to_sheet2",
+      "general_linear_RMSE": 0.3234210874668573,
+      "rank1_RMSE": 0.3232993646267773,
+      "rank1_energy_ratio": 0.9981046983146515,
+      "rank1_vs_linear_relative_MSE_gap": 0.0007525788452091168,
+      "singular_values": [
+        0.02221429525647696,
+        0.0009383479288123293,
+        0.00023078814918884823,
+        5.744424676806047e-05
+      ],
+      "spectral_gap": 23.673836297154384
+    },
+    {
+      "channel_coordinates": [
+        0.13443419880465263,
+        -0.04028368037849467,
+        -0.0067154443809789265,
+        0.9900805896964552
+      ],
+      "direction": "sheet2_to_sheet1",
+      "general_linear_RMSE": 0.5234270733790161,
+      "rank1_RMSE": 0.5230177202081748,
+      "rank1_energy_ratio": 0.9953035124740629,
+      "rank1_vs_linear_relative_MSE_gap": 0.0015635152309868624,
+      "singular_values": [
+        1.8308216267989916,
+        0.11588187238688671,
+        0.04610761416517993,
+        0.016185016349602642
+      ],
+      "spectral_gap": 15.799033870341303
+    }
+  ],
+  "pooled_rank1_vs_linear_relative_mse_gap": 0.0013341647930494621,
+  "status": "PASS",
+  "structure_status": "NLINEAR_PREDICTIVE_ONLY",
+  "time_shape_abs_correlation": 0.8454330175350903
+}

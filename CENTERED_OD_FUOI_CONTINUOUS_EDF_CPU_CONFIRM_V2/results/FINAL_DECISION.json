@@ -1,0 +1,121 @@
+{
+  "channel_surface_status": {
+    "crucible_rotation": "UNRESOLVED",
+    "crystal_rotation": "PREDICTIVE_ONLY",
+    "heater_power": "PREDICTIVE_ONLY",
+    "joint_lift": "PREDICTIVE_ONLY"
+  },
+  "comparison_vs_joint_k_ar": {
+    "baseline": "Joint-K+AR",
+    "block_min": 40,
+    "candidate": "FULL-UOI-PSAR",
+    "direction": "pooled",
+    "lower_95": -0.43468227251791736,
+    "median_relative_improvement": -0.15942503594388396,
+    "observed_relative_improvement": -0.18317109402550072,
+    "positive_probability": 0.126,
+    "upper_95": 0.10935633531672348
+  },
+  "comparison_vs_nlinear": {
+    "baseline": "NLinear-U",
+    "block_min": 40,
+    "candidate": "FULL-UOI",
+    "direction": "pooled",
+    "lower_95": -0.5074148414713503,
+    "median_relative_improvement": -0.07035898558603185,
+    "observed_relative_improvement": -0.0930327501273644,
+    "positive_probability": 0.365,
+    "upper_95": 0.22597793650484735
+  },
+  "comparison_vs_old_k": {
+    "baseline": "old K-only",
+    "block_min": 40,
+    "candidate": "FULL-UOI",
+    "direction": "pooled",
+    "lower_95": 0.03448929403431328,
+    "median_relative_improvement": 0.1513544225407141,
+    "observed_relative_improvement": 0.13970336274493192,
+    "positive_probability": 0.995,
+    "upper_95": 0.26260074633229424
+  },
+  "coordinate": "centered_increment",
+  "derived_lambda_full_by_direction": {
+    "sheet1_to_sheet2": 45100.07599942346,
+    "sheet2_to_sheet1": 6.092594519825018
+  },
+  "direction_metrics": {
+    "sheet1_to_sheet2": {
+      "FULL-UOI": 0.323263494037297,
+      "FULL-UOI-PSAR": 0.323263494037297,
+      "LIN-UOI": 0.3234210874668573,
+      "R1-LIN-DERIVED": 0.3232993646267773
+    },
+    "sheet2_to_sheet1": {
+      "FULL-UOI": 0.43529281875257453,
+      "FULL-UOI-PSAR": 0.43529281875257453,
+      "LIN-UOI": 0.5234270733790161,
+      "R1-LIN-DERIVED": 0.5230177202081748
+    }
+  },
+  "effective_df_by_direction": {
+    "sheet1_to_sheet2": 1.0673590630735215,
+    "sheet2_to_sheet1": 17.744388168141263
+  },
+  "estimator_status": "SMOOTHING_SELECTION_UNRESOLVED",
+  "model_status_detail": "ESTIMATOR_UNRESOLVED",
+  "nlinear_projection_status": "NLINEAR_PREDICTIVE_ONLY",
+  "nonlinear_increment_status": "NONLINEAR_INCREMENT_NOT_CERTIFIED",
+  "numerical_certification": {
+    "c1": "PASS",
+    "kkt": true,
+    "mesh": "BASIS_RESOLUTION_STABLE",
+    "orthogonality": true
+  },
+  "ood_summary": {
+    "sheet1_to_sheet2": 0.2532057421702988,
+    "sheet2_to_sheet1": 0.3907764454113678
+  },
+  "pooled_metrics": {
+    "FULL-UOI": {
+      "MSE": 0.14630175807390547,
+      "RMSE": 0.3824941281561136
+    },
+    "FULL-UOI-PSAR": {
+      "MSE": 0.14630175807390547,
+      "RMSE": 0.3824941281561136
+    },
+    "LIN-UOI": {
+      "MSE": 0.1879176881344879,
+      "RMSE": 0.43349473830081015
+    },
+    "R1-LIN-DERIVED": {
+      "MSE": 0.1876669749709876,
+      "RMSE": 0.4332054650751622
+    }
+  },
+  "rank1_energy_ratio_by_direction": {
+    "sheet1_to_sheet2": 0.9981046983146515,
+    "sheet2_to_sheet1": 0.9953035124740629
+  },
+  "registration": "ESTIMATOR_UNRESOLVED",
+  "residual_models_by_direction": {
+    "sheet1_to_sheet2": "A0",
+    "sheet2_to_sheet1": "A0"
+  },
+  "residual_status": "RESIDUAL_EXACT_ZERO",
+  "scientific_claims_allowed": [
+    "registered closed-loop input-history prediction on frozen L6",
+    "full Urysohn amplitude decomposition is numerically unique"
+  ],
+  "scientific_claims_forbidden": [
+    "open-loop plant kernel is proven",
+    "two rods establish universal physical causality",
+    "low RMSE alone certifies channel attribution",
+    "OOD saturation is physically reliable"
+  ],
+  "selected_edf_by_direction": {
+    "sheet1_to_sheet2": 1.0673590630735215,
+    "sheet2_to_sheet1": 17.744388168141263
+  },
+  "selection_method": "continuous_effective_df_blocked_cv_one_se"
+}

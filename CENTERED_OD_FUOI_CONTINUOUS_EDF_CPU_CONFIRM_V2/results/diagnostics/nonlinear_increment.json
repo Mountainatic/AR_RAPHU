@@ -1,0 +1,63 @@
+{
+  "directions": {
+    "sheet1_to_sheet2": {
+      "full_mse": 0.10449928657720155,
+      "linear_mse": 0.10460119981824459,
+      "mesh_relative_rmse_delta": 5.345695597580321e-05,
+      "mesh_stable": true,
+      "nonlinear_mse_gain": 0.00010191324104304178,
+      "ood_not_primary": true,
+      "ood_positive_gain_fraction": 0.2532057421702988,
+      "placebo_destroyed": true,
+      "placebo_gain": -0.00024820201425408694,
+      "refinement_rmse": 0.3232807747196663
+    },
+    "sheet2_to_sheet1": {
+      "full_mse": 0.1894798380575617,
+      "linear_mse": 0.2739759011461219,
+      "mesh_relative_rmse_delta": 0.019192305249505423,
+      "mesh_stable": true,
+      "nonlinear_mse_gain": 0.08449606308856022,
+      "ood_not_primary": true,
+      "ood_positive_gain_fraction": 0.3907764454113678,
+      "placebo_destroyed": true,
+      "placebo_gain": -0.09037120794390074,
+      "refinement_rmse": 0.4436470914029916
+    }
+  },
+  "mesh_status": "BASIS_RESOLUTION_STABLE",
+  "nonlinear_increment_status": "NONLINEAR_INCREMENT_NOT_CERTIFIED",
+  "primary_bootstrap": {
+    "block_min": 40,
+    "comparison": "CENTERED-LIN-UOI_vs_CENTERED-FULL-UOI",
+    "direction": "pooled",
+    "lower_95": 0.11188883468208083,
+    "median_relative_improvement": 0.22650176341140088,
+    "observed_relative_improvement": 0.2214582909874826,
+    "positive_probability": 1.0,
+    "upper_95": 0.32564119318994605
+  },
+  "status": "PASS",
+  "surface_correlations": {
+    "crucible_rotation": {
+      "beta": 0.7688862489966223,
+      "full": 0.4623245308038883,
+      "nonlinear": -0.3699191850424092
+    },
+    "crystal_rotation": {
+      "beta": 0.448899063854342,
+      "full": -0.6705933399945164,
+      "nonlinear": 0.7765395776437998
+    },
+    "heater_power": {
+      "beta": 0.9123217711413031,
+      "full": -0.14356333339197003,
+      "nonlinear": 0.7218632622390239
+    },
+    "joint_lift": {
+      "beta": -0.5694808599780963,
+      "full": 0.733113348795686,
+      "nonlinear": -0.29074801235746595
+    }
+  }
+}

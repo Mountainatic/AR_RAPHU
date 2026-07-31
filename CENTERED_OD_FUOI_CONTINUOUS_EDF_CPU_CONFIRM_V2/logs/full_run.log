@@ -1,0 +1,33 @@
+E0=CHECKPOINT_REUSED
+E1_E2=START
+CONTINUOUS_EDF_SELECTED=sheet1_to_sheet2:d_min=7.423156546086551:d_1se=1.0673590630734835
+CONTINUOUS_EDF_SELECTED=sheet2_to_sheet1:d_min=26.39074012336085:d_1se=17.744388168425616
+FULL_REFIT_DONE=sheet2_to_sheet1:main
+FULL_REFIT_DONE=sheet1_to_sheet2:main
+FULL_REFIT_DONE=sheet1_to_sheet2:refine
+FULL_REFIT_DONE=sheet2_to_sheet1:refine
+E1_E2=PASS
+E3=START
+E3=PASS
+E4=START
+E4=PASS
+E5=START
+E5=PASS
+E6_E7=START
+E6_E7=PASS
+E8=START
+E8=PASS
+E9=START
+/root/autodl-tmp/AR_RAPHU_OD_FUOI_V2/CENTERED_OD_FUOI_CONTINUOUS_EDF_CPU_CONFIRM_V2/src/runner.py:853: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
+  figure,axis=plt.subplots(figsize=(10,5)); axis.axis("off"); decision=json.loads((self.results/"FINAL_DECISION.json").read_text()); axis.text(.02,.95,json.dumps(decision,ensure_ascii=False,indent=2)[:3500],va="top",family="monospace",fontsize=7); figure.tight_layout(); figure.savefig(root/"16_final_decision_summary.png",dpi=180); plt.close(figure)
+E9=PASS
+FINAL_ZIP=/root/autodl-tmp/AR_RAPHU_OD_FUOI_V2/CENTERED_OD_FUOI_CONTINUOUS_EDF_CPU_CONFIRM_V2/return/CENTERED_OD_FUOI_CONTINUOUS_EDF_CPU_CONFIRM_V2_RESULTS_bundle.zip
+FINAL_SHA256=00819201124e018b1bace4b23a0f84d6a08b20ea4bfecd4b17db224cbb7dac52
+ZIP_SIZE=8458771
+MANIFEST_FILE_COUNT=116
+PROTOCOL_SHA256=017420a049b569a6a95ba47503f39cae4ae304bbacfb0f68b4cc4140c0d5e738
+SHARED_DATASET_SHA256=fb2e3a3957c2bc4b4dcb30f0c5d425fd6e75068e945aace835e1a3698a6206db
+V1_RESULTS_SHA256=5724f87d9895b5c2de3311b248e466b5bd6b368b2d9c3d8521977ed0beacfd75
+CPU_BASELINE_BUNDLE_SHA256=b5b923d552a908d80186ead586489c196d6f2c80af60d3d06288335a646d5ba8
+GPU_BASELINE_BUNDLE_SHA256=f0103f05e0953cd55f4cf9fd85c61c6f2413306fede0ef875400c1f0502c47ac
+VALIDATION_STATUS=PASS

@@ -1,0 +1,32 @@
+{
+  "c1_status": "PASS",
+  "channel_status": {
+    "crucible_rotation": "UNRESOLVED",
+    "crystal_rotation": "PREDICTIVE_ONLY",
+    "heater_power": "PREDICTIVE_ONLY",
+    "joint_lift": "PREDICTIVE_ONLY"
+  },
+  "status": "PASS",
+  "surface_correlations": {
+    "crucible_rotation": {
+      "beta": 0.7688862489966223,
+      "full": 0.4623245308038883,
+      "nonlinear": -0.3699191850424092
+    },
+    "crystal_rotation": {
+      "beta": 0.448899063854342,
+      "full": -0.6705933399945164,
+      "nonlinear": 0.7765395776437998
+    },
+    "heater_power": {
+      "beta": 0.9123217711413031,
+      "full": -0.14356333339197003,
+      "nonlinear": 0.7218632622390239
+    },
+    "joint_lift": {
+      "beta": -0.5694808599780963,
+      "full": 0.733113348795686,
+      "nonlinear": -0.29074801235746595
+    }
+  }
+}

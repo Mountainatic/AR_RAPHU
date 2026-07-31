@@ -1,0 +1,86 @@
+{
+  "sheet1_to_sheet2": {
+    "fold_intervals": [
+      {
+        "d0": 1.0,
+        "lower_df": 1.0000001177848457,
+        "lower_lambda": 19280993494.240677,
+        "rank": 617,
+        "upper_condition_number": 4503598493.317683,
+        "upper_df": 485.2315116768782,
+        "upper_lambda": 1.5545192540548014e-08
+      },
+      {
+        "d0": 1.0,
+        "lower_df": 1.0000001106413556,
+        "lower_lambda": 21877659926.59084,
+        "rank": 616,
+        "upper_condition_number": 4503598720.749071,
+        "upper_df": 494.2098626436907,
+        "upper_lambda": 1.4850521616203442e-08
+      },
+      {
+        "d0": 1.0,
+        "lower_df": 1.0000001014552102,
+        "lower_lambda": 25163545317.78316,
+        "rank": 624,
+        "upper_condition_number": 4503598646.859673,
+        "upper_df": 517.1150271664733,
+        "upper_lambda": 9.564793670098427e-09
+      },
+      {
+        "d0": 1.0,
+        "lower_df": 1.000000089647579,
+        "lower_lambda": 29200144134.80333,
+        "rank": 621,
+        "upper_condition_number": 4503598646.954306,
+        "upper_df": 513.5003282695889,
+        "upper_lambda": 1.1660153401637681e-08
+      }
+    ],
+    "lower_df": 1.0000001177848457,
+    "upper_df": 485.2315116768782
+  },
+  "sheet2_to_sheet1": {
+    "fold_intervals": [
+      {
+        "d0": 1.0,
+        "lower_df": 1.0000001732168362,
+        "lower_lambda": 16901903939.293276,
+        "rank": 633,
+        "upper_condition_number": 4503598741.235712,
+        "upper_df": 578.5905014074858,
+        "upper_lambda": 1.0825772869598529e-09
+      },
+      {
+        "d0": 1.0,
+        "lower_df": 1.000000139794382,
+        "lower_lambda": 21698678649.567017,
+        "rank": 643,
+        "upper_condition_number": 4503598757.581618,
+        "upper_df": 604.1872373937751,
+        "upper_lambda": 5.925285013241324e-10
+      },
+      {
+        "d0": 1.0,
+        "lower_df": 1.000000123908299,
+        "lower_lambda": 24683438747.535,
+        "rank": 653,
+        "upper_condition_number": 4503598709.323118,
+        "upper_df": 621.1261141467775,
+        "upper_lambda": 4.0345493052359703e-10
+      },
+      {
+        "d0": 1.0,
+        "lower_df": 1.0000001154252258,
+        "lower_lambda": 27186713684.670296,
+        "rank": 664,
+        "upper_condition_number": 4503598488.294855,
+        "upper_df": 636.2250608865843,
+        "upper_lambda": 3.162469258433449e-10
+      }
+    ],
+    "lower_df": 1.0000001732168362,
+    "upper_df": 578.5905014074858
+  }
+}
