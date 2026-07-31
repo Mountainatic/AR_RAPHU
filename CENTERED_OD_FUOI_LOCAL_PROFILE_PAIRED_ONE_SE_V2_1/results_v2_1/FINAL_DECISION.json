@@ -1,0 +1,195 @@
+{
+  "channel_surface_status": {
+    "crucible_rotation": "PREDICTIVE_ONLY",
+    "crystal_rotation": "UNRESOLVED",
+    "heater_power": "UNRESOLVED",
+    "joint_lift": "PREDICTIVE_ONLY"
+  },
+  "comparison_vs_joint_k_ar": {
+    "baseline": "Joint-K+AR",
+    "block_min": 40,
+    "candidate": "FULL-UOI-PSAR",
+    "direction": "pooled",
+    "lower_95": -1.7274520319166167,
+    "median_relative_improvement": -1.2348454321390725,
+    "observed_relative_improvement": -1.3229266050657171,
+    "positive_probability": 0.0,
+    "upper_95": -0.7466586183675895
+  },
+  "comparison_vs_nlinear": {
+    "baseline": "NLinear-U",
+    "block_min": 40,
+    "candidate": "FULL-UOI",
+    "direction": "pooled",
+    "lower_95": -1.9454464069065958,
+    "median_relative_improvement": -1.062324588385348,
+    "observed_relative_improvement": -1.145957476733521,
+    "positive_probability": 0.0,
+    "upper_95": -0.4415759654851775
+  },
+  "comparison_vs_old_k": {
+    "baseline": "old K-only",
+    "block_min": 40,
+    "candidate": "FULL-UOI",
+    "direction": "pooled",
+    "lower_95": -1.0557232113638457,
+    "median_relative_improvement": -0.6424451671544196,
+    "observed_relative_improvement": -0.6890253294890728,
+    "positive_probability": 0.001,
+    "upper_95": -0.2667504480588299
+  },
+  "coordinate": "centered_increment",
+  "derived_lambda_full_by_direction": {
+    "sheet1_to_sheet2": 169.25368048150705,
+    "sheet2_to_sheet1": 2164.3789768452616
+  },
+  "direction_metrics": {
+    "sheet1_to_sheet2": {
+      "FULL-UOI": 0.4099885521139422,
+      "FULL-UOI-PSAR": 0.4099885521139422,
+      "LIN-UOI": 0.35756527357065226,
+      "R1-LIN-DERIVED": 0.35835955246692314
+    },
+    "sheet2_to_sheet1": {
+      "FULL-UOI": 0.6405468598372296,
+      "FULL-UOI-PSAR": 0.6405468598372296,
+      "LIN-UOI": 0.6421327114691731,
+      "R1-LIN-DERIVED": 0.6405535177437724
+    }
+  },
+  "effective_df_by_direction": {
+    "sheet1_to_sheet2": 6.851919019683319,
+    "sheet2_to_sheet1": 2.1515810240154933
+  },
+  "estimator_status": "ESTIMATOR_STABLE_V2_1",
+  "far_field_interpolation_is_selection_gate": false,
+  "model_status_detail": "MODEL_REJECTED_UNDER_STABLE_ESTIMATOR",
+  "nlinear_projection_status": "NLINEAR_PREDICTIVE_ONLY",
+  "nonlinear_increment_status": "NONLINEAR_INCREMENT_NOT_CERTIFIED",
+  "numerical_certification": {
+    "c1": "PASS",
+    "kkt": true,
+    "mesh": "BASIS_RESOLUTION_STABLE",
+    "orthogonality": true
+  },
+  "ood_summary": {
+    "sheet1_to_sheet2": 0.07650288826530868,
+    "sheet2_to_sheet1": 0.15420710977249594
+  },
+  "pooled_metrics": {
+    "FULL-UOI": {
+      "MSE": 0.28723508198759157,
+      "RMSE": 0.5359431704832067
+    },
+    "FULL-UOI-PSAR": {
+      "MSE": 0.28723508198759157,
+      "RMSE": 0.5359431704832067
+    },
+    "LIN-UOI": {
+      "MSE": 0.2677911736584147,
+      "RMSE": 0.5174854332813772
+    },
+    "R1-LIN-DERIVED": {
+      "MSE": 0.26708368765324136,
+      "RMSE": 0.5168014005914083
+    }
+  },
+  "rank1_energy_ratio_by_direction": {
+    "sheet1_to_sheet2": 0.9991329517521764,
+    "sheet2_to_sheet1": 0.9945056968726409
+  },
+  "registration": "CENTERED_FULL_URYSOHN_REJECTED",
+  "residual_models_by_direction": {
+    "sheet1_to_sheet2": "A0",
+    "sheet2_to_sheet1": "A0"
+  },
+  "residual_status": "RESIDUAL_EXACT_ZERO",
+  "scientific_claims_allowed": [
+    "registered closed-loop input-history prediction on frozen L6",
+    "full Urysohn amplitude decomposition is numerically unique"
+  ],
+  "scientific_claims_forbidden": [
+    "open-loop plant kernel is proven",
+    "two rods establish universal physical causality",
+    "low RMSE alone certifies channel attribution",
+    "OOD saturation is physically reliable"
+  ],
+  "selected_edf_by_direction": {
+    "sheet1_to_sheet2": 6.851919019683319,
+    "sheet2_to_sheet1": 2.1515810240154933
+  },
+  "selection_method": "log_excess_basin_local_refinement_paired_block_one_se",
+  "selection_status": "SELECTION_RESOLVED_V2_1",
+  "v2_1_selection": {
+    "sheet1_to_sheet2": {
+      "common_resamples_across_d": true,
+      "d_min": 7.417022688329735,
+      "d_paired_1se": 6.851919019683068,
+      "far_field_interpolation_resolved": false,
+      "far_field_required_for_selection": false,
+      "fold_order_hashes": [
+        "526cb3657eab1ab5cfda29360c33b456f1a2013c1c3d36dfb98776c6372c2807",
+        "526cb3657eab1ab5cfda29360c33b456f1a2013c1c3d36dfb98776c6372c2807",
+        "526cb3657eab1ab5cfda29360c33b456f1a2013c1c3d36dfb98776c6372c2807",
+        "526cb3657eab1ab5cfda29360c33b456f1a2013c1c3d36dfb98776c6372c2807"
+      ],
+      "global_basin_discovery": "PASS",
+      "global_basin_discovery_pass": true,
+      "local_minimum_resolved": true,
+      "minimum_bracket": [
+        7.392022688329734,
+        7.442022688329735
+      ],
+      "new_profile_evaluations": 40,
+      "paired_delta": 0.0012969810097789279,
+      "paired_g": 5.199107426344949e-06,
+      "paired_one_se_boundary_resolved": true,
+      "paired_one_se_hits_lower_bound": false,
+      "paired_se": 0.001291781902352583,
+      "profile_evaluations": 116,
+      "root_bracket": [
+        6.851919019683068,
+        6.881474165652251
+      ],
+      "selection_change": 5.784559956609584,
+      "selection_resolved": true,
+      "upper_bound_hit": false,
+      "v2_d_1se": 1.0673590630734835
+    },
+    "sheet2_to_sheet1": {
+      "common_resamples_across_d": true,
+      "d_min": 3.191193002345531,
+      "d_paired_1se": 2.1515810240154924,
+      "far_field_interpolation_resolved": false,
+      "far_field_required_for_selection": false,
+      "fold_order_hashes": [
+        "3547281a3d19cb39bd179a170ad9737aa5afe163b5e4549df5f2ed88025088a4",
+        "c5b5d89abc3aae5b9debf1091964dedb9e385c3348ba8746fecd1165ae058289",
+        "3547281a3d19cb39bd179a170ad9737aa5afe163b5e4549df5f2ed88025088a4",
+        "c5b5d89abc3aae5b9debf1091964dedb9e385c3348ba8746fecd1165ae058289"
+      ],
+      "global_basin_discovery": "PASS",
+      "global_basin_discovery_pass": true,
+      "local_minimum_resolved": true,
+      "minimum_bracket": [
+        3.166193002345531,
+        3.216193002345531
+      ],
+      "new_profile_evaluations": 39,
+      "paired_delta": 0.0016746016332049327,
+      "paired_g": 7.297922643527627e-06,
+      "paired_one_se_boundary_resolved": true,
+      "paired_one_se_hits_lower_bound": false,
+      "paired_se": 0.001667303710561405,
+      "profile_evaluations": 108,
+      "root_bracket": [
+        2.081823033962807,
+        2.3691062804289613
+      ],
+      "selection_change": -15.592807144410123,
+      "selection_resolved": true,
+      "upper_bound_hit": false,
+      "v2_d_1se": 17.744388168425616
+    }
+  }
+}

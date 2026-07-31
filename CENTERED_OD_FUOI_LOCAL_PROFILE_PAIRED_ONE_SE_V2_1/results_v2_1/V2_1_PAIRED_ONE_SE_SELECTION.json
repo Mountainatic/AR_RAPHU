@@ -1,0 +1,72 @@
+{
+  "sheet1_to_sheet2": {
+    "common_resamples_across_d": true,
+    "d_min": 7.417022688329735,
+    "d_paired_1se": 6.851919019683068,
+    "far_field_interpolation_resolved": false,
+    "far_field_required_for_selection": false,
+    "fold_order_hashes": [
+      "526cb3657eab1ab5cfda29360c33b456f1a2013c1c3d36dfb98776c6372c2807",
+      "526cb3657eab1ab5cfda29360c33b456f1a2013c1c3d36dfb98776c6372c2807",
+      "526cb3657eab1ab5cfda29360c33b456f1a2013c1c3d36dfb98776c6372c2807",
+      "526cb3657eab1ab5cfda29360c33b456f1a2013c1c3d36dfb98776c6372c2807"
+    ],
+    "global_basin_discovery": "PASS",
+    "global_basin_discovery_pass": true,
+    "local_minimum_resolved": true,
+    "minimum_bracket": [
+      7.392022688329734,
+      7.442022688329735
+    ],
+    "new_profile_evaluations": 40,
+    "paired_delta": 0.0012969810097789279,
+    "paired_g": 5.199107426344949e-06,
+    "paired_one_se_boundary_resolved": true,
+    "paired_one_se_hits_lower_bound": false,
+    "paired_se": 0.001291781902352583,
+    "profile_evaluations": 116,
+    "root_bracket": [
+      6.851919019683068,
+      6.881474165652251
+    ],
+    "selection_change": 5.784559956609584,
+    "selection_resolved": true,
+    "upper_bound_hit": false,
+    "v2_d_1se": 1.0673590630734835
+  },
+  "sheet2_to_sheet1": {
+    "common_resamples_across_d": true,
+    "d_min": 3.191193002345531,
+    "d_paired_1se": 2.1515810240154924,
+    "far_field_interpolation_resolved": false,
+    "far_field_required_for_selection": false,
+    "fold_order_hashes": [
+      "3547281a3d19cb39bd179a170ad9737aa5afe163b5e4549df5f2ed88025088a4",
+      "c5b5d89abc3aae5b9debf1091964dedb9e385c3348ba8746fecd1165ae058289",
+      "3547281a3d19cb39bd179a170ad9737aa5afe163b5e4549df5f2ed88025088a4",
+      "c5b5d89abc3aae5b9debf1091964dedb9e385c3348ba8746fecd1165ae058289"
+    ],
+    "global_basin_discovery": "PASS",
+    "global_basin_discovery_pass": true,
+    "local_minimum_resolved": true,
+    "minimum_bracket": [
+      3.166193002345531,
+      3.216193002345531
+    ],
+    "new_profile_evaluations": 39,
+    "paired_delta": 0.0016746016332049327,
+    "paired_g": 7.297922643527627e-06,
+    "paired_one_se_boundary_resolved": true,
+    "paired_one_se_hits_lower_bound": false,
+    "paired_se": 0.001667303710561405,
+    "profile_evaluations": 108,
+    "root_bracket": [
+      2.081823033962807,
+      2.3691062804289613
+    ],
+    "selection_change": -15.592807144410123,
+    "selection_resolved": true,
+    "upper_bound_hit": false,
+    "v2_d_1se": 17.744388168425616
+  }
+}

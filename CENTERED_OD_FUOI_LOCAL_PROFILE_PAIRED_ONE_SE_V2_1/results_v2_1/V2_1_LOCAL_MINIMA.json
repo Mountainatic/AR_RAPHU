@@ -1,0 +1,22 @@
+{
+  "sheet1_to_sheet2": {
+    "d_min": 7.417022688329735,
+    "global_basin_discovery": "PASS",
+    "local_minimum_resolved": true,
+    "minimum_bracket": [
+      7.392022688329734,
+      7.442022688329735
+    ],
+    "upper_bound_hit": false
+  },
+  "sheet2_to_sheet1": {
+    "d_min": 3.191193002345531,
+    "global_basin_discovery": "PASS",
+    "local_minimum_resolved": true,
+    "minimum_bracket": [
+      3.166193002345531,
+      3.216193002345531
+    ],
+    "upper_bound_hit": false
+  }
+}

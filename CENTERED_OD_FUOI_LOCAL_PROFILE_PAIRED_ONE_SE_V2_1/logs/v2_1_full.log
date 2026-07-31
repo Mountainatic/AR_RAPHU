@@ -1,0 +1,22 @@
+E0=CHECKPOINT_REUSED
+E1_E2=CHECKPOINT_REUSED
+E3=CHECKPOINT_REUSED
+E4=CHECKPOINT_REUSED
+E5=CHECKPOINT_REUSED
+E6_E7=CHECKPOINT_REUSED
+E8=CHECKPOINT_REUSED
+E9=START
+/root/autodl-tmp/AR_RAPHU_OD_FUOI_V2_1/CENTERED_OD_FUOI_LOCAL_PROFILE_PAIRED_ONE_SE_V2_1/src/runner.py:853: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
+  figure,axis=plt.subplots(figsize=(10,5)); axis.axis("off"); decision=json.loads((self.results/"FINAL_DECISION.json").read_text()); axis.text(.02,.95,json.dumps(decision,ensure_ascii=False,indent=2)[:3500],va="top",family="monospace",fontsize=7); figure.tight_layout(); figure.savefig(root/"16_final_decision_summary.png",dpi=180); plt.close(figure)
+/root/autodl-tmp/AR_RAPHU_OD_FUOI_V2_1/CENTERED_OD_FUOI_LOCAL_PROFILE_PAIRED_ONE_SE_V2_1/src/v2_runner.py:455: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
+  figure.tight_layout()
+E9=PASS
+FINAL_ZIP=/root/autodl-tmp/AR_RAPHU_OD_FUOI_V2_1/CENTERED_OD_FUOI_LOCAL_PROFILE_PAIRED_ONE_SE_V2_1/return_v2_1/CENTERED_OD_FUOI_LOCAL_PROFILE_PAIRED_ONE_SE_V2_1_RESULTS_bundle.zip
+FINAL_SHA256=916c2fc601f27fbae70b4ed7fab988acd2d6f7b53dd3fda3698c19d89586f008
+ZIP_SIZE=8701711
+MANIFEST_FILE_COUNT=129
+V2_RESULTS_SHA256=fc75a208c87855eed83de6ae886694b2d0b9813fa14a1cf60938e776a523037d
+PROTOCOL_SHA256=7f8a43904e7f9ec69f0d07a87f90f232b009f8b79ae20d861f1e3ab047cee862
+SELECTION_STATUS=SELECTION_RESOLVED_V2_1
+ESTIMATOR_STATUS=ESTIMATOR_STABLE_V2_1
+VALIDATION_STATUS=PASS

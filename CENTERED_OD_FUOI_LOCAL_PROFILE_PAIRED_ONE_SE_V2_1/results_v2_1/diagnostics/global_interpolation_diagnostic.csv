@@ -1,0 +1,3 @@
+direction,far_field_interpolation_resolved,far_field_required_for_selection,legacy_max_quadratic_interpolation_error,used_as_selection_gate
+sheet1_to_sheet2,False,False,0.43776059708178805,False
+sheet2_to_sheet1,False,False,0.21052102467498476,False

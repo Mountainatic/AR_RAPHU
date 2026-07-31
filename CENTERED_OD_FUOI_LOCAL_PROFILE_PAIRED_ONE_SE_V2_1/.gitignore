@@ -1,0 +1,9 @@
+work/
+results/
+results_v2_1/
+logs/
+return/
+return_v2_1/
+__pycache__/
+.pytest_cache/
+*Zone.Identifier

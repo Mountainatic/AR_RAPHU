@@ -1,0 +1,63 @@
+{
+  "directions": {
+    "sheet1_to_sheet2": {
+      "full_mse": 0.16809061286448668,
+      "linear_mse": 0.1278529248636554,
+      "mesh_relative_rmse_delta": 0.015924669700746897,
+      "mesh_stable": true,
+      "nonlinear_mse_gain": -0.04023768800083127,
+      "ood_not_primary": true,
+      "ood_positive_gain_fraction": 0.07650288826530868,
+      "placebo_destroyed": true,
+      "placebo_gain": -0.06023177439472066,
+      "refinement_rmse": 0.4034596198404402
+    },
+    "sheet2_to_sheet1": {
+      "full_mse": 0.4103002796473354,
+      "linear_mse": 0.41233441913875224,
+      "mesh_relative_rmse_delta": 0.0001448913617900178,
+      "mesh_stable": true,
+      "nonlinear_mse_gain": 0.002034139491416842,
+      "ood_not_primary": true,
+      "ood_positive_gain_fraction": 0.15420710977249594,
+      "placebo_destroyed": true,
+      "placebo_gain": 0.0001967294151268284,
+      "refinement_rmse": 0.6404540501304175
+    }
+  },
+  "mesh_status": "BASIS_RESOLUTION_STABLE",
+  "nonlinear_increment_status": "NONLINEAR_INCREMENT_NOT_CERTIFIED",
+  "primary_bootstrap": {
+    "block_min": 40,
+    "comparison": "CENTERED-LIN-UOI_vs_CENTERED-FULL-UOI",
+    "direction": "pooled",
+    "lower_95": -0.11685343616719696,
+    "median_relative_improvement": -0.06794701117521595,
+    "observed_relative_improvement": -0.07260847347410654,
+    "positive_probability": 0.0,
+    "upper_95": -0.030413933904302033
+  },
+  "status": "PASS",
+  "surface_correlations": {
+    "crucible_rotation": {
+      "beta": 0.9947133155994274,
+      "full": 0.8543596268657648,
+      "nonlinear": 0.9787719009273873
+    },
+    "crystal_rotation": {
+      "beta": 0.7621919783075538,
+      "full": 0.9563914335874352,
+      "nonlinear": -0.39118797073698863
+    },
+    "heater_power": {
+      "beta": 0.7578211532814698,
+      "full": 0.10055598385999173,
+      "nonlinear": 0.04955268264642663
+    },
+    "joint_lift": {
+      "beta": 0.525818287579987,
+      "full": 0.9782490867532626,
+      "nonlinear": 0.968796020551931
+    }
+  }
+}

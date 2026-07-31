@@ -1,0 +1,10 @@
+{
+  "shared": "/root/autodl-tmp/OPS_UOI_SHARED_PRIVATE_K_CPU_CONFIRM_INPUTS/SHARED_BENCHMARK_DATASET_bundle.zip",
+  "cpu_baselines": "/root/autodl-tmp/OPS_UOI_SHARED_PRIVATE_K_CPU_CONFIRM_INPUTS/PHYSICS_FIRST_CPU_RESULTS_bundle.zip",
+  "gpu_baselines": "/root/autodl-tmp/OPS_UOI_SHARED_PRIVATE_K_CPU_CONFIRM_INPUTS/PHYSICS_FIRST_GPU_RESULTS_bundle.zip",
+  "v1_results": "/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/return/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1_RESULTS_bundle.zip",
+  "v2_results": "/root/autodl-tmp/AR_RAPHU_OD_FUOI_V2/CENTERED_OD_FUOI_CONTINUOUS_EDF_CPU_CONFIRM_V2/return/CENTERED_OD_FUOI_CONTINUOUS_EDF_CPU_CONFIRM_V2_RESULTS_bundle.zip",
+  "protocol": "configs/frozen_protocol_v2_1.yaml",
+  "profile_workers": 8,
+  "bootstrap_workers": 16
+}

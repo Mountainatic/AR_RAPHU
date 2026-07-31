@@ -1,0 +1,14 @@
+{
+  "directions": {
+    "sheet1_to_sheet2": {
+      "imported_profile_rows": 76,
+      "new_profile_rows": 40
+    },
+    "sheet2_to_sheet1": {
+      "imported_profile_rows": 69,
+      "new_profile_rows": 41
+    }
+  },
+  "status": "PASS",
+  "v2_results_sha256": "fc75a208c87855eed83de6ae886694b2d0b9813fa14a1cf60938e776a523037d"
+}
