@@ -8,6 +8,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 
@@ -63,20 +64,13 @@ def main() -> int:
     selected = set(args.models.split(",")) if args.models else None
     model_ids = load_model_ids(config_path, args.stage, selected)
     seed_ids = [value for value in args.seeds.split(",") if value]
-    largest_axis = max(len(model_ids), len(seed_ids))
-    worker_count = max(1, min(args.parallel_workers, largest_axis))
-    if len(model_ids) >= worker_count:
+    if len(model_ids) >= args.parallel_workers:
         shard_axis = "models"
-        groups = [
-            (model_ids[index::worker_count], seed_ids)
-            for index in range(worker_count)
-        ]
+        work_units = [([model_id], seed_ids) for model_id in model_ids]
     else:
         shard_axis = "seeds"
-        groups = [
-            (model_ids, seed_ids[index::worker_count])
-            for index in range(worker_count)
-        ]
+        work_units = [(model_ids, [seed_id]) for seed_id in seed_ids]
+    worker_count = max(1, min(args.parallel_workers, len(work_units)))
     log_prefix = args.log_prefix or args.stage
     log_root = results / "logs"
     checkpoint_root = results / "checkpoints"
@@ -85,11 +79,14 @@ def main() -> int:
 
     cpu_threads = max(1, min(4, (os.cpu_count() or worker_count) // worker_count))
     mps_share = max(10, 100 // worker_count)
-    processes: list[
-        tuple[int, list[str], list[str], subprocess.Popen[bytes], object]
-    ] = []
     runner = root / "scripts" / RUNNERS[args.stage]
-    for index, (model_group, seed_group) in enumerate(groups):
+    return_codes: dict[int, int] = {}
+    pending = list(enumerate(work_units))
+    active: dict[
+        int, tuple[list[str], list[str], subprocess.Popen[bytes], object]
+    ] = {}
+
+    def start_unit(index: int, model_group: list[str], seed_group: list[str]) -> None:
         log_path = log_root / f"{log_prefix}_shard_{index}.log"
         command = [
             args.python_bin,
@@ -138,7 +135,7 @@ def main() -> int:
         (log_root / f"{log_prefix}_shard_{index}.pid").write_text(
             f"{process.pid}\n", encoding="utf-8"
         )
-        processes.append((index, model_group, seed_group, process, handle))
+        active[index] = (model_group, seed_group, process, handle)
         print(
             f"SHARD_STARTED index={index} pid={process.pid} "
             f"models={','.join(model_group)} seeds={','.join(seed_group)} "
@@ -146,11 +143,27 @@ def main() -> int:
             flush=True,
         )
 
-    return_codes: dict[int, int] = {}
-    for index, _model_group, _seed_group, process, handle in processes:
-        return_codes[index] = process.wait()
-        handle.close()
-        print(f"SHARD_FINISHED index={index} rc={return_codes[index]}", flush=True)
+    while pending or active:
+        while pending and len(active) < worker_count:
+            index, (model_group, seed_group) = pending.pop(0)
+            start_unit(index, model_group, seed_group)
+        finished = [
+            index
+            for index, (_models, _seeds, process, _handle) in active.items()
+            if process.poll() is not None
+        ]
+        if not finished:
+            time.sleep(1.0)
+            continue
+        for index in finished:
+            _model_group, _seed_group, process, handle = active.pop(index)
+            return_codes[index] = int(process.returncode or 0)
+            handle.close()
+            print(
+                f"SHARD_FINISHED index={index} rc={return_codes[index]} "
+                f"remaining_units={len(pending)}",
+                flush=True,
+            )
 
     aggregate = subprocess.run(
         [
@@ -168,6 +181,7 @@ def main() -> int:
         "models": model_ids,
         "seeds": [int(value) for value in args.seeds.split(",") if value],
         "parallel_shards": worker_count,
+        "work_units": len(work_units),
         "shard_axis": shard_axis,
         "cpu_threads_per_shard": cpu_threads,
         "mps_active_thread_percentage_per_shard": mps_share,
