@@ -10,8 +10,8 @@ PIPELINE_PID_FILE="${PIPELINE_PID_FILE:-$RESULTS/logs/pipeline.pid}"
 FINAL_CONFIG="$RESULTS/checkpoints/gpu_finalists.yaml"
 
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
-export OMP_NUM_THREADS="${OMP_NUM_THREADS:-4}"
-export MKL_NUM_THREADS="${MKL_NUM_THREADS:-4}"
+export OMP_NUM_THREADS="${OMP_NUM_THREADS:-3}"
+export MKL_NUM_THREADS="${MKL_NUM_THREADS:-3}"
 export OPENBLAS_NUM_THREADS="${OPENBLAS_NUM_THREADS:-1}"
 export TOKENIZERS_PARALLELISM=false
 export PYTHONUNBUFFERED=1
@@ -38,15 +38,18 @@ non_residual_models="$("$PYTHON_BIN" -c \
 for fraction in 0.25 0.50; do
   label="${fraction/./_}"
   ablation_results="$RESULTS/ABLATIONS/train_fraction_$label"
-  "$PYTHON_BIN" "$ROOT/scripts/run_gpu_stage3_finalists.py" \
+  "$PYTHON_BIN" "$ROOT/scripts/run_gpu_parallel_stage.py" \
+    --stage finalists \
     --shared "$SHARED" \
     --config "$FINAL_CONFIG" \
     --results "$ablation_results" \
     --device cuda:0 \
     --models "$non_residual_models" \
     --seeds 0,1,2,3,4,5,6,7,8,9 \
-    --strict-folds \
-    --workers 0 \
+    --parallel-workers "${GPU_PARALLEL_WORKERS:-6}" \
+    --loader-workers 0 \
+    --python-bin "$PYTHON_BIN" \
+    --log-prefix "train_fraction_$label" \
     --train-fraction "$fraction" \
     2>&1 | tee "$RESULTS/logs/train_fraction_$label.log"
 done
