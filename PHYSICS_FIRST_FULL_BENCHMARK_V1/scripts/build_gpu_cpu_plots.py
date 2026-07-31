@@ -405,6 +405,10 @@ def build_report(
         "",
         "![CPU and GPU combined leaderboard](plots/cpu_gpu_combined_leaderboard.png)",
         "",
+        "## Complete figure atlas",
+        "",
+        "![All CPU and GPU figures](plots/cpu_gpu_all_figures_mega_panel.png)",
+        "",
         "CPU bars are deterministic FP64 benchmark results. GPU bars in the "
         "combined figure are the medians of the 10-seed FP32 finalist "
         "confirmation runs. Models are compared only within the input-only "
@@ -422,6 +426,70 @@ def build_report(
         "",
     ]
     output.write_text("\n".join(lines), encoding="utf-8")
+
+
+def build_mega_panel(plots: Path, output: Path) -> None:
+    panels = [
+        ("A", plots / "gpu_input_driven_leaderboard.png"),
+        ("B", plots / "gpu_dynamic_identification_leaderboard.png"),
+        ("C", plots / "gpu_finalist_bootstrap.png"),
+        ("D", plots / "cpu_gpu_combined_leaderboard.png"),
+    ]
+    for _, path in panels:
+        if not path.is_file():
+            raise FileNotFoundError(path)
+
+    fig, axes = plt.subplots(2, 2, figsize=(30, 18), dpi=200)
+    fig.suptitle(
+        "Physics-First CPU/GPU benchmark: complete figure atlas",
+        fontsize=34,
+        fontweight="bold",
+        x=0.02,
+        ha="left",
+        y=0.995,
+    )
+    fig.text(
+        0.02,
+        0.968,
+        "GPU screening, confirmed bootstrap evidence, and protocol-matched CPU/GPU comparison",
+        fontsize=21,
+        color="#555555",
+        ha="left",
+        va="top",
+    )
+    for ax, (label, path) in zip(axes.flat, panels, strict=True):
+        image = plt.imread(path)
+        ax.imshow(image)
+        ax.axis("off")
+        ax.text(
+            0.012,
+            0.982,
+            label,
+            transform=ax.transAxes,
+            ha="left",
+            va="top",
+            fontsize=28,
+            fontweight="bold",
+            color="#111111",
+            bbox={
+                "boxstyle": "round,pad=0.20",
+                "facecolor": "white",
+                "edgecolor": "#444444",
+                "linewidth": 1.5,
+                "alpha": 0.94,
+            },
+        )
+    fig.subplots_adjust(
+        left=0.012,
+        right=0.992,
+        bottom=0.015,
+        top=0.935,
+        wspace=0.022,
+        hspace=0.035,
+    )
+    output.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output, dpi=200, facecolor="white")
+    plt.close(fig)
 
 
 def parse_args() -> argparse.Namespace:
@@ -481,6 +549,7 @@ def main() -> int:
         )
     )
     plot_combined(combined, plots / "cpu_gpu_combined_leaderboard.png")
+    build_mega_panel(plots, plots / "cpu_gpu_all_figures_mega_panel.png")
     write_csv(gpu_root / "CPU_GPU_COMBINED_LEADERBOARD.csv", combined)
     build_report(
         gpu_root,
@@ -495,6 +564,7 @@ def main() -> int:
             "plots/gpu_dynamic_identification_leaderboard.png",
             "plots/gpu_finalist_bootstrap.png",
             "plots/cpu_gpu_combined_leaderboard.png",
+            "plots/cpu_gpu_all_figures_mega_panel.png",
         ],
         "comparison_rows": len(combined),
     }
