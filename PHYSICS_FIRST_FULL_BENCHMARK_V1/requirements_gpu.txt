@@ -1,0 +1,4 @@
+# The SeetaCloud PyTorch 2.8 / CUDA 12.8 image already supplies torch.
+numpy>=2.0,<3
+psutil>=5.9
+pytest>=8,<10
