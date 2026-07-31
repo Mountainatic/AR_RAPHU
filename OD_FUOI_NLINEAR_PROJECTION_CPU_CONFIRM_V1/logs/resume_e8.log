@@ -1,0 +1,21 @@
+E0=CHECKPOINT_REUSED
+E1_E2=CHECKPOINT_REUSED
+E3=CHECKPOINT_REUSED
+E4=CHECKPOINT_REUSED
+E5=CHECKPOINT_REUSED
+E6_E7=CHECKPOINT_REUSED
+E8=START
+E8=PASS
+E9=START
+/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/src/runner.py:843: UserWarning: Tight layout not applied. The bottom and top margins cannot be made large enough to accommodate all Axes decorations.
+  figure,axis=plt.subplots(figsize=(10,5)); axis.axis("off"); decision=json.loads((self.results/"FINAL_DECISION.json").read_text()); axis.text(.02,.95,json.dumps(decision,ensure_ascii=False,indent=2)[:3500],va="top",family="monospace",fontsize=7); figure.tight_layout(); figure.savefig(root/"16_final_decision_summary.png",dpi=180); plt.close(figure)
+E9=PASS
+FINAL_ZIP=/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/return/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1_RESULTS_bundle.zip
+FINAL_SHA256=206dadbb257979d6d2c747f39260aebdf5bab52c51ee6da40437e331785da2b6
+ZIP_SIZE=5985362
+MANIFEST_FILE_COUNT=91
+PROTOCOL_SHA256=4d1127f984148e691729a5f7342636ad2418fec0db450b32ea61b88a59dda984
+SHARED_DATASET_SHA256=fb2e3a3957c2bc4b4dcb30f0c5d425fd6e75068e945aace835e1a3698a6206db
+CPU_BASELINE_BUNDLE_SHA256=b5b923d552a908d80186ead586489c196d6f2c80af60d3d06288335a646d5ba8
+GPU_BASELINE_BUNDLE_SHA256=f0103f05e0953cd55f4cf9fd85c61c6f2413306fede0ef875400c1f0502c47ac
+VALIDATION_STATUS=PASS

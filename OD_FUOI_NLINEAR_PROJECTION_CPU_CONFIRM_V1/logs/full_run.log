@@ -1,0 +1,34 @@
+.........................                                                [100%]
+25 passed in 0.49s
+E0=CHECKPOINT_REUSED
+E1_E2=START
+MAIN_FIT_DONE=sheet1_to_sheet2
+MAIN_FIT_DONE=sheet2_to_sheet1
+FIT_DONE=sheet2_to_sheet1:fold0
+FIT_DONE=sheet1_to_sheet2:fold0
+FIT_DONE=sheet2_to_sheet1:fold1
+FIT_DONE=sheet1_to_sheet2:fold1
+FIT_DONE=sheet2_to_sheet1:fold2
+FIT_DONE=sheet1_to_sheet2:fold2
+FIT_DONE=sheet2_to_sheet1:fold3
+FIT_DONE=sheet1_to_sheet2:fold3
+FIT_DONE=sheet1_to_sheet2:refine
+FIT_DONE=sheet2_to_sheet1:refine
+E1_E2=PASS
+E3=START
+E3=PASS
+E4=START
+E4=PASS
+E5=START
+E5=PASS
+E6_E7=START
+Traceback (most recent call last):
+  File "/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/scripts/run_cpu_confirm.py", line 59, in <module>
+    raise SystemExit(main())
+  File "/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/scripts/run_cpu_confirm.py", line 55, in main
+    return experiment.run()
+  File "/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/src/runner.py", line 137, in run
+    payload = function()
+  File "/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/src/runner.py", line 543, in stage_e6_e7
+    raise RuntimeError("C1_CONTINUITY_FAILED")
+RuntimeError: C1_CONTINUITY_FAILED

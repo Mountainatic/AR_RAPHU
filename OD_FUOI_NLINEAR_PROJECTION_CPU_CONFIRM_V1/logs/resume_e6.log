@@ -1,0 +1,22 @@
+E0=CHECKPOINT_REUSED
+E1_E2=CHECKPOINT_REUSED
+E3=CHECKPOINT_REUSED
+E4=CHECKPOINT_REUSED
+E5=CHECKPOINT_REUSED
+E6_E7=START
+E6_E7=PASS
+E8=START
+Traceback (most recent call last):
+  File "/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/scripts/run_cpu_confirm.py", line 59, in <module>
+    raise SystemExit(main())
+  File "/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/scripts/run_cpu_confirm.py", line 55, in main
+    return experiment.run()
+  File "/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/src/runner.py", line 137, in run
+    payload = function()
+  File "/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/src/runner.py", line 585, in stage_e8
+    selected = select_residual_model(oof_residual, data.train["origin_raw_index"], data.train["future_right_raw_index"], config=self.config, protocol=protocol)
+  File "/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/src/residual.py", line 109, in select_residual_model
+    selected = one_se_select(rows)
+  File "/root/autodl-tmp/AR_RAPHU_OD_FUOI/OD_FUOI_NLINEAR_PROJECTION_CPU_CONFIRM_V1/src/solver.py", line 123, in one_se_select
+    selected = min(eligible, key=complexity)
+ValueError: min() arg is an empty sequence

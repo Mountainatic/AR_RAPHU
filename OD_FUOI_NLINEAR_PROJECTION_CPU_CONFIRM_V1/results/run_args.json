@@ -1,0 +1,8 @@
+{
+  "shared": "/root/autodl-tmp/OPS_UOI_SHARED_PRIVATE_K_CPU_CONFIRM_INPUTS/SHARED_BENCHMARK_DATASET_bundle.zip",
+  "cpu_baselines": "/root/autodl-tmp/OPS_UOI_SHARED_PRIVATE_K_CPU_CONFIRM_INPUTS/PHYSICS_FIRST_CPU_RESULTS_bundle.zip",
+  "gpu_baselines": "/root/autodl-tmp/OPS_UOI_SHARED_PRIVATE_K_CPU_CONFIRM_INPUTS/PHYSICS_FIRST_GPU_RESULTS_bundle.zip",
+  "protocol": "configs/frozen_protocol.yaml",
+  "n_jobs": 12,
+  "bootstrap_jobs": 16
+}

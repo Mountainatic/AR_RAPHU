@@ -1,0 +1,47 @@
+{
+  "directions": {
+    "sheet1_to_sheet2": {
+      "fold_k_lambda": [
+        1.0000007648900382e-12,
+        1.0000007648900382e-12,
+        1.0000007648900382e-12,
+        1.0000007648900382e-12
+      ],
+      "minimum_causality_margin_raw": 0,
+      "one_se_threshold": 27091.384032985814,
+      "oof_rows": 1400,
+      "selected_model": "A0",
+      "selected_ridge": 0.0,
+      "test_metrics": {
+        "MAE": 18.036188251311884,
+        "MSE": 856.1468017773831,
+        "R2": -8698.205915390336,
+        "RMSE": 29.259986359829067,
+        "rows": 3233
+      },
+      "test_residual_eligible_rows": 3234
+    },
+    "sheet2_to_sheet1": {
+      "fold_k_lambda": [
+        1.0000007648900382e-12,
+        1.0000007648900382e-12,
+        1.0000007648900382e-12,
+        1.0000007648900382e-12
+      ],
+      "minimum_causality_margin_raw": 0,
+      "one_se_threshold": 10380.259628971395,
+      "oof_rows": 1442,
+      "selected_model": "A0",
+      "selected_ridge": 0.0,
+      "test_metrics": {
+        "MAE": 127.98930979573602,
+        "MSE": 60562.689512212826,
+        "R2": -140281.0142846244,
+        "RMSE": 246.0948790857153,
+        "rows": 3130
+      },
+      "test_residual_eligible_rows": 3131
+    }
+  },
+  "status": "PASS"
+}
