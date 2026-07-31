@@ -13,27 +13,32 @@ from src.gpu_data import matured_residual_history
 
 
 def test_all_configured_architectures_forward():
-    config = json.loads((ROOT / 'configs' / 'gpu_models.yaml').read_text())
+    config_paths = [
+        ROOT / 'configs' / 'gpu_models.yaml',
+        ROOT / 'configs' / 'gpu_models_full.yaml',
+    ]
     seen = set()
-    for spec in config['models']:
-        key = (spec['architecture'], spec['mode'], json.dumps(spec.get('parameters', {}), sort_keys=True))
-        if key in seen:
-            continue
-        seen.add(key)
-        input_dim = 1 if spec['mode'] == 'residual' else (5 if spec['mode'] == 'dynamic' else 4)
-        model = build_model(
-            spec['architecture'],
-            sequence_length=240,
-            input_dim=input_dim,
-            parameters=spec.get('parameters', {}),
-        )
-        assert parameter_count(model) <= spec.get('max_parameters', config['max_parameters'])
-        x = torch.randn(2, 240, input_dim)
-        output = unwrap_output(model(x))
-        assert output.prediction.shape == (2,)
-        assert torch.isfinite(output.prediction).all()
-        if output.auxiliary_loss is not None:
-            assert torch.isfinite(output.auxiliary_loss)
+    for config_path in config_paths:
+        config = json.loads(config_path.read_text())
+        for spec in config['models']:
+            key = (spec['architecture'], spec['mode'], json.dumps(spec.get('parameters', {}), sort_keys=True))
+            if key in seen:
+                continue
+            seen.add(key)
+            input_dim = 1 if spec['mode'] == 'residual' else (5 if spec['mode'] == 'dynamic' else 4)
+            model = build_model(
+                spec['architecture'],
+                sequence_length=240,
+                input_dim=input_dim,
+                parameters=spec.get('parameters', {}),
+            )
+            assert parameter_count(model) <= spec.get('max_parameters', config['max_parameters'])
+            x = torch.randn(2, 240, input_dim)
+            output = unwrap_output(model(x))
+            assert output.prediction.shape == (2,)
+            assert torch.isfinite(output.prediction).all()
+            if output.auxiliary_loss is not None:
+                assert torch.isfinite(output.auxiliary_loss)
 
 
 def test_residual_history_uses_only_matured_rows():

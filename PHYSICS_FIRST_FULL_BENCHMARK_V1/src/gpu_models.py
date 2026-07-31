@@ -431,6 +431,233 @@ class GRUVAERegressor(nn.Module):
         return ModelOutput(prediction=prediction, auxiliary_loss=auxiliary)
 
 
+class BidirectionalLSTMControl(nn.Module):
+    """Explicitly non-causal control; excluded from the formal online tables."""
+
+    def __init__(self, input_dim: int, hidden: int = 48, layers: int = 1, dropout: float = 0.0):
+        super().__init__()
+        self.encoder = nn.LSTM(
+            input_dim,
+            hidden,
+            num_layers=layers,
+            batch_first=True,
+            bidirectional=True,
+            dropout=dropout if layers > 1 else 0.0,
+        )
+        self.head = nn.Sequential(nn.LayerNorm(2 * hidden), nn.Linear(2 * hidden, 1))
+
+    def forward(self, x: Tensor) -> Tensor:
+        _, (hidden, _) = self.encoder(x)
+        state = torch.cat((hidden[-2], hidden[-1]), dim=-1)
+        return self.head(state).squeeze(-1)
+
+
+class S4DLiteRegressor(nn.Module):
+    """Compact causal structured-state-space adaptation using long depthwise filters."""
+
+    def __init__(self, input_dim: int, width: int = 48, levels: int = 4, dropout: float = 0.1):
+        super().__init__()
+        self.input = nn.Conv1d(input_dim, width, 1)
+        blocks: list[nn.Module] = []
+        for level in range(levels):
+            dilation = 2**level
+            padding = 8 * dilation
+            blocks.append(
+                nn.Sequential(
+                    nn.Conv1d(
+                        width,
+                        width,
+                        kernel_size=9,
+                        dilation=dilation,
+                        padding=padding,
+                        groups=width,
+                    ),
+                    Chomp1d(padding),
+                    nn.Conv1d(width, width, 1),
+                    nn.GELU(),
+                    nn.Dropout(dropout),
+                )
+            )
+        self.blocks = nn.ModuleList(blocks)
+        self.norms = nn.ModuleList([nn.GroupNorm(1, width) for _ in blocks])
+        self.head = nn.Linear(width, 1)
+
+    def forward(self, x: Tensor) -> Tensor:
+        state = self.input(x.transpose(1, 2))
+        for block, norm in zip(self.blocks, self.norms):
+            state = norm(state + block(state))
+        return self.head(state[..., -1]).squeeze(-1)
+
+
+class StaticGATRegressor(nn.Module):
+    """Window-summary graph attention baseline."""
+
+    def __init__(self, sequence_length: int, input_dim: int, width: int = 32, heads: int = 4):
+        super().__init__()
+        self.temporal = GraphTemporalEncoder(sequence_length, input_dim, width)
+        self.attention = nn.MultiheadAttention(width, heads, batch_first=True)
+        self.norm = nn.LayerNorm(width)
+        self.head = nn.Linear(width, 1)
+
+    def forward(self, x: Tensor) -> Tensor:
+        nodes = self.temporal(x)
+        attended, _ = self.attention(nodes, nodes, nodes, need_weights=False)
+        return self.head(self.norm(nodes + attended).mean(dim=1)).squeeze(-1)
+
+
+class TemporalGraphRegressor(nn.Module):
+    """Causal per-node recurrent encoder followed by graph message passing."""
+
+    def __init__(
+        self,
+        input_dim: int,
+        width: int = 32,
+        heads: int = 4,
+        attention: bool = True,
+    ):
+        super().__init__()
+        self.input_dim = input_dim
+        self.encoder = nn.GRU(1, width, batch_first=True)
+        self.node_embeddings = nn.Parameter(torch.randn(input_dim, width) * 0.02)
+        self.attention = (
+            nn.MultiheadAttention(width, heads, batch_first=True)
+            if attention
+            else None
+        )
+        adjacency = torch.eye(input_dim) + torch.ones(input_dim, input_dim) / input_dim
+        degree = adjacency.sum(dim=1)
+        self.register_buffer(
+            "adjacency",
+            adjacency / torch.sqrt(degree[:, None] * degree[None, :]),
+            persistent=True,
+        )
+        self.norm = nn.LayerNorm(width)
+        self.head = nn.Linear(width, 1)
+
+    def forward(self, x: Tensor) -> Tensor:
+        batch, steps, channels = x.shape
+        series = x.transpose(1, 2).reshape(batch * channels, steps, 1)
+        _, hidden = self.encoder(series)
+        nodes = hidden[-1].reshape(batch, channels, -1)
+        nodes = nodes + self.node_embeddings.unsqueeze(0)
+        if self.attention is None:
+            message = torch.einsum("ij,bjd->bid", self.adjacency, nodes)
+        else:
+            message, _ = self.attention(nodes, nodes, nodes, need_weights=False)
+        return self.head(self.norm(nodes + message).mean(dim=1)).squeeze(-1)
+
+
+class FixedGraphKANRegressor(nn.Module):
+    def __init__(self, sequence_length: int, input_dim: int, width: int = 32):
+        super().__init__()
+        self.temporal = GraphTemporalEncoder(sequence_length, input_dim, width)
+        adjacency = torch.eye(input_dim) + torch.ones(input_dim, input_dim) / input_dim
+        degree = adjacency.sum(dim=1)
+        self.register_buffer(
+            "adjacency",
+            adjacency / torch.sqrt(degree[:, None] * degree[None, :]),
+            persistent=True,
+        )
+        self.message = nn.Linear(width, width)
+        self.norm = nn.LayerNorm(width)
+        self.head = RBFKANHead(width)
+
+    def forward(self, x: Tensor) -> Tensor:
+        nodes = self.temporal(x)
+        nodes = F.gelu(
+            self.message(torch.einsum("ij,bjd->bid", self.adjacency, nodes))
+        )
+        return self.head(self.norm(nodes.mean(dim=1)))
+
+
+class TemporalAutoencoderRegressor(nn.Module):
+    """Supervised causal temporal autoencoder baseline."""
+
+    def __init__(
+        self,
+        sequence_length: int,
+        input_dim: int,
+        hidden: int = 48,
+        latent: int = 16,
+        reconstruction_weight: float = 1e-2,
+    ):
+        super().__init__()
+        self.sequence_length = sequence_length
+        self.input_dim = input_dim
+        self.reconstruction_weight = reconstruction_weight
+        self.encoder = nn.GRU(input_dim, hidden, batch_first=True)
+        self.latent = nn.Linear(hidden, latent)
+        self.regressor = nn.Sequential(nn.Linear(latent, hidden), nn.GELU(), nn.Linear(hidden, 1))
+        self.decoder = nn.Sequential(
+            nn.Linear(latent, hidden),
+            nn.GELU(),
+            nn.Linear(hidden, sequence_length * input_dim),
+        )
+
+    def forward(self, x: Tensor) -> ModelOutput:
+        _, hidden = self.encoder(x)
+        latent = self.latent(hidden[-1])
+        prediction = self.regressor(latent).squeeze(-1)
+        reconstruction = self.decoder(latent).view_as(x)
+        auxiliary = self.reconstruction_weight * F.mse_loss(reconstruction, x)
+        return ModelOutput(prediction=prediction, auxiliary_loss=auxiliary)
+
+
+class PyramidVAERegressor(nn.Module):
+    """Causal multiresolution VAE adaptation for the supervised benchmark."""
+
+    def __init__(
+        self,
+        sequence_length: int,
+        input_dim: int,
+        hidden: int = 48,
+        latent: int = 16,
+        beta: float = 1e-3,
+        reconstruction_weight: float = 1e-2,
+    ):
+        super().__init__()
+        self.sequence_length = sequence_length
+        self.input_dim = input_dim
+        self.beta = beta
+        self.reconstruction_weight = reconstruction_weight
+        summary_dim = input_dim * 3
+        self.summary = nn.Sequential(nn.Linear(summary_dim, hidden), nn.GELU())
+        self.mean = nn.Linear(hidden, latent)
+        self.logvar = nn.Linear(hidden, latent)
+        self.regressor = nn.Sequential(nn.Linear(latent, hidden), nn.GELU(), nn.Linear(hidden, 1))
+        self.decoder = nn.Sequential(
+            nn.Linear(latent, hidden),
+            nn.GELU(),
+            nn.Linear(hidden, sequence_length * input_dim),
+        )
+
+    def forward(self, x: Tensor) -> ModelOutput:
+        summaries = torch.cat(
+            (
+                x[:, -1],
+                x[:, -min(12, x.shape[1]) :].mean(dim=1),
+                x.mean(dim=1),
+            ),
+            dim=-1,
+        )
+        encoded = self.summary(summaries)
+        mean = self.mean(encoded)
+        logvar = self.logvar(encoded).clamp(-10.0, 10.0)
+        latent = (
+            mean + torch.randn_like(mean) * torch.exp(0.5 * logvar)
+            if self.training
+            else mean
+        )
+        prediction = self.regressor(latent).squeeze(-1)
+        reconstruction = self.decoder(latent).view_as(x)
+        recon = F.mse_loss(reconstruction, x)
+        kl = -0.5 * torch.mean(1.0 + logvar - mean.square() - logvar.exp())
+        return ModelOutput(
+            prediction=prediction,
+            auxiliary_loss=self.reconstruction_weight * recon + self.beta * kl,
+        )
+
+
 MODEL_ALIASES = {
     "mlp": "mlp",
     "lstm": "lstm",
@@ -447,6 +674,20 @@ MODEL_ALIASES = {
     "adaptive_graph_kan": "adaptive_graph_kan",
     "no_graph_kan_adapted": "no_graph_kan_adapted",
     "gru_vae_adapted": "gru_vae_adapted",
+    "bilstm_control": "bilstm_control",
+    "informer_lite_adapted": "patchtst_adapted",
+    "autoformer_lite_adapted": "timesnet_adapted",
+    "s4d_adapted": "s4d_adapted",
+    "static_gat": "static_gat",
+    "temporal_gcn": "temporal_gcn",
+    "temporal_gat": "temporal_gat",
+    "dgdl_adapted": "adaptive_graph_mlp",
+    "akgnn_window_summary_adapted": "adaptive_graph_mlp",
+    "adaptive_graph_mlp": "adaptive_graph_mlp",
+    "fixed_graph_kan": "fixed_graph_kan",
+    "dmvaer_adapted": "gru_vae_adapted",
+    "pyramid_vae_adapted": "pyramid_vae_adapted",
+    "temporal_autoencoder": "temporal_autoencoder",
 }
 
 
@@ -489,4 +730,24 @@ def build_model(
         return NoGraphKANRegressor(sequence_length, input_dim, **parameters)
     if normalized == "gru_vae_adapted":
         return GRUVAERegressor(sequence_length, input_dim, **parameters)
+    if normalized == "bilstm_control":
+        return BidirectionalLSTMControl(input_dim, **parameters)
+    if normalized == "s4d_adapted":
+        return S4DLiteRegressor(input_dim, **parameters)
+    if normalized == "static_gat":
+        return StaticGATRegressor(sequence_length, input_dim, **parameters)
+    if normalized == "temporal_gcn":
+        return TemporalGraphRegressor(input_dim, attention=False, **parameters)
+    if normalized == "temporal_gat":
+        return TemporalGraphRegressor(input_dim, attention=True, **parameters)
+    if normalized == "adaptive_graph_mlp":
+        return AdaptiveGraphRegressor(
+            sequence_length, input_dim, kan_head=False, **parameters
+        )
+    if normalized == "fixed_graph_kan":
+        return FixedGraphKANRegressor(sequence_length, input_dim, **parameters)
+    if normalized == "pyramid_vae_adapted":
+        return PyramidVAERegressor(sequence_length, input_dim, **parameters)
+    if normalized == "temporal_autoencoder":
+        return TemporalAutoencoderRegressor(sequence_length, input_dim, **parameters)
     raise KeyError(f"UNKNOWN_MODEL:{name}")

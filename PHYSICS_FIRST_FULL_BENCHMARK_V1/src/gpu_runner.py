@@ -386,6 +386,12 @@ def run_task(
         "parameter_count": count,
         "chosen_epochs": chosen_epochs,
         "selection_folds": fold_records,
+        "selection_validation_mse_scaled_mean": float(
+            np.mean([row["best_validation_loss_scaled"] for row in fold_records])
+        ),
+        "selection_validation_mse_scaled_worst": float(
+            np.max([row["best_validation_loss_scaled"] for row in fold_records])
+        ),
         "training_dtype": final.dtype_used,
         "tf32": train_config.tf32,
         "fallback_reason": final.fallback_reason,
@@ -468,6 +474,25 @@ def aggregate_results(results_root: str | Path) -> list[dict[str, Any]]:
                 "direction_worst_MSE": float(max(direction_medians.values())),
                 "direction_best_MSE": float(min(direction_medians.values())),
                 "direction_MSE_json": json.dumps(direction_medians, sort_keys=True),
+                "selection_validation_mse_scaled_median": float(
+                    np.median(
+                        [
+                            row.get(
+                                "selection_validation_mse_scaled_mean",
+                                float(
+                                    np.mean(
+                                        [
+                                            fold["best_validation_loss_scaled"]
+                                            for fold in row.get("selection_folds", [])
+                                        ]
+                                    )
+                                ),
+                            )
+                            for row in group
+                            if row.get("selection_folds")
+                        ]
+                    )
+                ),
                 "R2_run_median": float(np.median([row["R2"] for row in group])),
                 "relative_persistence_run_median": float(np.median([row["relative_persistence"] for row in group])),
                 "parameter_count": int(np.median([row["parameter_count"] for row in group])),
@@ -485,14 +510,28 @@ def aggregate_results(results_root: str | Path) -> list[dict[str, Any]]:
 
     eligible = [
         row for row in summaries
-        if row["stage"] in {"core", "frontier"} and row["directions"] >= 2
+        if row["stage"] in {"core", "frontier"}
+        and row["directions"] >= 2
+        and row["implementation_label"]
+        != "NONCAUSAL_CONTROL_EXCLUDED_FROM_ONLINE_BOARD"
     ]
     provisional = {
-        mode: sorted(
-            [row for row in eligible if row["mode"] == mode],
-            key=lambda row: row["pooled_MSE_seed_median"],
-        )[:6]
-        for mode in ("input", "dynamic", "residual")
+        "input": sorted(
+            [row for row in eligible if row["mode"] == "input"],
+            key=lambda row: (
+                row["selection_validation_mse_scaled_median"],
+                row["parameter_count"],
+                row["model_id"],
+            ),
+        )[:6],
+        "dynamic": sorted(
+            [row for row in eligible if row["mode"] in {"dynamic", "residual"}],
+            key=lambda row: (
+                row["selection_validation_mse_scaled_median"],
+                row["parameter_count"],
+                row["model_id"],
+            ),
+        )[:6],
     }
     decision = {
         "schema": "PHYSICS_FIRST_GPU_DECISION_V1",
@@ -515,19 +554,21 @@ def aggregate_results(results_root: str | Path) -> list[dict[str, Any]]:
         "- `_adapted` methods are protocol-faithful compact adaptations, not exact paper reproductions.",
         "",
     ]
-    for mode in ("input", "dynamic", "residual"):
+    for mode in ("input", "dynamic"):
         lines.extend([f"## {mode.capitalize()} leaderboard", ""])
         rows = provisional.get(mode, [])
         if not rows:
             lines.extend(["No complete two-direction screening result yet.", ""])
             continue
         lines.extend([
-            "| Rank | Model | Pooled MSE median | Worst-direction MSE | Params |",
-            "|---:|---|---:|---:|---:|",
+            "| Rank | Model | Validation MSE | Pooled test MSE | Worst-direction MSE | Params |",
+            "|---:|---|---:|---:|---:|---:|",
         ])
         for rank, row in enumerate(rows, 1):
             lines.append(
-                f"| {rank} | {row['model_id']} | {row['pooled_MSE_seed_median']:.8g} | "
+                f"| {rank} | {row['model_id']} | "
+                f"{row['selection_validation_mse_scaled_median']:.8g} | "
+                f"{row['pooled_MSE_seed_median']:.8g} | "
                 f"{row['direction_worst_MSE']:.8g} | {row['parameter_count']} |"
             )
         lines.append("")
