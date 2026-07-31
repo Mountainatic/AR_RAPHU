@@ -25,6 +25,13 @@
     "finalist_seeds": 10,
     "strategy": "PREDECLARED_SINGLE_CONFIGURATION_PER_FAMILY_WITHIN_MAXIMUM_BUDGET"
   },
+  "ablation_protocol": {
+    "bootstrap_replicates": 500,
+    "bootstrap_block_rows": 60,
+    "training_fractions": [0.25, 0.5, 1.0],
+    "input_noise_std_fraction": 0.05,
+    "missing_control_replacement": "TRAIN_MEAN"
+  },
   "models": [
     {"id":"smoke_gru_u","architecture":"gru","mode":"input","stage":"smoke","label":"STANDARD_BASELINE","batch_size":128,"parameters":{"hidden":32}},
     {"id":"smoke_tcn_u","architecture":"tcn","mode":"input","stage":"smoke","label":"STANDARD_BASELINE","batch_size":128,"parameters":{"channels":32,"levels":3}},
