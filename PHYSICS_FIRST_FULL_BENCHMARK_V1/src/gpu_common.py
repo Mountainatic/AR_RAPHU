@@ -53,21 +53,31 @@ def json_ready(value: Any) -> Any:
 def atomic_json(path: str | Path, payload: Any) -> None:
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
-    temporary = target.with_suffix(target.suffix + ".tmp")
-    temporary.write_text(
-        json.dumps(json_ready(payload), ensure_ascii=False, indent=2, sort_keys=True),
-        encoding="utf-8",
+    temporary = target.with_name(
+        f".{target.name}.{os.getpid()}.{time.time_ns()}.tmp"
     )
-    os.replace(temporary, target)
+    try:
+        temporary.write_text(
+            json.dumps(json_ready(payload), ensure_ascii=False, indent=2, sort_keys=True),
+            encoding="utf-8",
+        )
+        os.replace(temporary, target)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def atomic_npz(path: str | Path, **arrays: np.ndarray) -> None:
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
-    temporary = target.with_suffix(target.suffix + ".tmp")
-    with temporary.open("wb") as stream:
-        np.savez_compressed(stream, **arrays)
-    os.replace(temporary, target)
+    temporary = target.with_name(
+        f".{target.name}.{os.getpid()}.{time.time_ns()}.tmp"
+    )
+    try:
+        with temporary.open("wb") as stream:
+            np.savez_compressed(stream, **arrays)
+        os.replace(temporary, target)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def write_csv(path: str | Path, rows: Iterable[dict[str, Any]]) -> None:

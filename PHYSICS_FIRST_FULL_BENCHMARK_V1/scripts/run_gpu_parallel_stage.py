@@ -35,6 +35,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--train-fraction", type=float, default=1.0)
     parser.add_argument("--python-bin", default=sys.executable)
     parser.add_argument("--log-prefix")
+    parser.add_argument("--retries", type=int, default=1)
     parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
@@ -82,12 +83,14 @@ def main() -> int:
     runner = root / "scripts" / RUNNERS[args.stage]
     return_codes: dict[int, int] = {}
     pending = list(enumerate(work_units))
+    attempts = {index: 0 for index, _unit in pending}
     active: dict[
         int, tuple[list[str], list[str], subprocess.Popen[bytes], object]
     ] = {}
 
     def start_unit(index: int, model_group: list[str], seed_group: list[str]) -> None:
-        log_path = log_root / f"{log_prefix}_shard_{index}.log"
+        attempt = attempts[index]
+        log_path = log_root / f"{log_prefix}_unit_{index}_attempt_{attempt}.log"
         command = [
             args.python_bin,
             str(runner),
@@ -109,14 +112,14 @@ def main() -> int:
             "--train-fraction",
             str(args.train_fraction),
             "--checkpoint-name",
-            f"{log_prefix}_shard_{index}.json",
+            f"{log_prefix}_unit_{index}_attempt_{attempt}.json",
             "--skip-aggregate",
         ]
         if args.cpu_results:
             command.extend(["--cpu-results", str(Path(args.cpu_results).resolve())])
         if args.directions:
             command.extend(["--directions", args.directions])
-        if args.force:
+        if args.force or attempt > 0:
             command.append("--force")
         env = os.environ.copy()
         env.update(
@@ -132,12 +135,12 @@ def main() -> int:
         )
         handle = log_path.open("wb")
         process = subprocess.Popen(command, env=env, stdout=handle, stderr=subprocess.STDOUT)
-        (log_root / f"{log_prefix}_shard_{index}.pid").write_text(
+        (log_root / f"{log_prefix}_unit_{index}.pid").write_text(
             f"{process.pid}\n", encoding="utf-8"
         )
         active[index] = (model_group, seed_group, process, handle)
         print(
-            f"SHARD_STARTED index={index} pid={process.pid} "
+            f"SHARD_STARTED index={index} attempt={attempt} pid={process.pid} "
             f"models={','.join(model_group)} seeds={','.join(seed_group)} "
             f"log={log_path}",
             flush=True,
@@ -156,9 +159,19 @@ def main() -> int:
             time.sleep(1.0)
             continue
         for index in finished:
-            _model_group, _seed_group, process, handle = active.pop(index)
-            return_codes[index] = int(process.returncode or 0)
+            model_group, seed_group, process, handle = active.pop(index)
+            return_code = int(process.returncode or 0)
             handle.close()
+            if return_code != 0 and attempts[index] < args.retries:
+                attempts[index] += 1
+                pending.append((index, (model_group, seed_group)))
+                print(
+                    f"SHARD_RETRY index={index} rc={return_code} "
+                    f"next_attempt={attempts[index]}",
+                    flush=True,
+                )
+                continue
+            return_codes[index] = return_code
             print(
                 f"SHARD_FINISHED index={index} rc={return_codes[index]} "
                 f"remaining_units={len(pending)}",
@@ -188,6 +201,7 @@ def main() -> int:
         "train_fraction": args.train_fraction,
         "directions": args.directions,
         "return_codes": return_codes,
+        "attempts": attempts,
     }
     (checkpoint_root / "latest.json").write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
