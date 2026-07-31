@@ -285,6 +285,7 @@ def run_task(
     epoch_override: int | None,
     workers_override: int | None,
     strict_folds: bool,
+    train_fraction: float,
     force: bool,
 ) -> dict[str, Any]:
     task_root = results_root / "tasks" / task.stage / direction_name / task.model_id / f"seed_{seed}"
@@ -307,6 +308,16 @@ def run_task(
         cpu_results_root=cpu_results_root,
         residual_history_rows=int(config["residual_history_rows"]),
     )
+    if not 0.0 < train_fraction <= 1.0:
+        raise ValueError(f"INVALID_TRAIN_FRACTION:{train_fraction}")
+    original_train_rows = len(arrays["y_train"])
+    train_limit = max(128, int(np.floor(original_train_rows * train_fraction)))
+    train_limit = min(original_train_rows, train_limit)
+    if train_limit < original_train_rows:
+        arrays = dict(arrays)
+        arrays["x_train"] = arrays["x_train"][:train_limit]
+        arrays["y_train"] = arrays["y_train"][:train_limit]
+        arrays["train_available"] = arrays["train_available"][:train_limit]
     train_config = _precision_config(
         config,
         task,
@@ -395,6 +406,9 @@ def run_task(
         "training_dtype": final.dtype_used,
         "tf32": train_config.tf32,
         "dataloader_workers": train_config.num_workers,
+        "train_fraction": train_fraction,
+        "available_train_rows": int(len(full_train_idx)),
+        "original_train_rows": int(original_train_rows),
         "fallback_reason": final.fallback_reason,
         "train_seconds_final": final.train_seconds,
         "train_seconds_total": float(time.perf_counter() - started),
@@ -626,6 +640,7 @@ def run_benchmark(args: argparse.Namespace) -> int:
                         epoch_override=args.epochs,
                         workers_override=args.workers,
                         strict_folds=args.strict_folds,
+                        train_fraction=args.train_fraction,
                         force=args.force,
                     )
                     latest["completed"].append(task_name)
@@ -676,6 +691,7 @@ def build_parser(default_stage: str | None = None) -> argparse.ArgumentParser:
     parser.add_argument("--epochs", type=int, default=None)
     parser.add_argument("--workers", type=int, default=None)
     parser.add_argument("--strict-folds", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--train-fraction", type=float, default=1.0)
     parser.add_argument("--force", action="store_true")
     return parser
 
