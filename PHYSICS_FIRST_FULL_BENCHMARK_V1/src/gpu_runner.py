@@ -394,6 +394,7 @@ def run_task(
         ),
         "training_dtype": final.dtype_used,
         "tf32": train_config.tf32,
+        "dataloader_workers": train_config.num_workers,
         "fallback_reason": final.fallback_reason,
         "train_seconds_final": final.train_seconds,
         "train_seconds_total": float(time.perf_counter() - started),
