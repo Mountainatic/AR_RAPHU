@@ -27,6 +27,8 @@ def residual_design(
     eligible: list[int] = []
     maximum_source: list[int] = []
     for current in range(len(residual)):
+        if not np.isfinite(residual[current]):
+            continue
         mature = np.flatnonzero((future_right <= origins[current]) & np.isfinite(residual))
         if not len(mature):
             continue
