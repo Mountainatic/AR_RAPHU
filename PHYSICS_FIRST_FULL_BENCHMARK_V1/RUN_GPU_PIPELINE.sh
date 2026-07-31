@@ -42,7 +42,7 @@ fi
   --cpu-results "$CPU_K_OOF" \
   --device cuda:0 \
   --seeds 0,1,2,3,4 \
-  --parallel-workers "${GPU_PARALLEL_WORKERS:-6}" \
+  --parallel-workers "${GPU_PARALLEL_WORKERS:-8}" \
   --loader-workers 0 \
   --python-bin "$PYTHON_BIN" \
   --log-prefix frontier \
@@ -63,7 +63,7 @@ fi
   --cpu-results "$CPU_K_OOF" \
   --device cuda:0 \
   --seeds 0,1,2,3,4,5,6,7,8,9 \
-  --parallel-workers "${GPU_PARALLEL_WORKERS:-6}" \
+  --parallel-workers "${GPU_PARALLEL_WORKERS:-8}" \
   --loader-workers 0 \
   --python-bin "$PYTHON_BIN" \
   --log-prefix finalists \

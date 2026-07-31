@@ -29,7 +29,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seeds", required=True)
     parser.add_argument("--models")
     parser.add_argument("--directions")
-    parser.add_argument("--parallel-workers", type=int, default=6)
+    parser.add_argument("--parallel-workers", type=int, default=8)
     parser.add_argument("--loader-workers", type=int, default=0)
     parser.add_argument("--train-fraction", type=float, default=1.0)
     parser.add_argument("--python-bin", default=sys.executable)
@@ -62,8 +62,21 @@ def main() -> int:
     config_path = Path(args.config).resolve()
     selected = set(args.models.split(",")) if args.models else None
     model_ids = load_model_ids(config_path, args.stage, selected)
-    worker_count = max(1, min(args.parallel_workers, len(model_ids)))
-    groups = [model_ids[index::worker_count] for index in range(worker_count)]
+    seed_ids = [value for value in args.seeds.split(",") if value]
+    largest_axis = max(len(model_ids), len(seed_ids))
+    worker_count = max(1, min(args.parallel_workers, largest_axis))
+    if len(model_ids) >= worker_count:
+        shard_axis = "models"
+        groups = [
+            (model_ids[index::worker_count], seed_ids)
+            for index in range(worker_count)
+        ]
+    else:
+        shard_axis = "seeds"
+        groups = [
+            (model_ids, seed_ids[index::worker_count])
+            for index in range(worker_count)
+        ]
     log_prefix = args.log_prefix or args.stage
     log_root = results / "logs"
     checkpoint_root = results / "checkpoints"
@@ -72,9 +85,11 @@ def main() -> int:
 
     cpu_threads = max(1, min(4, (os.cpu_count() or worker_count) // worker_count))
     mps_share = max(10, 100 // worker_count)
-    processes: list[tuple[int, list[str], subprocess.Popen[bytes], object]] = []
+    processes: list[
+        tuple[int, list[str], list[str], subprocess.Popen[bytes], object]
+    ] = []
     runner = root / "scripts" / RUNNERS[args.stage]
-    for index, group in enumerate(groups):
+    for index, (model_group, seed_group) in enumerate(groups):
         log_path = log_root / f"{log_prefix}_shard_{index}.log"
         command = [
             args.python_bin,
@@ -88,9 +103,9 @@ def main() -> int:
             "--device",
             args.device,
             "--models",
-            ",".join(group),
+            ",".join(model_group),
             "--seeds",
-            args.seeds,
+            ",".join(seed_group),
             "--strict-folds",
             "--workers",
             str(args.loader_workers),
@@ -123,15 +138,16 @@ def main() -> int:
         (log_root / f"{log_prefix}_shard_{index}.pid").write_text(
             f"{process.pid}\n", encoding="utf-8"
         )
-        processes.append((index, group, process, handle))
+        processes.append((index, model_group, seed_group, process, handle))
         print(
             f"SHARD_STARTED index={index} pid={process.pid} "
-            f"models={','.join(group)} log={log_path}",
+            f"models={','.join(model_group)} seeds={','.join(seed_group)} "
+            f"log={log_path}",
             flush=True,
         )
 
     return_codes: dict[int, int] = {}
-    for index, _group, process, handle in processes:
+    for index, _model_group, _seed_group, process, handle in processes:
         return_codes[index] = process.wait()
         handle.close()
         print(f"SHARD_FINISHED index={index} rc={return_codes[index]}", flush=True)
@@ -152,6 +168,7 @@ def main() -> int:
         "models": model_ids,
         "seeds": [int(value) for value in args.seeds.split(",") if value],
         "parallel_shards": worker_count,
+        "shard_axis": shard_axis,
         "cpu_threads_per_shard": cpu_threads,
         "mps_active_thread_percentage_per_shard": mps_share,
         "train_fraction": args.train_fraction,

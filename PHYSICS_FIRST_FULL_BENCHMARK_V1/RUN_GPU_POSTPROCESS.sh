@@ -46,7 +46,7 @@ for fraction in 0.25 0.50; do
     --device cuda:0 \
     --models "$non_residual_models" \
     --seeds 0,1,2,3,4,5,6,7,8,9 \
-    --parallel-workers "${GPU_PARALLEL_WORKERS:-6}" \
+    --parallel-workers "${GPU_PARALLEL_WORKERS:-8}" \
     --loader-workers 0 \
     --python-bin "$PYTHON_BIN" \
     --log-prefix "train_fraction_$label" \
