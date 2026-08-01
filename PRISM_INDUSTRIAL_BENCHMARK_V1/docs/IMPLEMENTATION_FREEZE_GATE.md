@@ -52,16 +52,11 @@ semantics gates.
 
 ## C4/C5 model gate
 
-- Lag-basis family and its candidate dimensions for every channel class.
-- Amplitude basis family, knot placement rule, and candidate `M_x` values.
-- Full finite-Urysohn candidate `M_tau` values.
-- Adaptive per-channel rank candidate set and rank tie-break order.
-- Numerical grids for `lambda_0`, `lambda_tau`, and `lambda_x`.
-- Exact one-SE complexity key across zero/linear/rank/full candidates.
-- KKT, condition-number, Gram/Schur, HS-error and rank-margin thresholds.
-- Exact solver/initialization/refit contract for rank-R and K-Joint AR.
-- Exact residual-AR and Joint-AR state candidate families and orders.
+Status: `FROZEN_BEFORE_PARAMETERIZED_MODEL_VALIDATION` on 2026-08-02.
 
-C1 shared-data implementation is authorized. Model fitting remains blocked until
-the C1 target, split, sample-ID, purge, proxy-isolation, and scaler artifacts pass
-their tests and validation report.
+All previously open items are frozen in `configs/cpu_model_freeze_v1.json` and
+explained in `docs/C2_C5_NUMERICAL_FREEZE.md`. CLI overrides are forbidden.
+
+C1 target, split, sample-ID, purge, proxy-isolation and scaler validation is
+`PASS`. Parameterized C2--C5 model implementation and fitting are authorized
+under the frozen configuration.

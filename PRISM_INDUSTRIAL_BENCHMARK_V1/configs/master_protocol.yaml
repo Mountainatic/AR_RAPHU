@@ -1,6 +1,6 @@
 {
   "protocol_id": "PRISM_INDUSTRIAL_BENCHMARK_V1_STRICT_RESTART",
-  "protocol_status": "C0_APPROVED_C1_AUTHORIZED",
+  "protocol_status": "C0_C1_PASS_C2_C5_NUMERICS_FROZEN",
   "raw_root": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources",
   "target_contract": {
     "definition": "future_window_mean_minus_current_window_mean",
