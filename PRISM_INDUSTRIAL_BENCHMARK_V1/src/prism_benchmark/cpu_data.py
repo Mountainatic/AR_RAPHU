@@ -200,6 +200,23 @@ class BaseAccessor:
         indices = samples["origin"].to_numpy(dtype=np.int64)[:, None] - offsets[None, :]
         return self.gather(samples, columns, indices)
 
+    def input_regular_lags(
+        self,
+        samples: pd.DataFrame,
+        columns: list[str],
+        delta_steps: int,
+        history_steps: int,
+        maximum_lags: int,
+    ) -> np.ndarray:
+        delta_steps = max(1, delta_steps)
+        available = max(1, history_steps // delta_steps)
+        lag_count = min(maximum_lags, available)
+        offsets = np.unique(
+            np.rint(np.linspace(delta_steps, history_steps, lag_count)).astype(np.int64)
+        )
+        indices = samples["origin"].to_numpy(dtype=np.int64)[:, None] - offsets[None, :]
+        return self.gather(samples, columns, indices)
+
     def target_state(
         self,
         samples: pd.DataFrame,

@@ -96,6 +96,8 @@
     "ar": {"features": ["strict_past_target_level", "strict_past_registered_change"]},
     "arx": {
       "features": ["selected_ar_state", "registered_input_history"],
+      "input_history_realization": "uniform_strict_past_lags_over_selected_ar_history",
+      "maximum_input_lags_per_channel": 16,
       "exact_x_zero_candidate": true,
       "block_penalty_ratios_x_over_ar": [0.25, 1.0, 4.0]
     },
@@ -110,6 +112,8 @@
       "state_orders": [2, 4, 6, 8, 12, 16],
       "block_rows_multiplier": 2,
       "stability_radius": 0.999,
+      "unknown_future_input_policy": "zero_order_hold_last_available_input",
+      "grouped_entity_policy": "fit_with_explicit_state_reset_or_retain_not_applicable_failure",
       "failed_fit_status": "SOLVER_FAILED_RETAINED"
     },
     "parallel_hammerstein": {
