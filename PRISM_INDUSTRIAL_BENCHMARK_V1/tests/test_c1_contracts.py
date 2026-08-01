@@ -56,6 +56,7 @@ def test_dependency_interval_and_boundary_purge_are_half_open() -> None:
 
 def test_registered_history_uses_eight_h_or_largest_feasible_h_zero_candidate() -> None:
     assert maximum_registered_history(12, 2, [500]) == 96
+    assert maximum_registered_history(300, 60, [-284]) == 2400
     assert maximum_registered_history(0, 1, [1436]) == 1024
     assert maximum_registered_history(0, 1, [6048]) == 4096
     assert maximum_registered_history(0, 1, [467]) == 256

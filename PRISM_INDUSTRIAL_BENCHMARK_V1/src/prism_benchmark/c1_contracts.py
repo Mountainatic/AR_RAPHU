@@ -79,11 +79,11 @@ def stable_identifier(*parts: object) -> str:
 
 
 def maximum_registered_history(h_steps: int, w0_steps: int, train_entity_lengths: Iterable[int]) -> int:
+    if h_steps > 0:
+        return max(w0_steps, 8 * h_steps)
     lengths = [int(length) for length in train_entity_lengths]
     if not lengths or min(lengths) <= 0:
         raise ValueError("positive training entity lengths are required")
-    if h_steps > 0:
-        return max(w0_steps, 8 * h_steps)
     candidates = sorted(
         {multiplier * cadence_multiple for multiplier in (4, 16, 64) for cadence_multiple in (1, 2, 4, 8, 16, 32, 64)}
     )
