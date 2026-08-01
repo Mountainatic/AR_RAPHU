@@ -1,6 +1,6 @@
 # C2--C5 numerical freeze
 
-Status: `FROZEN_BEFORE_PARAMETERIZED_MODEL_VALIDATION`
+Status: `FROZEN_BEFORE_DEVELOPMENT_RESULT_INSPECTION`
 
 The user authorized Codex on 2026-08-02 to pre-register and freeze every
 remaining C2--C5 numerical choice before parameterized development results are
@@ -16,7 +16,16 @@ a result-independent staged scan, but cannot add candidates or inspect model
 validation results.
 
 Final frozen SHA256 after that audit:
-`8d2696b82f5da6d7d2e183c325e3f4d826747dcd46361d68e6de44ba3868b131`.
+`14cefef2b0b4307ca208d0f0d43b50146de9edf78e93c59d67bf6fdd5d9cf65a`.
+
+The unattended C2 computation began against full-file hash
+`d7d90c9126d0a70e2cb3a6e859787a8bfb70da79dd5ba963573fa7b0842b4a4b`.
+Before any development metric was inspected, C5 residual-history realization
+and C6 result-independent finalist fields were completed. The canonical
+`{selection,c2}` subtree hash is identical in both files:
+`15d3665009caf12fb2102964bf24ea8b7b2ab7b7c973c3b7481ca4fa77100244`.
+Thus the already-computed C2 candidates were not changed or selected from their
+results; downstream stages use the final full-file hash above.
 
 Key safeguards are:
 

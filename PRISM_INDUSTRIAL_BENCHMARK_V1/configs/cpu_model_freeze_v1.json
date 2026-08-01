@@ -6,7 +6,7 @@
     "result_independent": true
   },
   "protocol_id": "PRISM_CPU_MODEL_FREEZE_V1",
-  "status": "FROZEN_BEFORE_PARAMETERIZED_MODEL_VALIDATION",
+  "status": "FROZEN_BEFORE_DEVELOPMENT_RESULT_INSPECTION",
   "selection": {
     "inner_folds": 4,
     "fold_type_continuous": "expanding_origin_with_dependency_interval_purge",
