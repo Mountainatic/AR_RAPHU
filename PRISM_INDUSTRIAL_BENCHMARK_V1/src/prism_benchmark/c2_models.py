@@ -448,10 +448,19 @@ def run_c2(shared: Path, project: Path, output: Path, n_jobs: int) -> dict[str, 
     jobs = [(view, model) for view in input_views for model in ("RIDGE", "PLS", "DPLS", "RBF_SVR", "XGBOOST")]
     jobs.extend((view, "LOCAL_LINEAR_TREND") for view in dynamic_views)
     results = []
+    pending = []
+    for view, model in jobs:
+        result_path = output / "PREDICTIONS" / model / view.relative_root / "RESULT.json"
+        if result_path.is_file():
+            previous = json.loads(result_path.read_text(encoding="utf-8"))
+            if previous.get("status") in {"PASS", "FAILED_RETAINED"}:
+                results.append(previous)
+                continue
+        pending.append((view, model))
     with ProcessPoolExecutor(max_workers=n_jobs) as executor:
         futures = {
             executor.submit(run_job, shared, project, output, view, model): (view, model)
-            for view, model in jobs
+            for view, model in pending
         }
         for future in as_completed(futures):
             results.append(future.result())
@@ -465,6 +474,7 @@ def run_c2(shared: Path, project: Path, output: Path, n_jobs: int) -> dict[str, 
         "jobs": len(results),
         "passed": sum(result["status"] == "PASS" for result in results),
         "failed_retained": sum(result["status"] != "PASS" for result in results),
+        "resumed_jobs": len(jobs) - len(pending),
         "test_accessed": False,
         "freeze_sha256": sha256_file(project / "configs/cpu_model_freeze_v1.json"),
     }
