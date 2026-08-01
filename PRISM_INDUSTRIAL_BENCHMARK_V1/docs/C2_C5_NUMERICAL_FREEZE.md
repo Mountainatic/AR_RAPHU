@@ -10,8 +10,13 @@ The canonical machine-readable contract is
 `configs/cpu_model_freeze_v1.json`. Its SHA256 must be recorded by every stage.
 No stage may override it from the CLI.
 
-Frozen SHA256:
-`9af20e322905415263717adaab1befde6c61f7162632b1268ae20f095b68b889`.
+The final hash is recorded after the pre-run computational-feasibility audit.
+That audit may reduce a declared maximum budget or replace a Cartesian scan by
+a result-independent staged scan, but cannot add candidates or inspect model
+validation results.
+
+Final frozen SHA256 after that audit:
+`aadd3caae821c5d000f22cdfc6291afe23a3c0fb5d4b5fd634e878d1cb02ddd6`.
 
 Key safeguards are:
 

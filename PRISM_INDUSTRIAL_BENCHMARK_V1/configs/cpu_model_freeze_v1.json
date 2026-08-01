@@ -24,8 +24,8 @@
       "predeclared_candidate_order"
     ],
     "fit_row_cap_default": 250000,
-    "fit_row_cap_svr": 50000,
-    "fit_row_cap_xgboost": 250000,
+    "fit_row_cap_svr": 12000,
+    "fit_row_cap_xgboost": 100000,
     "subsample_rule": "smallest_sha256_of_base_origin_id_within_training_fold",
     "prediction_row_policy": "all_immutable_rows"
   },
@@ -60,7 +60,8 @@
       "c": [0.1, 1.0, 10.0, 100.0, 1000.0],
       "gamma": [3.0517578125e-05, 0.00048828125, 0.0078125, 0.125, 2.0],
       "epsilon_standardized": 0.05,
-      "maximum_configurations": 25,
+      "selection": "c_scan_at_pilot_gamma_0.0078125_then_gamma_scan_at_frozen_c",
+      "maximum_configurations": 10,
       "complexity_key": ["smallest_c", "smallest_gamma"]
     },
     "xgboost": {
@@ -73,7 +74,8 @@
       "reg_lambda": 1.0,
       "tree_method": "hist",
       "nthread_per_fit": 1,
-      "maximum_configurations": 30,
+      "selection": "depth_learning_rate_scan_at_400_trees_then_estimator_scan_at_frozen_pair",
+      "maximum_configurations": 11,
       "complexity_key": ["smallest_max_depth", "fewest_estimators", "smallest_learning_rate"]
     }
   },
