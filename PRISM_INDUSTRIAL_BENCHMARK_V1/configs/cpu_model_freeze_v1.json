@@ -24,7 +24,9 @@
       "predeclared_candidate_order"
     ],
     "fit_row_cap_default": 250000,
-    "fit_row_cap_svr": 12000,
+    "selection_validation_row_cap_default": 50000,
+    "selection_validation_row_cap_svr": 20000,
+    "fit_row_cap_svr": 5000,
     "fit_row_cap_xgboost": 100000,
     "subsample_rule": "smallest_sha256_of_base_origin_id_within_training_fold",
     "prediction_row_policy": "all_immutable_rows"
@@ -51,6 +53,8 @@
     "dpls": {
       "lag_coverage_for_positive_h": [2, 4, 8],
       "lag_coverage_for_zero_h_in_delta": [4, 16, 64],
+      "lag_realization": "uniform_strict_past_lags",
+      "maximum_lags_per_channel": 16,
       "components": [1, 2, 4, 6, 8, 12, 16, 20],
       "maximum_joint_configurations": 24,
       "complexity_key": ["shortest_history", "smallest_components"]
