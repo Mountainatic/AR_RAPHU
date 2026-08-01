@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+shared/
+results_cpu/
+return/
+logs/
+checkpoints/
+raw_sources/
+*.parquet
+*.npy
+*.npz
+

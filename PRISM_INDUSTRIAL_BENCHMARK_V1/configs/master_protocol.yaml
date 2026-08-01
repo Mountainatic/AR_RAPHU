@@ -1,0 +1,66 @@
+{
+  "protocol_id": "PRISM_INDUSTRIAL_BENCHMARK_V1_STRICT_RESTART",
+  "protocol_status": "STAGE0_ONLY_UNTIL_ALL_FREEZE_GATES_PASS",
+  "raw_root": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources",
+  "target_contract": {
+    "definition": "future_window_mean_minus_current_window_mean",
+    "current_window_rule": "W0_equals_W",
+    "future_inputs_allowed": false,
+    "centered_windows_allowed": false
+  },
+  "datasets": {
+    "tep": {
+      "files": [
+        "tep_rieth/TEP_FaultFree_Training.RData",
+        "tep_rieth/TEP_FaultFree_Testing.RData",
+        "tep_rieth/TEP_Faulty_Training.RData",
+        "tep_rieth/TEP_Faulty_Testing.RData"
+      ],
+      "cadence_seconds": 180,
+      "cadence_basis": "Rieth dataset metadata: samples every 3 minutes",
+      "primary_tasks": ["TEP_G12"],
+      "split_unit": ["source_partition", "faultNumber", "simulationRun"]
+    },
+    "debutanizer": {
+      "files": ["industrial-debutanizer-soft-sensor/data/debutanizer_data.txt"],
+      "cadence_seconds": 360,
+      "cadence_basis": "Fortuna dataset literature: sampling time 6 minutes",
+      "pretranslated_target_samples": 8,
+      "primary_tasks": ["DEB_C4"],
+      "split_rule": "chronological_60_20_20"
+    },
+    "sru": {
+      "files": ["sru/SRU_data.txt"],
+      "process_cadence_seconds": 60,
+      "quality_measurement_cadence_seconds": 1800,
+      "label_representation_status": "UNRESOLVED_DENSE_FILE_VS_30MIN_ANALYZER",
+      "primary_tasks": ["SRU_H2S", "SRU_SO2"],
+      "split_rule": "chronological_60_20_20"
+    },
+    "pmsm": {
+      "files": ["pmsm_original/measures_v2.csv"],
+      "cadence_seconds": 0.5,
+      "cadence_basis": "Kaggle dataset card: 2 Hz",
+      "primary_tasks": ["PMSM_PM5"],
+      "split_unit": "profile_id"
+    },
+    "metropt": {
+      "files": ["metropt/metropt_3.zip"],
+      "cadence_seconds": 10,
+      "cadence_basis": "raw timestamp audit; official prose conflicts between 1 Hz and 0.1 Hz",
+      "primary_tasks": ["METRO_P60", "METRO_OIL20"],
+      "split_rule": {
+        "train_months": ["2020-02", "2020-03", "2020-04"],
+        "validation_months": ["2020-05"],
+        "test_months": ["2020-06", "2020-07", "2020-08"]
+      }
+    }
+  },
+  "stage_order": ["C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7"],
+  "numerics": {
+    "scientific_dtype": "float64",
+    "blas_threads_per_worker": 1,
+    "default_n_jobs_32_vcpu": 20
+  }
+}
+
