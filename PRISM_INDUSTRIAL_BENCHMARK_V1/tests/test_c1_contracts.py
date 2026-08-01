@@ -20,6 +20,7 @@ from prism_benchmark.c1_contracts import (
 import pandas as pd
 
 from prism_benchmark.c1_builder import _sample_frame, normalize_tep_index_dtypes
+from prism_benchmark.c1_validate import _forbidden_raw_files
 
 
 def test_half_open_target_has_exact_w0_and_w_samples() -> None:
@@ -108,3 +109,10 @@ def test_tep_index_schema_is_stable_across_rdata_numeric_decoders() -> None:
 
     assert normalized_float.dtypes.to_dict() == normalized_int.dtypes.to_dict()
     assert all(str(normalized_float[column].dtype) == "int64" for column in ("faultNumber", "simulationRun", "sample"))
+
+
+def test_generated_sample_count_csv_is_not_misclassified_as_raw(tmp_path) -> None:
+    (tmp_path / "C1_SAMPLE_COUNTS.csv").write_text("head,rows\nA,1\n", encoding="utf-8")
+    assert _forbidden_raw_files(tmp_path) == []
+    (tmp_path / "raw.csv").write_text("secret\n", encoding="utf-8")
+    assert [path.name for path in _forbidden_raw_files(tmp_path)] == ["raw.csv"]

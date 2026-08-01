@@ -35,6 +35,21 @@ SAMPLE_COLUMNS = [
     "y_true",
 ]
 
+GENERATED_CSV_ALLOWLIST = {"C1_SAMPLE_COUNTS.csv"}
+
+
+def _forbidden_raw_files(root: Path) -> list[Path]:
+    forbidden_suffixes = {".rdata", ".xlsx", ".xls", ".zip"}
+    result: list[Path] = []
+    for path in root.rglob("*"):
+        if not path.is_file():
+            continue
+        if path.suffix.lower() in forbidden_suffixes:
+            result.append(path)
+        elif path.suffix.lower() == ".csv" and str(path.relative_to(root)) not in GENERATED_CSV_ALLOWLIST:
+            result.append(path)
+    return result
+
 
 def _sample_rows(path: Path) -> list[dict[str, Any]]:
     parquet = pq.ParquetFile(path)
@@ -161,7 +176,7 @@ def validate_shared_data(root: Path, output: Path | None = None) -> dict[str, An
     for relative in expected_locked:
         if os.stat(root / relative).st_mode & 0o222:
             failures.append(f"LOCKBOX_WRITABLE:{relative}")
-    forbidden = [path for path in root.rglob("*") if path.suffix.lower() in {".rdata", ".xlsx", ".xls", ".csv", ".zip"}]
+    forbidden = _forbidden_raw_files(root)
     if forbidden:
         failures.append("RAW_FILES_PRESENT:" + ",".join(path.name for path in forbidden))
 
