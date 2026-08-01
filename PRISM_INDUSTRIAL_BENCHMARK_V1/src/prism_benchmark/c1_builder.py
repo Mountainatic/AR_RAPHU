@@ -208,10 +208,21 @@ def _tep_entities(raw_root: Path) -> Iterator[tuple[str, str, pd.DataFrame]]:
     for path in paths:
         objects = pyreadr.read_r(path)
         _, frame = next(iter(objects.items()))
+        frame = normalize_tep_index_dtypes(frame)
         partition = "Training" if "Training" in path.name else "Testing"
         for (fault, run), group in frame.groupby(["faultNumber", "simulationRun"], sort=True):
             entity_id = f"{partition}|fault={int(fault)}|run={int(run)}"
             yield entity_id, path.stem, group.sort_values("sample").reset_index(drop=True)
+
+
+def normalize_tep_index_dtypes(frame: pd.DataFrame) -> pd.DataFrame:
+    frame = frame.copy()
+    for column in ("faultNumber", "simulationRun", "sample"):
+        values = pd.to_numeric(frame[column], errors="raise")
+        if not np.equal(values, np.floor(values)).all():
+            raise ValueError(f"TEP index column {column} contains non-integer values")
+        frame[column] = values.astype(np.int64)
+    return frame
 
 
 def _pmsm_entities(raw_root: Path) -> Iterator[tuple[str, str, pd.DataFrame]]:

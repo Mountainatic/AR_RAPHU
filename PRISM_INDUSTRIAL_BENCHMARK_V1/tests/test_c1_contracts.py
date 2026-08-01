@@ -17,7 +17,9 @@ from prism_benchmark.c1_contracts import (
     target_change,
     valid_origins_for_interval,
 )
-from prism_benchmark.c1_builder import _sample_frame
+import pandas as pd
+
+from prism_benchmark.c1_builder import _sample_frame, normalize_tep_index_dtypes
 
 
 def test_half_open_target_has_exact_w0_and_w_samples() -> None:
@@ -92,3 +94,14 @@ def test_view_id_changes_with_availability_and_proxy_but_base_origin_does_not() 
     assert len({main.loc[0, "view_sample_id"], delayed.loc[0, "view_sample_id"], proxy.loc[0, "view_sample_id"]}) == 3
     assert main.loc[0, "latest_available_target_index"] == 2
     assert delayed.loc[0, "latest_available_target_index"] == -8
+
+
+def test_tep_index_schema_is_stable_across_rdata_numeric_decoders() -> None:
+    float_frame = pd.DataFrame({"faultNumber": [0.0], "simulationRun": [1.0], "sample": [1.0], "xmeas_1": [2.0]})
+    int_frame = pd.DataFrame({"faultNumber": np.asarray([0], dtype=np.int32), "simulationRun": [1.0], "sample": np.asarray([1], dtype=np.int32), "xmeas_1": [2.0]})
+
+    normalized_float = normalize_tep_index_dtypes(float_frame)
+    normalized_int = normalize_tep_index_dtypes(int_frame)
+
+    assert normalized_float.dtypes.to_dict() == normalized_int.dtypes.to_dict()
+    assert all(str(normalized_float[column].dtype) == "int64" for column in ("faultNumber", "simulationRun", "sample"))
