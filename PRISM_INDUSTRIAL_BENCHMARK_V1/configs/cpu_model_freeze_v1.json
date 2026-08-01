@@ -221,6 +221,10 @@
     }
   },
   "c6": {
+    "finalist_policy": "predeclared_primary_models_not_development_winners",
+    "input_only_finalists": ["PERSISTENCE", "PRISM_CHANNEL_SPECIFIC"],
+    "dynamic_finalists": ["PERSISTENCE", "AR", "PRISM_PHYSICS_FIRST", "PRISM_K_JOINT_AR"],
+    "ood_policy": "apply_same_frozen_models_to_registered_ood_without_refit",
     "bootstrap_replicates": 500,
     "bootstrap_seed": 20260802,
     "block_lengths": ["h_plus_w", "two_times_h_plus_w", "quarter_longest_core_history"],

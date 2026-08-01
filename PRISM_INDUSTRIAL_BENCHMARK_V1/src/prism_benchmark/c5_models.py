@@ -107,7 +107,8 @@ def _fit_frozen_channel_shapes(
     evaluation_parts = []
     for contract in contracts:
         channel = contract["channel"]
-        accessor = BaseAccessor(shared, view.head.dataset, "train", [channel])
+        fit_split = "validation" if "split" in train_samples and bool((train_samples["split"] == "validation").any()) else "train"
+        accessor = BaseAccessor(shared, view.head.dataset, fit_split, [channel])
         evaluation_split = str(evaluation_samples["split"].iloc[0]) if "split" in evaluation_samples else "train"
         evaluation_accessor = BaseAccessor(shared, view.head.dataset, evaluation_split, [channel])
         train_values, _ = profile_values(accessor, train_samples, channel, tuple(contract["selected_profile"]), int(contract["selected_m_tau"]))
