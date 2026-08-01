@@ -25,7 +25,7 @@ def main() -> int:
     if args.output.exists():
         shutil.rmtree(args.output)
     args.output.mkdir(parents=True)
-    for name in ("src", "scripts", "configs", "tests", "README.md", "requirements.txt"):
+    for name in ("src", "scripts", "configs", "tests", "README.md", "requirements.txt", "PRISM_INDUSTRIAL_BENCHMARK_V1_CPU_PLAN.md", "PRISM_INDUSTRIAL_BENCHMARK_V1_MASTER_PROTOCOL.md", "PRISM_INDUSTRIAL_BENCHMARK_V1_EXPERIMENT_MATRIX.csv", "PRISM_INDUSTRIAL_BENCHMARK_V1_GPU_PLAN.md", "MANIFEST.json", "SHA256SUMS.txt"):
         src = args.project / name
         if not src.exists():
             continue
@@ -56,4 +56,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
