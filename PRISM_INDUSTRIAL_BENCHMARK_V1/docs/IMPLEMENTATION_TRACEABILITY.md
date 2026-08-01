@@ -10,7 +10,7 @@ Status values are `NOT_STARTED`, `IMPLEMENTED`, `TESTED`, `RUN`, `PASS`,
 | Exact task definitions and target change | Master 4; Theory 1.5 | `src/prism_benchmark/c1_contracts.py` | `test_c1_contracts.py` | `TASK_REGISTRY.json`, `targets/` | PASS |
 | Immutable split/sample IDs and purge | Master 9, 10; Theory 2.6, 8 | `src/prism_benchmark/c1_builder.py` | unit plus independent package validator | `SPLIT_REGISTRY.json`, `SAMPLE_ID_REGISTRY.json` | PASS |
 | Input-only vs dynamic views | Master 5 | `src/prism_benchmark/c1_builder.py` | view ID, proxy and sample-count isolation checks | `dataset_views/` | PASS |
-| Mean/Persistence/Seasonal/Trend | CPU 4.1, C2 | C2 baselines | analytic fixtures | `SIMPLE_BASELINES.csv` | BLOCKED |
+| Mean/Persistence/Seasonal/Trend | CPU 4.1, C2 | `cpu_simple_baselines.py` | `test_cpu_simple_baselines.py` | `SIMPLE_BASELINES_DEVELOPMENT.csv` | IMPLEMENTED |
 | Ridge/PLS/DPLS/SVR/XGBoost | CPU 4.2, C2 | C2 soft sensor | leakage/budget/one-SE | `CLASSICAL_SOFT_SENSOR.csv` | BLOCKED |
 | AR/ARX/NARX/N4SID/Hammerstein/HW | CPU 4.3, C3 | C3 sysid | nestedness/stability | `SYSTEM_IDENTIFICATION.csv` | BLOCKED |
 | Per-channel profile and scale-matched AR | Master 7; CPU 5--6, C4 | C4 profile audit | profile isolation/sample equality | `PRISM_PROFILE_AUDIT.csv`, `AR_PROFILES/` | BLOCKED |

@@ -8,3 +8,13 @@
 - `PRISM_INDUSTRIAL_BENCHMARK_V1_EXPERIMENT_MATRIX.csv`：冻结任务矩阵。
 
 状态：`PRE-REGISTERED / NO RESULTS`。
+
+严格 CPU 流水线从已验证 C1 共享包继续：
+
+```bash
+bash RUN_CPU_CHAIN.sh
+```
+
+该入口可恢复地登记阶段状态，锁箱保持关闭。当前只自动运行已冻结的 C1
+复核与 C2 Mean/Persistence 开发集基线；遇到尚未冻结的 C2--C5 数值门禁时
+写入 `CHAIN_STATUS.json` 并停止，不会采用旧 smoke 默认值。
