@@ -10,12 +10,12 @@ Status values are `NOT_STARTED`, `IMPLEMENTED`, `TESTED`, `RUN`, `PASS`,
 | Exact task definitions and target change | Master 4; Theory 1.5 | `src/prism_benchmark/c1_contracts.py` | `test_c1_contracts.py` | `TASK_REGISTRY.json`, `targets/` | PASS |
 | Immutable split/sample IDs and purge | Master 9, 10; Theory 2.6, 8 | `src/prism_benchmark/c1_builder.py` | unit plus independent package validator | `SPLIT_REGISTRY.json`, `SAMPLE_ID_REGISTRY.json` | PASS |
 | Input-only vs dynamic views | Master 5 | `src/prism_benchmark/c1_builder.py` | view ID, proxy and sample-count isolation checks | `dataset_views/` | PASS |
-| Mean/Persistence/Seasonal/Trend | CPU 4.1, C2 | `cpu_simple_baselines.py` | `test_cpu_simple_baselines.py` | `SIMPLE_BASELINES_DEVELOPMENT.csv` | IMPLEMENTED |
-| Ridge/PLS/DPLS/SVR/XGBoost | CPU 4.2, C2 | C2 soft sensor | leakage/budget/one-SE | `CLASSICAL_SOFT_SENSOR.csv` | BLOCKED |
-| AR/ARX/NARX/N4SID/Hammerstein/HW | CPU 4.3, C3 | C3 sysid | nestedness/stability | `SYSTEM_IDENTIFICATION.csv` | BLOCKED |
-| Per-channel profile and scale-matched AR | Master 7; CPU 5--6, C4 | C4 profile audit | profile isolation/sample equality | `PRISM_PROFILE_AUDIT.csv`, `AR_PROFILES/` | BLOCKED |
-| Exact nested Urysohn ladder | Theory M3--M8, N4; CPU 5.2 | C4 Urysohn | exact nesting/rank/FP64 | `KERNELS/`, `NUMERICAL_CERTIFICATES/` | BLOCKED |
-| Physics-First mature OOF residual | Theory P2--P7; CPU 5.3, C5 | C5 route I | rolling OOF/maturity/frozen-K/zero | `PRISM_MODELS.csv`, predictions | BLOCKED |
-| True K-Joint AR | Theory J1--J4; CPU 5.4, C5 | C5 route II | joint-gradient/nested-zero/head isolation | `PRISM_MODELS.csv`, predictions | BLOCKED |
-| Paired block bootstrap and Holm | Master 11; CPU C6 | C6 statistics | paired IDs/block semantics | `BOOTSTRAP/`, `CPU_FINAL_REPORT.md` | BLOCKED |
-| Raw-data exclusion and round-trip bundle | Master 13; CPU 11--12 | packager | manifest/hash/privacy round trip | return bundle | BLOCKED |
+| Mean/Persistence/Seasonal/Trend | CPU 4.1, C2 | `cpu_simple_baselines.py` | `test_cpu_simple_baselines.py` | `SIMPLE_BASELINES_DEVELOPMENT.csv` | TESTED |
+| Ridge/PLS/DPLS/SVR/XGBoost | CPU 4.2, C2 | `c2_models.py` | leakage/budget/one-SE | `CLASSICAL_SOFT_SENSOR_DEVELOPMENT.csv` | TESTED |
+| AR/ARX/NARX/N4SID/Hammerstein/HW | CPU 4.3, C3 | `c3_models.py` | nestedness/stability | `SYSTEM_IDENTIFICATION_DEVELOPMENT.csv` | TESTED |
+| Per-channel profile and scale-matched AR | Master 7; CPU 5--6, C4 | `c4_prism.py` | profile isolation/sample equality | `PRISM_PROFILE_AUDIT.csv`, joint predictions | TESTED |
+| Exact nested Urysohn ladder | Theory M3--M8, N4; CPU 5.2 | `urysohn.py`, `c4_prism.py` | exact nesting/rank/FP64 | channel contracts and numerical certificates | TESTED |
+| Physics-First mature OOF residual | Theory P2--P7; CPU 5.3, C5 | `c5_models.py` | rolling OOF/maturity/frozen-K/zero | OOF residuals and predictions | TESTED |
+| True K-Joint AR | Theory J1--J4; CPU 5.4, C5 | `c5_models.py` | Urysohn subspace/nested-zero/head isolation | predictions and selection contract | TESTED |
+| Paired block bootstrap and Holm | Master 11; CPU C6 | `c6_final.py` | paired IDs/block semantics | `BOOTSTRAP_PAIRED.csv`, `CPU_FINAL_REPORT.md` | TESTED |
+| Raw-data exclusion and round-trip bundle | Master 13; CPU 11--12 | `build_cpu_bundle.py` | manifest/hash/privacy round trip | return bundle | TESTED |
