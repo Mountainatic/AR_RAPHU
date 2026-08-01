@@ -1,11 +1,9 @@
 {
   "datasets": [
     {
-      "blockers": [
-        "TEP_EXACT_RUN_SPLIT_NOT_FROZEN"
-      ],
+      "blockers": [],
       "dataset": "tep",
-      "decision": "BLOCKED",
+      "decision": "PASS",
       "raw_hashes": [
         {
           "bytes": 24678017,
@@ -27,7 +25,8 @@
           "relative_path": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources/tep_rieth/TEP_Faulty_Testing.RData",
           "sha256": "c2f1aabc77498efda4d5f9ad81ecc829e2fcd98752b84cf5b2a06558cabacc36"
         }
-      ]
+      ],
+      "split_registry_sha256": "298f075084adb9af507721dfdcec66c53d2a0365751f0ad662bcb86d535e46c2"
     },
     {
       "blockers": [],
@@ -39,7 +38,8 @@
           "relative_path": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources/industrial-debutanizer-soft-sensor/data/debutanizer_data.txt",
           "sha256": "e963abcd668e2bc3282815ffd21f73b4b4ccd89d34600feaecc6d5a42aad3438"
         }
-      ]
+      ],
+      "split_registry_sha256": "81187ee4b431aa55d07ae265986a663bb81355516337c893c171bc0fcb2b1e7c"
     },
     {
       "blockers": [],
@@ -51,21 +51,21 @@
           "relative_path": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources/sru/SRU_data.txt",
           "sha256": "6a8f1a632e7618b5aee2a3b50e80bad5af8c5730b17bc40c6072c8033f30a1ef"
         }
-      ]
+      ],
+      "split_registry_sha256": "84cb3c0596c426483216af6587c51dc01351b89d7878758cc70c96d9aaaca09d"
     },
     {
-      "blockers": [
-        "PMSM_EXACT_PROFILE_SPLIT_NOT_FROZEN"
-      ],
+      "blockers": [],
       "dataset": "pmsm",
-      "decision": "BLOCKED",
+      "decision": "PASS",
       "raw_hashes": [
         {
           "bytes": 300061411,
           "relative_path": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources/pmsm_original/measures_v2.csv",
           "sha256": "78f3d150f0f2ad9c5dc7ff24dd12c00d386ad530f48c1589ad24fcd88867d3ad"
         }
-      ]
+      ],
+      "split_registry_sha256": "a571e744884e58817ade9512f97cf3e89e9e18b493d9d9a49182aac21a1a9842"
     },
     {
       "blockers": [],
@@ -77,9 +77,10 @@
           "relative_path": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources/metropt/metropt_3.zip",
           "sha256": "aab991a970e58210de853bb8078ce0e63abb4d9412fdc5c79792dae3d8e1721a"
         }
-      ]
+      ],
+      "split_registry_sha256": "145a264f35f58c3839812b02b50d9097053a035bcfbb73d8f9c62454216347c9"
     }
   ],
   "stage": "C0",
-  "status": "BLOCKED"
+  "status": "PASS"
 }

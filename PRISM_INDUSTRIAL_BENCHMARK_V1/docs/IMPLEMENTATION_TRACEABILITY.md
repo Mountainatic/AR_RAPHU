@@ -7,8 +7,8 @@ Status values are `NOT_STARTED`, `IMPLEMENTED`, `TESTED`, `RUN`, `PASS`,
 |---|---|---|---|---|---|
 | Five-dataset source/hash/license freeze | Master 3, 12; CPU 2, C0 | `src/prism_benchmark/stage0.py` | `test_stage0.py` | `dataset_registry/*` | PASS |
 | Cadence and run/profile/month boundaries | Master 3, 9; CPU 2 | `stage0.py` | `test_stage0.py` | `CADENCE_AUDIT.json`, `RUN_BOUNDARIES.csv` | PASS |
-| Exact task definitions and target change | Master 4; Theory 1.5 | C1 target builder | leakage/target oracle tests | `TASK_REGISTRY.json`, `targets/` | BLOCKED |
-| Immutable split/sample IDs and purge | Master 9, 10; Theory 2.6, 8 | C1 data protocol | split disjointness and boundary tests | `SPLIT_REGISTRY.json`, `SAMPLE_ID_REGISTRY.json` | BLOCKED |
+| Exact task definitions and target change | Master 4; Theory 1.5 | C1 target builder | leakage/target oracle tests | `TASK_REGISTRY.json`, `targets/` | NOT_STARTED |
+| Immutable split/sample IDs and purge | Master 9, 10; Theory 2.6, 8 | C1 data protocol | split disjointness and boundary tests | `SPLIT_REGISTRY.json`, `SAMPLE_ID_REGISTRY.json` | NOT_STARTED |
 | Input-only vs dynamic views | Master 5 | C1 view builder | proxy/history isolation | `dataset_views/` | BLOCKED |
 | Mean/Persistence/Seasonal/Trend | CPU 4.1, C2 | C2 baselines | analytic fixtures | `SIMPLE_BASELINES.csv` | BLOCKED |
 | Ridge/PLS/DPLS/SVR/XGBoost | CPU 4.2, C2 | C2 soft sensor | leakage/budget/one-SE | `CLASSICAL_SOFT_SENSOR.csv` | BLOCKED |

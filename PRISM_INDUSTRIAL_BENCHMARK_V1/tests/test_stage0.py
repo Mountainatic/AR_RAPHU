@@ -11,7 +11,16 @@ import pandas as pd
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from prism_benchmark.stage0 import audit_metropt, read_numeric_text, sha256_file, write_json
+from prism_benchmark.stage0 import (
+    audit_metropt,
+    build_pmsm_split_registry,
+    build_tep_split_registry,
+    canonical_json_bytes,
+    largest_remainder_counts,
+    read_numeric_text,
+    sha256_file,
+    write_json,
+)
 
 
 def test_numeric_text_reader_keeps_only_exact_width_rows(tmp_path: Path) -> None:
@@ -58,3 +67,48 @@ def test_metropt_audit_freezes_fault_windows(tmp_path: Path) -> None:
         ["2020-06-05 10:00", "2020-06-07 14:30"],
         ["2020-07-15 14:30", "2020-07-15 19:00"],
     ]
+
+
+def test_tep_split_is_exact_disjoint_and_holds_out_unknown_faults() -> None:
+    split = build_tep_split_registry()
+
+    assert split["protocol"] == "TEP_RUN_FAULT_HOLDOUT_V1"
+    assert len(split["train_run_ids"]) == 16 * 400
+    assert len(split["validation_run_ids"]) == 16 * 100
+    assert len(split["main_test_run_ids"]) == 16 * 500
+    assert len(split["unseen_disturbance_ood_run_ids"]) == 5 * 500
+    assert len(split["discarded_run_ids"]) == 5 * 500
+    groups = [
+        set(split[key])
+        for key in (
+            "train_run_ids",
+            "validation_run_ids",
+            "main_test_run_ids",
+            "unseen_disturbance_ood_run_ids",
+            "discarded_run_ids",
+        )
+    ]
+    assert all(not left.intersection(right) for i, left in enumerate(groups) for right in groups[i + 1 :])
+    for fault in range(16):
+        assert f"Training|fault={fault}|run=400" in groups[0]
+        assert f"Training|fault={fault}|run=401" in groups[1]
+    assert all("fault=16|" not in run_id for run_id in split["train_run_ids"])
+    assert all("fault=16|" not in run_id for run_id in split["validation_run_ids"])
+
+
+def test_pmsm_split_is_canonical_stratified_and_deterministic() -> None:
+    profile_rows = {profile_id: 100 + profile_id for profile_id in range(1, 16)}
+    first = build_pmsm_split_registry(profile_rows, "a" * 64)
+    second = build_pmsm_split_registry(dict(reversed(list(profile_rows.items()))), "a" * 64)
+
+    assert canonical_json_bytes(first) == canonical_json_bytes(second)
+    assert largest_remainder_counts(5) == {"train": 3, "validation": 1, "test": 1}
+    assert [len(first["duration_strata"][name]) for name in ("short", "medium", "long")] == [5, 5, 5]
+    train = set(first["train_profile_ids"])
+    validation = set(first["validation_profile_ids"])
+    test = set(first["test_profile_ids"])
+    assert not train.intersection(validation)
+    assert not train.intersection(test)
+    assert not validation.intersection(test)
+    assert train | validation | test == set(profile_rows)
+    assert (len(train), len(validation), len(test)) == (9, 3, 3)

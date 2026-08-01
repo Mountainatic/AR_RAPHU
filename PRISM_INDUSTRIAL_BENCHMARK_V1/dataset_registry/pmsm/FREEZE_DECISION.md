@@ -1,7 +1,7 @@
 # pmsm freeze decision
 
-Status: `BLOCKED`
+Status: `PASS`
 
 Blockers:
 
-- `PMSM_EXACT_PROFILE_SPLIT_NOT_FROZEN`
+- None

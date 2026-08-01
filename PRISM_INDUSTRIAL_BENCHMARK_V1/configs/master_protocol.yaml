@@ -1,6 +1,6 @@
 {
   "protocol_id": "PRISM_INDUSTRIAL_BENCHMARK_V1_STRICT_RESTART",
-  "protocol_status": "STAGE0_ONLY_UNTIL_ALL_FREEZE_GATES_PASS",
+  "protocol_status": "C0_APPROVED_C1_AUTHORIZED",
   "raw_root": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources",
   "target_contract": {
     "definition": "future_window_mean_minus_current_window_mean",
@@ -21,7 +21,16 @@
       "target_record_time_main": true,
       "target_analyzer_maturity_sensitivity_seconds": 900,
       "primary_tasks": ["TEP_G12"],
-      "split_unit": ["source_partition", "faultNumber", "simulationRun"]
+      "split_unit": ["source_partition", "faultNumber", "simulationRun"],
+      "split_protocol": "TEP_RUN_FAULT_HOLDOUT_V1",
+      "split_rule": {
+        "train": "Training fault 0-15 simulationRun 1-400",
+        "validation": "Training fault 0-15 simulationRun 401-500",
+        "main_test": "Testing fault 0-15 simulationRun 1-500",
+        "unseen_disturbance_ood": "Testing fault 16-20 simulationRun 1-500",
+        "discarded": "Training fault 16-20 simulationRun 1-500"
+      },
+      "test_access": "after_model_hyperparameter_and_profile_freeze_only"
     },
     "debutanizer": {
       "files": ["industrial-debutanizer-soft-sensor/data/debutanizer_data.txt"],
@@ -47,7 +56,9 @@
       "cadence_seconds": 0.5,
       "cadence_basis": "Kaggle dataset card: 2 Hz",
       "primary_tasks": ["PMSM_PM5"],
-      "split_unit": "profile_id"
+      "split_unit": "profile_id",
+      "split_protocol": "PRISM_PMSM_SPLIT_V1",
+      "split_rule": "complete profiles; rank by (rows,profile_id) into equal short/medium/long strata; SHA256 protocol+raw_hash+canonical_id order; per-stratum largest-remainder 60/20/20 with train-validation-test tie priority"
     },
     "metropt": {
       "files": ["metropt/metropt_3.zip"],

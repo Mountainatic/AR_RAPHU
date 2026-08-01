@@ -31,6 +31,22 @@ def write_json(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def canonical_json_bytes(value: Any) -> bytes:
+    return json.dumps(
+        value,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode("utf-8")
+
+
+def write_canonical_json(path: Path, value: Any) -> str:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = canonical_json_bytes(value)
+    path.write_bytes(payload)
+    return hashlib.sha256(payload).hexdigest()
+
+
 def write_csv(path: Path, rows: Iterable[dict[str, Any]], fieldnames: list[str]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
@@ -92,6 +108,109 @@ def _common_quality(frame: pd.DataFrame, duplicate_subset: list[str] | None = No
         "missing_by_column": {str(k): int(v) for k, v in frame.isna().sum().items()},
         "duplicate_rows": duplicate_rows,
         "constant_columns": constants,
+    }
+
+
+def _tep_run_id(partition: str, fault_number: int, simulation_run: int) -> str:
+    return f"{partition}|fault={fault_number}|run={simulation_run}"
+
+
+def build_tep_split_registry() -> dict[str, Any]:
+    def ids(partition: str, faults: range, runs: range) -> list[str]:
+        return [
+            _tep_run_id(partition, fault_number, simulation_run)
+            for fault_number in faults
+            for simulation_run in runs
+        ]
+
+    registry = {
+        "protocol": "TEP_RUN_FAULT_HOLDOUT_V1",
+        "source_doi": "10.7910/DVN/6C3JR1",
+        "unit": ["source_partition", "faultNumber", "simulationRun"],
+        "train_run_ids": ids("Training", range(0, 16), range(1, 401)),
+        "validation_run_ids": ids("Training", range(0, 16), range(401, 501)),
+        "main_test_run_ids": ids("Testing", range(0, 16), range(1, 501)),
+        "unseen_disturbance_ood_run_ids": ids("Testing", range(16, 21), range(1, 501)),
+        "discarded_run_ids": ids("Training", range(16, 21), range(1, 501)),
+        "test_access_rule": "ONLY_AFTER_MODEL_HYPERPARAMETER_AND_PROFILE_FREEZE",
+        "reporting_rule": "MAIN_TEST_AND_UNSEEN_OOD_SEPARATE",
+    }
+    assigned = [
+        set(registry["train_run_ids"]),
+        set(registry["validation_run_ids"]),
+        set(registry["main_test_run_ids"]),
+        set(registry["unseen_disturbance_ood_run_ids"]),
+        set(registry["discarded_run_ids"]),
+    ]
+    if any(left.intersection(right) for i, left in enumerate(assigned) for right in assigned[i + 1 :]):
+        raise AssertionError("TEP run allocation is not disjoint")
+    return registry
+
+
+def largest_remainder_counts(n_items: int) -> dict[str, int]:
+    if n_items < 0:
+        raise ValueError("n_items must be nonnegative")
+    names = ("train", "validation", "test")
+    numerators = (3, 1, 1)
+    counts = {name: numerator * n_items // 5 for name, numerator in zip(names, numerators)}
+    remainders = {name: numerator * n_items % 5 for name, numerator in zip(names, numerators)}
+    remaining = n_items - sum(counts.values())
+    priority = {name: index for index, name in enumerate(names)}
+    order = sorted(names, key=lambda name: (-remainders[name], priority[name]))
+    for name in order[:remaining]:
+        counts[name] += 1
+    return counts
+
+
+def build_pmsm_split_registry(profile_rows: dict[int, int], raw_file_sha256: str) -> dict[str, Any]:
+    if not profile_rows:
+        raise ValueError("PMSM requires at least one eligible profile")
+    ordered = sorted(profile_rows, key=lambda profile_id: (profile_rows[profile_id], profile_id))
+    base, extra = divmod(len(ordered), 3)
+    stratum_sizes = [base + (1 if index < extra else 0) for index in range(3)]
+    strata: dict[str, list[int]] = {}
+    cursor = 0
+    for name, size in zip(("short", "medium", "long"), stratum_sizes):
+        strata[name] = ordered[cursor : cursor + size]
+        cursor += size
+
+    allocations = {"train": [], "validation": [], "test": []}
+    profile_hashes: dict[str, str] = {}
+    for stratum_name in ("short", "medium", "long"):
+        hashed: list[tuple[str, int]] = []
+        for profile_id in strata[stratum_name]:
+            canonical_id = str(profile_id)
+            payload = f"PRISM_PMSM_SPLIT_V1|{raw_file_sha256}|{canonical_id}".encode("utf-8")
+            digest = hashlib.sha256(payload).hexdigest()
+            profile_hashes[canonical_id] = digest
+            hashed.append((digest, profile_id))
+        hashed.sort()
+        ordered_ids = [profile_id for _, profile_id in hashed]
+        counts = largest_remainder_counts(len(ordered_ids))
+        train_stop = counts["train"]
+        validation_stop = train_stop + counts["validation"]
+        allocations["train"].extend(ordered_ids[:train_stop])
+        allocations["validation"].extend(ordered_ids[train_stop:validation_stop])
+        allocations["test"].extend(ordered_ids[validation_stop:])
+
+    assigned = [set(allocations[name]) for name in ("train", "validation", "test")]
+    if any(left.intersection(right) for i, left in enumerate(assigned) for right in assigned[i + 1 :]):
+        raise AssertionError("PMSM profile allocation is not disjoint")
+    if set().union(*assigned) != set(profile_rows):
+        raise AssertionError("PMSM profile allocation is not exhaustive")
+    return {
+        "protocol": "PRISM_PMSM_SPLIT_V1",
+        "raw_file_sha256": raw_file_sha256,
+        "sampling_hz": 2,
+        "eligible_profiles": sorted(profile_rows),
+        "profile_rows": {str(profile_id): profile_rows[profile_id] for profile_id in sorted(profile_rows)},
+        "duration_strata": strata,
+        "profile_hashes": profile_hashes,
+        "train_profile_ids": allocations["train"],
+        "validation_profile_ids": allocations["validation"],
+        "test_profile_ids": allocations["test"],
+        "allocation_scope": "LARGEST_REMAINDER_WITHIN_EACH_DURATION_STRATUM",
+        "allocation_priority_on_equal_remainder": ["train", "validation", "test"],
     }
 
 
@@ -171,20 +290,15 @@ def audit_tep(raw_root: Path) -> AuditResult:
             "sensitivity": "analyzer_maturity_15_minutes",
             "maturity_delay_seconds": 900,
         },
-        split_registry={
-            "unit": ["source_file", "faultNumber", "simulationRun"],
-            "rule": "complete_run_nominal_disturbance_stratified",
-            "exact_ids": "PENDING_STAGE0_FREEZE",
-            "unseen_disturbance_ood": "PENDING_STAGE0_FREEZE",
-        },
+        split_registry=build_tep_split_registry(),
         source_license_markdown=(
             "# TEP source and license\n\n"
             "Canonical data: Rieth et al. Tennessee Eastman Process Simulation Data, "
             "Harvard Dataverse DOI `10.7910/DVN/6C3JR1`. The local four RData files "
             "are never redistributed by this project.\n"
         ),
-        decision="BLOCKED",
-        blockers=["TEP_EXACT_RUN_SPLIT_NOT_FROZEN"],
+        decision="PASS",
+        blockers=[],
     )
 
 
@@ -287,13 +401,16 @@ def audit_sru(raw_root: Path) -> AuditResult:
 def audit_pmsm(raw_root: Path) -> AuditResult:
     path = raw_root / "pmsm_original/measures_v2.csv"
     frame = pd.read_csv(path)
+    raw_file_sha256 = sha256_file(path)
     expected = {"ambient", "coolant", "u_d", "u_q", "i_d", "i_q", "motor_speed", "torque", "pm", "profile_id"}
     missing_expected = sorted(expected.difference(frame.columns))
     if missing_expected:
         raise ValueError(f"PMSM missing expected columns: {missing_expected}")
+    grouped_sizes = frame.groupby("profile_id", sort=True).size()
+    profile_rows = {int(profile): int(size) for profile, size in grouped_sizes.items()}
     boundaries = [
-        {"profile_id": int(profile), "samples": int(size), "duration_seconds": float(size * 0.5)}
-        for profile, size in frame.groupby("profile_id", sort=True).size().items()
+        {"profile_id": profile, "samples": size, "duration_seconds": float(size * 0.5)}
+        for profile, size in profile_rows.items()
     ]
     primary = {"ambient", "coolant", "u_d", "u_q", "i_d", "i_q", "motor_speed", "torque"}
     secondary = {"stator_winding", "stator_tooth", "stator_yoke"}
@@ -313,15 +430,15 @@ def audit_pmsm(raw_root: Path) -> AuditResult:
         boundaries=boundaries,
         data_quality=_common_quality(frame),
         target_availability={"target": "pm", "main": "current_target_available"},
-        split_registry={"unit": "profile_id", "exact_ids": "PENDING_STAGE0_DURATION_COMPLETENESS_ONLY_ALLOCATION"},
+        split_registry=build_pmsm_split_registry(profile_rows, raw_file_sha256),
         source_license_markdown=(
             "# PMSM source and license\n\n"
             "Kaggle `wkirgsn/electric-motor-temperature`, dataset version containing "
             "`measures_v2.csv`; license CC BY-SA 4.0. Raw data is excluded from all "
             "return packages.\n"
         ),
-        decision="BLOCKED",
-        blockers=["PMSM_EXACT_PROFILE_SPLIT_NOT_FROZEN"],
+        decision="PASS",
+        blockers=[],
     )
 
 
@@ -425,7 +542,15 @@ def materialize(result: AuditResult, output_root: Path) -> dict[str, Any]:
     write_csv(out / "RUN_BOUNDARIES.csv", result.boundaries, boundary_fields)
     write_json(out / "MISSING_AND_DUPLICATE_AUDIT.json", result.data_quality)
     write_json(out / "TARGET_AVAILABILITY.json", result.target_availability)
-    write_json(out / "SPLIT_REGISTRY.json", result.split_registry)
+    if result.dataset == "pmsm":
+        split_hash = write_canonical_json(out / "SPLIT_REGISTRY.json", result.split_registry)
+    else:
+        write_json(out / "SPLIT_REGISTRY.json", result.split_registry)
+        split_hash = sha256_file(out / "SPLIT_REGISTRY.json")
+    (out / "SPLIT_REGISTRY.json.sha256").write_text(
+        f"{split_hash}  SPLIT_REGISTRY.json\n",
+        encoding="utf-8",
+    )
     (out / "SOURCE_AND_LICENSE.md").write_text(result.source_license_markdown, encoding="utf-8")
     blocker_lines = [f"- `{blocker}`" for blocker in result.blockers] or ["- None"]
     decision_text = [
@@ -438,7 +563,13 @@ def materialize(result: AuditResult, output_root: Path) -> dict[str, Any]:
         *blocker_lines,
     ]
     (out / "FREEZE_DECISION.md").write_text("\n".join(decision_text) + "\n", encoding="utf-8")
-    return {"dataset": result.dataset, "decision": result.decision, "blockers": result.blockers, "raw_hashes": raw_hashes}
+    return {
+        "dataset": result.dataset,
+        "decision": result.decision,
+        "blockers": result.blockers,
+        "raw_hashes": raw_hashes,
+        "split_registry_sha256": split_hash,
+    }
 
 
 def run_stage0(raw_root: Path, output_root: Path, dataset: str = "all") -> dict[str, Any]:

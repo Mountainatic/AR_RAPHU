@@ -7,11 +7,16 @@ results.
 
 ## C0 metadata gate
 
-- `PMSM_SPLIT_IDS`: choose complete profile IDs using only ID, duration and
-  completeness, then freeze the exact lists before any target/model metric.
-- `TEP_SPLIT_IDS`: freeze complete `(source_partition,faultNumber,simulationRun)`
-  lists with nominal/disturbance stratification and an unseen-disturbance OOD
-  allocation before any target/model metric.
+Status: `C0_APPROVED` on 2026-08-01. There are no unresolved C0 gates.
+
+- `TEP_SPLIT_IDS`: frozen as `TEP_RUN_FAULT_HOLDOUT_V1`; Training faults 0--15
+  use runs 1--400 for train and 401--500 for validation, Testing faults 0--15
+  form the locked main test, Testing faults 16--20 form the separately reported
+  locked unseen-disturbance OOD set, and Training faults 16--20 are discarded.
+- `PMSM_SPLIT_IDS`: frozen as `PRISM_PMSM_SPLIT_V1`; all complete profiles are
+  ranked by `(row_count, profile_id)` into equal short/medium/long strata, then
+  ordered by the approved SHA256 construction and allocated within each stratum
+  by deterministic largest remainder at 60/20/20.
 
 Resolved before model inspection:
 
@@ -51,5 +56,6 @@ Resolved before model inspection:
 - Exact solver/initialization/refit contract for rank-R and K-Joint AR.
 - Exact residual-AR and Joint-AR state candidate families and orders.
 
-Until these items are frozen, C0 inspection is allowed; C1 model-ready shared
-data and all fitting are blocked.
+C1 shared-data implementation is authorized. Model fitting remains blocked until
+the C1 target, split, sample-ID, purge, proxy-isolation, and scaler artifacts pass
+their tests and validation report.
