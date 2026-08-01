@@ -25,6 +25,7 @@ from .cpu_data import (
 from .cpu_selection import mse, regression_metrics, select_one_se
 from .stage0 import write_json
 from .urysohn import NaturalCubicBasis, fit_full, fit_rank_als, solve_penalized, tensor_design
+from .c3_models import _ridge_block_predict
 
 
 def _freeze(project: Path) -> dict[str, Any]:
@@ -432,18 +433,235 @@ def _run_channel_jobs(shared: Path, project: Path, output: Path, n_jobs: int) ->
     return results
 
 
+def _load_channel_results(output: Path, view: ViewSpec) -> list[dict[str, Any]]:
+    results = []
+    root = output / "CHANNELS" / view.head.head_id / view.proxy_policy
+    for path in sorted(root.glob("*/RESULT.json")):
+        result = json.loads(path.read_text(encoding="utf-8"))
+        if result.get("status") == "PASS" and result.get("candidate_for_joint_refit"):
+            results.append(result)
+    return results
+
+
+def _contract_prediction(
+    shared: Path,
+    view: ViewSpec,
+    samples: pd.DataFrame,
+    split: str,
+    result: dict[str, Any],
+) -> np.ndarray:
+    channel = result["channel"]
+    accessor = BaseAccessor(shared, view.head.dataset, split, [channel])
+    values, _ = profile_values(
+        accessor,
+        samples,
+        channel,
+        tuple(result["selected_profile"]),
+        int(result["selected_m_tau"]),
+    )
+    contract = result["model_contract"]
+    if contract["kind"] == "exact_zero":
+        return np.zeros(len(samples), dtype=np.float64)
+    basis = NaturalCubicBasis.from_metadata(contract["basis"])
+    phi = tensor_design(values, basis)
+    theta = np.asarray(contract["theta"], dtype=np.float64)
+    return np.einsum("tbx,bx->t", phi, theta) + float(contract["intercept"])
+
+
+def _linear_multichannel_features(
+    accessor: BaseAccessor,
+    samples: pd.DataFrame,
+    columns: list[str],
+    profile: tuple[int, int],
+    m_tau: int,
+) -> np.ndarray:
+    blocks = [profile_values(accessor, samples, column, profile, m_tau)[0] for column in columns]
+    return np.concatenate(blocks, axis=1)
+
+
+def _run_joint_and_ablations(
+    shared: Path,
+    project: Path,
+    output: Path,
+    view: ViewSpec,
+) -> dict[str, Any]:
+    started = time.time()
+    destination = output / "JOINT" / view.head.head_id / view.proxy_policy
+    destination.mkdir(parents=True, exist_ok=True)
+    try:
+        freeze = _freeze(project)
+        config = freeze["c4"]
+        train = load_samples(shared, view, "train")
+        validation = load_samples(shared, view, "validation")
+        selected_channels = _load_channel_results(output, view)
+        fit_index = deterministic_subsample(train, int(config["fit_row_cap"]))
+        train_subset = train.iloc[fit_index]
+        if selected_channels:
+            train_contributions = np.column_stack(
+                [_contract_prediction(shared, view, train_subset, "train", result) for result in selected_channels]
+            )
+            validation_contributions = np.column_stack(
+                [_contract_prediction(shared, view, validation, "validation", result) for result in selected_channels]
+            )
+            joint_prediction, joint_certificate = _ridge_block_predict(
+                train_contributions,
+                train_subset["y_true"].to_numpy(dtype=np.float64),
+                validation_contributions,
+                0.0001,
+            )
+            joint_parameter_count = len(selected_channels) + 1
+        else:
+            joint_prediction = np.zeros(len(validation), dtype=np.float64)
+            joint_certificate = {"solver": "exact_zero", "relative_kkt": 0.0, "condition_number": 1.0}
+            joint_parameter_count = 0
+        predictions: dict[str, tuple[np.ndarray, int, dict[str, Any]]] = {
+            "PRISM_CHANNEL_SPECIFIC": (joint_prediction, joint_parameter_count, joint_certificate)
+        }
+
+        columns = input_columns(shared, view.head.task_id, view.proxy_policy)
+        accessor = BaseAccessor(shared, view.head.dataset, "train", columns)
+        validation_accessor = BaseAccessor(shared, view.head.dataset, "validation", columns)
+        folds = [
+            (
+                _capped(train, train_index, int(config["fit_row_cap"])),
+                _capped(train, validation_index, int(config["selection_validation_row_cap"])),
+            )
+            for train_index, validation_index in _folds(train, view)
+        ]
+        maximum_delta = max(1, view.head.h_steps + view.head.w_steps)
+        common_profiles = sorted(
+            {
+                (delta, multiplier * view.head.h_steps)
+                for delta in (1, 2, 4, 8)
+                for multiplier in (2, 4, 8)
+                if view.head.h_steps > 0 and delta <= maximum_delta and delta <= multiplier * view.head.h_steps
+            },
+            key=lambda value: (value[1], -value[0]),
+        )
+        common_losses = {profile: [] for profile in common_profiles}
+        for train_index, validation_index in folds:
+            fold_train = train.iloc[train_index]
+            fold_validation = train.iloc[validation_index]
+            y_train = fold_train["y_true"].to_numpy(dtype=np.float64)
+            y_validation = fold_validation["y_true"].to_numpy(dtype=np.float64)
+            for profile in common_profiles:
+                x_train = _linear_multichannel_features(accessor, fold_train, columns, profile, 8)
+                x_validation = _linear_multichannel_features(accessor, fold_validation, columns, profile, 8)
+                prediction, _ = _ridge_block_predict(x_train, y_train, x_validation, 0.0001)
+                common_losses[profile].append(mse(y_validation, prediction))
+        common_selection = select_one_se(_finite(common_losses), lambda value: (value[1], -value[0]))
+        common_profile = tuple(common_selection.candidate)
+        x_train = _linear_multichannel_features(accessor, train_subset, columns, common_profile, 8)
+        x_validation = _linear_multichannel_features(validation_accessor, validation, columns, common_profile, 8)
+        single_prediction, single_certificate = _ridge_block_predict(
+            x_train,
+            train_subset["y_true"].to_numpy(dtype=np.float64),
+            x_validation,
+            0.0001,
+        )
+        predictions["PRISM_SINGLE_SCALE"] = (single_prediction, x_train.shape[1] + 1, single_certificate)
+
+        fixed_profile = (1, max(1, 8 * view.head.h_steps))
+        x_train = _linear_multichannel_features(accessor, train_subset, columns, fixed_profile, 12)
+        x_validation = _linear_multichannel_features(validation_accessor, validation, columns, fixed_profile, 12)
+        fixed_prediction, fixed_certificate = _ridge_block_predict(
+            x_train,
+            train_subset["y_true"].to_numpy(dtype=np.float64),
+            x_validation,
+            0.0001,
+        )
+        predictions["PRISM_FIXED_MULTIRESOLUTION"] = (fixed_prediction, x_train.shape[1] + 1, fixed_certificate)
+
+        metric_rows = []
+        prediction_files = []
+        for model, (prediction, parameter_count, certificate) in predictions.items():
+            frame = _prediction_frame(validation, view, model, prediction, parameter_count)
+            path = destination / f"{model}.validation.parquet"
+            frame.to_parquet(path, index=False, compression="zstd")
+            prediction_files.append({"model": model, "path": str(path.relative_to(output)), "sha256": sha256_file(path)})
+            metric_rows.append(
+                {
+                    "status": "PASS",
+                    "model": model,
+                    "dataset": view.head.dataset,
+                    "task": view.head.task_id,
+                    "target_head": view.head.head_id,
+                    "rows": len(frame),
+                    "parameter_count": parameter_count,
+                    "test_accessed": False,
+                    **regression_metrics(frame["y_true"].to_numpy(), frame["y_pred"].to_numpy()),
+                }
+            )
+        result = {
+            "status": "PASS",
+            "stage": "C4_JOINT_AND_ABLATIONS",
+            "dataset": view.head.dataset,
+            "task": view.head.task_id,
+            "target_head": view.head.head_id,
+            "selected_channels": [result["channel"] for result in selected_channels],
+            "selected_channel_contracts": selected_channels,
+            "joint_certificate": joint_certificate,
+            "single_scale_profile": list(common_profile),
+            "single_scale_selection": common_selection.__dict__,
+            "single_scale_fold_losses": {str(key): value for key, value in common_losses.items()},
+            "fixed_multiresolution_profile": list(fixed_profile),
+            "metrics": metric_rows,
+            "prediction_files": prediction_files,
+            "test_accessed": False,
+            "elapsed_seconds": time.time() - started,
+        }
+    except Exception as error:
+        result = {
+            "status": "FAILED_RETAINED",
+            "stage": "C4_JOINT_AND_ABLATIONS",
+            "dataset": view.head.dataset,
+            "task": view.head.task_id,
+            "target_head": view.head.head_id,
+            "test_accessed": False,
+            "error_type": type(error).__name__,
+            "error": str(error),
+            "traceback": traceback.format_exc(),
+            "elapsed_seconds": time.time() - started,
+        }
+    write_json(destination / "RESULT.json", result)
+    return result
+
+
+def _run_joint_jobs(shared: Path, project: Path, output: Path, n_jobs: int) -> list[dict[str, Any]]:
+    views = main_views(shared, "input_only")
+    results = []
+    pending = []
+    for view in views:
+        path = output / "JOINT" / view.head.head_id / view.proxy_policy / "RESULT.json"
+        if path.is_file():
+            previous = json.loads(path.read_text(encoding="utf-8"))
+            if previous.get("status") in {"PASS", "FAILED_RETAINED"}:
+                results.append(previous)
+                continue
+        pending.append(view)
+    with ProcessPoolExecutor(max_workers=n_jobs) as executor:
+        futures = {executor.submit(_run_joint_and_ablations, shared, project, output, view): view for view in pending}
+        for future in as_completed(futures):
+            results.append(future.result())
+    return results
+
+
 def run_c4(shared: Path, project: Path, output: Path, n_jobs: int) -> dict[str, Any]:
     output.mkdir(parents=True, exist_ok=True)
     results = _run_channel_jobs(shared, project, output, n_jobs)
+    joint_results = _run_joint_jobs(shared, project, output, min(n_jobs, 4))
     flat = [{key: value for key, value in result.items() if key not in {"model_contract", "penalty_audit", "traceback", "profile_fold_losses"}} for result in results]
     pd.DataFrame(flat).sort_values(["task", "channel"]).to_csv(output / "PRISM_PROFILE_AUDIT.csv", index=False)
     manifest = {
-        "status": "PASS" if all(result["status"] == "PASS" for result in results) else "PASS_WITH_RETAINED_FAILURES",
+        "status": "PASS" if all(result["status"] == "PASS" for result in [*results, *joint_results]) else "PASS_WITH_RETAINED_FAILURES",
         "channel_jobs": len(results),
         "passed": sum(result["status"] == "PASS" for result in results),
         "failed_retained": sum(result["status"] != "PASS" for result in results),
         "exact_zero": sum(result.get("selected_kind") == "exact_zero" for result in results),
         "joint_candidates": sum(bool(result.get("candidate_for_joint_refit")) for result in results),
+        "joint_tasks": len(joint_results),
+        "joint_tasks_passed": sum(result["status"] == "PASS" for result in joint_results),
+        "joint_tasks_failed_retained": sum(result["status"] != "PASS" for result in joint_results),
         "test_accessed": False,
         "freeze_sha256": sha256_file(project / "configs/cpu_model_freeze_v1.json"),
     }

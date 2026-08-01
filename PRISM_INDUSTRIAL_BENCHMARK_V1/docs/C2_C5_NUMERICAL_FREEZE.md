@@ -16,7 +16,7 @@ a result-independent staged scan, but cannot add candidates or inspect model
 validation results.
 
 Final frozen SHA256 after that audit:
-`d7d90c9126d0a70e2cb3a6e859787a8bfb70da79dd5ba963573fa7b0842b4a4b`.
+`84ce0773f13d8b8cba3ca646d7e00eeac87f7e58e1a2d616679c261cae254bb2`.
 
 Key safeguards are:
 

@@ -205,6 +205,8 @@
       "maturity_rule": "s+h+W<=t",
       "residual_models": ["exact_zero", "ridge_ar"],
       "state_profiles": "c3_state_profile",
+      "maximum_residual_lags": 64,
+      "missing_mature_history": "zero_after_oof_residual_mean_centering",
       "k_frozen_before_residual_fit": true,
       "joint_backpropagation_after_freeze": false
     },
@@ -213,6 +215,7 @@
       "state_profiles": "c3_state_profile",
       "exact_k_zero_candidate": true,
       "exact_ar_zero_candidate": true,
+      "exact_both_zero_candidate": true,
       "block_penalty_ratios_k_over_ar": [0.25, 1.0, 4.0],
       "solver": "joint_fp64_penalized_least_squares_for_fixed_basis_or_joint_als_for_low_rank"
     }
