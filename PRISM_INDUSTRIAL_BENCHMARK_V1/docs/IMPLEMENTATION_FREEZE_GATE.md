@@ -35,14 +35,20 @@ Resolved before model inspection:
 
 ## C1 target/data gate
 
-- Exact half-open discrete endpoint convention for the current and future means.
-- Exact deterministic rounding rule when physical horizons are not integer
-  multiples of cadence (the protocol only specifies nearest causal integer and a
-  10% failure threshold).
-- Exact purge formula for each model family and inner fold.
-- Exact handling of the Debutanizer file's already shifted target in the
-  record-time main view and 60-minute label-delay sensitivity view.
-- Exact TEP target maturity interpretation for `XMEAS(40)`.
+Status: `C1_SEMANTICS_APPROVED` on 2026-08-01. There are no unresolved C1
+semantics gates.
+
+- `HALF_OPEN_V1`: current `[t-W0,t)`, future `[t+h,t+h+W)`, and strict target
+  history ending at `t-1-D`.
+- `ROUND_HALF_UP_V1`: `floor(seconds/cadence+0.5)`, with the approved minima and
+  the pre-registered 10% unsupported threshold.
+- `DEPENDENCY_INTERVAL_V1`: `[t-Lmax,t+h+W+D)` and 10-minute ceil-rounded extra
+  buffer at boundaries.
+- `SHIFTED_SOURCE_TARGET_V1`: published Debutanizer target is used without
+  reversal; main delay 0 and sensitivity delay 10 steps. The sensitivity name is
+  `DELAY_10_STEPS` unless the 6-minute cadence is independently authoritative.
+- `SAME_ROW_TARGET_V1`: TEP target stays on the XMEAS(40) row; delay sensitivity
+  changes only strict target/residual/state availability by 5 steps.
 
 ## C4/C5 model gate
 

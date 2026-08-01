@@ -8,6 +8,22 @@
     "future_inputs_allowed": false,
     "centered_windows_allowed": false
   },
+  "c1_semantics": {
+    "status": "C1_SEMANTICS_APPROVED",
+    "target_index_contract": "HALF_OPEN_V1",
+    "current_window": "[t-W0,t)",
+    "future_window": "[t+h,t+h+W)",
+    "latest_dynamic_target_index": "t-1-D",
+    "time_realization_contract": "ROUND_HALF_UP_V1",
+    "purge_contract": "DEPENDENCY_INTERVAL_V1",
+    "dependency_interval": "[t-Lmax,t+h+W+D)",
+    "extra_dependency_interval_seconds": 600,
+    "debutanizer_availability_contract": "SHIFTED_SOURCE_TARGET_V1",
+    "tep_availability_contract": "SAME_ROW_TARGET_V1",
+    "immutable_targets": true,
+    "immutable_sample_ids": true,
+    "no_unregistered_defaults": true
+  },
   "datasets": {
     "tep": {
       "files": [
