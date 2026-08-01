@@ -7,9 +7,9 @@ Status values are `NOT_STARTED`, `IMPLEMENTED`, `TESTED`, `RUN`, `PASS`,
 |---|---|---|---|---|---|
 | Five-dataset source/hash/license freeze | Master 3, 12; CPU 2, C0 | `src/prism_benchmark/stage0.py` | `test_stage0.py` | `dataset_registry/*` | PASS |
 | Cadence and run/profile/month boundaries | Master 3, 9; CPU 2 | `stage0.py` | `test_stage0.py` | `CADENCE_AUDIT.json`, `RUN_BOUNDARIES.csv` | PASS |
-| Exact task definitions and target change | Master 4; Theory 1.5 | `src/prism_benchmark/c1_contracts.py` | `test_c1_contracts.py` | `TASK_REGISTRY.json`, `targets/` | TESTED |
-| Immutable split/sample IDs and purge | Master 9, 10; Theory 2.6, 8 | `src/prism_benchmark/c1_builder.py` | `test_c1_contracts.py` | `SPLIT_REGISTRY.json`, `SAMPLE_ID_REGISTRY.json` | TESTED |
-| Input-only vs dynamic views | Master 5 | `src/prism_benchmark/c1_builder.py` | view ID and proxy isolation tests | `dataset_views/` | TESTED |
+| Exact task definitions and target change | Master 4; Theory 1.5 | `src/prism_benchmark/c1_contracts.py` | `test_c1_contracts.py` | `TASK_REGISTRY.json`, `targets/` | PASS |
+| Immutable split/sample IDs and purge | Master 9, 10; Theory 2.6, 8 | `src/prism_benchmark/c1_builder.py` | unit plus independent package validator | `SPLIT_REGISTRY.json`, `SAMPLE_ID_REGISTRY.json` | PASS |
+| Input-only vs dynamic views | Master 5 | `src/prism_benchmark/c1_builder.py` | view ID, proxy and sample-count isolation checks | `dataset_views/` | PASS |
 | Mean/Persistence/Seasonal/Trend | CPU 4.1, C2 | C2 baselines | analytic fixtures | `SIMPLE_BASELINES.csv` | BLOCKED |
 | Ridge/PLS/DPLS/SVR/XGBoost | CPU 4.2, C2 | C2 soft sensor | leakage/budget/one-SE | `CLASSICAL_SOFT_SENSOR.csv` | BLOCKED |
 | AR/ARX/NARX/N4SID/Hammerstein/HW | CPU 4.3, C3 | C3 sysid | nestedness/stability | `SYSTEM_IDENTIFICATION.csv` | BLOCKED |

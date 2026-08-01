@@ -338,6 +338,53 @@ def _view_specs(dataset: str, task: dict[str, Any], columns: list[str]) -> list[
     return specs
 
 
+def _lockbox_paths(output_root: Path) -> list[str]:
+    return [
+        path.relative_to(output_root).as_posix()
+        for path in sorted(output_root.rglob("*.parquet"))
+        if path.name in {"test.parquet", "ood.parquet"}
+    ]
+
+
+def write_lockbox_contract(output_root: Path) -> str:
+    paths = _lockbox_paths(output_root)
+    contract = {
+        "contract": "PRISM_C1_TEST_LOCKBOX_V1",
+        "protocol_frozen": False,
+        "access_rule": "MODEL_HYPERPARAMETER_PROFILE_AND_THRESHOLDS_FROZEN",
+        "metric_access_before_freeze": False,
+        "locked_files": paths,
+    }
+    digest = _write_canonical(output_root / "LOCKBOX.json", contract)
+    for relative in paths:
+        os.chmod(output_root / relative, 0o400)
+    return digest
+
+
+def finalize_existing_shared_data(output_root: Path) -> dict[str, Any]:
+    output_root = output_root.resolve(strict=True)
+    lockbox_hash = write_lockbox_contract(output_root)
+    registry_path = output_root / "SAMPLE_ID_REGISTRY.json"
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    files = [entry for entry in registry["files"] if entry["path"] != "LOCKBOX.json"]
+    lockbox_path = output_root / "LOCKBOX.json"
+    files.append({"path": "LOCKBOX.json", "bytes": lockbox_path.stat().st_size, "sha256": lockbox_hash})
+    registry["files"] = sorted(files, key=lambda entry: entry["path"])
+    registry_hash = _write_canonical(registry_path, registry)
+    os.chmod(registry_path, 0o444)
+    report_path = output_root / "VALIDATION_REPORT.md"
+    lines = [line for line in report_path.read_text(encoding="utf-8").splitlines() if not line.startswith("- Registered files:") and not line.startswith("- Sample registry SHA256:") and not line.startswith("- Lockbox contract:")]
+    lines.extend(
+        [
+            f"- Registered files: {len(registry['files'])}",
+            f"- Sample registry SHA256: `{registry_hash}`",
+            f"- Lockbox contract: `PRISM_C1_TEST_LOCKBOX_V1` ({len(registry['files'])} registry entries; {len(_lockbox_paths(output_root))} locked parquet files).",
+        ]
+    )
+    report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return {"status": "PASS", "sample_registry_sha256": registry_hash, "lockbox_sha256": lockbox_hash}
+
+
 def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, output_root: Path) -> dict[str, Any]:
     raw_root = raw_root.resolve(strict=True)
     registry_root = registry_root.resolve(strict=True)
@@ -496,6 +543,8 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
             {"fit_partition": "train_only", "count": int(count), "mean": mean, "std": float(np.sqrt(max(variance, 0.0)))},
         )
 
+    write_lockbox_contract(output_root)
+
     files = []
     for path in sorted(output_root.rglob("*")):
         if path.is_file() and path.name not in {"SAMPLE_ID_REGISTRY.json", "VALIDATION_REPORT.md"}:
@@ -524,6 +573,7 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
         f"- Sample registry SHA256: `{registry_hash}`",
         "- All scaler metadata are train-only.",
         "- Expanded windows are lazy and must be reconstructed only from immutable base data plus sample registries.",
+        f"- Lockbox contract: `PRISM_C1_TEST_LOCKBOX_V1` ({len(_lockbox_paths(output_root))} locked parquet files).",
     ]
     (output_root / "VALIDATION_REPORT.md").write_text("\n".join(report) + "\n", encoding="utf-8")
     os.chmod(output_root / "SAMPLE_ID_REGISTRY.json", 0o444)
