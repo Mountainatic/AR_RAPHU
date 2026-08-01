@@ -1,0 +1,31 @@
+{
+  "bundle": "PRISM_INDUSTRIAL_BENCHMARK_V1",
+  "status": "PRE-REGISTERED / NO RESULTS",
+  "files": [
+    {
+      "file": "PRISM_INDUSTRIAL_BENCHMARK_V1_CPU_PLAN.md",
+      "bytes": 10008,
+      "sha256": "7e62ef56ce0b94a9a04c9157782837856482fa78737d04a5fc87d479730c2b56"
+    },
+    {
+      "file": "PRISM_INDUSTRIAL_BENCHMARK_V1_EXPERIMENT_MATRIX.csv",
+      "bytes": 1725,
+      "sha256": "9b0334c50305acd2cabc27856a11de4285e510d2692ab565f709b0c239ef6569"
+    },
+    {
+      "file": "PRISM_INDUSTRIAL_BENCHMARK_V1_GPU_PLAN.md",
+      "bytes": 10367,
+      "sha256": "0b589b73e18f7d01e84c7c72be368d26bb54e06fd4e65977833347378ac8771f"
+    },
+    {
+      "file": "PRISM_INDUSTRIAL_BENCHMARK_V1_MASTER_PROTOCOL.md",
+      "bytes": 17245,
+      "sha256": "25d81e1bba9bfa1f874c0f8772ca58c409cc7073c7e2b2512dd8be48eb7f1bfe"
+    },
+    {
+      "file": "README.md",
+      "bytes": 544,
+      "sha256": "3ee186082e2034ebf986d074ce7ccfa1719559c7d555aead9e9d0c52818ad328"
+    }
+  ]
+}

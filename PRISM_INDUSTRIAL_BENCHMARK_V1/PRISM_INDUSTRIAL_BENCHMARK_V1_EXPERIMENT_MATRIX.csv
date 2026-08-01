@@ -1,0 +1,8 @@
+task_id,dataset,tier,target,primary_horizon,target_window,scale_sweep,primary_input_rule,split_rule,label_availability
+TEP_G12,Tennessee Eastman,authoritative_anchor,XMEAS(40) Product G composition,12 min,6 min,"3|12|36 min","exclude XMEAS(37:41); use registered manipulated/upstream measurements","complete-run split; nominal/disturbance stratified; unseen disturbance OOD","record-time main; analyzer-maturity sensitivity"
+DEB_C4,Debutanizer,authoritative_real,C4 content in bottom product,30 min,one verified sample,"0|30|60 min","seven process variables","60/20/20 chronological; expanding inner CV","record-time main; 60 min delay sensitivity"
+SRU_H2S,SRU,authoritative_real,H2S concentration,5 min,1 min or one verified sample,"0|5|30 min","registered process inputs; exclude SO2 as proxy in main view","chronological; optional cross-line outer validation","record-time"
+SRU_SO2,SRU,authoritative_real,SO2 concentration,5 min,1 min or one verified sample,"0|5|30 min","registered process inputs; exclude H2S as proxy in main view","chronological; optional cross-line outer validation","record-time"
+PMSM_PM5,PMSM,real_multiscale,permanent-magnet temperature pm,5 min,30 s,"30 s|5 min|20 min","ambient,coolant,u_d,u_q,i_d,i_q,motor_speed,torque; stator temps secondary","complete profile_id group split","current target available"
+METRO_P60,MetroPT-3,real_multiscale,Reservoirs pressure,60 s,10 s,"10 s|60 s|5 min","exclude TP3 in main view; full-sensor secondary","chronological months; fault windows OOD","current target available"
+METRO_OIL20,MetroPT-3,real_multiscale,Oil_temperature,20 min,2 min,"5|20|60 min","all registered non-target sensors","chronological months; fault windows OOD","current target available"
