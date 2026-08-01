@@ -1,0 +1,20 @@
+protocol: PRISM_INDUSTRIAL_BENCHMARK_V1
+version: '1.0'
+status: PRE-REGISTERED
+cpu_dtype: float64
+split: chronological_target_index_60_20_20
+raw_data_in_return_bundle: false
+bootstrap_replicates: 500
+models:
+  - MEAN
+  - PERSISTENCE
+  - RIDGE_X
+  - PLS_X
+  - HISTGB_X
+  - AR
+  - ARX
+  - PRISM_FIXED_MULTIRESOLUTION
+  - PRISM_CHANNEL_SPECIFIC
+  - PRISM_K_JOINT_AR
+  - PRISM_U_FIRST_RESIDUAL_AR
+

@@ -1,0 +1,18 @@
+{
+  "raw_sources/new_tep_datasets/matlab_data_1year.csv": {
+    "sha256": "18a5edf79c71bff1c32618b18f90d0bbd06000d17c6652556be6633fb29ccb33",
+    "bytes": 71970291
+  },
+  "raw_sources/industrial-debutanizer-soft-sensor/data/debutanizer_data.txt": {
+    "sha256": "e963abcd668e2bc3282815ffd21f73b4b4ccd89d34600feaecc6d5a42aad3438",
+    "bytes": 308978
+  },
+  "raw_sources/pmsm/pmsm_rotor_temp.zip": {
+    "sha256": "c64198c9382d1ed751942f096b6bd2fcf4c22d3369c1b32ca01ec4571979cb26",
+    "bytes": 59305187
+  },
+  "raw_sources/metropt/metropt_3.zip": {
+    "sha256": "aab991a970e58210de853bb8078ce0e63abb4d9412fdc5c79792dae3d8e1721a",
+    "bytes": 218381995
+  }
+}

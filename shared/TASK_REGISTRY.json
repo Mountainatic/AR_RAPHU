@@ -1,0 +1,272 @@
+{
+  "datasets": {
+    "TEP": {
+      "status": "COMPLETED",
+      "audit": {
+        "dataset": "TEP",
+        "rows": 175201,
+        "columns": 53,
+        "targets": [
+          "XMEAS(40)"
+        ],
+        "inputs": [
+          "XMEAS(1)",
+          "XMEAS(2)",
+          "XMEAS(3)",
+          "XMEAS(4)",
+          "XMEAS(5)",
+          "XMEAS(6)",
+          "XMEAS(7)",
+          "XMEAS(8)",
+          "XMEAS(9)",
+          "XMEAS(10)",
+          "XMEAS(11)",
+          "XMEAS(12)",
+          "XMEAS(13)",
+          "XMEAS(14)",
+          "XMEAS(15)",
+          "XMEAS(16)",
+          "XMEAS(17)",
+          "XMEAS(18)",
+          "XMEAS(19)",
+          "XMEAS(20)",
+          "XMEAS(21)",
+          "XMEAS(22)",
+          "XMEAS(23)",
+          "XMEAS(24)",
+          "XMEAS(25)",
+          "XMEAS(26)",
+          "XMEAS(27)",
+          "XMEAS(28)",
+          "XMEAS(29)",
+          "XMEAS(30)",
+          "XMEAS(31)",
+          "XMEAS(32)",
+          "XMEAS(33)",
+          "XMEAS(34)",
+          "XMEAS(35)",
+          "XMEAS(36)",
+          "XMV(1)",
+          "XMV(2)",
+          "XMV(3)",
+          "XMV(4)",
+          "XMV(5)",
+          "XMV(6)",
+          "XMV(7)",
+          "XMV(8)",
+          "XMV(9)",
+          "XMV(10)",
+          "XMV(11)"
+        ],
+        "missing_cells": 0,
+        "duplicate_rows": 0,
+        "constant_numeric_columns": [
+          "XMV(5)",
+          "XMV(9)"
+        ],
+        "run_count": 255,
+        "cadence": {
+          "median_seconds": 180,
+          "n": 0
+        },
+        "metadata": {
+          "cadence_seconds": 180,
+          "source_variant": "matlab_data_1year.csv"
+        },
+        "source_files": [
+          "raw_sources/new_tep_datasets/matlab_data_1year.csv"
+        ]
+      }
+    },
+    "Debutanizer": {
+      "status": "COMPLETED",
+      "audit": {
+        "dataset": "Debutanizer",
+        "rows": 2394,
+        "columns": 8,
+        "targets": [
+          "y"
+        ],
+        "inputs": [
+          "u1",
+          "u2",
+          "u3",
+          "u4",
+          "u5",
+          "u6",
+          "u7"
+        ],
+        "missing_cells": 0,
+        "duplicate_rows": 0,
+        "constant_numeric_columns": [],
+        "run_count": 1,
+        "cadence": {
+          "median_seconds": null,
+          "n": 0
+        },
+        "metadata": {
+          "cadence_seconds": null,
+          "label_shift_note": "source states y translated by 8 samples"
+        },
+        "source_files": [
+          "raw_sources/industrial-debutanizer-soft-sensor/data/debutanizer_data.txt"
+        ]
+      }
+    },
+    "SRU": {
+      "status": "BLOCKED_BY_MISSING_DATA",
+      "error": "FileNotFoundError: SRU raw table with H2S and SO2 not available"
+    },
+    "PMSM": {
+      "status": "COMPLETED",
+      "audit": {
+        "dataset": "PMSM",
+        "rows": 1268915,
+        "columns": 7,
+        "targets": [
+          "pm"
+        ],
+        "inputs": [
+          "ambient",
+          "coolant",
+          "u_d",
+          "u_q",
+          "i_a"
+        ],
+        "missing_cells": 0,
+        "duplicate_rows": 0,
+        "constant_numeric_columns": [],
+        "run_count": 66,
+        "cadence": {
+          "median_seconds": 0.5,
+          "n": 0
+        },
+        "metadata": {
+          "cadence_seconds": 0.5,
+          "profile_column": "_profile_id",
+          "archive_members": 66
+        },
+        "source_files": [
+          "raw_sources/pmsm/pmsm_rotor_temp.zip"
+        ]
+      }
+    },
+    "MetroPT-3": {
+      "status": "COMPLETED",
+      "audit": {
+        "dataset": "MetroPT-3",
+        "rows": 1516948,
+        "columns": 17,
+        "targets": [
+          "Reservoirs",
+          "Oil_temperature"
+        ],
+        "inputs": [
+          "TP2",
+          "H1",
+          "DV_pressure",
+          "Motor_current",
+          "COMP",
+          "DV_eletric",
+          "Towers",
+          "MPG",
+          "LPS",
+          "Pressure_switch",
+          "Oil_level",
+          "Caudal_impulses"
+        ],
+        "missing_cells": 0,
+        "duplicate_rows": 0,
+        "constant_numeric_columns": [],
+        "run_count": 8,
+        "cadence": {
+          "median_seconds": 10.0,
+          "p05": 9.0,
+          "p95": 10.0,
+          "n": 1516947
+        },
+        "metadata": {
+          "cadence_seconds": null,
+          "archive_member": "MetroPT3(AirCompressor).csv",
+          "proxy_excluded": "TP3"
+        },
+        "source_files": [
+          "raw_sources/metropt/metropt_3.zip"
+        ]
+      }
+    }
+  },
+  "tasks": [
+    {
+      "task_id": "TEP_G12",
+      "dataset": "TEP",
+      "target": "XMEAS(40)",
+      "horizon_seconds": 720,
+      "target_window_seconds": 360,
+      "dynamic": true,
+      "input_policy": "tep_proxy_excluded",
+      "split_policy": "run_or_time"
+    },
+    {
+      "task_id": "DEB_C4",
+      "dataset": "Debutanizer",
+      "target": "y",
+      "horizon_seconds": 1800,
+      "target_window_seconds": 0,
+      "dynamic": true,
+      "input_policy": "all_online_inputs",
+      "split_policy": "chronological_60_20_20"
+    },
+    {
+      "task_id": "SRU_H2S",
+      "dataset": "SRU",
+      "target": "H2S",
+      "horizon_seconds": 300,
+      "target_window_seconds": 60,
+      "dynamic": true,
+      "input_policy": "sru_process_only",
+      "split_policy": "chronological_60_20_20"
+    },
+    {
+      "task_id": "SRU_SO2",
+      "dataset": "SRU",
+      "target": "SO2",
+      "horizon_seconds": 300,
+      "target_window_seconds": 60,
+      "dynamic": true,
+      "input_policy": "sru_process_only",
+      "split_policy": "chronological_60_20_20"
+    },
+    {
+      "task_id": "PMSM_PM5",
+      "dataset": "PMSM",
+      "target": "pm",
+      "horizon_seconds": 300,
+      "target_window_seconds": 30,
+      "dynamic": true,
+      "input_policy": "pmsm_external_only",
+      "split_policy": "profile_id"
+    },
+    {
+      "task_id": "METRO_P60",
+      "dataset": "MetroPT-3",
+      "target": "Reservoirs",
+      "horizon_seconds": 60,
+      "target_window_seconds": 10,
+      "dynamic": true,
+      "input_policy": "metro_tp3_excluded",
+      "split_policy": "month"
+    },
+    {
+      "task_id": "METRO_OIL20",
+      "dataset": "MetroPT-3",
+      "target": "Oil_temperature",
+      "horizon_seconds": 1200,
+      "target_window_seconds": 120,
+      "dynamic": true,
+      "input_policy": "metro_all_except_target",
+      "split_policy": "month"
+    }
+  ],
+  "sample_cap": 50000
+}

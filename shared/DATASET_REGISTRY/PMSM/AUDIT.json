@@ -1,0 +1,31 @@
+{
+  "dataset": "PMSM",
+  "rows": 1268915,
+  "columns": 7,
+  "targets": [
+    "pm"
+  ],
+  "inputs": [
+    "ambient",
+    "coolant",
+    "u_d",
+    "u_q",
+    "i_a"
+  ],
+  "missing_cells": 0,
+  "duplicate_rows": 0,
+  "constant_numeric_columns": [],
+  "run_count": 66,
+  "cadence": {
+    "median_seconds": 0.5,
+    "n": 0
+  },
+  "metadata": {
+    "cadence_seconds": 0.5,
+    "profile_column": "_profile_id",
+    "archive_members": 66
+  },
+  "source_files": [
+    "raw_sources/pmsm/pmsm_rotor_temp.zip"
+  ]
+}

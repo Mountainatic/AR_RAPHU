@@ -1,0 +1,75 @@
+{
+  "dataset": "TEP",
+  "rows": 175201,
+  "columns": 53,
+  "targets": [
+    "XMEAS(40)"
+  ],
+  "inputs": [
+    "XMEAS(1)",
+    "XMEAS(2)",
+    "XMEAS(3)",
+    "XMEAS(4)",
+    "XMEAS(5)",
+    "XMEAS(6)",
+    "XMEAS(7)",
+    "XMEAS(8)",
+    "XMEAS(9)",
+    "XMEAS(10)",
+    "XMEAS(11)",
+    "XMEAS(12)",
+    "XMEAS(13)",
+    "XMEAS(14)",
+    "XMEAS(15)",
+    "XMEAS(16)",
+    "XMEAS(17)",
+    "XMEAS(18)",
+    "XMEAS(19)",
+    "XMEAS(20)",
+    "XMEAS(21)",
+    "XMEAS(22)",
+    "XMEAS(23)",
+    "XMEAS(24)",
+    "XMEAS(25)",
+    "XMEAS(26)",
+    "XMEAS(27)",
+    "XMEAS(28)",
+    "XMEAS(29)",
+    "XMEAS(30)",
+    "XMEAS(31)",
+    "XMEAS(32)",
+    "XMEAS(33)",
+    "XMEAS(34)",
+    "XMEAS(35)",
+    "XMEAS(36)",
+    "XMV(1)",
+    "XMV(2)",
+    "XMV(3)",
+    "XMV(4)",
+    "XMV(5)",
+    "XMV(6)",
+    "XMV(7)",
+    "XMV(8)",
+    "XMV(9)",
+    "XMV(10)",
+    "XMV(11)"
+  ],
+  "missing_cells": 0,
+  "duplicate_rows": 0,
+  "constant_numeric_columns": [
+    "XMV(5)",
+    "XMV(9)"
+  ],
+  "run_count": 255,
+  "cadence": {
+    "median_seconds": 180,
+    "n": 0
+  },
+  "metadata": {
+    "cadence_seconds": 180,
+    "source_variant": "matlab_data_1year.csv"
+  },
+  "source_files": [
+    "raw_sources/new_tep_datasets/matlab_data_1year.csv"
+  ]
+}

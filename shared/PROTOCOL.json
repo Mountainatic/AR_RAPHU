@@ -1,0 +1,81 @@
+{
+  "protocol": "PRISM_INDUSTRIAL_BENCHMARK_V1",
+  "version": "1.0",
+  "status": "PRE-REGISTERED",
+  "tasks": [
+    {
+      "task_id": "TEP_G12",
+      "dataset": "TEP",
+      "target": "XMEAS(40)",
+      "horizon_seconds": 720,
+      "target_window_seconds": 360,
+      "dynamic": true,
+      "input_policy": "tep_proxy_excluded",
+      "split_policy": "run_or_time"
+    },
+    {
+      "task_id": "DEB_C4",
+      "dataset": "Debutanizer",
+      "target": "y",
+      "horizon_seconds": 1800,
+      "target_window_seconds": 0,
+      "dynamic": true,
+      "input_policy": "all_online_inputs",
+      "split_policy": "chronological_60_20_20"
+    },
+    {
+      "task_id": "SRU_H2S",
+      "dataset": "SRU",
+      "target": "H2S",
+      "horizon_seconds": 300,
+      "target_window_seconds": 60,
+      "dynamic": true,
+      "input_policy": "sru_process_only",
+      "split_policy": "chronological_60_20_20"
+    },
+    {
+      "task_id": "SRU_SO2",
+      "dataset": "SRU",
+      "target": "SO2",
+      "horizon_seconds": 300,
+      "target_window_seconds": 60,
+      "dynamic": true,
+      "input_policy": "sru_process_only",
+      "split_policy": "chronological_60_20_20"
+    },
+    {
+      "task_id": "PMSM_PM5",
+      "dataset": "PMSM",
+      "target": "pm",
+      "horizon_seconds": 300,
+      "target_window_seconds": 30,
+      "dynamic": true,
+      "input_policy": "pmsm_external_only",
+      "split_policy": "profile_id"
+    },
+    {
+      "task_id": "METRO_P60",
+      "dataset": "MetroPT-3",
+      "target": "Reservoirs",
+      "horizon_seconds": 60,
+      "target_window_seconds": 10,
+      "dynamic": true,
+      "input_policy": "metro_tp3_excluded",
+      "split_policy": "month"
+    },
+    {
+      "task_id": "METRO_OIL20",
+      "dataset": "MetroPT-3",
+      "target": "Oil_temperature",
+      "horizon_seconds": 1200,
+      "target_window_seconds": 120,
+      "dynamic": true,
+      "input_policy": "metro_all_except_target",
+      "split_policy": "month"
+    }
+  ],
+  "sample_cap": 50000,
+  "raw_data_excluded_from_return_bundle": true,
+  "cpu_dtype": "float64",
+  "split_rule": "target_index_chronological_no_future_features"
+}

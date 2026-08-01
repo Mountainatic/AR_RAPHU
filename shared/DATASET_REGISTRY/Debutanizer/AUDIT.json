@@ -1,0 +1,32 @@
+{
+  "dataset": "Debutanizer",
+  "rows": 2394,
+  "columns": 8,
+  "targets": [
+    "y"
+  ],
+  "inputs": [
+    "u1",
+    "u2",
+    "u3",
+    "u4",
+    "u5",
+    "u6",
+    "u7"
+  ],
+  "missing_cells": 0,
+  "duplicate_rows": 0,
+  "constant_numeric_columns": [],
+  "run_count": 1,
+  "cadence": {
+    "median_seconds": null,
+    "n": 0
+  },
+  "metadata": {
+    "cadence_seconds": null,
+    "label_shift_note": "source states y translated by 8 samples"
+  },
+  "source_files": [
+    "raw_sources/industrial-debutanizer-soft-sensor/data/debutanizer_data.txt"
+  ]
+}

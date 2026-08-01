@@ -1,0 +1,41 @@
+{
+  "dataset": "MetroPT-3",
+  "rows": 1516948,
+  "columns": 17,
+  "targets": [
+    "Reservoirs",
+    "Oil_temperature"
+  ],
+  "inputs": [
+    "TP2",
+    "H1",
+    "DV_pressure",
+    "Motor_current",
+    "COMP",
+    "DV_eletric",
+    "Towers",
+    "MPG",
+    "LPS",
+    "Pressure_switch",
+    "Oil_level",
+    "Caudal_impulses"
+  ],
+  "missing_cells": 0,
+  "duplicate_rows": 0,
+  "constant_numeric_columns": [],
+  "run_count": 8,
+  "cadence": {
+    "median_seconds": 10.0,
+    "p05": 9.0,
+    "p95": 10.0,
+    "n": 1516947
+  },
+  "metadata": {
+    "cadence_seconds": null,
+    "archive_member": "MetroPT3(AirCompressor).csv",
+    "proxy_excluded": "TP3"
+  },
+  "source_files": [
+    "raw_sources/metropt/metropt_3.zip"
+  ]
+}

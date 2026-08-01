@@ -1,0 +1,132 @@
+{
+  "TEP_G12": {
+    "status": "COMPLETED",
+    "dataset": "TEP",
+    "n_samples": 50000,
+    "counts": {
+      "train": 30000,
+      "validation": 10004,
+      "test": 9996
+    },
+    "metadata": {
+      "target_index_min": 12,
+      "target_index_max": 175200,
+      "history_steps": 8,
+      "target_alignment": "y[t+h]",
+      "max_input_index": "t",
+      "future_X_used": false,
+      "future_y_used": false,
+      "split_boundaries": [
+        105120,
+        140160
+      ],
+      "cadence_known": true
+    }
+  },
+  "DEB_C4": {
+    "status": "COMPLETED",
+    "dataset": "Debutanizer",
+    "n_samples": 2304,
+    "counts": {
+      "train": 1346,
+      "validation": 479,
+      "test": 479
+    },
+    "metadata": {
+      "target_index_min": 90,
+      "target_index_max": 2393,
+      "history_steps": 60,
+      "target_alignment": "y[t+h]",
+      "max_input_index": "t",
+      "future_X_used": false,
+      "future_y_used": false,
+      "split_boundaries": [
+        1436,
+        1915
+      ],
+      "cadence_known": false
+    }
+  },
+  "SRU_H2S": {
+    "status": "BLOCKED_BY_MISSING_DATA",
+    "dataset": "SRU",
+    "error": "FileNotFoundError: SRU raw table with H2S and SO2 not available"
+  },
+  "SRU_SO2": {
+    "status": "BLOCKED_BY_MISSING_DATA",
+    "dataset": "SRU",
+    "error": "FileNotFoundError: SRU raw table with H2S and SO2 not available"
+  },
+  "PMSM_PM5": {
+    "status": "COMPLETED",
+    "dataset": "PMSM",
+    "n_samples": 50000,
+    "counts": {
+      "train": 29963,
+      "validation": 10031,
+      "test": 10006
+    },
+    "metadata": {
+      "target_index_min": 640,
+      "target_index_max": 1268914,
+      "history_steps": 128,
+      "target_alignment": "y[t+h]",
+      "max_input_index": "t",
+      "future_X_used": false,
+      "future_y_used": false,
+      "split_boundaries": [
+        761349,
+        1015132
+      ],
+      "cadence_known": true
+    }
+  },
+  "METRO_P60": {
+    "status": "COMPLETED",
+    "dataset": "MetroPT-3",
+    "n_samples": 50000,
+    "counts": {
+      "train": 29999,
+      "validation": 10002,
+      "test": 9999
+    },
+    "metadata": {
+      "target_index_min": 18,
+      "target_index_max": 1516947,
+      "history_steps": 12,
+      "target_alignment": "y[t+h]",
+      "max_input_index": "t",
+      "future_X_used": false,
+      "future_y_used": false,
+      "split_boundaries": [
+        910168,
+        1213558
+      ],
+      "cadence_known": true
+    }
+  },
+  "METRO_OIL20": {
+    "status": "COMPLETED",
+    "dataset": "MetroPT-3",
+    "n_samples": 50000,
+    "counts": {
+      "train": 29998,
+      "validation": 10006,
+      "test": 9996
+    },
+    "metadata": {
+      "target_index_min": 248,
+      "target_index_max": 1516947,
+      "history_steps": 128,
+      "target_alignment": "y[t+h]",
+      "max_input_index": "t",
+      "future_X_used": false,
+      "future_y_used": false,
+      "split_boundaries": [
+        910168,
+        1213558
+      ],
+      "cadence_known": true
+    }
+  }
+}
