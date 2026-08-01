@@ -1,9 +1,9 @@
 {
-  "checked_parquet_files": 278,
+  "checked_parquet_files": 298,
   "failures": [],
-  "locked_files": 114,
-  "registered_files": 318,
-  "registry_sha256": "db605df88bf68daba91a19e8242937e3000b30b267f06a801424d3cbefc47b87",
-  "sample_semantic_spot_checks": 579,
+  "locked_files": 124,
+  "registered_files": 338,
+  "registry_sha256": "510315bb6983af3edf37af36d6fba85377d148e7acfdf82b6ccece611636b7e4",
+  "sample_semantic_spot_checks": 621,
   "status": "PASS"
 }

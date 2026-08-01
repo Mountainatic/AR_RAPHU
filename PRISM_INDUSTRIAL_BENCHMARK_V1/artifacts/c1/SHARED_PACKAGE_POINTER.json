@@ -1,8 +1,8 @@
 {
   "parquet_in_git_artifact": false,
   "raw_data_in_git_artifact": false,
-  "sample_registry_sha256": "db605df88bf68daba91a19e8242937e3000b30b267f06a801424d3cbefc47b87",
-  "shared_file_count": 322,
+  "sample_registry_sha256": "510315bb6983af3edf37af36d6fba85377d148e7acfdf82b6ccece611636b7e4",
+  "shared_file_count": 342,
   "shared_path_on_build_server": "/root/autodl-tmp/PRISM_SHARED_DATA_C1",
-  "shared_total_bytes": 15312880334
+  "shared_total_bytes": 15315873484
 }
