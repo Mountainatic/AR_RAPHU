@@ -30,7 +30,23 @@ def _stage(state: dict[str, Any], state_path: Path, name: str, command: list[str
     state["stages"].setdefault(name, {})["started_utc"] = datetime.now(timezone.utc).isoformat()
     state["stages"][name]["status"] = "RUNNING"
     _write_status(state_path, state)
-    _run(command, log)
+    current_command = list(command)
+    while True:
+        try:
+            _run(current_command, log)
+            break
+        except RuntimeError:
+            if "--n-jobs" not in current_command:
+                raise
+            position = current_command.index("--n-jobs") + 1
+            workers = int(current_command[position])
+            if workers <= 1:
+                raise
+            current_command[position] = str(workers - 1)
+            state["stages"][name].setdefault("parallel_fallbacks", []).append(
+                {"failed_workers": workers, "retry_workers": workers - 1, "utc": datetime.now(timezone.utc).isoformat()}
+            )
+            _write_status(state_path, state)
     state["stages"][name]["status"] = "PASS"
     state["stages"][name]["completed_utc"] = datetime.now(timezone.utc).isoformat()
     _write_status(state_path, state)
@@ -55,6 +71,9 @@ def main() -> None:
     if state_path.is_file() and json.loads(state_path.read_text(encoding="utf-8")).get("schema_version") == 2:
         state = json.loads(state_path.read_text(encoding="utf-8"))
         state["resumed_utc"] = datetime.now(timezone.utc).isoformat()
+        state.pop("error", None)
+        state.pop("failed_utc", None)
+        state["status"] = "RUNNING"
     else:
         state = {
             "schema_version": 2,
