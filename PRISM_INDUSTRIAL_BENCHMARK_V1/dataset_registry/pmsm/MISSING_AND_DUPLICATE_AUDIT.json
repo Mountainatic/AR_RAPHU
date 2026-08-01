@@ -1,0 +1,21 @@
+{
+  "column_count": 13,
+  "constant_columns": [],
+  "duplicate_rows": 0,
+  "missing_by_column": {
+    "ambient": 0,
+    "coolant": 0,
+    "i_d": 0,
+    "i_q": 0,
+    "motor_speed": 0,
+    "pm": 0,
+    "profile_id": 0,
+    "stator_tooth": 0,
+    "stator_winding": 0,
+    "stator_yoke": 0,
+    "torque": 0,
+    "u_d": 0,
+    "u_q": 0
+  },
+  "row_count": 1330816
+}

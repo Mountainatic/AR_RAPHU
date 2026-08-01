@@ -1,0 +1,6 @@
+{
+  "file_declares_pretranslated_samples": 8,
+  "main": "record_time_use_published_pretranslated_target",
+  "sensitivity_delay_minutes": 60,
+  "target": "y"
+}

@@ -1,0 +1,5 @@
+{
+  "METRO_OIL20": "Oil_temperature",
+  "METRO_P60": "Reservoirs",
+  "main": "current_target_available"
+}

@@ -1,0 +1,17 @@
+{
+  "inner": "four_fold_expanding",
+  "purge_seconds": "max_history_plus_horizon_plus_target_window_plus_label_delay",
+  "rule": "chronological_60_20_20_floor_boundaries",
+  "test": [
+    1915,
+    2394
+  ],
+  "train": [
+    0,
+    1436
+  ],
+  "validation": [
+    1436,
+    1915
+  ]
+}

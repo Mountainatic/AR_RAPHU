@@ -1,0 +1,20 @@
+{
+  "column_count": 8,
+  "constant_columns": [],
+  "duplicate_rows": 0,
+  "header_lines": [
+    "Debutanizer column data (u1,u2,u3,u4,u5,u6,u7,y).",
+    "(y values have been translated by 8 samples to compensate for the effect of the time delay)"
+  ],
+  "missing_by_column": {
+    "u1": 0,
+    "u2": 0,
+    "u3": 0,
+    "u4": 0,
+    "u5": 0,
+    "u6": 0,
+    "u7": 0,
+    "y": 0
+  },
+  "row_count": 2394
+}

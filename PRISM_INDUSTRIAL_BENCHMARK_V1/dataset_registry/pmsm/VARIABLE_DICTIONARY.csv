@@ -1,0 +1,14 @@
+name,role,primary_view,unit
+u_q,U_X,primary,KAGGLE_DATA_DICTIONARY
+coolant,U_X,primary,KAGGLE_DATA_DICTIONARY
+stator_winding,PROXY,full_sensor_secondary,KAGGLE_DATA_DICTIONARY
+u_d,U_X,primary,KAGGLE_DATA_DICTIONARY
+stator_tooth,PROXY,full_sensor_secondary,KAGGLE_DATA_DICTIONARY
+motor_speed,U_X,primary,KAGGLE_DATA_DICTIONARY
+i_d,U_X,primary,KAGGLE_DATA_DICTIONARY
+i_q,U_X,primary,KAGGLE_DATA_DICTIONARY
+pm,Y,target,KAGGLE_DATA_DICTIONARY
+stator_yoke,PROXY,full_sensor_secondary,KAGGLE_DATA_DICTIONARY
+ambient,U_X,primary,KAGGLE_DATA_DICTIONARY
+torque,U_X,primary,KAGGLE_DATA_DICTIONARY
+profile_id,INDEX,metadata,KAGGLE_DATA_DICTIONARY

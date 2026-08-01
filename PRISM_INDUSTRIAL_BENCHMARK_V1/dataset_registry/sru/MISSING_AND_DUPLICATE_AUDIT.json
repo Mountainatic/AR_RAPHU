@@ -1,0 +1,18 @@
+{
+  "column_count": 7,
+  "constant_columns": [],
+  "duplicate_rows": 0,
+  "header_lines": [
+    "SRU Scaled data (u1,u2,u3,u4,u5,y1,y2)"
+  ],
+  "missing_by_column": {
+    "u1": 0,
+    "u2": 0,
+    "u3": 0,
+    "u4": 0,
+    "u5": 0,
+    "y1": 0,
+    "y2": 0
+  },
+  "row_count": 10081
+}

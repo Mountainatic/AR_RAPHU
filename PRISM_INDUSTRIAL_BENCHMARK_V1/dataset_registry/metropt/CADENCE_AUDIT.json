@@ -1,0 +1,16 @@
+{
+  "observed_median_seconds": 10.0,
+  "observed_quantiles_seconds": {
+    "0.0": 8.0,
+    "0.01": 9.0,
+    "0.5": 10.0,
+    "0.99": 12.0,
+    "1.0": 172918.0
+  },
+  "official_conflict": [
+    "1 Hz prose",
+    "0.1 Hz feature description"
+  ],
+  "physical_seconds": 10,
+  "status": "SUPPORTED_BY_RAW_TIMESTAMPS"
+}

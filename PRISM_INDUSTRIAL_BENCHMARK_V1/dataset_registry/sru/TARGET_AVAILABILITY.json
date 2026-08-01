@@ -1,0 +1,8 @@
+{
+  "main": "record_time_dense_one_minute_line4",
+  "provenance_sensitivity": "some literature describes 30-minute analyzer measurements",
+  "targets": {
+    "SRU_H2S": "y1",
+    "SRU_SO2": "y2"
+  }
+}

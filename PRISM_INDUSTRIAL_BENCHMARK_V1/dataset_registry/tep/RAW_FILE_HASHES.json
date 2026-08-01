@@ -1,0 +1,22 @@
+[
+  {
+    "bytes": 24678017,
+    "relative_path": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources/tep_rieth/TEP_FaultFree_Training.RData",
+    "sha256": "12d1055b852763fac09ef36bd7c9612a800c8bf7b6f75f344d12119206f9e940"
+  },
+  {
+    "bytes": 47327663,
+    "relative_path": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources/tep_rieth/TEP_FaultFree_Testing.RData",
+    "sha256": "4f45afafa469793eeb7203fb9ed10ed0b1724c73c9c95537f15a0889ade0ebd4"
+  },
+  {
+    "bytes": 494063194,
+    "relative_path": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources/tep_rieth/TEP_Faulty_Training.RData",
+    "sha256": "058df8bd90c5f575f44d2f6085bdd3bc3662e3e9cc25a50e34af42be3748952b"
+  },
+  {
+    "bytes": 836882037,
+    "relative_path": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources/tep_rieth/TEP_Faulty_Testing.RData",
+    "sha256": "c2f1aabc77498efda4d5f9ad81ecc829e2fcd98752b84cf5b2a06558cabacc36"
+  }
+]

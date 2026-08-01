@@ -1,0 +1,6 @@
+{
+  "main": "record_time",
+  "maturity_delay_seconds": 900,
+  "sensitivity": "analyzer_maturity_15_minutes",
+  "target": "xmeas_40"
+}

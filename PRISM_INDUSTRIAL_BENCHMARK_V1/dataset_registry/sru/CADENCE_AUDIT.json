@@ -1,0 +1,18 @@
+{
+  "dense_target_change_audit": {
+    "y1": {
+      "median_change_gap_rows": 1.0,
+      "nonzero_change_count": 9952,
+      "unique_values": 9888
+    },
+    "y2": {
+      "median_change_gap_rows": 1.0,
+      "nonzero_change_count": 10039,
+      "unique_values": 10012
+    }
+  },
+  "process_seconds": 60,
+  "quality_measurement_seconds": 60,
+  "source": "published Line 4 SRU description; 30-minute analyzer report retained as provenance sensitivity",
+  "status": "SUPPORTED_PRIMARY_WITH_DOCUMENTED_PROVENANCE_CONFLICT"
+}

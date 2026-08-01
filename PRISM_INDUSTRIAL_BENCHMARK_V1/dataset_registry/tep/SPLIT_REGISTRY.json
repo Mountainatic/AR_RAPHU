@@ -1,0 +1,10 @@
+{
+  "exact_ids": "PENDING_STAGE0_FREEZE",
+  "rule": "complete_run_nominal_disturbance_stratified",
+  "unit": [
+    "source_file",
+    "faultNumber",
+    "simulationRun"
+  ],
+  "unseen_disturbance_ood": "PENDING_STAGE0_FREEZE"
+}

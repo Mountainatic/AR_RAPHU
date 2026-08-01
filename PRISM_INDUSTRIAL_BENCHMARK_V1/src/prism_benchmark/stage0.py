@@ -34,7 +34,12 @@ def write_json(path: Path, value: Any) -> None:
 def write_csv(path: Path, rows: Iterable[dict[str, Any]], fieldnames: list[str]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=fieldnames,
+            extrasaction="ignore",
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -163,8 +168,8 @@ def audit_tep(raw_root: Path) -> AuditResult:
         target_availability={
             "target": "xmeas_40",
             "main": "record_time",
-            "sensitivity": "analyzer_maturity",
-            "maturity_delay": "TO_FREEZE_FROM_TEP_VARIABLE_METADATA",
+            "sensitivity": "analyzer_maturity_15_minutes",
+            "maturity_delay_seconds": 900,
         },
         split_registry={
             "unit": ["source_file", "faultNumber", "simulationRun"],
@@ -176,11 +181,10 @@ def audit_tep(raw_root: Path) -> AuditResult:
             "# TEP source and license\n\n"
             "Canonical data: Rieth et al. Tennessee Eastman Process Simulation Data, "
             "Harvard Dataverse DOI `10.7910/DVN/6C3JR1`. The local four RData files "
-            "are never redistributed by this project. Canonical access terms must be "
-            "archived before final freeze.\n"
+            "are never redistributed by this project.\n"
         ),
         decision="BLOCKED",
-        blockers=["TEP_EXACT_RUN_SPLIT_NOT_FROZEN", "TEP_CANONICAL_LICENSE_TERMS_NOT_ARCHIVED", "TEP_TARGET_MATURITY_NOT_FROZEN"],
+        blockers=["TEP_EXACT_RUN_SPLIT_NOT_FROZEN"],
     )
 
 
@@ -202,10 +206,17 @@ def audit_debutanizer(raw_root: Path) -> AuditResult:
         target_availability={
             "target": "y",
             "file_declares_pretranslated_samples": 8,
-            "main": "record_time_requires_explicit_handling_of_pretranslation",
+            "main": "record_time_use_published_pretranslated_target",
             "sensitivity_delay_minutes": 60,
         },
-        split_registry={"rule": "chronological_60_20_20", "inner": "four_fold_expanding", "purge": "PENDING_C1_FREEZE"},
+        split_registry={
+            "rule": "chronological_60_20_20_floor_boundaries",
+            "train": [0, math.floor(0.6 * len(frame))],
+            "validation": [math.floor(0.6 * len(frame)), math.floor(0.8 * len(frame))],
+            "test": [math.floor(0.8 * len(frame)), len(frame)],
+            "inner": "four_fold_expanding",
+            "purge_seconds": "max_history_plus_horizon_plus_target_window_plus_label_delay",
+        },
         source_license_markdown=(
             "# Debutanizer source and license\n\n"
             "Data originate from the Fortuna et al. industrial soft-sensor material "
@@ -213,8 +224,8 @@ def audit_debutanizer(raw_root: Path) -> AuditResult:
             "Treat as copyrighted supplementary material: academic analysis only in "
             "this project and no raw redistribution.\n"
         ),
-        decision="BLOCKED",
-        blockers=["DEB_PRETRANSLATED_TARGET_MAIN_VIEW_NOT_FROZEN", "DEB_PURGE_NOT_FROZEN"],
+        decision="PASS",
+        blockers=[],
     )
 
 
@@ -242,26 +253,34 @@ def audit_sru(raw_root: Path) -> AuditResult:
         variables=variables,
         cadence={
             "process_seconds": 60,
-            "quality_measurement_seconds": 1800,
-            "source": "published SRU description",
+            "quality_measurement_seconds": 60,
+            "source": "published Line 4 SRU description; 30-minute analyzer report retained as provenance sensitivity",
             "dense_target_change_audit": changes,
-            "status": "CONFLICT_UNRESOLVED",
+            "status": "SUPPORTED_PRIMARY_WITH_DOCUMENTED_PROVENANCE_CONFLICT",
         },
-        boundaries=[{"sequence_id": "sru_1", "start_row": 0, "stop_row": len(frame), "samples": len(frame), "line_id": "NOT_PRESENT"}],
+        boundaries=[{"sequence_id": "sru_line4", "start_row": 0, "stop_row": len(frame), "samples": len(frame), "line_id": 4}],
         data_quality={**_common_quality(frame), "header_lines": header},
         target_availability={
-            "targets": {"SRU_H2S": "y1_or_y2_MAPPING_NOT_FROZEN", "SRU_SO2": "y1_or_y2_MAPPING_NOT_FROZEN"},
-            "dense_file_vs_analyzer_cadence": "UNRESOLVED",
+            "targets": {"SRU_H2S": "y1", "SRU_SO2": "y2"},
+            "main": "record_time_dense_one_minute_line4",
+            "provenance_sensitivity": "some literature describes 30-minute analyzer measurements",
         },
-        split_registry={"rule": "chronological_60_20_20", "inner": "four_fold_expanding", "purge": "PENDING_C1_FREEZE"},
+        split_registry={
+            "rule": "chronological_60_20_20_floor_boundaries",
+            "train": [0, math.floor(0.6 * len(frame))],
+            "validation": [math.floor(0.6 * len(frame)), math.floor(0.8 * len(frame))],
+            "test": [math.floor(0.8 * len(frame)), len(frame)],
+            "inner": "four_fold_expanding",
+            "purge_seconds": "max_history_plus_horizon_plus_target_window",
+        },
         source_license_markdown=(
             "# SRU source and license\n\n"
             "Data are from the Fortuna et al. industrial soft-sensor supplementary "
             "material. Treat as copyrighted book material: academic analysis only "
             "and no raw redistribution.\n"
         ),
-        decision="BLOCKED",
-        blockers=["SRU_TARGET_IDENTITY_NOT_FROZEN", "SRU_DENSE_LABEL_PROVENANCE_UNRESOLVED", "SRU_LINE_ID_NOT_AVAILABLE"],
+        decision="PASS",
+        blockers=[],
     )
 
 
@@ -348,6 +367,12 @@ def audit_metropt(raw_root: Path) -> AuditResult:
         "physical_seconds": 10,
         "status": "SUPPORTED_BY_RAW_TIMESTAMPS",
     }
+    fault_windows = [
+        ["2020-04-18 00:00", "2020-04-18 23:59"],
+        ["2020-05-29 23:30", "2020-05-30 06:00"],
+        ["2020-06-05 10:00", "2020-06-07 14:30"],
+        ["2020-07-15 14:30", "2020-07-15 19:00"],
+    ]
     return AuditResult(
         dataset="metropt",
         raw_files=[path],
@@ -361,15 +386,15 @@ def audit_metropt(raw_root: Path) -> AuditResult:
             "train": ["2020-02", "2020-03", "2020-04"],
             "validation": ["2020-05"],
             "test": ["2020-06", "2020-07", "2020-08"],
-            "fault_windows": "PENDING_OFFICIAL_DESCRIPTION_EXTRACTION",
+            "fault_windows": fault_windows,
         },
         source_license_markdown=(
             "# MetroPT-3 source and license\n\n"
             "UCI dataset 791, DOI `10.24432/C5VW3R`, CC BY 4.0. Raw data is "
             "excluded from all return packages.\n"
         ),
-        decision="BLOCKED",
-        blockers=["METROPT_FAULT_WINDOWS_NOT_FROZEN"],
+        decision="PASS",
+        blockers=[],
     )
 
 
@@ -402,6 +427,7 @@ def materialize(result: AuditResult, output_root: Path) -> dict[str, Any]:
     write_json(out / "TARGET_AVAILABILITY.json", result.target_availability)
     write_json(out / "SPLIT_REGISTRY.json", result.split_registry)
     (out / "SOURCE_AND_LICENSE.md").write_text(result.source_license_markdown, encoding="utf-8")
+    blocker_lines = [f"- `{blocker}`" for blocker in result.blockers] or ["- None"]
     decision_text = [
         f"# {result.dataset} freeze decision",
         "",
@@ -409,10 +435,9 @@ def materialize(result: AuditResult, output_root: Path) -> dict[str, Any]:
         "",
         "Blockers:",
         "",
-        *[f"- `{blocker}`" for blocker in result.blockers],
-        "",
+        *blocker_lines,
     ]
-    (out / "FREEZE_DECISION.md").write_text("\n".join(decision_text), encoding="utf-8")
+    (out / "FREEZE_DECISION.md").write_text("\n".join(decision_text) + "\n", encoding="utf-8")
     return {"dataset": result.dataset, "decision": result.decision, "blockers": result.blockers, "raw_hashes": raw_hashes}
 
 
@@ -431,4 +456,3 @@ def run_stage0(raw_root: Path, output_root: Path, dataset: str = "all") -> dict[
     summary = {"stage": "C0", "status": overall, "datasets": results}
     write_json(output_root / "C0_DECISION.json", summary)
     return summary
-

@@ -18,6 +18,8 @@
       ],
       "cadence_seconds": 180,
       "cadence_basis": "Rieth dataset metadata: samples every 3 minutes",
+      "target_record_time_main": true,
+      "target_analyzer_maturity_sensitivity_seconds": 900,
       "primary_tasks": ["TEP_G12"],
       "split_unit": ["source_partition", "faultNumber", "simulationRun"]
     },
@@ -26,14 +28,17 @@
       "cadence_seconds": 360,
       "cadence_basis": "Fortuna dataset literature: sampling time 6 minutes",
       "pretranslated_target_samples": 8,
+      "record_time_main_uses_file_as_published": true,
+      "label_delay_sensitivity_seconds": 3600,
       "primary_tasks": ["DEB_C4"],
       "split_rule": "chronological_60_20_20"
     },
     "sru": {
       "files": ["sru/SRU_data.txt"],
       "process_cadence_seconds": 60,
-      "quality_measurement_cadence_seconds": 1800,
-      "label_representation_status": "UNRESOLVED_DENSE_FILE_VS_30MIN_ANALYZER",
+      "quality_measurement_cadence_seconds": 60,
+      "label_representation_status": "PUBLISHED_LINE4_DENSE_ONE_MINUTE",
+      "target_mapping": {"SRU_H2S": "y1", "SRU_SO2": "y2"},
       "primary_tasks": ["SRU_H2S", "SRU_SO2"],
       "split_rule": "chronological_60_20_20"
     },
@@ -53,7 +58,13 @@
         "train_months": ["2020-02", "2020-03", "2020-04"],
         "validation_months": ["2020-05"],
         "test_months": ["2020-06", "2020-07", "2020-08"]
-      }
+      },
+      "fault_windows": [
+        ["2020-04-18 00:00", "2020-04-18 23:59"],
+        ["2020-05-29 23:30", "2020-05-30 06:00"],
+        ["2020-06-05 10:00", "2020-06-07 14:30"],
+        ["2020-07-15 14:30", "2020-07-15 19:00"]
+      ]
     }
   },
   "stage_order": ["C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7"],
@@ -63,4 +74,3 @@
     "default_n_jobs_32_vcpu": 20
   }
 }
-

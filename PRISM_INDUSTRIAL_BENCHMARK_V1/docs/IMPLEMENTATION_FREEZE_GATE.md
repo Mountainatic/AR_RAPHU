@@ -7,20 +7,26 @@ results.
 
 ## C0 metadata gate
 
-- `SRU_LABEL_REPRESENTATION`: the file has 10,081 dense rows and both output
-  columns change almost every row, while source literature describes 1-minute
-  process samples and 30-minute quality measurements. We must establish whether
-  the dense targets are interpolation, model-filled values, or true record-time
-  labels before constructing 5-minute targets.
-- `TEP_LICENSE`: the canonical source DOI and access terms must be recorded; raw
-  data will not be redistributed regardless.
-- `DEB_SRU_LICENSE`: the files are copyrighted book supplementary material.
-  Register use/citation terms and prohibit raw redistribution.
 - `PMSM_SPLIT_IDS`: choose complete profile IDs using only ID, duration and
   completeness, then freeze the exact lists before any target/model metric.
 - `TEP_SPLIT_IDS`: freeze complete `(source_partition,faultNumber,simulationRun)`
   lists with nominal/disturbance stratification and an unseen-disturbance OOD
   allocation before any target/model metric.
+
+Resolved before model inspection:
+
+- TEP: 180 s cadence; record-time main target; 900 s analyzer-maturity
+  sensitivity for product analysis; canonical DOI `10.7910/DVN/6C3JR1`;
+  raw redistribution prohibited by this project.
+- Debutanizer: 360 s cadence; the distributed file's eight-sample target
+  pretranslation is preserved in the record-time main view; 3600 s label-delay
+  sensitivity is separate; raw redistribution prohibited.
+- SRU: published Line 4 dense series at 60 s; `y1=H2S`, `y2=SO2`; the conflicting
+  30-minute analyzer description remains documented as provenance sensitivity,
+  not silently mixed into the primary record-time task.
+- MetroPT-3: observed timestamp cadence is 10 s; the official PDF's four fault
+  intervals are frozen as OOD masks; CC BY 4.0.
+- PMSM: 0.5 s cadence and CC BY-SA 4.0.
 
 ## C1 target/data gate
 
@@ -47,4 +53,3 @@ results.
 
 Until these items are frozen, C0 inspection is allowed; C1 model-ready shared
 data and all fitting are blocked.
-
