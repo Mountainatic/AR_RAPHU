@@ -129,6 +129,9 @@
     }
   },
   "c4": {
+    "fit_row_cap": 100000,
+    "selection_validation_row_cap": 30000,
+    "evaluation_chunk_rows": 50000,
     "channel_class_rules": {
       "tep_xmv": "FAST",
       "tep_xmeas": "MEDIUM",
@@ -160,6 +163,7 @@
     },
     "rank_candidates": [0, 1, 2, 3, 4],
     "rank_tie_break": "smallest_rank",
+    "selection_order": "linear_profile_then_full_resolution_then_rank_ladder_then_sequential_penalties",
     "penalties": {
       "lambda_0": [0.0, 1e-06, 0.0001, 0.01, 1.0],
       "lambda_tau": [0.0, 0.0001, 0.001, 0.01],
