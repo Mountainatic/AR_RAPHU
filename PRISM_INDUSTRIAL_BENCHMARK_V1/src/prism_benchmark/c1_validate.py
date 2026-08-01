@@ -136,6 +136,18 @@ def validate_shared_data(root: Path, output: Path | None = None) -> dict[str, An
         ]
         if not candidates or any(candidate != count for candidate in candidates):
             failures.append(f"TARGET_SAMPLE_MISMATCH:{head}:{split}:{count}:{candidates}")
+    required_splits = {
+        "tep": {"train", "validation", "test", "ood"},
+        "debutanizer": {"train", "validation", "test"},
+        "sru": {"train", "validation", "test"},
+        "pmsm": {"train", "validation", "test"},
+        "metropt": {"train", "validation", "test", "ood"},
+    }
+    for head_id, head in heads.items():
+        present = {split for (candidate_head, split), count in target_counts.items() if candidate_head == head_id and count > 0}
+        missing = required_splits[head["dataset"]].difference(present)
+        if missing:
+            failures.append(f"MISSING_REQUIRED_SPLIT:{head_id}:{sorted(missing)}")
 
     expected_locked = sorted(
         entry["path"]

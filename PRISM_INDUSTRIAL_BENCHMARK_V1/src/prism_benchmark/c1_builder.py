@@ -409,16 +409,28 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
         _prepare_split_cache(dataset, split)
         entities = _dataset_entities(dataset, raw_root)
         first_columns: list[str] | None = None
+        b_for_dataset = ceil_steps(
+            config["extra_dependency_interval_seconds"],
+            float(heads_by_dataset[dataset][0].cadence_seconds),
+        )
         if dataset == "tep":
-            train_lengths = [500]
+            required_interval_lengths = [500, 960]
         elif dataset == "debutanizer":
-            train_lengths = [split["train"][1] - split["train"][0]]
+            required_interval_lengths = [
+                split["train"][1] - split["train"][0],
+                split["validation"][1] - split["validation"][0] - b_for_dataset,
+                split["test"][1] - split["test"][0] - b_for_dataset,
+            ]
         elif dataset == "sru":
-            train_lengths = [split["train"][1] - split["train"][0]]
+            required_interval_lengths = [
+                split["train"][1] - split["train"][0],
+                split["validation"][1] - split["validation"][0] - b_for_dataset,
+                split["test"][1] - split["test"][0] - b_for_dataset,
+            ]
         elif dataset == "pmsm":
-            train_lengths = [split["profile_rows"][str(profile)] for profile in split["train_profile_ids"]]
+            required_interval_lengths = [int(length) for length in split["profile_rows"].values()]
         else:
-            train_lengths = [100_000]
+            required_interval_lengths = [100_000]
 
         for entity_id, source_name, frame in entities:
             frame = frame.copy()
@@ -450,7 +462,12 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
 
             for head in heads_by_dataset[dataset]:
                 task = task_by_id[head.task_id]
-                lmax = maximum_registered_history(head.h_steps, head.w0_steps, train_lengths)
+                maximum_delay = max(int(delay) for delay in task["availability_delays_steps"])
+                dependency_capacities = [
+                    length - head.h_steps - head.w_steps - maximum_delay + 1
+                    for length in required_interval_lengths
+                ]
+                lmax = maximum_registered_history(head.h_steps, head.w0_steps, dependency_capacities)
                 y = frame[head.target].to_numpy(dtype=np.float64, copy=False)
                 for delay in task["availability_delays_steps"]:
                     information_sets = ["dynamic"]

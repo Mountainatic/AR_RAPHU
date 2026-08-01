@@ -58,6 +58,8 @@ def test_registered_history_uses_eight_h_or_largest_feasible_h_zero_candidate() 
     assert maximum_registered_history(12, 2, [500]) == 96
     assert maximum_registered_history(0, 1, [1436]) == 1024
     assert maximum_registered_history(0, 1, [6048]) == 4096
+    assert maximum_registered_history(0, 1, [467]) == 256
+    assert maximum_registered_history(0, 1, [2006]) == 1024
 
 
 def test_view_id_changes_with_availability_and_proxy_but_base_origin_does_not() -> None:
