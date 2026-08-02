@@ -350,19 +350,23 @@ def _load_completed_split(
 
 
 def _entity_groups(entities: np.ndarray) -> tuple[np.ndarray, list[np.ndarray]]:
-    labels, codes = np.unique(entities, return_inverse=True)
-    # np.unique sorts labels, whereas the original protocol uses first-seen order.
-    first = np.full(len(labels), len(entities), dtype=np.int64)
-    np.minimum.at(first, codes, np.arange(len(entities), dtype=np.int64))
-    order = np.argsort(first, kind="stable")
-    remap = np.empty(len(order), dtype=np.int64)
-    remap[order] = np.arange(len(order), dtype=np.int64)
-    first_seen_codes = remap[codes]
-    first_seen_labels = labels[order]
-    position_order = np.argsort(first_seen_codes, kind="stable")
-    counts = np.bincount(first_seen_codes, minlength=len(first_seen_labels))
+    codes, labels = pd.factorize(entities, sort=False)
+    position_order = np.argsort(codes, kind="stable")
+    counts = np.bincount(codes, minlength=len(labels))
     boundaries = np.cumsum(counts)[:-1]
-    return first_seen_labels, [np.asarray(index, dtype=np.int64) for index in np.split(position_order, boundaries)]
+    return np.asarray(labels), [np.asarray(index, dtype=np.int64) for index in np.split(position_order, boundaries)]
+
+
+def _paired_frames(left: pd.DataFrame, right: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    left_ids = left["sample_id"].to_numpy()
+    right_ids = right["sample_id"].to_numpy()
+    if np.array_equal(left_ids, right_ids):
+        return left, right
+    ordered_left = left.sort_values("sample_id")
+    ordered_right = right.sort_values("sample_id")
+    if not np.array_equal(ordered_left["sample_id"].to_numpy(), ordered_right["sample_id"].to_numpy()):
+        raise AssertionError("unpaired finalist sample IDs")
+    return ordered_left, ordered_right
 
 
 def _paired_bootstrap_grouped(
@@ -485,10 +489,10 @@ def _statistics(frames: list[pd.DataFrame], config: dict[str, Any], n_jobs: int 
         history_block = max(1, int(math.ceil(int(example["core_history_steps"].iloc[0]) / 4)))
         blocks = sorted({base_block, 2 * base_block, history_block})
         for model, reference in comparisons:
-            left = models[model].sort_values("sample_id")
-            right = models[reference].sort_values("sample_id")
-            if not np.array_equal(left["sample_id"].to_numpy(), right["sample_id"].to_numpy()):
-                raise AssertionError(f"unpaired finalists: {key} {model} {reference}")
+            try:
+                left, right = _paired_frames(models[model], models[reference])
+            except AssertionError as error:
+                raise AssertionError(f"unpaired finalists: {key} {model} {reference}") from error
             diff = np.square(right["y_pred"].to_numpy() - right["y_true"].to_numpy()) - np.square(left["y_pred"].to_numpy() - left["y_true"].to_numpy())
             for block in blocks:
                 seed_text = f"{key}|{model}|{reference}|{block}|{config['bootstrap_seed']}"

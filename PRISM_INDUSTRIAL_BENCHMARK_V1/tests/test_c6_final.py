@@ -4,7 +4,7 @@ import numpy as np
 
 import pandas as pd
 
-from prism_benchmark.c6_final import _entity_groups, _holm, _paired_bootstrap
+from prism_benchmark.c6_final import _entity_groups, _holm, _paired_bootstrap, _paired_frames
 
 
 def _legacy_paired_bootstrap(diff: np.ndarray, entities: np.ndarray, block: int, replicates: int, seed: int) -> np.ndarray:
@@ -54,6 +54,17 @@ def test_entity_groups_keep_first_seen_order_and_positions() -> None:
     np.testing.assert_array_equal(groups[0], [0, 2])
     np.testing.assert_array_equal(groups[1], [1, 4])
     np.testing.assert_array_equal(groups[2], [3])
+
+
+def test_paired_frames_skip_sort_when_order_matches_and_recover_when_needed() -> None:
+    left = pd.DataFrame({"sample_id": ["b", "a"], "value": [2, 1]})
+    same = pd.DataFrame({"sample_id": ["b", "a"], "value": [20, 10]})
+    actual_left, actual_same = _paired_frames(left, same)
+    assert actual_left is left
+    assert actual_same is same
+    reversed_frame = same.iloc[::-1]
+    ordered_left, ordered_right = _paired_frames(left, reversed_frame)
+    np.testing.assert_array_equal(ordered_left["sample_id"], ordered_right["sample_id"])
 
 
 def test_holm_is_monotone_and_bounded() -> None:
