@@ -25,14 +25,15 @@ def _freeze(project: Path) -> dict[str, Any]:
 def rolling_oof_folds(samples: pd.DataFrame, count: int = 4) -> list[tuple[np.ndarray, np.ndarray]]:
     """Expanding folds inside every entity, with dependency-interval separation."""
     folds: list[tuple[np.ndarray, np.ndarray]] = []
-    entities = samples["entity_id"].astype(str).to_numpy()
+    entity_series = samples["entity_id"].astype(str)
+    entity_groups = entity_series.groupby(entity_series, sort=False).indices
     dependency_start = samples["dependency_start"].to_numpy(dtype=np.int64)
     dependency_stop = samples["dependency_stop_exclusive"].to_numpy(dtype=np.int64)
     for fold in range(count):
         train_parts: list[np.ndarray] = []
         validation_parts: list[np.ndarray] = []
-        for entity in pd.unique(entities):
-            entity_index = np.flatnonzero(entities == entity)
+        for entity_index in entity_groups.values():
+            entity_index = np.asarray(entity_index, dtype=np.int64)
             ordered = entity_index[np.argsort(samples.iloc[entity_index]["origin"].to_numpy(dtype=np.int64))]
             if len(ordered) < count + 1:
                 continue
@@ -72,14 +73,17 @@ def mature_residual_features(
 ) -> np.ndarray:
     offsets = _residual_offsets(delta_steps, history_steps, maximum_lags)
     result = np.zeros((len(samples), len(offsets)), dtype=np.float64)
-    sample_entities = samples["entity_id"].astype(str).to_numpy()
+    sample_entity_series = samples["entity_id"].astype(str)
+    sample_groups = sample_entity_series.groupby(sample_entity_series, sort=False).indices
     origins = samples["origin"].to_numpy(dtype=np.int64)
-    residual_entities = residuals["entity_id"].astype(str).to_numpy()
-    for entity in pd.unique(sample_entities):
-        sample_index = np.flatnonzero(sample_entities == entity)
-        residual_index = np.flatnonzero(residual_entities == entity)
-        if not len(residual_index):
+    residual_entity_series = residuals["entity_id"].astype(str)
+    residual_groups = residual_entity_series.groupby(residual_entity_series, sort=False).indices
+    for entity, sample_index in sample_groups.items():
+        sample_index = np.asarray(sample_index, dtype=np.int64)
+        residual_index = residual_groups.get(entity)
+        if residual_index is None or not len(residual_index):
             continue
+        residual_index = np.asarray(residual_index, dtype=np.int64)
         raw_origins = residuals.iloc[residual_index]["origin"].to_numpy(dtype=np.int64)
         raw_values = residuals.iloc[residual_index]["residual"].to_numpy(dtype=np.float64) - residual_mean
         # Preserve the legacy dict rule for duplicate origins (last value wins),
