@@ -515,6 +515,52 @@ def _statistics(frames: list[pd.DataFrame], config: dict[str, Any], n_jobs: int 
     return metric_frame, bootstrap_frame, ranks
 
 
+def _markdown_table(frame: pd.DataFrame) -> str:
+    """Render a deterministic GitHub table without pandas' optional tabulate dependency."""
+    columns = [str(column) for column in frame.columns]
+
+    def cells(values: list[Any]) -> str:
+        rendered = [str(value).replace("|", "\\|").replace("\n", " ") for value in values]
+        return "| " + " | ".join(rendered) + " |"
+
+    lines = [cells(columns), cells(["---"] * len(columns))]
+    lines.extend(cells(row) for row in frame.itertuples(index=False, name=None))
+    return "\n".join(lines)
+
+
+def _load_completed_statistics(output: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, list[dict[str, Any]]] | None:
+    """Resume only a complete, schema-valid C6 statistics checkpoint."""
+    metric_path = output / "CPU_FINAL_METRICS.csv"
+    bootstrap_path = output / "BOOTSTRAP_PAIRED.csv"
+    rank_path = output / "CROSS_TASK_RANKS.csv"
+    failure_path = output / "C6_FAILURES.json"
+    paths = [metric_path, bootstrap_path, rank_path, failure_path]
+    if not all(path.is_file() for path in paths):
+        return None
+    prediction_paths = sorted((output / "PREDICTIONS").rglob("*.parquet"))
+    if not prediction_paths or min(path.stat().st_mtime_ns for path in paths) < max(path.stat().st_mtime_ns for path in prediction_paths):
+        return None
+    metrics = pd.read_csv(metric_path)
+    bootstrap = pd.read_csv(bootstrap_path)
+    ranks = pd.read_csv(rank_path)
+    failures = json.loads(failure_path.read_text(encoding="utf-8"))
+    required_metrics = {"target_head", "split", "information_set", "model", "rows", "mse"}
+    required_bootstrap = {"target_head", "split", "information_set", "model", "reference", "block_length", "p_value", "holm_adjusted_p"}
+    required_ranks = {"split", "information_set", "model", "mean_rank", "median_rank", "tasks"}
+    if not required_metrics.issubset(metrics.columns) or not required_bootstrap.issubset(bootstrap.columns) or not required_ranks.issubset(ranks.columns):
+        return None
+    if not isinstance(failures, list) or metrics.empty or bootstrap.empty or ranks.empty:
+        return None
+    if len(metrics) != len(prediction_paths):
+        return None
+    if metrics.duplicated(["target_head", "split", "information_set", "model"]).any():
+        return None
+    numeric_checks = [metrics["mse"], bootstrap["p_value"], bootstrap["holm_adjusted_p"], ranks["mean_rank"]]
+    if any(not np.isfinite(series.to_numpy(dtype=np.float64)).all() for series in numeric_checks):
+        return None
+    return metrics, bootstrap, ranks, failures
+
+
 def run_c6(
     shared: Path,
     project: Path,
@@ -529,29 +575,37 @@ def run_c6(
     freeze_manifest = write_final_freeze_manifest(shared, project, c2_output, c3_output, c4_output, c5_output, output)
     if not freeze_manifest.is_file() or _load_json(freeze_manifest).get("status") != "FROZEN":
         raise RuntimeError("test access denied: final freeze manifest absent")
-    frames: list[pd.DataFrame] = []
-    failures = []
-    for view in main_views(shared, "dynamic"):
-        for split in ("test", "ood"):
-            sample_path = shared / "sample_ids" / view.relative_root / f"{split}.parquet"
-            if not sample_path.is_file():
-                continue
-            try:
-                cached = _load_completed_split(shared, output, view, split)
-                frames.extend(
-                    cached
-                    if cached is not None
-                    else _evaluate_split(shared, project, c3_output, c4_output, c5_output, output, view, split)
-                )
-            except Exception as error:
-                failures.append({"target_head": view.head.head_id, "split": split, "error_type": type(error).__name__, "error": str(error), "traceback": traceback.format_exc()})
-    if not frames:
-        raise RuntimeError("no C6 finalist predictions were produced")
-    metrics, bootstrap, ranks = _statistics(frames, _freeze(project)["c6"], n_jobs)
-    metrics.to_csv(output / "CPU_FINAL_METRICS.csv", index=False)
-    bootstrap.to_csv(output / "BOOTSTRAP_PAIRED.csv", index=False)
-    ranks.to_csv(output / "CROSS_TASK_RANKS.csv", index=False)
-    write_json(output / "C6_FAILURES.json", failures)
+    completed = _load_completed_statistics(output)
+    if completed is None:
+        frames: list[pd.DataFrame] = []
+        failures = []
+        for view in main_views(shared, "dynamic"):
+            for split in ("test", "ood"):
+                sample_path = shared / "sample_ids" / view.relative_root / f"{split}.parquet"
+                if not sample_path.is_file():
+                    continue
+                try:
+                    cached = _load_completed_split(shared, output, view, split)
+                    frames.extend(
+                        cached
+                        if cached is not None
+                        else _evaluate_split(shared, project, c3_output, c4_output, c5_output, output, view, split)
+                    )
+                except Exception as error:
+                    failures.append({"target_head": view.head.head_id, "split": split, "error_type": type(error).__name__, "error": str(error), "traceback": traceback.format_exc()})
+        if not frames:
+            raise RuntimeError("no C6 finalist predictions were produced")
+        metrics, bootstrap, ranks = _statistics(frames, _freeze(project)["c6"], n_jobs)
+        metrics.to_csv(output / "CPU_FINAL_METRICS.csv", index=False)
+        bootstrap.to_csv(output / "BOOTSTRAP_PAIRED.csv", index=False)
+        ranks.to_csv(output / "CROSS_TASK_RANKS.csv", index=False)
+        write_json(output / "C6_FAILURES.json", failures)
+        prediction_frames = len(frames)
+        resumed_statistics = False
+    else:
+        metrics, bootstrap, ranks, failures = completed
+        prediction_frames = len(metrics)
+        resumed_statistics = True
     report_lines = [
         "# PRISM Industrial CPU Final Report",
         "",
@@ -562,11 +616,11 @@ def run_c6(
         "",
         "## Cross-task ranks",
         "",
-        ranks.to_markdown(index=False),
+        _markdown_table(ranks),
         "",
         "## Test and OOD metrics",
         "",
-        metrics.to_markdown(index=False),
+        _markdown_table(metrics),
         "",
         "## Statistical audit",
         "",
@@ -580,11 +634,12 @@ def run_c6(
         "stage": "C6_CPU_FINALISTS_AND_STATISTICS",
         "finalist_policy": _freeze(project)["c6"]["finalist_policy"],
         "test_accessed": True,
-        "prediction_frames": len(frames),
+        "prediction_frames": prediction_frames,
         "metric_rows": len(metrics),
         "bootstrap_rows": len(bootstrap),
         "failures": len(failures),
         "bootstrap_jobs": int(n_jobs),
+        "resumed_completed_statistics": resumed_statistics,
         "final_freeze_sha256": sha256_file(freeze_manifest),
     }
     write_json(output / "CPU_FINAL_DECISION.json", decision)

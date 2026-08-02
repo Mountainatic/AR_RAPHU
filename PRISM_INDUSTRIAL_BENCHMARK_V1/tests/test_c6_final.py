@@ -4,7 +4,7 @@ import numpy as np
 
 import pandas as pd
 
-from prism_benchmark.c6_final import _entity_groups, _holm, _paired_bootstrap, _paired_frames
+from prism_benchmark.c6_final import _entity_groups, _holm, _markdown_table, _paired_bootstrap, _paired_frames
 
 
 def _legacy_paired_bootstrap(diff: np.ndarray, entities: np.ndarray, block: int, replicates: int, seed: int) -> np.ndarray:
@@ -73,3 +73,10 @@ def test_holm_is_monotone_and_bounded() -> None:
     adjusted = [row["holm_adjusted_p"] for row in rows]
     assert all(0.0 <= value <= 1.0 for value in adjusted)
     assert adjusted[0] <= adjusted[1] <= adjusted[2]
+
+
+def test_markdown_table_has_no_optional_dependency_and_escapes_cells() -> None:
+    frame = pd.DataFrame({"name": ["a|b"], "score": [1.5]})
+    rendered = _markdown_table(frame)
+    assert "| name | score |" in rendered
+    assert "| a\\|b | 1.5 |" in rendered

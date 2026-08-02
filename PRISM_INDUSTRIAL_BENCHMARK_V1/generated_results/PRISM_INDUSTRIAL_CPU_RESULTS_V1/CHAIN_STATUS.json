@@ -1,0 +1,137 @@
+{
+  "current_stage": "PUBLISH",
+  "pipeline": "PRISM_CPU_STRICT_CHAIN_V1",
+  "resumed_utc": "2026-08-02T06:58:38.425920+00:00",
+  "schema_version": 2,
+  "stages": {
+    "C1_VALIDATE": {
+      "completed_utc": "2026-08-02T06:59:03.489542+00:00",
+      "started_utc": "2026-08-02T06:58:38.426881+00:00",
+      "status": "PASS"
+    },
+    "C2_CLASSICAL": {
+      "completed_utc": "2026-08-01T17:15:57.002163+00:00",
+      "started_utc": "2026-08-01T17:15:56.564144+00:00",
+      "status": "PASS"
+    },
+    "C2_SIMPLE": {
+      "completed_utc": "2026-08-01T17:15:56.563763+00:00",
+      "started_utc": "2026-08-01T17:15:16.889115+00:00",
+      "status": "PASS"
+    },
+    "C3_SYSTEM_IDENTIFICATION": {
+      "completed_utc": "2026-08-01T19:10:50.367651+00:00",
+      "started_utc": "2026-08-01T17:55:54.277546+00:00",
+      "status": "PASS"
+    },
+    "C4_PRISM": {
+      "completed_utc": "2026-08-01T23:12:30.593659+00:00",
+      "started_utc": "2026-08-01T19:10:50.368162+00:00",
+      "status": "PASS"
+    },
+    "C5_PRISM_DYNAMIC": {
+      "completed_utc": "2026-08-02T02:28:23.866506+00:00",
+      "started_utc": "2026-08-02T02:22:16.569014+00:00",
+      "status": "PASS"
+    },
+    "C6_FINAL": {
+      "completed_utc": "2026-08-02T06:59:03.940480+00:00",
+      "parallel_fallbacks": [
+        {
+          "failed_workers": 20,
+          "retry_workers": 19,
+          "utc": "2026-08-02T05:25:09.310015+00:00"
+        },
+        {
+          "failed_workers": 19,
+          "retry_workers": 18,
+          "utc": "2026-08-02T05:29:36.815529+00:00"
+        },
+        {
+          "failed_workers": 18,
+          "retry_workers": 17,
+          "utc": "2026-08-02T05:34:01.454464+00:00"
+        },
+        {
+          "failed_workers": 17,
+          "retry_workers": 16,
+          "utc": "2026-08-02T05:38:52.517030+00:00"
+        },
+        {
+          "failed_workers": 16,
+          "retry_workers": 15,
+          "utc": "2026-08-02T05:43:55.773688+00:00"
+        },
+        {
+          "failed_workers": 15,
+          "retry_workers": 14,
+          "utc": "2026-08-02T05:49:01.188709+00:00"
+        },
+        {
+          "failed_workers": 14,
+          "retry_workers": 13,
+          "utc": "2026-08-02T05:54:05.733943+00:00"
+        },
+        {
+          "failed_workers": 13,
+          "retry_workers": 12,
+          "utc": "2026-08-02T05:59:10.423343+00:00"
+        },
+        {
+          "failed_workers": 12,
+          "retry_workers": 11,
+          "utc": "2026-08-02T06:04:06.002235+00:00"
+        },
+        {
+          "failed_workers": 11,
+          "retry_workers": 10,
+          "utc": "2026-08-02T06:09:21.844957+00:00"
+        },
+        {
+          "failed_workers": 10,
+          "retry_workers": 9,
+          "utc": "2026-08-02T06:14:45.837481+00:00"
+        },
+        {
+          "failed_workers": 9,
+          "retry_workers": 8,
+          "utc": "2026-08-02T06:20:13.825281+00:00"
+        },
+        {
+          "failed_workers": 8,
+          "retry_workers": 7,
+          "utc": "2026-08-02T06:26:05.971837+00:00"
+        },
+        {
+          "failed_workers": 7,
+          "retry_workers": 6,
+          "utc": "2026-08-02T06:32:28.747082+00:00"
+        },
+        {
+          "failed_workers": 6,
+          "retry_workers": 5,
+          "utc": "2026-08-02T06:39:12.879338+00:00"
+        },
+        {
+          "failed_workers": 5,
+          "retry_workers": 4,
+          "utc": "2026-08-02T06:46:45.663907+00:00"
+        }
+      ],
+      "started_utc": "2026-08-02T06:59:03.490126+00:00",
+      "status": "PASS"
+    },
+    "PACKAGE": {
+      "completed_utc": "2026-08-02T07:06:35.450569+00:00",
+      "started_utc": "2026-08-02T06:59:03.940997+00:00",
+      "status": "PASS"
+    },
+    "PUBLISH": {
+      "started_utc": "2026-08-02T07:06:35.451265+00:00",
+      "status": "RUNNING"
+    }
+  },
+  "started_utc": "2026-08-01T17:14:49.742311+00:00",
+  "status": "RUNNING",
+  "test_accessed": true
+}

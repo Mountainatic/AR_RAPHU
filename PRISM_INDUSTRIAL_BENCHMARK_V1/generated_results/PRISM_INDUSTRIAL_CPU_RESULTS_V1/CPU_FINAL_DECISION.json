@@ -1,0 +1,13 @@
+{
+  "bootstrap_jobs": 20,
+  "bootstrap_rows": 180,
+  "failures": 0,
+  "final_freeze_sha256": "4fd36c3589eafb9748c75a8b375feb53f45afbd33aea48fbe3ac84182a51328f",
+  "finalist_policy": "predeclared_primary_models_not_development_winners",
+  "metric_rows": 60,
+  "prediction_frames": 60,
+  "resumed_completed_statistics": true,
+  "stage": "C6_CPU_FINALISTS_AND_STATISTICS",
+  "status": "PASS",
+  "test_accessed": true
+}
