@@ -63,6 +63,7 @@ def main() -> None:
     parser.add_argument("--c4-jobs", type=int, default=8)
     parser.add_argument("--c5-jobs", type=int, default=2)
     parser.add_argument("--c5-inner-jobs", type=int, default=1)
+    parser.add_argument("--c6-jobs", type=int, default=1)
     parser.add_argument("--publish", action="store_true")
     parser.add_argument("--release-tag", default="prism-industrial-cpu-v1-20260802")
     arguments = parser.parse_args()
@@ -95,7 +96,7 @@ def main() -> None:
         ("C3_SYSTEM_IDENTIFICATION", [python, str(project / "scripts/run_c3_system_identification.py"), "--shared", str(arguments.shared), "--project", str(project), "--output", str(results / "C3_SYSTEM_IDENTIFICATION"), "--n-jobs", str(arguments.c3_jobs)]),
         ("C4_PRISM", [python, str(project / "scripts/run_c4_prism_profile_audit.py"), "--shared", str(arguments.shared), "--project", str(project), "--output", str(results / "C4_PRISM"), "--n-jobs", str(arguments.c4_jobs)]),
         ("C5_PRISM_DYNAMIC", [python, str(project / "scripts/run_c5_prism_dynamic.py"), "--shared", str(arguments.shared), "--project", str(project), "--c3-output", str(results / "C3_SYSTEM_IDENTIFICATION"), "--c4-output", str(results / "C4_PRISM"), "--output", str(results / "C5_PRISM_DYNAMIC"), "--n-jobs", str(arguments.c5_jobs), "--inner-jobs", str(arguments.c5_inner_jobs)]),
-        ("C6_FINAL", [python, str(project / "scripts/run_c6_final.py"), "--shared", str(arguments.shared), "--project", str(project), "--c2-output", str(results / "C2_CLASSICAL"), "--c3-output", str(results / "C3_SYSTEM_IDENTIFICATION"), "--c4-output", str(results / "C4_PRISM"), "--c5-output", str(results / "C5_PRISM_DYNAMIC"), "--output", str(results / "C6_FINAL")]),
+        ("C6_FINAL", [python, str(project / "scripts/run_c6_final.py"), "--shared", str(arguments.shared), "--project", str(project), "--c2-output", str(results / "C2_CLASSICAL"), "--c3-output", str(results / "C3_SYSTEM_IDENTIFICATION"), "--c4-output", str(results / "C4_PRISM"), "--c5-output", str(results / "C5_PRISM_DYNAMIC"), "--output", str(results / "C6_FINAL"), "--n-jobs", str(arguments.c6_jobs)]),
         ("PACKAGE", [python, str(project / "scripts/build_cpu_bundle.py"), "--project", str(project), "--results", str(results), "--shared", str(arguments.shared), "--output-root", str(arguments.return_root)]),
     ]
 

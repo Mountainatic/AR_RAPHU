@@ -15,8 +15,18 @@ def main() -> None:
     parser.add_argument("--c4-output", required=True, type=Path)
     parser.add_argument("--c5-output", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--n-jobs", type=int, default=1)
     arguments = parser.parse_args()
-    result = run_c6(arguments.shared, arguments.project, arguments.c2_output, arguments.c3_output, arguments.c4_output, arguments.c5_output, arguments.output)
+    result = run_c6(
+        arguments.shared,
+        arguments.project,
+        arguments.c2_output,
+        arguments.c3_output,
+        arguments.c4_output,
+        arguments.c5_output,
+        arguments.output,
+        arguments.n_jobs,
+    )
     print(f"C6_STATUS={result['status']}")
     print(f"C6_METRIC_ROWS={result['metric_rows']}")
     print(f"C6_BOOTSTRAP_ROWS={result['bootstrap_rows']}")

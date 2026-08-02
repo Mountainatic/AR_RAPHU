@@ -3,8 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import multiprocessing
 import time
 import traceback
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +19,9 @@ from .c5_models import _fit_frozen_channel_shapes, mature_residual_features
 from .cpu_data import BaseAccessor, ViewSpec, deterministic_subsample, load_samples, main_views, sha256_file
 from .cpu_selection import regression_metrics
 from .stage0 import write_json
+
+
+_BOOTSTRAP_TASKS: list[tuple[Any, ...]] = []
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -296,27 +301,141 @@ def _evaluate_split(
     return frames
 
 
-def _paired_bootstrap(diff: np.ndarray, entities: np.ndarray, block: int, replicates: int, seed: int) -> np.ndarray:
+def _load_completed_split(
+    shared: Path,
+    output: Path,
+    head_view: ViewSpec,
+    split: str,
+) -> list[pd.DataFrame] | None:
+    """Load an already completed immutable prediction set after strict QA."""
+    destination = output / "PREDICTIONS" / head_view.head.head_id / split
+    expected = [
+        ("input_only", "PERSISTENCE"),
+        ("input_only", "PRISM_CHANNEL_SPECIFIC"),
+        ("dynamic", "PERSISTENCE"),
+        ("dynamic", "AR"),
+        ("dynamic", "PRISM_PHYSICS_FIRST"),
+        ("dynamic", "PRISM_K_JOINT_AR"),
+    ]
+    paths = [destination / f"{information_set}__{model}.parquet" for information_set, model in expected]
+    if not all(path.is_file() for path in paths):
+        return None
+    samples_by_information_set = {
+        information_set: load_samples(
+            shared,
+            ViewSpec(head_view.head, information_set, head_view.availability_scenario, head_view.proxy_policy),
+            split,
+        )
+        for information_set in ("input_only", "dynamic")
+    }
+    frames = []
+    for (information_set, model), path in zip(expected, paths, strict=True):
+        frame = pd.read_parquet(path)
+        samples = samples_by_information_set[information_set]
+        required = {"sample_id", "base_origin_id", "y_true", "y_pred", "model", "information_set", "split"}
+        if not required.issubset(frame.columns):
+            raise AssertionError(f"incomplete cached C6 prediction schema: {path}")
+        if len(frame) != len(samples):
+            raise AssertionError(f"cached C6 prediction row mismatch: {path}")
+        if not np.array_equal(frame["sample_id"].to_numpy(), samples["view_sample_id"].to_numpy()):
+            raise AssertionError(f"cached C6 prediction sample IDs changed: {path}")
+        if not np.array_equal(frame["base_origin_id"].to_numpy(), samples["base_origin_id"].to_numpy()):
+            raise AssertionError(f"cached C6 prediction origins changed: {path}")
+        if not np.array_equal(frame["y_true"].to_numpy(dtype=np.float64), samples["y_true"].to_numpy(dtype=np.float64)):
+            raise AssertionError(f"cached C6 prediction targets changed: {path}")
+        if set(frame["model"].astype(str)) != {model} or set(frame["information_set"].astype(str)) != {information_set}:
+            raise AssertionError(f"cached C6 prediction identity mismatch: {path}")
+        frames.append(frame)
+    return frames
+
+
+def _entity_groups(entities: np.ndarray) -> tuple[np.ndarray, list[np.ndarray]]:
+    labels, codes = np.unique(entities, return_inverse=True)
+    # np.unique sorts labels, whereas the original protocol uses first-seen order.
+    first = np.full(len(labels), len(entities), dtype=np.int64)
+    np.minimum.at(first, codes, np.arange(len(entities), dtype=np.int64))
+    order = np.argsort(first, kind="stable")
+    remap = np.empty(len(order), dtype=np.int64)
+    remap[order] = np.arange(len(order), dtype=np.int64)
+    first_seen_codes = remap[codes]
+    first_seen_labels = labels[order]
+    position_order = np.argsort(first_seen_codes, kind="stable")
+    counts = np.bincount(first_seen_codes, minlength=len(first_seen_labels))
+    boundaries = np.cumsum(counts)[:-1]
+    return first_seen_labels, [np.asarray(index, dtype=np.int64) for index in np.split(position_order, boundaries)]
+
+
+def _paired_bootstrap_grouped(
+    diff: np.ndarray,
+    labels: np.ndarray,
+    groups: list[np.ndarray],
+    block: int,
+    replicates: int,
+    seed: int,
+) -> np.ndarray:
     rng = np.random.default_rng(seed)
-    unique = pd.unique(entities)
-    entity_blocks: dict[str, list[np.ndarray]] = {}
-    for entity in unique:
-        values = diff[entities == entity]
-        entity_blocks[str(entity)] = [values[start : start + block] for start in range(0, len(values), block) if len(values[start : start + block])]
+    block_summaries: list[tuple[np.ndarray, np.ndarray]] = []
+    for index in groups:
+        values = diff[index]
+        starts = np.arange(0, len(values), block, dtype=np.int64)
+        sums = np.asarray([np.sum(values[start : start + block], dtype=np.float64) for start in starts], dtype=np.float64)
+        lengths = np.minimum(block, len(values) - starts).astype(np.int64, copy=False)
+        block_summaries.append((sums, lengths))
     draws = np.empty(replicates, dtype=np.float64)
+    entity_count = len(labels)
+    label_to_index = {str(label): index for index, label in enumerate(labels)}
     for replicate in range(replicates):
-        selected_entities = rng.choice(unique, size=len(unique), replace=True) if len(unique) > 1 else unique
+        selected_entities = rng.choice(labels, size=entity_count, replace=True) if entity_count > 1 else labels
         total = 0.0
         count = 0
         for entity in selected_entities:
-            blocks = entity_blocks[str(entity)]
-            selected = rng.integers(0, len(blocks), size=len(blocks))
-            for index in selected:
-                block_values = blocks[int(index)]
-                total += float(np.sum(block_values, dtype=np.float64))
-                count += len(block_values)
+            sums, lengths = block_summaries[label_to_index[str(entity)]]
+            selected = rng.integers(0, len(sums), size=len(sums))
+            total += float(np.sum(sums[selected], dtype=np.float64))
+            count += int(np.sum(lengths[selected], dtype=np.int64))
         draws[replicate] = total / max(count, 1)
     return draws
+
+
+def _paired_bootstrap(diff: np.ndarray, entities: np.ndarray, block: int, replicates: int, seed: int) -> np.ndarray:
+    labels, groups = _entity_groups(entities)
+    return _paired_bootstrap_grouped(diff, labels, groups, block, replicates, seed)
+
+
+def _bootstrap_worker(index: int) -> tuple[int, dict[str, Any]]:
+    diff, labels, groups, block, replicates, seed, row = _BOOTSTRAP_TASKS[index]
+    draws = _paired_bootstrap_grouped(diff, labels, groups, block, replicates, seed)
+    probability_positive = float(np.mean(draws > 0.0))
+    result = {
+        **row,
+        "mean_mse_improvement": float(np.mean(diff)),
+        "ci_low": float(np.quantile(draws, 0.025)),
+        "ci_high": float(np.quantile(draws, 0.975)),
+        "positive_probability": probability_positive,
+        "p_value": min(1.0, 2.0 * min(probability_positive, 1.0 - probability_positive)),
+    }
+    return index, result
+
+
+def _execute_bootstrap_tasks(tasks: list[tuple[Any, ...]], n_jobs: int) -> list[dict[str, Any]]:
+    global _BOOTSTRAP_TASKS
+    _BOOTSTRAP_TASKS = tasks
+    results: list[dict[str, Any] | None] = [None] * len(tasks)
+    if n_jobs <= 1 or "fork" not in multiprocessing.get_all_start_methods():
+        for index in range(len(tasks)):
+            position, row = _bootstrap_worker(index)
+            results[position] = row
+    else:
+        context = multiprocessing.get_context("fork")
+        with ProcessPoolExecutor(max_workers=min(n_jobs, len(tasks)), mp_context=context) as executor:
+            futures = [executor.submit(_bootstrap_worker, index) for index in range(len(tasks))]
+            for future in as_completed(futures):
+                position, row = future.result()
+                results[position] = row
+    _BOOTSTRAP_TASKS = []
+    if any(row is None for row in results):
+        raise AssertionError("bootstrap task result missing")
+    return [row for row in results if row is not None]
 
 
 def _holm(rows: list[dict[str, Any]], alpha: float) -> None:
@@ -330,7 +449,7 @@ def _holm(rows: list[dict[str, Any]], alpha: float) -> None:
         rows[index]["holm_reject"] = running <= alpha
 
 
-def _statistics(frames: list[pd.DataFrame], config: dict[str, Any]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def _statistics(frames: list[pd.DataFrame], config: dict[str, Any], n_jobs: int = 1) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     metrics = []
     by_key: dict[tuple[str, str, str], dict[str, pd.DataFrame]] = {}
     for frame in frames:
@@ -349,7 +468,7 @@ def _statistics(frames: list[pd.DataFrame], config: dict[str, Any]) -> tuple[pd.
         key = (row["target_head"], row["split"], row["information_set"])
         by_key.setdefault(key, {})[row["model"]] = frame
     metric_frame = pd.DataFrame(metrics)
-    bootstrap_rows: list[dict[str, Any]] = []
+    bootstrap_tasks: list[tuple[Any, ...]] = []
     for key, models in by_key.items():
         comparisons = []
         if "PRISM_CHANNEL_SPECIFIC" in models and "PERSISTENCE" in models:
@@ -361,6 +480,7 @@ def _statistics(frames: list[pd.DataFrame], config: dict[str, Any]) -> tuple[pd.
             if model in models and "AR" in models:
                 comparisons.append((model, "AR"))
         example = next(frame for frame in models.values())
+        labels, groups = _entity_groups(example["profile_id"].astype(str).to_numpy())
         base_block = max(1, int(example["h_steps"].iloc[0]) + int(example["w_steps"].iloc[0]))
         history_block = max(1, int(math.ceil(int(example["core_history_steps"].iloc[0]) / 4)))
         blocks = sorted({base_block, 2 * base_block, history_block})
@@ -373,14 +493,16 @@ def _statistics(frames: list[pd.DataFrame], config: dict[str, Any]) -> tuple[pd.
             for block in blocks:
                 seed_text = f"{key}|{model}|{reference}|{block}|{config['bootstrap_seed']}"
                 seed = int(hashlib.sha256(seed_text.encode()).hexdigest()[:16], 16)
-                draws = _paired_bootstrap(diff, left["profile_id"].astype(str).to_numpy(), block, int(config["bootstrap_replicates"]), seed)
-                probability_positive = float(np.mean(draws > 0.0))
-                p_value = min(1.0, 2.0 * min(probability_positive, 1.0 - probability_positive))
-                bootstrap_rows.append({
-                    "target_head": key[0], "split": key[1], "information_set": key[2], "model": model, "reference": reference,
-                    "block_length": block, "mean_mse_improvement": float(np.mean(diff)), "ci_low": float(np.quantile(draws, 0.025)),
-                    "ci_high": float(np.quantile(draws, 0.975)), "positive_probability": probability_positive, "p_value": p_value,
-                })
+                bootstrap_tasks.append((
+                    diff,
+                    labels,
+                    groups,
+                    block,
+                    int(config["bootstrap_replicates"]),
+                    seed,
+                    {"target_head": key[0], "split": key[1], "information_set": key[2], "model": model, "reference": reference, "block_length": block},
+                ))
+    bootstrap_rows = _execute_bootstrap_tasks(bootstrap_tasks, n_jobs)
     _holm(bootstrap_rows, float(config["holm_alpha"]))
     bootstrap_frame = pd.DataFrame(bootstrap_rows)
     rank_frame = metric_frame.copy()
@@ -397,6 +519,7 @@ def run_c6(
     c4_output: Path,
     c5_output: Path,
     output: Path,
+    n_jobs: int = 1,
 ) -> dict[str, Any]:
     output.mkdir(parents=True, exist_ok=True)
     freeze_manifest = write_final_freeze_manifest(shared, project, c2_output, c3_output, c4_output, c5_output, output)
@@ -410,12 +533,17 @@ def run_c6(
             if not sample_path.is_file():
                 continue
             try:
-                frames.extend(_evaluate_split(shared, project, c3_output, c4_output, c5_output, output, view, split))
+                cached = _load_completed_split(shared, output, view, split)
+                frames.extend(
+                    cached
+                    if cached is not None
+                    else _evaluate_split(shared, project, c3_output, c4_output, c5_output, output, view, split)
+                )
             except Exception as error:
                 failures.append({"target_head": view.head.head_id, "split": split, "error_type": type(error).__name__, "error": str(error), "traceback": traceback.format_exc()})
     if not frames:
         raise RuntimeError("no C6 finalist predictions were produced")
-    metrics, bootstrap, ranks = _statistics(frames, _freeze(project)["c6"])
+    metrics, bootstrap, ranks = _statistics(frames, _freeze(project)["c6"], n_jobs)
     metrics.to_csv(output / "CPU_FINAL_METRICS.csv", index=False)
     bootstrap.to_csv(output / "BOOTSTRAP_PAIRED.csv", index=False)
     ranks.to_csv(output / "CROSS_TASK_RANKS.csv", index=False)
@@ -452,6 +580,7 @@ def run_c6(
         "metric_rows": len(metrics),
         "bootstrap_rows": len(bootstrap),
         "failures": len(failures),
+        "bootstrap_jobs": int(n_jobs),
         "final_freeze_sha256": sha256_file(freeze_manifest),
     }
     write_json(output / "CPU_FINAL_DECISION.json", decision)
