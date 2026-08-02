@@ -61,6 +61,53 @@ def _residual_offsets(delta_steps: int, history_steps: int, maximum_lags: int) -
     return offsets
 
 
+def _entity_position_groups(frame: pd.DataFrame) -> dict[str, np.ndarray]:
+    series = frame["entity_id"].astype(str)
+    return {str(entity): np.asarray(index, dtype=np.int64) for entity, index in series.groupby(series, sort=False).indices.items()}
+
+
+def _residual_entity_lookup(
+    residuals: pd.DataFrame, residual_mean: float
+) -> dict[str, tuple[np.ndarray, np.ndarray]]:
+    groups = _entity_position_groups(residuals)
+    origins = residuals["origin"].to_numpy(dtype=np.int64)
+    values = residuals["residual"].to_numpy(dtype=np.float64) - residual_mean
+    result: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+    for entity, index in groups.items():
+        # Preserve the legacy dict rule for duplicate origins: last value wins.
+        mapping = {int(origin): float(value) for origin, value in zip(origins[index], values[index], strict=True)}
+        entity_origins = np.asarray(sorted(mapping), dtype=np.int64)
+        entity_values = np.asarray([mapping[int(origin)] for origin in entity_origins], dtype=np.float64)
+        result[entity] = (entity_origins, entity_values)
+    return result
+
+
+def _mature_residual_features_from_lookup(
+    origins: np.ndarray,
+    sample_groups: dict[str, np.ndarray],
+    residual_lookup: dict[str, tuple[np.ndarray, np.ndarray]],
+    horizon_steps: int,
+    window_steps: int,
+    offsets: np.ndarray,
+) -> np.ndarray:
+    result = np.zeros((len(origins), len(offsets)), dtype=np.float64)
+    for entity, sample_index in sample_groups.items():
+        lookup = residual_lookup.get(entity)
+        if lookup is None:
+            continue
+        entity_origins, entity_values = lookup
+        latest_mature = origins[sample_index] - horizon_steps - window_steps
+        queries = latest_mature[:, None] - offsets[None, :]
+        positions = np.searchsorted(entity_origins, queries)
+        valid = positions < len(entity_origins)
+        safe_positions = np.minimum(positions, len(entity_origins) - 1)
+        valid &= entity_origins[safe_positions] == queries
+        values = np.zeros(queries.shape, dtype=np.float64)
+        values[valid] = entity_values[safe_positions[valid]]
+        result[sample_index] = values
+    return result
+
+
 def mature_residual_features(
     samples: pd.DataFrame,
     residuals: pd.DataFrame,
@@ -72,35 +119,15 @@ def mature_residual_features(
     residual_mean: float,
 ) -> np.ndarray:
     offsets = _residual_offsets(delta_steps, history_steps, maximum_lags)
-    result = np.zeros((len(samples), len(offsets)), dtype=np.float64)
-    sample_entity_series = samples["entity_id"].astype(str)
-    sample_groups = sample_entity_series.groupby(sample_entity_series, sort=False).indices
     origins = samples["origin"].to_numpy(dtype=np.int64)
-    residual_entity_series = residuals["entity_id"].astype(str)
-    residual_groups = residual_entity_series.groupby(residual_entity_series, sort=False).indices
-    for entity, sample_index in sample_groups.items():
-        sample_index = np.asarray(sample_index, dtype=np.int64)
-        residual_index = residual_groups.get(entity)
-        if residual_index is None or not len(residual_index):
-            continue
-        residual_index = np.asarray(residual_index, dtype=np.int64)
-        raw_origins = residuals.iloc[residual_index]["origin"].to_numpy(dtype=np.int64)
-        raw_values = residuals.iloc[residual_index]["residual"].to_numpy(dtype=np.float64) - residual_mean
-        # Preserve the legacy dict rule for duplicate origins (last value wins),
-        # then perform every lag lookup for the entity in compiled NumPy code.
-        lookup = {int(origin): float(value) for origin, value in zip(raw_origins, raw_values, strict=True)}
-        entity_origins = np.asarray(sorted(lookup), dtype=np.int64)
-        entity_values = np.asarray([lookup[int(origin)] for origin in entity_origins], dtype=np.float64)
-        latest_mature = origins[sample_index] - horizon_steps - window_steps
-        queries = latest_mature[:, None] - offsets[None, :]
-        positions = np.searchsorted(entity_origins, queries)
-        valid = positions < len(entity_origins)
-        safe_positions = np.minimum(positions, len(entity_origins) - 1)
-        valid &= entity_origins[safe_positions] == queries
-        values = np.zeros(queries.shape, dtype=np.float64)
-        values[valid] = entity_values[safe_positions[valid]]
-        result[sample_index] = values
-    return result
+    return _mature_residual_features_from_lookup(
+        origins,
+        _entity_position_groups(samples),
+        _residual_entity_lookup(residuals, residual_mean),
+        horizon_steps,
+        window_steps,
+        offsets,
+    )
 
 
 def _ridge_path_losses(
@@ -136,17 +163,19 @@ def _residual_profile_fold_path(
     profile: tuple[int, int],
     fit_rows: pd.DataFrame,
     evaluation_rows: pd.DataFrame,
-    oof: pd.DataFrame,
+    fit_context: tuple[np.ndarray, dict[str, np.ndarray]],
+    evaluation_context: tuple[np.ndarray, dict[str, np.ndarray]],
+    residual_lookup: dict[str, tuple[np.ndarray, np.ndarray]],
     view: ViewSpec,
     maximum_lags: int,
-    residual_mean: float,
     alpha_grid: list[float],
 ) -> tuple[int, tuple[int, int], list[float]]:
-    fit_x = mature_residual_features(
-        fit_rows, oof, view.head.h_steps, view.head.w_steps, *profile, maximum_lags, residual_mean
+    offsets = _residual_offsets(*profile, maximum_lags)
+    fit_x = _mature_residual_features_from_lookup(
+        *fit_context, residual_lookup, view.head.h_steps, view.head.w_steps, offsets
     )
-    evaluation_x = mature_residual_features(
-        evaluation_rows, oof, view.head.h_steps, view.head.w_steps, *profile, maximum_lags, residual_mean
+    evaluation_x = _mature_residual_features_from_lookup(
+        *evaluation_context, residual_lookup, view.head.h_steps, view.head.w_steps, offsets
     )
     path_losses = _ridge_path_losses(
         fit_x,
@@ -261,25 +290,42 @@ def _residual_model(
     losses: dict[Any, list[float]] = {candidate: [] for candidate in candidates}
     usable_folds = sorted(int(value) for value in oof["oof_fold"].unique())[1:]
     fold_rows: dict[int, tuple[pd.DataFrame, pd.DataFrame]] = {}
+    fold_contexts: dict[
+        int,
+        tuple[
+            tuple[np.ndarray, dict[str, np.ndarray]],
+            tuple[np.ndarray, dict[str, np.ndarray]],
+        ],
+    ] = {}
+    residual_lookup = _residual_entity_lookup(oof, residual_mean)
     for fold in usable_folds:
         fit_rows = oof[oof["oof_fold"] < fold]
         evaluation_rows = oof[oof["oof_fold"] == fold]
         fold_rows[fold] = (fit_rows, evaluation_rows)
+        fold_contexts[fold] = (
+            (fit_rows["origin"].to_numpy(dtype=np.int64), _entity_position_groups(fit_rows)),
+            (evaluation_rows["origin"].to_numpy(dtype=np.int64), _entity_position_groups(evaluation_rows)),
+        )
         losses["EXACT_ZERO"].append(float(np.mean(np.square(evaluation_rows["residual"].to_numpy(dtype=np.float64)), dtype=np.float64)))
-    tasks = [(fold, profile, *fold_rows[fold]) for fold in usable_folds for profile in profiles]
+    tasks = [
+        (fold, profile, *fold_rows[fold], *fold_contexts[fold])
+        for fold in usable_folds
+        for profile in profiles
+    ]
     path_results: dict[tuple[int, tuple[int, int]], list[float]] = {}
 
-    def execute(task: tuple[int, tuple[int, int], pd.DataFrame, pd.DataFrame]) -> tuple[int, tuple[int, int], list[float]]:
-        fold, profile, fit_rows, evaluation_rows = task
+    def execute(task: tuple[Any, ...]) -> tuple[int, tuple[int, int], list[float]]:
+        fold, profile, fit_rows, evaluation_rows, fit_context, evaluation_context = task
         return _residual_profile_fold_path(
             fold,
             profile,
             fit_rows,
             evaluation_rows,
-            oof,
+            fit_context,
+            evaluation_context,
+            residual_lookup,
             view,
             int(config["maximum_residual_lags"]),
-            residual_mean,
             alpha_grid,
         )
 
