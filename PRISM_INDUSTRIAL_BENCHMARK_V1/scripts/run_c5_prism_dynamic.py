@@ -14,8 +14,17 @@ def main() -> None:
     parser.add_argument("--c4-output", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--n-jobs", type=int, default=2)
+    parser.add_argument("--inner-jobs", type=int, default=1)
     arguments = parser.parse_args()
-    manifest = run_c5(arguments.shared, arguments.project, arguments.c3_output, arguments.c4_output, arguments.output, arguments.n_jobs)
+    manifest = run_c5(
+        arguments.shared,
+        arguments.project,
+        arguments.c3_output,
+        arguments.c4_output,
+        arguments.output,
+        arguments.n_jobs,
+        arguments.inner_jobs,
+    )
     print(f"C5_STATUS={manifest['status']}")
     print(f"C5_JOBS={manifest['jobs']}")
 

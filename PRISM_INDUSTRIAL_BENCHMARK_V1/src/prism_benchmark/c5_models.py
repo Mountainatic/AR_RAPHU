@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import time
 import traceback
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +14,7 @@ from .c2_models import _prediction_frame
 from .c3_models import _load_ar_contract, _ridge_block_predict
 from .c4_prism import _contract_prediction, _fit_candidate, profile_values
 from .cpu_data import BaseAccessor, ViewSpec, deterministic_subsample, load_samples, main_views, realized_state_profiles, sha256_file
-from .cpu_selection import mse, regression_metrics, select_one_se
+from .cpu_selection import Standardizer, mse, regression_metrics, select_one_se
 from .stage0 import write_json
 
 
@@ -53,6 +53,13 @@ def rolling_oof_folds(samples: pd.DataFrame, count: int = 4) -> list[tuple[np.nd
     return folds
 
 
+def _residual_offsets(delta_steps: int, history_steps: int, maximum_lags: int) -> np.ndarray:
+    offsets = np.arange(0, history_steps + 1, max(1, delta_steps), dtype=np.int64)
+    if len(offsets) > maximum_lags:
+        offsets = offsets[np.unique(np.rint(np.linspace(0, len(offsets) - 1, maximum_lags)).astype(np.int64))]
+    return offsets
+
+
 def mature_residual_features(
     samples: pd.DataFrame,
     residuals: pd.DataFrame,
@@ -63,9 +70,7 @@ def mature_residual_features(
     maximum_lags: int,
     residual_mean: float,
 ) -> np.ndarray:
-    offsets = np.arange(0, history_steps + 1, max(1, delta_steps), dtype=np.int64)
-    if len(offsets) > maximum_lags:
-        offsets = offsets[np.unique(np.rint(np.linspace(0, len(offsets) - 1, maximum_lags)).astype(np.int64))]
+    offsets = _residual_offsets(delta_steps, history_steps, maximum_lags)
     result = np.zeros((len(samples), len(offsets)), dtype=np.float64)
     sample_entities = samples["entity_id"].astype(str).to_numpy()
     origins = samples["origin"].to_numpy(dtype=np.int64)
@@ -75,13 +80,78 @@ def mature_residual_features(
         residual_index = np.flatnonzero(residual_entities == entity)
         if not len(residual_index):
             continue
-        entity_origins = residuals.iloc[residual_index]["origin"].to_numpy(dtype=np.int64)
-        entity_values = residuals.iloc[residual_index]["residual"].to_numpy(dtype=np.float64) - residual_mean
-        lookup = {int(origin): float(value) for origin, value in zip(entity_origins, entity_values, strict=True)}
+        raw_origins = residuals.iloc[residual_index]["origin"].to_numpy(dtype=np.int64)
+        raw_values = residuals.iloc[residual_index]["residual"].to_numpy(dtype=np.float64) - residual_mean
+        # Preserve the legacy dict rule for duplicate origins (last value wins),
+        # then perform every lag lookup for the entity in compiled NumPy code.
+        lookup = {int(origin): float(value) for origin, value in zip(raw_origins, raw_values, strict=True)}
+        entity_origins = np.asarray(sorted(lookup), dtype=np.int64)
+        entity_values = np.asarray([lookup[int(origin)] for origin in entity_origins], dtype=np.float64)
         latest_mature = origins[sample_index] - horizon_steps - window_steps
-        for local_row, sample_row in enumerate(sample_index):
-            result[sample_row] = [lookup.get(int(latest_mature[local_row] - offset), 0.0) for offset in offsets]
+        queries = latest_mature[:, None] - offsets[None, :]
+        positions = np.searchsorted(entity_origins, queries)
+        valid = positions < len(entity_origins)
+        safe_positions = np.minimum(positions, len(entity_origins) - 1)
+        valid &= entity_origins[safe_positions] == queries
+        values = np.zeros(queries.shape, dtype=np.float64)
+        values[valid] = entity_values[safe_positions[valid]]
+        result[sample_index] = values
     return result
+
+
+def _ridge_path_losses(
+    x_train: np.ndarray,
+    y_train: np.ndarray,
+    x_evaluation: np.ndarray,
+    y_evaluation: np.ndarray,
+    alphas: list[float],
+) -> list[float]:
+    """Evaluate the frozen ridge path with one FP64 sufficient-statistics pass."""
+    scaler = Standardizer().fit(x_train)
+    train = scaler.transform(x_train)
+    evaluation = scaler.transform(x_evaluation)
+    y_mean = float(np.mean(y_train, dtype=np.float64))
+    centered_y = np.asarray(y_train, dtype=np.float64) - y_mean
+    gram = train.T @ train
+    rhs = train.T @ centered_y
+    identity = np.eye(train.shape[1], dtype=np.float64)
+    losses = []
+    for alpha in alphas:
+        system = gram + identity * float(alpha)
+        try:
+            coefficient = np.linalg.solve(system, rhs)
+        except np.linalg.LinAlgError:
+            coefficient = np.linalg.lstsq(system, rhs, rcond=1e-12)[0]
+        prediction = evaluation @ coefficient + y_mean
+        losses.append(mse(y_evaluation, prediction))
+    return losses
+
+
+def _residual_profile_fold_path(
+    fold: int,
+    profile: tuple[int, int],
+    fit_rows: pd.DataFrame,
+    evaluation_rows: pd.DataFrame,
+    oof: pd.DataFrame,
+    view: ViewSpec,
+    maximum_lags: int,
+    residual_mean: float,
+    alpha_grid: list[float],
+) -> tuple[int, tuple[int, int], list[float]]:
+    fit_x = mature_residual_features(
+        fit_rows, oof, view.head.h_steps, view.head.w_steps, *profile, maximum_lags, residual_mean
+    )
+    evaluation_x = mature_residual_features(
+        evaluation_rows, oof, view.head.h_steps, view.head.w_steps, *profile, maximum_lags, residual_mean
+    )
+    path_losses = _ridge_path_losses(
+        fit_x,
+        fit_rows["residual"].to_numpy(dtype=np.float64),
+        evaluation_x,
+        evaluation_rows["residual"].to_numpy(dtype=np.float64),
+        alpha_grid,
+    )
+    return fold, profile, path_losses
 
 
 def _load_c4_joint(c4_output: Path, view: ViewSpec) -> dict[str, Any]:
@@ -176,6 +246,7 @@ def _residual_model(
     validation: pd.DataFrame,
     oof: pd.DataFrame,
     validation_k: np.ndarray,
+    inner_jobs: int = 1,
 ) -> tuple[np.ndarray, dict[str, Any], int]:
     freeze = _freeze(project)
     config = freeze["c5"]["physics_first"]
@@ -185,16 +256,44 @@ def _residual_model(
     candidates: list[Any] = ["EXACT_ZERO", *[(profile, alpha) for profile in profiles for alpha in alpha_grid]]
     losses: dict[Any, list[float]] = {candidate: [] for candidate in candidates}
     usable_folds = sorted(int(value) for value in oof["oof_fold"].unique())[1:]
+    fold_rows: dict[int, tuple[pd.DataFrame, pd.DataFrame]] = {}
     for fold in usable_folds:
         fit_rows = oof[oof["oof_fold"] < fold]
         evaluation_rows = oof[oof["oof_fold"] == fold]
+        fold_rows[fold] = (fit_rows, evaluation_rows)
         losses["EXACT_ZERO"].append(float(np.mean(np.square(evaluation_rows["residual"].to_numpy(dtype=np.float64)), dtype=np.float64)))
+    tasks = [(fold, profile, *fold_rows[fold]) for fold in usable_folds for profile in profiles]
+    path_results: dict[tuple[int, tuple[int, int]], list[float]] = {}
+
+    def execute(task: tuple[int, tuple[int, int], pd.DataFrame, pd.DataFrame]) -> tuple[int, tuple[int, int], list[float]]:
+        fold, profile, fit_rows, evaluation_rows = task
+        return _residual_profile_fold_path(
+            fold,
+            profile,
+            fit_rows,
+            evaluation_rows,
+            oof,
+            view,
+            int(config["maximum_residual_lags"]),
+            residual_mean,
+            alpha_grid,
+        )
+
+    if inner_jobs <= 1:
+        for fold, profile, path in map(execute, tasks):
+            path_results[(fold, profile)] = path
+    else:
+        with ThreadPoolExecutor(max_workers=min(inner_jobs, len(tasks))) as executor:
+            futures = [executor.submit(execute, task) for task in tasks]
+            for future in as_completed(futures):
+                fold, profile, path = future.result()
+                path_results[(fold, profile)] = path
+
+    # Completion order must not affect one-SE. Restore legacy fold/profile/alpha order.
+    for fold in usable_folds:
         for profile in profiles:
-            fit_x = mature_residual_features(fit_rows, oof, view.head.h_steps, view.head.w_steps, *profile, int(config["maximum_residual_lags"]), residual_mean)
-            evaluation_x = mature_residual_features(evaluation_rows, oof, view.head.h_steps, view.head.w_steps, *profile, int(config["maximum_residual_lags"]), residual_mean)
-            for alpha in alpha_grid:
-                prediction, _ = _ridge_block_predict(fit_x, fit_rows["residual"].to_numpy(dtype=np.float64), evaluation_x, alpha)
-                losses[(profile, alpha)].append(mse(evaluation_rows["residual"].to_numpy(dtype=np.float64), prediction))
+            for alpha, value in zip(alpha_grid, path_results[(fold, profile)], strict=True):
+                losses[(profile, alpha)].append(value)
     selection = select_one_se(losses, lambda value: (0,) if value == "EXACT_ZERO" else (1, value[0][1], -value[0][0], -value[1]))
     if selection.candidate == "EXACT_ZERO":
         residual_prediction = np.zeros(len(validation), dtype=np.float64)
@@ -227,6 +326,11 @@ def _residual_model(
         "usable_residual_selection_folds": len(usable_folds),
         "maturity_rule": "s+h+W<=t",
         "numerical_certificate": certificate,
+        "runtime_parallelism": {
+            "inner_jobs": int(inner_jobs),
+            "path_tasks": len(tasks),
+            "ridge_sufficient_statistics_reused": True,
+        },
     }, parameter_count
 
 
@@ -312,7 +416,15 @@ def _joint_ar(
     }, parameter_count
 
 
-def _run_view(shared: Path, project: Path, c3_output: Path, c4_output: Path, output: Path, view: ViewSpec) -> dict[str, Any]:
+def _run_view(
+    shared: Path,
+    project: Path,
+    c3_output: Path,
+    c4_output: Path,
+    output: Path,
+    view: ViewSpec,
+    inner_jobs: int,
+) -> dict[str, Any]:
     started = time.time()
     destination = output / view.head.head_id / view.proxy_policy
     destination.mkdir(parents=True, exist_ok=True)
@@ -325,7 +437,9 @@ def _run_view(shared: Path, project: Path, c3_output: Path, c4_output: Path, out
         oof_path = destination / "PHYSICS_K_OOF_RESIDUALS.parquet"
         oof.to_parquet(oof_path, index=False, compression="zstd")
         validation_k = pd.read_parquet(c4_output / "JOINT" / view.head.head_id / view.proxy_policy / "PRISM_CHANNEL_SPECIFIC.validation.parquet")["y_pred"].to_numpy(dtype=np.float64)
-        residual_prediction, physics_selection, physics_parameters = _residual_model(shared, project, view, train, validation, oof, validation_k)
+        residual_prediction, physics_selection, physics_parameters = _residual_model(
+            shared, project, view, train, validation, oof, validation_k, inner_jobs
+        )
         physics_prediction = validation_k + residual_prediction
         joint_prediction, joint_selection, joint_parameters = _joint_ar(shared, project, c3_output, view, train, validation, oof, contracts)
         rows = []
@@ -373,7 +487,15 @@ def _run_view(shared: Path, project: Path, c3_output: Path, c4_output: Path, out
     return result
 
 
-def run_c5(shared: Path, project: Path, c3_output: Path, c4_output: Path, output: Path, n_jobs: int) -> dict[str, Any]:
+def run_c5(
+    shared: Path,
+    project: Path,
+    c3_output: Path,
+    c4_output: Path,
+    output: Path,
+    n_jobs: int,
+    inner_jobs: int = 1,
+) -> dict[str, Any]:
     output.mkdir(parents=True, exist_ok=True)
     results = []
     pending = []
@@ -386,7 +508,10 @@ def run_c5(shared: Path, project: Path, c3_output: Path, c4_output: Path, output
                 continue
         pending.append(view)
     with ProcessPoolExecutor(max_workers=n_jobs) as executor:
-        futures = {executor.submit(_run_view, shared, project, c3_output, c4_output, output, view): view for view in pending}
+        futures = {
+            executor.submit(_run_view, shared, project, c3_output, c4_output, output, view, inner_jobs): view
+            for view in pending
+        }
         for future in as_completed(futures):
             results.append(future.result())
     manifest = {
@@ -394,6 +519,8 @@ def run_c5(shared: Path, project: Path, c3_output: Path, c4_output: Path, output
         "jobs": len(results),
         "passed": sum(item["status"] == "PASS" for item in results),
         "failed_retained": sum(item["status"] != "PASS" for item in results),
+        "outer_jobs": int(n_jobs),
+        "residual_inner_jobs": int(inner_jobs),
         "test_accessed": False,
         "freeze_sha256": sha256_file(project / "configs/cpu_model_freeze_v1.json"),
     }

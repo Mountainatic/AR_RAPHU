@@ -21,5 +21,6 @@ exec "${PYTHON}" "${PROJECT_DIR}/scripts/run_cpu_chain.py" \
   --c2-jobs "${PRISM_C2_JOBS:-8}" \
   --c3-jobs "${PRISM_C3_JOBS:-6}" \
   --c4-jobs "${PRISM_C4_JOBS:-8}" \
-  --c5-jobs "${PRISM_C5_JOBS:-2}" \
+  --c5-jobs "${PRISM_C5_JOBS:-1}" \
+  --c5-inner-jobs "${PRISM_C5_INNER_JOBS:-27}" \
   --publish
