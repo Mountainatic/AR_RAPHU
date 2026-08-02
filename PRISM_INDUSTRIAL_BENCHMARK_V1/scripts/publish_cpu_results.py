@@ -70,7 +70,7 @@ def main() -> None:
         raise RuntimeError("gh is not installed; source push completed but release upload cannot continue")
     existing = subprocess.run([gh, "release", "view", arguments.release_tag], cwd=arguments.project.parent, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if existing.returncode:
-        run([gh, "release", "create", arguments.release_tag, "--title", "PRISM Industrial CPU Results V1", "--notes-file", str(report), "--latest=false"], arguments.project.parent)
+        run([gh, "release", "create", arguments.release_tag, "--title", "PRISM Industrial CPU Results V1", "--notes-file", str(report)], arguments.project.parent)
     run([gh, "release", "upload", arguments.release_tag, str(arguments.sha256_file), str(report), "--clobber"], arguments.project.parent)
     assets = _upload_bundle(gh, arguments.release_tag, arguments.bundle, arguments.project.parent)
     asset_manifest = arguments.bundle.with_name("RELEASE_ASSET_MANIFEST.json")

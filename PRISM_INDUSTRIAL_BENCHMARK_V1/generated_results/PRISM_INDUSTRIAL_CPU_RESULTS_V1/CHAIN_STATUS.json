@@ -1,12 +1,12 @@
 {
   "current_stage": "PUBLISH",
   "pipeline": "PRISM_CPU_STRICT_CHAIN_V1",
-  "resumed_utc": "2026-08-02T06:58:38.425920+00:00",
+  "resumed_utc": "2026-08-02T07:07:18.056360+00:00",
   "schema_version": 2,
   "stages": {
     "C1_VALIDATE": {
-      "completed_utc": "2026-08-02T06:59:03.489542+00:00",
-      "started_utc": "2026-08-02T06:58:38.426881+00:00",
+      "completed_utc": "2026-08-02T07:07:44.023332+00:00",
+      "started_utc": "2026-08-02T07:07:18.057084+00:00",
       "status": "PASS"
     },
     "C2_CLASSICAL": {
@@ -122,12 +122,12 @@
       "status": "PASS"
     },
     "PACKAGE": {
-      "completed_utc": "2026-08-02T07:06:35.450569+00:00",
-      "started_utc": "2026-08-02T06:59:03.940997+00:00",
+      "completed_utc": "2026-08-02T07:15:19.890935+00:00",
+      "started_utc": "2026-08-02T07:07:44.023882+00:00",
       "status": "PASS"
     },
     "PUBLISH": {
-      "started_utc": "2026-08-02T07:06:35.451265+00:00",
+      "started_utc": "2026-08-02T07:15:19.891576+00:00",
       "status": "RUNNING"
     }
   },

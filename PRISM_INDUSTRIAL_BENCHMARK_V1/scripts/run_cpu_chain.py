@@ -30,6 +30,25 @@ def _stage(state: dict[str, Any], state_path: Path, name: str, command: list[str
     state["stages"].setdefault(name, {})["started_utc"] = datetime.now(timezone.utc).isoformat()
     state["stages"][name]["status"] = "RUNNING"
     _write_status(state_path, state)
+
+
+def _package_checkpoint_valid(return_root: Path) -> bool:
+    path = return_root / "PACKAGE_OUTPUT.json"
+    if not path.is_file():
+        return False
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        bundle = Path(payload["zip"])
+        checksum = Path(payload["sha256_file"])
+        return (
+            payload.get("status") == "PASS"
+            and payload.get("roundtrip") == "PASS"
+            and bundle.is_file()
+            and checksum.is_file()
+            and bundle.stat().st_size == int(payload["zip_bytes"])
+        )
+    except (KeyError, OSError, TypeError, ValueError, json.JSONDecodeError):
+        return False
     current_command = list(command)
     while True:
         try:
@@ -103,8 +122,9 @@ def main() -> None:
     try:
         for name, command in commands:
             previous = state.get("stages", {}).get(name, {})
-            if isinstance(previous, dict) and previous.get("status") == "PASS" and name not in {"C1_VALIDATE", "PACKAGE"}:
-                continue
+            if isinstance(previous, dict) and previous.get("status") == "PASS" and name != "C1_VALIDATE":
+                if name != "PACKAGE" or _package_checkpoint_valid(arguments.return_root):
+                    continue
             _stage(state, state_path, name, command, results / "LOGS" / f"{name}.log")
             if name == "C6_FINAL":
                 state["test_accessed"] = True
