@@ -35,6 +35,30 @@ def test_accessor_uses_strict_past_and_block_means() -> None:
     np.testing.assert_allclose(accessor.block_means(samples, "u", [(0, 2), (2, 5)]), [[3.5, 1.0], [5.5, 3.0]])
 
 
+def test_accessor_grouped_fast_path_preserves_interleaved_row_order() -> None:
+    accessor = object.__new__(BaseAccessor)
+    accessor.dataset = "demo"
+    accessor.entities = {
+        "one": (np.arange(8, dtype=np.int64), {"u": np.arange(8, dtype=np.float64)}),
+        "two": (np.arange(8, dtype=np.int64), {"u": 100.0 + np.arange(8, dtype=np.float64)}),
+    }
+    samples = pd.DataFrame(
+        {
+            "entity_id": ["two", "one", "two", "one"],
+            "origin": [5, 4, 7, 6],
+            "latest_available_target_index": [4, 3, 6, 5],
+        }
+    )
+    np.testing.assert_array_equal(
+        accessor.snapshot(samples, ["u"]).reshape(-1),
+        [104.0, 3.0, 106.0, 5.0],
+    )
+    np.testing.assert_allclose(
+        accessor.block_means(samples, "u", [(0, 2)]).reshape(-1),
+        [103.5, 2.5, 105.5, 4.5],
+    )
+
+
 def test_tep_inner_folds_keep_same_run_across_faults() -> None:
     rows = []
     for run in range(1, 6):

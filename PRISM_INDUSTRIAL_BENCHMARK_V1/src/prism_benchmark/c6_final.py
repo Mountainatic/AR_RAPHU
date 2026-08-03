@@ -406,17 +406,27 @@ def _paired_bootstrap(diff: np.ndarray, entities: np.ndarray, block: int, replic
     return _paired_bootstrap_grouped(diff, labels, groups, block, replicates, seed)
 
 
+def _two_sided_sign_p_value(draws: np.ndarray) -> float:
+    probability_nonpositive = float(np.mean(draws <= 0.0))
+    probability_nonnegative = float(np.mean(draws >= 0.0))
+    return min(1.0, 2.0 * min(probability_nonpositive, probability_nonnegative))
+
+
 def _bootstrap_worker(index: int) -> tuple[int, dict[str, Any]]:
     diff, labels, groups, block, replicates, seed, row = _BOOTSTRAP_TASKS[index]
     draws = _paired_bootstrap_grouped(diff, labels, groups, block, replicates, seed)
     probability_positive = float(np.mean(draws > 0.0))
+    # Include ties in both tails. Using only P(draw > 0) makes an exactly
+    # zero paired difference look maximally significant (p=0), although it is
+    # the strongest possible null result. The inclusive tails provide the
+    # conservative two-sided sign probability and preserve p=1 for all ties.
     result = {
         **row,
         "mean_mse_improvement": float(np.mean(diff)),
         "ci_low": float(np.quantile(draws, 0.025)),
         "ci_high": float(np.quantile(draws, 0.975)),
         "positive_probability": probability_positive,
-        "p_value": min(1.0, 2.0 * min(probability_positive, 1.0 - probability_positive)),
+        "p_value": _two_sided_sign_p_value(draws),
     }
     return index, result
 

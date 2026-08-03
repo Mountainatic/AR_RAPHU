@@ -169,8 +169,11 @@ class BaseAccessor:
             indices = indices[:, None]
         result = np.empty((len(samples), indices.shape[1] * len(columns)), dtype=np.float64)
         entities = samples["entity_id"].astype(str).to_numpy()
-        for entity_id in pd.unique(entities):
-            mask = np.flatnonzero(entities == entity_id)
+        codes, labels = pd.factorize(entities, sort=False)
+        order = np.argsort(codes, kind="stable")
+        counts = np.bincount(codes, minlength=len(labels))
+        groups = np.split(order, np.cumsum(counts)[:-1])
+        for entity_id, mask in zip(labels, groups, strict=True):
             rows, arrays = self.entities[entity_id]
             wanted = indices[mask]
             positions = np.searchsorted(rows, wanted)
@@ -244,8 +247,11 @@ class BaseAccessor:
         result = np.empty((len(samples), len(intervals)), dtype=np.float64)
         entities = samples["entity_id"].astype(str).to_numpy()
         origins = samples["origin"].to_numpy(dtype=np.int64)
-        for entity_id in pd.unique(entities):
-            mask = np.flatnonzero(entities == entity_id)
+        codes, labels = pd.factorize(entities, sort=False)
+        order = np.argsort(codes, kind="stable")
+        counts = np.bincount(codes, minlength=len(labels))
+        groups = np.split(order, np.cumsum(counts)[:-1])
+        for entity_id, mask in zip(labels, groups, strict=True):
             rows, arrays = self.entities[entity_id]
             dense_min = int(rows.min())
             dense_max = int(rows.max())

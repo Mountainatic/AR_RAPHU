@@ -4,7 +4,14 @@ import numpy as np
 
 import pandas as pd
 
-from prism_benchmark.c6_final import _entity_groups, _holm, _markdown_table, _paired_bootstrap, _paired_frames
+from prism_benchmark.c6_final import (
+    _entity_groups,
+    _holm,
+    _markdown_table,
+    _paired_bootstrap,
+    _paired_frames,
+    _two_sided_sign_p_value,
+)
 
 
 def _legacy_paired_bootstrap(diff: np.ndarray, entities: np.ndarray, block: int, replicates: int, seed: int) -> np.ndarray:
@@ -36,6 +43,13 @@ def test_paired_bootstrap_preserves_positive_difference() -> None:
     entities = np.array(["a"] * 50 + ["b"] * 50)
     draws = _paired_bootstrap(diff, entities, 10, 50, 7)
     np.testing.assert_allclose(draws, 1.0)
+
+
+def test_two_sided_sign_probability_treats_exact_ties_as_null() -> None:
+    assert _two_sided_sign_p_value(np.zeros(20, dtype=np.float64)) == 1.0
+    assert _two_sided_sign_p_value(np.ones(20, dtype=np.float64)) == 0.0
+    assert _two_sided_sign_p_value(-np.ones(20, dtype=np.float64)) == 0.0
+    assert _two_sided_sign_p_value(np.array([-1.0, 0.0, 1.0])) == 1.0
 
 
 def test_grouped_bootstrap_matches_legacy_draws() -> None:
