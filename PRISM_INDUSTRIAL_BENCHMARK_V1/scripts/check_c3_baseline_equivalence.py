@@ -42,8 +42,13 @@ def main() -> None:
     candidate = run_job(args.shared, args.project, candidate_root, view, args.model)
     reference_path = reference_root / "PREDICTIONS" / args.model / view.relative_root / "RESULT.json"
     reference = json.loads(reference_path.read_text(encoding="utf-8"))
-    fields = ["status", "model", "parameter_count", "selection"]
+    fields = ["status", "model", "parameter_count"]
     field_equal = {field: reference.get(field) == candidate.get(field) for field in fields}
+    selection_fields = sorted(set(reference.get("selection", {})) | set(candidate.get("selection", {})))
+    selection_equal = {
+        field: reference.get("selection", {}).get(field) == candidate.get("selection", {}).get(field)
+        for field in selection_fields
+    }
     old = pd.read_parquet(reference_root / reference["prediction_path"])
     new = pd.read_parquet(candidate_root / candidate["prediction_path"])
     identity = next(
@@ -58,8 +63,9 @@ def main() -> None:
         old["y_pred"].to_numpy(dtype=np.float64) - new["y_pred"].to_numpy(dtype=np.float64)
     )
     report = {
-        "status": "PASS" if all(field_equal.values()) and float(difference.max(initial=0.0)) <= 1e-8 else "FAIL",
+        "status": "PASS" if all(field_equal.values()) and all(selection_equal.values()) and float(difference.max(initial=0.0)) <= 1e-8 else "FAIL",
         "field_equal": field_equal,
+        "selection_equal": selection_equal,
         "prediction_rows": len(new),
         "prediction_max_abs_difference": float(difference.max(initial=0.0)),
         "prediction_mean_abs_difference": float(difference.mean(dtype=np.float64)),
