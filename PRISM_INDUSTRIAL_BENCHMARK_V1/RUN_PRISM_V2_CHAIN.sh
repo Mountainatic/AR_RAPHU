@@ -28,4 +28,19 @@ run_stage v6 1
 run_stage v7 5
 run_stage bdev 20
 run_stage g3 1
+run_stage v8c 3
+run_stage v8b 3
+printf '%s START report\n' "$(date --iso-8601=seconds)" | tee -a "$OUTPUT/logs/CHAIN.log"
+"$PYTHON" "$PROJECT/scripts/run_prism_v2_stage.py" report \
+  --shared "$SHARED" --project "$PROJECT" --output "$OUTPUT" --n-jobs 1 \
+  --c6-summary /root/autodl-tmp/PRISM_V2_BASELINE_CACHE/C6_V2_SUMMARY.tar \
+  2>&1 | tee "$OUTPUT/logs/REPORT.log"
+printf '%s COMPLETE report\n' "$(date --iso-8601=seconds)" | tee -a "$OUTPUT/logs/CHAIN.log"
+printf '%s START package\n' "$(date --iso-8601=seconds)" | tee -a "$OUTPUT/logs/CHAIN.log"
+mkdir -p /root/autodl-tmp/PRISM_V2_MODULAR_CPU_RELEASE
+"$PYTHON" "$PROJECT/scripts/build_prism_v2_release.py" \
+  --project "$PROJECT" --output "$OUTPUT" \
+  --return-dir /root/autodl-tmp/PRISM_V2_MODULAR_CPU_RELEASE \
+  2>&1 | tee /root/autodl-tmp/PRISM_V2_MODULAR_CPU_RELEASE/PACKAGE.log
+printf '%s COMPLETE package\n' "$(date --iso-8601=seconds)" | tee -a "$OUTPUT/logs/CHAIN.log"
 printf '%s DEVELOPMENT_CHAIN_COMPLETE\n' "$(date --iso-8601=seconds)" | tee -a "$OUTPUT/logs/CHAIN.log"

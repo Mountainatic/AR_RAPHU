@@ -94,7 +94,7 @@ def evaluate_level_c_baselines(shared:Path,project:Path,output:Path,n_jobs:int)-
         for split in ("test","ood"):
             if not (shared/"sample_ids"/view.relative_root/f"{split}.parquet").is_file():continue
             for model in ("PERSISTENCE","DPLS","XGBOOST","PARALLEL_HAMMERSTEIN","HAMMERSTEIN_WIENER"):
-                jobs.append((shared,project,c2,c3,final,view,split,model,core))
+                jobs.append((shared,project,c2,c3,final/view.availability_scenario/view.proxy_policy,view,split,model,core))
     results=_run_parallel(_evaluate_baseline_job,jobs,n_jobs)
     jobs=[]
     for view in dynamic_views:
@@ -102,13 +102,13 @@ def evaluate_level_c_baselines(shared:Path,project:Path,output:Path,n_jobs:int)-
         for split in ("test","ood"):
             if not (shared/"sample_ids"/view.relative_root/f"{split}.parquet").is_file():continue
             for model in ("PERSISTENCE","AR","ARX","LINEAR_NARX"):
-                jobs.append((shared,project,c2,c3,final,view,split,model,core))
+                jobs.append((shared,project,c2,c3,final/view.availability_scenario/view.proxy_policy,view,split,model,core))
     results.extend(_run_parallel(_evaluate_baseline_job,jobs,n_jobs))
     prism_jobs=[]
     for view in input_views:
         core=max(view.head.h_steps*8,view.head.w_steps)
         for split in ("test","ood"):
-            if (shared/"sample_ids"/view.relative_root/f"{split}.parquet").is_file():prism_jobs.append((shared,project,c3,c4,c5,final,view,split,core))
+            if (shared/"sample_ids"/view.relative_root/f"{split}.parquet").is_file():prism_jobs.append((shared,project,c3,c4,c5,final/view.availability_scenario/view.proxy_policy,view,split,core))
     with ProcessPoolExecutor(max_workers=min(n_jobs,8)) as executor:
         futures=[executor.submit(_evaluate_prism_job,job) for job in prism_jobs]
         for future in as_completed(futures):results.extend(future.result())

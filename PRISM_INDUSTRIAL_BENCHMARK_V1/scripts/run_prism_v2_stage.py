@@ -16,11 +16,12 @@ from prism_benchmark.v2_j import run_v7_j
 from prism_benchmark.v2_state import run_v1_state
 from prism_benchmark.v2_w import run_v4_w
 from prism_benchmark.v2_baselines import evaluate_level_c_baselines, run_level_c_baseline_development
+from prism_benchmark.v2_reporting import build_v2_report
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run a numerically frozen PRISM V2 stage")
-    parser.add_argument("stage", choices=["v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "bdev", "g3", "v8c", "v8b"])
+    parser.add_argument("stage", choices=["v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "bdev", "g3", "v8c", "v8b", "report"])
     parser.add_argument("--shared", type=Path, required=True)
     parser.add_argument("--project", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--output", type=Path, required=True)
@@ -56,8 +57,12 @@ def main() -> None:
     elif args.stage == "v8c":
         result = {"v2":run_v8_level(paths.shared,paths.project,paths.output,"LEVEL_C_CONFIRMATION",args.n_jobs),
                   "baselines":evaluate_level_c_baselines(paths.shared,paths.project,paths.output,args.n_jobs)}
-    else:
+    elif args.stage == "v8b":
         result = run_v8_level(paths.shared,paths.project,paths.output,"LEVEL_B_PRIMARY_EXPLORATORY",args.n_jobs)
+    else:
+        if args.c6_summary is None:
+            raise SystemExit("report requires --c6-summary")
+        result = build_v2_report(paths.shared,paths.project,paths.output,args.c6_summary.resolve())
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
 
 
