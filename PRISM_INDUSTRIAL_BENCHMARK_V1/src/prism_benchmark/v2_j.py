@@ -18,7 +18,7 @@ from .v2_config import load_frozen_config
 from .v2_k import _cap
 from .v2_numerics import solve_certified
 from .v2_selection import one_se_select, practical_activation
-from .v2_runtime import run_parallel
+from .v2_runtime import release_process_memory, run_parallel
 from .v2_state import _quadratic
 from .v2_views import development_dynamic_views
 from .v2_w import fit_w_candidate
@@ -73,7 +73,7 @@ def run_j_view(shared:Path,project:Path,output:Path,view:ViewSpec)->dict[str,Any
         train=load_samples(shared,view,"train");validation=load_samples(shared,view,"validation");folds=inner_folds(train,4)
         alphas=[float(x) for x in config["J_module"]["ridge_alpha_grid"]];ratios=[float(x) for x in config["J_module"]["block_penalty_ratios_k_over_state"]]
         candidates=["EXACT_BOTH_ZERO","EXACT_K_ZERO","EXACT_STATE_ZERO"]+[(family,alpha,ratio) for family in ("JOINT_K_STATE_LINEAR","JOINT_KW_STATE_LINEAR") for alpha in alphas for ratio in ratios]
-        losses={candidate:[] for candidate in candidates};fold_cache=[]
+        losses={candidate:[] for candidate in candidates}
         for fit_index,evaluation_index in folds:
             fit=_cap(train.iloc[fit_index],int(config["row_caps"]["joint_predictive_fit"]));evaluation=_cap(train.iloc[evaluation_index],int(config["row_caps"]["validation_selection_per_fold"]))
             features=fit_physical_features(shared,view,fit,evaluation,active,config,fit_split="train",evaluation_split="train")
@@ -94,7 +94,11 @@ def run_j_view(shared:Path,project:Path,output:Path,view:ViewSpec)->dict[str,Any
                 current_k_eval=k_eval if family=="JOINT_K_STATE_LINEAR" else np.column_stack([k_eval,kw_eval])
                 prediction,_=_joint_fit(current_k_fit,state_fit,y_fit,current_k_eval,state_eval,alpha,ratio)
                 losses[(family,alpha,ratio)].append(mse(y_eval,prediction))
-            fold_cache.append((fit,evaluation,features,state_fit,state_eval,y_fit,y_eval))
+            # No later selection step consumes the fold feature matrices.  The
+            # previous append retained four 250k-row joint bases per worker.
+            del fit,evaluation,features,k_fit,k_eval,state_fit,state_eval,y_fit,y_eval
+            del k_train_scalar,k_eval_scalar,kw_fit,kw_eval
+            release_process_memory()
         def complexity(value):
             if value=="EXACT_BOTH_ZERO":return(0,)
             if value in {"EXACT_K_ZERO","EXACT_STATE_ZERO"}:return(1,0 if value=="EXACT_K_ZERO" else 1)
@@ -141,7 +145,7 @@ def run_v7_j(shared:Path,project:Path,output:Path,n_jobs:int)->dict[str,Any]:
             run_j_view,
             [(shared, project, output, view) for view in pending],
             n_jobs,
-            per_worker_gib=5.0,
+            per_worker_gib=2.5,
             label="V7_JOINT_PREDICTIVE",
         )
     )

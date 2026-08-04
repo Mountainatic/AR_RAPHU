@@ -93,3 +93,9 @@ losses.  The scientific candidates and one-SE decisions are unchanged.  Large ar
 explicitly deleted and `malloc_trim` is called at each fold boundary.  The audited worker
 budget is consequently reduced from 5.0 to 2.5 GiB, raising useful V3 concurrency without
 approaching the 60 GiB limit.
+
+The same lifetime audit found two downstream cases.  V4 only retains scalar latent vectors
+but did not trim the large temporary C basis at fold boundaries; it now does.  V7 appended
+four complete feature dictionaries to an unused `fold_cache`; that dead retention was
+removed and each fold is explicitly released.  Their conservative budgets are reduced to
+2.5 GiB without changing any fit, loss, selection, prediction, or frozen configuration.

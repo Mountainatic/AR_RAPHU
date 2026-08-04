@@ -20,7 +20,7 @@ from .v2_config import load_frozen_config
 from .v2_k import _cap
 from .v2_numerics import difference_penalty, residualize, solve_certified
 from .v2_selection import one_se_select, practical_activation
-from .v2_runtime import run_parallel
+from .v2_runtime import release_process_memory, run_parallel
 from .v2_views import development_input_views
 
 
@@ -171,6 +171,9 @@ def run_w_view(shared: Path, project: Path, output: Path, view: ViewSpec) -> dic
             target = fit["y_true"].to_numpy(dtype=np.float64); evaluation_target = evaluation["y_true"].to_numpy(dtype=np.float64)
             correlation = float(stats.spearmanr(fit_latent, target - fit_latent).statistic) if np.std(fit_latent) > 0 else 0.0
             signs.append(correlation); fold_data.append((fold, fit_latent, target, evaluation_latent, evaluation_target, evaluation))
+            # fit_c_fold_prediction materializes a large joint basis internally;
+            # return its released arenas at every fold boundary.
+            release_process_memory()
         applicable_signs = [value for value in signs if abs(value) >= float(config["W_module"]["monotone_direction"]["absolute_correlation_min"])]
         direction = 1 if sum(value > 0 for value in applicable_signs) >= sum(value < 0 for value in applicable_signs) else -1
         monotone_applicable = bool(applicable_signs) and sum((value > 0) == (direction > 0) for value in applicable_signs) / len(signs) >= float(config["W_module"]["monotone_direction"]["same_sign_fold_fraction_min"])
@@ -245,7 +248,7 @@ def run_v4_w(shared: Path, project: Path, output: Path, n_jobs: int) -> dict[str
             run_w_view,
             [(shared, project, output, view) for view in pending],
             n_jobs,
-            per_worker_gib=6.0,
+            per_worker_gib=2.5,
             label="V4_WIENER",
         )
     )
