@@ -8,6 +8,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+import pyarrow.parquet as pq
 
 from .cpu_data import ViewSpec, load_samples
 from .stage0 import write_json
@@ -23,7 +24,7 @@ def _prediction_index(output:Path)->dict[tuple[str,...],Path]:
     paths=[*sorted((output/"PREDICTIONS").glob("LEVEL_*/*/*/*/*/*/*.parquet")),*sorted((output/"BASELINE_PREDICTIONS").rglob("*.parquet"))]
     result={}
     for path in paths:
-        frame=pd.read_parquet(path,columns=["target_head","split","information_set","availability_scenario","proxy_policy","model"])
+        frame=pq.ParquetFile(path).read_row_group(0,columns=["target_head","split","information_set","availability_scenario","proxy_policy","model"]).slice(0,1).to_pandas()
         if frame.empty:continue
         row=frame.iloc[0];key=tuple(str(row[name]) for name in ("target_head","split","information_set","availability_scenario","proxy_policy","model"));result[key]=path
     return result
@@ -89,17 +90,20 @@ def _bootstrap(output:Path,shared:Path,index:dict[tuple[str,...],Path],config:di
             losses={name:_metrics(models[name],"TEMP")["mse"] for name in baseline_names};best=min(losses,key=losses.get);comparisons.append((view_key,best,"PRISM_V2_FINAL_ASSEMBLY"))
         for reference,candidate in (("K_COMPRESSED","K_JOINT_BASIS"),("K_JOINT_BASIS","K_JOINT_BASIS_W"),("K_JOINT_BASIS","K_JOINT_BASIS_A"),("K_JOINT_BASIS_W","K_JOINT_BASIS_W_A")):
             if reference in models and candidate in models:comparisons.append((view_key,reference,candidate))
-    rows=[];boot=config["bootstrap"]
+    rows=[];boot=config["bootstrap"];cached_key=None;cached_entities=None
     for comparison_index,(key,reference,candidate) in enumerate(comparisons):
         head,split,information,availability,proxy=key;view=views[(head,information,availability,proxy)];left=_read_prediction(by_view[key][reference]);right=_read_prediction(by_view[key][candidate])
         if not np.array_equal(left["sample_id"].to_numpy(),right["sample_id"].to_numpy()):raise RuntimeError(f"paired sample mismatch: {key} {reference} {candidate}")
-        samples=load_samples(shared,view,split);lookup=samples.set_index("view_sample_id")["entity_id"];entities=lookup.loc[left["sample_id"]].astype(str).to_numpy()
+        if key!=cached_key:
+            samples=load_samples(shared,view,split);lookup=samples.set_index("view_sample_id")["entity_id"];cached_entities=lookup.loc[left["sample_id"]].astype(str).to_numpy();cached_key=key
+        entities=cached_entities
         y=left["y_true"].to_numpy(dtype=np.float64);reference_loss=(y-left["y_pred"].to_numpy(dtype=np.float64))**2;candidate_loss=(y-right["y_pred"].to_numpy(dtype=np.float64))**2;difference=reference_loss-candidate_loss
         core=int(max(left["core_history_steps"].iloc[0],right["core_history_steps"].iloc[0]));blocks=sorted(set([view.head.h_steps+view.head.w_steps,2*(view.head.h_steps+view.head.w_steps),int(math.ceil(core/4))]));longest=max(blocks)
         for block in blocks:
             draws=_block_draws(difference,reference_loss,entities,max(1,block),int(boot["replicates"]),int(boot["seed"])+comparison_index*101+block)
             p=min(1.0,2*min((np.count_nonzero(draws<=0)+1)/(len(draws)+1),(np.count_nonzero(draws>=0)+1)/(len(draws)+1)))
             rows.append({"target_head":head,"split":split,"information_set":information,"availability_scenario":availability,"proxy_policy":proxy,"reference":reference,"candidate":candidate,
+                         "dataset":view.head.dataset,
                          "block_length":block,"is_longest_block":block==longest,"relative_mse_improvement":float(difference.mean()/max(reference_loss.mean(),1e-300)),
                          "ci_low":float(np.quantile(draws,0.025)),"ci_high":float(np.quantile(draws,0.975)),"positive_probability":float(np.mean(draws>0)),"p_two_sided":float(p)})
     return _holm(pd.DataFrame(rows)) if rows else pd.DataFrame()
@@ -120,17 +124,54 @@ def build_v2_report(shared:Path,project:Path,output:Path,c6_archive:Path)->dict[
         card=json.loads(path.read_text());activations.append({key:card.get(key) for key in ("target_head","information_set","availability_scenario","proxy_policy","selected_assembly")})
     activation_frame=pd.DataFrame(activations);activation_frame.to_csv(output/"PRISM_V2_MODULE_ACTIVATION.csv",index=False)
     bootstrap=_bootstrap(output,shared,index,config);(output/"BOOTSTRAP").mkdir(exist_ok=True);bootstrap.to_csv(output/"BOOTSTRAP"/"PAIRED_BLOCK_BOOTSTRAP.csv",index=False)
-    supported=0
+    support_rows=[]
     if not bootstrap.empty:
         grouped=bootstrap.groupby(["target_head","split","information_set","availability_scenario","proxy_policy","reference","candidate"])
-        for _,group in grouped:
-            if int(group["holm_reject"].sum())>=2 and bool(group.loc[group["is_longest_block"],"holm_reject"].any()) and float(group["positive_probability"].min())>=0.95:supported+=1
+        for keys,group in grouped:
+            supported=int(group["holm_reject"].sum())>=2 and bool(group.loc[group["is_longest_block"],"holm_reject"].any()) and float(group["positive_probability"].min())>=0.95
+            support_rows.append({**dict(zip(["target_head","split","information_set","availability_scenario","proxy_policy","reference","candidate"],keys,strict=True)),"dataset":group["dataset"].iloc[0],"supported":bool(supported),"point_improvement":float(group["relative_mse_improvement"].iloc[0])})
+    support=pd.DataFrame(support_rows);support.to_csv(output/"BOOTSTRAP"/"SUPPORTED_COMPARISONS.csv",index=False)
+    joint_support=support[(support.get("reference")=="K_COMPRESSED")&(support.get("candidate")=="K_JOINT_BASIS")&support.get("supported",False)] if not support.empty else support
+    w_support=support[(support.get("candidate")=="K_JOINT_BASIS_W")&support.get("supported",False)] if not support.empty else support
+    a_support=support[support.get("candidate",pd.Series(dtype=str)).astype(str).str.endswith("_A")&support.get("supported",False)].copy() if not support.empty else support
+    if not a_support.empty:
+        orthogonal=[]
+        for row in a_support.itertuples():
+            path=output/"DEVELOPMENT"/"RESIDUAL_STATE"/row.target_head/row.availability_scenario/row.proxy_policy/"RESULT.json";value=json.loads(path.read_text())
+            contract=value["identity_w_a"]["a_contract"] if row.candidate=="K_JOINT_BASIS_A" else value["a_contract"];orthogonal.append(contract.get("family")=="ORTHOGONAL_MATURE_RESIDUAL_AR")
+        a_support=a_support[np.asarray(orthogonal,dtype=bool)]
+    structural=pd.concat([joint_support,a_support],ignore_index=True) if not support.empty else support
+    structural_success=len(structural)>=int(config["confirmation_and_stopping"]["structural_success_min_supported_views"]) and structural["dataset"].nunique()>=int(config["confirmation_and_stopping"]["structural_success_min_distinct_datasets"])
+    level_c_test=ranks[(ranks["level"]=="LEVEL_C_CONFIRMATION")&(ranks["split"]=="test")]
+    def mean_rank(information:str,model:str)->float:
+        values=level_c_test[(level_c_test["information_set"]==information)&(level_c_test["model"]==model)]["mean_rank"]
+        return float(values.iloc[0]) if len(values) else float("inf")
+    input_predictive=mean_rank("input_only","PRISM_V2_FINAL_ASSEMBLY")<=min(mean_rank("input_only","PARALLEL_HAMMERSTEIN"),mean_rank("input_only","HAMMERSTEIN_WIENER"))
+    dynamic_predictive=mean_rank("dynamic","PRISM_V2_FINAL_ASSEMBLY")<=min(mean_rank("dynamic","ARX"),mean_rank("dynamic","LINEAR_NARX"))
+    ood_bad=support[(support["split"]=="ood")&(support["candidate"]=="PRISM_V2_FINAL_ASSEMBLY")&(support["point_improvement"]<=-float(config["support_and_ood"]["id_to_ood_material_worsening_relative_mse"]))&support["supported"]] if not support.empty else support
+    ood_improved=support[(support["split"]=="ood")&(support["candidate"]=="PRISM_V2_FINAL_ASSEMBLY")&(support["point_improvement"]>0)&support["supported"]] if not support.empty else support
+    development_values=[json.loads(path.read_text()) for path in (output/"DEVELOPMENT").rglob("RESULT.json")]
+    def numeric_failure(value:dict[str,Any])->bool:
+        return value.get("numerical_status") in {"NUMERICALLY_INVALID","FAILED"} or value.get("error_type") in {"LinAlgError","FloatingPointError","MemoryError"}
+    candidate_failures=sum(numeric_failure(value) for value in development_values);candidate_failure_rate=candidate_failures/max(len(development_values),1)
+    evaluation_summaries=[json.loads(path.read_text()) for path in (output/"PREDICTIONS").glob("LEVEL_*/SUMMARY.json")];final_jobs=sum(int(value.get("jobs",0)) for value in evaluation_summaries);final_pass=sum(int(value.get("pass",0)) for value in evaluation_summaries);final_failure_rate=(final_jobs-final_pass)/max(final_jobs,1)
+    stop_reasons=[]
+    if len(joint_support)==0:stop_reasons.append("JOINT_BASIS_LEVEL_C_SUPPORTED_VIEWS_ZERO")
+    if len(w_support)==0:stop_reasons.append("W_LEVEL_C_SUPPORTED_VIEWS_ZERO")
+    if len(a_support)==0:stop_reasons.append("ORTHOGONAL_A_SUPPORTED_VIEWS_ZERO")
+    if candidate_failure_rate>float(config["confirmation_and_stopping"]["candidate_numeric_hard_failure_rate_stop"]):stop_reasons.append("CANDIDATE_NUMERIC_HARD_FAILURE_RATE")
+    if final_failure_rate>float(config["confirmation_and_stopping"]["selected_or_final_numeric_hard_failure_rate_stop"]):stop_reasons.append("SELECTED_OR_FINAL_NUMERIC_HARD_FAILURE_RATE")
+    if len(ood_bad)>=int(config["confirmation_and_stopping"]["ood_systematic_degradation_stop"]["minimum_degraded_ood_views"]) and len(ood_improved)<int(config["confirmation_and_stopping"]["ood_systematic_degradation_stop"]["minimum_improved_ood_views_to_override"]):stop_reasons.append("SYSTEMATIC_OOD_DEGRADATION")
     decision={"status":"COMPLETED","protocol_id":config["protocol_id"],"level_c_prediction_files":sum("LEVEL_C_CONFIRMATION" in str(path) for path in index.values()),
-              "level_b_prediction_files":sum("LEVEL_B_PRIMARY_EXPLORATORY" in str(path) for path in index.values()),"statistically_supported_comparisons":supported,
+              "level_b_prediction_files":sum("LEVEL_B_PRIMARY_EXPLORATORY" in str(path) for path in index.values()),"statistically_supported_comparisons":int(support["supported"].sum()) if not support.empty else 0,
+              "joint_basis_supported_views":len(joint_support),"w_supported_views":len(w_support),"orthogonal_a_supported_views":len(a_support),
+              "structural_success":bool(structural_success),"w_modularity_success":len(w_support)>=int(config["confirmation_and_stopping"]["w_success_min_supported_views"]),
+              "predictive_success":bool((input_predictive or dynamic_predictive) and len(ood_bad)==0),"materially_degraded_supported_ood_views":len(ood_bad),
+              "candidate_numeric_failure_rate":candidate_failure_rate,"selected_or_final_failure_rate":final_failure_rate,"stop_expansion":bool(stop_reasons),"stop_reasons":stop_reasons,
               "engineering_success":bool(activations) and all(item.get("selected_assembly") for item in activations),"test_accessed":True}
     write_json(output/"PRISM_V2_FINAL_DECISION.json",decision)
     best=ranks.sort_values(["level","split","information_set","mean_rank"]).groupby(["level","split","information_set"],as_index=False).first() if not ranks.empty else ranks
-    report=["# PRISM V2 Modular CPU Benchmark — Final Report","",f"- Protocol: `{config['protocol_id']}`",f"- Status: `{decision['status']}`",f"- Assembly cards: {len(activations)}",f"- Statistically supported paired comparisons: {supported}","","## Average-rank leaders",""]
+    report=["# PRISM V2 Modular CPU Benchmark — Final Report","",f"- Protocol: `{config['protocol_id']}`",f"- Status: `{decision['status']}`",f"- Assembly cards: {len(activations)}",f"- Statistically supported paired comparisons: {decision['statistically_supported_comparisons']}",f"- Structural success: `{decision['structural_success']}`",f"- Predictive success: `{decision['predictive_success']}`","","## Average-rank leaders",""]
     if not best.empty:report.extend(["| Level | Split | Information | Model | Mean rank |","|---|---|---|---|---:|",*[f"| {r.level} | {r.split} | {r.information_set} | {r.model} | {r.mean_rank:.3f} |" for r in best.itertuples()]])
     report.extend(["","Level C is prospective internal confirmation. Level B is explicitly post-hoc exploratory and reuses the frozen C6 V2 baseline summary.","All retained failures remain present in the result tree; raw C1 data are not included in release artifacts."])
     (output/"PRISM_V2_FINAL_REPORT.md").write_text("\n".join(report)+"\n",encoding="utf-8")

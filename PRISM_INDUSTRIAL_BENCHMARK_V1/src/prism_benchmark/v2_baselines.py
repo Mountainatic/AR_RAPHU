@@ -5,12 +5,16 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, Callable
 
+import pandas as pd
+
 from .c2_models import run_job as run_c2_job
 from .c3_models import run_job as run_c3_job
 from .c4_prism import _run_channel, _run_joint_and_ablations
 from .c5_models import _run_view as run_c5_view
 from .c6_full_final import _evaluate_baseline_job, _evaluate_prism_job
 from .cpu_data import ViewSpec, input_columns
+from .cpu_data import sha256_file
+from .cpu_selection import regression_metrics
 from .stage0 import write_json
 from .v2_views import development_dynamic_views, development_input_views, evaluation_level
 
@@ -35,6 +39,17 @@ def _complete(path:Path)->dict[str,Any]|None:
     if not path.is_file():return None
     value=json.loads(path.read_text())
     return value if value.get("status") in {"PASS","FAILED_RETAINED"} else None
+
+
+def _normalize_final_prediction(result:dict[str,Any])->dict[str,Any]:
+    if result.get("status")!="PASS":return result
+    path=Path(result["prediction_path"]);frame=pd.read_parquet(path)
+    frame["assembly_id"]=frame["model"];frame["support_flag"]="INHERITED_TRAIN_SUPPORT_AUDIT_PENDING";frame["ood_flag"]=frame["split"].astype(str).eq("ood")
+    frame.to_parquet(path,index=False,compression="zstd");result["prediction_sha256"]=sha256_file(path);result.update(regression_metrics(frame["y_true"].to_numpy(),frame["y_pred"].to_numpy()))
+    row=frame.iloc[0];audit_path=path.parents[3]/"MODEL_AUDIT"/str(row["target_head"])/str(row["split"])/f"{row['information_set']}__{row['model']}.json"
+    if audit_path.is_file():
+        audit=json.loads(audit_path.read_text());audit.update({key:result[key] for key in ("prediction_sha256","mse","rmse","mae")});write_json(audit_path,audit)
+    return result
 
 
 def run_level_c_baseline_development(shared:Path,project:Path,output:Path,n_jobs:int)->dict[str,Any]:
@@ -112,7 +127,7 @@ def evaluate_level_c_baselines(shared:Path,project:Path,output:Path,n_jobs:int)-
     with ProcessPoolExecutor(max_workers=min(n_jobs,8)) as executor:
         futures=[executor.submit(_evaluate_prism_job,job) for job in prism_jobs]
         for future in as_completed(futures):results.extend(future.result())
-    passed=sum(value.get("status")=="PASS" for value in results)
+    results=[_normalize_final_prediction(value) for value in results];passed=sum(value.get("status")=="PASS" for value in results)
     summary={"status":"PASS" if passed==len(results) else "COMPLETED_WITH_RETAINED_FAILURES","stage":"LEVEL_C_BASELINE_EVALUATION",
              "jobs":len(results),"pass":passed,"failed_retained":len(results)-passed}
     write_json(final/"SUMMARY.json",summary);return summary
