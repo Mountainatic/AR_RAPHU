@@ -107,3 +107,7 @@ Hammerstein fold/profile, regular-lag arrays are built once and reused across al
 nonlinearities and output maps; previously they were rebuilt for every candidate.  Large
 arrays are released at profile/fold boundaries.  Heavy Hammerstein pools use a measured
 3.5 GiB budget while light C3 pools retain 2.5 GiB.
+
+V6 assembly now treats a PASS summary plus the exact registered count of readable PASS
+assembly cards as a resumable checkpoint.  Baseline-only restarts no longer spend several
+minutes rematerializing unchanged validation assembly files before reaching BDEV.

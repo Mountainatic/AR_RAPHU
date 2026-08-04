@@ -73,7 +73,19 @@ def _view_card(shared:Path,output:Path,view:ViewSpec,dynamic:bool)->dict[str,Any
 
 
 def run_v6_assembly(shared:Path,project:Path,output:Path)->dict[str,Any]:
-    load_frozen_config(project);cards=[]
+    load_frozen_config(project)
+    summary_path=output/"ASSEMBLY_CARDS"/"SUMMARY.json"
+    if summary_path.is_file():
+        prior=json.loads(summary_path.read_text())
+        card_paths=sorted((output/"ASSEMBLY_CARDS").rglob("ASSEMBLY_CARD.json"))
+        if (
+            prior.get("status")=="PASS"
+            and prior.get("test_accessed") is False
+            and len(card_paths)==int(prior.get("cards",-1))
+            and all(json.loads(path.read_text()).get("status")=="PASS" for path in card_paths)
+        ):
+            return prior
+    cards=[]
     for view in development_input_views(shared):cards.append(_view_card(shared,output,view,False))
     for view in development_dynamic_views(shared):cards.append(_view_card(shared,output,view,True))
     summary={"status":"PASS","stage":"V6_ASSEMBLY_SELECTION","cards":len(cards),"selection_counts":{},"test_accessed":False}
