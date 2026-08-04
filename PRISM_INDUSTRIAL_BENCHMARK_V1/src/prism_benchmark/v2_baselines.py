@@ -82,13 +82,30 @@ def run_level_c_baseline_development(shared:Path,project:Path,output:Path,n_jobs
                 else:results.append(prior)
         model_label = models[0]
         heavy = model_label in {"PARALLEL_HAMMERSTEIN", "HAMMERSTEIN_WIENER"}
-        results.extend(_run_parallel(
-            run_c3_job,
-            jobs,
-            n_jobs,
-            per_worker_gib=3.5 if heavy else 2.5,
-            label=f"BASELINE:C3:{model_label}",
-        ))
+        if heavy:
+            # Long Metro/PMSM/TEP Hammerstein jobs peak together.  A mixed
+            # ten-job pool repeatedly reached the platform memory watchdog
+            # without a cgroup OOM record.  Dataset-sized pools preserve all
+            # useful within-dataset parallelism while separating those peaks.
+            grouped:dict[str,list[tuple[Any,...]]]={}
+            for job in jobs:
+                grouped.setdefault(job[3].head.dataset,[]).append(job)
+            for dataset,dataset_jobs in sorted(grouped.items(),key=lambda item:(-len(item[1]),item[0])):
+                results.extend(_run_parallel(
+                    run_c3_job,
+                    dataset_jobs,
+                    min(n_jobs,len(dataset_jobs)),
+                    per_worker_gib=3.5,
+                    label=f"BASELINE:C3:{model_label}:{dataset}",
+                ))
+        else:
+            results.extend(_run_parallel(
+                run_c3_job,
+                jobs,
+                n_jobs,
+                per_worker_gib=2.5,
+                label=f"BASELINE:C3:{model_label}",
+            ))
 
     jobs=[]
     for view in input_views:

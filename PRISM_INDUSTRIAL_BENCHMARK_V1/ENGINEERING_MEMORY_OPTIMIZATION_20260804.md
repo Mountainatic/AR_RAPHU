@@ -111,3 +111,9 @@ arrays are released at profile/fold boundaries.  Heavy Hammerstein pools use a m
 V6 assembly now treats a PASS summary plus the exact registered count of readable PASS
 assembly cards as a resumable checkpoint.  Baseline-only restarts no longer spend several
 minutes rematerializing unchanged validation assembly files before reaching BDEV.
+
+The remaining Hammerstein tail consists only of long Metro, PMSM, and TEP jobs.  Launching
+all ten together still triggered the provider watchdog while cgroup `oom_kill` remained
+zero.  Heavy C3 families are therefore subdivided into deterministic dataset pools (at
+most five concurrent jobs for the current registry).  This keeps within-dataset parallelism
+but prevents unrelated datasets from aligning their maximum design-matrix peaks.
