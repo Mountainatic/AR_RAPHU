@@ -29,7 +29,7 @@ def registered_views(shared: Path, information_set: str) -> list[ViewSpec]:
 
 def state_development_views(shared: Path) -> list[ViewSpec]:
     """State has no U/X; retain availability variants but deduplicate proxy variants."""
-    views = registered_views(shared, "dynamic")
+    views = [view for view in registered_views(shared, "dynamic") if evaluation_level(view, shared) is not None]
     chosen: dict[tuple[str, str], ViewSpec] = {}
     for view in views:
         key = (view.head.head_id, view.availability_scenario)
@@ -45,7 +45,7 @@ def evaluation_level(view: ViewSpec, shared: Path) -> str | None:
         return "LEVEL_B_PRIMARY_EXPLORATORY"
     if not view.head.primary and view.availability_scenario == "record_time" and view.proxy_policy == primary_proxy:
         return "LEVEL_C_CONFIRMATION"
-    if view.head.primary and view.head.dataset == "tep" and view.availability_scenario == "delay_5_steps" and view.proxy_policy == primary_proxy:
+    if view.head.primary and view.head.dataset == "tep" and view.availability_scenario == "analyzer_maturity_5_steps" and view.proxy_policy == primary_proxy:
         return "LEVEL_C_CONFIRMATION"
     if view.head.primary and view.head.dataset == "debutanizer" and view.availability_scenario == "delay_10_steps" and view.proxy_policy == primary_proxy:
         return "LEVEL_C_CONFIRMATION"
@@ -60,4 +60,3 @@ def development_input_views(shared: Path) -> list[ViewSpec]:
 
 def development_dynamic_views(shared: Path) -> list[ViewSpec]:
     return [view for view in registered_views(shared, "dynamic") if evaluation_level(view, shared) is not None]
-
