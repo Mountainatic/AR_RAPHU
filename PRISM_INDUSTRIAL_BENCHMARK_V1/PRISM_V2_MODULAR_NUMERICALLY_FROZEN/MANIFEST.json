@@ -1,0 +1,51 @@
+{
+  "benchmark_status": "NUMERICALLY_FROZEN_BEFORE_IMPLEMENTATION",
+  "bundle_id": "PRISM_V2_MODULAR_THEORY_AND_CPU_PLAN_NUMERICALLY_FROZEN_20260804",
+  "files": [
+    {
+      "bytes": 35808,
+      "path": "PRISM_Theory_v2_0_Modular_Assembly_Theory_Only.md",
+      "sha256": "cd4ad86888e26323c05445ab6afe55189cedd2e4c40f955eb01a811b2a21bb99"
+    },
+    {
+      "bytes": 16850,
+      "path": "PRISM_V2_ASSEMBLY_CONFIG_FROZEN.json",
+      "sha256": "7a0c490909dc60997bba876a00b6bf8070b843d6d2a86b8de295201521105156"
+    },
+    {
+      "bytes": 4706,
+      "path": "PRISM_V2_CHANGELOG_FROM_V1_3.md",
+      "sha256": "da5746045ac6c633cdfd6f9f38f184fb689d47dfaf54d4e908b35f3e939f8c7b"
+    },
+    {
+      "bytes": 6302,
+      "path": "PRISM_V2_FROZEN_DATA_INHERITANCE.json",
+      "sha256": "d75c06eef11dc0bd09e031f16710bc1cc9a631302fff9afffa82f4845c1660b7"
+    },
+    {
+      "bytes": 22784,
+      "path": "PRISM_V2_MODULAR_CPU_BENCHMARK_PROTOCOL.md",
+      "sha256": "ba30165ea60ca901dcfc0d0d613e43955088bff16f85788e5e72fbe81bdebe9b"
+    },
+    {
+      "bytes": 8797,
+      "path": "PRISM_V2_NUMERICAL_FREEZE.md",
+      "sha256": "7deb667755f32d2cb03d363e5ca2147a6ba833589c30977fd32851a4c9ef1cfc"
+    },
+    {
+      "bytes": 697,
+      "path": "PRISM_V2_NUMERICAL_FREEZE_AUDIT.json",
+      "sha256": "f2617141ff00fa32dbe35d442dfd68ac98b37c38ef708cb9922b8d0036a1ab37"
+    },
+    {
+      "bytes": 1584,
+      "path": "README.md",
+      "sha256": "7345165029673b68f8c7b9005942934aa5f1711526a29c8a945f0c525c0d20cb"
+    }
+  ],
+  "numerical_protocol_id": "PRISM_V2_MODULAR_ASSEMBLY_NUMERICAL_FREEZE_V1",
+  "source_theory_sha256": "32833133c4a05d08bd6bf3060bf1057da808860218894efc7bd8d825fd3beeff",
+  "status": "PASS",
+  "theory_status": "DRAFT_FOR_REVIEW",
+  "unresolved_numeric_semantics": []
+}

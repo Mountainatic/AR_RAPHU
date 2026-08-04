@@ -1,4 +1,37 @@
-# PRISM Industrial Benchmark V1 strict restart
+# PRISM v2 Modular CPU — numerically frozen branch
+
+For branch `prism-v2-modular-cpu-frozen`, authority is, in descending order:
+
+1. `PRISM_V2_MODULAR_NUMERICALLY_FROZEN/PRISM_V2_ASSEMBLY_CONFIG_FROZEN.json`;
+2. `PRISM_V2_MODULAR_NUMERICALLY_FROZEN/PRISM_V2_NUMERICAL_FREEZE.md`;
+3. `PRISM_V2_MODULAR_NUMERICALLY_FROZEN/PRISM_V2_MODULAR_CPU_BENCHMARK_PROTOCOL.md`;
+4. `PRISM_V2_MODULAR_NUMERICALLY_FROZEN/PRISM_Theory_v2_0_Modular_Assembly_Theory_Only.md`;
+5. the V1 documents below, only for inherited C0/C1 data and frozen C6 baselines.
+
+The V2 bundle SHA256 is
+`538e455c9a44a3cbf346dbe24a478ec6411d9d18af15b7503a6775504bd9f35d`.
+Its machine-readable configuration must retain
+`protocol_id=PRISM_V2_MODULAR_ASSEMBLY_NUMERICAL_FREEZE_V1`,
+`status=FROZEN_BEFORE_IMPLEMENTATION_AND_V2_DEVELOPMENT_ACCESS`, and an empty
+`unresolved_numeric_semantics`. Missing implementation-facing numeric values
+are hard stops; no defaults may be invented.
+
+Execution order is strictly V0 -> V1 -> V2 -> V3 -> V4 -> V5 -> V6 -> V7 ->
+G3 freeze -> V8 Level C -> V8 Level B. Level C unaccessed registered views are
+evaluated before primary heads. Primary-head V2 results are post-hoc
+exploratory and may not be relabeled confirmatory. C1 targets, sample IDs,
+purge masks, scalers, splits, proxy policies, and availability contracts are
+read-only and must not be rebuilt.
+
+All physical operators, solvers, certificates, metrics, and bootstrap paths
+use FP64. Neutral candidates (K exact-zero, C additive, W identity, A
+exact-zero, and J exact-zero blocks) are mandatory. Test/OOD data may not be
+read before `V2_FINAL_FREEZE_MANIFEST.json` records `test_accessed=false`.
+
+The remainder of this file documents the inherited V1 baseline and remains
+applicable only where it does not conflict with the V2 frozen bundle.
+
+# PRISM Industrial Benchmark V1 strict restart (inherited baseline)
 
 This directory is governed, in descending order of authority, by:
 
@@ -55,4 +88,3 @@ not cross an unresolved gate.
   `docs/IMPLEMENTATION_TRACEABILITY.md`.
 - Generated artifacts record commit SHA, protocol hash, raw-data hashes and the
   exact uv-managed interpreter path.
-
