@@ -69,3 +69,9 @@ sample path and the Rust-enabled prefix implementation.
 Every pool emits a `PRISM_PROCESS_POOL_START` JSON line containing requested and resolved
 workers, job count, cgroup limit/current bytes, and the per-worker budget. This makes later
 resource decisions auditable from stage logs without changing scientific outputs.
+
+The first all-dataset pressure launch showed that immutable sample parquet frames remain
+private and reached the 60 GiB cgroup limit at 29 workers (no OOM or OOM kill). The launch
+was stopped before scientific output was written, and the V2 budget was conservatively
+raised from 1.25 to 2.0 GiB per worker. This retains a real multi-GiB margin while allowing
+roughly 20--24 concurrent workers depending on the parent preload and current page cache.

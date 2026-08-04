@@ -297,7 +297,10 @@ def run_v2_channels(shared: Path, project: Path, output: Path, n_jobs: int) -> d
             run_channel,
             arguments,
             n_jobs,
-            per_worker_gib=1.25,
+            # Sample parquet frames remain private to a channel worker.  The
+            # measured 60 GiB pressure run requires a conservative 2 GiB
+            # budget even though base arrays/prefixes are shared via COW.
+            per_worker_gib=2.0,
             label="V2_CHANNEL_E_K:ALL_DATASETS_SHARED",
             fork=True,
         )
