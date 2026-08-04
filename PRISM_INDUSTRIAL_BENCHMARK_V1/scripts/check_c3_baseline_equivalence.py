@@ -46,9 +46,13 @@ def main() -> None:
     field_equal = {field: reference.get(field) == candidate.get(field) for field in fields}
     old = pd.read_parquet(reference_root / reference["prediction_path"])
     new = pd.read_parquet(candidate_root / candidate["prediction_path"])
-    old = old.sort_values("view_sample_id").reset_index(drop=True)
-    new = new.sort_values("view_sample_id").reset_index(drop=True)
-    if not old["view_sample_id"].equals(new["view_sample_id"]):
+    identity = next(
+        column for column in ("view_sample_id", "sample_id", "base_origin_id")
+        if column in old.columns and column in new.columns
+    )
+    old = old.sort_values(identity).reset_index(drop=True)
+    new = new.sort_values(identity).reset_index(drop=True)
+    if not old[identity].equals(new[identity]):
         raise RuntimeError("immutable prediction sample IDs changed")
     difference = np.abs(
         old["y_pred"].to_numpy(dtype=np.float64) - new["y_pred"].to_numpy(dtype=np.float64)
