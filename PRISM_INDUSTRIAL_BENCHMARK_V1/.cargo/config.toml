@@ -2,7 +2,7 @@
 replace-with = "tsinghua"
 
 [source.tsinghua]
-registry = "sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"
+registry = "sparse+http://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"
 
 [net]
 git-fetch-with-cli = true
