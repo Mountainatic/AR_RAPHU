@@ -38,7 +38,7 @@ active result directory is resumed in place, while the archive remains independe
    persistent workers from retaining previous high-water arenas.
 7. All V1/V3--V8 and baseline pools use the 60 GiB cgroup limit, current usage, a 4 GiB
    reserve, and a stage-specific per-worker estimate to resolve safe concurrency. The
-   V2 pool is additionally capped at 20 stable workers; other stages request all 31 CPU
+   V2 pool is additionally capped at 19 stable workers; other stages request all 31 CPU
    workers and are clamped only when memory or pending-task count requires it.
 8. An optional Rust/Rayon prefix kernel is available with a complete Python fallback.
    Process-level parallel execution freezes `RAYON_NUM_THREADS=1` to avoid nested
@@ -78,5 +78,8 @@ private and reached the 60 GiB cgroup limit at 29 workers (no OOM or OOM kill). 
 23-worker cross-dataset run produced results but its large parent disappeared without a
 cgroup OOM event, leaving active PPID-1 workers that could no longer refill the queue. The
 orphan process group was stopped after preserving 257/322 results. This observation caused
-the cross-dataset parent design to be rejected: V2 now runs one dataset at a time, caps at
-20 workers, kills workers with their parent, and resumes completed channel files on retry.
+the cross-dataset parent design to be rejected. A subsequent single-dataset 20-worker TEP
+pool peaked at 56.8 GiB and twice received external `SIGKILL` (`exit=137`) while cgroup
+`oom_kill` remained zero; its workers exited correctly with their parent and retries resumed.
+V2 therefore runs one dataset at a time, caps at 19 workers, kills workers with their parent,
+and resumes completed channel files on retry.

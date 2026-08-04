@@ -44,7 +44,7 @@ run_stage_retry() {
 }
 
 run_stage_retry v1 31 2
-run_stage_retry v2 20 3
+run_stage_retry v2 19 3
 run_stage_retry v3 31 2
 run_stage_retry v4 31 2
 run_stage_retry v5 31 2

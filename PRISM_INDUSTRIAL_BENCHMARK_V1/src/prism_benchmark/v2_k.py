@@ -300,9 +300,10 @@ def run_v2_channels(shared: Path, project: Path, output: Path, n_jobs: int) -> d
             run_parallel(
                 run_channel,
                 arguments,
-                min(n_jobs, 20),
-                # A 20-worker ceiling stays below the measured 60 GiB cgroup
-                # limit while leaving enough headroom for the pool parent.
+                min(n_jobs, 19),
+                # A 20-worker TEP pool reached 56.8 GiB and its parent received
+                # SIGKILL from outside the cgroup OOM accounting.  Reducing by
+                # exactly one worker preserves throughput and transient margin.
                 per_worker_gib=2.0,
                 label=f"V2_CHANNEL_E_K:{dataset}",
                 fork=True,
