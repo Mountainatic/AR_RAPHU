@@ -139,15 +139,17 @@ def run_state_view(shared: Path, project: Path, output: Path, view: ViewSpec) ->
             family, profile, alpha = selected
             feasible_final=_feasible_state_rows(final_train,accessor,profile);final_train=final_train.iloc[np.flatnonzero(feasible_final)]
             x_train = accessor.target_state(final_train, view.head.target, *profile)
-            x_validation = final_accessor.target_state(validation, view.head.target, *profile)
             if family == "NAR_TARGET_QUADRATIC":
                 maximum = int(module["target_only_quadratic"]["maximum_linear_state_features_before_expansion"])
                 x_train = _quadratic(x_train, maximum)
-                x_validation = _quadratic(x_validation, maximum)
-            prediction, fitted = _standardized_fit(x_train, final_train["y_true"].to_numpy(dtype=np.float64), x_validation, alpha)
+            _, fitted = _standardized_fit(x_train, final_train["y_true"].to_numpy(dtype=np.float64), x_train[:1], alpha)
             contract = {"family": family, "profile": list(profile), "parameter_count": len(fitted["coefficient"]) + 1, **fitted}
             if family == "NAR_TARGET_QUADRATIC":
                 contract["maximum_linear_state_features_before_expansion"] = maximum
+            chunks=[]
+            for start in range(0,len(validation),100000):
+                current=validation.iloc[start:start+100000];features=final_accessor.target_state(current,view.head.target,*profile);chunks.append(predict_state(features,contract))
+            prediction=np.concatenate(chunks) if chunks else np.empty(0,dtype=np.float64)
         frame = validation[["base_origin_id", "view_sample_id", "entity_id", "origin", "y_true"]].copy()
         frame["y_pred"] = prediction
         frame["model"] = "PRISM_V2_STATE_ONLY"

@@ -197,7 +197,10 @@ def _fit_state_final(shared:Path,view:ViewSpec,output:Path,config:dict[str,Any])
 
 def _state_prediction(samples:pd.DataFrame,view:ViewSpec,contract:dict[str,Any],accessor:BaseAccessor)->np.ndarray:
     if contract["family"]=="EXACT_ZERO":return np.zeros(len(samples))
-    features=accessor.target_state(samples,view.head.target,*tuple(contract["profile"]));return predict_state(features,contract)
+    chunks=[]
+    for start in range(0,len(samples),100000):
+        features=accessor.target_state(samples.iloc[start:start+100000],view.head.target,*tuple(contract["profile"]));chunks.append(predict_state(features,contract))
+    return np.concatenate(chunks) if chunks else np.empty(0,dtype=np.float64)
 
 
 def _j_selection(result:dict[str,Any])->str|tuple[Any,...]:
