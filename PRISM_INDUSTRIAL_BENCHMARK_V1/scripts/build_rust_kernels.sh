@@ -3,6 +3,10 @@ set -euo pipefail
 
 PROJECT="${PROJECT:-$(cd "$(dirname "$0")/.." && pwd)}"
 PYTHON="${PYTHON:-python}"
+export UV_DEFAULT_INDEX="${UV_DEFAULT_INDEX:-https://pypi.tuna.tsinghua.edu.cn/simple}"
+export PIP_INDEX_URL="${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}"
+export RUSTUP_DIST_SERVER="${RUSTUP_DIST_SERVER:-https://mirrors.tuna.tsinghua.edu.cn/rustup}"
+export RUSTUP_UPDATE_ROOT="${RUSTUP_UPDATE_ROOT:-https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup}"
 
 "$PYTHON" -m maturin build \
   --manifest-path "$PROJECT/rust/prism_kernels/Cargo.toml" \
