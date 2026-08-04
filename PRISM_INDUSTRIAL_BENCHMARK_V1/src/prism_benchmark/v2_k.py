@@ -34,6 +34,17 @@ FAMILY_ORDER = [
 # read-only base arrays and precomputed prefixes through copy-on-write pages.
 _PRELOADED_ACCESSOR: BaseAccessor | None = None
 
+CHANNEL_SAMPLE_COLUMNS = [
+    "base_origin_id",
+    "view_sample_id",
+    "dataset",
+    "entity_id",
+    "origin",
+    "dependency_start",
+    "dependency_stop_exclusive",
+    "y_true",
+]
+
 
 def channel_profiles(view: ViewSpec, channel: str, config: dict[str, Any]) -> list[tuple[int, int]]:
     category = channel_class(view.head.dataset, channel)
@@ -136,8 +147,8 @@ def run_channel(shared: Path, project: Path, output: Path, view: ViewSpec, chann
     try:
         config = load_frozen_config(project)
         k_config = config["K_module"]
-        train = load_samples(shared, view, "train")
-        validation = load_samples(shared, view, "validation")
+        train = load_samples(shared, view, "train", columns=CHANNEL_SAMPLE_COLUMNS)
+        validation = load_samples(shared, view, "validation", columns=CHANNEL_SAMPLE_COLUMNS)
         shared_accessor = _PRELOADED_ACCESSOR
         if (
             shared_accessor is not None
