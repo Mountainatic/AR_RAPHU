@@ -28,6 +28,12 @@ def _quadratic(features: np.ndarray, maximum_linear: int) -> np.ndarray:
     return np.concatenate([features, selected * selected], axis=1)
 
 
+def _feasible_state_rows(samples:pd.DataFrame,accessor:BaseAccessor,profile:tuple[int,int])->np.ndarray:
+    delta,history=profile;count=max(1,history//max(delta,1));oldest=samples["latest_available_target_index"].to_numpy(dtype=np.int64)-(count-1)*max(delta,1)
+    entities=samples["entity_id"].astype(str).to_numpy();minimum=np.asarray([accessor.entities[entity][0].min() for entity in entities],dtype=np.int64)
+    return oldest>=minimum
+
+
 def _standardized_fit(
     x_train: np.ndarray,
     y_train: np.ndarray,
@@ -85,13 +91,22 @@ def run_state_view(shared: Path, project: Path, output: Path, view: ViewSpec) ->
             y_evaluation = evaluation["y_true"].to_numpy(dtype=np.float64)
             losses["EXACT_ZERO"].append(float(np.mean(y_evaluation * y_evaluation, dtype=np.float64)))
             for profile in profiles:
-                x_fit = accessor.target_state(fit, view.head.target, *profile)
-                x_evaluation = accessor.target_state(evaluation, view.head.target, *profile)
+                try:
+                    feasible_fit=_feasible_state_rows(fit,accessor,profile);feasible_evaluation=_feasible_state_rows(evaluation,accessor,profile)
+                    if not bool(np.all(feasible_evaluation)) or int(feasible_fit.sum())<200:raise ValueError("state profile unavailable on immutable rows")
+                    profile_fit=fit.iloc[np.flatnonzero(feasible_fit)]
+                    x_fit = accessor.target_state(profile_fit, view.head.target, *profile)
+                    x_evaluation = accessor.target_state(evaluation, view.head.target, *profile)
+                except ValueError:
+                    for family in ("AR_LINEAR", "NAR_TARGET_QUADRATIC"):
+                        for alpha in alpha_grid:
+                            losses[(family, profile, alpha)].append(float("inf"))
+                    continue
                 for family in ("AR_LINEAR", "NAR_TARGET_QUADRATIC"):
                     current_fit = x_fit if family == "AR_LINEAR" else _quadratic(x_fit, int(module["target_only_quadratic"]["maximum_linear_state_features_before_expansion"]))
                     current_evaluation = x_evaluation if family == "AR_LINEAR" else _quadratic(x_evaluation, int(module["target_only_quadratic"]["maximum_linear_state_features_before_expansion"]))
                     for alpha in alpha_grid:
-                        prediction, _ = _standardized_fit(current_fit, y_fit, current_evaluation, alpha)
+                        prediction, _ = _standardized_fit(current_fit, profile_fit["y_true"].to_numpy(dtype=np.float64), current_evaluation, alpha)
                         losses[(family, profile, alpha)].append(mse(y_evaluation, prediction))
         def complexity(candidate: Any) -> tuple[Any, ...]:
             if candidate == "EXACT_ZERO":
@@ -122,6 +137,7 @@ def run_state_view(shared: Path, project: Path, output: Path, view: ViewSpec) ->
             prediction = np.zeros(len(validation), dtype=np.float64)
         else:
             family, profile, alpha = selected
+            feasible_final=_feasible_state_rows(final_train,accessor,profile);final_train=final_train.iloc[np.flatnonzero(feasible_final)]
             x_train = accessor.target_state(final_train, view.head.target, *profile)
             x_validation = final_accessor.target_state(validation, view.head.target, *profile)
             if family == "NAR_TARGET_QUADRATIC":
@@ -164,7 +180,7 @@ def run_v1_state(shared: Path, project: Path, output: Path, n_jobs: int) -> dict
         path = output / "DEVELOPMENT" / "STATE_ONLY" / view.head.head_id / view.availability_scenario / "RESULT.json"
         if path.is_file():
             prior = json.loads(path.read_text(encoding="utf-8"))
-            if prior.get("status") in {"PASS", "SOLVER_FAILED_RETAINED"}:
+            if prior.get("status") == "PASS":
                 results.append(prior)
                 continue
         pending.append(view)
@@ -177,4 +193,3 @@ def run_v1_state(shared: Path, project: Path, output: Path, n_jobs: int) -> dict
                "test_accessed": False}
     write_json(output / "DEVELOPMENT" / "STATE_ONLY" / "SUMMARY.json", summary)
     return summary
-
