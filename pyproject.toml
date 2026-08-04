@@ -16,6 +16,7 @@ dependencies = [
   "xgboost==3.0.2",
   "nfoursid==1.0.2",
   "torch==2.8.0",
+  "zstandard>=0.25.0",
 ]
 
 [dependency-groups]
