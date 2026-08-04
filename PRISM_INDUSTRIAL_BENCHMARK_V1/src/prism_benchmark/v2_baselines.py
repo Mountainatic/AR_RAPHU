@@ -1,0 +1,118 @@
+from __future__ import annotations
+
+import json
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from pathlib import Path
+from typing import Any, Callable
+
+from .c2_models import run_job as run_c2_job
+from .c3_models import run_job as run_c3_job
+from .c4_prism import _run_channel, _run_joint_and_ablations
+from .c5_models import _run_view as run_c5_view
+from .c6_full_final import _evaluate_baseline_job, _evaluate_prism_job
+from .cpu_data import ViewSpec, input_columns
+from .stage0 import write_json
+from .v2_views import development_dynamic_views, development_input_views, evaluation_level
+
+
+def _level_c_input_views(shared:Path)->list[ViewSpec]:
+    return [view for view in development_input_views(shared) if evaluation_level(view,shared)=="LEVEL_C_CONFIRMATION"]
+
+
+def _level_c_dynamic_views(shared:Path)->list[ViewSpec]:
+    return [view for view in development_dynamic_views(shared) if evaluation_level(view,shared)=="LEVEL_C_CONFIRMATION"]
+
+
+def _run_parallel(function:Callable[...,dict[str,Any]],jobs:list[tuple[Any,...]],n_jobs:int)->list[dict[str,Any]]:
+    results=[]
+    with ProcessPoolExecutor(max_workers=n_jobs) as executor:
+        futures=[executor.submit(function,*job) for job in jobs]
+        for future in as_completed(futures):results.append(future.result())
+    return results
+
+
+def _complete(path:Path)->dict[str,Any]|None:
+    if not path.is_file():return None
+    value=json.loads(path.read_text())
+    return value if value.get("status") in {"PASS","FAILED_RETAINED"} else None
+
+
+def run_level_c_baseline_development(shared:Path,project:Path,output:Path,n_jobs:int)->dict[str,Any]:
+    root=output/"BASELINE_DEVELOPMENT";c2=root/"C2";c3=root/"C3";c4=root/"C4";c5=root/"C5"
+    input_views=_level_c_input_views(shared);dynamic_views=_level_c_dynamic_views(shared);results=[]
+
+    jobs=[]
+    for view in input_views:
+        for model in ("DPLS","XGBOOST"):
+            path=c2/"PREDICTIONS"/model/view.relative_root/"RESULT.json";prior=_complete(path)
+            if prior is None:jobs.append((shared,project,c2,view,model))
+            else:results.append(prior)
+    results.extend(_run_parallel(run_c2_job,jobs,n_jobs))
+
+    for models in (("AR",),("ARX","LINEAR_NARX","PARALLEL_HAMMERSTEIN","HAMMERSTEIN_WIENER")):
+        jobs=[]
+        for view in dynamic_views:
+            for model in models:
+                path=c3/"PREDICTIONS"/model/view.relative_root/"RESULT.json";prior=_complete(path)
+                if prior is None:jobs.append((shared,project,c3,view,model))
+                else:results.append(prior)
+        results.extend(_run_parallel(run_c3_job,jobs,n_jobs))
+
+    jobs=[]
+    for view in input_views:
+        for channel in input_columns(shared,view.head.task_id,view.proxy_policy):
+            path=c4/"CHANNELS"/view.head.head_id/view.proxy_policy/channel/"RESULT.json";prior=_complete(path)
+            if prior is None:jobs.append((shared,project,c4,view,channel))
+            else:results.append(prior)
+    results.extend(_run_parallel(_run_channel,jobs,n_jobs))
+
+    jobs=[]
+    for view in input_views:
+        path=c4/"JOINT"/view.head.head_id/view.proxy_policy/"RESULT.json";prior=_complete(path)
+        if prior is None:jobs.append((shared,project,c4,view))
+        else:results.append(prior)
+    results.extend(_run_parallel(_run_joint_and_ablations,jobs,n_jobs))
+
+    jobs=[]
+    for view in dynamic_views:
+        path=c5/view.head.head_id/view.proxy_policy/"RESULT.json";prior=_complete(path)
+        if prior is None:jobs.append((shared,project,c3,c4,c5,view,1))
+        else:results.append(prior)
+    results.extend(_run_parallel(run_c5_view,jobs,min(n_jobs,8)))
+    passed=sum(value.get("status")=="PASS" for value in results)
+    summary={"status":"PASS" if passed==len(results) else "PASS_WITH_RETAINED_FAILURES","stage":"LEVEL_C_BASELINE_DEVELOPMENT",
+             "results":len(results),"pass":passed,"failed_retained":len(results)-passed,"test_accessed":False}
+    write_json(root/"SUMMARY.json",summary);return summary
+
+
+def evaluate_level_c_baselines(shared:Path,project:Path,output:Path,n_jobs:int)->dict[str,Any]:
+    root=output/"BASELINE_DEVELOPMENT";final=output/"BASELINE_PREDICTIONS"/"LEVEL_C_CONFIRMATION"
+    c2=root/"C2";c3=root/"C3";c4=root/"C4";c5=root/"C5";jobs=[]
+    input_views=_level_c_input_views(shared);dynamic_views=_level_c_dynamic_views(shared)
+    for view in input_views:
+        core=max(view.head.h_steps*8,view.head.w_steps)
+        for split in ("test","ood"):
+            if not (shared/"sample_ids"/view.relative_root/f"{split}.parquet").is_file():continue
+            for model in ("PERSISTENCE","DPLS","XGBOOST","PARALLEL_HAMMERSTEIN","HAMMERSTEIN_WIENER"):
+                jobs.append((shared,project,c2,c3,final,view,split,model,core))
+    results=_run_parallel(_evaluate_baseline_job,jobs,n_jobs)
+    jobs=[]
+    for view in dynamic_views:
+        core=max(view.head.h_steps*8,view.head.w_steps)
+        for split in ("test","ood"):
+            if not (shared/"sample_ids"/view.relative_root/f"{split}.parquet").is_file():continue
+            for model in ("PERSISTENCE","AR","ARX","LINEAR_NARX"):
+                jobs.append((shared,project,c2,c3,final,view,split,model,core))
+    results.extend(_run_parallel(_evaluate_baseline_job,jobs,n_jobs))
+    prism_jobs=[]
+    for view in input_views:
+        core=max(view.head.h_steps*8,view.head.w_steps)
+        for split in ("test","ood"):
+            if (shared/"sample_ids"/view.relative_root/f"{split}.parquet").is_file():prism_jobs.append((shared,project,c3,c4,c5,final,view,split,core))
+    with ProcessPoolExecutor(max_workers=min(n_jobs,8)) as executor:
+        futures=[executor.submit(_evaluate_prism_job,job) for job in prism_jobs]
+        for future in as_completed(futures):results.extend(future.result())
+    passed=sum(value.get("status")=="PASS" for value in results)
+    summary={"status":"PASS" if passed==len(results) else "COMPLETED_WITH_RETAINED_FAILURES","stage":"LEVEL_C_BASELINE_EVALUATION",
+             "jobs":len(results),"pass":passed,"failed_retained":len(results)-passed}
+    write_json(final/"SUMMARY.json",summary);return summary

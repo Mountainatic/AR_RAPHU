@@ -84,7 +84,10 @@ def run_v6_assembly(shared:Path,project:Path,output:Path)->dict[str,Any]:
 def freeze_g3(paths:V2Paths)->dict[str,Any]:
     config=load_frozen_config(paths.project)
     audits=[]
-    for root_name in ("DEVELOPMENT","ASSEMBLY_CARDS"):
+    baseline_summary=paths.output/"BASELINE_DEVELOPMENT"/"SUMMARY.json"
+    if not baseline_summary.is_file() or json.loads(baseline_summary.read_text()).get("status") not in {"PASS","PASS_WITH_RETAINED_FAILURES"}:
+        raise RuntimeError("Level C baseline development must complete before G3")
+    for root_name in ("DEVELOPMENT","ASSEMBLY_CARDS","BASELINE_DEVELOPMENT"):
         for path in sorted((paths.output/root_name).rglob("*.json")):
             audits.append({"path":str(path.relative_to(paths.output)),"bytes":path.stat().st_size,"sha256":sha256_file(path)})
     cards=[]
@@ -99,4 +102,3 @@ def freeze_g3(paths:V2Paths)->dict[str,Any]:
               "c6_summary_sha256":next(item["observed"] for item in inheritance["checks"] if item["name"]=="C6_V2_SUMMARY"),
               "development_results":audits,"assembly_cards":cards,"test_accessed":False}
     write_json(paths.output/"FREEZE"/"V2_FINAL_FREEZE_MANIFEST.json",manifest);return manifest
-

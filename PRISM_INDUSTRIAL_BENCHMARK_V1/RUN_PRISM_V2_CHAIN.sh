@@ -26,6 +26,6 @@ run_stage v4 5
 run_stage v5 10
 run_stage v6 1
 run_stage v7 5
+run_stage bdev 20
 run_stage g3 1
 printf '%s DEVELOPMENT_CHAIN_COMPLETE\n' "$(date --iso-8601=seconds)" | tee -a "$OUTPUT/logs/CHAIN.log"
-
