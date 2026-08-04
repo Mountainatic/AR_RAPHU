@@ -30,9 +30,9 @@ FAMILY_ORDER = [
 ]
 
 
-# Set in the parent immediately before a Linux fork.  Children share the
-# read-only base arrays and precomputed prefixes through copy-on-write pages.
-_PRELOADED_ACCESSOR: BaseAccessor | None = None
+# Set in the parent immediately before a Linux fork.  Children share all
+# read-only dataset arrays and precomputed prefixes through copy-on-write pages.
+_PRELOADED_ACCESSORS: dict[str, BaseAccessor] = {}
 
 CHANNEL_SAMPLE_COLUMNS = [
     "base_origin_id",
@@ -149,7 +149,7 @@ def run_channel(shared: Path, project: Path, output: Path, view: ViewSpec, chann
         k_config = config["K_module"]
         train = load_samples(shared, view, "train", columns=CHANNEL_SAMPLE_COLUMNS)
         validation = load_samples(shared, view, "validation", columns=CHANNEL_SAMPLE_COLUMNS)
-        shared_accessor = _PRELOADED_ACCESSOR
+        shared_accessor = _PRELOADED_ACCESSORS.get(view.head.dataset)
         if (
             shared_accessor is not None
             and shared_accessor.dataset == view.head.dataset
@@ -284,25 +284,26 @@ def run_v2_channels(shared: Path, project: Path, output: Path, n_jobs: int) -> d
     grouped: dict[str, list[tuple[ViewSpec, str]]] = defaultdict(list)
     for view, channel in pending:
         grouped[view.head.dataset].append((view, channel))
-    global _PRELOADED_ACCESSOR
+    global _PRELOADED_ACCESSORS
     for dataset, dataset_jobs in grouped.items():
         channels = sorted({channel for _, channel in dataset_jobs})
-        _PRELOADED_ACCESSOR = BaseAccessor(shared, dataset, "validation", channels)
-        _PRELOADED_ACCESSOR.warm_prefixes(channels)
+        accessor = BaseAccessor(shared, dataset, "validation", channels)
+        accessor.warm_prefixes(channels)
+        _PRELOADED_ACCESSORS[dataset] = accessor
         release_process_memory()
-        arguments = [(shared, project, output, view, channel) for view, channel in dataset_jobs]
-        results.extend(
-            run_parallel(
-                run_channel,
-                arguments,
-                n_jobs,
-                per_worker_gib=1.25,
-                label=f"V2_CHANNEL_E_K:{dataset}",
-                fork=True,
-            )
+    arguments = [(shared, project, output, view, channel) for view, channel in pending]
+    results.extend(
+        run_parallel(
+            run_channel,
+            arguments,
+            n_jobs,
+            per_worker_gib=1.25,
+            label="V2_CHANNEL_E_K:ALL_DATASETS_SHARED",
+            fork=True,
         )
-        _PRELOADED_ACCESSOR = None
-        release_process_memory()
+    )
+    _PRELOADED_ACCESSORS = {}
+    release_process_memory()
     summary = {"status": "PASS" if all(item["status"] == "PASS" for item in results) else "COMPLETED_WITH_RETAINED_FAILURES",
                "stage": "V2_CHANNEL_E_K", "jobs": len(results), "pass": sum(item["status"] == "PASS" for item in results),
                "active": sum(bool(item.get("active")) for item in results), "test_accessed": False}

@@ -23,8 +23,9 @@ active result directory is resumed in place, while the archive remains independe
 
 1. A validation-scope `BaseAccessor` now serves both train and validation samples. The old
    implementation loaded the training base twice inside every channel process.
-2. V2 channel base arrays and prefix statistics are loaded once per dataset in the parent
-   and inherited by Linux workers through copy-on-write pages.
+2. V2 channel base arrays and prefix statistics are loaded once per pending dataset in the
+   parent and inherited by one cross-dataset Linux pool through copy-on-write pages. This
+   also removes the low-utilization tail that occurred when each dataset had a separate pool.
 3. Prefix sums are cached per entity/channel instead of rebuilt for every candidate and
    fold.
 4. V2 channel sample parquet reads request only the eight frozen columns actually used by
