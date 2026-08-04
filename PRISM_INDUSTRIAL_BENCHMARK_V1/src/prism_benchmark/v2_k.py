@@ -30,9 +30,9 @@ FAMILY_ORDER = [
 ]
 
 
-# Set in the parent immediately before a Linux fork.  Children share all
-# read-only dataset arrays and precomputed prefixes through copy-on-write pages.
-_PRELOADED_ACCESSORS: dict[str, BaseAccessor] = {}
+# Set in the parent immediately before a Linux fork.  Only one dataset is kept
+# resident at a time so the pool parent remains small and robust.
+_PRELOADED_ACCESSOR: BaseAccessor | None = None
 
 CHANNEL_SAMPLE_COLUMNS = [
     "base_origin_id",
@@ -149,7 +149,7 @@ def run_channel(shared: Path, project: Path, output: Path, view: ViewSpec, chann
         k_config = config["K_module"]
         train = load_samples(shared, view, "train", columns=CHANNEL_SAMPLE_COLUMNS)
         validation = load_samples(shared, view, "validation", columns=CHANNEL_SAMPLE_COLUMNS)
-        shared_accessor = _PRELOADED_ACCESSORS.get(view.head.dataset)
+        shared_accessor = _PRELOADED_ACCESSOR
         if (
             shared_accessor is not None
             and shared_accessor.dataset == view.head.dataset
@@ -284,29 +284,33 @@ def run_v2_channels(shared: Path, project: Path, output: Path, n_jobs: int) -> d
     grouped: dict[str, list[tuple[ViewSpec, str]]] = defaultdict(list)
     for view, channel in pending:
         grouped[view.head.dataset].append((view, channel))
-    global _PRELOADED_ACCESSORS
-    for dataset, dataset_jobs in grouped.items():
+    global _PRELOADED_ACCESSOR
+    # Largest pending datasets run first, keeping the stable 20-worker budget
+    # busy early while preserving deterministic ordering for ties.
+    ordered_groups = sorted(grouped.items(), key=lambda item: (-len(item[1]), item[0]))
+    for dataset, dataset_jobs in ordered_groups:
         channels = sorted({channel for _, channel in dataset_jobs})
         accessor = BaseAccessor(shared, dataset, "validation", channels)
-        accessor.warm_prefixes(channels)
-        _PRELOADED_ACCESSORS[dataset] = accessor
+        # Prefixes remain lazy: prewarming all channels inflated the parent and
+        # defeated the copy-on-write memory advantage on long datasets.
+        _PRELOADED_ACCESSOR = accessor
         release_process_memory()
-    arguments = [(shared, project, output, view, channel) for view, channel in pending]
-    results.extend(
-        run_parallel(
-            run_channel,
-            arguments,
-            n_jobs,
-            # Sample parquet frames remain private to a channel worker.  The
-            # measured 60 GiB pressure run requires a conservative 2 GiB
-            # budget even though base arrays/prefixes are shared via COW.
-            per_worker_gib=2.0,
-            label="V2_CHANNEL_E_K:ALL_DATASETS_SHARED",
-            fork=True,
+        arguments = [(shared, project, output, view, channel) for view, channel in dataset_jobs]
+        results.extend(
+            run_parallel(
+                run_channel,
+                arguments,
+                min(n_jobs, 20),
+                # A 20-worker ceiling stays below the measured 60 GiB cgroup
+                # limit while leaving enough headroom for the pool parent.
+                per_worker_gib=2.0,
+                label=f"V2_CHANNEL_E_K:{dataset}",
+                fork=True,
+            )
         )
-    )
-    _PRELOADED_ACCESSORS = {}
-    release_process_memory()
+        _PRELOADED_ACCESSOR = None
+        del accessor
+        release_process_memory()
     summary = {"status": "PASS" if all(item["status"] == "PASS" for item in results) else "COMPLETED_WITH_RETAINED_FAILURES",
                "stage": "V2_CHANNEL_E_K", "jobs": len(results), "pass": sum(item["status"] == "PASS" for item in results),
                "active": sum(bool(item.get("active")) for item in results), "test_accessed": False}

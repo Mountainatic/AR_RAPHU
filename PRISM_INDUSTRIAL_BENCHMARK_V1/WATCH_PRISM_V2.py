@@ -64,14 +64,15 @@ for item in Path("/proc").iterdir():
             if line.startswith("Pss:"):
                 pss_kib = int(line.split()[1])
                 break
-        processes.append((int(item.name), cpu_seconds, pss_kib))
+        processes.append((int(item.name), int(stat[3]), cpu_seconds, pss_kib))
     except (OSError, ValueError, IndexError):
         continue
 if processes:
     print(
         f"ACTIVE_STAGE_PROCESSES: {len(processes)}; "
-        f"aggregate_PSS={sum(item[2] for item in processes) / 1024**2:.2f} GiB; "
-        f"aggregate_CPU_time={sum(item[1] for item in processes):.1f}s"
+        f"aggregate_PSS={sum(item[3] for item in processes) / 1024**2:.2f} GiB; "
+        f"aggregate_CPU_time={sum(item[2] for item in processes):.1f}s; "
+        f"orphan_workers={sum(item[1] == 1 for item in processes)}"
     )
 
 for log in (OUTPUT / "logs/CHAIN_NOHUP.log", OUTPUT / "logs/CHAIN.log"):

@@ -11,27 +11,49 @@ export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 NUMEXPR_NUM_TH
 export RAYON_NUM_THREADS="${RAYON_NUM_THREADS:-1}"
 export PRISM_MEMORY_RESERVE_GIB="${PRISM_MEMORY_RESERVE_GIB:-4}"
 
-run_stage() {
+run_stage_once() {
   local stage="$1" jobs="$2"
   local log="$OUTPUT/logs/${stage^^}.log"
   printf '%s START %s jobs=%s\n' "$(date --iso-8601=seconds)" "$stage" "$jobs" | tee -a "$OUTPUT/logs/CHAIN.log"
-  "$PYTHON" "$PROJECT/scripts/run_prism_v2_stage.py" "$stage" \
-    --shared "$SHARED" --project "$PROJECT" --output "$OUTPUT" --n-jobs "$jobs" \
-    2>&1 | tee "$log"
-  printf '%s COMPLETE %s\n' "$(date --iso-8601=seconds)" "$stage" | tee -a "$OUTPUT/logs/CHAIN.log"
+  if "$PYTHON" "$PROJECT/scripts/run_prism_v2_stage.py" "$stage" \
+      --shared "$SHARED" --project "$PROJECT" --output "$OUTPUT" --n-jobs "$jobs" \
+      2>&1 | tee "$log"; then
+    printf '%s COMPLETE %s\n' "$(date --iso-8601=seconds)" "$stage" | tee -a "$OUTPUT/logs/CHAIN.log"
+    return 0
+  else
+    local status=$?
+    printf '%s FAILED %s exit=%s\n' "$(date --iso-8601=seconds)" "$stage" "$status" | tee -a "$OUTPUT/logs/CHAIN.log"
+    return "$status"
+  fi
 }
 
-run_stage v1 31
-run_stage v2 31
-run_stage v3 31
-run_stage v4 31
-run_stage v5 31
-run_stage v6 1
-run_stage v7 31
-run_stage bdev 31
-run_stage g3 1
-run_stage v8c 31
-run_stage v8b 31
+run_stage_retry() {
+  local stage="$1" jobs="$2" attempts="$3"
+  local attempt
+  for ((attempt=1; attempt<=attempts; attempt++)); do
+    printf '%s ATTEMPT %s %s/%s\n' "$(date --iso-8601=seconds)" "$stage" "$attempt" "$attempts" | tee -a "$OUTPUT/logs/CHAIN.log"
+    if run_stage_once "$stage" "$jobs"; then
+      return 0
+    fi
+    if (( attempt < attempts )); then
+      printf '%s RETRY %s checkpoint-preserving\n' "$(date --iso-8601=seconds)" "$stage" | tee -a "$OUTPUT/logs/CHAIN.log"
+      sleep 5
+    fi
+  done
+  return 1
+}
+
+run_stage_retry v1 31 2
+run_stage_retry v2 20 3
+run_stage_retry v3 31 2
+run_stage_retry v4 31 2
+run_stage_retry v5 31 2
+run_stage_retry v6 1 2
+run_stage_retry v7 31 2
+run_stage_retry bdev 31 2
+run_stage_retry g3 1 2
+run_stage_retry v8c 31 2
+run_stage_retry v8b 31 2
 printf '%s START report\n' "$(date --iso-8601=seconds)" | tee -a "$OUTPUT/logs/CHAIN.log"
 "$PYTHON" "$PROJECT/scripts/run_prism_v2_stage.py" report \
   --shared "$SHARED" --project "$PROJECT" --output "$OUTPUT" --n-jobs 1 \

@@ -35,7 +35,7 @@ def main() -> None:
         raise SystemExit("channel is not present in the immutable input view")
     accessor = BaseAccessor(args.shared, view.head.dataset, "validation", [args.channel])
     accessor.warm_prefixes([args.channel])
-    v2_k._PRELOADED_ACCESSORS = {view.head.dataset: accessor}
+    v2_k._PRELOADED_ACCESSOR = accessor
     candidate = run_channel(args.shared, args.project, args.candidate_output, view, args.channel)
     reference_path = (
         args.reference_output

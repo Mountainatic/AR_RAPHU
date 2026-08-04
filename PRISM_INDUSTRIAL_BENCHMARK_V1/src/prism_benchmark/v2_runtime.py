@@ -6,6 +6,7 @@ import json
 import math
 import multiprocessing as mp
 import os
+import signal
 import sys
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
@@ -72,6 +73,26 @@ def _call_and_trim(function: Callable[..., Any], arguments: tuple[Any, ...]) -> 
         release_process_memory()
 
 
+def _install_parent_death_signal(expected_parent_pid: int) -> None:
+    """Terminate a Linux worker if its pool parent disappears.
+
+    ProcessPoolExecutor does not otherwise guarantee that already-forked
+    workers die with a crashed/killed parent.  PR_SET_PDEATHSIG closes that
+    hole, while the post-prctl parent check handles the setup race.
+    """
+    if not sys.platform.startswith("linux"):
+        return
+    libc = ctypes.CDLL(None, use_errno=True)
+    prctl = libc.prctl
+    prctl.argtypes = [ctypes.c_int, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong]
+    prctl.restype = ctypes.c_int
+    if prctl(1, int(signal.SIGTERM), 0, 0, 0) != 0:  # PR_SET_PDEATHSIG = 1
+        error = ctypes.get_errno()
+        raise OSError(error, os.strerror(error))
+    if os.getppid() != expected_parent_pid:
+        os.kill(os.getpid(), signal.SIGTERM)
+
+
 def run_parallel(
     function: Callable[..., Any],
     jobs: Iterable[tuple[Any, ...]],
@@ -100,11 +121,18 @@ def run_parallel(
         "per_worker_gib": per_worker_gib,
         "memory_limit_bytes": limit,
         "memory_current_bytes": current,
+        "parent_pid": os.getpid(),
+        "parent_death_signal": "SIGTERM" if sys.platform.startswith("linux") else None,
     }
     print(json.dumps(telemetry, sort_keys=True), file=sys.stderr, flush=True)
     context = mp.get_context("fork") if fork and sys.platform.startswith("linux") else None
     results = []
-    with ProcessPoolExecutor(max_workers=workers, mp_context=context) as executor:
+    with ProcessPoolExecutor(
+        max_workers=workers,
+        mp_context=context,
+        initializer=_install_parent_death_signal,
+        initargs=(os.getpid(),),
+    ) as executor:
         futures = [executor.submit(_call_and_trim, function, arguments) for arguments in materialized]
         for future in as_completed(futures):
             results.append(future.result())
