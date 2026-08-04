@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import time
 import traceback
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +15,7 @@ from .stage0 import write_json
 from .v2_config import load_frozen_config
 from .v2_numerics import deterministic_subsample, solve_certified, solve_certified_gram
 from .v2_selection import one_se_select, practical_activation
+from .v2_runtime import run_parallel
 from .v2_views import state_development_views
 
 
@@ -88,7 +88,7 @@ def run_state_view(shared: Path, project: Path, output: Path, view: ViewSpec) ->
         train = load_samples(shared, view, "train")
         validation = load_samples(shared, view, "validation")
         folds = inner_folds(train, int(config["folds_and_selection"]["inner_folds"]))
-        accessor = BaseAccessor(shared, view.head.dataset, "train", [view.head.target])
+        accessor = BaseAccessor(shared, view.head.dataset, "validation", [view.head.target])
         profiles = realized_state_profiles(view.head)
         alpha_grid = [float(value) for value in module["ridge_alpha_grid"]]
         losses: dict[Any, list[float]] = {"EXACT_ZERO": []}
@@ -143,7 +143,7 @@ def run_state_view(shared: Path, project: Path, output: Path, view: ViewSpec) ->
             if not activation["pass"]:
                 selected = "EXACT_ZERO"
         final_train = _subsample(train, int(config["row_caps"]["state_fit"]))
-        final_accessor = BaseAccessor(shared, view.head.dataset, "validation", [view.head.target])
+        final_accessor = accessor
         if selected == "EXACT_ZERO":
             contract = {"family": "EXACT_ZERO", "parameter_count": 0, "numerical_certificate": {"status": "EXACT_ZERO"}}
             prediction = np.zeros(len(validation), dtype=np.float64)
@@ -198,10 +198,15 @@ def run_v1_state(shared: Path, project: Path, output: Path, n_jobs: int) -> dict
                 results.append(prior)
                 continue
         pending.append(view)
-    with ProcessPoolExecutor(max_workers=n_jobs) as executor:
-        futures = [executor.submit(run_state_view, shared, project, output, view) for view in pending]
-        for future in as_completed(futures):
-            results.append(future.result())
+    results.extend(
+        run_parallel(
+            run_state_view,
+            [(shared, project, output, view) for view in pending],
+            n_jobs,
+            per_worker_gib=2.0,
+            label="V1_STATE_ONLY",
+        )
+    )
     summary = {"status": "PASS" if all(item["status"] == "PASS" for item in results) else "COMPLETED_WITH_RETAINED_FAILURES",
                "stage": "V1_STATE_ONLY", "views": len(results), "pass": sum(item["status"] == "PASS" for item in results),
                "test_accessed": False}

@@ -4,7 +4,6 @@ import itertools
 import json
 import time
 import traceback
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +19,7 @@ from .v2_config import load_frozen_config
 from .v2_k import _als_kwargs, _cap, profile_values
 from .v2_numerics import residualize, solve_certified
 from .v2_selection import one_se_select, practical_activation
+from .v2_runtime import run_parallel
 from .v2_urysohn import basis_from_metadata, fit_contract, predict_contract
 from .v2_views import development_input_views
 
@@ -78,8 +78,10 @@ def fit_physical_features(
         return {"channels": [], "compressed_train": np.empty((len(fit_samples), 0)), "compressed_evaluation": np.empty((len(evaluation_samples), 0)),
                 "joint_train": np.empty((len(fit_samples), 0)), "joint_evaluation": np.empty((len(evaluation_samples), 0)), "channel_contracts": []}
     channels = [item["channel"] for item in active]
-    fit_accessor = BaseAccessor(shared, view.head.dataset, fit_split, channels)
     evaluation_accessor = BaseAccessor(shared, view.head.dataset, evaluation_split, channels)
+    # evaluation_split is always a superset of fit_split (train <= validation <= test),
+    # so one accessor serves both frames without duplicating base data.
+    fit_accessor = evaluation_accessor
     compressed_train, compressed_evaluation = [], []
     joint_train, joint_evaluation, contracts = [], [], []
     per_channel_max = int(config["C_module"]["joint_basis"]["per_channel_max_columns"])
@@ -308,9 +310,15 @@ def run_v3_c(shared: Path, project: Path, output: Path, n_jobs: int) -> dict[str
             prior = json.loads(path.read_text(encoding="utf-8"))
             if prior.get("status") in {"PASS", "SOLVER_FAILED_RETAINED"}: results.append(prior); continue
         pending.append(view)
-    with ProcessPoolExecutor(max_workers=n_jobs) as executor:
-        futures = [executor.submit(run_c_view, shared, project, output, view) for view in pending]
-        for future in as_completed(futures): results.append(future.result())
+    results.extend(
+        run_parallel(
+            run_c_view,
+            [(shared, project, output, view) for view in pending],
+            n_jobs,
+            per_worker_gib=5.0,
+            label="V3_C_FUSION",
+        )
+    )
     summary = {"status": "PASS" if all(item["status"] == "PASS" for item in results) else "COMPLETED_WITH_RETAINED_FAILURES",
                "stage": "V3_C_FUSION", "views": len(results), "pass": sum(item["status"] == "PASS" for item in results),
                "joint_basis": sum(item.get("selected_family") == "ADDITIVE_JOINT_BASIS" for item in results),

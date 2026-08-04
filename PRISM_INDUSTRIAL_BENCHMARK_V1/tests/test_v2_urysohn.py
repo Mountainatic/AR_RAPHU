@@ -3,6 +3,11 @@ from __future__ import annotations
 import numpy as np
 
 from prism_benchmark.v2_urysohn import fit_contract, predict_contract
+from prism_benchmark.v2_numerics import (
+    centered_sufficient_statistics,
+    solve_centered_certified_gram,
+    solve_certified,
+)
 
 
 def test_neutral_and_linear_are_exactly_nested() -> None:
@@ -27,3 +32,18 @@ def test_rank_ladder_returns_rank_bounded_surface() -> None:
     assert np.linalg.matrix_rank(theta, tol=1e-8) <= 2
     assert np.isfinite(predict_contract(x, model)).all()
     assert model["certificate"]["fixed_support_refit"]
+
+
+def test_streamed_centered_gram_matches_dense_centered_solve() -> None:
+    rng = np.random.default_rng(41)
+    x = rng.normal(size=(35003, 17))
+    y = rng.normal(size=len(x))
+    penalty = np.eye(x.shape[1]) * 1e-3
+    center = x.mean(axis=0, dtype=np.float64)
+    y_mean = float(y.mean(dtype=np.float64))
+    dense, _ = solve_certified(x - center, y - y_mean, penalty)
+    statistics = centered_sufficient_statistics(x, y, chunk_rows=4096)
+    streamed, intercept, certificate = solve_centered_certified_gram(*statistics, penalty)
+    np.testing.assert_allclose(streamed, dense, rtol=5e-11, atol=5e-12)
+    np.testing.assert_allclose(intercept, y_mean - center @ dense, rtol=5e-11, atol=5e-12)
+    assert certificate.status in {"PASS", "PASS_WITH_WARNING"}

@@ -4,7 +4,7 @@ import json
 import math
 import time
 import traceback
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +19,7 @@ from .v2_basis import causal_geometric_intervals
 from .v2_config import load_frozen_config
 from .v2_numerics import deterministic_subsample
 from .v2_selection import one_se_select, practical_activation
+from .v2_runtime import release_process_memory, run_parallel
 from .v2_urysohn import fit_contract, predict_contract
 from .v2_views import development_input_views
 
@@ -27,6 +28,11 @@ FAMILY_ORDER = [
     "EXACT_ZERO", "LINEAR_DISTRIBUTED_LAG", "RANK_1_URYSOHN", "RANK_2_URYSOHN",
     "RANK_3_URYSOHN", "FULL_FINITE_URYSOHN",
 ]
+
+
+# Set in the parent immediately before a Linux fork.  Children share the
+# read-only base arrays and precomputed prefixes through copy-on-write pages.
+_PRELOADED_ACCESSOR: BaseAccessor | None = None
 
 
 def channel_profiles(view: ViewSpec, channel: str, config: dict[str, Any]) -> list[tuple[int, int]]:
@@ -132,8 +138,20 @@ def run_channel(shared: Path, project: Path, output: Path, view: ViewSpec, chann
         k_config = config["K_module"]
         train = load_samples(shared, view, "train")
         validation = load_samples(shared, view, "validation")
-        accessor = BaseAccessor(shared, view.head.dataset, "train", [channel])
-        validation_accessor = BaseAccessor(shared, view.head.dataset, "validation", [channel])
+        shared_accessor = _PRELOADED_ACCESSOR
+        if (
+            shared_accessor is not None
+            and shared_accessor.dataset == view.head.dataset
+            and shared_accessor.has_columns([channel])
+        ):
+            accessor = validation_accessor = shared_accessor
+        else:
+            # The validation accessor already contains train + validation and is
+            # valid for both sample frames.  Loading a separate train accessor
+            # used to duplicate the largest resident object in every worker.
+            accessor = validation_accessor = BaseAccessor(
+                shared, view.head.dataset, "validation", [channel]
+            )
         folds = inner_folds(train, int(config["folds_and_selection"]["inner_folds"]))
         profiles = channel_profiles(view, channel, config)
         pilot = k_config["penalties"]["pilot"]
@@ -252,13 +270,30 @@ def run_v2_channels(shared: Path, project: Path, output: Path, n_jobs: int) -> d
                 results.append(prior)
                 continue
         pending.append((view, channel))
-    with ProcessPoolExecutor(max_workers=n_jobs) as executor:
-        futures = [executor.submit(run_channel, shared, project, output, view, channel) for view, channel in pending]
-        for future in as_completed(futures):
-            results.append(future.result())
+    grouped: dict[str, list[tuple[ViewSpec, str]]] = defaultdict(list)
+    for view, channel in pending:
+        grouped[view.head.dataset].append((view, channel))
+    global _PRELOADED_ACCESSOR
+    for dataset, dataset_jobs in grouped.items():
+        channels = sorted({channel for _, channel in dataset_jobs})
+        _PRELOADED_ACCESSOR = BaseAccessor(shared, dataset, "validation", channels)
+        _PRELOADED_ACCESSOR.warm_prefixes(channels)
+        release_process_memory()
+        arguments = [(shared, project, output, view, channel) for view, channel in dataset_jobs]
+        results.extend(
+            run_parallel(
+                run_channel,
+                arguments,
+                n_jobs,
+                per_worker_gib=1.25,
+                label=f"V2_CHANNEL_E_K:{dataset}",
+                fork=True,
+            )
+        )
+        _PRELOADED_ACCESSOR = None
+        release_process_memory()
     summary = {"status": "PASS" if all(item["status"] == "PASS" for item in results) else "COMPLETED_WITH_RETAINED_FAILURES",
                "stage": "V2_CHANNEL_E_K", "jobs": len(results), "pass": sum(item["status"] == "PASS" for item in results),
                "active": sum(bool(item.get("active")) for item in results), "test_accessed": False}
     write_json(output / "DEVELOPMENT" / "CHANNEL_AUDIT" / "SUMMARY.json", summary)
     return summary
-

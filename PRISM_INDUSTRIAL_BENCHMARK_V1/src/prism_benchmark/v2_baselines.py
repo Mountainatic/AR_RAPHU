@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, Callable
 
@@ -17,6 +16,7 @@ from .cpu_data import sha256_file
 from .cpu_selection import regression_metrics
 from .stage0 import write_json
 from .v2_views import development_dynamic_views, development_input_views, evaluation_level
+from .v2_runtime import run_parallel
 
 
 def _level_c_input_views(shared:Path)->list[ViewSpec]:
@@ -28,11 +28,13 @@ def _level_c_dynamic_views(shared:Path)->list[ViewSpec]:
 
 
 def _run_parallel(function:Callable[...,dict[str,Any]],jobs:list[tuple[Any,...]],n_jobs:int)->list[dict[str,Any]]:
-    results=[]
-    with ProcessPoolExecutor(max_workers=n_jobs) as executor:
-        futures=[executor.submit(function,*job) for job in jobs]
-        for future in as_completed(futures):results.append(future.result())
-    return results
+    return run_parallel(
+        function,
+        jobs,
+        n_jobs,
+        per_worker_gib=2.5,
+        label=f"BASELINE:{function.__name__}",
+    )
 
 
 def _complete(path:Path)->dict[str,Any]|None:
@@ -124,9 +126,15 @@ def evaluate_level_c_baselines(shared:Path,project:Path,output:Path,n_jobs:int)-
         core=max(view.head.h_steps*8,view.head.w_steps)
         for split in ("test","ood"):
             if (shared/"sample_ids"/view.relative_root/f"{split}.parquet").is_file():prism_jobs.append((shared,project,c3,c4,c5,final/view.availability_scenario/view.proxy_policy,view,split,core))
-    with ProcessPoolExecutor(max_workers=min(n_jobs,8)) as executor:
-        futures=[executor.submit(_evaluate_prism_job,job) for job in prism_jobs]
-        for future in as_completed(futures):results.extend(future.result())
+    nested = run_parallel(
+        _evaluate_prism_job,
+        [(job,) for job in prism_jobs],
+        min(n_jobs, 8),
+        per_worker_gib=6.0,
+        label="LEVEL_C_PRISM_EVALUATION",
+    )
+    for value in nested:
+        results.extend(value)
     results=[_normalize_final_prediction(value) for value in results];passed=sum(value.get("status")=="PASS" for value in results)
     summary={"status":"PASS" if passed==len(results) else "COMPLETED_WITH_RETAINED_FAILURES","stage":"LEVEL_C_BASELINE_EVALUATION",
              "jobs":len(results),"pass":passed,"failed_retained":len(results)-passed}

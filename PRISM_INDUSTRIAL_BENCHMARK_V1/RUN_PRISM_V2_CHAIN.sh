@@ -8,6 +8,7 @@ PYTHON="${PYTHON:-/root/AR_RAPHU_AUTODL/.venv/bin/python}"
 mkdir -p "$OUTPUT/logs"
 export PYTHONPATH="$PROJECT/src"
 export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
+export PRISM_MEMORY_RESERVE_GIB="${PRISM_MEMORY_RESERVE_GIB:-4}"
 
 run_stage() {
   local stage="$1" jobs="$2"
@@ -19,17 +20,17 @@ run_stage() {
   printf '%s COMPLETE %s\n' "$(date --iso-8601=seconds)" "$stage" | tee -a "$OUTPUT/logs/CHAIN.log"
 }
 
-run_stage v1 20
-run_stage v2 28
-run_stage v3 6
-run_stage v4 5
-run_stage v5 10
+run_stage v1 31
+run_stage v2 31
+run_stage v3 31
+run_stage v4 31
+run_stage v5 31
 run_stage v6 1
-run_stage v7 5
-run_stage bdev 20
+run_stage v7 31
+run_stage bdev 31
 run_stage g3 1
-run_stage v8c 3
-run_stage v8b 3
+run_stage v8c 31
+run_stage v8b 31
 printf '%s START report\n' "$(date --iso-8601=seconds)" | tee -a "$OUTPUT/logs/CHAIN.log"
 "$PYTHON" "$PROJECT/scripts/run_prism_v2_stage.py" report \
   --shared "$SHARED" --project "$PROJECT" --output "$OUTPUT" --n-jobs 1 \

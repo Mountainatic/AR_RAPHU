@@ -10,6 +10,8 @@ from typing import Iterable
 import numpy as np
 import pandas as pd
 
+from .rust_kernels import block_means_prefix as rust_block_means_prefix
+
 
 @dataclass(frozen=True)
 class HeadSpec:
@@ -153,6 +155,9 @@ class BaseAccessor:
         if not frames:
             raise FileNotFoundError((dataset, split))
         frame = pd.concat(frames, ignore_index=True)
+        self.columns = frozenset(
+            column for column in requested if column not in {"entity_id", "row_in_entity"}
+        )
         self.entities: dict[str, tuple[np.ndarray, dict[str, np.ndarray]]] = {}
         for entity_id, group in frame.groupby("entity_id", sort=False):
             group = group.sort_values("row_in_entity")
@@ -163,6 +168,41 @@ class BaseAccessor:
                 if column not in {"entity_id", "row_in_entity"}
             }
             self.entities[str(entity_id)] = (rows, arrays)
+        self._count_prefix: dict[str, tuple[int, np.ndarray]] = {}
+        self._value_prefix: dict[tuple[str, str], tuple[int, np.ndarray]] = {}
+
+    def has_columns(self, columns: Iterable[str]) -> bool:
+        return set(columns).issubset(self.columns)
+
+    def _prefixes(self, entity_id: str, column: str) -> tuple[int, np.ndarray, np.ndarray]:
+        value_key = (entity_id, column)
+        cached_value = self._value_prefix.get(value_key)
+        cached_count = self._count_prefix.get(entity_id)
+        if cached_value is not None and cached_count is not None:
+            if cached_value[0] != cached_count[0]:
+                raise AssertionError("prefix origins disagree")
+            return cached_value[0], cached_value[1], cached_count[1]
+        rows, arrays = self.entities[entity_id]
+        dense_min = int(rows.min())
+        dense_max = int(rows.max())
+        length = dense_max - dense_min + 1
+        present = np.zeros(length, dtype=np.int64)
+        present[rows - dense_min] = 1
+        count_prefix = np.concatenate([[0], np.cumsum(present, dtype=np.int64)])
+        dense = np.zeros(length, dtype=np.float64)
+        dense[rows - dense_min] = arrays[column]
+        value_prefix = np.concatenate([[0.0], np.cumsum(dense, dtype=np.float64)])
+        self._count_prefix[entity_id] = (dense_min, count_prefix)
+        self._value_prefix[value_key] = (dense_min, value_prefix)
+        return dense_min, value_prefix, count_prefix
+
+    def warm_prefixes(self, columns: Iterable[str]) -> None:
+        selected = list(columns)
+        if not self.has_columns(selected):
+            raise KeyError(set(selected) - set(self.columns))
+        for entity_id in self.entities:
+            for column in selected:
+                self._prefixes(entity_id, column)
 
     def gather(self, samples: pd.DataFrame, columns: list[str], indices: np.ndarray) -> np.ndarray:
         if indices.ndim == 1:
@@ -252,19 +292,18 @@ class BaseAccessor:
         counts = np.bincount(codes, minlength=len(labels))
         groups = np.split(order, np.cumsum(counts)[:-1])
         for entity_id, mask in zip(labels, groups, strict=True):
-            rows, arrays = self.entities[entity_id]
-            dense_min = int(rows.min())
-            dense_max = int(rows.max())
-            dense = np.full(dense_max - dense_min + 1, np.nan, dtype=np.float64)
-            dense[rows - dense_min] = arrays[column]
-            values = np.where(np.isfinite(dense), dense, 0.0)
-            counts = np.isfinite(dense).astype(np.int64)
-            prefix = np.concatenate([[0.0], np.cumsum(values, dtype=np.float64)])
-            count_prefix = np.concatenate([[0], np.cumsum(counts, dtype=np.int64)])
+            dense_min, prefix, count_prefix = self._prefixes(entity_id, column)
+            dense_length = len(count_prefix) - 1
+            rust_result = rust_block_means_prefix(
+                origins[mask], dense_min, prefix, count_prefix, intervals
+            )
+            if rust_result is not None:
+                result[mask] = rust_result
+                continue
             for block_index, (near, far) in enumerate(intervals):
                 starts = origins[mask] - far - dense_min
                 stops = origins[mask] - near - dense_min
-                if np.any(starts < 0) or np.any(stops > len(dense)):
+                if np.any(starts < 0) or np.any(stops > dense_length):
                     raise ValueError(f"block outside entity support: {entity_id}")
                 block_counts = count_prefix[stops] - count_prefix[starts]
                 expected = far - near

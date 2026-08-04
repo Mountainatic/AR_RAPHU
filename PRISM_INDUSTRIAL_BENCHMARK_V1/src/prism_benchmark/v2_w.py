@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import time
 import traceback
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +20,7 @@ from .v2_config import load_frozen_config
 from .v2_k import _cap
 from .v2_numerics import difference_penalty, residualize, solve_certified
 from .v2_selection import one_se_select, practical_activation
+from .v2_runtime import run_parallel
 from .v2_views import development_input_views
 
 
@@ -240,9 +240,15 @@ def run_v4_w(shared: Path, project: Path, output: Path, n_jobs: int) -> dict[str
             prior=json.loads(path.read_text());
             if prior.get("status") in {"PASS","SOLVER_FAILED_RETAINED"}: results.append(prior); continue
         pending.append(view)
-    with ProcessPoolExecutor(max_workers=n_jobs) as executor:
-        futures=[executor.submit(run_w_view,shared,project,output,view) for view in pending]
-        for future in as_completed(futures): results.append(future.result())
+    results.extend(
+        run_parallel(
+            run_w_view,
+            [(shared, project, output, view) for view in pending],
+            n_jobs,
+            per_worker_gib=6.0,
+            label="V4_WIENER",
+        )
+    )
     summary={"status":"PASS" if all(x["status"]=="PASS" for x in results) else "COMPLETED_WITH_RETAINED_FAILURES","stage":"V4_WIENER",
              "views":len(results),"pass":sum(x["status"]=="PASS" for x in results),"activated":sum(x.get("selected_candidate")!="IDENTITY" for x in results),"test_accessed":False}
     write_json(output/"DEVELOPMENT"/"WIENER"/"SUMMARY.json",summary); return summary

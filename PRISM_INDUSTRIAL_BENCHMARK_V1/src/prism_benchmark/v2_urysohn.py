@@ -6,7 +6,14 @@ from typing import Any
 import numpy as np
 
 from .v2_basis import AmplitudeBasis, tensor_design
-from .v2_numerics import difference_penalty, solve_certified
+from .v2_numerics import (
+    centered_sufficient_statistics,
+    difference_penalty,
+    solve_centered_certified_gram,
+)
+
+
+STREAM_CHUNK_ROWS = 16384
 
 
 def surface_penalty(m_tau: int, m_x: int, lambda_0: float, lambda_tau: float, lambda_x: float) -> np.ndarray:
@@ -18,10 +25,37 @@ def surface_penalty(m_tau: int, m_x: int, lambda_0: float, lambda_tau: float, la
 
 
 def _centered_solve(design: np.ndarray, target: np.ndarray, penalty: np.ndarray) -> tuple[np.ndarray, float, dict[str, Any]]:
-    center = design.mean(axis=0, dtype=np.float64)
-    y_mean = float(np.mean(target, dtype=np.float64))
-    coefficient, certificate = solve_certified(design - center, target - y_mean, penalty)
-    intercept = y_mean - float(center @ coefficient)
+    statistics = centered_sufficient_statistics(design, target, chunk_rows=STREAM_CHUNK_ROWS)
+    coefficient, intercept, certificate = solve_centered_certified_gram(*statistics, penalty)
+    return coefficient, intercept, certificate.to_json()
+
+
+def _transformed_centered_solve(
+    values: np.ndarray,
+    target: np.ndarray,
+    basis: AmplitudeBasis,
+    penalty: np.ndarray,
+    *,
+    linear_only: bool,
+) -> tuple[np.ndarray, float, dict[str, Any]]:
+    rows, m_tau = values.shape
+    width = m_tau if linear_only else m_tau * basis.dimension
+    gram = np.zeros((width, width), dtype=np.float64)
+    rhs = np.zeros(width, dtype=np.float64)
+    feature_sum = np.zeros(width, dtype=np.float64)
+    target_sum = 0.0
+    for start in range(0, rows, STREAM_CHUNK_ROWS):
+        stop = min(start + STREAM_CHUNK_ROWS, rows)
+        transformed = basis.transform(values[start:stop])
+        design = transformed[:, :, 0] if linear_only else transformed.reshape(stop - start, -1)
+        block_y = target[start:stop]
+        gram += design.T @ design
+        rhs += design.T @ block_y
+        feature_sum += np.sum(design, axis=0, dtype=np.float64)
+        target_sum += float(np.sum(block_y, dtype=np.float64))
+    coefficient, intercept, certificate = solve_centered_certified_gram(
+        gram, rhs, feature_sum, target_sum, rows, penalty
+    )
     return coefficient, intercept, certificate.to_json()
 
 
@@ -142,20 +176,22 @@ def fit_contract(
     basis = AmplitudeBasis.fit(values, requested)
     if basis.dimension == 0:
         return {"family": "EXACT_ZERO", "intercept": 0.0, "theta": [], "basis": basis.metadata(), "certificate": {"status": "NOT_APPLICABLE", "reason": "CONSTANT_CHANNEL"}, "parameter_count": 0}
-    phi = tensor_design(values, basis)
-    m_tau, realized_m_x = phi.shape[1:]
+    m_tau, realized_m_x = values.shape[1], basis.dimension
     if family == "LINEAR_DISTRIBUTED_LAG":
-        design = phi[:, :, 0]
-        coefficient, intercept, certificate = _centered_solve(
-            design, y, lambdas[0] * np.eye(m_tau) + lambdas[1] * difference_penalty(m_tau)
+        coefficient, intercept, certificate = _transformed_centered_solve(
+            values, y, basis,
+            lambdas[0] * np.eye(m_tau) + lambdas[1] * difference_penalty(m_tau),
+            linear_only=True,
         )
         theta = coefficient[:, None]
     elif family == "FULL_FINITE_URYSOHN":
-        coefficient, intercept, certificate = _centered_solve(
-            phi.reshape(len(phi), -1), y, surface_penalty(m_tau, realized_m_x, *lambdas)
+        coefficient, intercept, certificate = _transformed_centered_solve(
+            values, y, basis, surface_penalty(m_tau, realized_m_x, *lambdas),
+            linear_only=False,
         )
         theta = coefficient.reshape(m_tau, realized_m_x)
     elif family.startswith("RANK_"):
+        phi = tensor_design(values, basis)
         rank = int(family.split("_")[1])
         candidates = [
             _rank_als(
@@ -193,6 +229,10 @@ def predict_contract(values: np.ndarray, contract: dict[str, Any]) -> np.ndarray
     if contract["family"] == "EXACT_ZERO":
         return np.zeros(len(values), dtype=np.float64)
     basis = basis_from_metadata(contract["basis"])
-    phi = tensor_design(values, basis)
     theta = np.asarray(contract["theta"], dtype=np.float64)
-    return np.einsum("tbx,bx->t", phi, theta) + float(contract["intercept"])
+    result = np.empty(len(values), dtype=np.float64)
+    for start in range(0, len(values), STREAM_CHUNK_ROWS):
+        stop = min(start + STREAM_CHUNK_ROWS, len(values))
+        phi = tensor_design(values[start:stop], basis)
+        result[start:stop] = np.einsum("tbx,bx->t", phi, theta) + float(contract["intercept"])
+    return result

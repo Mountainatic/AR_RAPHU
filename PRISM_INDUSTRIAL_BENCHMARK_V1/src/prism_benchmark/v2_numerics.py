@@ -137,6 +137,54 @@ def solve_certified_gram(
     return coefficient, LinearCertificate(status, solver, used_jitter, relative_kkt, condition, rank, coefficient_l2)
 
 
+def solve_centered_certified_gram(
+    gram: np.ndarray,
+    rhs: np.ndarray,
+    feature_sum: np.ndarray,
+    target_sum: float,
+    rows: int,
+    penalty: np.ndarray | float = 0.0,
+) -> tuple[np.ndarray, float, LinearCertificate]:
+    """Solve a centered penalized regression from uncentered FP64 statistics."""
+    if rows < 1:
+        raise ValueError("centered sufficient statistics require at least one row")
+    feature_sum = np.asarray(feature_sum, dtype=np.float64)
+    centered_gram = np.asarray(gram, dtype=np.float64) - np.outer(feature_sum, feature_sum) / rows
+    centered_rhs = np.asarray(rhs, dtype=np.float64) - feature_sum * (float(target_sum) / rows)
+    coefficient, certificate = solve_certified_gram(centered_gram, centered_rhs, penalty)
+    feature_mean = feature_sum / rows
+    target_mean = float(target_sum) / rows
+    intercept = target_mean - float(feature_mean @ coefficient)
+    return coefficient, intercept, certificate
+
+
+def centered_sufficient_statistics(
+    design: np.ndarray,
+    target: np.ndarray,
+    *,
+    chunk_rows: int = 16384,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, float, int]:
+    """Accumulate deterministic FP64 centered-solve inputs without a centered matrix copy."""
+    x = np.asarray(design, dtype=np.float64)
+    y = np.asarray(target, dtype=np.float64)
+    if x.ndim != 2 or y.shape != (len(x),) or chunk_rows < 1:
+        raise ValueError("invalid centered sufficient-statistics input")
+    width = x.shape[1]
+    gram = np.zeros((width, width), dtype=np.float64)
+    rhs = np.zeros(width, dtype=np.float64)
+    feature_sum = np.zeros(width, dtype=np.float64)
+    target_sum = 0.0
+    for start in range(0, len(x), chunk_rows):
+        stop = min(start + chunk_rows, len(x))
+        block = x[start:stop]
+        block_y = y[start:stop]
+        gram += block.T @ block
+        rhs += block.T @ block_y
+        feature_sum += np.sum(block, axis=0, dtype=np.float64)
+        target_sum += float(np.sum(block_y, dtype=np.float64))
+    return gram, rhs, feature_sum, target_sum, len(x)
+
+
 def residualize(
     candidate: np.ndarray,
     against: np.ndarray,

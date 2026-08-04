@@ -4,7 +4,6 @@ import ast
 import json
 import time
 import traceback
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +21,7 @@ from .v2_k import _cap, profile_values
 from .v2_state import _feasible_state_rows, _quadratic, _standardized_fit, predict_state
 from .v2_urysohn import basis_from_metadata, predict_contract
 from .v2_views import development_dynamic_views, development_input_views, evaluation_level
+from .v2_runtime import run_parallel
 from .v2_w import fit_w_candidate, predict_w_contract
 
 
@@ -306,6 +306,25 @@ def evaluate_view_split(shared:Path,project:Path,output:Path,view:ViewSpec,split
     return audits
 
 
+def _evaluate_view_split_retained(
+    shared: Path,
+    project: Path,
+    output: Path,
+    view: ViewSpec,
+    split: str,
+    level: str,
+) -> list[dict[str, Any]]:
+    try:
+        return evaluate_view_split(shared, project, output, view, split, level)
+    except Exception as error:
+        return [{
+            "status": "SOLVER_FAILED_RETAINED",
+            "error_type": type(error).__name__,
+            "error": str(error),
+            "traceback": traceback.format_exc(),
+        }]
+
+
 def run_v8_level(shared:Path,project:Path,output:Path,level:str,n_jobs:int)->dict[str,Any]:
     freeze=output/"FREEZE"/"V2_FINAL_FREEZE_MANIFEST.json"
     if not freeze.is_file() or json.loads(freeze.read_text()).get("test_accessed") is not False:raise RuntimeError("G3 freeze manifest missing or invalid")
@@ -315,10 +334,14 @@ def run_v8_level(shared:Path,project:Path,output:Path,level:str,n_jobs:int)->dic
         for split in ("test","ood"):
             if (shared/"sample_ids"/view.relative_root/f"{split}.parquet").is_file():jobs.append((view,split))
     results=[]
-    with ProcessPoolExecutor(max_workers=n_jobs) as executor:
-        futures=[executor.submit(evaluate_view_split,shared,project,output,view,split,level) for view,split in jobs]
-        for future in as_completed(futures):
-            try:results.extend(future.result())
-            except Exception as error:results.append({"status":"SOLVER_FAILED_RETAINED","error_type":type(error).__name__,"error":str(error),"traceback":traceback.format_exc()})
+    nested = run_parallel(
+        _evaluate_view_split_retained,
+        [(shared, project, output, view, split, level) for view, split in jobs],
+        n_jobs,
+        per_worker_gib=5.0,
+        label=f"V8:{level}",
+    )
+    for value in nested:
+        results.extend(value)
     summary={"status":"PASS" if all(x["status"]=="PASS" for x in results) else "COMPLETED_WITH_RETAINED_FAILURES","stage":level,"jobs":len(jobs),"pass":sum(x["status"]=="PASS" for x in results),"results":results}
     write_json(output/"PREDICTIONS"/level/"SUMMARY.json",summary);return summary
