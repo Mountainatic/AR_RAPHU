@@ -83,3 +83,13 @@ pool peaked at 56.8 GiB and twice received external `SIGKILL` (`exit=137`) while
 `oom_kill` remained zero; its workers exited correctly with their parent and retries resumed.
 V2 therefore runs one dataset at a time, caps at 19 workers, kills workers with their parent,
 and resumes completed channel files on retry.
+
+V3 originally retained four complete fold feature dictionaries.  At the frozen cap this
+included four `250000 x 384` FP64 joint-basis matrices plus evaluation matrices and caused
+an intrinsic 4--5 GiB resident set per worker.  V3 now uses a deterministic two-pass fold
+stream: the first pass retains only scalar candidate losses and pair IDs; after base-family
+selection, the second pass rebuilds exactly one fold at a time and accumulates scalar pair
+losses.  The scientific candidates and one-SE decisions are unchanged.  Large arrays are
+explicitly deleted and `malloc_trim` is called at each fold boundary.  The audited worker
+budget is consequently reduced from 5.0 to 2.5 GiB, raising useful V3 concurrency without
+approaching the 60 GiB limit.

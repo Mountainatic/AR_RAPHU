@@ -19,7 +19,7 @@ from .v2_config import load_frozen_config
 from .v2_k import _als_kwargs, _cap, profile_values
 from .v2_numerics import residualize, solve_certified
 from .v2_selection import one_se_select, practical_activation
-from .v2_runtime import run_parallel
+from .v2_runtime import release_process_memory, run_parallel
 from .v2_urysohn import basis_from_metadata, fit_contract, predict_contract
 from .v2_views import development_input_views
 
@@ -156,8 +156,11 @@ def run_c_view(shared: Path, project: Path, output: Path, view: ViewSpec) -> dic
         validation = load_samples(shared, view, "validation")
         folds = inner_folds(train, int(config["folds_and_selection"]["inner_folds"]))
         alpha_grid = [float(value) for value in config["C_module"]["joint_basis"]["ridge_alpha_grid"]]
-        family_losses = {"ADDITIVE_COMPRESSED": [], "ADDITIVE_JOINT_BASIS": []}
-        fold_cache = []
+        families = ("ADDITIVE_COMPRESSED", "ADDITIVE_JOINT_BASIS")
+        candidate_losses = {
+            (family, alpha): [] for family in families for alpha in alpha_grid
+        }
+        fold_definitions = []
         pair_pool: set[tuple[int, int]] = set()
         for fit_index, evaluation_index in folds:
             fit = _cap(train.iloc[fit_index], int(config["row_caps"]["joint_physical_fit"]))
@@ -172,7 +175,10 @@ def run_c_view(shared: Path, project: Path, output: Path, view: ViewSpec) -> dic
                     path[family] = [float(np.mean(y_evaluation * y_evaluation))] * len(alpha_grid)
                 else:
                     path[family] = [mse(y_evaluation, _ridge_fit(x_fit, y_fit, x_evaluation, alpha)[0]) for alpha in alpha_grid]
-            fold_cache.append((fit, evaluation, features, y_fit, y_evaluation, path))
+            for family in families:
+                for alpha_index, alpha in enumerate(alpha_grid):
+                    candidate_losses[(family, alpha)].append(path[family][alpha_index])
+            fold_definitions.append((fit_index, evaluation_index))
             if features["compressed_train"].shape[1] >= 2 and len(fit) >= int(config["C_module"]["pairwise_anova"]["minimum_fit_rows"]):
                 baseline = _ridge_fit(features["compressed_train"], y_fit, features["compressed_train"], alpha_grid[0])[0]
                 residual = y_fit - baseline
@@ -184,10 +190,11 @@ def run_c_view(shared: Path, project: Path, output: Path, view: ViewSpec) -> dic
                     if correlation >= float(config["C_module"]["pairwise_anova"]["screening_absolute_train_only_residual_correlation_min"]):
                         scores.append((correlation, pair))
                 pair_pool.update(pair for _, pair in sorted(scores, reverse=True)[: int(config["C_module"]["pairwise_anova"]["candidate_pair_pool_max"])] )
-        candidate_losses = {}
-        for family in family_losses:
-            for alpha_index, alpha in enumerate(alpha_grid):
-                candidate_losses[(family, alpha)] = [cache[-1][family][alpha_index] for cache in fold_cache]
+            # Keeping all four fold feature dictionaries resident requires
+            # several GiB per worker (250k x up to 384 FP64 columns per fold).
+            # Only scalar losses and deterministic fold indices cross passes.
+            del fit, evaluation, features, y_fit, y_evaluation, path
+            release_process_memory()
         compressed_selection = one_se_select(
             {key: value for key, value in candidate_losses.items() if key[0] == "ADDITIVE_COMPRESSED"},
             lambda value: (-value[1],), minimum_usable_folds=3,
@@ -211,20 +218,36 @@ def run_c_view(shared: Path, project: Path, output: Path, view: ViewSpec) -> dic
         pair_audit = []
         base_key = "joint" if selected_family == "ADDITIVE_JOINT_BASIS" else "compressed"
         current_losses = candidate_losses[(selected_family, selected_alpha)]
-        remaining = sorted(pair_pool)
-        for _ in range(int(config["C_module"]["pairwise_anova"]["selected_pair_max"])):
-            pair_losses = {}
-            for pair in remaining:
-                losses = []
-                for fit, evaluation, features, y_fit, y_evaluation, _ in fold_cache:
+        # Pair losses need the selected base family/alpha.  Rebuild one fold at
+        # a time after that selection, accumulate only scalar losses, and
+        # release its large joint basis before moving to the next fold.
+        all_pair_losses = {pair: [] for pair in sorted(pair_pool)}
+        if all_pair_losses:
+            for fit_index, evaluation_index in fold_definitions:
+                fit = _cap(train.iloc[fit_index], int(config["row_caps"]["joint_physical_fit"]))
+                evaluation = _cap(train.iloc[evaluation_index], int(config["row_caps"]["validation_selection_per_fold"]))
+                features = fit_physical_features(
+                    shared, view, fit, evaluation, active, config,
+                    fit_split="train", evaluation_split="train",
+                )
+                y_fit = fit["y_true"].to_numpy(dtype=np.float64)
+                y_evaluation = evaluation["y_true"].to_numpy(dtype=np.float64)
+                for pair in all_pair_losses:
                     pair_fit, pair_evaluation, _ = _pair_columns(
                         features["compressed_train"], features["compressed_evaluation"], pair,
                         int(config["C_module"]["pairwise_anova"]["per_axis_spline_knot_count"]),
                     )
                     x_fit = np.concatenate([features[f"{base_key}_train"], pair_fit], axis=1)
                     x_evaluation = np.concatenate([features[f"{base_key}_evaluation"], pair_evaluation], axis=1)
-                    losses.append(mse(y_evaluation, _ridge_fit(x_fit, y_fit, x_evaluation, selected_alpha)[0]))
-                pair_losses[pair] = losses
+                    all_pair_losses[pair].append(
+                        mse(y_evaluation, _ridge_fit(x_fit, y_fit, x_evaluation, selected_alpha)[0])
+                    )
+                    del pair_fit, pair_evaluation, x_fit, x_evaluation
+                del fit, evaluation, features, y_fit, y_evaluation
+                release_process_memory()
+        remaining = sorted(pair_pool)
+        for _ in range(int(config["C_module"]["pairwise_anova"]["selected_pair_max"])):
+            pair_losses = {pair: all_pair_losses[pair] for pair in remaining}
             if not pair_losses:
                 break
             neutral = "NO_PAIR"
@@ -315,7 +338,7 @@ def run_v3_c(shared: Path, project: Path, output: Path, n_jobs: int) -> dict[str
             run_c_view,
             [(shared, project, output, view) for view in pending],
             n_jobs,
-            per_worker_gib=5.0,
+            per_worker_gib=2.5,
             label="V3_C_FUSION",
         )
     )
