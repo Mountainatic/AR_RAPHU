@@ -175,6 +175,12 @@ class BaseAccessor:
         return set(columns).issubset(self.columns)
 
     def _prefixes(self, entity_id: str, column: str) -> tuple[int, np.ndarray, np.ndarray]:
+        # A few protocol tests construct a minimal accessor with object.__new__;
+        # keep the cache lazy so that reference fixture remains supported.
+        if not hasattr(self, "_value_prefix"):
+            self._value_prefix = {}
+        if not hasattr(self, "_count_prefix"):
+            self._count_prefix = {}
         value_key = (entity_id, column)
         cached_value = self._value_prefix.get(value_key)
         cached_count = self._count_prefix.get(entity_id)
