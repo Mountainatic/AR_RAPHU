@@ -86,6 +86,18 @@ def _ispline_raw(values: np.ndarray, internal_knots: np.ndarray, degree: int = 3
     return np.column_stack(columns) if columns else np.empty((len(x), 0), dtype=np.float64)
 
 
+def _ispline_fixed(values:np.ndarray,internal_knots:np.ndarray,lower:float,upper:float,degree:int=3)->np.ndarray:
+    x=np.clip(np.asarray(values,dtype=np.float64).reshape(-1),lower,upper)
+    knots=np.concatenate([np.full(degree+1,lower),internal_knots,np.full(degree+1,upper)]);count=len(knots)-degree-1;columns=[]
+    for index in range(count):
+        coefficient=np.zeros(count);coefficient[index]=1.0;basis=BSpline(knots,coefficient,degree,extrapolate=True)
+        denominator=knots[index+degree+1]-knots[index]
+        if denominator<=0:continue
+        antiderivative=basis.antiderivative();multiplier=(degree+1)/denominator;base=float(antiderivative(lower));total=float(multiplier*(antiderivative(upper)-base))
+        if total>0:columns.append(np.clip(multiplier*(antiderivative(x)-base)/total,0.0,1.0))
+    return np.column_stack(columns) if columns else np.empty((len(x),0),dtype=np.float64)
+
+
 def _w_design(train_latent: np.ndarray, evaluation_latent: np.ndarray, family: str, knot_count: int) -> tuple[np.ndarray, np.ndarray, dict[str, Any]]:
     mean = float(np.mean(train_latent)); scale = float(np.std(train_latent)) or 1.0
     train = (train_latent - mean) / scale; evaluation = (evaluation_latent - mean) / scale
@@ -95,7 +107,7 @@ def _w_design(train_latent: np.ndarray, evaluation_latent: np.ndarray, family: s
         # Re-evaluate with train support for exact basis identity.
         lower, upper = float(np.min(train)), float(np.max(train))
         clipped_eval = np.clip(evaluation, lower, upper)
-        evaluation_raw = _ispline_raw(np.concatenate([train, clipped_eval]), knots)[len(train):]
+        evaluation_raw = _ispline_fixed(clipped_eval, knots, lower, upper)
         return train_raw, evaluation_raw, {"mean": mean, "scale": scale, "knots": knots.tolist(), "train_min": lower, "train_max": upper}
     train_raw = natural_cubic_columns(train, knots)[:, 2:]
     evaluation_raw = natural_cubic_columns(evaluation, knots)[:, 2:]
@@ -131,6 +143,18 @@ def fit_w_candidate(train_latent: np.ndarray, target: np.ndarray, evaluation_lat
     return prediction, {"family": family, "knot_count": knot_count, "smoothness": smoothness, "direction": direction,
                         "coefficient": coefficient.tolist(), "basis": metadata, "effective_df": effective_df,
                         "parameter_count": int(np.count_nonzero(np.abs(coefficient) > 1e-12)), "numerical_certificate": certificate}
+
+
+def predict_w_contract(latent:np.ndarray,contract:dict[str,Any])->np.ndarray:
+    values=np.asarray(latent,dtype=np.float64)
+    if contract["family"]=="IDENTITY":return values.copy()
+    metadata=contract["basis"];standardized=(values-float(metadata["mean"]))/float(metadata["scale"]);knots=np.asarray(metadata["knots"],dtype=np.float64)
+    if contract["family"]=="MONOTONE":
+        design=_ispline_fixed(standardized,knots,float(metadata["train_min"]),float(metadata["train_max"]))
+        return values+int(contract["direction"])*design@np.asarray(contract["coefficient"],dtype=np.float64)
+    raw=natural_cubic_columns(standardized,knots)[:,2:];against=np.column_stack([np.ones(len(values)),standardized])
+    design=raw-against@np.asarray(metadata["projection"],dtype=np.float64)
+    return values+design@np.asarray(contract["coefficient"],dtype=np.float64)
 
 
 def run_w_view(shared: Path, project: Path, output: Path, view: ViewSpec) -> dict[str, Any]:
