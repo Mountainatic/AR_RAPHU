@@ -44,9 +44,11 @@ def main() -> None:
     reference = json.loads(reference_path.read_text(encoding="utf-8"))
     fields = ["status", "model", "parameter_count"]
     field_equal = {field: reference.get(field) == candidate.get(field) for field in fields}
-    selection_fields = sorted(set(reference.get("selection", {})) | set(candidate.get("selection", {})))
+    candidate_selection = json.loads(json.dumps(candidate.get("selection", {}), sort_keys=True))
+    reference_selection = reference.get("selection", {})
+    selection_fields = sorted(set(reference_selection) | set(candidate_selection))
     selection_equal = {
-        field: reference.get("selection", {}).get(field) == candidate.get("selection", {}).get(field)
+        field: reference_selection.get(field) == candidate_selection.get(field)
         for field in selection_fields
     }
     old = pd.read_parquet(reference_root / reference["prediction_path"])
