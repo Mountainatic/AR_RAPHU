@@ -25,6 +25,7 @@ from .cpu_data import (
 from .cpu_selection import Standardizer, mse, regression_metrics, select_one_se
 from .c2_models import _capped, _folds, _prediction_frame
 from .stage0 import write_json
+from .v2_runtime import release_process_memory
 
 
 def _freeze(project: Path) -> dict[str, Any]:
@@ -202,6 +203,8 @@ def _run_arx(
             )
             prediction, _ = _ridge_block_predict(x_train, y_train, x_validation, penalties)
             losses[ratio].append(mse(y_validation, prediction))
+        del train_subset, validation_subset, x_train, x_validation, y_train, y_validation, zero_prediction
+        release_process_memory()
     selected = select_one_se(losses, lambda value: (0,) if value == "EXACT_X_ZERO" else (1, -float(value)))
     final_index = deterministic_subsample(train, fit_cap)
     train_subset = train.iloc[final_index]
@@ -288,6 +291,8 @@ def _run_narx(
         for alpha in alphas:
             prediction, _ = _ridge_block_predict(x_train, train_subset["y_true"].to_numpy(dtype=np.float64), x_validation, alpha)
             losses[alpha].append(mse(validation_subset["y_true"].to_numpy(dtype=np.float64), prediction))
+        del train_subset, validation_subset, raw_train, raw_validation, x_train, x_validation
+        release_process_memory()
     selected = select_one_se(losses, lambda value: (-value,))
     final_index = deterministic_subsample(train, fit_cap)
     train_subset = train.iloc[final_index]
@@ -385,32 +390,42 @@ def _run_hammerstein(
         validation_index = _capped(train, validation_index, validation_cap)
         train_subset = train.iloc[train_index]
         validation_subset = train.iloc[validation_index]
-        for profile, nonlinearity, output_map in candidates:
+        for profile in profiles:
             delta, history = profile
             raw_train = accessor.input_regular_lags(train_subset, columns, delta, history, 8)
             raw_validation = accessor.input_regular_lags(validation_subset, columns, delta, history, 8)
-            x_train, x_validation = _nonlinear_features(raw_train, raw_validation, nonlinearity)
-            prediction, _ = _ridge_block_predict(
-                x_train,
-                train_subset["y_true"].to_numpy(dtype=np.float64),
-                x_validation,
-                0.001,
-            )
-            if output_map == "isotonic_train_only":
-                train_prediction, _ = _ridge_block_predict(
+            nonlinearities = config["input_nonlinearities"] if wiener else config["nonlinearities"]
+            output_maps = config["output_map"] if wiener else ["identity"]
+            for nonlinearity in nonlinearities:
+                x_train, x_validation = _nonlinear_features(raw_train, raw_validation, nonlinearity)
+                prediction, _ = _ridge_block_predict(
                     x_train,
                     train_subset["y_true"].to_numpy(dtype=np.float64),
-                    x_train,
+                    x_validation,
                     0.001,
                 )
-                calibrator = IsotonicRegression(out_of_bounds="clip").fit(
-                    train_prediction,
-                    train_subset["y_true"].to_numpy(dtype=np.float64),
-                )
-                prediction = calibrator.predict(prediction)
-            losses[(profile, nonlinearity, output_map)].append(
-                mse(validation_subset["y_true"].to_numpy(dtype=np.float64), prediction)
-            )
+                train_prediction = None
+                for output_map in output_maps:
+                    current_prediction = prediction
+                    if output_map == "isotonic_train_only":
+                        if train_prediction is None:
+                            train_prediction, _ = _ridge_block_predict(
+                                x_train,
+                                train_subset["y_true"].to_numpy(dtype=np.float64),
+                                x_train,
+                                0.001,
+                            )
+                        calibrator = IsotonicRegression(out_of_bounds="clip").fit(
+                            train_prediction,
+                            train_subset["y_true"].to_numpy(dtype=np.float64),
+                        )
+                        current_prediction = calibrator.predict(prediction)
+                    losses[(profile, nonlinearity, output_map)].append(
+                        mse(validation_subset["y_true"].to_numpy(dtype=np.float64), current_prediction)
+                    )
+                del x_train, x_validation, prediction, train_prediction
+            del raw_train, raw_validation
+            release_process_memory()
     selected = select_one_se(
         losses,
         lambda value: (value[0][1], -value[0][0], 0 if value[1] == "linear" else 1, 0 if value[2] == "identity" else 1),

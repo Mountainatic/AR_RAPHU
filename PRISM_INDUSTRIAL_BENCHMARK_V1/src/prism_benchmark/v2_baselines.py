@@ -27,13 +27,20 @@ def _level_c_dynamic_views(shared:Path)->list[ViewSpec]:
     return [view for view in development_dynamic_views(shared) if evaluation_level(view,shared)=="LEVEL_C_CONFIRMATION"]
 
 
-def _run_parallel(function:Callable[...,dict[str,Any]],jobs:list[tuple[Any,...]],n_jobs:int)->list[dict[str,Any]]:
+def _run_parallel(
+    function:Callable[...,dict[str,Any]],
+    jobs:list[tuple[Any,...]],
+    n_jobs:int,
+    *,
+    per_worker_gib:float=2.5,
+    label:str|None=None,
+)->list[dict[str,Any]]:
     return run_parallel(
         function,
         jobs,
         n_jobs,
-        per_worker_gib=2.5,
-        label=f"BASELINE:{function.__name__}",
+        per_worker_gib=per_worker_gib,
+        label=label or f"BASELINE:{function.__name__}",
     )
 
 
@@ -66,14 +73,22 @@ def run_level_c_baseline_development(shared:Path,project:Path,output:Path,n_jobs
             else:results.append(prior)
     results.extend(_run_parallel(run_c2_job,jobs,n_jobs))
 
-    for models in (("AR",),("ARX","LINEAR_NARX","PARALLEL_HAMMERSTEIN","HAMMERSTEIN_WIENER")):
+    for models in (("AR",), ("ARX",), ("LINEAR_NARX",), ("PARALLEL_HAMMERSTEIN",), ("HAMMERSTEIN_WIENER",)):
         jobs=[]
         for view in dynamic_views:
             for model in models:
                 path=c3/"PREDICTIONS"/model/view.relative_root/"RESULT.json";prior=_complete(path)
                 if prior is None:jobs.append((shared,project,c3,view,model))
                 else:results.append(prior)
-        results.extend(_run_parallel(run_c3_job,jobs,n_jobs))
+        model_label = models[0]
+        heavy = model_label in {"PARALLEL_HAMMERSTEIN", "HAMMERSTEIN_WIENER"}
+        results.extend(_run_parallel(
+            run_c3_job,
+            jobs,
+            n_jobs,
+            per_worker_gib=3.5 if heavy else 2.5,
+            label=f"BASELINE:C3:{model_label}",
+        ))
 
     jobs=[]
     for view in input_views:

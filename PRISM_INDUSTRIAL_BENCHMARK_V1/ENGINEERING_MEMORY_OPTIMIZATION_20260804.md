@@ -99,3 +99,11 @@ but did not trim the large temporary C basis at fold boundaries; it now does.  V
 four complete feature dictionaries to an unused `fold_cache`; that dead retention was
 removed and each fold is explicitly released.  Their conservative budgets are reduced to
 2.5 GiB without changing any fit, loss, selection, prediction, or frozen configuration.
+
+Baseline development was also separated by C3 model family after a mixed 17-worker pool
+lost one native worker and invalidated the remaining futures.  ARX, linear NARX, parallel
+Hammerstein, and Hammerstein--Wiener now use independent checkpointable pools.  For each
+Hammerstein fold/profile, regular-lag arrays are built once and reused across all registered
+nonlinearities and output maps; previously they were rebuilt for every candidate.  Large
+arrays are released at profile/fold boundaries.  Heavy Hammerstein pools use a measured
+3.5 GiB budget while light C3 pools retain 2.5 GiB.
