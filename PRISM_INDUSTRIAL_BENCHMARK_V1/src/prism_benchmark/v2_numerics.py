@@ -58,9 +58,29 @@ def solve_certified(
     y = np.asarray(target, dtype=np.float64)
     if x.ndim != 2 or y.shape != (len(x),) or not np.isfinite(x).all() or not np.isfinite(y).all():
         raise ValueError("non-finite or invalid linear system")
-    p = x.shape[1]
     gram = x.T @ x
     rhs = x.T @ y
+    return solve_certified_gram(gram,rhs,penalty,jitter_grid=jitter_grid,qr_tolerance=qr_tolerance,svd_rcond=svd_rcond,
+                                kkt_warning=kkt_warning,kkt_hard=kkt_hard,condition_warning=condition_warning,condition_hard=condition_hard,coefficient_hard=coefficient_hard)
+
+
+def solve_certified_gram(
+    gram:np.ndarray,
+    rhs:np.ndarray,
+    penalty:np.ndarray|float=0.0,
+    *,
+    jitter_grid:tuple[float,...]=(0.0,1e-12,1e-10,1e-8),
+    qr_tolerance:float=1e-10,
+    svd_rcond:float=1e-12,
+    kkt_warning:float=1e-10,
+    kkt_hard:float=1e-8,
+    condition_warning:float=1e12,
+    condition_hard:float=1e14,
+    coefficient_hard:float=1e6,
+) -> tuple[np.ndarray,LinearCertificate]:
+    gram=np.asarray(gram,dtype=np.float64);rhs=np.asarray(rhs,dtype=np.float64)
+    if gram.ndim!=2 or gram.shape[0]!=gram.shape[1] or rhs.shape!=(gram.shape[0],) or not np.isfinite(gram).all() or not np.isfinite(rhs).all():raise ValueError("non-finite or invalid sufficient statistics")
+    p=gram.shape[0]
     if np.isscalar(penalty):
         penalty_matrix = np.eye(p, dtype=np.float64) * float(penalty)
     else:
@@ -144,4 +164,3 @@ def residualize(
         "relative_orthogonality": relative,
         "pass": bool(relative <= relative_tolerance),
     }
-

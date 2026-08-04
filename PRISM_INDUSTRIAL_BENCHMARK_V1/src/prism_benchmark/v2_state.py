@@ -14,7 +14,7 @@ from .cpu_data import BaseAccessor, ViewSpec, inner_folds, load_samples, realize
 from .cpu_selection import mse, regression_metrics
 from .stage0 import write_json
 from .v2_config import load_frozen_config
-from .v2_numerics import deterministic_subsample, solve_certified
+from .v2_numerics import deterministic_subsample, solve_certified, solve_certified_gram
 from .v2_selection import one_se_select, practical_activation
 from .v2_views import state_development_views
 
@@ -52,6 +52,18 @@ def _standardized_fit(
         "mean": mean.tolist(), "scale": scale.tolist(), "coefficient": coefficient.tolist(),
         "intercept": y_mean, "alpha": alpha, "numerical_certificate": certificate.to_json(),
     }
+
+
+def _standardized_path(
+    x_train:np.ndarray,
+    y_train:np.ndarray,
+    x_evaluation:np.ndarray,
+    alphas:list[float],
+) -> list[np.ndarray]:
+    mean=x_train.mean(axis=0,dtype=np.float64);scale=x_train.std(axis=0,dtype=np.float64);scale[scale*scale<1e-12]=1.0
+    train=(x_train-mean)/scale;evaluation=(x_evaluation-mean)/scale;target_mean=float(np.mean(y_train,dtype=np.float64));centered=y_train-target_mean
+    gram=train.T@train;rhs=train.T@centered
+    return [evaluation@solve_certified_gram(gram,rhs,alpha)[0]+target_mean for alpha in alphas]
 
 
 def predict_state(features: np.ndarray, contract: dict[str, Any]) -> np.ndarray:
@@ -105,8 +117,8 @@ def run_state_view(shared: Path, project: Path, output: Path, view: ViewSpec) ->
                 for family in ("AR_LINEAR", "NAR_TARGET_QUADRATIC"):
                     current_fit = x_fit if family == "AR_LINEAR" else _quadratic(x_fit, int(module["target_only_quadratic"]["maximum_linear_state_features_before_expansion"]))
                     current_evaluation = x_evaluation if family == "AR_LINEAR" else _quadratic(x_evaluation, int(module["target_only_quadratic"]["maximum_linear_state_features_before_expansion"]))
-                    for alpha in alpha_grid:
-                        prediction, _ = _standardized_fit(current_fit, profile_fit["y_true"].to_numpy(dtype=np.float64), current_evaluation, alpha)
+                    predictions=_standardized_path(current_fit,profile_fit["y_true"].to_numpy(dtype=np.float64),current_evaluation,alpha_grid)
+                    for alpha,prediction in zip(alpha_grid,predictions,strict=True):
                         losses[(family, profile, alpha)].append(mse(y_evaluation, prediction))
         def complexity(candidate: Any) -> tuple[Any, ...]:
             if candidate == "EXACT_ZERO":
