@@ -1,4 +1,7 @@
 import numpy as np
+import pandas as pd
+
+import prism_benchmark.v21_joint as v21_joint
 
 from prism_benchmark.v21_joint import (
     J_KWA,
@@ -12,6 +15,10 @@ def test_joint_candidates_forbid_k_zero_and_ar_only():
     candidates = registered_joint_candidates()
     assert candidates == ("J_K", "J_KW", "J_KA", "J_KWA")
     assert all("ZERO" not in value and value != "J_A" for value in candidates)
+
+
+def test_joint_runner_exposes_dataframe_reader_dependency():
+    assert v21_joint.pd is pd
 
 
 def test_joint_has_full_w_basis_block_and_prediction_components_close():

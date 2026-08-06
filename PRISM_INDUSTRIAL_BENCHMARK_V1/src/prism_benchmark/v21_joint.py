@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Mapping
 
 import numpy as np
+import pandas as pd
 
 from .v2_numerics import solve_certified
 from .v21_w import IDENTITY, build_w_design
