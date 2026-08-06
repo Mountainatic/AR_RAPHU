@@ -63,7 +63,8 @@ def run_e0(paths: V21Paths) -> dict[str, Any]:
         "non_sru_bases_preserved": non_sru > 0,
         "write_shared_data_false": config["write_shared_data"] is False,
         "legacy_v2_freeze_present": (paths.project / "PRISM_V2_MODULAR_NUMERICALLY_FROZEN").is_dir(),
-        "branch_is_v21": branch == "prism-v2-1-sru-stagewise-routed",
+        "branch_is_v21_or_detached_release": branch
+        in {"prism-v2-1-sru-stagewise-routed", ""},
     }
     result = {
         "status": "PASS" if all(checks.values()) else "STOP_INHERITANCE_MISMATCH",
