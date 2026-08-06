@@ -13,6 +13,9 @@ PROTOCOL_STATUS = "PROPOSED_BEFORE_IMPLEMENTATION_AND_TEST_ACCESS"
 ACTIVE_DATASET = "sru"
 ACTIVE_HEADS = frozenset({"SRU_H2S__H5__W1", "SRU_SO2__H5__W1"})
 OUTPUT_DIRECTORY = "results_prism_v2_1_sru"
+BASELINE_AMENDMENT_ID = "PRISM_V2_1_SRU_BASELINE_REPLAY_AMENDMENT_20260806"
+BASELINE_AMENDMENT_STATUS = "FROZEN_USER_AUTHORIZED_BEFORE_BASELINE_REPLAY"
+BASELINE_AMENDMENT_JSON = "PRISM_V2_1_SRU_BASELINE_REPLAY_AMENDMENT_20260806.json"
 
 
 @dataclass(frozen=True)
@@ -20,7 +23,6 @@ class V21Paths:
     project: Path
     shared: Path
     output: Path
-    baseline_root: Path | None = None
 
     @property
     def plan(self) -> Path:
@@ -33,6 +35,49 @@ class V21Paths:
     @property
     def final_freeze_path(self) -> Path:
         return self.output / "FREEZE" / "V21_SRU_FINAL_FREEZE_MANIFEST.json"
+
+    @property
+    def baseline_amendment_path(self) -> Path:
+        return self.plan / BASELINE_AMENDMENT_JSON
+
+    @property
+    def baseline_replay_root(self) -> Path:
+        return self.output / "BASELINES" / "REPLAY"
+
+
+def load_baseline_replay_amendment(project: Path) -> dict[str, Any]:
+    path = project / "PRISM_V2_1_SRU_STAGEWISE_ROUTED" / BASELINE_AMENDMENT_JSON
+    amendment = json.loads(path.read_text(encoding="utf-8"))
+    if amendment.get("amendment_id") != BASELINE_AMENDMENT_ID:
+        raise RuntimeError("PRISM v2.1 baseline replay amendment_id mismatch")
+    if amendment.get("status") != BASELINE_AMENDMENT_STATUS:
+        raise RuntimeError("PRISM v2.1 baseline replay amendment is not frozen")
+    if amendment.get("historical_baseline_parquet") != "NOT_AVAILABLE_NOT_SEARCHED_NOT_REQUIRED":
+        raise RuntimeError("historical baseline parquet must not be searched or required")
+    if amendment.get("active_datasets") != [ACTIVE_DATASET]:
+        raise RuntimeError("baseline replay is restricted to SRU")
+    if frozenset(amendment.get("active_heads", ())) != ACTIVE_HEADS:
+        raise RuntimeError("baseline replay active SRU heads mismatch")
+    if amendment.get("splits_materialized_by_b0") != ["validation", "test"]:
+        raise RuntimeError("baseline replay must materialize validation and test only")
+    if any(
+        amendment.get(key) is not False
+        for key in ("ood_enabled", "other_datasets_enabled", "private_cz_enabled")
+    ):
+        raise RuntimeError("baseline replay scope expansion is forbidden")
+    if amendment.get("external_baseline_root_allowed") is not False:
+        raise RuntimeError("external baseline roots are forbidden by the amendment")
+    if amendment.get("historical_prediction_search_allowed") is not False:
+        raise RuntimeError("historical prediction search is forbidden by the amendment")
+    baseline_test = amendment.get("baseline_test_access", {})
+    if (
+        baseline_test.get("allowed_in_b0") is not True
+        or baseline_test.get("metrics_computed_in_b0") is not False
+        or baseline_test.get("selection_exposure") is not False
+        or baseline_test.get("separate_subprocess_required") is not True
+    ):
+        raise RuntimeError("baseline-only test access contract mismatch")
+    return amendment
 
 
 def load_v21_config(project: Path) -> dict[str, Any]:
@@ -78,4 +123,14 @@ def require_test_freeze(paths: V21Paths) -> dict[str, Any]:
     observed = sha256_file(paths.config_path)
     if expected != observed:
         raise RuntimeError("v2.1 config changed after final freeze")
+    amendment_expected = manifest.get("baseline_replay_amendment_sha256")
+    if amendment_expected != sha256_file(paths.baseline_amendment_path):
+        raise RuntimeError("baseline replay amendment changed after final freeze")
+    replay_path = paths.output / "BASELINES" / "BASELINE_REPLAY_MANIFEST.json"
+    if manifest.get("baseline_replay_manifest_sha256") != sha256_file(replay_path):
+        raise RuntimeError("baseline replay manifest changed after final freeze")
+    if manifest.get("baseline_test_metrics_exposed_to_selection") is not False:
+        raise RuntimeError("baseline test metrics reached v2.1 selection")
+    if manifest.get("v21_candidate_test_accessed") is not False:
+        raise RuntimeError("v2.1 candidate test was accessed before E7")
     return manifest

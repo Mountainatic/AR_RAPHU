@@ -8,10 +8,20 @@ from typing import Any
 
 from .stage0 import write_json
 from .v21_a import run_e4_a
-from .v21_audit import write_post_audit, write_pre_audit
-from .v21_baselines import freeze_baseline_inventory
+from .v21_audit import write_post_audit
+from .v21_baselines import (
+    REPLAY_MANIFEST_NAME,
+    REPLAY_STATUS,
+    freeze_baseline_inventory,
+    run_baseline_replay,
+)
 from .v21_c import run_e2_c
-from .v21_config import ACTIVE_HEADS, V21Paths, load_v21_config
+from .v21_config import (
+    ACTIVE_HEADS,
+    V21Paths,
+    load_baseline_replay_amendment,
+    load_v21_config,
+)
 from .v21_joint import run_e5_joint
 from .v21_k import run_e2_k
 from .v21_views import assert_only_sru, sru_dynamic_views, sru_input_views
@@ -31,6 +41,20 @@ E1_TESTS = (
     "tests/test_v21_reporting.py",
 )
 
+CHAIN_STAGES = (
+    "b0",
+    "e0",
+    "e1",
+    "e2k",
+    "e2c",
+    "e3",
+    "e4",
+    "e5",
+    "e6",
+    "e7",
+    "e8",
+)
+
 
 def _sha256(path: Path) -> str:
     import hashlib
@@ -48,21 +72,40 @@ def _git(project: Path, *args: str) -> str:
 
 def run_e0(paths: V21Paths) -> dict[str, Any]:
     config = load_v21_config(paths.project)
+    amendment = load_baseline_replay_amendment(paths.project)
+    baseline_inventory = freeze_baseline_inventory(paths)
     validation = json.loads((paths.shared / "C1_VALIDATION.json").read_text(encoding="utf-8"))
     input_views = sru_input_views(paths.shared)
     dynamic_views = sru_dynamic_views(paths.shared)
     assert_only_sru(input_views)
     assert_only_sru(dynamic_views)
-    pre = write_pre_audit(paths.shared, paths.output)
+    pre_path = paths.output / "DATA_AUDIT" / "V21_DATA_BASE_PRE_AUDIT.json"
+    baseline_post_path = (
+        paths.output / "DATA_AUDIT" / "V21_DATA_BASE_POST_BASELINE_AUDIT.json"
+    )
+    replay_path = paths.output / "BASELINES" / REPLAY_MANIFEST_NAME
+    if not pre_path.is_file() or not baseline_post_path.is_file() or not replay_path.is_file():
+        raise RuntimeError("E0 requires a completed B0 baseline replay")
+    pre = json.loads(pre_path.read_text(encoding="utf-8"))
+    baseline_post = json.loads(baseline_post_path.read_text(encoding="utf-8"))
+    replay = json.loads(replay_path.read_text(encoding="utf-8"))
     observed_heads = {view.head.head_id for view in [*input_views, *dynamic_views]}
     non_sru = pre["summary"].get("non_sru", {}).get("files", 0)
     branch = _git(paths.project, "branch", "--show-current")
+    current_head = _git(paths.project, "rev-parse", "HEAD")
     checks = {
         "C1_validation_pass": validation.get("status") == "PASS",
         "active_heads_exact": observed_heads == ACTIVE_HEADS,
         "non_sru_bases_preserved": non_sru > 0,
         "write_shared_data_false": config["write_shared_data"] is False,
         "legacy_v2_freeze_present": (paths.project / "PRISM_V2_MODULAR_NUMERICALLY_FROZEN").is_dir(),
+        "baseline_replay_frozen": replay.get("status") == REPLAY_STATUS,
+        "baseline_replay_data_immutable": baseline_post.get("comparison_to_pre", {}).get("status") == "PASS",
+        "historical_baseline_not_searched": replay.get("historical_prediction_search_performed") is False,
+        "baseline_test_metrics_not_exposed": replay.get("baseline_test_metrics_exposed_to_selection") is False,
+        "baseline_amendment_frozen": replay.get("amendment_id") == amendment["amendment_id"],
+        "baseline_inventory_verified": bool(baseline_inventory.get("entries")),
+        "baseline_replay_code_matches": replay.get("source_code_commit") == current_head,
         "branch_is_v21_or_detached_release": branch
         in {"prism-v2-1-sru-stagewise-routed", ""},
     }
@@ -70,10 +113,13 @@ def run_e0(paths: V21Paths) -> dict[str, Any]:
         "status": "PASS" if all(checks.values()) else "STOP_INHERITANCE_MISMATCH",
         "stage": "E0_INHERITANCE_AUDIT",
         "checks": checks,
-        "git_head": _git(paths.project, "rev-parse", "HEAD"),
+        "git_head": current_head,
         "git_branch": branch,
         "git_dirty": bool(_git(paths.project, "status", "--short")),
         "data_pre_audit_sha256": _sha256(paths.output / "DATA_AUDIT" / "V21_DATA_BASE_PRE_AUDIT.json"),
+        "baseline_replay_manifest_sha256": _sha256(replay_path),
+        "baseline_replay_test_accessed": True,
+        "v21_candidate_test_accessed": False,
         "test_accessed": False,
     }
     write_json(paths.output / "FREEZE" / "E0_INHERITANCE_AUDIT.json", result)
@@ -116,6 +162,7 @@ def freeze_e6(paths: V21Paths) -> dict[str, Any]:
     if not all(required.values()):
         raise RuntimeError(f"E6 prerequisites missing: {required}")
     baseline_inventory = freeze_baseline_inventory(paths)
+    baseline_replay_path = paths.output / "BASELINES" / REPLAY_MANIFEST_NAME
     post = write_post_audit(paths.shared, paths.output)
     if post["comparison_to_pre"]["status"] != "PASS":
         raise RuntimeError("STOP_DATA_BASE_MUTATED")
@@ -134,9 +181,14 @@ def freeze_e6(paths: V21Paths) -> dict[str, Any]:
         "baseline_inventory_sha256": _sha256(
             paths.output / "BASELINES" / "FROZEN_BASELINE_INVENTORY.json"
         ),
+        "baseline_replay_manifest_sha256": _sha256(baseline_replay_path),
+        "baseline_replay_amendment_sha256": _sha256(paths.baseline_amendment_path),
         "baseline_inclusion": baseline_inventory["entries"],
         "best_frozen_baselines": baseline_inventory["best_by_validation"],
         "selections": selections, "validation_files": validation_files,
+        "baseline_replay_test_accessed": True,
+        "baseline_test_metrics_exposed_to_selection": False,
+        "v21_candidate_test_accessed": False,
         "test_accessed": False,
     }
     write_json(paths.final_freeze_path, manifest)
@@ -146,6 +198,7 @@ def freeze_e6(paths: V21Paths) -> dict[str, Any]:
 def run_stage(stage: str, paths: V21Paths) -> dict[str, Any]:
     if paths.output.name != "results_prism_v2_1_sru":
         raise RuntimeError("v2.1 output must use the isolated results_prism_v2_1_sru namespace")
+    if stage == "b0": return run_baseline_replay(paths)
     if stage == "e0": return run_e0(paths)
     if stage == "e1": return run_e1(paths)
     if stage == "e2k": return run_e2_k(paths.shared, paths.project, paths.output)
