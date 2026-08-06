@@ -23,6 +23,11 @@ COMPRESSED = "ADDITIVE_COMPRESSED"
 JOINT_BASIS = "ADDITIVE_JOINT_BASIS"
 
 
+def _target_mean(values: Any) -> float:
+    """Return an FP64 mean without passing NumPy kwargs to pandas."""
+    return float(np.mean(np.asarray(values, dtype=np.float64), dtype=np.float64))
+
+
 def run_c_view(
     shared: Path,
     project: Path,
@@ -82,7 +87,7 @@ def run_c_view(
                     if train_x.shape[1] == 0:
                         prediction = np.full(
                             len(evaluation),
-                            float(np.mean(target, dtype=np.float64)),
+                            _target_mean(target),
                             dtype=np.float64,
                         )
                     else:
@@ -134,7 +139,7 @@ def run_c_view(
                 float(selected_alpha),
             )
         else:
-            intercept = float(np.mean(final_train["y_true"], dtype=np.float64))
+            intercept = _target_mean(final_train["y_true"])
             prediction = np.full(len(validation), intercept, dtype=np.float64)
             contract = {
                 "status": "K_EXACT_ZERO",

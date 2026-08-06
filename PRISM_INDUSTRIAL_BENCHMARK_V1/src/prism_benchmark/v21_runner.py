@@ -163,6 +163,12 @@ def freeze_e6(paths: V21Paths) -> dict[str, Any]:
         raise RuntimeError(f"E6 prerequisites missing: {required}")
     baseline_inventory = freeze_baseline_inventory(paths)
     baseline_replay_path = paths.output / "BASELINES" / REPLAY_MANIFEST_NAME
+    runtime_profile_path = paths.output / "RUN_LOG" / "V21_RUNTIME_PROFILE.json"
+    if not runtime_profile_path.is_file():
+        raise FileNotFoundError(runtime_profile_path)
+    code_transitions = sorted(
+        paths.output.glob("RUN_LOG/CODE_TRANSITION_*.json")
+    )
     post = write_post_audit(paths.shared, paths.output)
     if post["comparison_to_pre"]["status"] != "PASS":
         raise RuntimeError("STOP_DATA_BASE_MUTATED")
@@ -183,6 +189,14 @@ def freeze_e6(paths: V21Paths) -> dict[str, Any]:
         ),
         "baseline_replay_manifest_sha256": _sha256(baseline_replay_path),
         "baseline_replay_amendment_sha256": _sha256(paths.baseline_amendment_path),
+        "runtime_profile_sha256": _sha256(runtime_profile_path),
+        "code_transitions": [
+            {
+                "path": path.relative_to(paths.output).as_posix(),
+                "sha256": _sha256(path),
+            }
+            for path in code_transitions
+        ],
         "baseline_inclusion": baseline_inventory["entries"],
         "best_frozen_baselines": baseline_inventory["best_by_validation"],
         "selections": selections, "validation_files": validation_files,

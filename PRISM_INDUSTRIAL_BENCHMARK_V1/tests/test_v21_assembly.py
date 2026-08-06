@@ -1,5 +1,8 @@
+import pandas as pd
+
 from prism_benchmark.v21_a import EXACT_ZERO
 from prism_benchmark.v21_assembly import build_physics_first_card
+from prism_benchmark.v21_c import _target_mean
 from prism_benchmark.v21_w import IDENTITY
 
 
@@ -31,3 +34,7 @@ def test_pf_reports_not_supported_when_input_path_is_zero():
     )
     assert card["status"] == "PHYSICS_ROUTE_NOT_SUPPORTED"
     assert card["assembly"] is None
+
+
+def test_c_exact_zero_intercept_accepts_pandas_series():
+    assert _target_mean(pd.Series([1.0, 2.0, 3.0])) == 2.0

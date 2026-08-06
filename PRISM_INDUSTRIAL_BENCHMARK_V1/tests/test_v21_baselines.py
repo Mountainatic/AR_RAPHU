@@ -21,6 +21,7 @@ from prism_benchmark.v21_config import (
 )
 from prism_benchmark.v21_runner import CHAIN_STAGES
 from scripts.run_prism_v21_chain import _complete, _marker
+from scripts.run_prism_v21_chain import _validate_runtime_budget
 
 
 def _view(head_id: str = "SRU_H2S__H5__W1", information_set: str = "input_only") -> ViewSpec:
@@ -249,3 +250,16 @@ def test_user_authorized_test_generation_override_is_frozen():
     assert amendment["splits_materialized_by_b0"] == ["validation", "test"]
     assert amendment["baseline_test_access"]["metrics_computed_in_b0"] is False
     assert amendment["baseline_test_access"]["selection_exposure"] is False
+
+
+def test_runtime_budget_uses_32_threads_with_60_gib_guard():
+    profile = _validate_runtime_budget(
+        cpu_count=32,
+        memory_limit_bytes=60 * 1024**3,
+        workers=8,
+        threads_per_worker=4,
+        memory_gib_per_worker=4,
+        memory_reserve_gib=8,
+    )
+    assert profile["total_thread_budget"] == 32
+    assert profile["required_memory_budget_bytes"] == 40 * 1024**3
