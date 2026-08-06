@@ -29,6 +29,7 @@ IDENTITY = "IDENTITY_CORRECTION"
 MONOTONE = "MONOTONE_I_SPLINE_CORRECTION"
 NATURAL_CUBIC = "NATURAL_CUBIC_CORRECTION"
 W_FAMILIES = (IDENTITY, MONOTONE, NATURAL_CUBIC)
+LATENT_VARIANCE_FLOOR = 1e-12
 
 
 @dataclass(frozen=True)
@@ -242,11 +243,20 @@ def run_e3_w(shared: Path, project: Path, output: Path) -> dict[str, Any]:
         "stage": "E3_W",
         "views": len(results),
         "pass": sum(item["status"] == "PASS" for item in results),
-        "activated": sum(item.get("w_contract", {}).get("family") != IDENTITY for item in results),
+        "activated": _count_activated_w(results),
         "test_accessed": False,
     }
     write_json(output / "DEVELOPMENT" / "W" / "SUMMARY.json", summary)
     return summary
+
+
+def _count_activated_w(results: list[dict[str, Any]]) -> int:
+    """Count only successful, explicitly non-identity W contracts."""
+    return sum(
+        item.get("status") == "PASS"
+        and item.get("w_contract", {}).get("family") not in {None, IDENTITY}
+        for item in results
+    )
 
 
 def _load_c_result(output: Path, view: ViewSpec) -> dict[str, Any]:
@@ -265,6 +275,52 @@ def _w_candidates(v21: dict[str, Any], v2: dict[str, Any], direction: int, monot
         candidates.extend((MONOTONE, int(k), s, mu, direction) for k in v21["W"]["monotone_knots"] for s in smoothness for mu in mus)
     candidates.extend((NATURAL_CUBIC, int(k), s, mu, 1) for k in v21["W"]["natural_cubic_knots"] for s in smoothness for mu in mus)
     return candidates
+
+
+def _w_candidate_scope(
+    v21: dict[str, Any],
+    v2: dict[str, Any],
+    direction: int,
+    monotone: bool,
+    *,
+    input_path_nonzero: bool,
+    fold_train_latents: list[np.ndarray],
+) -> tuple[list[Any], dict[str, Any]]:
+    """Resolve whether nonlinear W candidates have a scientifically valid latent.
+
+    A K/C exact-zero route has no input-response latent for W to transform.  The
+    only registered W state in that case is the exact identity correction.  The
+    same rule applies when any train fold has no numerically resolvable latent
+    variation, because train-only knots cannot be defined for that fold.
+    """
+    fold_variances = [
+        float(np.var(np.asarray(values, dtype=np.float64), dtype=np.float64))
+        for values in fold_train_latents
+    ]
+    all_folds_vary = bool(fold_variances) and all(
+        value > LATENT_VARIANCE_FLOOR for value in fold_variances
+    )
+    if not input_path_nonzero:
+        reason = "K_C_INPUT_PATH_EXACT_ZERO"
+    elif not all_folds_vary:
+        reason = "NO_TRAIN_FOLD_LATENT_VARIATION"
+    else:
+        reason = "NONLINEAR_W_ELIGIBLE"
+    nonlinear_allowed = bool(input_path_nonzero and all_folds_vary)
+    candidates = (
+        _w_candidates(v21, v2, direction, monotone)
+        if nonlinear_allowed
+        else [IDENTITY]
+    )
+    return candidates, {
+        "input_path_nonzero": bool(input_path_nonzero),
+        "fold_train_latent_variances": fold_variances,
+        "latent_variance_floor": LATENT_VARIANCE_FLOOR,
+        "all_train_folds_have_latent_variation": all_folds_vary,
+        "nonlinear_candidates_allowed": nonlinear_allowed,
+        "identity_forced": not nonlinear_allowed,
+        "reason": reason,
+    }
 
 
 def _fit_c_routed(
@@ -332,7 +388,14 @@ def _fit_registered_w(
     upstream_predictions: np.ndarray,
 ) -> tuple[np.ndarray, dict[str, Any]]:
     if candidate == IDENTITY:
-        return np.zeros(len(evaluation_latent), dtype=np.float64), {"family": IDENTITY, "parameter_count": 0, "effective_df": 0.0, "soft_overlap_mu": 0.0, "hard_feature_residualization": False}
+        return np.zeros(len(evaluation_latent), dtype=np.float64), {
+            "family": IDENTITY,
+            "parameter_count": 0,
+            "effective_df": 0.0,
+            "soft_overlap_mu": 0.0,
+            "hard_feature_residualization": False,
+            "numerical_certificate": {"status": "EXACT_ZERO"},
+        }
     family, knots, smoothness, mu, direction = candidate
     return fit_w_correction(train_latent, train_target - train_latent, evaluation_latent, family=family, knot_count=knots, smoothness=smoothness, mu=mu, upstream_predictions=upstream_predictions, direction=direction)
 
@@ -354,13 +417,27 @@ def run_w_view(shared: Path, project: Path, output: Path, view: ViewSpec) -> dic
             evaluation = _cap(train.iloc[evaluation_index], int(v2["row_caps"]["validation_selection_per_fold"]))
             fit_latent, evaluation_latent, fit_upstream, evaluation_upstream, _ = _fit_c_routed(shared, view, fit, evaluation, active, v2, c_result, fit_split="train", evaluation_split="train")
             fit_target = fit["y_true"].to_numpy(dtype=np.float64)
-            correlations.append(float(stats.spearmanr(fit_latent, fit_target - fit_latent).statistic))
+            fit_latent_variance = float(
+                np.var(np.asarray(fit_latent, dtype=np.float64), dtype=np.float64)
+            )
+            correlations.append(
+                float(stats.spearmanr(fit_latent, fit_target - fit_latent).statistic)
+                if fit_latent_variance > LATENT_VARIANCE_FLOOR
+                else float("nan")
+            )
             fold_inputs.append((fold, evaluation, fit_latent, evaluation_latent, fit_upstream, evaluation_upstream, fit_target, evaluation["y_true"].to_numpy(dtype=np.float64)))
         finite = np.asarray([value for value in correlations if np.isfinite(value)], dtype=np.float64)
         direction = 1 if len(finite) == 0 or float(np.median(finite)) >= 0 else -1
         rule = v2["W_module"]["monotone_direction"]
         monotone = bool(len(finite) >= int(v21["selection"]["minimum_usable_folds"]) and abs(float(np.median(finite))) >= float(rule["absolute_correlation_min"]) and float(np.mean(np.sign(finite) == direction)) >= float(rule["same_sign_fold_fraction_min"]))
-        candidates = _w_candidates(v21, v2, direction, monotone)
+        candidates, candidate_scope = _w_candidate_scope(
+            v21,
+            v2,
+            direction,
+            monotone,
+            input_path_nonzero=bool(c_result.get("input_path_nonzero", False)),
+            fold_train_latents=[item[2] for item in fold_inputs],
+        )
         losses = {candidate: [] for candidate in candidates}
         for _, _, fit_latent, evaluation_latent, fit_upstream, _, fit_target, evaluation_target in fold_inputs:
             for candidate in candidates:
@@ -385,6 +462,12 @@ def run_w_view(shared: Path, project: Path, output: Path, view: ViewSpec) -> dic
         final_train = _cap(train, int(v2["row_caps"]["wiener_fit"]))
         fit_latent, validation_latent, fit_upstream, _, c_contract = _fit_c_routed(shared, view, final_train, validation, active, v2, c_result, fit_split="train", evaluation_split="validation")
         correction, contract = _fit_registered_w(selected, fit_latent, final_train["y_true"].to_numpy(dtype=np.float64), validation_latent, fit_upstream)
+        if selected == IDENTITY and candidate_scope["identity_forced"]:
+            contract = {
+                **contract,
+                "identity_reason": candidate_scope["reason"],
+                "input_path_nonzero": candidate_scope["input_path_nonzero"],
+            }
         prediction = validation_latent + correction
         if selected == IDENTITY:
             replay_prediction = validation_latent.copy()
@@ -408,7 +491,7 @@ def run_w_view(shared: Path, project: Path, output: Path, view: ViewSpec) -> dic
         oof.to_parquet(oof_path, index=False, compression="zstd")
         frame.to_parquet(prediction_path, index=False, compression="zstd")
         final_loss = mse(frame["y_true"].to_numpy(dtype=np.float64), prediction)
-        result = {"status": "PASS", "stage": "E3_W", "dataset": view.head.dataset, "target_head": view.head.head_id, "proxy_policy": view.proxy_policy, "selected_candidate": str(selected), "w_contract": contract, "c_final_contract": c_contract, "selection": selection.to_json(), "candidate_fold_losses": {str(key): value for key, value in losses.items()}, "monotone_correlations": correlations, "monotone_applicable": monotone, "monotone_direction": direction, "hard_feature_residualization": False, "hard_projection_replay": {"selection_eligible": False, "split": "validation", "contract": replay_contract, "mse": mse(validation["y_true"].to_numpy(dtype=np.float64), replay_prediction)}, "oof_path": str(oof_path.relative_to(output)), "oof_sha256": sha256_file(oof_path), "final_selected_candidate": str(selected), "final_selected_fold_losses": list(selection.final_selected_fold_losses), "final_selected_prediction_path": str(prediction_path.relative_to(output)), "final_selected_contract": contract, "final_prediction_loss": final_loss, "prediction_path": str(prediction_path.relative_to(output)), "prediction_sha256": sha256_file(prediction_path), "test_accessed": False, "elapsed_seconds": time.time() - started, **regression_metrics(frame["y_true"].to_numpy(dtype=np.float64), prediction)}
+        result = {"status": "PASS", "stage": "E3_W", "dataset": view.head.dataset, "target_head": view.head.head_id, "proxy_policy": view.proxy_policy, "selected_candidate": str(selected), "w_contract": contract, "w_candidate_scope": candidate_scope, "input_path_nonzero": bool(c_result.get("input_path_nonzero", False)), "c_final_contract": c_contract, "selection": selection.to_json(), "candidate_fold_losses": {str(key): value for key, value in losses.items()}, "monotone_correlations": correlations, "monotone_applicable": monotone, "monotone_direction": direction, "hard_feature_residualization": False, "hard_projection_replay": {"selection_eligible": False, "split": "validation", "contract": replay_contract, "mse": mse(validation["y_true"].to_numpy(dtype=np.float64), replay_prediction)}, "oof_path": str(oof_path.relative_to(output)), "oof_sha256": sha256_file(oof_path), "final_selected_candidate": str(selected), "final_selected_fold_losses": list(selection.final_selected_fold_losses), "final_selected_prediction_path": str(prediction_path.relative_to(output)), "final_selected_contract": contract, "final_prediction_loss": final_loss, "prediction_path": str(prediction_path.relative_to(output)), "prediction_sha256": sha256_file(prediction_path), "test_accessed": False, "elapsed_seconds": time.time() - started, **regression_metrics(frame["y_true"].to_numpy(dtype=np.float64), prediction)}
     except Exception as error:
         result = {"status": "SOLVER_FAILED_RETAINED", "stage": "E3_W", "target_head": view.head.head_id, "proxy_policy": view.proxy_policy, "test_accessed": False, "error_type": type(error).__name__, "error": str(error), "traceback": traceback.format_exc(), "elapsed_seconds": time.time() - started}
     write_json(destination / "RESULT.json", result)
