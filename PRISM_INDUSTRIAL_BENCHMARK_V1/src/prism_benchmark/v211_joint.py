@@ -23,7 +23,11 @@ from .v211_a import fit_mature_residual_ar
 from .v211_c import _gate_config, _smallest_stable_alpha
 from .v211_config import load_v211_configs
 from .v211_k import load_active_channels
-from .v211_selection import input_path_preservation_gate, numerical_contract_passes
+from .v211_selection import (
+    attach_nonselecting_validation_confirmation,
+    input_path_preservation_gate,
+    numerical_contract_passes,
+)
 from .v211_w import IDENTITY, _fit_c_routed, build_w_design
 
 
@@ -645,15 +649,19 @@ def run_joint_view(
             numerical_certificate_passed=numerical_contract_passes(contract),
             **gate_parameters,
         )
-        gate = {
+        final_numerical_pass = numerical_contract_passes(contract)
+        formal_pass = bool(oof_gate["pass"] and final_numerical_pass)
+        formal_gate = {
             **oof_gate,
             "status": "INPUT_PATH_PRESERVED"
-            if oof_gate["pass"] and validation_gate["pass"]
+            if formal_pass
             else "INPUT_PATH_COLLAPSED",
-            "pass": bool(oof_gate["pass"] and validation_gate["pass"]),
-            "oof_confirmation_passed": bool(oof_gate["pass"]),
-            "validation_confirmation": validation_gate,
+            "pass": formal_pass,
+            "final_refit_numerical_certificate_passed": final_numerical_pass,
         }
+        gate = attach_nonselecting_validation_confirmation(
+            formal_gate, validation_gate
+        )
         frame = validation[
             [
                 "base_origin_id",

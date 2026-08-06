@@ -16,6 +16,7 @@ from prism_benchmark.v211_c import (
 from prism_benchmark.v211_config import V211Paths, require_v211_test_freeze
 from prism_benchmark.v211_joint import registered_joint_candidates
 from prism_benchmark.v211_selection import (
+    attach_nonselecting_validation_confirmation,
     input_path_preservation_gate,
     profile_one_se_regret_guard,
     select_smallest_stable,
@@ -168,7 +169,21 @@ def test_pf_and_joint_share_input_path_gate():
     )
     pf_gate = input_path_preservation_gate(**common)
     joint_gate = input_path_preservation_gate(**common)
+    failed_validation_diagnostic = {
+        **joint_gate,
+        "status": "INPUT_PATH_COLLAPSED",
+        "pass": False,
+    }
+    pf_gate = attach_nonselecting_validation_confirmation(
+        pf_gate, failed_validation_diagnostic
+    )
+    joint_gate = attach_nonselecting_validation_confirmation(
+        joint_gate, failed_validation_diagnostic
+    )
     assert pf_gate == joint_gate
+    assert joint_gate["pass"] is True
+    assert joint_gate["validation_confirmation"]["pass"] is False
+    assert joint_gate["validation_confirmation"]["selection_eligible"] is False
     assert pf_and_joint_input_status_match(
         {"input_path_preservation": pf_gate},
         {"input_path_preservation": joint_gate},

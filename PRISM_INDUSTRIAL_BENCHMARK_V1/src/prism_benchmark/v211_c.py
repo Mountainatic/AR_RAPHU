@@ -19,6 +19,7 @@ from .v21_views import sru_input_views
 from .v211_config import load_v211_configs
 from .v211_k import load_active_channels
 from .v211_selection import (
+    attach_nonselecting_validation_confirmation,
     input_path_preservation_gate,
     numerical_contract_passes,
 )
@@ -361,21 +362,21 @@ def run_c_view(
                     ),
                     **gate_parameters,
                 )
-                combined_pass = bool(
-                    family_oof_gate.get("pass", False)
-                    and validation_gate.get("pass", False)
+                final_numerical_pass = numerical_contract_passes(family_contract)
+                formal_pass = bool(
+                    family_oof_gate.get("pass", False) and final_numerical_pass
                 )
-                combined_gate = {
+                formal_gate = {
                     **family_oof_gate,
                     "status": "INPUT_PATH_PRESERVED"
-                    if combined_pass
+                    if formal_pass
                     else "INPUT_PATH_COLLAPSED",
-                    "pass": combined_pass,
-                    "oof_confirmation_passed": bool(
-                        family_oof_gate.get("pass", False)
-                    ),
-                    "validation_confirmation": validation_gate,
+                    "pass": formal_pass,
+                    "final_refit_numerical_certificate_passed": final_numerical_pass,
                 }
+                combined_gate = attach_nonselecting_validation_confirmation(
+                    formal_gate, validation_gate
+                )
                 payload = {
                     "family": family,
                     "alpha": family_alpha,
@@ -388,7 +389,7 @@ def run_c_view(
                     "alpha": family_alpha,
                     "input_path_preservation": combined_gate,
                 }
-                if combined_pass:
+                if formal_pass:
                     selected_payload = payload
                     break
                 if family == BEST_ACTIVE_K:

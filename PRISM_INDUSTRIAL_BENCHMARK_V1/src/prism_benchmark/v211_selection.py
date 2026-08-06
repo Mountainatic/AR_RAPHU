@@ -245,3 +245,18 @@ def input_path_preservation_gate(
             np.max(np.abs(coefficients), initial=0.0)
         ),
     }
+
+
+def attach_nonselecting_validation_confirmation(
+    formal_oof_gate: Mapping[str, Any],
+    validation_gate: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Record materialized-validation behavior without changing the OOF decision."""
+    result = dict(formal_oof_gate)
+    result["oof_confirmation_passed"] = bool(formal_oof_gate.get("pass", False))
+    result["validation_confirmation"] = {
+        **dict(validation_gate),
+        "selection_eligible": False,
+        "role": "POST_SELECTION_MATERIALIZATION_DIAGNOSTIC",
+    }
+    return result
