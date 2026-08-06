@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 import prism_benchmark.v21_joint as v21_joint
+from prism_benchmark.v21_assembly import build_joint_card
 
 from prism_benchmark.v21_joint import (
     J_KWA,
@@ -43,3 +44,18 @@ def test_joint_has_full_w_basis_block_and_prediction_components_close():
 def test_input_path_collapse_is_reported_not_replaced_by_ar():
     gate = input_path_gate([1.0, 1.0, 1.0, 1.0], [0.8, 0.8, 0.8, 0.8], np.zeros(20))
     assert gate["status"] == "JOINT_INPUT_PATH_COLLAPSED"
+
+
+def test_exact_zero_joint_collapse_card_has_no_ar_fallback():
+    card = build_joint_card(
+        {
+            "status": "JOINT_INPUT_PATH_COLLAPSED",
+            "final_selected_candidate": None,
+            "input_path_gate": {
+                "status": "JOINT_INPUT_PATH_COLLAPSED",
+            },
+        }
+    )
+    assert card["assembly"] is None
+    assert card["selected_candidate"] is None
+    assert card["ar_only_fallback_allowed"] is False

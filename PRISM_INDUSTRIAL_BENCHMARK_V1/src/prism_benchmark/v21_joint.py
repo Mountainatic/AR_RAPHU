@@ -239,6 +239,35 @@ def input_path_gate(
     }
 
 
+def _collapsed_joint_result(view: Any, *, reason: str) -> dict[str, Any]:
+    """Return the registered non-fallback result for an unavailable input path."""
+    return {
+        "status": "JOINT_INPUT_PATH_COLLAPSED",
+        "stage": "E5_JOINT",
+        "dataset": view.head.dataset,
+        "target_head": view.head.head_id,
+        "availability_scenario": view.availability_scenario,
+        "proxy_policy": view.proxy_policy,
+        "registered_candidates": list(JOINT_CANDIDATES),
+        "applicable_candidates": [],
+        "selected_candidate": None,
+        "final_selected_candidate": None,
+        "input_path_gate": {
+            "status": "JOINT_INPUT_PATH_COLLAPSED",
+            "pass": False,
+            "reason": reason,
+            "input_prediction_variance": 0.0,
+            "finite_fold_count": 0,
+        },
+        "joint_contract": {
+            "status": "NOT_FIT_INPUT_PATH_UNAVAILABLE",
+            "input_path_required": True,
+            "ar_only_fallback_allowed": False,
+        },
+        "test_accessed": False,
+    }
+
+
 def run_joint_view(shared: "Path", project: "Path", output: "Path", view: Any) -> dict[str, Any]:
     import json
     import time
@@ -266,6 +295,13 @@ def run_joint_view(shared: "Path", project: "Path", output: "Path", view: Any) -
         a_result = json.loads((output / "DEVELOPMENT" / "A" / view.head.head_id / view.availability_scenario / view.proxy_policy / "RESULT.json").read_text(encoding="utf-8"))
         if any(item.get("status") != "PASS" for item in (c_result, w_result, a_result)):
             raise RuntimeError("E2-E4 prerequisite is not PASS")
+        if not bool(c_result.get("input_path_nonzero", False)):
+            result = _collapsed_joint_result(
+                view,
+                reason="K_C_INPUT_PATH_EXACT_ZERO",
+            )
+            write_json(destination / "RESULT.json", result)
+            return result
         active = load_active_channels(output, view)
         oof = pd.read_parquet(output / w_result["oof_path"])
         w_contract = w_result["w_contract"]
@@ -292,6 +328,13 @@ def run_joint_view(shared: "Path", project: "Path", output: "Path", view: Any) -
             evaluation = oof[oof["oof_fold"] == fold].reset_index(drop=True)
             features = fit_physical_features(shared, view, fit, evaluation, active, v2, fit_split="train", evaluation_split="train")
             k_train, k_eval = features["joint_train"], features["joint_evaluation"]
+            if k_train.shape[1] == 0:
+                result = _collapsed_joint_result(
+                    view,
+                    reason="EMPTY_K_BLOCK_IN_TRAIN_FOLD",
+                )
+                write_json(destination / "RESULT.json", result)
+                return result
             if w_contract["family"] == IDENTITY:
                 w_train, w_eval = np.empty((len(fit), 0)), np.empty((len(evaluation), 0))
             else:

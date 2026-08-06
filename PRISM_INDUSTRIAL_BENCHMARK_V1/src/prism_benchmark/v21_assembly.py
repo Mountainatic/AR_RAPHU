@@ -75,11 +75,11 @@ def build_physics_first_card(
 
 
 def build_joint_card(joint_result: Mapping[str, Any]) -> dict[str, Any]:
-    selected = _selected(joint_result)
-    if selected not in JOINT_CANDIDATES:
-        raise RuntimeError("Joint result contains an unregistered or AR-only candidate")
     gate = joint_result.get("input_path_gate", {})
     if gate.get("status") != "JOINT_INPUT_PATH_VALIDATED":
+        selected = joint_result.get("final_selected_candidate")
+        if selected is not None and selected not in JOINT_CANDIDATES:
+            raise RuntimeError("Joint result contains an unregistered or AR-only candidate")
         return {
             "status": "JOINT_INPUT_PATH_COLLAPSED",
             "assembly": None,
@@ -87,6 +87,9 @@ def build_joint_card(joint_result: Mapping[str, Any]) -> dict[str, Any]:
             "ar_only_fallback_allowed": False,
             "test_accessed": False,
         }
+    selected = _selected(joint_result)
+    if selected not in JOINT_CANDIDATES:
+        raise RuntimeError("Joint result contains an unregistered or AR-only candidate")
     assert_final_prediction_contract(joint_result)
     return {
         "status": "PREDICTIVE_JOINT_KWA",
