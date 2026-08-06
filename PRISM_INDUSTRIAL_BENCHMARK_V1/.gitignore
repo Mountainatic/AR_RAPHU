@@ -10,4 +10,5 @@ raw_sources/
 *.parquet
 *.npy
 *.npz
+results_prism_v2_1_sru/
 
