@@ -86,6 +86,32 @@ def _evaluate_a_indexed(candidate_index: int) -> float:
     )
 
 
+def _merge_w_oof_for_a(
+    train: pd.DataFrame,
+    w_oof: pd.DataFrame,
+    contribution_columns: list[str],
+) -> pd.DataFrame:
+    columns = [
+        "base_origin_id",
+        "physical_oof",
+        "delta_w_oof",
+        "physical_w_oof",
+        "delta_w_ablation_oof",
+        "physical_w_ablation_oof",
+        "oof_fold",
+        *contribution_columns,
+    ]
+    missing = [column for column in columns if column not in w_oof.columns]
+    if missing:
+        raise RuntimeError(f"W OOF is missing registered A-route columns: {missing}")
+    return train.merge(
+        w_oof[columns],
+        on="base_origin_id",
+        how="inner",
+        validate="one_to_one",
+    )
+
+
 def _fit_frozen_a_route(
     oof: pd.DataFrame,
     validation: pd.DataFrame,
@@ -209,21 +235,7 @@ def run_a_view(
             for column in oof.columns
             if column.startswith("k_channel_contribution_")
         )
-        oof = train.merge(
-            oof[
-                [
-                    "base_origin_id",
-                    "physical_oof",
-                    "delta_w_oof",
-                    "physical_w_oof",
-                    "oof_fold",
-                    *contribution_columns,
-                ]
-            ],
-            on="base_origin_id",
-            how="inner",
-            validate="one_to_one",
-        )
+        oof = _merge_w_oof_for_a(train, oof, contribution_columns)
         if len(oof) > int(v2["row_caps"]["state_fit"]):
             raise RuntimeError("A OOF fit rows exceed the frozen state_fit cap")
         oof["residual"] = oof["y_true"] - oof["physical_w_oof"]

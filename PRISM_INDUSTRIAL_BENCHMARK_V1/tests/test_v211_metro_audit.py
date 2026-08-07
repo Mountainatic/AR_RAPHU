@@ -10,7 +10,7 @@ import pytest
 from prism_benchmark.v2_k import _cap
 from prism_benchmark.v2_runtime import ordered_fork_map, run_parallel
 from prism_benchmark.v211_assembly import pf_and_joint_input_status_match
-from prism_benchmark.v211_a import _evaluate_a_candidate
+from prism_benchmark.v211_a import _evaluate_a_candidate, _merge_w_oof_for_a
 from prism_benchmark.v211_joint import (
     J_K,
     J_KA,
@@ -396,6 +396,34 @@ def test_a_candidate_parallel_map_is_exact_and_ordered() -> None:
     serial = _ordered_parallel_map(_evaluate_a_candidate, jobs, workers=1)
     parallel = _ordered_parallel_map(_evaluate_a_candidate, jobs, workers=3)
     _assert_nested_exact(serial, parallel)
+
+
+def test_a_oof_merge_preserves_both_registered_w_routes() -> None:
+    train = pd.DataFrame(
+        {
+            "base_origin_id": ["a", "b"],
+            "y_true": [1.0, 2.0],
+        }
+    )
+    w_oof = pd.DataFrame(
+        {
+            "base_origin_id": ["a", "b"],
+            "physical_oof": [0.8, 1.9],
+            "delta_w_oof": [0.1, 0.1],
+            "physical_w_oof": [0.9, 2.0],
+            "delta_w_ablation_oof": [0.2, 0.3],
+            "physical_w_ablation_oof": [1.0, 2.2],
+            "oof_fold": [0, 1],
+            "k_channel_contribution_000": [0.4, 0.5],
+        }
+    )
+
+    merged = _merge_w_oof_for_a(
+        train, w_oof, ["k_channel_contribution_000"]
+    )
+
+    assert merged["physical_w_ablation_oof"].tolist() == [1.0, 2.2]
+    assert merged["delta_w_ablation_oof"].tolist() == [0.2, 0.3]
 
 
 def test_joint_candidate_parallel_map_is_exact_and_ordered() -> None:
