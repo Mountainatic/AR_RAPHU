@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 
 from prism_benchmark.v2_k import _cap
-from prism_benchmark.v2_runtime import run_parallel
+from prism_benchmark.v2_runtime import ordered_fork_map, run_parallel
 from prism_benchmark.v211_assembly import pf_and_joint_input_status_match
 from prism_benchmark.v211_a import _evaluate_a_candidate
 from prism_benchmark.v211_joint import (
@@ -51,6 +51,15 @@ from prism_benchmark.v211_w import (
 
 def _deterministic_affine(value: int) -> int:
     return 3 * value + 1
+
+
+def _nested_ordered_fork(value: int) -> list[int]:
+    return ordered_fork_map(
+        _deterministic_affine,
+        [(value + offset,) for offset in range(4)],
+        workers=2,
+        label="METRO_TEST_NESTED_FORK_INNER",
+    )
 
 
 def test_identity_w_is_exactly_skip_w() -> None:
@@ -307,6 +316,34 @@ def test_k_inner_parallel_map_matches_serial_and_preserves_order() -> None:
     serial = _ordered_parallel_map(transform, jobs, workers=1)
     parallel = _ordered_parallel_map(transform, jobs, workers=4)
     assert parallel == serial
+
+
+def test_ordered_fork_map_matches_serial_and_preserves_order() -> None:
+    jobs = [(value,) for value in range(12)]
+    serial = [_deterministic_affine(*job) for job in jobs]
+    parallel = ordered_fork_map(
+        _deterministic_affine,
+        jobs,
+        workers=4,
+        label="METRO_TEST_FORK_PARALLEL",
+    )
+    assert parallel == serial
+
+
+def test_ordered_fork_map_runs_inside_outer_process_pool() -> None:
+    parallel = run_parallel(
+        _nested_ordered_fork,
+        [(0,), (10,)],
+        requested_workers=2,
+        per_worker_gib=0.01,
+        label="METRO_TEST_NESTED_FORK_OUTER",
+    )
+    assert sorted(parallel) == sorted(
+        [
+            [_deterministic_affine(value) for value in range(4)],
+            [_deterministic_affine(value) for value in range(10, 14)],
+        ]
+    )
 
 
 def _assert_nested_exact(left, right) -> None:

@@ -20,12 +20,12 @@ from .v2_basis import natural_cubic_columns
 from .v2_c import _ridge_fit, fit_physical_features
 from .v2_k import _cap
 from .v2_numerics import difference_penalty, solve_certified
-from .v2_runtime import run_parallel
 from .v2_w import _ispline_fixed, fit_w_candidate as fit_hard_projection_replay
 from .v21_selection import guarded_local_one_se_select
 from .v21_w import _psd_root, _standardized_columns, soft_overlap_penalty
 from .v211_config import load_v211_configs
-from .v211_k import _ordered_parallel_map, load_active_channels
+from .v2_runtime import ordered_fork_map, run_parallel
+from .v211_k import load_active_channels
 from .v211_selection import numerical_contract_passes
 
 
@@ -35,6 +35,17 @@ NATURAL_CUBIC = "NATURAL_CUBIC_CORRECTION"
 W_FAMILIES = (IDENTITY, MONOTONE, NATURAL_CUBIC)
 BEST_ACTIVE_K = "BEST_ACTIVE_K_CHANNEL"
 W_INNER_WORKERS_ENV = "PRISM_V211_W_INNER_WORKERS"
+_W_CANDIDATE_CONTEXT: tuple[list[Any], list[tuple[Any, ...]], list[dict[str, Any]]] | None = None
+_W_FOLD_CONTEXT: tuple[
+    Path,
+    ViewSpec,
+    pd.DataFrame,
+    list[dict[str, Any]],
+    dict[str, Any],
+    dict[str, Any],
+    dict[str, Any],
+    list[tuple[np.ndarray, np.ndarray]],
+] | None = None
 
 
 def _w_inner_workers() -> int:
@@ -623,6 +634,81 @@ def _evaluate_w_candidate(
         }
 
 
+def _evaluate_w_indexed(fold_index: int, candidate_index: int) -> tuple[float, dict[str, Any]]:
+    if _W_CANDIDATE_CONTEXT is None:
+        raise RuntimeError("W candidate context was not initialized before fork")
+    candidates, fold_inputs, fold_audits = _W_CANDIDATE_CONTEXT
+    item = fold_inputs[fold_index]
+    return _evaluate_w_candidate(
+        candidates[candidate_index],
+        item[2],
+        item[6],
+        item[3],
+        item[4],
+        item[7],
+        fold_index,
+        bool(fold_audits[fold_index]["pass"]),
+    )
+
+
+def _prepare_w_fold_indexed(
+    fold_index: int,
+) -> tuple[tuple[Any, ...], float, dict[str, Any]]:
+    if _W_FOLD_CONTEXT is None:
+        raise RuntimeError("W fold context was not initialized before fork")
+    shared, view, train, active, v2, c_result, rule, folds = _W_FOLD_CONTEXT
+    fit_index, evaluation_index = folds[fold_index]
+    fit = _cap(train.iloc[fit_index], int(v2["row_caps"]["wiener_fit"]))
+    evaluation = _cap(
+        train.iloc[evaluation_index],
+        int(v2["row_caps"]["validation_selection_per_fold"]),
+    )
+    (
+        fit_latent,
+        evaluation_latent,
+        fit_upstream,
+        evaluation_upstream,
+        _,
+    ) = _fit_c_routed(
+        shared,
+        view,
+        fit,
+        evaluation,
+        active,
+        v2,
+        c_result,
+        fit_split="train",
+        evaluation_split="train",
+    )
+    fit_target = fit["y_true"].to_numpy(dtype=np.float64)
+    latent_audit = latent_fold_usable(
+        fit_latent,
+        minimum_distinct_values=int(
+            rule["minimum_distinct_latent_values_per_fold"]
+        ),
+        minimum_rank=int(rule["minimum_rank_of_intercept_and_latent"]),
+        scale_floor_multiplier=float(
+            rule["relative_scale_floor_multiplier_float64_eps"]
+        ),
+    )
+    correlation = (
+        float(stats.spearmanr(fit_latent, fit_target - fit_latent).statistic)
+        if latent_audit["pass"]
+        else float("nan")
+    )
+    fold_input = (
+        fold_index,
+        evaluation,
+        fit_latent,
+        evaluation_latent,
+        fit_upstream,
+        evaluation_upstream,
+        fit_target,
+        evaluation["y_true"].to_numpy(dtype=np.float64),
+    )
+    return fold_input, correlation, latent_audit
+
+
 def run_w_view(
     shared: Path,
     project: Path,
@@ -630,6 +716,7 @@ def run_w_view(
     view: ViewSpec,
     protocol: str = "sru",
 ) -> dict[str, Any]:
+    global _W_FOLD_CONTEXT, _W_CANDIDATE_CONTEXT
     started = time.time()
     destination = output / "DEVELOPMENT" / "W" / view.head.head_id / view.proxy_policy
     destination.mkdir(parents=True, exist_ok=True)
@@ -646,60 +733,32 @@ def run_w_view(
         correlations: list[float] = []
         fold_latent_audits: list[dict[str, Any]] = []
         rule = v211["W"]
-        for fold, (fit_index, evaluation_index) in enumerate(
+        fold_indices = list(
             inner_folds(train, int(v21["selection"]["inner_folds"]))
-        ):
-            fit = _cap(train.iloc[fit_index], int(v2["row_caps"]["wiener_fit"]))
-            evaluation = _cap(
-                train.iloc[evaluation_index],
-                int(v2["row_caps"]["validation_selection_per_fold"]),
+        )
+        _W_FOLD_CONTEXT = (
+            shared,
+            view,
+            train,
+            active,
+            v2,
+            c_result,
+            rule,
+            fold_indices,
+        )
+        try:
+            prepared_folds = ordered_fork_map(
+                _prepare_w_fold_indexed,
+                [(fold_index,) for fold_index in range(len(fold_indices))],
+                min(inner_workers, len(fold_indices)),
+                label="PRISM_V211_METRO_M3_W_FOLDS",
             )
-            (
-                fit_latent,
-                evaluation_latent,
-                fit_upstream,
-                evaluation_upstream,
-                _,
-            ) = _fit_c_routed(
-                shared,
-                view,
-                fit,
-                evaluation,
-                active,
-                v2,
-                c_result,
-                fit_split="train",
-                evaluation_split="train",
-            )
-            fit_target = fit["y_true"].to_numpy(dtype=np.float64)
-            latent_audit = latent_fold_usable(
-                fit_latent,
-                minimum_distinct_values=int(
-                    rule["minimum_distinct_latent_values_per_fold"]
-                ),
-                minimum_rank=int(rule["minimum_rank_of_intercept_and_latent"]),
-                scale_floor_multiplier=float(
-                    rule["relative_scale_floor_multiplier_float64_eps"]
-                ),
-            )
+        finally:
+            _W_FOLD_CONTEXT = None
+        for fold_input, correlation, latent_audit in prepared_folds:
+            fold_inputs.append(fold_input)
+            correlations.append(correlation)
             fold_latent_audits.append(latent_audit)
-            correlations.append(
-                float(stats.spearmanr(fit_latent, fit_target - fit_latent).statistic)
-                if latent_audit["pass"]
-                else float("nan")
-            )
-            fold_inputs.append(
-                (
-                    fold,
-                    evaluation,
-                    fit_latent,
-                    evaluation_latent,
-                    fit_upstream,
-                    evaluation_upstream,
-                    fit_target,
-                    evaluation["y_true"].to_numpy(dtype=np.float64),
-                )
-            )
         finite = np.asarray(
             [value for value in correlations if np.isfinite(value)], dtype=np.float64
         )
@@ -730,39 +789,27 @@ def run_w_view(
         candidate_numeric_audit: dict[str, list[dict[str, Any]]] = {
             str(candidate): [] for candidate in candidates
         }
-        for fold_index, item in enumerate(fold_inputs):
-            (
-                _,
-                _,
-                fit_latent,
-                evaluation_latent,
-                fit_upstream,
-                _,
-                fit_target,
-                evaluation_target,
-            ) = item
-            fold_results = _ordered_parallel_map(
-                _evaluate_w_candidate,
-                [
-                    (
-                        candidate,
-                        fit_latent,
-                        fit_target,
-                        evaluation_latent,
-                        fit_upstream,
-                        evaluation_target,
-                        fold_index,
-                        bool(fold_latent_audits[fold_index]["pass"]),
-                    )
-                    for candidate in candidates
-                ],
+        _W_CANDIDATE_CONTEXT = (candidates, fold_inputs, fold_latent_audits)
+        try:
+            indexed_jobs = [
+                (fold_index, candidate_index)
+                for fold_index in range(len(fold_inputs))
+                for candidate_index in range(len(candidates))
+            ]
+            indexed_results = ordered_fork_map(
+                _evaluate_w_indexed,
+                indexed_jobs,
                 inner_workers,
+                label="PRISM_V211_METRO_M3_W_INNER",
             )
-            for candidate, (loss, audit) in zip(
-                candidates, fold_results, strict=True
-            ):
-                losses[candidate].append(loss)
-                candidate_numeric_audit[str(candidate)].append(audit)
+        finally:
+            _W_CANDIDATE_CONTEXT = None
+        for (fold_index, candidate_index), (loss, audit) in zip(
+            indexed_jobs, indexed_results, strict=True
+        ):
+            candidate = candidates[candidate_index]
+            losses[candidate].append(loss)
+            candidate_numeric_audit[str(candidate)].append(audit)
 
         def complexity(candidate: Any) -> tuple[Any, ...]:
             if candidate == IDENTITY:

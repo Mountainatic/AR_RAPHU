@@ -138,3 +138,53 @@ def run_parallel(
             results.append(future.result())
     release_process_memory()
     return results
+
+
+def ordered_fork_map(
+    function: Callable[..., Any],
+    jobs: Iterable[tuple[Any, ...]],
+    workers: int,
+    *,
+    label: str,
+) -> list[Any]:
+    """Evaluate indexed, fork-safe jobs concurrently and collect in input order."""
+    materialized = list(jobs)
+    if workers <= 1 or len(materialized) <= 1:
+        return [function(*arguments) for arguments in materialized]
+    if not sys.platform.startswith("linux"):
+        raise RuntimeError(f"{label} inner process parallelism requires Linux fork")
+    resolved = min(int(workers), len(materialized))
+    limit, current = cgroup_memory()
+    print(
+        json.dumps(
+            {
+                "event": "PRISM_ORDERED_FORK_POOL_START",
+                "label": label,
+                "jobs": len(materialized),
+                "requested_workers": int(workers),
+                "resolved_workers": resolved,
+                "memory_limit_bytes": limit,
+                "memory_current_bytes": current,
+                "parent_pid": os.getpid(),
+                "parent_death_signal": "SIGTERM",
+                "collection_order": "REGISTRATION_ORDER",
+            },
+            sort_keys=True,
+        ),
+        file=sys.stderr,
+        flush=True,
+    )
+    context = mp.get_context("fork")
+    with ProcessPoolExecutor(
+        max_workers=resolved,
+        mp_context=context,
+        initializer=_install_parent_death_signal,
+        initargs=(os.getpid(),),
+    ) as executor:
+        futures = [
+            executor.submit(_call_and_trim, function, arguments)
+            for arguments in materialized
+        ]
+        results = [future.result() for future in futures]
+    release_process_memory()
+    return results
