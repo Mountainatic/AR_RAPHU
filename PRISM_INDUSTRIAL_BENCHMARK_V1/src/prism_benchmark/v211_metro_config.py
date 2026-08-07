@@ -27,6 +27,9 @@ WORKER_OVERRIDE_ENV = "PRISM_V211_METRO_WORKERS"
 K_MEMORY_GIB_ENV = "PRISM_V211_K_MEMORY_GIB_PER_WORKER"
 K_INNER_WORKERS_ENV = "PRISM_V211_K_INNER_WORKERS"
 K_OUTER_WORKERS_ENV = "PRISM_V211_K_OUTER_WORKERS"
+W_INNER_WORKERS_ENV = "PRISM_V211_W_INNER_WORKERS"
+A_INNER_WORKERS_ENV = "PRISM_V211_A_INNER_WORKERS"
+J_INNER_WORKERS_ENV = "PRISM_V211_J_INNER_WORKERS"
 
 
 @dataclass(frozen=True)
@@ -197,6 +200,18 @@ def effective_k_inner_workers() -> int:
     return _positive_worker_env(K_INNER_WORKERS_ENV, 1)
 
 
+def effective_w_inner_workers() -> int:
+    return _positive_worker_env(W_INNER_WORKERS_ENV, 1)
+
+
+def effective_a_inner_workers() -> int:
+    return _positive_worker_env(A_INNER_WORKERS_ENV, 1)
+
+
+def effective_j_inner_workers() -> int:
+    return _positive_worker_env(J_INNER_WORKERS_ENV, 1)
+
+
 def effective_k_outer_workers(config: dict[str, Any], task_count: int) -> int:
     if task_count < 1:
         return 1
@@ -212,6 +227,9 @@ def runtime_parallelism_audit(config: dict[str, Any]) -> dict[str, Any]:
     configured = int(config["resource"]["workers"])
     k_inner = effective_k_inner_workers()
     k_outer = effective_k_outer_workers(config, 27)
+    w_inner = effective_w_inner_workers()
+    a_inner = effective_a_inner_workers()
+    j_inner = effective_j_inner_workers()
     return {
         "configured_workers": configured,
         "effective_task_workers": effective,
@@ -221,6 +239,18 @@ def runtime_parallelism_audit(config: dict[str, Any]) -> dict[str, Any]:
         "k_inner_candidate_workers": k_inner,
         "k_total_candidate_thread_budget": int(k_outer * k_inner),
         "k_parallelism_scope": "TASK_LEVEL_THROUGHPUT_ONLY_ORDER_PRESERVED",
+        "general_memory_gib_per_outer_worker": float(
+            os.environ.get("PRISM_V211_MEMORY_GIB_PER_WORKER", "20")
+        ),
+        "w_inner_candidate_workers": w_inner,
+        "a_inner_candidate_workers": a_inner,
+        "j_inner_candidate_workers": j_inner,
+        "w_total_candidate_thread_budget": int(2 * w_inner),
+        "a_total_candidate_thread_budget": int(4 * a_inner),
+        "j_total_candidate_thread_budget": int(4 * j_inner),
+        "stage_inner_parallelism_scope": (
+            "ORDERED_INDEPENDENT_CANDIDATES_ONLY"
+        ),
         "blas_threads_per_worker": int(config["resource"]["blas_threads"]),
         "override_active": effective != configured,
         "override_scope": "TASK_LEVEL_THROUGHPUT_ONLY",

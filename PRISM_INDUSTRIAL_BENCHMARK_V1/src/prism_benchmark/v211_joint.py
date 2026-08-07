@@ -22,7 +22,7 @@ from .v21_selection import guarded_local_one_se_select
 from .v211_a import fit_mature_residual_ar
 from .v211_c import _gate_config, _smallest_stable_alpha
 from .v211_config import load_v211_configs
-from .v211_k import load_active_channels
+from .v211_k import _ordered_parallel_map, load_active_channels
 from .v211_selection import (
     attach_nonselecting_validation_confirmation,
     input_path_preservation_gate,
@@ -36,6 +36,21 @@ J_KW = "J_KW"
 J_KA = "J_KA"
 J_KWA = "J_KWA"
 JOINT_CANDIDATES = (J_K, J_KW, J_KA, J_KWA)
+J_INNER_WORKERS_ENV = "PRISM_V211_J_INNER_WORKERS"
+
+
+def _j_inner_workers() -> int:
+    raw = os.environ.get(J_INNER_WORKERS_ENV, "1")
+    try:
+        workers = int(raw)
+    except ValueError as error:
+        raise RuntimeError(f"{J_INNER_WORKERS_ENV} must be an integer") from error
+    cpu_count = os.cpu_count() or 1
+    if workers < 1 or workers > cpu_count:
+        raise RuntimeError(
+            f"{J_INNER_WORKERS_ENV} must be within [1, {cpu_count}]"
+        )
+    return workers
 
 
 def registered_joint_candidates() -> tuple[str, ...]:
@@ -284,6 +299,30 @@ def _collapsed_joint_result(
     }
 
 
+def _evaluate_joint_candidate(
+    train_blocks: Mapping[str, np.ndarray],
+    target: np.ndarray,
+    evaluation_blocks: Mapping[str, np.ndarray],
+    evaluation_target: np.ndarray,
+    candidate: tuple[str, float, float, float],
+) -> tuple[dict[str, Any], float]:
+    route, alpha, ratio_k, ratio_w = candidate
+    prediction, contract, _ = fit_joint_candidate(
+        train_blocks,
+        target,
+        evaluation_blocks,
+        candidate=route,
+        alpha=alpha,
+        k_over_a_ratio=ratio_k,
+        w_over_a_ratio=ratio_w,
+    )
+    return contract, (
+        mse(evaluation_target, prediction)
+        if numerical_contract_passes(contract)
+        else float("nan")
+    )
+
+
 def run_joint_view(
     shared: Path,
     project: Path,
@@ -303,6 +342,7 @@ def run_joint_view(
     destination.mkdir(parents=True, exist_ok=True)
     try:
         v211, v21, v2 = load_v211_configs(project, protocol=protocol)
+        inner_workers = _j_inner_workers()
         c_result = json.loads(
             (
                 output
@@ -432,23 +472,27 @@ def run_joint_view(
             )
             target = fit["y_true"].to_numpy(dtype=np.float64)
             evaluation_target = evaluation["y_true"].to_numpy(dtype=np.float64)
-            for candidate in all_candidates:
-                route, alpha, ratio_k, ratio_w = candidate
-                prediction, contract, _ = fit_joint_candidate(
-                    {"K": k_train, "W": w_train, "A": a_train},
-                    target,
-                    {"K": k_eval, "W": w_eval, "A": a_eval},
-                    candidate=route,
-                    alpha=alpha,
-                    k_over_a_ratio=ratio_k,
-                    w_over_a_ratio=ratio_w,
-                )
+            train_blocks = {"K": k_train, "W": w_train, "A": a_train}
+            evaluation_blocks = {"K": k_eval, "W": w_eval, "A": a_eval}
+            candidate_results = _ordered_parallel_map(
+                _evaluate_joint_candidate,
+                [
+                    (
+                        train_blocks,
+                        target,
+                        evaluation_blocks,
+                        evaluation_target,
+                        candidate,
+                    )
+                    for candidate in all_candidates
+                ],
+                inner_workers,
+            )
+            for candidate, (contract, candidate_loss) in zip(
+                all_candidates, candidate_results, strict=True
+            ):
                 contracts_by_candidate[candidate].append(contract)
-                losses[candidate].append(
-                    mse(evaluation_target, prediction)
-                    if numerical_contract_passes(contract)
-                    else float("nan")
-                )
+                losses[candidate].append(candidate_loss)
             for alpha in alpha_grid:
                 prediction, _ = fit_mature_residual_ar(
                     a_train,
@@ -734,6 +778,8 @@ def run_joint_view(
         result = {
             "status": "PASS" if gate["pass"] else "JOINT_INPUT_PATH_COLLAPSED",
             "stage": "E5R_JOINT",
+            "inner_candidate_workers": inner_workers,
+            "inner_parallelism_scope": "ORDERED_INDEPENDENT_CANDIDATES_ONLY",
             "dataset": view.head.dataset,
             "target_head": view.head.head_id,
             "availability_scenario": view.availability_scenario,

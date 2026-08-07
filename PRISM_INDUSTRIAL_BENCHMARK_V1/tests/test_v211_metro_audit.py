@@ -10,7 +10,15 @@ import pytest
 from prism_benchmark.v2_k import _cap
 from prism_benchmark.v2_runtime import run_parallel
 from prism_benchmark.v211_assembly import pf_and_joint_input_status_match
-from prism_benchmark.v211_joint import registered_joint_candidates
+from prism_benchmark.v211_a import _evaluate_a_candidate
+from prism_benchmark.v211_joint import (
+    J_K,
+    J_KA,
+    J_KW,
+    J_KWA,
+    _evaluate_joint_candidate,
+    registered_joint_candidates,
+)
 from prism_benchmark.v211_k import (
     _ordered_parallel_map,
     oof_replay_audit,
@@ -35,6 +43,7 @@ from prism_benchmark.v211_metro_runner import (
 from prism_benchmark.v211_w import (
     IDENTITY,
     NATURAL_CUBIC,
+    _evaluate_w_candidate,
     fit_w_correction,
     predict_w_correction,
 )
@@ -298,6 +307,99 @@ def test_k_inner_parallel_map_matches_serial_and_preserves_order() -> None:
     serial = _ordered_parallel_map(transform, jobs, workers=1)
     parallel = _ordered_parallel_map(transform, jobs, workers=4)
     assert parallel == serial
+
+
+def _assert_nested_exact(left, right) -> None:
+    if isinstance(left, np.ndarray):
+        np.testing.assert_array_equal(left, right)
+    elif isinstance(left, dict):
+        assert left.keys() == right.keys()
+        for key in left:
+            _assert_nested_exact(left[key], right[key])
+    elif isinstance(left, (list, tuple)):
+        assert len(left) == len(right)
+        for left_item, right_item in zip(left, right, strict=True):
+            _assert_nested_exact(left_item, right_item)
+    elif isinstance(left, float) and np.isnan(left):
+        assert np.isnan(right)
+    else:
+        assert left == right
+
+
+def test_w_candidate_parallel_map_is_exact_and_ordered() -> None:
+    latent = np.linspace(-1.5, 1.5, 160, dtype=np.float64)
+    target = latent + 0.12 * latent * latent
+    upstream = np.column_stack([latent, latent * latent])
+    candidates = [
+        IDENTITY,
+        (NATURAL_CUBIC, 4, 0.0, 0.0, 1),
+        (NATURAL_CUBIC, 5, 1e-3, 0.03, 1),
+    ]
+    jobs = [
+        (candidate, latent, target, latent, upstream, target, 0, True)
+        for candidate in candidates
+    ]
+    serial = _ordered_parallel_map(_evaluate_w_candidate, jobs, workers=1)
+    parallel = _ordered_parallel_map(_evaluate_w_candidate, jobs, workers=3)
+    _assert_nested_exact(serial, parallel)
+
+
+def test_a_candidate_parallel_map_is_exact_and_ordered() -> None:
+    x_fit = np.column_stack(
+        [np.ones(180), np.linspace(-1.0, 1.0, 180), np.linspace(1.0, 2.0, 180)]
+    )
+    x_evaluation = x_fit[::2].copy()
+    y_fit = 0.2 + 0.4 * x_fit[:, 1] - 0.1 * x_fit[:, 2]
+    y_evaluation = 0.2 + 0.4 * x_evaluation[:, 1] - 0.1 * x_evaluation[:, 2]
+    upstream = x_fit[:, 1:].copy()
+    jobs = [
+        (x_fit, y_fit, x_evaluation, y_evaluation, alpha, mu, upstream)
+        for alpha, mu in ((0.0, 0.0), (1e-4, 0.03), (1e-3, 0.3))
+    ]
+    serial = _ordered_parallel_map(_evaluate_a_candidate, jobs, workers=1)
+    parallel = _ordered_parallel_map(_evaluate_a_candidate, jobs, workers=3)
+    _assert_nested_exact(serial, parallel)
+
+
+def test_joint_candidate_parallel_map_is_exact_and_ordered() -> None:
+    axis = np.linspace(-1.0, 1.0, 200, dtype=np.float64)
+    train_blocks = {
+        "K": np.column_stack([axis, axis * axis]),
+        "W": np.column_stack([np.sin(axis), np.cos(axis)]),
+        "A": np.column_stack([np.roll(axis, 1), np.roll(axis, 2)]),
+    }
+    evaluation_blocks = {
+        key: value[::2].copy() for key, value in train_blocks.items()
+    }
+    target = (
+        0.5 * train_blocks["K"][:, 0]
+        + 0.2 * train_blocks["W"][:, 0]
+        - 0.1 * train_blocks["A"][:, 1]
+    )
+    evaluation_target = target[::2].copy()
+    candidates = [
+        (J_K, 1e-4, 1.0, 1.0),
+        (J_KW, 1e-4, 1.0, 1.0),
+        (J_KA, 1e-3, 0.3, 1.0),
+        (J_KWA, 1e-3, 3.0, 0.3),
+    ]
+    jobs = [
+        (
+            train_blocks,
+            target,
+            evaluation_blocks,
+            evaluation_target,
+            candidate,
+        )
+        for candidate in candidates
+    ]
+    serial = _ordered_parallel_map(
+        _evaluate_joint_candidate, jobs, workers=1
+    )
+    parallel = _ordered_parallel_map(
+        _evaluate_joint_candidate, jobs, workers=4
+    )
+    _assert_nested_exact(serial, parallel)
 
 
 def test_k_parallel_ridge_selection_matches_serial() -> None:

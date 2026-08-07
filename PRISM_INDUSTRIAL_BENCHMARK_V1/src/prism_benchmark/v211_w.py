@@ -25,7 +25,7 @@ from .v2_w import _ispline_fixed, fit_w_candidate as fit_hard_projection_replay
 from .v21_selection import guarded_local_one_se_select
 from .v21_w import _psd_root, _standardized_columns, soft_overlap_penalty
 from .v211_config import load_v211_configs
-from .v211_k import load_active_channels
+from .v211_k import _ordered_parallel_map, load_active_channels
 from .v211_selection import numerical_contract_passes
 
 
@@ -34,6 +34,21 @@ MONOTONE = "MONOTONE_I_SPLINE_CORRECTION"
 NATURAL_CUBIC = "NATURAL_CUBIC_CORRECTION"
 W_FAMILIES = (IDENTITY, MONOTONE, NATURAL_CUBIC)
 BEST_ACTIVE_K = "BEST_ACTIVE_K_CHANNEL"
+W_INNER_WORKERS_ENV = "PRISM_V211_W_INNER_WORKERS"
+
+
+def _w_inner_workers() -> int:
+    raw = os.environ.get(W_INNER_WORKERS_ENV, "1")
+    try:
+        workers = int(raw)
+    except ValueError as error:
+        raise RuntimeError(f"{W_INNER_WORKERS_ENV} must be an integer") from error
+    cpu_count = os.cpu_count() or 1
+    if workers < 1 or workers > cpu_count:
+        raise RuntimeError(
+            f"{W_INNER_WORKERS_ENV} must be within [1, {cpu_count}]"
+        )
+    return workers
 
 
 def _row_id_hash(frame: pd.DataFrame) -> str:
@@ -567,6 +582,47 @@ def _fit_registered_w(
     )
 
 
+def _evaluate_w_candidate(
+    candidate: Any,
+    fit_latent: np.ndarray,
+    fit_target: np.ndarray,
+    evaluation_latent: np.ndarray,
+    fit_upstream: np.ndarray,
+    evaluation_target: np.ndarray,
+    fold_index: int,
+    fold_usable: bool,
+) -> tuple[float, dict[str, Any]]:
+    if candidate != IDENTITY and not fold_usable:
+        return float("nan"), {"status": "NOT_APPLICABLE", "fold": fold_index}
+    try:
+        correction, contract = _fit_registered_w(
+            candidate,
+            fit_latent,
+            fit_target,
+            evaluation_latent,
+            fit_upstream,
+        )
+        valid = bool(
+            np.isfinite(correction).all() and numerical_contract_passes(contract)
+        )
+        return (
+            mse(evaluation_target, evaluation_latent + correction)
+            if valid
+            else float("nan"),
+            {
+                "status": "PASS" if valid else "NUMERICALLY_INVALID",
+                "fold": fold_index,
+                "certificate": contract.get("numerical_certificate", {}),
+            },
+        )
+    except (ValueError, np.linalg.LinAlgError) as error:
+        return float("nan"), {
+            "status": "NOT_APPLICABLE",
+            "fold": fold_index,
+            "error": str(error),
+        }
+
+
 def run_w_view(
     shared: Path,
     project: Path,
@@ -579,6 +635,7 @@ def run_w_view(
     destination.mkdir(parents=True, exist_ok=True)
     try:
         v211, v21, v2 = load_v211_configs(project, protocol=protocol)
+        inner_workers = _w_inner_workers()
         c_result = _load_c_result(output, view)
         active = load_active_channels(output, view)
         frozen_channels = set(c_result.get("active_channels", ()))
@@ -684,46 +741,28 @@ def run_w_view(
                 fit_target,
                 evaluation_target,
             ) = item
-            for candidate in candidates:
-                if candidate != IDENTITY and not fold_latent_audits[fold_index]["pass"]:
-                    losses[candidate].append(float("nan"))
-                    candidate_numeric_audit[str(candidate)].append(
-                        {"status": "NOT_APPLICABLE", "fold": fold_index}
-                    )
-                    continue
-                try:
-                    correction, contract = _fit_registered_w(
+            fold_results = _ordered_parallel_map(
+                _evaluate_w_candidate,
+                [
+                    (
                         candidate,
                         fit_latent,
                         fit_target,
                         evaluation_latent,
                         fit_upstream,
+                        evaluation_target,
+                        fold_index,
+                        bool(fold_latent_audits[fold_index]["pass"]),
                     )
-                    valid = bool(
-                        np.isfinite(correction).all()
-                        and numerical_contract_passes(contract)
-                    )
-                    losses[candidate].append(
-                        mse(evaluation_target, evaluation_latent + correction)
-                        if valid
-                        else float("nan")
-                    )
-                    candidate_numeric_audit[str(candidate)].append(
-                        {
-                            "status": "PASS" if valid else "NUMERICALLY_INVALID",
-                            "fold": fold_index,
-                            "certificate": contract.get("numerical_certificate", {}),
-                        }
-                    )
-                except (ValueError, np.linalg.LinAlgError) as error:
-                    losses[candidate].append(float("nan"))
-                    candidate_numeric_audit[str(candidate)].append(
-                        {
-                            "status": "NOT_APPLICABLE",
-                            "fold": fold_index,
-                            "error": str(error),
-                        }
-                    )
+                    for candidate in candidates
+                ],
+                inner_workers,
+            )
+            for candidate, (loss, audit) in zip(
+                candidates, fold_results, strict=True
+            ):
+                losses[candidate].append(loss)
+                candidate_numeric_audit[str(candidate)].append(audit)
 
         def complexity(candidate: Any) -> tuple[Any, ...]:
             if candidate == IDENTITY:
@@ -998,6 +1037,8 @@ def run_w_view(
         result = {
             "status": status,
             "stage": "E3R_W",
+            "inner_candidate_workers": inner_workers,
+            "inner_parallelism_scope": "ORDERED_INDEPENDENT_CANDIDATES_ONLY",
             "dataset": view.head.dataset,
             "target_head": view.head.head_id,
             "proxy_policy": view.proxy_policy,

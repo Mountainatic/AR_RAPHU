@@ -23,6 +23,44 @@ from .v21_a import (
 )
 from .v21_selection import guarded_local_one_se_select
 from .v211_config import load_v211_configs
+from .v211_k import _ordered_parallel_map
+
+
+A_INNER_WORKERS_ENV = "PRISM_V211_A_INNER_WORKERS"
+
+
+def _a_inner_workers() -> int:
+    raw = os.environ.get(A_INNER_WORKERS_ENV, "1")
+    try:
+        workers = int(raw)
+    except ValueError as error:
+        raise RuntimeError(f"{A_INNER_WORKERS_ENV} must be an integer") from error
+    cpu_count = os.cpu_count() or 1
+    if workers < 1 or workers > cpu_count:
+        raise RuntimeError(
+            f"{A_INNER_WORKERS_ENV} must be within [1, {cpu_count}]"
+        )
+    return workers
+
+
+def _evaluate_a_candidate(
+    x_fit: np.ndarray,
+    y_fit: np.ndarray,
+    x_evaluation: np.ndarray,
+    y_evaluation: np.ndarray,
+    alpha: float,
+    mu: float,
+    upstream: np.ndarray,
+) -> float:
+    prediction, _ = fit_mature_residual_ar(
+        x_fit,
+        y_fit,
+        x_evaluation,
+        alpha=alpha,
+        mu=mu,
+        upstream_predictions=upstream,
+    )
+    return mse(y_evaluation, prediction)
 
 
 def _fit_frozen_a_route(
@@ -133,6 +171,7 @@ def run_a_view(
     destination.mkdir(parents=True, exist_ok=True)
     try:
         v211, v21, v2 = load_v211_configs(project, protocol=protocol)
+        inner_workers = _a_inner_workers()
         w_root = output / "DEVELOPMENT" / "W" / view.head.head_id / view.proxy_policy
         w_result = json.loads((w_root / "RESULT.json").read_text(encoding="utf-8"))
         if w_result.get("status") != "PASS":
@@ -239,19 +278,31 @@ def run_a_view(
                     residual_mean=residual_mean,
                 )
                 coverage[str(profile)].extend([observed_fit, observed_eval])
-                for alpha in alphas:
-                    for mu in mus:
-                        prediction, _ = fit_mature_residual_ar(
+                candidate_pairs = [
+                    (alpha, mu) for alpha in alphas for mu in mus
+                ]
+                candidate_losses = _ordered_parallel_map(
+                    _evaluate_a_candidate,
+                    [
+                        (
                             x_fit,
                             y_fit,
                             x_eval,
-                            alpha=alpha,
-                            mu=mu,
-                            upstream_predictions=upstream,
+                            y_eval,
+                            alpha,
+                            mu,
+                            upstream,
                         )
-                        losses[(MATURE_RESIDUAL_AR, profile, alpha, mu)].append(
-                            mse(y_eval, prediction)
-                        )
+                        for alpha, mu in candidate_pairs
+                    ],
+                    inner_workers,
+                )
+                for (alpha, mu), candidate_loss in zip(
+                    candidate_pairs, candidate_losses, strict=True
+                ):
+                    losses[(MATURE_RESIDUAL_AR, profile, alpha, mu)].append(
+                        candidate_loss
+                    )
 
         def complexity(candidate: Any) -> tuple[Any, ...]:
             if candidate == EXACT_ZERO:
@@ -512,6 +563,8 @@ def run_a_view(
         result = {
             "status": "PASS",
             "stage": "E4R_A",
+            "inner_candidate_workers": inner_workers,
+            "inner_parallelism_scope": "ORDERED_INDEPENDENT_CANDIDATES_ONLY",
             "dataset": view.head.dataset,
             "target_head": view.head.head_id,
             "availability_scenario": view.availability_scenario,
