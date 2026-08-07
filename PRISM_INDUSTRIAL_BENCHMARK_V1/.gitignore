@@ -1,3 +1,6 @@
+logs/
+results/runtime/*.pid
+results/runtime/*_log_path.txt
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -12,8 +15,12 @@ raw_sources/
 *.npz
 results_prism_v2_1_sru/
 results_prism_v2_1_1_sru/
+results_prism_v2_1_1_metro_p60_w_audit/
 PRISM_V2_1_1_SRU_IMPLEMENTATION_CORRECTION_RESULTS_bundle.zip
 PRISM_V2_1_1_SRU_IMPLEMENTATION_CORRECTION_RESULTS_bundle.zip.sha256
 PRISM_V2_1_1_SRU_IMPLEMENTATION_CORRECTION_RESULTS_bundle.zip.tmp
 PRISM_V2_1_1_SRU_IMPLEMENTATION_CORRECTION_RESULTS_bundle_stage_*/
-
+PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_RESULTS_bundle.zip
+PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_RESULTS_bundle.zip.sha256
+PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_RESULTS_bundle.zip.tmp
+metro_v211_bundle_*/

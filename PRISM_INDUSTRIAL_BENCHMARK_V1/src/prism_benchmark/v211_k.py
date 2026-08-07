@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pandas as pd
 
 from .cpu_data import (
     BaseAccessor,
@@ -120,6 +121,7 @@ def run_k_channel(
     output: Path,
     view: ViewSpec,
     channel: str,
+    protocol: str = "sru",
 ) -> dict[str, Any]:
     started = time.time()
     destination = (
@@ -127,7 +129,7 @@ def run_k_channel(
     )
     destination.mkdir(parents=True, exist_ok=True)
     try:
-        v211, v21, v2 = load_v211_configs(project)
+        v211, v21, v2 = load_v211_configs(project, protocol=protocol)
         minimum_folds = int(v21["selection"]["minimum_usable_folds"])
         train = load_samples(shared, view, "train", columns=CHANNEL_SAMPLE_COLUMNS)
         validation = load_samples(
@@ -347,6 +349,55 @@ def run_k_channel(
                 tuple(float(value) for value in selected_lambdas),
                 v2,
             )
+        oof_frames = []
+        oof_losses = []
+        for fold, (fit_index, evaluation_index) in enumerate(folds):
+            fit = _cap(
+                train.iloc[fit_index], int(v2["row_caps"]["single_channel_k_fit"])
+            )
+            evaluation = _cap(
+                train.iloc[evaluation_index],
+                int(v2["row_caps"]["validation_selection_per_fold"]),
+            )
+            if selected_family == EXACT_ZERO:
+                fold_prediction = np.zeros(len(evaluation), dtype=np.float64)
+            else:
+                fit_values, _ = profile_values(
+                    accessor, fit, channel, selected_profile, selected_m_tau
+                )
+                evaluation_values, _ = profile_values(
+                    accessor, evaluation, channel, selected_profile, selected_m_tau
+                )
+                fold_contract = fit_contract(
+                    fit_values,
+                    fit["y_true"].to_numpy(dtype=np.float64),
+                    selected_family,
+                    selected_m_x,
+                    tuple(float(value) for value in selected_lambdas),
+                    **_als_kwargs(v2),
+                )
+                fold_prediction = predict_contract(evaluation_values, fold_contract)
+            oof_loss = mse(
+                evaluation["y_true"].to_numpy(dtype=np.float64), fold_prediction
+            )
+            oof_losses.append(oof_loss)
+            oof_frame = evaluation[
+                ["base_origin_id", "view_sample_id", "entity_id", "origin", "y_true"]
+            ].copy()
+            oof_frame["y_pred"] = fold_prediction
+            oof_frame["oof_fold"] = fold
+            oof_frames.append(oof_frame)
+        if not np.allclose(
+            np.asarray(oof_losses, dtype=np.float64),
+            np.asarray(final_fold_losses, dtype=np.float64),
+            rtol=1e-12,
+            atol=1e-15,
+        ):
+            raise RuntimeError("selected K OOF predictions do not reproduce fold losses")
+        oof_path = destination / "SELECTED_OOF.parquet"
+        pd.concat(oof_frames, ignore_index=True).to_parquet(
+            oof_path, index=False, compression="zstd"
+        )
         result = {
             "status": "PASS",
             "stage": "E2R_K",
@@ -390,6 +441,16 @@ def run_k_channel(
             ),
             "prediction_path": str(prediction_path.relative_to(output)),
             "prediction_sha256": sha256_file(prediction_path),
+            "oof_prediction_path": str(oof_path.relative_to(output)),
+            "oof_prediction_sha256": sha256_file(oof_path),
+            "oof_prediction_fold_losses": oof_losses,
+            "row_cap_audit": {
+                "cap_name": "single_channel_k_fit",
+                "cap": int(v2["row_caps"]["single_channel_k_fit"]),
+                "fit_rows": len(final_train),
+                "validation_rows": len(validation),
+                "fit_source": "train_only",
+            },
             "test_accessed": False,
             "elapsed_seconds": time.time() - started,
             **regression_metrics(

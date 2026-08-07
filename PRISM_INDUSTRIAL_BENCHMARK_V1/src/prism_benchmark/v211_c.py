@@ -112,12 +112,13 @@ def run_c_view(
     project: Path,
     output: Path,
     view: ViewSpec,
+    protocol: str = "sru",
 ) -> dict[str, Any]:
     started = time.time()
     destination = output / "DEVELOPMENT" / "C" / view.head.head_id / view.proxy_policy
     destination.mkdir(parents=True, exist_ok=True)
     try:
-        v211, v21, v2 = load_v211_configs(project)
+        v211, v21, v2 = load_v211_configs(project, protocol=protocol)
         active = load_active_channels(output, view)
         maximum = int(v2["K_module"]["active_channel_gate"]["maximum_active_channels"])
         active = sorted(
@@ -417,6 +418,48 @@ def run_c_view(
             else:
                 selection_status = "C_REPRESENTATION_SELECTED"
 
+        if selected_family == BEST_ACTIVE_K:
+            selected_oof_predictions = fold_best_channel_predictions[best_channel]
+        elif selected_family == "K_EXACT_ZERO":
+            selected_oof_predictions = [
+                np.zeros(len(_cap(train.iloc[evaluation_index], int(v2["row_caps"]["validation_selection_per_fold"]))), dtype=np.float64)
+                for _, evaluation_index in folds
+            ]
+        else:
+            selected_oof_predictions = candidate_predictions[
+                (selected_family, selected_alpha)
+            ]
+        oof_frames = []
+        oof_losses = []
+        for fold, ((_, evaluation_index), fold_prediction) in enumerate(
+            zip(folds, selected_oof_predictions, strict=True)
+        ):
+            evaluation = _cap(
+                train.iloc[evaluation_index],
+                int(v2["row_caps"]["validation_selection_per_fold"]),
+            )
+            fold_prediction = np.asarray(fold_prediction, dtype=np.float64)
+            fold_loss = mse(
+                evaluation["y_true"].to_numpy(dtype=np.float64), fold_prediction
+            )
+            oof_losses.append(fold_loss)
+            oof_frame = evaluation[
+                ["base_origin_id", "view_sample_id", "entity_id", "origin", "y_true"]
+            ].copy()
+            oof_frame["y_pred"] = fold_prediction
+            oof_frame["oof_fold"] = fold
+            oof_frames.append(oof_frame)
+        if not np.allclose(
+            np.asarray(oof_losses, dtype=np.float64),
+            np.asarray(selected_fold_losses, dtype=np.float64),
+            rtol=1e-12,
+            atol=1e-15,
+        ):
+            raise RuntimeError("selected C OOF predictions do not reproduce fold losses")
+        oof_path = destination / "SELECTED_OOF.parquet"
+        pd.concat(oof_frames, ignore_index=True).to_parquet(
+            oof_path, index=False, compression="zstd"
+        )
         frame = validation[
             ["base_origin_id", "view_sample_id", "entity_id", "origin", "y_true"]
         ].copy()
@@ -462,6 +505,18 @@ def run_c_view(
             ),
             "prediction_path": str(prediction_path.relative_to(output)),
             "prediction_sha256": sha256_file(prediction_path),
+            "oof_prediction_path": str(oof_path.relative_to(output)),
+            "oof_prediction_sha256": sha256_file(oof_path),
+            "oof_prediction_fold_losses": oof_losses,
+            "row_cap_audit": {
+                "cap_name": "joint_physical_fit",
+                "cap": int(v2["row_caps"]["joint_physical_fit"]),
+                "fit_rows": min(
+                    len(train), int(v2["row_caps"]["joint_physical_fit"])
+                ),
+                "validation_rows": len(validation),
+                "fit_source": "train_only",
+            },
             "test_accessed": False,
             "elapsed_seconds": time.time() - started,
             **regression_metrics(

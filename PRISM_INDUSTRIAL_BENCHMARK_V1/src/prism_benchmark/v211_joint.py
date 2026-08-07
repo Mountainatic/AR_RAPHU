@@ -289,6 +289,7 @@ def run_joint_view(
     project: Path,
     output: Path,
     view: Any,
+    protocol: str = "sru",
 ) -> dict[str, Any]:
     started = time.time()
     destination = (
@@ -301,7 +302,7 @@ def run_joint_view(
     )
     destination.mkdir(parents=True, exist_ok=True)
     try:
-        v211, v21, v2 = load_v211_configs(project)
+        v211, v21, v2 = load_v211_configs(project, protocol=protocol)
         c_result = json.loads(
             (
                 output
@@ -352,7 +353,12 @@ def run_joint_view(
             write_json(destination / "RESULT.json", result)
             return result
         oof = pd.read_parquet(output / w_result["oof_path"])
-        w_contract = w_result["w_contract"]
+        pf_w_contract = w_result["w_contract"]
+        w_contract = w_result.get("joint_w_basis_contract")
+        if not isinstance(w_contract, Mapping):
+            raise RuntimeError(
+                "Joint W basis construction was not frozen from the registered W pool"
+            )
         a_profile = tuple(
             a_result["a_contract"].get(
                 "profile", realized_state_profiles(view.head)[0]
@@ -363,9 +369,7 @@ def run_joint_view(
         )
         ratios_k = [float(value) for value in v21["J"]["k_over_a_ratio"]]
         ratios_w = [float(value) for value in v21["J"]["w_over_a_ratio"]]
-        available_routes = [J_K, J_KA]
-        if w_contract["family"] != IDENTITY:
-            available_routes.extend([J_KW, J_KWA])
+        available_routes = list(JOINT_CANDIDATES)
         all_candidates = [
             (route, alpha, ratio_k, ratio_w)
             for route in available_routes
@@ -662,6 +666,53 @@ def run_joint_view(
         gate = attach_nonselecting_validation_confirmation(
             formal_gate, validation_gate
         )
+        route_materializations: dict[str, Any] = {}
+        for route, route_candidate in sorted(route_best.items()):
+            _, route_alpha, route_rk, route_rw = route_candidate
+            route_prediction, route_contract, route_components = fit_joint_candidate(
+                {"K": k_train, "W": w_train, "A": a_train},
+                train["y_true"].to_numpy(dtype=np.float64),
+                {"K": k_validation, "W": w_validation, "A": a_validation},
+                candidate=route,
+                alpha=float(route_alpha),
+                k_over_a_ratio=float(route_rk),
+                w_over_a_ratio=float(route_rw),
+            )
+            if route in {J_KW, J_KWA} and int(
+                route_contract.get("blocks", {}).get("W", {}).get("columns", 0)
+            ) <= 0:
+                raise RuntimeError("Joint W route did not jointly fit a W basis block")
+            route_frame = validation[
+                [
+                    "base_origin_id",
+                    "view_sample_id",
+                    "entity_id",
+                    "origin",
+                    "latest_available_target_index",
+                    "y_true",
+                ]
+            ].copy()
+            route_frame["y_pred"] = route_prediction
+            route_frame["input_prediction"] = route_components["INPUT"]
+            route_frame["model"] = f"PRISM_V2_1_1_{route}"
+            route_frame["dtype"] = "float64"
+            route_path = destination / f"validation_{route}.parquet"
+            route_frame.to_parquet(route_path, index=False, compression="zstd")
+            route_materializations[route] = {
+                "selected_hyperparameters": list(route_candidate),
+                "prediction_path": str(route_path.relative_to(output)),
+                "prediction_sha256": sha256_file(route_path),
+                "prediction_loss": mse(
+                    route_frame["y_true"].to_numpy(dtype=np.float64),
+                    route_prediction,
+                ),
+                "contract": route_contract,
+                "block_dimensions": {
+                    block: int(value["columns"])
+                    for block, value in route_contract.get("blocks", {}).items()
+                },
+                "w_coefficients_jointly_fitted": route in {J_KW, J_KWA},
+            }
         frame = validation[
             [
                 "base_origin_id",
@@ -689,9 +740,14 @@ def run_joint_view(
             "proxy_policy": view.proxy_policy,
             "registered_candidates": list(JOINT_CANDIDATES),
             "applicable_candidates": available_routes,
+            "pf_w_contract": pf_w_contract,
+            "joint_w_basis_contract": w_contract,
+            "joint_w_coefficients_jointly_fitted": True,
+            "joint_w_prefit_scalar_forbidden": True,
             "route_local_selected": {
                 route: list(candidate) for route, candidate in route_best.items()
             },
+            "route_materializations": route_materializations,
             "ridge_semantics": "NUMERICAL_STABILITY_ONLY",
             "minimal_stabilizing_ridge_audits": ridge_audits,
             "ar_profile": list(a_profile),
@@ -716,6 +772,13 @@ def run_joint_view(
             "final_prediction_loss": final_loss,
             "prediction_path": str(prediction_path.relative_to(output)),
             "prediction_sha256": sha256_file(prediction_path),
+            "row_cap_audit": {
+                "cap_name": "joint_predictive_fit",
+                "cap": int(v2["row_caps"]["joint_predictive_fit"]),
+                "fit_rows": len(train),
+                "validation_rows": len(validation),
+                "fit_source": "train_only",
+            },
             "test_accessed": False,
             "elapsed_seconds": time.time() - started,
             **regression_metrics(

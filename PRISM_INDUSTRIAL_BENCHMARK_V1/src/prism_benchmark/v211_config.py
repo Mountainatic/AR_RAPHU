@@ -15,6 +15,8 @@ PLAN_DIRECTORY = "PRISM_V2_1_1_SRU_IMPLEMENTATION_CORRECTION"
 CONFIG_NAME = "PRISM_V2_1_1_SRU_CONFIG_PATCH.json"
 FINAL_FREEZE_NAME = "V211_SRU_FINAL_FREEZE_MANIFEST.json"
 DEVELOPMENT_DECISION_NAME = "V211_DEVELOPMENT_DECISION.json"
+SRU_PROTOCOL = "sru"
+METRO_P60_PROTOCOL = "metro_p60"
 
 
 @dataclass(frozen=True)
@@ -102,9 +104,23 @@ def load_v211_config(project: Path) -> dict[str, Any]:
 
 def load_v211_configs(
     project: Path,
+    protocol: str = SRU_PROTOCOL,
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    """Return the v2.1.1 patch, inherited v2.1 contract, and frozen v2 grid."""
-    return load_v211_config(project), load_v21_config(project), load_frozen_config(project)
+    """Return the selected v2.1.1 patch and its inherited frozen contracts.
+
+    The default remains the published SRU correction.  The Metro-P60 audit is
+    an explicit protocol value rather than an environment override so a worker
+    cannot silently switch scientific contracts.
+    """
+    if protocol == SRU_PROTOCOL:
+        patch = load_v211_config(project)
+    elif protocol == METRO_P60_PROTOCOL:
+        from .v211_metro_config import load_metro_config
+
+        patch = load_metro_config(project)
+    else:
+        raise ValueError(f"unsupported PRISM v2.1.1 protocol: {protocol}")
+    return patch, load_v21_config(project), load_frozen_config(project)
 
 
 def require_v211_test_freeze(paths: V211Paths) -> dict[str, Any]:

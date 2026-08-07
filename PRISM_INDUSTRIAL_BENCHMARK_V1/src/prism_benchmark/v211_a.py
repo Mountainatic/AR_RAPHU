@@ -5,7 +5,7 @@ import os
 import time
 import traceback
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 import numpy as np
 import pandas as pd
@@ -25,11 +25,101 @@ from .v21_selection import guarded_local_one_se_select
 from .v211_config import load_v211_configs
 
 
+def _fit_frozen_a_route(
+    oof: pd.DataFrame,
+    validation: pd.DataFrame,
+    *,
+    oof_physical_column: str,
+    validation_physical_column: str,
+    oof_w_column: str | None,
+    selected: Any,
+    contribution_columns: list[str],
+    view: Any,
+    v2: Mapping[str, Any],
+) -> tuple[np.ndarray, dict[str, Any], float]:
+    """Refit a frozen A construction on one pre-registered PF route."""
+    route_oof = oof.copy()
+    route_validation = validation.copy()
+    route_oof["residual"] = (
+        route_oof["y_true"].to_numpy(dtype=np.float64)
+        - route_oof[oof_physical_column].to_numpy(dtype=np.float64)
+    )
+    route_validation["residual"] = (
+        route_validation["y_true"].to_numpy(dtype=np.float64)
+        - route_validation[validation_physical_column].to_numpy(dtype=np.float64)
+    )
+    if selected == EXACT_ZERO:
+        return (
+            np.zeros(len(route_validation), dtype=np.float64),
+            {
+                "family": EXACT_ZERO,
+                "parameter_count": 0,
+                "soft_overlap_mu": 0.0,
+                "hard_feature_residualization": False,
+                "numerical_certificate": {"status": "EXACT_ZERO"},
+            },
+            1.0,
+        )
+    _, profile, alpha, mu = selected
+    delta, history = profile
+    residual_mean = float(route_oof["residual"].mean())
+    source = pd.concat(
+        [
+            route_oof[["entity_id", "origin", "residual"]],
+            route_validation[["entity_id", "origin", "residual"]],
+        ],
+        ignore_index=True,
+    )
+    x_train, observed_train, train_audit = mature_residual_features(
+        route_oof,
+        route_oof,
+        h_steps=view.head.h_steps,
+        w_steps=view.head.w_steps,
+        delta=delta,
+        history=history,
+        maximum_lags=int(v2["A_module"]["state_profile"]["maximum_lags"]),
+        residual_mean=residual_mean,
+    )
+    x_validation, observed_validation, validation_audit = mature_residual_features(
+        route_validation,
+        source,
+        h_steps=view.head.h_steps,
+        w_steps=view.head.w_steps,
+        delta=delta,
+        history=history,
+        maximum_lags=int(v2["A_module"]["state_profile"]["maximum_lags"]),
+        residual_mean=residual_mean,
+    )
+    upstream_columns = list(contribution_columns)
+    if oof_w_column is not None:
+        upstream_columns.append(oof_w_column)
+    if not upstream_columns:
+        upstream_columns = [oof_physical_column]
+    prediction, contract = fit_mature_residual_ar(
+        x_train,
+        route_oof["residual"].to_numpy(dtype=np.float64),
+        x_validation,
+        alpha=float(alpha),
+        mu=float(mu),
+        upstream_predictions=route_oof[upstream_columns].to_numpy(dtype=np.float64),
+    )
+    contract.update(
+        {
+            "profile": list(profile),
+            "residual_mean": residual_mean,
+            "maturity_train_audit": train_audit,
+            "maturity_validation_audit": validation_audit,
+        }
+    )
+    return prediction, contract, min(observed_train, observed_validation)
+
+
 def run_a_view(
     shared: Path,
     project: Path,
     output: Path,
     view: Any,
+    protocol: str = "sru",
 ) -> dict[str, Any]:
     started = time.time()
     destination = (
@@ -42,7 +132,7 @@ def run_a_view(
     )
     destination.mkdir(parents=True, exist_ok=True)
     try:
-        _, v21, v2 = load_v211_configs(project)
+        v211, v21, v2 = load_v211_configs(project, protocol=protocol)
         w_root = output / "DEVELOPMENT" / "W" / view.head.head_id / view.proxy_policy
         w_result = json.loads((w_root / "RESULT.json").read_text(encoding="utf-8"))
         if w_result.get("status") != "PASS":
@@ -71,10 +161,19 @@ def run_a_view(
             how="inner",
             validate="one_to_one",
         )
+        if len(oof) > int(v2["row_caps"]["state_fit"]):
+            raise RuntimeError("A OOF fit rows exceed the frozen state_fit cap")
         oof["residual"] = oof["y_true"] - oof["physical_w_oof"]
         validation_frame = validation.merge(
             w_validation[
-                ["base_origin_id", "physical_latent", "delta_w", "y_pred"]
+                [
+                    "base_origin_id",
+                    "physical_latent",
+                    "delta_w",
+                    "delta_w_ablation",
+                    "physical_w_ablation",
+                    "y_pred",
+                ]
             ].rename(columns={"y_pred": "physical_w"}),
             on="base_origin_id",
             how="inner",
@@ -251,6 +350,147 @@ def run_a_view(
             validation_frame["physical_w"].to_numpy(dtype=np.float64)
             + residual_prediction
         )
+        validation_residual = validation_frame["residual"].to_numpy(
+            dtype=np.float64
+        )
+        residual_variance = float(np.var(validation_residual, dtype=np.float64))
+        prediction_variance = float(
+            np.var(residual_prediction, dtype=np.float64)
+        )
+        variance_floor = np.finfo(np.float64).tiny
+        effective_prediction_variance_ratio = prediction_variance / max(
+            residual_variance, variance_floor
+        )
+        coefficient = np.asarray(contract.get("coefficient", []), dtype=np.float64)
+        maximum_nonintercept_coefficient_abs = float(
+            np.max(np.abs(coefficient), initial=0.0)
+        )
+        neutral_validation_loss = float(
+            np.mean(validation_residual * validation_residual, dtype=np.float64)
+        )
+        active_validation_loss = mse(validation_residual, residual_prediction)
+        validation_relative_gain = (
+            neutral_validation_loss - active_validation_loss
+        ) / max(neutral_validation_loss, variance_floor)
+        variance_threshold = float(
+            v211["C"]["input_path_preservation"][
+                "minimum_variance_ratio_to_target"
+            ]
+        )
+        coefficient_threshold = float(
+            v211["C"]["input_path_preservation"][
+                "minimum_nonintercept_coefficient_abs"
+            ]
+        )
+        gain_threshold = float(
+            v21["selection"]["minimum_relative_improvement"]["A"]
+        )
+        active_near_zero = bool(
+            selected != EXACT_ZERO
+            and effective_prediction_variance_ratio < variance_threshold
+            and maximum_nonintercept_coefficient_abs < coefficient_threshold
+            and validation_relative_gain < gain_threshold
+        )
+        active_near_zero_audit = {
+            "required": bool(
+                v211.get("A", {}).get(
+                    "active_near_zero_must_materialize_as_exact_zero", False
+                )
+            ),
+            "effective_prediction_variance_ratio": effective_prediction_variance_ratio,
+            "variance_ratio_threshold": variance_threshold,
+            "maximum_nonintercept_coefficient_abs": maximum_nonintercept_coefficient_abs,
+            "coefficient_abs_threshold": coefficient_threshold,
+            "validation_relative_gain": validation_relative_gain,
+            "relative_gain_threshold": gain_threshold,
+            "all_three_below_threshold": active_near_zero,
+            "threshold_source": "FROZEN_V211_NUMERICAL_ZERO_AND_A_ACTIVATION_GATES",
+            "materialized_as_exact_zero": False,
+        }
+        if active_near_zero and active_near_zero_audit["required"]:
+            selected = EXACT_ZERO
+            residual_prediction = np.zeros(len(validation_frame), dtype=np.float64)
+            contract = {
+                "family": EXACT_ZERO,
+                "parameter_count": 0,
+                "soft_overlap_mu": 0.0,
+                "hard_feature_residualization": False,
+                "numerical_certificate": {"status": "EXACT_ZERO"},
+                "reason": "ACTIVE_NEAR_ZERO_REMATERIALIZED",
+            }
+            selected_coverage = 1.0
+            prediction = validation_frame["physical_w"].to_numpy(dtype=np.float64)
+            active_near_zero_audit["materialized_as_exact_zero"] = True
+        kca_residual, kca_contract, kca_coverage = _fit_frozen_a_route(
+            oof,
+            validation_frame,
+            oof_physical_column="physical_oof",
+            validation_physical_column="physical_latent",
+            oof_w_column=None,
+            selected=selected,
+            contribution_columns=contribution_columns,
+            view=view,
+            v2=v2,
+        )
+        kcwa_residual, kcwa_contract, kcwa_coverage = _fit_frozen_a_route(
+            oof,
+            validation_frame,
+            oof_physical_column="physical_w_ablation_oof",
+            validation_physical_column="physical_w_ablation",
+            oof_w_column="delta_w_ablation_oof",
+            selected=selected,
+            contribution_columns=contribution_columns,
+            view=view,
+            v2=v2,
+        )
+        route_predictions = {
+            "KC": validation_frame["physical_latent"].to_numpy(dtype=np.float64),
+            "KCW": validation_frame["physical_w_ablation"].to_numpy(dtype=np.float64),
+        }
+        route_predictions["KCA"] = route_predictions["KC"] + kca_residual
+        route_predictions["KCWA"] = route_predictions["KCW"] + kcwa_residual
+        w_active = w_result.get("w_contract", {}).get("family") != "IDENTITY_CORRECTION"
+        a_active = selected != EXACT_ZERO
+        pf_selected_route = (
+            "KCWA"
+            if w_active and a_active
+            else "KCW"
+            if w_active
+            else "KCA"
+            if a_active
+            else "KC"
+        )
+        route_predictions["PF_SELECTED"] = route_predictions[pf_selected_route].copy()
+        selected_route_error = float(
+            np.max(
+                np.abs(route_predictions["PF_SELECTED"] - prediction),
+                initial=0.0,
+            )
+        )
+        if selected_route_error > 1e-10:
+            raise RuntimeError(
+                "PF selected route does not reproduce the selected A validation prediction"
+            )
+        nested_frames = []
+        for candidate, route_prediction in route_predictions.items():
+            nested = validation_frame[
+                [
+                    "base_origin_id",
+                    "view_sample_id",
+                    "entity_id",
+                    "origin",
+                    "latest_available_target_index",
+                    "y_true",
+                ]
+            ].copy().rename(columns={"view_sample_id": "sample_id"})
+            nested["split"] = "validation"
+            nested["candidate"] = candidate
+            nested["y_pred"] = route_prediction
+            nested_frames.append(nested)
+        nested_path = destination / "validation_nested_pf.parquet"
+        pd.concat(nested_frames, ignore_index=True).to_parquet(
+            nested_path, index=False, compression="zstd"
+        )
         frame = validation_frame[
             [
                 "base_origin_id",
@@ -287,14 +527,37 @@ def run_a_view(
             "maturity_rule": "s_plus_h_plus_W_plus_D_le_t",
             "uses_latest_available_target_index": True,
             "observed_mature_feature_fraction": selected_coverage,
+            "active_near_zero_audit": active_near_zero_audit,
             "hard_feature_residualization": False,
             "final_selected_candidate": str(selected),
-            "final_selected_fold_losses": list(selection.final_selected_fold_losses),
+            "final_selected_fold_losses": list(losses[selected]),
             "final_selected_prediction_path": str(prediction_path.relative_to(output)),
             "final_selected_contract": contract,
             "final_prediction_loss": final_loss,
             "prediction_path": str(prediction_path.relative_to(output)),
             "prediction_sha256": sha256_file(prediction_path),
+            "nested_validation_prediction_path": str(
+                nested_path.relative_to(output)
+            ),
+            "nested_validation_prediction_sha256": sha256_file(nested_path),
+            "pf_selected_route": pf_selected_route,
+            "pf_selected_route_max_abs_error": selected_route_error,
+            "nested_a_contracts": {
+                "KCA": kca_contract,
+                "KCWA": kcwa_contract,
+            },
+            "nested_a_coverage": {
+                "KCA": kca_coverage,
+                "KCWA": kcwa_coverage,
+            },
+            "row_cap_audit": {
+                "cap_name": "state_fit",
+                "cap": int(v2["row_caps"]["state_fit"]),
+                "fit_rows": len(oof),
+                "validation_rows": len(validation),
+                "fit_source": "train_inner_oof_only",
+                "within_cap": len(oof) <= int(v2["row_caps"]["state_fit"]),
+            },
             "input_prediction_path": w_result["prediction_path"],
             "input_prediction_sha256": w_result["prediction_sha256"],
             "test_accessed": False,

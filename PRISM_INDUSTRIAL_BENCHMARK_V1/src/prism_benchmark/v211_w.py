@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import time
 import traceback
@@ -33,6 +34,27 @@ MONOTONE = "MONOTONE_I_SPLINE_CORRECTION"
 NATURAL_CUBIC = "NATURAL_CUBIC_CORRECTION"
 W_FAMILIES = (IDENTITY, MONOTONE, NATURAL_CUBIC)
 BEST_ACTIVE_K = "BEST_ACTIVE_K_CHANNEL"
+
+
+def _row_id_hash(frame: pd.DataFrame) -> str:
+    digest = hashlib.sha256()
+    for value in frame["base_origin_id"].astype(str):
+        digest.update(value.encode("utf-8"))
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def _candidate_descriptor(candidate: Any) -> dict[str, Any]:
+    if candidate == IDENTITY:
+        return {"family": IDENTITY}
+    family, knots, smoothness, mu, direction = candidate
+    return {
+        "family": str(family),
+        "knot_count": int(knots),
+        "smoothness": float(smoothness),
+        "soft_overlap_mu": float(mu),
+        "direction": int(direction),
+    }
 
 
 @dataclass(frozen=True)
@@ -282,6 +304,60 @@ def predict_w_correction(latent: np.ndarray, contract: dict[str, Any]) -> np.nda
     return design @ np.asarray(contract["coefficient"], dtype=np.float64)
 
 
+def w_support_derivative_audit(
+    latent: np.ndarray,
+    contract: dict[str, Any],
+    *,
+    grid_points: int = 2048,
+) -> dict[str, Any]:
+    values = np.asarray(latent, dtype=np.float64).reshape(-1)
+    if contract["family"] == IDENTITY:
+        return {
+            "status": "PASS",
+            "family": IDENTITY,
+            "rows": len(values),
+            "below_support_fraction": 0.0,
+            "above_support_fraction": 0.0,
+            "maximum_absolute_derivative": 0.0,
+            "finite_derivative": True,
+            "monotonicity_violation_fraction": 0.0,
+            "grid_points": 0,
+        }
+    metadata = contract["basis"]
+    standardized = (
+        values - float(metadata["mean"])
+    ) / float(metadata["scale"])
+    lower = float(metadata["train_min"])
+    upper = float(metadata["train_max"])
+    grid_standardized = np.linspace(lower, upper, int(grid_points))
+    grid = grid_standardized * float(metadata["scale"]) + float(metadata["mean"])
+    correction = predict_w_correction(grid, contract)
+    derivative = np.diff(correction) / np.diff(grid)
+    finite = bool(np.isfinite(derivative).all())
+    direction = int(contract.get("direction", 1))
+    tolerance = 64.0 * np.finfo(np.float64).eps * max(
+        1.0, float(np.max(np.abs(derivative), initial=0.0))
+    )
+    violation = (
+        float(np.mean(direction * derivative < -tolerance))
+        if contract["family"] == MONOTONE and len(derivative)
+        else 0.0
+    )
+    return {
+        "status": "PASS" if finite and violation == 0.0 else "NUMERICAL_WARNING",
+        "family": contract["family"],
+        "rows": len(values),
+        "below_support_fraction": float(np.mean(standardized < lower)),
+        "above_support_fraction": float(np.mean(standardized > upper)),
+        "maximum_absolute_derivative": float(
+            np.max(np.abs(derivative), initial=0.0)
+        ),
+        "finite_derivative": finite,
+        "monotonicity_violation_fraction": violation,
+        "grid_points": int(grid_points),
+    }
+
+
 def _load_c_result(output: Path, view: ViewSpec) -> dict[str, Any]:
     path = (
         output
@@ -307,7 +383,11 @@ def _w_candidates(
     candidates: list[Any] = [IDENTITY]
     smoothness = [float(value) for value in v2["W_module"]["smoothness_penalties"]]
     mus = [float(value) for value in v211["W"]["soft_overlap_mu"]]
-    if monotone:
+    include_monotone = bool(
+        monotone
+        or MONOTONE in set(v211.get("W", {}).get("candidates", ()))
+    )
+    if include_monotone:
         candidates.extend(
             (MONOTONE, int(knots), penalty, mu, direction)
             for knots in v21["W"]["monotone_knots"]
@@ -492,12 +572,13 @@ def run_w_view(
     project: Path,
     output: Path,
     view: ViewSpec,
+    protocol: str = "sru",
 ) -> dict[str, Any]:
     started = time.time()
     destination = output / "DEVELOPMENT" / "W" / view.head.head_id / view.proxy_policy
     destination.mkdir(parents=True, exist_ok=True)
     try:
-        v211, v21, v2 = load_v211_configs(project)
+        v211, v21, v2 = load_v211_configs(project, protocol=protocol)
         c_result = _load_c_result(output, view)
         active = load_active_channels(output, view)
         frozen_channels = set(c_result.get("active_channels", ()))
@@ -656,6 +737,33 @@ def run_w_view(
                 -float(mu),
             )
 
+        minimum_usable = int(rule["minimum_usable_folds"])
+        applicable_nonlinear = [
+            candidate
+            for candidate in candidates
+            if candidate != IDENTITY
+            and int(np.count_nonzero(np.isfinite(losses[candidate])))
+            >= minimum_usable
+        ]
+        joint_basis_candidate = (
+            min(
+                applicable_nonlinear,
+                key=lambda candidate: (
+                    float(
+                        np.mean(
+                            np.asarray(losses[candidate], dtype=np.float64)[
+                                np.isfinite(losses[candidate])
+                            ],
+                            dtype=np.float64,
+                        )
+                    ),
+                    complexity(candidate),
+                ),
+            )
+            if applicable_nonlinear
+            else None
+        )
+
         selection = guarded_local_one_se_select(
             losses,
             complexity,
@@ -671,6 +779,18 @@ def run_w_view(
             candidate_scope["formal_nonlinear_interpretation_allowed"]
         )
         selected = diagnostic_selected if formal_allowed else IDENTITY
+        # The formal PF activation decision remains exactly the guarded v2.1.1
+        # selection above.  The Metro transfer audit also pre-registers a W-on
+        # ablation when PF selects identity.  Freeze that ablation from the
+        # development-loss-best applicable non-identity construction; it is
+        # never selection eligible and never changes ``selected``.
+        pf_ablation_candidate = (
+            selected if selected != IDENTITY else joint_basis_candidate
+        )
+        if pf_ablation_candidate is None:
+            raise RuntimeError(
+                "no applicable non-identity W construction for the registered ablation"
+            )
         selection_status = (
             "W_RESCUE_DIAGNOSTIC_ONLY"
             if not input_path_preserved and not k_exact_zero
@@ -695,6 +815,16 @@ def run_w_view(
                 evaluation_latent,
                 fit_upstream,
             )
+            if pf_ablation_candidate == selected:
+                ablation_correction = correction.copy()
+            else:
+                ablation_correction, _ = _fit_registered_w(
+                    pf_ablation_candidate,
+                    fit_latent,
+                    fit_target,
+                    evaluation_latent,
+                    fit_upstream,
+                )
             frame = evaluation[
                 [
                     "base_origin_id",
@@ -708,6 +838,10 @@ def run_w_view(
             frame["physical_oof"] = evaluation_latent
             frame["delta_w_oof"] = correction
             frame["physical_w_oof"] = evaluation_latent + correction
+            frame["delta_w_ablation_oof"] = ablation_correction
+            frame["physical_w_ablation_oof"] = (
+                evaluation_latent + ablation_correction
+            )
             frame["oof_fold"] = fold
             for index in range(evaluation_upstream.shape[1]):
                 frame[f"k_channel_contribution_{index:03d}"] = evaluation_upstream[
@@ -742,6 +876,76 @@ def run_w_view(
         )
         if not numerical_contract_passes(contract):
             raise RuntimeError("selected W final refit failed its numerical certificate")
+        if pf_ablation_candidate == selected:
+            ablation_correction = correction.copy()
+            ablation_contract = dict(contract)
+        else:
+            ablation_correction, ablation_contract = _fit_registered_w(
+                pf_ablation_candidate,
+                fit_latent,
+                final_train["y_true"].to_numpy(dtype=np.float64),
+                validation_latent,
+                fit_upstream,
+            )
+        if not numerical_contract_passes(ablation_contract):
+            raise RuntimeError("registered W ablation final refit failed its numerical certificate")
+        selected_support_derivative_audit = w_support_derivative_audit(
+            validation_latent, contract
+        )
+        ablation_support_derivative_audit = w_support_derivative_audit(
+            validation_latent, ablation_contract
+        )
+        identity_correction, identity_contract = _fit_registered_w(
+            IDENTITY,
+            fit_latent,
+            final_train["y_true"].to_numpy(dtype=np.float64),
+            validation_latent,
+            fit_upstream,
+        )
+        identity_prediction_error = float(
+            np.max(np.abs(validation_latent + identity_correction - validation_latent), initial=0.0)
+        )
+        validation_target = validation["y_true"].to_numpy(dtype=np.float64)
+        identity_residual_error = float(
+            np.max(
+                np.abs(
+                    (validation_target - validation_latent - identity_correction)
+                    - (validation_target - validation_latent)
+                ),
+                initial=0.0,
+            )
+        )
+        joint_basis_contract = None
+        if joint_basis_candidate is not None:
+            _, joint_basis_fit = _fit_registered_w(
+                joint_basis_candidate,
+                fit_latent,
+                final_train["y_true"].to_numpy(dtype=np.float64),
+                validation_latent,
+                fit_upstream,
+            )
+            if numerical_contract_passes(joint_basis_fit):
+                joint_basis_contract = {
+                    key: joint_basis_fit[key]
+                    for key in (
+                        "family",
+                        "knot_count",
+                        "smoothness",
+                        "direction",
+                        "basis",
+                        "numerical_certificate",
+                    )
+                }
+                joint_basis_contract.update(
+                    {
+                        "source": "BEST_MEAN_APPLICABLE_NONIDENTITY_W_BASIS",
+                        "pf_activation_eligible": False,
+                        "candidate": _candidate_descriptor(joint_basis_candidate),
+                        "support_derivative_audit": w_support_derivative_audit(
+                            validation_latent, joint_basis_fit
+                        ),
+                    }
+                )
         if selected == IDENTITY:
             contract = {
                 **contract,
@@ -776,6 +980,8 @@ def run_w_view(
         ].copy()
         frame["physical_latent"] = validation_latent
         frame["delta_w"] = correction
+        frame["delta_w_ablation"] = ablation_correction
+        frame["physical_w_ablation"] = validation_latent + ablation_correction
         frame["y_pred"] = prediction
         frame["model"] = "PRISM_V2_1_1_K_C_W"
         frame["dtype"] = "float64"
@@ -799,6 +1005,13 @@ def run_w_view(
             "diagnostic_selected_candidate": str(diagnostic_selected),
             "selection_status": selection_status,
             "w_contract": contract,
+            "pf_ablation_w_candidate": _candidate_descriptor(
+                pf_ablation_candidate
+            ),
+            "pf_ablation_w_contract": ablation_contract,
+            "pf_ablation_selection_eligible": False,
+            "selected_support_derivative_audit": selected_support_derivative_audit,
+            "pf_ablation_support_derivative_audit": ablation_support_derivative_audit,
             "w_candidate_scope": candidate_scope,
             "usable_fold_count": candidate_scope["usable_fold_count"],
             "input_path_preservation": c_result.get("input_path_preservation", {}),
@@ -809,6 +1022,34 @@ def run_w_view(
                 str(key): value for key, value in losses.items()
             },
             "candidate_numerical_audit": candidate_numeric_audit,
+            "candidate_families_compared": sorted(
+                {
+                    _candidate_descriptor(candidate)["family"]
+                    for candidate in candidates
+                    if candidate == IDENTITY
+                    or int(np.count_nonzero(np.isfinite(losses[candidate])))
+                    >= minimum_usable
+                }
+            ),
+            "candidate_descriptors": [
+                _candidate_descriptor(candidate) for candidate in candidates
+            ],
+            "fold_row_id_hashes": [
+                {
+                    "fold": int(item[0]),
+                    "row_id_sha256": _row_id_hash(item[1]),
+                }
+                for item in fold_inputs
+            ],
+            "nested_candidates_share_fold_mask_and_row_ids": True,
+            "identity_equivalence": {
+                "prediction_max_abs_error": identity_prediction_error,
+                "residual_max_abs_error": identity_residual_error,
+                "identity_contract": identity_contract,
+                "pass": identity_prediction_error == 0.0
+                and identity_residual_error == 0.0,
+            },
+            "joint_w_basis_contract": joint_basis_contract,
             "monotone_correlations": correlations,
             "monotone_applicable": monotone,
             "monotone_direction": direction,
@@ -831,6 +1072,13 @@ def run_w_view(
             "final_prediction_loss": final_loss,
             "prediction_path": str(prediction_path.relative_to(output)),
             "prediction_sha256": sha256_file(prediction_path),
+            "row_cap_audit": {
+                "cap_name": "wiener_fit",
+                "cap": int(v2["row_caps"]["wiener_fit"]),
+                "fit_rows": len(final_train),
+                "validation_rows": len(validation),
+                "fit_source": "train_only",
+            },
             "test_accessed": False,
             "elapsed_seconds": time.time() - started,
             **regression_metrics(
