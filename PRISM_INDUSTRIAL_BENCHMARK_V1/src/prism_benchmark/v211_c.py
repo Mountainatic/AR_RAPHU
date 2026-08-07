@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pandas as pd
 
 from .cpu_data import ViewSpec, inner_folds, load_samples, sha256_file
 from .cpu_selection import mse, regression_metrics
@@ -28,6 +29,13 @@ from .v211_selection import (
 COMPRESSED = "ADDITIVE_COMPRESSED"
 JOINT_BASIS = "ADDITIVE_JOINT_BASIS"
 BEST_ACTIVE_K = "BEST_ACTIVE_K_CHANNEL"
+
+
+def _write_oof_frames(oof_frames: list[pd.DataFrame], path: Path) -> None:
+    """Materialize the selected C out-of-fold predictions."""
+    pd.concat(oof_frames, ignore_index=True).to_parquet(
+        path, index=False, compression="zstd"
+    )
 
 
 def select_c_family_with_fallback(
@@ -457,9 +465,7 @@ def run_c_view(
         ):
             raise RuntimeError("selected C OOF predictions do not reproduce fold losses")
         oof_path = destination / "SELECTED_OOF.parquet"
-        pd.concat(oof_frames, ignore_index=True).to_parquet(
-            oof_path, index=False, compression="zstd"
-        )
+        _write_oof_frames(oof_frames, oof_path)
         frame = validation[
             ["base_origin_id", "view_sample_id", "entity_id", "origin", "y_true"]
         ].copy()

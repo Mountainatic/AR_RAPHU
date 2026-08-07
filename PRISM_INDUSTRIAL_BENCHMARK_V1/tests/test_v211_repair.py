@@ -11,6 +11,7 @@ from prism_benchmark.v211_c import (
     BEST_ACTIVE_K,
     COMPRESSED,
     JOINT_BASIS,
+    _write_oof_frames,
     select_c_family_with_fallback,
 )
 from prism_benchmark.v211_config import V211Paths, require_v211_test_freeze
@@ -213,6 +214,34 @@ def test_final_loss_matches_materialized_prediction(tmp_path):
     assert_final_prediction_contract(result, recomputed_loss=recomputed)
     with pytest.raises(RuntimeError, match="stored loss disagree"):
         assert_final_prediction_contract(result, recomputed_loss=recomputed + 0.1)
+
+
+def test_c_selected_oof_frames_are_materialized(tmp_path):
+    path = tmp_path / "SELECTED_OOF.parquet"
+    first = pd.DataFrame(
+        {
+            "view_sample_id": [10, 11],
+            "y_true": [1.0, 2.0],
+            "y_pred": [0.9, 2.1],
+            "oof_fold": [0, 0],
+        }
+    )
+    second = pd.DataFrame(
+        {
+            "view_sample_id": [12],
+            "y_true": [3.0],
+            "y_pred": [3.2],
+            "oof_fold": [1],
+        }
+    )
+
+    _write_oof_frames([first, second], path)
+
+    materialized = pd.read_parquet(path)
+    pd.testing.assert_frame_equal(
+        materialized,
+        pd.concat([first, second], ignore_index=True),
+    )
 
 
 def test_joint_has_no_ar_only_candidate():
