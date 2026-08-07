@@ -4,6 +4,7 @@ import json
 import os
 import time
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
@@ -40,6 +41,32 @@ from .v211_selection import profile_one_se_regret_guard
 
 
 EXACT_ZERO = "EXACT_ZERO"
+K_INNER_WORKERS_ENV = "PRISM_V211_K_INNER_WORKERS"
+
+
+def _k_inner_workers() -> int:
+    raw = os.environ.get(K_INNER_WORKERS_ENV, "1")
+    try:
+        workers = int(raw)
+    except ValueError as error:
+        raise RuntimeError(f"{K_INNER_WORKERS_ENV} must be an integer") from error
+    cpu_count = os.cpu_count() or 1
+    if workers < 1 or workers > cpu_count:
+        raise RuntimeError(f"{K_INNER_WORKERS_ENV} must be within [1, {cpu_count}]")
+    return workers
+
+
+def _ordered_parallel_map(
+    function: Callable[..., Any],
+    jobs: Sequence[tuple[Any, ...]],
+    workers: int,
+) -> list[Any]:
+    """Evaluate independent jobs concurrently while preserving registration order."""
+    if workers <= 1 or len(jobs) <= 1:
+        return [function(*arguments) for arguments in jobs]
+    with ThreadPoolExecutor(max_workers=min(int(workers), len(jobs))) as executor:
+        futures = [executor.submit(function, *arguments) for arguments in jobs]
+        return [future.result() for future in futures]
 
 
 def oof_replay_audit(
@@ -73,6 +100,7 @@ def select_smallest_stable_full_and_folds(
     *,
     valid_full: Callable[[Mapping[str, Any]], bool],
     valid_fold: Callable[[dict[str, Any]], bool],
+    parallel_workers: int = 1,
 ) -> tuple[float, Mapping[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
     """Select the first ridge whose full refit and every inner fold certify."""
     def certificate(contract: Mapping[str, Any]) -> Mapping[str, Any]:
@@ -80,34 +108,50 @@ def select_smallest_stable_full_and_folds(
             "numerical_certificate", contract.get("certificate", {})
         )
 
-    audits = []
-    for candidate in candidates:
+    def evaluate_candidate(candidate: float) -> tuple[Mapping[str, Any], bool, list[dict[str, Any]]]:
         full_contract = fit_full(float(candidate))
         full_pass = bool(valid_full(full_contract))
         fold_payloads = fit_folds(float(candidate)) if full_pass else []
-        fold_passes = [bool(valid_fold(payload)) for payload in fold_payloads]
-        passed = bool(full_pass and fold_passes and all(fold_passes))
-        audits.append(
-            {
-                "candidate": float(candidate),
-                "pass": passed,
-                "full_refit_pass": full_pass,
-                "all_inner_folds_pass": bool(fold_passes and all(fold_passes)),
-                "full_refit_certificate": certificate(full_contract),
-                "inner_fold_certificates": [
-                    {
-                        "fold": int(payload["fold"]),
-                        "pass": fold_pass,
-                        "certificate": certificate(payload["contract"]),
-                    }
-                    for payload, fold_pass in zip(
-                        fold_payloads, fold_passes, strict=True
-                    )
-                ],
-            }
+        return full_contract, full_pass, fold_payloads
+
+    registered = [float(candidate) for candidate in candidates]
+    batch_size = max(1, int(parallel_workers))
+    audits = []
+    for start in range(0, len(registered), batch_size):
+        batch = registered[start : start + batch_size]
+        evaluations = _ordered_parallel_map(
+            evaluate_candidate,
+            [(candidate,) for candidate in batch],
+            batch_size,
         )
-        if passed:
-            return float(candidate), full_contract, fold_payloads, audits
+        for candidate, (full_contract, full_pass, fold_payloads) in zip(
+            batch, evaluations, strict=True
+        ):
+            fold_passes = [bool(valid_fold(payload)) for payload in fold_payloads]
+            passed = bool(full_pass and fold_passes and all(fold_passes))
+            audits.append(
+                {
+                    "candidate": float(candidate),
+                    "pass": passed,
+                    "full_refit_pass": full_pass,
+                    "all_inner_folds_pass": bool(
+                        fold_passes and all(fold_passes)
+                    ),
+                    "full_refit_certificate": certificate(full_contract),
+                    "inner_fold_certificates": [
+                        {
+                            "fold": int(payload["fold"]),
+                            "pass": fold_pass,
+                            "certificate": certificate(payload["contract"]),
+                        }
+                        for payload, fold_pass in zip(
+                            fold_payloads, fold_passes, strict=True
+                        )
+                    ],
+                }
+            )
+            if passed:
+                return float(candidate), full_contract, fold_payloads, audits
     raise RuntimeError(
         "no registered ridge candidate passed full-refit and all-inner-fold certificates"
     )
@@ -144,6 +188,7 @@ def _smoothness_selection(
     m_x: int,
     v2: dict[str, Any],
     minimum_folds: int,
+    parallel_workers: int = 1,
 ) -> tuple[float, float, dict[str, Any]]:
     lambda_0 = 0.0
     lambda_tau = float(v2["K_module"]["penalties"]["pilot"]["lambda_tau"])
@@ -154,22 +199,32 @@ def _smoothness_selection(
             lambda_x = 0.0
             audit[name] = {"status": "NOT_APPLICABLE_LINEAR_FAMILY", "selected": 0.0}
             continue
-        scan: dict[float, list[float]] = {}
-        for value in v2["K_module"]["penalties"][name]:
-            candidate_tau = float(value) if name == "lambda_tau" else lambda_tau
-            candidate_x = float(value) if name == "lambda_x" else lambda_x
-            scan[float(value)] = evaluate_candidate(
-                accessor,
-                train,
-                folds,
-                channel,
-                profile,
-                m_tau,
-                family,
-                m_x,
-                (lambda_0, candidate_tau, candidate_x),
-                v2,
+        values = [float(value) for value in v2["K_module"]["penalties"][name]]
+        jobs = []
+        for value in values:
+            candidate_tau = value if name == "lambda_tau" else lambda_tau
+            candidate_x = value if name == "lambda_x" else lambda_x
+            jobs.append(
+                (
+                    accessor,
+                    train,
+                    folds,
+                    channel,
+                    profile,
+                    m_tau,
+                    family,
+                    m_x,
+                    (lambda_0, candidate_tau, candidate_x),
+                    v2,
+                )
             )
+        scan = dict(
+            zip(
+                values,
+                _ordered_parallel_map(evaluate_candidate, jobs, parallel_workers),
+                strict=True,
+            )
+        )
         selection = one_se_select(
             scan,
             lambda value: (-float(value),),
@@ -207,6 +262,8 @@ def run_k_channel(
             shared, view, "validation", columns=CHANNEL_SAMPLE_COLUMNS
         )
         accessor = BaseAccessor(shared, view.head.dataset, "validation", [channel])
+        accessor.warm_prefixes([channel])
+        inner_workers = _k_inner_workers()
         folds = inner_folds(train, int(v21["selection"]["inner_folds"]))
         profiles = channel_profiles(view, channel, v2)
         pilot = v2["K_module"]["penalties"]["pilot"]
@@ -216,8 +273,8 @@ def run_k_channel(
             float(pilot["lambda_x"]),
         )
         pilot_m_tau = 8
-        profile_losses = {
-            profile: evaluate_candidate(
+        profile_jobs = [
+            (
                 accessor,
                 train,
                 folds,
@@ -230,7 +287,14 @@ def run_k_channel(
                 v2,
             )
             for profile in profiles
-        }
+        ]
+        profile_losses = dict(
+            zip(
+                profiles,
+                _ordered_parallel_map(evaluate_candidate, profile_jobs, inner_workers),
+                strict=True,
+            )
+        )
         profile_rule = v211["K"]["profile_selection"]
         profile_selection = profile_one_se_regret_guard(
             profile_losses,
@@ -283,34 +347,52 @@ def run_k_channel(
             lambda_x = float(pilot["lambda_x"])
             smoothness_audit: dict[str, Any] = {}
         else:
+            structural_specs = []
+            structural_jobs = []
             for profile in retained_profiles:
                 for m_tau in v21["K_C"]["m_tau"]:
-                    structural_losses[(profile, int(m_tau), "LINEAR_DISTRIBUTED_LAG", 1)] = evaluate_candidate(
-                        accessor,
-                        train,
-                        folds,
-                        channel,
-                        profile,
-                        int(m_tau),
-                        "LINEAR_DISTRIBUTED_LAG",
-                        1,
-                        pilot_lambdas,
-                        v2,
+                    structural_specs.append(
+                        (profile, int(m_tau), "LINEAR_DISTRIBUTED_LAG", 1)
+                    )
+                    structural_jobs.append(
+                        (
+                            accessor,
+                            train,
+                            folds,
+                            channel,
+                            profile,
+                            int(m_tau),
+                            "LINEAR_DISTRIBUTED_LAG",
+                            1,
+                            pilot_lambdas,
+                            v2,
+                        )
                     )
                     for m_x in v21["K_C"]["m_x"]:
                         for family in FAMILY_ORDER[2:]:
-                            structural_losses[(profile, int(m_tau), family, int(m_x))] = evaluate_candidate(
-                                accessor,
-                                train,
-                                folds,
-                                channel,
-                                profile,
-                                int(m_tau),
-                                family,
-                                int(m_x),
-                                pilot_lambdas,
-                                v2,
+                            structural_specs.append(
+                                (profile, int(m_tau), family, int(m_x))
                             )
+                            structural_jobs.append(
+                                (
+                                    accessor,
+                                    train,
+                                    folds,
+                                    channel,
+                                    profile,
+                                    int(m_tau),
+                                    family,
+                                    int(m_x),
+                                    pilot_lambdas,
+                                    v2,
+                                )
+                            )
+            structural_results = _ordered_parallel_map(
+                evaluate_candidate, structural_jobs, inner_workers
+            )
+            structural_losses.update(
+                zip(structural_specs, structural_results, strict=True)
+            )
             structural_selection = guarded_local_one_se_select(
                 structural_losses,
                 _structural_complexity,
@@ -349,6 +431,7 @@ def run_k_channel(
                     m_x=selected_m_x,
                     v2=v2,
                     minimum_folds=minimum_folds,
+                    parallel_workers=inner_workers,
                 )
 
         final_train = _cap(train, int(v2["row_caps"]["single_channel_k_fit"]))
@@ -463,6 +546,7 @@ def run_k_channel(
                     ).all()
                     and np.isfinite(float(payload["loss"]))
                 ),
+                parallel_workers=inner_workers,
             )
             selected_lambdas = (float(lambda_0), lambda_tau, lambda_x)
 

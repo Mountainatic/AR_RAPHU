@@ -25,6 +25,8 @@ DEVELOPMENT_DECISION_NAME = "METRO_P60_V211_DEVELOPMENT_DECISION.json"
 TEST_ACCESS_AUDIT_NAME = "METRO_P60_V211_TEST_OOD_ACCESS_AUDIT.json"
 WORKER_OVERRIDE_ENV = "PRISM_V211_METRO_WORKERS"
 K_MEMORY_GIB_ENV = "PRISM_V211_K_MEMORY_GIB_PER_WORKER"
+K_INNER_WORKERS_ENV = "PRISM_V211_K_INNER_WORKERS"
+K_OUTER_WORKERS_ENV = "PRISM_V211_K_OUTER_WORKERS"
 
 
 @dataclass(frozen=True)
@@ -182,14 +184,43 @@ def effective_worker_count(config: dict[str, Any]) -> int:
     return workers
 
 
+def _positive_worker_env(name: str, default: int) -> int:
+    raw = os.environ.get(name)
+    value = default if raw is None else int(raw)
+    cpu_count = os.cpu_count() or 1
+    if value < 1 or value > cpu_count:
+        raise RuntimeError(f"{name} must be within [1, {cpu_count}]")
+    return value
+
+
+def effective_k_inner_workers() -> int:
+    return _positive_worker_env(K_INNER_WORKERS_ENV, 1)
+
+
+def effective_k_outer_workers(config: dict[str, Any], task_count: int) -> int:
+    if task_count < 1:
+        return 1
+    inner = effective_k_inner_workers()
+    task_budget = effective_worker_count(config)
+    default_outer = max(1, (task_budget + inner - 1) // inner)
+    requested = _positive_worker_env(K_OUTER_WORKERS_ENV, default_outer)
+    return min(requested, int(task_count))
+
+
 def runtime_parallelism_audit(config: dict[str, Any]) -> dict[str, Any]:
     effective = effective_worker_count(config)
     configured = int(config["resource"]["workers"])
+    k_inner = effective_k_inner_workers()
+    k_outer = effective_k_outer_workers(config, 27)
     return {
         "configured_workers": configured,
         "effective_task_workers": effective,
         "worker_override_environment": os.environ.get(WORKER_OVERRIDE_ENV),
         "k_memory_gib_per_worker": float(os.environ.get(K_MEMORY_GIB_ENV, "20")),
+        "k_outer_task_workers": k_outer,
+        "k_inner_candidate_workers": k_inner,
+        "k_total_candidate_thread_budget": int(k_outer * k_inner),
+        "k_parallelism_scope": "TASK_LEVEL_THROUGHPUT_ONLY_ORDER_PRESERVED",
         "blas_threads_per_worker": int(config["resource"]["blas_threads"]),
         "override_active": effective != configured,
         "override_scope": "TASK_LEVEL_THROUGHPUT_ONLY",

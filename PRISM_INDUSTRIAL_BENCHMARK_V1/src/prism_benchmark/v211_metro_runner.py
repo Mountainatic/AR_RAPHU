@@ -41,6 +41,7 @@ from .v211_metro_config import (
     SOURCE_COMMIT,
     MetroV211Paths,
     effective_worker_count,
+    effective_k_outer_workers,
     git_value,
     load_metro_config,
     runtime_parallelism_audit,
@@ -415,10 +416,11 @@ def run_m2(paths: MetroV211Paths) -> dict[str, Any]:
         for channel in input_columns(paths.shared, view.head.task_id, view.proxy_policy):
             k_jobs.append((paths.shared, paths.project, paths.output, view, channel, PROTOCOL))
             k_paths.append(_result_path(paths.output, "K", view, channel))
+    k_workers = effective_k_outer_workers(config, len(k_jobs))
     run_parallel(
         run_k_channel,
         k_jobs,
-        workers,
+        k_workers,
         per_worker_gib=k_memory,
         label="PRISM_V211_METRO_M2_K",
     )
@@ -445,6 +447,10 @@ def run_m2(paths: MetroV211Paths) -> dict[str, Any]:
         "stage": "M2_DEVELOPMENT_K_C",
         "k_jobs": len(k_results),
         "requested_k_workers": workers,
+        "k_outer_task_workers": k_workers,
+        "k_inner_candidate_workers": int(
+            os.environ.get("PRISM_V211_K_INNER_WORKERS", "1")
+        ),
         "k_memory_gib_per_worker": k_memory,
         "k_pass": sum(item.get("status") == "PASS" for item in k_results),
         "active_by_view": active_by_view,

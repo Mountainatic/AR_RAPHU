@@ -12,6 +12,7 @@ from prism_benchmark.v2_runtime import run_parallel
 from prism_benchmark.v211_assembly import pf_and_joint_input_status_match
 from prism_benchmark.v211_joint import registered_joint_candidates
 from prism_benchmark.v211_k import (
+    _ordered_parallel_map,
     oof_replay_audit,
     select_smallest_stable_full_and_folds,
 )
@@ -270,12 +271,13 @@ def test_k_ridge_requires_full_refit_and_every_inner_fold_certificate() -> None:
             valid_fold=lambda payload: (
                 payload["contract"]["certificate"]["status"] == "PASS"
             ),
+            parallel_workers=2,
         )
     )
 
     assert selected == pytest.approx(1e-4)
     assert contract["ridge"] == pytest.approx(1e-4)
-    assert attempted_folds == [0.0, 1e-4]
+    assert sorted(attempted_folds) == [0.0, 1e-4]
     assert len(fold_payloads) == 4
     assert [entry["pass"] for entry in audit] == [False, True]
     assert audit[0]["full_refit_pass"] is True
@@ -285,3 +287,58 @@ def test_k_ridge_requires_full_refit_and_every_inner_fold_certificate() -> None:
         "NUMERICALLY_INVALID"
     )
     assert audit[1]["all_inner_folds_pass"] is True
+
+
+def test_k_inner_parallel_map_matches_serial_and_preserves_order() -> None:
+    jobs = [(value,) for value in range(17)]
+
+    def transform(value: int) -> tuple[int, int]:
+        return value, value * value
+
+    serial = _ordered_parallel_map(transform, jobs, workers=1)
+    parallel = _ordered_parallel_map(transform, jobs, workers=4)
+    assert parallel == serial
+
+
+def test_k_parallel_ridge_selection_matches_serial() -> None:
+    def fit_full(value: float) -> dict[str, object]:
+        return {"ridge": value, "certificate": {"status": "PASS"}}
+
+    def fit_folds(value: float) -> list[dict[str, object]]:
+        return [
+            {
+                "fold": fold,
+                "fit_rows": 100,
+                "contract": {
+                    "certificate": {
+                        "status": (
+                            "NUMERICALLY_INVALID"
+                            if value == 0.0 and fold == 1
+                            else "PASS"
+                        )
+                    }
+                },
+                "prediction": [value + fold],
+                "loss": value + fold,
+            }
+            for fold in range(4)
+        ]
+
+    def run(workers: int):
+        return select_smallest_stable_full_and_folds(
+            [0.0, 1e-4, 1e-3],
+            fit_full,
+            fit_folds,
+            valid_full=lambda candidate: candidate["certificate"]["status"] == "PASS",
+            valid_fold=lambda payload: payload["contract"]["certificate"]["status"] == "PASS",
+            parallel_workers=workers,
+        )
+
+    serial = run(1)
+    parallel = run(2)
+    assert parallel[0] == serial[0] == pytest.approx(1e-4)
+    assert parallel[1] == serial[1]
+    assert parallel[3] == serial[3]
+    assert [item["loss"] for item in parallel[2]] == [
+        item["loss"] for item in serial[2]
+    ]
