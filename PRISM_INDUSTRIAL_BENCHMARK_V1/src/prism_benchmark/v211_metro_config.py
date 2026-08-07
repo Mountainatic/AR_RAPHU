@@ -246,8 +246,8 @@ def runtime_parallelism_audit(config: dict[str, Any]) -> dict[str, Any]:
         "a_inner_candidate_workers": a_inner,
         "j_inner_candidate_workers": j_inner,
         "w_total_candidate_thread_budget": int(2 * w_inner),
-        "a_total_candidate_thread_budget": int(4 * a_inner),
-        "j_total_candidate_thread_budget": int(4 * j_inner),
+        "a_total_candidate_thread_budget": int(2 * a_inner),
+        "j_total_candidate_thread_budget": int(2 * j_inner),
         "stage_inner_parallelism_scope": (
             "ORDERED_INDEPENDENT_CANDIDATES_ONLY"
         ),
