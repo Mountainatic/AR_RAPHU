@@ -39,7 +39,12 @@ from .v211_joint import (
     predict_joint_candidate,
 )
 from .v211_k import load_active_channels
-from .v211_metro_config import MetroV211Paths, load_metro_config, require_metro_test_freeze
+from .v211_metro_config import (
+    MetroV211Paths,
+    effective_worker_count,
+    load_metro_config,
+    require_metro_test_freeze,
+)
 from .v211_metro_contracts import stable_candidate_id
 from .v211_metro_views import metro_p60_dynamic_views
 from .v211_w import (
@@ -657,7 +662,7 @@ def run_m7(paths: MetroV211Paths) -> dict[str, Any]:
     results = run_parallel(
         materialize_view,
         [(paths, view, development_decision_sha256) for view in views],
-        int(config["resource"]["workers"]),
+        effective_worker_count(config),
         per_worker_gib=float(os.environ.get("PRISM_V211_MEMORY_GIB_PER_WORKER", "20")),
         label="PRISM_V211_METRO_M7_TEST_OOD",
     )

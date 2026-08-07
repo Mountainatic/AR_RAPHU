@@ -40,8 +40,10 @@ from .v211_metro_config import (
     RECOMMENDED_BRANCH,
     SOURCE_COMMIT,
     MetroV211Paths,
+    effective_worker_count,
     git_value,
     load_metro_config,
+    runtime_parallelism_audit,
 )
 from .v211_metro_contracts import (
     assert_candidate_id_binding,
@@ -170,6 +172,7 @@ def runtime_environment_audit(config: MappingLike) -> dict[str, Any]:
             Path("/sys/fs/cgroup/memory.swap.max")
         ),
         "frozen_resource_contract": config["resource"],
+        "runtime_parallelism": runtime_parallelism_audit(config),
         "thread_environment": {
             name: os.environ.get(name)
             for name in (
@@ -403,8 +406,9 @@ def run_m1(paths: MetroV211Paths) -> dict[str, Any]:
 def run_m2(paths: MetroV211Paths) -> dict[str, Any]:
     config = load_metro_config(paths.project)
     views = metro_p60_input_views(paths.shared)
-    workers = int(config["resource"]["workers"])
+    workers = effective_worker_count(config)
     memory = float(os.environ.get("PRISM_V211_MEMORY_GIB_PER_WORKER", "20"))
+    k_memory = float(os.environ.get("PRISM_V211_K_MEMORY_GIB_PER_WORKER", "20"))
     k_jobs = []
     k_paths = []
     for view in views:
@@ -415,7 +419,7 @@ def run_m2(paths: MetroV211Paths) -> dict[str, Any]:
         run_k_channel,
         k_jobs,
         workers,
-        per_worker_gib=memory,
+        per_worker_gib=k_memory,
         label="PRISM_V211_METRO_M2_K",
     )
     k_results = _bind(paths, k_paths)
@@ -440,6 +444,8 @@ def run_m2(paths: MetroV211Paths) -> dict[str, Any]:
         "status": "PASS" if noncollapsed and all(active_by_view.values()) else "STOP_KC_INPUT_PATH_COLLAPSED",
         "stage": "M2_DEVELOPMENT_K_C",
         "k_jobs": len(k_results),
+        "requested_k_workers": workers,
+        "k_memory_gib_per_worker": k_memory,
         "k_pass": sum(item.get("status") == "PASS" for item in k_results),
         "active_by_view": active_by_view,
         "c_views": len(c_results),
@@ -461,7 +467,7 @@ def run_m3(paths: MetroV211Paths) -> dict[str, Any]:
     run_parallel(
         run_w_view,
         [(paths.shared, paths.project, paths.output, view, PROTOCOL) for view in views],
-        int(config["resource"]["workers"]),
+        effective_worker_count(config),
         per_worker_gib=float(os.environ.get("PRISM_V211_MEMORY_GIB_PER_WORKER", "20")),
         label="PRISM_V211_METRO_M3_W",
     )
@@ -499,7 +505,7 @@ def run_m4(paths: MetroV211Paths) -> dict[str, Any]:
     run_parallel(
         run_a_view,
         [(paths.shared, paths.project, paths.output, view, PROTOCOL) for view in views],
-        int(config["resource"]["workers"]),
+        effective_worker_count(config),
         per_worker_gib=float(os.environ.get("PRISM_V211_MEMORY_GIB_PER_WORKER", "20")),
         label="PRISM_V211_METRO_M4_A",
     )
@@ -548,7 +554,7 @@ def run_m5(paths: MetroV211Paths) -> dict[str, Any]:
     run_parallel(
         run_joint_view,
         [(paths.shared, paths.project, paths.output, view, PROTOCOL) for view in views],
-        int(config["resource"]["workers"]),
+        effective_worker_count(config),
         per_worker_gib=float(os.environ.get("PRISM_V211_MEMORY_GIB_PER_WORKER", "20")),
         label="PRISM_V211_METRO_M5_JOINT",
     )
@@ -746,6 +752,7 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
         "test_accessed": False,
         "ood_accessed": False,
         "materialize_after_freeze": config["post_freeze_materialized_candidates"],
+        "runtime_parallelism": runtime_parallelism_audit(config),
         "pending_materialization_candidate_ids": pending_candidate_ids,
         "m0_audit_sha256": sha256_file(
             paths.output / "FREEZE" / "M0_INHERITANCE_DATA_AUDIT.json"

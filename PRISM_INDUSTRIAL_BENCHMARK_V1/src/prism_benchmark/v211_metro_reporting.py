@@ -26,8 +26,10 @@ from .v211_metro_config import (
     PROTOCOL_ID,
     SOURCE_COMMIT,
     MetroV211Paths,
+    effective_worker_count,
     git_value,
     load_metro_config,
+    runtime_parallelism_audit,
 )
 from .v211_metro_views import metro_p60_dynamic_views
 from .v211_w import IDENTITY
@@ -495,7 +497,11 @@ def _selection_transfer_audit(
     }
 
 
-def _resource_audit(paths: MetroV211Paths, views: list[ViewSpec]) -> dict[str, Any]:
+def _resource_audit(
+    paths: MetroV211Paths,
+    views: list[ViewSpec],
+    config: dict[str, Any],
+) -> dict[str, Any]:
     development = []
     failures = []
     for path in sorted((paths.output / "DEVELOPMENT").rglob("RESULT.json")):
@@ -526,7 +532,7 @@ def _resource_audit(paths: MetroV211Paths, views: list[ViewSpec]) -> dict[str, A
     return {
         "status": "PASS",
         "runtime_manager": "uv",
-        "workers": 2,
+        "runtime_parallelism": runtime_parallelism_audit(config),
         "blas_threads_per_worker": 1,
         "dtype": "float64",
         "development": development,
@@ -747,7 +753,7 @@ def run_m8(paths: MetroV211Paths) -> dict[str, Any]:
     bootstrap_parts = run_parallel(
         _bootstrap_view,
         [(paths, view, replicates) for view in views],
-        int(config["resource"]["workers"]),
+        effective_worker_count(config),
         per_worker_gib=float(os.environ.get("PRISM_V211_MEMORY_GIB_PER_WORKER", "20")),
         label="PRISM_V211_METRO_M8_BOOTSTRAP",
     )
@@ -774,7 +780,7 @@ def run_m8(paths: MetroV211Paths) -> dict[str, Any]:
     pd.DataFrame(historical["records"]).to_csv(
         final / "METRO_P60_V211_HISTORICAL_CONTEXT_ONLY.csv", index=False
     )
-    resource_audit = _resource_audit(paths, views)
+    resource_audit = _resource_audit(paths, views, config)
     write_json(final / "METRO_P60_V211_RESOURCE_AUDIT.json", resource_audit)
     write_json(
         final / "METRO_P60_V211_SOLVER_FAILURE_INVENTORY.json",

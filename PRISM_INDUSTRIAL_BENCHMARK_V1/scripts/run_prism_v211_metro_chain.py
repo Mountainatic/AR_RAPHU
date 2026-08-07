@@ -56,6 +56,12 @@ def main() -> None:
             "PYTHONHASHSEED": "0",
             "MALLOC_ARENA_MAX": "2",
             "PRISM_V211_WORKERS": "2",
+            "PRISM_V211_METRO_WORKERS": env.get(
+                "PRISM_V211_METRO_WORKERS", "27"
+            ),
+            "PRISM_V211_K_MEMORY_GIB_PER_WORKER": env.get(
+                "PRISM_V211_K_MEMORY_GIB_PER_WORKER", "1.75"
+            ),
             "PRISM_V211_MEMORY_GIB_PER_WORKER": env.get(
                 "PRISM_V211_MEMORY_GIB_PER_WORKER", "20"
             ),

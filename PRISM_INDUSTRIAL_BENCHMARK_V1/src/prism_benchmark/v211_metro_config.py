@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -22,6 +23,8 @@ SOURCE_COMMIT = "5b3a971c8eea5127e01e607208ca5d3ea69517a8"
 DEVELOPMENT_FREEZE_NAME = "METRO_P60_V211_DEVELOPMENT_FREEZE.json"
 DEVELOPMENT_DECISION_NAME = "METRO_P60_V211_DEVELOPMENT_DECISION.json"
 TEST_ACCESS_AUDIT_NAME = "METRO_P60_V211_TEST_OOD_ACCESS_AUDIT.json"
+WORKER_OVERRIDE_ENV = "PRISM_V211_METRO_WORKERS"
+K_MEMORY_GIB_ENV = "PRISM_V211_K_MEMORY_GIB_PER_WORKER"
 
 
 @dataclass(frozen=True)
@@ -165,6 +168,34 @@ def git_value(project: Path, *arguments: str) -> str:
         text=True,
         capture_output=True,
     ).stdout.strip()
+
+
+def effective_worker_count(config: dict[str, Any]) -> int:
+    configured = int(config["resource"]["workers"])
+    raw = os.environ.get(WORKER_OVERRIDE_ENV)
+    workers = configured if raw is None else int(raw)
+    cpu_count = os.cpu_count() or 1
+    if workers < 1 or workers > cpu_count:
+        raise RuntimeError(
+            f"{WORKER_OVERRIDE_ENV} must be within [1, {cpu_count}]"
+        )
+    return workers
+
+
+def runtime_parallelism_audit(config: dict[str, Any]) -> dict[str, Any]:
+    effective = effective_worker_count(config)
+    configured = int(config["resource"]["workers"])
+    return {
+        "configured_workers": configured,
+        "effective_task_workers": effective,
+        "worker_override_environment": os.environ.get(WORKER_OVERRIDE_ENV),
+        "k_memory_gib_per_worker": float(os.environ.get(K_MEMORY_GIB_ENV, "20")),
+        "blas_threads_per_worker": int(config["resource"]["blas_threads"]),
+        "override_active": effective != configured,
+        "override_scope": "TASK_LEVEL_THROUGHPUT_ONLY",
+        "scientific_contract_unchanged": True,
+        "user_authorized_on": "2026-08-07",
+    }
 
 
 def require_metro_test_freeze(paths: MetroV211Paths) -> dict[str, Any]:

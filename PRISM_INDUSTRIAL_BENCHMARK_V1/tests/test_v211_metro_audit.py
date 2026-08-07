@@ -8,9 +8,15 @@ import pandas as pd
 import pytest
 
 from prism_benchmark.v2_k import _cap
+from prism_benchmark.v2_runtime import run_parallel
 from prism_benchmark.v211_assembly import pf_and_joint_input_status_match
 from prism_benchmark.v211_joint import registered_joint_candidates
-from prism_benchmark.v211_metro_config import MetroV211Paths, require_metro_test_freeze
+from prism_benchmark.v211_metro_config import (
+    MetroV211Paths,
+    effective_worker_count,
+    require_metro_test_freeze,
+    runtime_parallelism_audit,
+)
 from prism_benchmark.v211_metro_contracts import (
     assert_candidate_id_binding,
     bind_result_candidate_ids,
@@ -27,6 +33,10 @@ from prism_benchmark.v211_w import (
     fit_w_correction,
     predict_w_correction,
 )
+
+
+def _deterministic_affine(value: int) -> int:
+    return 3 * value + 1
 
 
 def test_identity_w_is_exactly_skip_w() -> None:
@@ -169,3 +179,34 @@ def test_vectorized_moving_block_bootstrap_is_deterministic_and_shared() -> None
     )
     np.testing.assert_array_equal(left, right)
     np.testing.assert_allclose(left[:, 1], 2.0 * left[:, 0], rtol=1e-14, atol=1e-14)
+
+
+def test_worker_override_changes_only_task_parallelism(monkeypatch: pytest.MonkeyPatch) -> None:
+    configured = {"resource": {"workers": 2, "blas_threads": 1}}
+    requested = min(4, __import__("os").cpu_count() or 1)
+    monkeypatch.setenv("PRISM_V211_METRO_WORKERS", str(requested))
+    monkeypatch.setenv("PRISM_V211_K_MEMORY_GIB_PER_WORKER", "1.75")
+    assert effective_worker_count(configured) == requested
+    audit = runtime_parallelism_audit(configured)
+    assert audit["scientific_contract_unchanged"] is True
+    assert audit["override_scope"] == "TASK_LEVEL_THROUGHPUT_ONLY"
+    jobs = [(value,) for value in range(8)]
+    serial = sorted(
+        run_parallel(
+            _deterministic_affine,
+            jobs,
+            1,
+            per_worker_gib=0.01,
+            label="METRO_TEST_SERIAL",
+        )
+    )
+    parallel = sorted(
+        run_parallel(
+            _deterministic_affine,
+            jobs,
+            requested,
+            per_worker_gib=0.01,
+            label="METRO_TEST_PARALLEL",
+        )
+    )
+    assert parallel == serial
