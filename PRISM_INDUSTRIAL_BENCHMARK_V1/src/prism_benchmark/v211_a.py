@@ -13,7 +13,7 @@ import pandas as pd
 from .cpu_data import load_samples, realized_state_profiles, sha256_file
 from .cpu_selection import mse, regression_metrics
 from .stage0 import write_json
-from .v2_runtime import run_parallel
+from .v2_runtime import ordered_fork_map, run_parallel
 from .v21_a import (
     EXACT_ZERO,
     MATURE_RESIDUAL_AR,
@@ -23,10 +23,15 @@ from .v21_a import (
 )
 from .v21_selection import guarded_local_one_se_select
 from .v211_config import load_v211_configs
-from .v211_k import _ordered_parallel_map
-
-
 A_INNER_WORKERS_ENV = "PRISM_V211_A_INNER_WORKERS"
+_A_CANDIDATE_CONTEXT: tuple[
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    list[tuple[float, float]],
+] | None = None
 
 
 def _a_inner_workers() -> int:
@@ -61,6 +66,24 @@ def _evaluate_a_candidate(
         upstream_predictions=upstream,
     )
     return mse(y_evaluation, prediction)
+
+
+def _evaluate_a_indexed(candidate_index: int) -> float:
+    if _A_CANDIDATE_CONTEXT is None:
+        raise RuntimeError("A candidate context was not initialized before fork")
+    x_fit, y_fit, x_evaluation, y_evaluation, upstream, candidate_pairs = (
+        _A_CANDIDATE_CONTEXT
+    )
+    alpha, mu = candidate_pairs[candidate_index]
+    return _evaluate_a_candidate(
+        x_fit,
+        y_fit,
+        x_evaluation,
+        y_evaluation,
+        alpha,
+        mu,
+        upstream,
+    )
 
 
 def _fit_frozen_a_route(
@@ -159,6 +182,7 @@ def run_a_view(
     view: Any,
     protocol: str = "sru",
 ) -> dict[str, Any]:
+    global _A_CANDIDATE_CONTEXT
     started = time.time()
     destination = (
         output
@@ -281,22 +305,23 @@ def run_a_view(
                 candidate_pairs = [
                     (alpha, mu) for alpha in alphas for mu in mus
                 ]
-                candidate_losses = _ordered_parallel_map(
-                    _evaluate_a_candidate,
-                    [
-                        (
-                            x_fit,
-                            y_fit,
-                            x_eval,
-                            y_eval,
-                            alpha,
-                            mu,
-                            upstream,
-                        )
-                        for alpha, mu in candidate_pairs
-                    ],
-                    inner_workers,
+                _A_CANDIDATE_CONTEXT = (
+                    x_fit,
+                    y_fit,
+                    x_eval,
+                    y_eval,
+                    upstream,
+                    candidate_pairs,
                 )
+                try:
+                    candidate_losses = ordered_fork_map(
+                        _evaluate_a_indexed,
+                        [(index,) for index in range(len(candidate_pairs))],
+                        inner_workers,
+                        label="PRISM_V211_METRO_M4_A_INNER",
+                    )
+                finally:
+                    _A_CANDIDATE_CONTEXT = None
                 for (alpha, mu), candidate_loss in zip(
                     candidate_pairs, candidate_losses, strict=True
                 ):

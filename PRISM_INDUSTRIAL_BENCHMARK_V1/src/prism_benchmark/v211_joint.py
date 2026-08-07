@@ -16,13 +16,13 @@ from .stage0 import write_json
 from .v2_c import fit_physical_features
 from .v2_k import _cap
 from .v2_numerics import solve_certified
-from .v2_runtime import run_parallel
+from .v2_runtime import ordered_fork_map, run_parallel
 from .v2_selection import one_se_select
 from .v21_selection import guarded_local_one_se_select
 from .v211_a import fit_mature_residual_ar
 from .v211_c import _gate_config, _smallest_stable_alpha
 from .v211_config import load_v211_configs
-from .v211_k import _ordered_parallel_map, load_active_channels
+from .v211_k import load_active_channels
 from .v211_selection import (
     attach_nonselecting_validation_confirmation,
     input_path_preservation_gate,
@@ -37,6 +37,13 @@ J_KA = "J_KA"
 J_KWA = "J_KWA"
 JOINT_CANDIDATES = (J_K, J_KW, J_KA, J_KWA)
 J_INNER_WORKERS_ENV = "PRISM_V211_J_INNER_WORKERS"
+_J_CANDIDATE_CONTEXT: tuple[
+    Mapping[str, np.ndarray],
+    np.ndarray,
+    Mapping[str, np.ndarray],
+    np.ndarray,
+    list[tuple[str, float, float, float]],
+] | None = None
 
 
 def _j_inner_workers() -> int:
@@ -323,6 +330,21 @@ def _evaluate_joint_candidate(
     )
 
 
+def _evaluate_joint_indexed(candidate_index: int) -> tuple[dict[str, Any], float]:
+    if _J_CANDIDATE_CONTEXT is None:
+        raise RuntimeError("Joint candidate context was not initialized before fork")
+    train_blocks, target, evaluation_blocks, evaluation_target, candidates = (
+        _J_CANDIDATE_CONTEXT
+    )
+    return _evaluate_joint_candidate(
+        train_blocks,
+        target,
+        evaluation_blocks,
+        evaluation_target,
+        candidates[candidate_index],
+    )
+
+
 def run_joint_view(
     shared: Path,
     project: Path,
@@ -330,6 +352,7 @@ def run_joint_view(
     view: Any,
     protocol: str = "sru",
 ) -> dict[str, Any]:
+    global _J_CANDIDATE_CONTEXT
     started = time.time()
     destination = (
         output
@@ -474,20 +497,22 @@ def run_joint_view(
             evaluation_target = evaluation["y_true"].to_numpy(dtype=np.float64)
             train_blocks = {"K": k_train, "W": w_train, "A": a_train}
             evaluation_blocks = {"K": k_eval, "W": w_eval, "A": a_eval}
-            candidate_results = _ordered_parallel_map(
-                _evaluate_joint_candidate,
-                [
-                    (
-                        train_blocks,
-                        target,
-                        evaluation_blocks,
-                        evaluation_target,
-                        candidate,
-                    )
-                    for candidate in all_candidates
-                ],
-                inner_workers,
+            _J_CANDIDATE_CONTEXT = (
+                train_blocks,
+                target,
+                evaluation_blocks,
+                evaluation_target,
+                all_candidates,
             )
+            try:
+                candidate_results = ordered_fork_map(
+                    _evaluate_joint_indexed,
+                    [(index,) for index in range(len(all_candidates))],
+                    inner_workers,
+                    label="PRISM_V211_METRO_M5_JOINT_INNER",
+                )
+            finally:
+                _J_CANDIDATE_CONTEXT = None
             for candidate, (contract, candidate_loss) in zip(
                 all_candidates, candidate_results, strict=True
             ):
