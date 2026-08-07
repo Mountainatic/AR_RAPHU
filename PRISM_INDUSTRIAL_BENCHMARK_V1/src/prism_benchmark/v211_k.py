@@ -5,7 +5,7 @@ import os
 import time
 import traceback
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 import pandas as pd
@@ -36,7 +36,7 @@ from .v2_urysohn import fit_contract, predict_contract
 from .v21_selection import guarded_local_one_se_select
 from .v21_views import sru_input_views
 from .v211_config import load_v211_configs
-from .v211_selection import profile_one_se_regret_guard, select_smallest_stable
+from .v211_selection import profile_one_se_regret_guard
 
 
 EXACT_ZERO = "EXACT_ZERO"
@@ -64,6 +64,53 @@ def oof_replay_audit(
         ),
         "selection_use": False,
     }
+
+
+def select_smallest_stable_full_and_folds(
+    candidates: Sequence[float],
+    fit_full: Callable[[float], Mapping[str, Any]],
+    fit_folds: Callable[[float], list[dict[str, Any]]],
+    *,
+    valid_full: Callable[[Mapping[str, Any]], bool],
+    valid_fold: Callable[[dict[str, Any]], bool],
+) -> tuple[float, Mapping[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
+    """Select the first ridge whose full refit and every inner fold certify."""
+    def certificate(contract: Mapping[str, Any]) -> Mapping[str, Any]:
+        return contract.get(
+            "numerical_certificate", contract.get("certificate", {})
+        )
+
+    audits = []
+    for candidate in candidates:
+        full_contract = fit_full(float(candidate))
+        full_pass = bool(valid_full(full_contract))
+        fold_payloads = fit_folds(float(candidate)) if full_pass else []
+        fold_passes = [bool(valid_fold(payload)) for payload in fold_payloads]
+        passed = bool(full_pass and fold_passes and all(fold_passes))
+        audits.append(
+            {
+                "candidate": float(candidate),
+                "pass": passed,
+                "full_refit_pass": full_pass,
+                "all_inner_folds_pass": bool(fold_passes and all(fold_passes)),
+                "full_refit_certificate": certificate(full_contract),
+                "inner_fold_certificates": [
+                    {
+                        "fold": int(payload["fold"]),
+                        "pass": fold_pass,
+                        "certificate": certificate(payload["contract"]),
+                    }
+                    for payload, fold_pass in zip(
+                        fold_payloads, fold_passes, strict=True
+                    )
+                ],
+            }
+        )
+        if passed:
+            return float(candidate), full_contract, fold_payloads, audits
+    raise RuntimeError(
+        "no registered ridge candidate passed full-refit and all-inner-fold certificates"
+    )
 
 
 def _profile_complexity(profile: tuple[int, int]) -> tuple[int, int]:
@@ -312,6 +359,7 @@ def run_k_channel(
             accessor, validation, channel, selected_profile, selected_m_tau
         )
         ridge_audit: list[dict[str, Any]] = []
+        certified_fold_payloads: list[dict[str, Any]] = []
         if selected_family == EXACT_ZERO:
             selected_lambdas = pilot_lambdas
             refit_contract = fit_contract(
@@ -337,11 +385,83 @@ def run_k_channel(
                     **_als_kwargs(v2),
                 )
 
-            lambda_0, refit_contract, ridge_audit = select_smallest_stable(
+            def fit_ridge_folds(lambda_0: float) -> list[dict[str, Any]]:
+                payloads = []
+                for fold, (fit_index, evaluation_index) in enumerate(folds):
+                    fit = _cap(
+                        train.iloc[fit_index],
+                        int(v2["row_caps"]["single_channel_k_fit"]),
+                    )
+                    evaluation = _cap(
+                        train.iloc[evaluation_index],
+                        int(v2["row_caps"]["validation_selection_per_fold"]),
+                    )
+                    fit_values, _ = profile_values(
+                        accessor, fit, channel, selected_profile, selected_m_tau
+                    )
+                    evaluation_values, _ = profile_values(
+                        accessor,
+                        evaluation,
+                        channel,
+                        selected_profile,
+                        selected_m_tau,
+                    )
+                    fold_contract = fit_contract(
+                        fit_values,
+                        fit["y_true"].to_numpy(dtype=np.float64),
+                        selected_family,
+                        selected_m_x,
+                        (float(lambda_0), lambda_tau, lambda_x),
+                        **_als_kwargs(v2),
+                    )
+                    fold_certificate_pass = _candidate_valid(
+                        fold_contract, len(fit), v2
+                    )
+                    if fold_certificate_pass:
+                        fold_prediction = predict_contract(
+                            evaluation_values, fold_contract
+                        )
+                        fold_loss = mse(
+                            evaluation["y_true"].to_numpy(dtype=np.float64),
+                            fold_prediction,
+                        )
+                    else:
+                        fold_prediction = np.full(
+                            len(evaluation), np.nan, dtype=np.float64
+                        )
+                        fold_loss = float("inf")
+                    payloads.append(
+                        {
+                            "fold": fold,
+                            "fit_rows": len(fit),
+                            "evaluation_index": evaluation_index,
+                            "contract": fold_contract,
+                            "prediction": fold_prediction,
+                            "loss": fold_loss,
+                        }
+                    )
+                return payloads
+
+            (
+                lambda_0,
+                refit_contract,
+                certified_fold_payloads,
+                ridge_audit,
+            ) = select_smallest_stable_full_and_folds(
                 ridge_values,
                 fit_ridge,
-                valid_candidate=lambda contract: _candidate_valid(
+                fit_ridge_folds,
+                valid_full=lambda contract: _candidate_valid(
                     dict(contract), len(final_train), v2
+                ),
+                valid_fold=lambda payload: (
+                    _candidate_valid(
+                        dict(payload["contract"]), int(payload["fit_rows"]), v2
+                    )
+                    and np.isfinite(
+                        np.asarray(payload["prediction"], dtype=np.float64)
+                    ).all()
+                    and np.isfinite(float(payload["loss"]))
                 ),
             )
             selected_lambdas = (float(lambda_0), lambda_tau, lambda_x)
@@ -360,47 +480,39 @@ def run_k_channel(
         )
         if selected_family == EXACT_ZERO:
             final_fold_losses = zero_losses
+            certified_fold_predictions = [
+                np.zeros(
+                    len(
+                        _cap(
+                            train.iloc[evaluation_index],
+                            int(
+                                v2["row_caps"][
+                                    "validation_selection_per_fold"
+                                ]
+                            ),
+                        )
+                    ),
+                    dtype=np.float64,
+                )
+                for _, evaluation_index in folds
+            ]
         else:
-            final_fold_losses = evaluate_candidate(
-                accessor,
-                train,
-                folds,
-                channel,
-                selected_profile,
-                selected_m_tau,
-                selected_family,
-                selected_m_x,
-                tuple(float(value) for value in selected_lambdas),
-                v2,
-            )
+            final_fold_losses = [
+                float(payload["loss"]) for payload in certified_fold_payloads
+            ]
+            certified_fold_predictions = [
+                np.asarray(payload["prediction"], dtype=np.float64)
+                for payload in certified_fold_payloads
+            ]
         oof_frames = []
         oof_losses = []
-        for fold, (fit_index, evaluation_index) in enumerate(folds):
-            fit = _cap(
-                train.iloc[fit_index], int(v2["row_caps"]["single_channel_k_fit"])
-            )
+        for fold, ((_, evaluation_index), fold_prediction) in enumerate(
+            zip(folds, certified_fold_predictions, strict=True)
+        ):
             evaluation = _cap(
                 train.iloc[evaluation_index],
                 int(v2["row_caps"]["validation_selection_per_fold"]),
             )
-            if selected_family == EXACT_ZERO:
-                fold_prediction = np.zeros(len(evaluation), dtype=np.float64)
-            else:
-                fit_values, _ = profile_values(
-                    accessor, fit, channel, selected_profile, selected_m_tau
-                )
-                evaluation_values, _ = profile_values(
-                    accessor, evaluation, channel, selected_profile, selected_m_tau
-                )
-                fold_contract = fit_contract(
-                    fit_values,
-                    fit["y_true"].to_numpy(dtype=np.float64),
-                    selected_family,
-                    selected_m_x,
-                    tuple(float(value) for value in selected_lambdas),
-                    **_als_kwargs(v2),
-                )
-                fold_prediction = predict_contract(evaluation_values, fold_contract)
             oof_loss = mse(
                 evaluation["y_true"].to_numpy(dtype=np.float64), fold_prediction
             )
