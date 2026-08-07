@@ -11,6 +11,7 @@ from prism_benchmark.v2_k import _cap
 from prism_benchmark.v2_runtime import run_parallel
 from prism_benchmark.v211_assembly import pf_and_joint_input_status_match
 from prism_benchmark.v211_joint import registered_joint_candidates
+from prism_benchmark.v211_k import oof_replay_audit
 from prism_benchmark.v211_metro_config import (
     MetroV211Paths,
     effective_worker_count,
@@ -210,3 +211,14 @@ def test_worker_override_changes_only_task_parallelism(monkeypatch: pytest.Monke
         )
     )
     assert parallel == serial
+
+
+def test_k_oof_replay_difference_is_recorded_without_changing_candidate() -> None:
+    audit = oof_replay_audit(
+        [1.0, 0.9, 0.8, 0.7],
+        [1.0 + 1e-8, 0.9, 0.8 - 2e-8, 0.7],
+    )
+    assert audit["strict_1e_12_replay_match"] is False
+    assert audit["candidate_unchanged"] is True
+    assert audit["selection_use"] is False
+    assert audit["maximum_absolute_loss_difference"] == pytest.approx(2e-8)

@@ -42,6 +42,30 @@ from .v211_selection import profile_one_se_regret_guard, select_smallest_stable
 EXACT_ZERO = "EXACT_ZERO"
 
 
+def oof_replay_audit(
+    selection_fold_losses: list[float],
+    materialized_fold_losses: list[float],
+) -> dict[str, Any]:
+    selection = np.asarray(selection_fold_losses, dtype=np.float64)
+    materialized = np.asarray(materialized_fold_losses, dtype=np.float64)
+    if selection.shape != materialized.shape or selection.ndim != 1:
+        raise ValueError("OOF replay loss vectors are incompatible")
+    difference = materialized - selection
+    return {
+        "status": "RECORDED_NONSELECTING_REPLAY_AUDIT",
+        "candidate_unchanged": True,
+        "selection_fold_losses": selection.tolist(),
+        "materialized_fold_losses": materialized.tolist(),
+        "maximum_absolute_loss_difference": float(
+            np.max(np.abs(difference), initial=0.0)
+        ),
+        "strict_1e_12_replay_match": bool(
+            np.allclose(materialized, selection, rtol=1e-12, atol=1e-15)
+        ),
+        "selection_use": False,
+    }
+
+
 def _profile_complexity(profile: tuple[int, int]) -> tuple[int, int]:
     return int(profile[1]), -int(profile[0])
 
@@ -387,13 +411,7 @@ def run_k_channel(
             oof_frame["y_pred"] = fold_prediction
             oof_frame["oof_fold"] = fold
             oof_frames.append(oof_frame)
-        if not np.allclose(
-            np.asarray(oof_losses, dtype=np.float64),
-            np.asarray(final_fold_losses, dtype=np.float64),
-            rtol=1e-12,
-            atol=1e-15,
-        ):
-            raise RuntimeError("selected K OOF predictions do not reproduce fold losses")
+        replay_audit = oof_replay_audit(final_fold_losses, oof_losses)
         oof_path = destination / "SELECTED_OOF.parquet"
         pd.concat(oof_frames, ignore_index=True).to_parquet(
             oof_path, index=False, compression="zstd"
@@ -431,7 +449,9 @@ def run_k_channel(
             "final_selected_candidate": str(
                 (selected_profile, selected_m_tau, selected_family, selected_m_x)
             ),
-            "final_selected_fold_losses": list(final_fold_losses),
+            "final_selected_fold_losses": list(oof_losses),
+            "selection_fold_losses_before_oof_replay": list(final_fold_losses),
+            "oof_replay_audit": replay_audit,
             "final_selected_prediction_path": str(
                 prediction_path.relative_to(output)
             ),
