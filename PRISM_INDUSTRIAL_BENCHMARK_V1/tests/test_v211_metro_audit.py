@@ -9,7 +9,11 @@ import pytest
 
 from prism_benchmark.v2_k import _cap
 from prism_benchmark.v2_runtime import ordered_fork_map, run_parallel
-from prism_benchmark.v211_assembly import pf_and_joint_input_status_match
+from prism_benchmark.v211_assembly import (
+    build_joint_card,
+    pf_and_joint_input_status_match,
+    pf_joint_input_gate_inconsistent,
+)
 from prism_benchmark.v211_a import _evaluate_a_candidate, _merge_w_oof_for_a
 from prism_benchmark.v211_joint import (
     J_K,
@@ -34,11 +38,19 @@ from prism_benchmark.v211_metro_contracts import (
     assert_candidate_id_binding,
     bind_result_candidate_ids,
 )
-from prism_benchmark.v211_metro_final import _candidate_ids
-from prism_benchmark.v211_metro_reporting import moving_block_matrix_means
+from prism_benchmark.v211_metro_final import (
+    _candidate_ids,
+    _development_prerequisites,
+    _formal_candidate_names,
+)
+from prism_benchmark.v211_metro_reporting import (
+    _formal_comparisons,
+    moving_block_matrix_means,
+)
 from prism_benchmark.v211_metro_runner import (
     compare_shared_data_audits,
     full_shared_data_audit,
+    hierarchical_route_freeze_decision,
 )
 from prism_benchmark.v211_w import (
     IDENTITY,
@@ -116,12 +128,33 @@ def test_lockbox_rejects_test_access_without_freeze(tmp_path: Path) -> None:
         require_metro_test_freeze(paths)
 
 
-def test_pf_joint_read_the_same_input_gate() -> None:
-    passed = {"input_path_preservation": {"pass": True}}
-    failed = {"input_path_preservation": {"pass": False}}
-    assert pf_and_joint_input_status_match(passed, passed)
-    assert pf_and_joint_input_status_match(failed, failed)
-    assert not pf_and_joint_input_status_match(passed, failed)
+def _gate(pass_: bool, prediction: str) -> dict[str, object]:
+    return {
+        "input_path_preservation": {
+            "pass": pass_,
+            "gate_evaluation_identity": {
+                "gate_version": "INPUT_GATE_V1",
+                "gate_parameters_sha256": "parameters",
+                "input_prediction_sha256": prediction,
+                "target_sha256": "target",
+                "best_k_comparator_sha256": "best-k",
+            },
+        }
+    }
+
+
+def test_shared_gate_contract_does_not_require_same_outcome_for_different_predictions() -> None:
+    pf = _gate(True, "pf-prediction")
+    joint = _gate(False, "joint-prediction")
+    assert not pf_joint_input_gate_inconsistent(pf, joint)
+    assert pf_and_joint_input_status_match(pf, joint)
+
+
+def test_same_gate_evaluation_with_different_outcome_is_inconsistent() -> None:
+    pf = _gate(True, "same-prediction")
+    joint = _gate(False, "same-prediction")
+    assert pf_joint_input_gate_inconsistent(pf, joint)
+    assert not pf_and_joint_input_status_match(pf, joint)
 
 
 def test_joint_registry_has_no_ar_only_or_k_zero() -> None:
@@ -174,6 +207,150 @@ def test_selected_alias_candidate_ids_follow_frozen_routes() -> None:
     assert ids["PF_SELECTED"] == ids["KCA"]
     assert ids["J_SELECTED"] == ids["J_KW"]
     assert ids["KCW"] != ids["KC"]
+
+
+def _passing_pf_checks() -> dict[str, bool]:
+    return {
+        "data_hash_unchanged": True,
+        "k_c_input_path_noncollapsed": True,
+        "w_candidates_actually_compared": True,
+        "identity_equivalence_pass": True,
+        "all_a_pass": True,
+        "pf_assembly_card_valid": True,
+        "pf_candidate_binding_pass": True,
+        "test_accessed_false": True,
+        "ood_accessed_false": True,
+        "code_tree_clean": True,
+    }
+
+
+def _passing_joint_checks() -> dict[str, bool]:
+    return {
+        "joint_fold_protocol_all_pass": True,
+        "joint_uses_original_registered_inner_support": True,
+        "all_registered_joint_folds_present": True,
+        "joint_candidate_set_complete": True,
+        "joint_w_jointly_fit": True,
+        "joint_candidate_binding_pass": True,
+        "joint_numerical_solver_valid": True,
+        "pf_joint_same_evaluation_not_inconsistent": True,
+    }
+
+
+def test_pf_and_joint_both_freeze_when_both_pass() -> None:
+    decision = hierarchical_route_freeze_decision(
+        _passing_pf_checks(), _passing_joint_checks(), joint_model_gate_pass=True
+    )
+    assert decision["status"] == "PASS_PF_AND_JOINT"
+    assert decision["formal_routes"] == ["PHYSICS_FIRST", "JOINT"]
+
+
+def test_pf_freezes_independently_when_only_joint_model_gate_fails() -> None:
+    decision = hierarchical_route_freeze_decision(
+        _passing_pf_checks(), _passing_joint_checks(), joint_model_gate_pass=False
+    )
+    assert decision["status"] == "PASS_PF_ONLY"
+    assert decision["development_frozen"] is True
+    assert decision["joint_status"] == "JOINT_NOT_SUPPORTED_ON_DEVELOPMENT"
+    assert decision["joint_formal_test_eligible"] is False
+
+
+def test_joint_protocol_mismatch_remains_a_hard_stop() -> None:
+    joint = _passing_joint_checks()
+    joint["joint_fold_protocol_all_pass"] = False
+    decision = hierarchical_route_freeze_decision(
+        _passing_pf_checks(), joint, joint_model_gate_pass=False
+    )
+    assert decision["hard_stop"] is True
+    assert decision["status"] == "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"
+
+
+def test_pf_failure_remains_a_hard_stop_even_if_joint_passes() -> None:
+    pf = _passing_pf_checks()
+    pf["pf_assembly_card_valid"] = False
+    decision = hierarchical_route_freeze_decision(
+        pf, _passing_joint_checks(), joint_model_gate_pass=True
+    )
+    assert decision["hard_stop"] is True
+    assert decision["status"] == "PHYSICS_ROUTE_NOT_SUPPORTED"
+
+
+def test_pf_only_candidate_registry_contains_no_joint_ids() -> None:
+    class Head:
+        head_id = "METRO_P60__H6__W1"
+        dataset = "metropt"
+
+    class View:
+        head = Head()
+        relative_root = Path("dynamic/record_time/proxy_excluded")
+
+    ids = _candidate_ids(
+        View(),
+        "KC",
+        None,
+        "freeze",
+        formal_routes=["PHYSICS_FIRST"],
+    )
+    assert set(ids) == {"KC", "KCW", "KCA", "KCWA", "PF_SELECTED"}
+    assert _formal_candidate_names(["PHYSICS_FIRST"]) == (
+        "KC",
+        "KCW",
+        "KCA",
+        "KCWA",
+        "PF_SELECTED",
+    )
+    assert all(
+        "J_" not in candidate and "J_" not in comparator
+        for candidate, comparator, _ in _formal_comparisons(["PHYSICS_FIRST"])
+    )
+
+
+def test_pf_only_m7_prerequisites_do_not_read_joint_result(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class Head:
+        head_id = "METRO_P60__H6__W1"
+        dataset = "metropt"
+
+    class View:
+        head = Head()
+        availability_scenario = "record_time"
+        proxy_policy = "proxy_excluded"
+
+    paths = MetroV211Paths(project=tmp_path, shared=tmp_path, output=tmp_path / "output")
+    read_paths: list[Path] = []
+
+    def fake_read(path: Path) -> dict[str, str]:
+        read_paths.append(path)
+        if "JOINT" in path.parts:
+            raise AssertionError("PF-only M7 attempted to read Joint RESULT")
+        return {"status": "PASS"}
+
+    monkeypatch.setattr("prism_benchmark.v211_metro_final._read", fake_read)
+    prerequisites = _development_prerequisites(
+        paths, View(), ["PHYSICS_FIRST"]
+    )
+    assert set(prerequisites) == {"C", "W", "A"}
+    assert all("JOINT" not in path.parts for path in read_paths)
+
+
+def test_joint_gate_failure_card_is_diagnostic_only() -> None:
+    card = build_joint_card(
+        {
+            "status": "JOINT_OOF_PROTOCOL_CORRECTED_BUT_MODEL_GATE_FAILED",
+            "final_selected_candidate": "J_KW",
+            "input_path_preservation": {
+                "pass": False,
+                "input_path_failure_class": (
+                    "INPUT_PATH_PRESERVATION_PERFORMANCE_GATE_FAILED"
+                ),
+            },
+        }
+    )
+    assert card["status"] == "JOINT_NOT_SUPPORTED_ON_DEVELOPMENT"
+    assert card["assembly"] is None
+    assert card["formal_test_eligible"] is False
+    assert card["evidence_role"] == "DEVELOPMENT_DIAGNOSTIC_ONLY"
 
 
 def test_shared_data_full_hash_detects_and_accepts_expected_state(tmp_path: Path) -> None:

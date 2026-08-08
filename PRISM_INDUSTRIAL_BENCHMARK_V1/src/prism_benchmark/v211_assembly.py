@@ -27,12 +27,37 @@ def input_path_passed(result: Mapping[str, Any]) -> bool:
     return bool(result.get("input_path_preservation", {}).get("pass", False))
 
 
+_GATE_IDENTITY_FIELDS = (
+    "gate_version",
+    "gate_parameters_sha256",
+    "input_prediction_sha256",
+    "target_sha256",
+    "best_k_comparator_sha256",
+)
+
+
+def pf_joint_input_gate_inconsistent(
+    physics_first: Mapping[str, Any],
+    joint: Mapping[str, Any],
+) -> bool:
+    """Detect contradictory outcomes only for the exact same gate evaluation."""
+    if input_path_passed(physics_first) == input_path_passed(joint):
+        return False
+    pf_gate = physics_first.get("input_path_preservation", {})
+    joint_gate = joint.get("input_path_preservation", {})
+    pf_identity = pf_gate.get("gate_evaluation_identity", pf_gate)
+    joint_identity = joint_gate.get("gate_evaluation_identity", joint_gate)
+    pf_values = tuple(pf_identity.get(name) for name in _GATE_IDENTITY_FIELDS)
+    joint_values = tuple(joint_identity.get(name) for name in _GATE_IDENTITY_FIELDS)
+    return all(value is not None for value in pf_values) and pf_values == joint_values
+
+
 def pf_and_joint_input_status_match(
     physics_first: Mapping[str, Any],
     joint: Mapping[str, Any],
 ) -> bool:
-    """Both cards deliberately read the same registered gate representation."""
-    return input_path_passed(physics_first) == input_path_passed(joint)
+    """Compatibility wrapper: different predictions may have different outcomes."""
+    return not pf_joint_input_gate_inconsistent(physics_first, joint)
 
 
 def build_physics_first_card(
@@ -95,10 +120,17 @@ def build_joint_card(joint_result: Mapping[str, Any]) -> dict[str, Any]:
         raise RuntimeError("Joint result contains an unregistered or AR-only candidate")
     if not bool(gate.get("pass", False)):
         return {
-            "status": "JOINT_INPUT_PATH_COLLAPSED",
+            "status": "JOINT_NOT_SUPPORTED_ON_DEVELOPMENT",
             "assembly": None,
             "selected_candidate": selected,
             "input_path_preservation": gate,
+            "input_path_failure_class": gate.get(
+                "input_path_failure_class",
+                joint_result.get("input_path_failure_class"),
+            ),
+            "formal_test_eligible": False,
+            "selection_eligible_for_test": False,
+            "evidence_role": "DEVELOPMENT_DIAGNOSTIC_ONLY",
             "ar_only_fallback_allowed": False,
             "test_accessed": False,
         }
@@ -111,6 +143,9 @@ def build_joint_card(joint_result: Mapping[str, Any]) -> dict[str, Any]:
         "input_path_preservation": gate,
         "input_path_status": "INPUT_PATH_PRESERVED",
         "physical_interpretation": "TOTAL_PREDICTION_ONLY",
+        "formal_test_eligible": True,
+        "selection_eligible_for_test": True,
+        "evidence_role": "FORMAL_PREDICTIVE_CANDIDATE",
         "ar_only_fallback_allowed": False,
         "test_accessed": False,
     }

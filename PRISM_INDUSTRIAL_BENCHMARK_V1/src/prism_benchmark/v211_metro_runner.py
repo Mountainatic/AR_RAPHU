@@ -24,7 +24,7 @@ from .v211_a import run_a_view
 from .v211_assembly import (
     build_joint_card,
     build_physics_first_card,
-    pf_and_joint_input_status_match,
+    pf_joint_input_gate_inconsistent,
 )
 from .v211_c import run_c_view
 from .v211_joint import JOINT_CANDIDATES, run_joint_view
@@ -56,6 +56,8 @@ from .v211_w import W_FAMILIES, run_w_view
 
 
 PROTOCOL = "metro_p60"
+DEVELOPMENT_ARTIFACT_SOURCE_COMMIT = "b5a4d672f65d0c5a01135f331d193a996e9c8c2d"
+PF_FINAL_CANDIDATES = ("KC", "KCW", "KCA", "KCWA", "PF_SELECTED")
 STAGES = ("m0", "m1", "m2", "m3", "m4", "m5", "m6", "m7", "m8")
 M1_TESTS = (
     "tests/test_v211_repair.py",
@@ -554,6 +556,96 @@ def run_m4(paths: MetroV211Paths) -> dict[str, Any]:
     return summary
 
 
+def hierarchical_route_freeze_decision(
+    pf_checks: MappingLike,
+    joint_checks: MappingLike,
+    *,
+    joint_model_gate_pass: bool,
+) -> dict[str, Any]:
+    """Apply the mandatory-PF/optional-Joint development freeze contract."""
+    pf_stop_mapping = (
+        ("data_hash_unchanged", "STOP_DATA_BASE_MUTATED"),
+        ("k_c_input_path_noncollapsed", "STOP_KC_INPUT_PATH_COLLAPSED"),
+        ("w_candidates_actually_compared", "STOP_W_CANDIDATES_NOT_ACTUALLY_COMPARED"),
+        ("identity_equivalence_pass", "STOP_IDENTITY_W_NOT_EQUIVALENT"),
+        ("all_a_pass", "PHYSICS_ROUTE_NOT_SUPPORTED"),
+        ("pf_assembly_card_valid", "PHYSICS_ROUTE_NOT_SUPPORTED"),
+        ("pf_candidate_binding_pass", "STOP_CANDIDATE_ID_MISMATCH"),
+        ("test_accessed_false", "STOP_TEST_OR_OOD_EARLY_ACCESS"),
+        ("ood_accessed_false", "STOP_TEST_OR_OOD_EARLY_ACCESS"),
+        ("code_tree_clean", "STOP_CODE_TREE_DIRTY"),
+    )
+    joint_stop_mapping = (
+        ("joint_fold_protocol_all_pass", "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"),
+        ("joint_uses_original_registered_inner_support", "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"),
+        ("all_registered_joint_folds_present", "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"),
+        ("joint_candidate_set_complete", "STOP_JOINT_ROUTE_MATERIALIZATION_MISSING"),
+        ("joint_w_jointly_fit", "STOP_JOINT_W_NOT_JOINTLY_FIT"),
+        ("joint_candidate_binding_pass", "STOP_CANDIDATE_ID_MISMATCH"),
+        ("joint_numerical_solver_valid", "STOP_JOINT_NUMERICAL_FAILURE"),
+        ("pf_joint_same_evaluation_not_inconsistent", "STOP_PF_JOINT_INPUT_GATE_INCONSISTENT"),
+    )
+    failed = next((label for key, label in pf_stop_mapping if not pf_checks.get(key, False)), None)
+    if failed is None:
+        failed = next(
+            (label for key, label in joint_stop_mapping if not joint_checks.get(key, False)),
+            None,
+        )
+    if failed is not None:
+        return {
+            "status": failed,
+            "development_frozen": False,
+            "hard_stop": True,
+            "formal_routes": [],
+            "pf_status": "PHYSICS_ROUTE_NOT_SUPPORTED",
+            "joint_status": "JOINT_NOT_FROZEN",
+            "joint_formal_test_eligible": False,
+        }
+    if joint_model_gate_pass:
+        return {
+            "status": "PASS_PF_AND_JOINT",
+            "development_frozen": True,
+            "hard_stop": False,
+            "formal_routes": ["PHYSICS_FIRST", "JOINT"],
+            "pf_status": "PF_AND_JOINT_FROZEN",
+            "joint_status": "JOINT_PREDICTIVE_VALIDATED",
+            "joint_formal_test_eligible": True,
+        }
+    return {
+        "status": "PASS_PF_ONLY",
+        "development_frozen": True,
+        "hard_stop": False,
+        "formal_routes": ["PHYSICS_FIRST"],
+        "pf_status": "PF_ONLY_FROZEN",
+        "joint_status": "JOINT_NOT_SUPPORTED_ON_DEVELOPMENT",
+        "joint_formal_test_eligible": False,
+    }
+
+
+def _candidate_bindings_pass(results: Iterable[MappingLike]) -> bool:
+    try:
+        for item in results:
+            assert_candidate_id_binding(item)
+    except RuntimeError:
+        return False
+    return True
+
+
+def _joint_numerics_valid(result: MappingLike) -> bool:
+    if not bool(
+        result.get("input_path_preservation", {})
+        .get("checks", {})
+        .get("numerical_certificate", False)
+    ):
+        return False
+    routes = result.get("route_materializations", {})
+    return all(
+        payload.get("contract", {}).get("numerical_certificate", {}).get("status")
+        == "PASS"
+        for payload in routes.values()
+    )
+
+
 def run_m5(paths: MetroV211Paths) -> dict[str, Any]:
     config = load_metro_config(paths.project)
     views = metro_p60_dynamic_views(paths.shared)
@@ -566,16 +658,18 @@ def run_m5(paths: MetroV211Paths) -> dict[str, Any]:
         label="PRISM_V211_METRO_M5_JOINT",
     )
     results = _bind(paths, result_paths)
-    gate_match = True
+    gate_inconsistent = False
     routes_complete = True
     jointly_fit = True
+    candidate_binding_pass = True
+    numerics_valid = True
     fold_protocol_complete = True
     original_support_only = True
     all_four_fold_losses = True
     protocol_mismatch = False
     for view, joint_result in zip(views, results):
         c_result = _read(_result_path(paths.output, "C", view))
-        gate_match &= pf_and_joint_input_status_match(c_result, joint_result)
+        gate_inconsistent |= pf_joint_input_gate_inconsistent(c_result, joint_result)
         protocol_mismatch |= (
             joint_result.get("status") == "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"
         )
@@ -597,6 +691,8 @@ def run_m5(paths: MetroV211Paths) -> dict[str, Any]:
         )
         routes_complete &= set(joint_result.get("route_materializations", {})) == set(JOINT_CANDIDATES)
         jointly_fit &= bool(joint_result.get("joint_w_coefficients_jointly_fitted"))
+        candidate_binding_pass &= _candidate_bindings_pass([joint_result])
+        numerics_valid &= _joint_numerics_valid(joint_result)
         if protocol_mismatch:
             continue
         card = build_joint_card(joint_result)
@@ -628,17 +724,24 @@ def run_m5(paths: MetroV211Paths) -> dict[str, Any]:
     status = "PASS"
     if protocol_mismatch or not fold_protocol_complete or not original_support_only or not all_four_fold_losses:
         status = "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"
-    elif corrected_model_gate_failed:
-        status = "JOINT_OOF_PROTOCOL_CORRECTED_BUT_MODEL_GATE_FAILED"
-    elif not gate_match:
+    elif gate_inconsistent:
         status = "STOP_PF_JOINT_INPUT_GATE_INCONSISTENT"
-    elif not passed or not routes_complete or not jointly_fit:
+    elif not routes_complete:
+        status = "STOP_JOINT_ROUTE_MATERIALIZATION_MISSING"
+    elif not jointly_fit:
         status = "STOP_JOINT_W_NOT_JOINTLY_FIT"
+    elif not candidate_binding_pass:
+        status = "STOP_CANDIDATE_ID_MISMATCH"
+    elif corrected_model_gate_failed:
+        status = "PASS_WITH_JOINT_NOT_SUPPORTED"
+    elif not numerics_valid or not passed:
+        status = "STOP_JOINT_NUMERICAL_FAILURE"
+    joint_supported = status == "PASS"
     summary = {
         "status": status,
         "stage": "M5_DEVELOPMENT_JOINT",
         "views": len(results),
-        "pf_joint_gate_match": gate_match,
+        "pf_joint_same_evaluation_not_inconsistent": not gate_inconsistent,
         "joint_fold_protocol_audit_pass": fold_protocol_complete,
         "original_registered_inner_support_only": original_support_only,
         "all_four_registered_fold_losses_present": all_four_fold_losses,
@@ -646,12 +749,28 @@ def run_m5(paths: MetroV211Paths) -> dict[str, Any]:
         "w_physical_oof_used_as_training_pool": False,
         "all_four_routes_materialized": routes_complete,
         "w_coefficients_jointly_fitted": jointly_fit,
+        "candidate_binding_pass": candidate_binding_pass,
+        "joint_numerical_solver_valid": numerics_valid,
+        "joint_status": (
+            "JOINT_PREDICTIVE_VALIDATED"
+            if joint_supported
+            else "JOINT_NOT_SUPPORTED_ON_DEVELOPMENT"
+            if status == "PASS_WITH_JOINT_NOT_SUPPORTED"
+            else status
+        ),
+        "joint_formal_test_eligible": joint_supported,
+        "selection_eligible_for_test": joint_supported,
+        "development_selected_route_role": (
+            "FORMAL_PREDICTIVE_CANDIDATE"
+            if joint_supported
+            else "DEVELOPMENT_DIAGNOSTIC_ONLY"
+        ),
         "test_accessed": False,
         "ood_accessed": False,
     }
     write_json(paths.output / "DEVELOPMENT" / "JOINT" / "SUMMARY.json", summary)
     _run_status(paths, status=status, stage="M5")
-    if status != "PASS":
+    if status not in {"PASS", "PASS_WITH_JOINT_NOT_SUPPORTED"}:
         stop(paths, status, summary)
     return summary
 
@@ -679,22 +798,45 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
     a_results = [_read(_result_path(paths.output, "A", view)) for view in dynamic_views]
     joint_results = [_read(_result_path(paths.output, "JOINT", view)) for view in dynamic_views]
     bound_results = _all_bound_results(paths)
-    candidate_ids_ok = True
-    try:
-        for item in bound_results:
-            assert_candidate_id_binding(item)
-    except RuntimeError:
-        candidate_ids_ok = False
-    gates_match = all(
-        pf_and_joint_input_status_match(c_result, joint_result)
-        for c_result, joint_result in zip(c_results, joint_results)
+    pf_cards = []
+    for c_result, w_result, a_result in zip(c_results, w_results, a_results):
+        k_result = {
+            "status": "PASS",
+            "final_selected_candidate": c_result.get("active_channels", []),
+            "input_path_preservation": c_result.get("input_path_preservation", {}),
+        }
+        pf_cards.append(build_physics_first_card(k_result, c_result, w_result, a_result))
+    all_development_results = [*bound_results, *joint_results]
+    test_accessed = paths.test_access_audit_path.exists() or any(
+        item.get("test_accessed") is not False for item in all_development_results
     )
-    checks = {
+    ood_accessed = paths.test_access_audit_path.exists() or any(
+        item.get("ood_accessed") is not False for item in all_development_results
+    )
+    pf_checks = {
         "data_hash_unchanged": comparison["status"] == "PASS",
         "k_c_input_path_noncollapsed": all(
             bool(item.get("input_path_preservation", {}).get("pass")) for item in c_results
         ),
-        "pf_joint_input_status_match": gates_match,
+        "w_candidates_actually_compared": all(
+            set(item.get("candidate_families_compared", ())) == set(W_FAMILIES)
+            for item in w_results
+        ),
+        "identity_equivalence_pass": all(
+            item.get("identity_equivalence", {}).get("pass") is True for item in w_results
+        ),
+        "all_a_pass": all(item.get("status") == "PASS" for item in a_results),
+        "pf_assembly_card_valid": all(
+            item.get("status") == "PHYSICS_FIRST_STAGEWISE"
+            and item.get("assembly") is not None
+            for item in pf_cards
+        ),
+        "pf_candidate_binding_pass": _candidate_bindings_pass(bound_results),
+        "test_accessed_false": not test_accessed,
+        "ood_accessed_false": not ood_accessed,
+        "code_tree_clean": not _git(paths.project, "status", "--porcelain=v1"),
+    }
+    joint_checks = {
         "joint_fold_protocol_all_pass": all(
             bool(item.get("joint_fold_protocol_audit_pass"))
             for item in joint_results
@@ -714,39 +856,35 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
             and len(item.get("joint_fold_protocol_audit", ())) == 4
             for item in joint_results
         ),
-        "w_candidates_actually_compared": all(
-            set(item.get("candidate_families_compared", ())) == set(W_FAMILIES)
-            for item in w_results
+        "joint_candidate_set_complete": all(
+            set(item.get("registered_candidates", ())) == set(JOINT_CANDIDATES)
+            and set(item.get("route_materializations", {})) == set(JOINT_CANDIDATES)
+            for item in joint_results
         ),
-        "identity_equivalence_pass": all(
-            item.get("identity_equivalence", {}).get("pass") is True for item in w_results
-        ),
-        "candidate_id_consistency_pass": candidate_ids_ok,
         "joint_w_jointly_fit": all(
             bool(item.get("joint_w_coefficients_jointly_fitted"))
             and set(item.get("route_materializations", {})) == set(JOINT_CANDIDATES)
             for item in joint_results
         ),
-        "all_a_pass": all(item.get("status") == "PASS" for item in a_results),
-        "test_accessed_false": True,
-        "ood_accessed_false": True,
-        "code_tree_clean": not _git(paths.project, "status", "--porcelain=v1"),
+        "joint_candidate_binding_pass": _candidate_bindings_pass(joint_results),
+        "joint_numerical_solver_valid": all(
+            _joint_numerics_valid(item) for item in joint_results
+        ),
+        "pf_joint_same_evaluation_not_inconsistent": not any(
+            pf_joint_input_gate_inconsistent(c_result, joint_result)
+            for c_result, joint_result in zip(c_results, joint_results)
+        ),
     }
-    stop_mapping = (
-        ("data_hash_unchanged", "STOP_DATA_BASE_MUTATED"),
-        ("k_c_input_path_noncollapsed", "STOP_KC_INPUT_PATH_COLLAPSED"),
-        ("pf_joint_input_status_match", "STOP_PF_JOINT_INPUT_GATE_INCONSISTENT"),
-        ("joint_fold_protocol_all_pass", "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"),
-        ("joint_uses_original_registered_inner_support", "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"),
-        ("all_registered_joint_folds_present", "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"),
-        ("w_candidates_actually_compared", "STOP_W_CANDIDATES_NOT_ACTUALLY_COMPARED"),
-        ("identity_equivalence_pass", "STOP_IDENTITY_W_NOT_EQUIVALENT"),
-        ("candidate_id_consistency_pass", "STOP_CANDIDATE_ID_MISMATCH"),
-        ("joint_w_jointly_fit", "STOP_JOINT_W_NOT_JOINTLY_FIT"),
+    joint_model_gate_pass = all(
+        item.get("status") == "PASS"
+        and bool(item.get("input_path_preservation", {}).get("pass"))
+        for item in joint_results
     )
-    failed = next((label for key, label in stop_mapping if not checks[key]), None)
-    if failed is None and not all(checks.values()):
-        failed = "FAILED"
+    route_decision = hierarchical_route_freeze_decision(
+        pf_checks,
+        joint_checks,
+        joint_model_gate_pass=joint_model_gate_pass,
+    )
     selections = []
     for view, c_result, w_result, a_result, joint_result in zip(
         dynamic_views, c_results, w_results, a_results, joint_results
@@ -773,6 +911,20 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
                 "pf_selected_route": a_result.get("pf_selected_route"),
                 "joint_selected": joint_selected,
                 "joint_candidate_id": joint_result.get("final_selected_candidate_id"),
+                "joint_selection_eligible_for_test": route_decision[
+                    "joint_formal_test_eligible"
+                ],
+                "joint_evidence_role": (
+                    "FORMAL_PREDICTIVE_CANDIDATE"
+                    if route_decision["joint_formal_test_eligible"]
+                    else "DEVELOPMENT_DIAGNOSTIC_ONLY"
+                ),
+                "joint_input_path_failure_class": joint_result.get(
+                    "input_path_failure_class"
+                ),
+                "joint_input_path_preservation": joint_result.get(
+                    "input_path_preservation", {}
+                ),
                 "joint_route_hyperparameters": joint_result.get("route_local_selected", {}),
                 "joint_selected_hyperparameters": joint_selected_hyperparameters,
                 "joint_alpha": (
@@ -804,18 +956,29 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
             }
         )
     decision = {
-        "status": "PASS" if failed is None else failed,
+        "status": route_decision["status"],
         "protocol_id": PROTOCOL_ID,
         "evidence_class": EVIDENCE_CLASS,
         "stage": "M6_DEVELOPMENT_FREEZE_DECISION",
-        "checks": checks,
+        "development_frozen": route_decision["development_frozen"],
+        "formal_routes": route_decision["formal_routes"],
+        "pf_status": route_decision["pf_status"],
+        "joint_status": route_decision["joint_status"],
+        "joint_formal_test_eligible": route_decision[
+            "joint_formal_test_eligible"
+        ],
+        "pf_mandatory_checks": pf_checks,
+        "joint_optional_checks": {
+            **joint_checks,
+            "joint_development_model_gate_pass": joint_model_gate_pass,
+        },
         "development_selections": selections,
         "test_accessed": False,
         "ood_accessed": False,
     }
     write_json(paths.development_decision_path, decision)
-    if failed is not None:
-        stop(paths, failed, decision)
+    if route_decision["hard_stop"]:
+        stop(paths, route_decision["status"], decision)
     frozen_config = paths.output / "FREEZE" / "METRO_P60_V212_CONFIG_FROZEN.json"
     frozen_config.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(paths.config_path, frozen_config)
@@ -826,24 +989,35 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
             "view": view.relative_root.as_posix(),
             "development_decision_sha256": decision_sha256,
         }
-        identifiers = {
+        identifiers: dict[str, str] = {
             name: stable_candidate_id(
                 "FINAL", {**common, "candidate": name}
             )
-            for name in ("KC", "KCW", "KCA", "KCWA", *JOINT_CANDIDATES)
+            for name in PF_FINAL_CANDIDATES[:-1]
         }
         identifiers["PF_SELECTED"] = identifiers[
             str(selection["pf_selected_route"])
         ]
-        identifiers["J_SELECTED"] = identifiers[
-            str(selection["joint_selected"])
-        ]
+        if "JOINT" in route_decision["formal_routes"]:
+            identifiers.update(
+                {
+                    name: stable_candidate_id(
+                        "FINAL", {**common, "candidate": name}
+                    )
+                    for name in JOINT_CANDIDATES
+                }
+            )
+            identifiers["J_SELECTED"] = identifiers[
+                str(selection["joint_selected"])
+            ]
         pending_candidate_ids.append(
             {
                 "view": view.relative_root.as_posix(),
                 "candidate_ids": identifiers,
             }
         )
+    m0 = _read(paths.output / "FREEZE" / "M0_INHERITANCE_DATA_AUDIT.json")
+    reuse_audit_path = paths.output / "DEVELOPMENT_ARTIFACT_REUSE_AUDIT.json"
     manifest = {
         "status": "METRO_P60_V2_1_2_DEVELOPMENT_FROZEN",
         "protocol_id": PROTOCOL_ID,
@@ -851,6 +1025,14 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
         "code_commit": _git(paths.project, "rev-parse", "HEAD"),
         "git_branch": _git(paths.project, "branch", "--show-current"),
         "git_clean": True,
+        "development_status": route_decision["status"],
+        "development_frozen": True,
+        "formal_routes": route_decision["formal_routes"],
+        "pf_status": route_decision["pf_status"],
+        "joint_status": route_decision["joint_status"],
+        "joint_formal_test_eligible": route_decision[
+            "joint_formal_test_eligible"
+        ],
         "config_sha256": sha256_file(paths.config_path),
         "frozen_config_sha256": sha256_file(frozen_config),
         "development_decision_sha256": decision_sha256,
@@ -859,18 +1041,38 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
         "data_aggregate_sha256": post["aggregate_sha256"],
         "test_accessed": False,
         "ood_accessed": False,
-        "materialize_after_freeze": config["post_freeze_materialized_candidates"],
+        "materialize_after_freeze": {
+            "physics_first": config["post_freeze_materialized_candidates"][
+                "physics_first"
+            ],
+            "joint": (
+                config["post_freeze_materialized_candidates"]["joint"]
+                if "JOINT" in route_decision["formal_routes"]
+                else []
+            ),
+        },
         "runtime_parallelism": runtime_parallelism_audit(config),
         "pending_materialization_candidate_ids": pending_candidate_ids,
         "m0_audit_sha256": sha256_file(
             paths.output / "FREEZE" / "M0_INHERITANCE_DATA_AUDIT.json"
+        ),
+        "development_artifact_source_commit": DEVELOPMENT_ARTIFACT_SOURCE_COMMIT,
+        "freeze_semantics_commit": _git(paths.project, "rev-parse", "HEAD"),
+        "development_generating_theory_sha256": m0["theory_sha256"],
+        "amended_practice_theory_sha256": sha256_file(paths.theory_path),
+        "theory_change_class": "PRACTICE_FREEZE_SEMANTICS_ONLY",
+        "estimator_semantics_changed": False,
+        "selection_threshold_changed": False,
+        "development_artifacts_recomputed": False,
+        "development_artifact_reuse_audit_sha256": (
+            sha256_file(reuse_audit_path) if reuse_audit_path.is_file() else None
         ),
         "frozen_at_unix": time.time(),
     }
     write_json(paths.development_freeze_path, manifest)
     _run_status(
         paths,
-        status="PASS",
+        status=route_decision["status"],
         stage="M6",
         development_frozen=True,
         test_accessed=False,

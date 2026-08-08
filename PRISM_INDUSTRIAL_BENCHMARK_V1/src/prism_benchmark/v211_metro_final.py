@@ -61,6 +61,13 @@ PF_CANDIDATES = ("KC", "KCW", "KCA", "KCWA", "PF_SELECTED")
 JOINT_CANDIDATES = (J_K, J_KW, J_KA, J_KWA, "J_SELECTED")
 
 
+def _formal_candidate_names(formal_routes: list[str] | tuple[str, ...]) -> tuple[str, ...]:
+    routes = set(formal_routes)
+    if "PHYSICS_FIRST" not in routes:
+        raise RuntimeError("M7 requires a frozen PHYSICS_FIRST route")
+    return (*PF_CANDIDATES, *JOINT_CANDIDATES) if "JOINT" in routes else PF_CANDIDATES
+
+
 @dataclass
 class MetricAccumulator:
     rows: int = 0
@@ -110,6 +117,21 @@ def _result_path(output: Path, stage: str, view: ViewSpec) -> Path:
         / view.proxy_policy
         / "RESULT.json"
     )
+
+
+def _development_prerequisites(
+    paths: MetroV211Paths,
+    view: ViewSpec,
+    formal_routes: list[str] | tuple[str, ...],
+) -> dict[str, dict[str, Any]]:
+    """Load only estimators that M6 explicitly froze for formal materialization."""
+    result = {
+        stage: _read(_result_path(paths.output, stage, view))
+        for stage in ("C", "W", "A")
+    }
+    if "JOINT" in set(formal_routes):
+        result["JOINT"] = _read(_result_path(paths.output, "JOINT", view))
+    return result
 
 
 def _row_id_hash(frame: pd.DataFrame) -> str:
@@ -357,19 +379,30 @@ def _predict_joint_w_design(latent: np.ndarray, metadata: Mapping[str, Any]) -> 
 def _candidate_ids(
     view: ViewSpec,
     selected_pf: str,
-    selected_joint: str,
+    selected_joint: str | None,
     development_decision_sha256: str,
+    *,
+    formal_routes: list[str] | tuple[str, ...] = ("PHYSICS_FIRST", "JOINT"),
 ) -> dict[str, str]:
     common = {
         "view": view.relative_root.as_posix(),
         "development_decision_sha256": development_decision_sha256,
     }
-    result = {
+    result: dict[str, str] = {
         name: stable_candidate_id("FINAL", {**common, "candidate": name})
-        for name in (*PF_CANDIDATES[:-1], *JOINT_CANDIDATES[:-1])
+        for name in PF_CANDIDATES[:-1]
     }
     result["PF_SELECTED"] = result[selected_pf]
-    result["J_SELECTED"] = result[selected_joint]
+    if "JOINT" in set(formal_routes):
+        if selected_joint is None:
+            raise RuntimeError("frozen Joint route lacks a selected candidate")
+        result.update(
+            {
+                name: stable_candidate_id("FINAL", {**common, "candidate": name})
+                for name in JOINT_CANDIDATES[:-1]
+            }
+        )
+        result["J_SELECTED"] = result[selected_joint]
     return result
 
 
@@ -403,14 +436,17 @@ def materialize_view(
     paths: MetroV211Paths,
     view: ViewSpec,
     development_decision_sha256: str,
+    formal_routes: list[str] | tuple[str, ...],
 ) -> dict[str, Any]:
     started = time.perf_counter()
     config = load_metro_config(paths.project)
     v2 = load_frozen_config(paths.project)
-    c_result = _read(_result_path(paths.output, "C", view))
-    w_result = _read(_result_path(paths.output, "W", view))
-    a_result = _read(_result_path(paths.output, "A", view))
-    joint_result = _read(_result_path(paths.output, "JOINT", view))
+    prerequisites = _development_prerequisites(paths, view, formal_routes)
+    c_result = prerequisites["C"]
+    w_result = prerequisites["W"]
+    a_result = prerequisites["A"]
+    joint_result = prerequisites.get("JOINT")
+    include_joint = joint_result is not None
     active = [
         item
         for item in load_active_channels(paths.output, view)
@@ -473,26 +509,36 @@ def materialize_view(
         v2,
         np.column_stack([model["compressed_fit"], fit_w_ablation]),
     )
-    joint_w_contract = w_result["joint_w_basis_contract"]
-    joint_w_fit, _, joint_w_metadata = joint_w_basis(fit_kc, fit_kc, joint_w_contract)
-    target_accessor = BaseAccessor(paths.shared, view.head.dataset, "validation", [view.head.target])
-    delta, history = (int(value) for value in joint_result["ar_profile"])
-    joint_a_fit = target_accessor.target_state(fit, view.head.target, delta, history)
     joint_contracts: dict[str, Any] = {}
-    for route in (J_K, J_KW, J_KA, J_KWA):
-        selected = joint_result["route_local_selected"][route]
-        _, alpha, ratio_k, ratio_w = selected
-        _, contract, _ = fit_joint_candidate(
-            {"K": model["joint_fit"], "W": joint_w_fit, "A": joint_a_fit},
-            y_fit,
-            {"K": model["joint_fit"], "W": joint_w_fit, "A": joint_a_fit},
-            candidate=route,
-            alpha=float(alpha),
-            k_over_a_ratio=float(ratio_k),
-            w_over_a_ratio=float(ratio_w),
+    joint_w_metadata: dict[str, Any] | None = None
+    selected_joint: str | None = None
+    delta = history = None
+    if include_joint:
+        joint_w_contract = w_result["joint_w_basis_contract"]
+        joint_w_fit, _, joint_w_metadata = joint_w_basis(
+            fit_kc, fit_kc, joint_w_contract
         )
-        joint_contracts[route] = contract
-    selected_joint = str(joint_result["final_selected_candidate"])
+        target_accessor = BaseAccessor(
+            paths.shared, view.head.dataset, "validation", [view.head.target]
+        )
+        delta, history = (int(value) for value in joint_result["ar_profile"])
+        joint_a_fit = target_accessor.target_state(
+            fit, view.head.target, delta, history
+        )
+        for route in (J_K, J_KW, J_KA, J_KWA):
+            selected = joint_result["route_local_selected"][route]
+            _, alpha, ratio_k, ratio_w = selected
+            _, contract, _ = fit_joint_candidate(
+                {"K": model["joint_fit"], "W": joint_w_fit, "A": joint_a_fit},
+                y_fit,
+                {"K": model["joint_fit"], "W": joint_w_fit, "A": joint_a_fit},
+                candidate=route,
+                alpha=float(alpha),
+                k_over_a_ratio=float(ratio_k),
+                w_over_a_ratio=float(ratio_w),
+            )
+            joint_contracts[route] = contract
+        selected_joint = str(joint_result["final_selected_candidate"])
     selected_w_active = pf_w_selected["family"] != IDENTITY
     selected_a_active = a_result["a_contract"]["family"] != EXACT_ZERO
     selected_pf = (
@@ -507,7 +553,11 @@ def materialize_view(
     if str(a_result.get("pf_selected_route")) != selected_pf:
         raise RuntimeError("frozen PF selected route disagrees with development materialization")
     candidate_ids = _candidate_ids(
-        view, selected_pf, selected_joint, development_decision_sha256
+        view,
+        selected_pf,
+        selected_joint,
+        development_decision_sha256,
+        formal_routes=formal_routes,
     )
     output_root = (
         paths.output
@@ -530,7 +580,8 @@ def materialize_view(
             [*model["channels"], view.head.target],
         )
         writers: dict[str, pq.ParquetWriter] = {}
-        accumulators = {name: MetricAccumulator() for name in (*PF_CANDIDATES, *JOINT_CANDIDATES)}
+        candidate_names = _formal_candidate_names(formal_routes)
+        accumulators = {name: MetricAccumulator() for name in candidate_names}
         paths_by_name = {name: output_root / f"{split}_{name}.parquet" for name in accumulators}
         try:
             for start in range(0, len(frame), chunk_rows):
@@ -541,15 +592,6 @@ def materialize_view(
                 kcw = kc + w
                 kca = kc + _predict_a(view, chunk, kc_source, kca_contract, v2)
                 kcwa = kcw + _predict_a(view, chunk, kcw_source, kcwa_contract, v2)
-                joint_w_chunk = _predict_joint_w_design(kc, joint_w_metadata)
-                joint_a_chunk = accessor.target_state(chunk, view.head.target, delta, history)
-                joint_predictions = {
-                    route: predict_joint_candidate(
-                        {"K": blocks["joint"], "W": joint_w_chunk, "A": joint_a_chunk},
-                        joint_contracts[route],
-                    )[0]
-                    for route in (J_K, J_KW, J_KA, J_KWA)
-                }
                 predictions = {
                     "KC": kc,
                     "KCW": kcw,
@@ -561,9 +603,25 @@ def materialize_view(
                         "KCA": kca,
                         "KCWA": kcwa,
                     }[selected_pf],
-                    **joint_predictions,
-                    "J_SELECTED": joint_predictions[selected_joint],
                 }
+                if include_joint:
+                    joint_w_chunk = _predict_joint_w_design(kc, joint_w_metadata)
+                    joint_a_chunk = accessor.target_state(
+                        chunk, view.head.target, delta, history
+                    )
+                    joint_predictions = {
+                        route: predict_joint_candidate(
+                            {
+                                "K": blocks["joint"],
+                                "W": joint_w_chunk,
+                                "A": joint_a_chunk,
+                            },
+                            joint_contracts[route],
+                        )[0]
+                        for route in (J_K, J_KW, J_KA, J_KWA)
+                    }
+                    predictions.update(joint_predictions)
+                    predictions["J_SELECTED"] = joint_predictions[selected_joint]
                 y = chunk["y_true"].to_numpy(dtype=np.float64)
                 for name, prediction in predictions.items():
                     materialized = _writer_frame(chunk, view, name, candidate_ids[name], prediction)
@@ -574,7 +632,7 @@ def materialize_view(
                         )
                     writers[name].write_table(table)
                     accumulators[name].update(y, prediction)
-                del blocks, joint_w_chunk, joint_a_chunk, joint_predictions, predictions
+                del blocks, predictions
                 gc.collect()
         finally:
             for writer in writers.values():
@@ -603,8 +661,14 @@ def materialize_view(
         "fit_row_id_sha256": _row_id_hash(fit),
         "prediction_chunk_rows": chunk_rows,
         "candidate_ids": candidate_ids,
+        "formal_routes": list(formal_routes),
         "selected_pf": selected_pf,
         "selected_joint": selected_joint,
+        "joint_status": (
+            "JOINT_PREDICTIVE_VALIDATED"
+            if include_joint
+            else "NOT_APPLICABLE_NOT_FROZEN"
+        ),
         "input_model": {
             "channels": model["channels"],
             "channel_contracts": model["channel_contracts"],
@@ -616,8 +680,6 @@ def materialize_view(
         "pf_ablation_selection_eligible": False,
         "kca_contract": kca_contract,
         "kcwa_contract": kcwa_contract,
-        "joint_w_basis_metadata": joint_w_metadata,
-        "joint_contracts": joint_contracts,
         "prediction_paths": prediction_paths,
         "metrics": list(metrics.values()),
         "test_accessed": True,
@@ -625,6 +687,13 @@ def materialize_view(
         "wall_seconds": time.perf_counter() - started,
         "peak_rss_kib": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
     }
+    if include_joint:
+        contract_payload.update(
+            {
+                "joint_w_basis_metadata": joint_w_metadata,
+                "joint_contracts": joint_contracts,
+            }
+        )
     contract_path = contract_root / "FINAL_MODEL_CONTRACT.json"
     write_json(contract_path, contract_payload)
     return {
@@ -643,6 +712,12 @@ def materialize_view(
 
 def run_m7(paths: MetroV211Paths) -> dict[str, Any]:
     manifest = require_metro_test_freeze(paths)
+    formal_routes = list(manifest.get("formal_routes", ()))
+    _formal_candidate_names(formal_routes)
+    if "JOINT" not in formal_routes and manifest.get(
+        "joint_formal_test_eligible"
+    ) is not False:
+        raise RuntimeError("PF-only freeze must explicitly exclude Joint from M7")
     freeze_sha256 = sha256_file(paths.development_freeze_path)
     development_decision_sha256 = manifest["development_decision_sha256"]
     write_json(
@@ -661,7 +736,10 @@ def run_m7(paths: MetroV211Paths) -> dict[str, Any]:
     views = metro_p60_dynamic_views(paths.shared)
     results = run_parallel(
         materialize_view,
-        [(paths, view, development_decision_sha256) for view in views],
+        [
+            (paths, view, development_decision_sha256, formal_routes)
+            for view in views
+        ],
         effective_worker_count(config),
         per_worker_gib=float(os.environ.get("PRISM_V211_MEMORY_GIB_PER_WORKER", "20")),
         label="PRISM_V211_METRO_M7_TEST_OOD",

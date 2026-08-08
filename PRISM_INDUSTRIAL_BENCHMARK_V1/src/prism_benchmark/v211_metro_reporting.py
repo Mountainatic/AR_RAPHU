@@ -39,20 +39,29 @@ PACKAGE_NAME = "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_RESULTS_bundle"
 BOOTSTRAP_SEED = 20260807
 PF_CANDIDATES = ("KC", "KCW", "KCA", "KCWA", "PF_SELECTED")
 JOINT_CANDIDATES = (J_K, J_KW, J_KA, J_KWA, "J_SELECTED")
-COMPARISONS = (
+PF_COMPARISONS = (
     ("KCW", "KC", "PF_W_MARGINAL"),
     ("KCWA", "KCA", "PF_W_MARGINAL"),
     ("PF_SELECTED", "KC", "PF_SELECTED_INCREMENT"),
+)
+JOINT_COMPARISONS = (
     (J_KW, J_K, "JOINT_W_MARGINAL"),
     (J_KWA, J_KA, "JOINT_W_MARGINAL"),
     ("J_SELECTED", J_K, "JOINT_SELECTED_INCREMENT"),
 )
+COMPARISONS = (*PF_COMPARISONS, *JOINT_COMPARISONS)
 PRIMARY_W_COMPARISONS = {
     "KCW_vs_KC",
     "KCWA_vs_KCA",
     "J_KW_vs_J_K",
     "J_KWA_vs_J_KA",
 }
+
+
+def _formal_comparisons(
+    formal_routes: list[str] | tuple[str, ...],
+) -> tuple[tuple[str, str, str], ...]:
+    return COMPARISONS if "JOINT" in set(formal_routes) else PF_COMPARISONS
 
 
 def _read(path: Path) -> dict[str, Any]:
@@ -108,40 +117,56 @@ def _normalize_prediction(frame: pd.DataFrame) -> pd.DataFrame:
 
 
 def _development_predictions(
-    paths: MetroV211Paths, view: ViewSpec
+    paths: MetroV211Paths,
+    view: ViewSpec,
+    formal_routes: list[str] | tuple[str, ...],
 ) -> dict[str, pd.DataFrame]:
     a_result = _read(_result_path(paths, "A", view))
-    joint_result = _read(_result_path(paths, "JOINT", view))
     pf = pd.read_parquet(paths.output / a_result["nested_validation_prediction_path"])
     result = {
         candidate: _normalize_prediction(group.reset_index(drop=True))
         for candidate, group in pf.groupby("candidate", sort=False)
     }
-    for route in (J_K, J_KW, J_KA, J_KWA):
-        payload = joint_result["route_materializations"][route]
-        frame = pd.read_parquet(paths.output / payload["prediction_path"])
-        result[route] = _normalize_prediction(frame)
-    result["J_SELECTED"] = result[str(joint_result["final_selected_candidate"])].copy()
-    missing = set((*PF_CANDIDATES, *JOINT_CANDIDATES)) - set(result)
+    expected = set(PF_CANDIDATES)
+    if "JOINT" in set(formal_routes):
+        joint_result = _read(_result_path(paths, "JOINT", view))
+        for route in (J_K, J_KW, J_KA, J_KWA):
+            payload = joint_result["route_materializations"][route]
+            frame = pd.read_parquet(paths.output / payload["prediction_path"])
+            result[route] = _normalize_prediction(frame)
+        result["J_SELECTED"] = result[
+            str(joint_result["final_selected_candidate"])
+        ].copy()
+        expected.update(JOINT_CANDIDATES)
+    missing = expected - set(result)
     if missing:
         raise RuntimeError(f"development prediction routes are missing: {sorted(missing)}")
     return result
 
 
 def _final_predictions(
-    paths: MetroV211Paths, view: ViewSpec, split: str
+    paths: MetroV211Paths,
+    view: ViewSpec,
+    split: str,
+    formal_routes: list[str] | tuple[str, ...],
 ) -> dict[str, pd.DataFrame]:
     contract = _read(_contract_path(paths, view))
+    candidates = (
+        (*PF_CANDIDATES, *JOINT_CANDIDATES)
+        if "JOINT" in set(formal_routes)
+        else PF_CANDIDATES
+    )
     return {
         candidate: _normalize_prediction(
             pd.read_parquet(paths.output / contract["prediction_paths"][split][candidate])
         )
-        for candidate in (*PF_CANDIDATES, *JOINT_CANDIDATES)
+        for candidate in candidates
     }
 
 
 def _aligned_loss_matrices(
     frames: Mapping[str, pd.DataFrame],
+    comparisons: tuple[tuple[str, str, str], ...] = COMPARISONS,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     reference = frames["KC"]
     sample_ids = reference["sample_id"].astype(str).to_numpy()
@@ -150,7 +175,7 @@ def _aligned_loss_matrices(
     origin = reference["origin"].to_numpy(dtype=np.int64)
     differences = []
     comparators = []
-    for candidate, comparator, _ in COMPARISONS:
+    for candidate, comparator, _ in comparisons:
         left = frames[candidate]
         right = frames[comparator]
         if not np.array_equal(sample_ids, left["sample_id"].astype(str).to_numpy()):
@@ -239,15 +264,24 @@ def _bootstrap_view(
     paths: MetroV211Paths,
     view: ViewSpec,
     replicates: int,
+    formal_routes: list[str] | tuple[str, ...],
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     block_length = _block_length(paths, view)
-    split_frames = {"validation": _development_predictions(paths, view)}
+    comparisons = _formal_comparisons(formal_routes)
+    split_frames = {
+        "validation": _development_predictions(paths, view, formal_routes)
+    }
     split_frames.update(
-        {split: _final_predictions(paths, view, split) for split in ("test", "ood")}
+        {
+            split: _final_predictions(paths, view, split, formal_routes)
+            for split in ("test", "ood")
+        }
     )
     for split, frames in split_frames.items():
-        entity, origin, difference, comparator = _aligned_loss_matrices(frames)
+        entity, origin, difference, comparator = _aligned_loss_matrices(
+            frames, comparisons
+        )
         seed = _stable_seed(f"{view.relative_root.as_posix()}|{split}")
         samples = moving_block_matrix_means(
             entity,
@@ -257,8 +291,8 @@ def _bootstrap_view(
             replicates=replicates,
             seed=seed,
         )
-        difference_samples = samples[:, : len(COMPARISONS)]
-        comparator_samples = samples[:, len(COMPARISONS) :]
+        difference_samples = samples[:, : len(comparisons)]
+        comparator_samples = samples[:, len(comparisons) :]
         observed_difference = np.mean(difference, axis=0, dtype=np.float64)
         observed_comparator = np.mean(comparator, axis=0, dtype=np.float64)
         observed_relative = -observed_difference / np.maximum(
@@ -267,7 +301,7 @@ def _bootstrap_view(
         relative_samples = -difference_samples / np.maximum(
             comparator_samples, np.finfo(np.float64).tiny
         )
-        for index, (candidate, comparator_name, family) in enumerate(COMPARISONS):
+        for index, (candidate, comparator_name, family) in enumerate(comparisons):
             below = float(np.mean(difference_samples[:, index] <= 0.0))
             above = float(np.mean(difference_samples[:, index] >= 0.0))
             rows.append(
@@ -349,7 +383,7 @@ def _metric_rows(paths: MetroV211Paths, views: list[ViewSpec]) -> list[dict[str,
                     "availability_scenario": view.availability_scenario,
                     "proxy_policy": view.proxy_policy,
                     "selected_pf_route": contract["selected_pf"],
-                    "selected_joint_route": contract["selected_joint"],
+                    "selected_joint_route": contract.get("selected_joint"),
                     "selection_role": (
                         "FORMAL_SELECTED_ALIAS"
                         if candidate in {"PF_SELECTED", "J_SELECTED"}
@@ -377,15 +411,19 @@ def _selection_transfer_audit(
     paths: MetroV211Paths,
     views: list[ViewSpec],
     bootstrap: pd.DataFrame,
+    formal_routes: list[str] | tuple[str, ...],
 ) -> dict[str, Any]:
     audited = []
+    include_joint = "JOINT" in set(formal_routes)
     for view in views:
         w_result = _read(_result_path(paths, "W", view))
         a_result = _read(_result_path(paths, "A", view))
-        joint_result = _read(_result_path(paths, "JOINT", view))
         pf_w_active = w_result["w_contract"]["family"] != IDENTITY
         a_active = a_result["a_contract"]["family"] != EXACT_ZERO
-        selected_joint = str(joint_result["final_selected_candidate"])
+        selected_joint = None
+        if include_joint:
+            joint_result = _read(_result_path(paths, "JOINT", view))
+            selected_joint = str(joint_result["final_selected_candidate"])
         joint_w_active = selected_joint in {J_KW, J_KWA}
         pf_comparison = "KCWA_vs_KCA" if a_active else "KCW_vs_KC"
         joint_comparison = (
@@ -396,6 +434,8 @@ def _selection_transfer_audit(
             else "J_KWA_vs_J_KA"
             if selected_joint == J_KA
             else "J_KW_vs_J_K"
+            if include_joint
+            else None
         )
 
         def row(split: str, comparison: str) -> dict[str, Any]:
@@ -414,14 +454,16 @@ def _selection_transfer_audit(
             and _supported(row("ood", pf_comparison), better=True)
         )
         joint_transfer = bool(
-            joint_w_active
+            include_joint
+            and joint_w_active
             and _supported(row("test", joint_comparison), better=True)
             and _supported(row("ood", joint_comparison), better=True)
         )
         selected_ood_risk = bool(
             (pf_w_active and _supported(row("ood", pf_comparison), better=False))
             or (
-                joint_w_active
+                include_joint
+                and joint_w_active
                 and _supported(row("ood", joint_comparison), better=False)
             )
         )
@@ -449,7 +491,8 @@ def _selection_transfer_audit(
                 and float(row("test", pf_comparison)["relative_mse_improvement"]) > 0.0
             )
             or (
-                not joint_w_active
+                include_joint
+                and not joint_w_active
                 and float(
                     row("test", joint_comparison)["relative_mse_improvement"]
                 )
@@ -467,6 +510,11 @@ def _selection_transfer_audit(
                 "joint_w_active_on_development": joint_w_active,
                 "pf_formal_w_comparison": pf_comparison,
                 "joint_formal_w_comparison": joint_comparison,
+                "joint_comparison_status": (
+                    "FORMAL_FROZEN"
+                    if include_joint
+                    else "NOT_APPLICABLE_NOT_FROZEN"
+                ),
                 "pf_w_test_and_ood_transfer_supported": pf_transfer,
                 "joint_w_test_and_ood_transfer_supported": joint_transfer,
                 "selected_w_ood_risk_supported": selected_ood_risk,
@@ -514,7 +562,17 @@ def _resource_audit(
             "row_cap_audit": value.get("row_cap_audit"),
         }
         development.append(record)
-        if value.get("status") != "PASS":
+        diagnostic_joint_gate_failure = bool(
+            value.get("stage") == "JOINT"
+            and value.get("status")
+            == "JOINT_OOF_PROTOCOL_CORRECTED_BUT_MODEL_GATE_FAILED"
+        )
+        record["evidence_role"] = (
+            "DEVELOPMENT_DIAGNOSTIC_ONLY"
+            if diagnostic_joint_gate_failure
+            else "FORMAL_DEVELOPMENT_RESULT"
+        )
+        if value.get("status") != "PASS" and not diagnostic_joint_gate_failure:
             failures.append(record)
     final = []
     for view in views:
@@ -739,6 +797,9 @@ def run_m8(paths: MetroV211Paths) -> dict[str, Any]:
     if access.get("status") != "PASS":
         raise RuntimeError("M8 requires a completed M7 test/OOD access audit")
     freeze = _read(paths.development_freeze_path)
+    formal_routes = list(freeze.get("formal_routes", ()))
+    if "PHYSICS_FIRST" not in formal_routes:
+        raise RuntimeError("M8 requires a frozen PHYSICS_FIRST route")
     if freeze.get("code_commit") != git_value(paths.project, "rev-parse", "HEAD"):
         raise RuntimeError("code changed after development freeze")
     if git_value(paths.project, "status", "--porcelain=v1"):
@@ -752,7 +813,7 @@ def run_m8(paths: MetroV211Paths) -> dict[str, Any]:
     views = metro_p60_dynamic_views(paths.shared)
     bootstrap_parts = run_parallel(
         _bootstrap_view,
-        [(paths, view, replicates) for view in views],
+        [(paths, view, replicates, formal_routes) for view in views],
         effective_worker_count(config),
         per_worker_gib=float(os.environ.get("PRISM_V211_MEMORY_GIB_PER_WORKER", "20")),
         label="PRISM_V211_METRO_M8_BOOTSTRAP",
@@ -765,7 +826,7 @@ def run_m8(paths: MetroV211Paths) -> dict[str, Any]:
     metrics = pd.DataFrame(_metric_rows(paths, views)).sort_values(
         ["proxy_policy", "split", "candidate"]
     )
-    transfer = _selection_transfer_audit(paths, views, bootstrap)
+    transfer = _selection_transfer_audit(paths, views, bootstrap, formal_routes)
     final = paths.output / "FINAL"
     final.mkdir(parents=True, exist_ok=True)
     metrics.to_csv(final / "METRO_P60_V211_FINAL_METRICS.csv", index=False)

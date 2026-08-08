@@ -16,6 +16,8 @@
 > **算法边界**：本文给出参考算法和必须满足的不变量，但不把某个 Python 文件、某个库版本或某个数据集专用常数定义为理论本身。所有数值阈值必须由配套冻结配置预注册。  
 > **版本状态**：v2.1 的理论路线继续成立；v2.1.1 是实现与选择语义修正版本，不继承不满足本文不变量的旧实验结论。
 
+> **Practice Contract Amendment（2026-08-08）**：实践执行语义补充如下。Physical-First 与 Joint 是两个分层证据路线。PF 是可以独立满足合同、独立冻结并进入正式 test/OOD 评价的结构路线；Joint 是建立在冻结输入支持与基构造规则之上的可选预测增强路线。Joint 未通过自身的 development 稳定性门时，不得进入正式预测、test 或 OOD，但这不否定已经通过自身全部合同的 PF。本补充只澄清冻结、装配和访问资格，不改变任何估计器、候选集合、超参数或判定阈值。
+
 ---
 
 # 0. v2.1.1 的核心修订
@@ -1239,6 +1241,23 @@ Joint 路线回答：
 
 > 在相同输入 profile、W 基族和 AR profile 下，允许 K、W、AR 在共享目标空间中相互侵占和调节时，能达到怎样的预测上限？
 
+Joint 是 optional predictive enhancement，而不是 PF 有效性的必要条件。PF 的正式结构路线为
+
+```text
+K -> C -> W -> A
+```
+
+Joint 的候选路线为 `J_K / J_KW / J_KA / J_KWA`，其职责是在冻结输入支持与基构造规则下评估联合预测上限。因此二者的证据关系是分层并列关系，而不是串联必要关系：
+
+\[
+\mathrm{PF\_VALID}\not\Rightarrow\mathrm{JOINT\_VALID},
+\qquad
+\mathrm{JOINT\_INVALID}\not\Rightarrow\mathrm{PF\_INVALID}.
+\tag{7.0a}
+\]
+
+`PF_pass = true` 可以独立产生正式模型；`Joint_pass = true` 只决定 Joint 是否附加成为正式 predictive candidate。
+
 它不回答：
 
 - K 的唯一物理贡献；
@@ -1375,13 +1394,13 @@ Joint 只有在：
 JOINT_INPUT_PATH_VALIDATED
 ```
 
-否则标记：
+若 Joint 的协议、候选绑定与数值求解均合法，但该预测门未通过，则标记：
 
 ```text
-JOINT_INPUT_PATH_COLLAPSED
+JOINT_NOT_SUPPORTED_ON_DEVELOPMENT
 ```
 
-并且不把 AR-only 作为 Joint 的替代结果。
+该状态只表示当前 Joint estimator 在注册 development 协议下没有获得足够稳定的预测证据；它不是 `PHYSICS_ROUTE_NOT_SUPPORTED`，也不是 `PF_FAILED`。此时不得自动回退 AR-only、改成 K-zero、放宽阈值或把 Joint 送入 test/OOD 再决定是否恢复。仍然不把 AR-only 作为 Joint 的替代结果。真正的几何、系数或数值失败继续保留各自明确的失败分类。
 
 ## 7.5 Joint 的不可归因性
 
@@ -1785,13 +1804,15 @@ Joint 不授予物理证书。其合同必须证明：
 - PF 与 Joint 调用同一输入支路 gate 版本与参数；
 - block prediction 与 total prediction 均被落盘审计。
 
-Joint 只输出：
+Joint 的合法输出状态包括：
 
 - `JOINT_INPUT_PATH_VALIDATED`
-- `JOINT_INPUT_PATH_COLLAPSED`
 - `JOINT_PREDICTIVE_VALIDATED`
+- `JOINT_NOT_SUPPORTED_ON_DEVELOPMENT`
 - `JOINT_PREDICTIVE_UNSTABLE`
 - `JOINT_OOD_UNSTABLE`
+
+真正的数值、结构和协议失败状态继续保留。只有 Joint 自己通过 development predictive gate，才能生成正式 Joint freeze certificate 和 test-eligible Joint candidate ID。development gate 未通过时可以保存诊断 artifact、已选 diagnostic route 和 fold loss，但不得把它们注册为正式预测候选。
 
 ## 10.5 装配状态
 
@@ -1807,7 +1828,10 @@ Joint 只输出：
 | `C_FALLBACK_TO_BEST_ACTIVE_K` | C 未获证书，但保存已通过的 K 路径 |
 | `C_INPUT_PATH_COLLAPSE_BUG` | active K 被 C 静默压成近零，硬失败 |
 | `W_RESCUE_DIAGNOSTIC_ONLY` | W 仅用于诊断上游过度收缩，不进入正式装配 |
-| `PF_JOINT_INPUT_GATE_INCONSISTENT` | PF 与 Joint 对同一输入支路判定矛盾，硬失败 |
+| `PF_ONLY_FROZEN` | PF 已通过全部正式合同并冻结；Joint 未获 development 支持，不进入正式预测候选 |
+| `PF_AND_JOINT_FROZEN` | PF 与 Joint 均通过各自 development 合同，两条路线均被冻结 |
+| `JOINT_NOT_SUPPORTED_ON_DEVELOPMENT` | Joint development 稳定性证据不足；不影响合法 PF |
+| `PF_JOINT_INPUT_GATE_INCONSISTENT` | 同一 gate version、参数、input prediction/hash、target 与 best-K comparator 却产生不同 gate 结果，属于硬实现失败 |
 | `NOT_APPLICABLE` | 某 fold/候选因数值退化不适用，不伪装成 neutral |
 | `PREDICTIVE_JOINT_KWA` | K/W/AR 联合预测 |
 | `PHYSICAL_CERTIFIED` | 对应物理模块证书完整通过 |
@@ -1941,7 +1965,49 @@ def evaluate_input_path(y, input_pred, best_k_pred, nonintercept_coef, cfg):
                       coefficient_ok=coef_ok)
 ```
 
-PF 的 C 输出与 Joint 的 \(g_U\) 均调用该函数。若输入对象不同，可以传入不同 `input_pred`，但阈值、标准化、方差 floor 和状态语义必须一致。
+PF 的 C 输出与 Joint 的 \(g_U\) 均调用该函数。若输入对象不同，可以传入不同 `input_pred`，但阈值、标准化、方差 floor 和状态语义必须一致。“共享 gate”只表示 same implementation、same configuration、same numerical semantics；不要求 PF 与 Joint 的 PASS/FAIL 结果相同，因为 \(g_C\neq g_U\) 时两条路线本来就可以得到不同结果：
+
+\[
+\boxed{\text{same gate contract}\neq\text{same gate outcome}.}
+\tag{11A.0}
+\]
+
+只有 gate version、参数、被评估 prediction/hash、target 和 best-K comparator 全部相同，却返回不同结果时，才构成 `PF_JOINT_INPUT_GATE_INCONSISTENT`。
+
+## 11A.2A 分层冻结实践合同
+
+```text
+PF_OK = (
+    K/C input path valid
+    and W contract valid
+    and A contract valid
+    and PF candidate binding valid
+)
+
+JOINT_OK = (
+    Joint protocol valid
+    and Joint candidate family valid
+    and Joint W truly jointly fit
+    and Joint predictive/input gate valid
+    and Joint candidate binding valid
+)
+
+if not PF_OK:
+    PRISM route unsupported
+    STOP before test
+
+if PF_OK and not JOINT_OK:
+    freeze PF
+    joint_status = JOINT_NOT_SUPPORTED_ON_DEVELOPMENT
+    formal_routes = [PHYSICS_FIRST]
+
+if PF_OK and JOINT_OK:
+    freeze PF
+    freeze Joint
+    formal_routes = [PHYSICS_FIRST, JOINT]
+```
+
+其中 Joint 的协议、候选族、真实联合拟合、数值证书或候选绑定失败仍是硬实现/协议失败；只有这些条件均合法而 Joint 自己的 development predictive gate 未通过时，才应用 PF-only freeze。严禁用 `PF_OK and not JOINT_OK` 作为把 Joint 送入 test/OOD 再决定的理由。M7/M8 的物化集合必须完全由冻结清单中的 `formal_routes` 决定。
 
 ## 11A.3 候选对象的不可变数据结构
 

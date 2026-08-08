@@ -1,5 +1,25 @@
 # Changelog
 
+## PRISM v2.1.2 - PF Independent Freeze Semantics
+
+- Clarifies practice-contract, freeze, assembly, and materialization semantics;
+  there is no estimator, hyperparameter, candidate-family, or threshold change.
+- Retains the v2.1.2 Joint OOF correction development results unchanged and
+  does not recompute M2--M5.
+- Makes Physical-First and Joint independently freeze-eligible evidence
+  routes. Physical-First is the mandatory formal route; Joint remains an
+  optional predictive enhancement.
+- Excludes a development-unsupported Joint route before test/OOD while
+  allowing a fully valid Physical-First route to freeze independently.
+- Makes M6 candidate registration and later M7/M8 behavior route-aware, so a
+  PF-only freeze cannot create, fit, predict, or report formal Joint models.
+- Distinguishes different outcomes from the same gate implementation applied
+  to different predictions from a true same-evaluation implementation
+  inconsistency.
+- This practice-contract clarification was derived and frozen before any new
+  test/OOD access. `test_accessed=false` and `ood_accessed=false` remain hard
+  development guards.
+
 ## PRISM v2.1.2 - Joint OOF Protocol Correction
 
 - Preserves the PRISM v2.1.1 Metro-P60 failed-stop branch, release, and result
