@@ -55,6 +55,8 @@ from .v211_w import (
     fit_w_correction,
     predict_w_correction,
 )
+from .v22_config import CHANNEL_COMPRESSED, FULL_BASIS
+from .v22_joint import fit_joint_candidate_v22
 
 
 PF_CANDIDATES = ("KC", "KCW", "KCA", "KCWA", "PF_SELECTED")
@@ -437,6 +439,7 @@ def materialize_view(
     view: ViewSpec,
     development_decision_sha256: str,
     formal_routes: list[str] | tuple[str, ...],
+    frozen_candidate_ids: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     started = time.perf_counter()
     config = load_metro_config(paths.project)
@@ -527,16 +530,37 @@ def materialize_view(
         )
         for route in (J_K, J_KW, J_KA, J_KWA):
             selected = joint_result["route_local_selected"][route]
-            _, alpha, ratio_k, ratio_w = selected
-            _, contract, _ = fit_joint_candidate(
-                {"K": model["joint_fit"], "W": joint_w_fit, "A": joint_a_fit},
-                y_fit,
-                {"K": model["joint_fit"], "W": joint_w_fit, "A": joint_a_fit},
-                candidate=route,
-                alpha=float(alpha),
-                k_over_a_ratio=float(ratio_k),
-                w_over_a_ratio=float(ratio_w),
-            )
+            if joint_result.get("estimator_version") == "PRISM_V2_2":
+                representation = str(selected["k_representation"])
+                if representation == CHANNEL_COMPRESSED:
+                    k_fit = model["compressed_fit"]
+                elif representation == FULL_BASIS:
+                    k_fit = model["joint_fit"]
+                else:
+                    raise RuntimeError(
+                        f"unsupported frozen v2.2 K representation: {representation}"
+                    )
+                _, contract, _ = fit_joint_candidate_v22(
+                    {"K": k_fit, "W": joint_w_fit, "A": joint_a_fit},
+                    y_fit,
+                    {"K": k_fit, "W": joint_w_fit, "A": joint_a_fit},
+                    candidate=route,
+                    k_representation=representation,
+                    numerical_alpha=float(selected["numerical_alpha"]),
+                    predictive_eta=float(selected["predictive_eta"]),
+                    raw_k_support=tuple(model["channels"]),
+                )
+            else:
+                _, alpha, ratio_k, ratio_w = selected
+                _, contract, _ = fit_joint_candidate(
+                    {"K": model["joint_fit"], "W": joint_w_fit, "A": joint_a_fit},
+                    y_fit,
+                    {"K": model["joint_fit"], "W": joint_w_fit, "A": joint_a_fit},
+                    candidate=route,
+                    alpha=float(alpha),
+                    k_over_a_ratio=float(ratio_k),
+                    w_over_a_ratio=float(ratio_w),
+                )
             joint_contracts[route] = contract
         selected_joint = str(joint_result["final_selected_candidate"])
     selected_w_active = pf_w_selected["family"] != IDENTITY
@@ -559,6 +583,11 @@ def materialize_view(
         development_decision_sha256,
         formal_routes=formal_routes,
     )
+    if frozen_candidate_ids is not None:
+        expected_names = set(_formal_candidate_names(formal_routes))
+        if set(frozen_candidate_ids) != expected_names:
+            raise RuntimeError("M7 frozen candidate-ID set differs from formal routes")
+        candidate_ids = {name: str(frozen_candidate_ids[name]) for name in expected_names}
     output_root = (
         paths.output
         / "FINAL"
@@ -612,7 +641,12 @@ def materialize_view(
                     joint_predictions = {
                         route: predict_joint_candidate(
                             {
-                                "K": blocks["joint"],
+                                "K": (
+                                    blocks["compressed"]
+                                    if joint_contracts[route].get("k_representation")
+                                    == CHANNEL_COMPRESSED
+                                    else blocks["joint"]
+                                ),
                                 "W": joint_w_chunk,
                                 "A": joint_a_chunk,
                             },
@@ -734,20 +768,26 @@ def run_m7(paths: MetroV211Paths) -> dict[str, Any]:
     )
     config = load_metro_config(paths.project)
     views = metro_p60_dynamic_views(paths.shared)
+    frozen_ids = {
+        str(item["view"]): item["candidate_ids"]
+        for item in manifest["pending_materialization_candidate_ids"]
+    }
     results = run_parallel(
         materialize_view,
         [
-            (paths, view, development_decision_sha256, formal_routes)
+            (
+                paths,
+                view,
+                development_decision_sha256,
+                formal_routes,
+                frozen_ids[view.relative_root.as_posix()],
+            )
             for view in views
         ],
         effective_worker_count(config),
         per_worker_gib=float(os.environ.get("PRISM_V211_MEMORY_GIB_PER_WORKER", "20")),
         label="PRISM_V211_METRO_M7_TEST_OOD",
     )
-    frozen_ids = {
-        str(item["view"]): item["candidate_ids"]
-        for item in manifest["pending_materialization_candidate_ids"]
-    }
     candidate_ids_match = True
     for item in results:
         contract = _read(paths.output / item["contract_path"])

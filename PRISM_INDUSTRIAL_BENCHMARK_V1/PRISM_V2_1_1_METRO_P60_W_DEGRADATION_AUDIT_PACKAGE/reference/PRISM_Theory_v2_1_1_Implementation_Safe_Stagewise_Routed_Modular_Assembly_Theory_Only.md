@@ -2453,3 +2453,5 @@ PRISM v2.1.1 的核心问题是：
 - 测试时自适应；
 - 把不确定性作为预测层；
 - 用 AR-only 作为 Joint 退化候选。
+
+> 后继 Joint predictive-stability estimator extension 见 `PRISM_Theory_v2_2_Joint_Predictive_Stability_Extension_Theory_Only.md`。该后继扩展不回写为 v2.1.1 原始估计器内容。

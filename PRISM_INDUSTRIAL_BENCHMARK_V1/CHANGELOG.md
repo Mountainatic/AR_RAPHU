@@ -45,3 +45,12 @@
   remains valid after the runner creates its output directory.
 - Test and OOD data were not accessed before this correction and are not used
   to motivate or tune it.
+## PRISM v2.2 - Joint Predictive Stability
+
+- First estimator change after the v2.1.2 protocol and freeze-semantics corrections.
+- Adds `CHANNEL_COMPRESSED` and `FULL_BASIS` representations of the same frozen Joint K support.
+- Separates numerical ridge from explicit predictive ridge with the pre-registered eta grid.
+- Retains corrected v2.1.2 Joint as a non-selecting diagnostic legacy anchor.
+- Makes no K/C/W/A estimator, data-split, gate-threshold, or PF-independent-freeze change.
+- Preserves Joint as an optional predictive enhancement; unsupported Joint remains excluded before test/OOD.
+- No test or OOD data were accessed to define this extension.

@@ -1,0 +1,43 @@
+{
+  "protocol_id": "PRISM_V2_2_METRO_P60_JOINT_PREDICTIVE_STABILITY_V1",
+  "model_version": "PRISM_V2_2",
+  "parent_branch": "prism-v2-1-2-pf-independent-freeze-semantics",
+  "parent_commit": "6ebcac898a75b6c1aa05c920a3a39847db052957",
+  "development_artifact_commit": "b5a4d672f65d0c5a01135f331d193a996e9c8c2d",
+  "output_root": "results_prism_v2_2_metro_p60_joint_stability",
+  "joint_routes": [
+    "J_K",
+    "J_KW",
+    "J_KA",
+    "J_KWA"
+  ],
+  "k_representations": [
+    "CHANNEL_COMPRESSED",
+    "FULL_BASIS"
+  ],
+  "predictive_eta_grid": [
+    0.0,
+    0.00001,
+    0.0001,
+    0.001,
+    0.01,
+    0.1,
+    1.0
+  ],
+  "numerical_alpha_grid_semantics": "ZERO_NEUTRAL_THEN_INHERITED_V212_GRID",
+  "predictive_block_ratio": 1.0,
+  "predictive_penalty_semantics": "N_FIT_TIMES_ETA_IDENTITY_ON_FIT_STANDARDIZED_COLUMNS",
+  "numerical_alpha_selection": "SMALLEST_ALL_REGISTERED_FOLDS_CERTIFIED_NO_LOSS_USE",
+  "predictive_eta_selection": "FOUR_FOLD_OOF_ONE_SE_LARGER_ETA_SIMPLER",
+  "representation_selection": "CHANNEL_COMPRESSED_NEUTRAL_FULL_REQUIRES_ONE_SE_PRACTICAL_AND_POSITIVE_FOLD_GUARDS",
+  "reuse_m2_m4": true,
+  "run_m2_m4": false,
+  "test_access": false,
+  "ood_access": false,
+  "allow_ar_only": false,
+  "allow_k_zero": false,
+  "legacy_anchor_selection_eligible": false,
+  "blas_threads": 1,
+  "outer_view_workers": 2,
+  "inner_candidate_workers": 12
+}
