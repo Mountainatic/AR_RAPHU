@@ -33,6 +33,7 @@ from .v211_joint import (
     JointFoldProtocolMismatch,
     _input_only_view,
     audit_joint_fold_protocol,
+    fit_joint_candidate,
     joint_w_basis,
     registered_joint_inner_fold_frames,
 )
@@ -731,6 +732,19 @@ def run_joint_v22_view(
         inner_target_accessor = BaseAccessor(
             shared, view.head.dataset, "train", [view.head.target]
         )
+        legacy_path = (
+            legacy_results_root
+            / "DEVELOPMENT/JOINT"
+            / view.head.head_id
+            / view.availability_scenario
+            / view.proxy_policy
+            / "RESULT.json"
+        )
+        legacy = json.loads(legacy_path.read_text(encoding="utf-8"))
+        legacy_route = str(legacy["final_selected_candidate"])
+        legacy_selected = legacy["route_local_selected"][legacy_route]
+        _, legacy_alpha, legacy_ratio_k, legacy_ratio_w = legacy_selected
+        observed_legacy_losses: list[float] = []
         prepared_folds: list[dict[str, PreparedRepresentation]] = []
         fold_records: list[dict[str, Any]] = []
         protocol_audits: list[dict[str, Any]] = []
@@ -796,6 +810,24 @@ def run_joint_v22_view(
             )
             target = fit["y_true"].to_numpy(dtype=np.float64)
             evaluation_target = evaluation["y_true"].to_numpy(dtype=np.float64)
+            legacy_prediction, _, _ = fit_joint_candidate(
+                {
+                    "K": k_blocks[FULL_BASIS][0],
+                    "W": w_train,
+                    "A": a_train,
+                },
+                target,
+                {
+                    "K": k_blocks[FULL_BASIS][1],
+                    "W": w_eval,
+                    "A": a_eval,
+                },
+                candidate=legacy_route,
+                alpha=float(legacy_alpha),
+                k_over_a_ratio=float(legacy_ratio_k),
+                w_over_a_ratio=float(legacy_ratio_w),
+            )
+            observed_legacy_losses.append(mse(evaluation_target, legacy_prediction))
             prepared_by_representation = {}
             for representation in K_REPRESENTATIONS:
                 k_train, k_evaluation = k_blocks[representation]
@@ -817,30 +849,6 @@ def run_joint_v22_view(
         if len(prepared_folds) != 4:
             raise JointFoldProtocolMismatch("v2.2 Joint requires all four folds")
 
-        legacy_path = (
-            legacy_results_root
-            / "DEVELOPMENT/JOINT"
-            / view.head.head_id
-            / view.availability_scenario
-            / view.proxy_policy
-            / "RESULT.json"
-        )
-        legacy = json.loads(legacy_path.read_text(encoding="utf-8"))
-        legacy_route = str(legacy["final_selected_candidate"])
-        legacy_selected = legacy["route_local_selected"][legacy_route]
-        _, legacy_alpha, legacy_ratio_k, legacy_ratio_w = legacy_selected
-        observed_legacy_losses = []
-        for prepared_by_representation, fold in zip(
-            prepared_folds, fold_records, strict=True
-        ):
-            prediction, _ = solve_prepared_legacy_anchor(
-                prepared_by_representation[FULL_BASIS],
-                route=legacy_route,
-                alpha=float(legacy_alpha),
-                k_over_a_ratio=float(legacy_ratio_k),
-                w_over_a_ratio=float(legacy_ratio_w),
-            )
-            observed_legacy_losses.append(mse(fold["evaluation_target"], prediction))
         expected_legacy_losses = [
             float(value) for value in legacy["final_selected_fold_losses"]
         ]

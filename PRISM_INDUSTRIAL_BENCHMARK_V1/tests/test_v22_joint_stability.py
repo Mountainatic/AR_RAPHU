@@ -96,6 +96,9 @@ def test_full_basis_legacy_anchor_matches_v212_solver() -> None:
         w_over_a_ratio=0.3,
     )
     np.testing.assert_allclose(observed, expected, rtol=1e-10, atol=1e-12)
+    import prism_benchmark.v22_joint as module
+
+    assert "fit_joint_candidate(" in inspect.getsource(module.run_joint_v22_view)
 
 
 def test_channel_compressed_columns_equal_active_k_count() -> None:
