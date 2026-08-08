@@ -10,19 +10,19 @@ from typing import Any
 from .v2_config import sha256_file
 
 
-PROTOCOL_ID = "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_V1"
+PROTOCOL_ID = "PRISM_V2_1_2_METRO_P60_JOINT_OOF_PROTOCOL_CORRECTION_V1"
 EVIDENCE_CLASS = "RETROSPECTIVE_TRANSFER_AND_DEGRADATION_AUDIT"
-OUTPUT_DIRECTORY = "results_prism_v2_1_1_metro_p60_w_audit"
+OUTPUT_DIRECTORY = "results_prism_v2_1_2_metro_p60_joint_oof_correction"
 PLAN_DIRECTORY = "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_PACKAGE"
-CONFIG_NAME = "PRISM_V2_1_1_METRO_P60_CONFIG_FROZEN_PROPOSED.json"
-CONFIG_SHA256 = "764cd2b7d8a94a3a2e0391629f75afce79df1ffcbebad0fdce8b7cd514106bba"
+CONFIG_NAME = "PRISM_V2_1_2_JOINT_OOF_PROTOCOL_CORRECTION_CONFIG.json"
+CONFIG_SHA256 = "a14c05cb51d94c4af3f5aed33f6ec810f93170acfdf2e513292ae49e2566f1f7"
 ACTIVE_DATASET = "metropt"
 ACTIVE_HEAD = "METRO_P60__H6__W1"
-RECOMMENDED_BRANCH = "prism-v2-1-1-metro-p60-w-audit"
-SOURCE_COMMIT = "5b3a971c8eea5127e01e607208ca5d3ea69517a8"
-DEVELOPMENT_FREEZE_NAME = "METRO_P60_V211_DEVELOPMENT_FREEZE.json"
-DEVELOPMENT_DECISION_NAME = "METRO_P60_V211_DEVELOPMENT_DECISION.json"
-TEST_ACCESS_AUDIT_NAME = "METRO_P60_V211_TEST_OOD_ACCESS_AUDIT.json"
+RECOMMENDED_BRANCH = "prism-v2-1-2-joint-oof-protocol-correction"
+SOURCE_COMMIT = "29ff09f88ca4d3424cb36e4d508db9e2d220f119"
+DEVELOPMENT_FREEZE_NAME = "METRO_P60_V212_DEVELOPMENT_FREEZE.json"
+DEVELOPMENT_DECISION_NAME = "METRO_P60_V212_DEVELOPMENT_DECISION.json"
+TEST_ACCESS_AUDIT_NAME = "METRO_P60_V212_TEST_OOD_ACCESS_AUDIT.json"
 WORKER_OVERRIDE_ENV = "PRISM_V211_METRO_WORKERS"
 K_MEMORY_GIB_ENV = "PRISM_V211_K_MEMORY_GIB_PER_WORKER"
 K_INNER_WORKERS_ENV = "PRISM_V211_K_INNER_WORKERS"
@@ -255,7 +255,7 @@ def runtime_parallelism_audit(config: dict[str, Any]) -> dict[str, Any]:
         "override_active": effective != configured,
         "override_scope": "TASK_LEVEL_THROUGHPUT_ONLY",
         "scientific_contract_unchanged": True,
-        "user_authorized_on": "2026-08-07",
+        "user_authorized_on": "2026-08-08",
     }
 
 
@@ -265,7 +265,7 @@ def require_metro_test_freeze(paths: MetroV211Paths) -> dict[str, Any]:
     if paths.test_access_audit_path.exists():
         raise RuntimeError("Metro-P60 test/OOD was already accessed")
     manifest = json.loads(paths.development_freeze_path.read_text(encoding="utf-8"))
-    if manifest.get("status") != "METRO_P60_V2_1_1_DEVELOPMENT_FROZEN":
+    if manifest.get("status") != "METRO_P60_V2_1_2_DEVELOPMENT_FROZEN":
         raise RuntimeError("Metro-P60 development freeze is not valid")
     if manifest.get("test_accessed") is not False or manifest.get("ood_accessed") is not False:
         raise RuntimeError("Metro-P60 freeze records early test/OOD access")

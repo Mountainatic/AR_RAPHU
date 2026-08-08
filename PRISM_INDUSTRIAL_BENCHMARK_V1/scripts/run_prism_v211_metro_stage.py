@@ -26,7 +26,7 @@ from prism_benchmark.v211_metro_runner import STAGES, run_stage  # noqa: E402
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run one frozen PRISM v2.1.1 Metro-P60 audit stage."
+        description="Run one PRISM v2.1.2 Metro-P60 Joint OOF correction stage."
     )
     parser.add_argument("stage", choices=STAGES)
     parser.add_argument("--project-root", type=Path, default=PROJECT_DEFAULT)

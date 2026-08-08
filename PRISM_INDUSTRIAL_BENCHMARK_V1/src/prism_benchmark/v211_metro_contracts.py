@@ -60,7 +60,11 @@ def _selected_descriptor(result: Mapping[str, Any]) -> dict[str, Any]:
 
 def bind_result_candidate_ids(output: Path, result_path: Path) -> dict[str, Any]:
     result = json.loads(result_path.read_text(encoding="utf-8"))
-    if result.get("status") not in {"PASS", "JOINT_INPUT_PATH_COLLAPSED"}:
+    if result.get("status") not in {
+        "PASS",
+        "JOINT_INPUT_PATH_COLLAPSED",
+        "JOINT_OOF_PROTOCOL_CORRECTED_BUT_MODEL_GATE_FAILED",
+    }:
         return result
     prediction_path = output / str(result["final_selected_prediction_path"])
     prediction = pd.read_parquet(prediction_path, columns=["y_true", "y_pred"])

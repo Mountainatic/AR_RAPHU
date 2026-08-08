@@ -70,6 +70,7 @@ M1_TESTS = (
     "tests/test_v21_baselines.py",
     "tests/test_v21_reporting.py",
     "tests/test_v211_metro_audit.py",
+    "tests/test_v212_joint_oof_protocol.py",
 )
 
 
@@ -568,11 +569,36 @@ def run_m5(paths: MetroV211Paths) -> dict[str, Any]:
     gate_match = True
     routes_complete = True
     jointly_fit = True
+    fold_protocol_complete = True
+    original_support_only = True
+    all_four_fold_losses = True
+    protocol_mismatch = False
     for view, joint_result in zip(views, results):
         c_result = _read(_result_path(paths.output, "C", view))
         gate_match &= pf_and_joint_input_status_match(c_result, joint_result)
+        protocol_mismatch |= (
+            joint_result.get("status") == "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"
+        )
+        fold_protocol_complete &= bool(
+            joint_result.get("joint_fold_protocol_audit_pass")
+        )
+        original_support_only &= bool(
+            joint_result.get("joint_fit_source")
+            == "ORIGINAL_REGISTERED_INNER_TRAIN_SUPPORT"
+            and joint_result.get("joint_evaluation_source")
+            == "ORIGINAL_REGISTERED_INNER_VALIDATION_SUPPORT"
+            and joint_result.get("nested_oof_training_used") is False
+            and joint_result.get("w_physical_oof_used_as_training_pool") is False
+        )
+        all_four_fold_losses &= bool(
+            joint_result.get("registered_inner_fold_count") == 4
+            and joint_result.get("candidate_fold_loss_count") == 4
+            and len(joint_result.get("joint_fold_protocol_audit", ())) == 4
+        )
         routes_complete &= set(joint_result.get("route_materializations", {})) == set(JOINT_CANDIDATES)
         jointly_fit &= bool(joint_result.get("joint_w_coefficients_jointly_fitted"))
+        if protocol_mismatch:
+            continue
         card = build_joint_card(joint_result)
         card.update(
             {
@@ -587,8 +613,24 @@ def run_m5(paths: MetroV211Paths) -> dict[str, Any]:
             card,
         )
     passed = all(item.get("status") == "PASS" for item in results)
+    corrected_model_gate_failed = bool(
+        all(
+            item.get("status")
+            in {"PASS", "JOINT_OOF_PROTOCOL_CORRECTED_BUT_MODEL_GATE_FAILED"}
+            for item in results
+        )
+        and any(
+            item.get("status")
+            == "JOINT_OOF_PROTOCOL_CORRECTED_BUT_MODEL_GATE_FAILED"
+            for item in results
+        )
+    )
     status = "PASS"
-    if not gate_match:
+    if protocol_mismatch or not fold_protocol_complete or not original_support_only or not all_four_fold_losses:
+        status = "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"
+    elif corrected_model_gate_failed:
+        status = "JOINT_OOF_PROTOCOL_CORRECTED_BUT_MODEL_GATE_FAILED"
+    elif not gate_match:
         status = "STOP_PF_JOINT_INPUT_GATE_INCONSISTENT"
     elif not passed or not routes_complete or not jointly_fit:
         status = "STOP_JOINT_W_NOT_JOINTLY_FIT"
@@ -597,6 +639,11 @@ def run_m5(paths: MetroV211Paths) -> dict[str, Any]:
         "stage": "M5_DEVELOPMENT_JOINT",
         "views": len(results),
         "pf_joint_gate_match": gate_match,
+        "joint_fold_protocol_audit_pass": fold_protocol_complete,
+        "original_registered_inner_support_only": original_support_only,
+        "all_four_registered_fold_losses_present": all_four_fold_losses,
+        "nested_oof_training_used": False,
+        "w_physical_oof_used_as_training_pool": False,
         "all_four_routes_materialized": routes_complete,
         "w_coefficients_jointly_fitted": jointly_fit,
         "test_accessed": False,
@@ -648,6 +695,25 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
             bool(item.get("input_path_preservation", {}).get("pass")) for item in c_results
         ),
         "pf_joint_input_status_match": gates_match,
+        "joint_fold_protocol_all_pass": all(
+            bool(item.get("joint_fold_protocol_audit_pass"))
+            for item in joint_results
+        ),
+        "joint_uses_original_registered_inner_support": all(
+            item.get("joint_fit_source")
+            == "ORIGINAL_REGISTERED_INNER_TRAIN_SUPPORT"
+            and item.get("joint_evaluation_source")
+            == "ORIGINAL_REGISTERED_INNER_VALIDATION_SUPPORT"
+            and item.get("nested_oof_training_used") is False
+            and item.get("w_physical_oof_used_as_training_pool") is False
+            for item in joint_results
+        ),
+        "all_registered_joint_folds_present": all(
+            item.get("registered_inner_fold_count") == 4
+            and item.get("candidate_fold_loss_count") == 4
+            and len(item.get("joint_fold_protocol_audit", ())) == 4
+            for item in joint_results
+        ),
         "w_candidates_actually_compared": all(
             set(item.get("candidate_families_compared", ())) == set(W_FAMILIES)
             for item in w_results
@@ -670,6 +736,9 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
         ("data_hash_unchanged", "STOP_DATA_BASE_MUTATED"),
         ("k_c_input_path_noncollapsed", "STOP_KC_INPUT_PATH_COLLAPSED"),
         ("pf_joint_input_status_match", "STOP_PF_JOINT_INPUT_GATE_INCONSISTENT"),
+        ("joint_fold_protocol_all_pass", "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"),
+        ("joint_uses_original_registered_inner_support", "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"),
+        ("all_registered_joint_folds_present", "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"),
         ("w_candidates_actually_compared", "STOP_W_CANDIDATES_NOT_ACTUALLY_COMPARED"),
         ("identity_equivalence_pass", "STOP_IDENTITY_W_NOT_EQUIVALENT"),
         ("candidate_id_consistency_pass", "STOP_CANDIDATE_ID_MISMATCH"),
@@ -682,11 +751,17 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
     for view, c_result, w_result, a_result, joint_result in zip(
         dynamic_views, c_results, w_results, a_results, joint_results
     ):
+        joint_selected = joint_result.get("final_selected_candidate")
+        joint_selected_hyperparameters = joint_result.get(
+            "route_local_selected", {}
+        ).get(joint_selected)
         selections.append(
             {
                 "view": view.relative_root.as_posix(),
                 "active_channels": c_result.get("active_channels", []),
                 "c_candidate_id": c_result.get("final_selected_candidate_id"),
+                "c_family": c_result.get("selected_family"),
+                "c_ridge_alpha": c_result.get("selected_alpha"),
                 "pf_w_family": w_result.get("w_contract", {}).get("family"),
                 "w_candidate_id": w_result.get("final_selected_candidate_id"),
                 "pf_ablation_w_candidate": w_result.get(
@@ -696,9 +771,36 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
                 "a_family": a_result.get("a_contract", {}).get("family"),
                 "a_candidate_id": a_result.get("final_selected_candidate_id"),
                 "pf_selected_route": a_result.get("pf_selected_route"),
-                "joint_selected": joint_result.get("final_selected_candidate"),
+                "joint_selected": joint_selected,
                 "joint_candidate_id": joint_result.get("final_selected_candidate_id"),
                 "joint_route_hyperparameters": joint_result.get("route_local_selected", {}),
+                "joint_selected_hyperparameters": joint_selected_hyperparameters,
+                "joint_alpha": (
+                    joint_selected_hyperparameters[1]
+                    if joint_selected_hyperparameters is not None
+                    else None
+                ),
+                "joint_k_over_a_ratio": (
+                    joint_selected_hyperparameters[2]
+                    if joint_selected_hyperparameters is not None
+                    else None
+                ),
+                "joint_w_over_a_ratio": (
+                    joint_selected_hyperparameters[3]
+                    if joint_selected_hyperparameters is not None
+                    else None
+                ),
+                "joint_fold_protocol_audit": joint_result.get(
+                    "joint_fold_protocol_audit", []
+                ),
+                "joint_fit_source": joint_result.get("joint_fit_source"),
+                "joint_evaluation_source": joint_result.get(
+                    "joint_evaluation_source"
+                ),
+                "candidate_ids": [
+                    item.get("candidate_id")
+                    for item in joint_result.get("candidate_registry", [])
+                ],
             }
         )
     decision = {
@@ -714,7 +816,7 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
     write_json(paths.development_decision_path, decision)
     if failed is not None:
         stop(paths, failed, decision)
-    frozen_config = paths.output / "FREEZE" / "METRO_P60_V211_CONFIG_FROZEN.json"
+    frozen_config = paths.output / "FREEZE" / "METRO_P60_V212_CONFIG_FROZEN.json"
     frozen_config.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(paths.config_path, frozen_config)
     decision_sha256 = sha256_file(paths.development_decision_path)
@@ -743,7 +845,7 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
             }
         )
     manifest = {
-        "status": "METRO_P60_V2_1_1_DEVELOPMENT_FROZEN",
+        "status": "METRO_P60_V2_1_2_DEVELOPMENT_FROZEN",
         "protocol_id": PROTOCOL_ID,
         "evidence_class": EVIDENCE_CLASS,
         "code_commit": _git(paths.project, "rev-parse", "HEAD"),

@@ -10,6 +10,30 @@ import numpy as np
 T = TypeVar("T")
 
 
+INPUT_PATH_GEOMETRIC_COLLAPSE = "INPUT_PATH_GEOMETRIC_COLLAPSE"
+INPUT_PATH_COEFFICIENT_COLLAPSE = "INPUT_PATH_COEFFICIENT_COLLAPSE"
+INPUT_PATH_NUMERICAL_FAILURE = "INPUT_PATH_NUMERICAL_FAILURE"
+INPUT_PATH_PRESERVATION_PERFORMANCE_GATE_FAILED = (
+    "INPUT_PATH_PRESERVATION_PERFORMANCE_GATE_FAILED"
+)
+INPUT_PATH_PRESERVED = "INPUT_PATH_PRESERVED"
+
+
+def input_path_failure_class(checks: Mapping[str, Any]) -> str:
+    """Classify a gate result without changing its registered PASS/FAIL rule."""
+    if all(bool(checks.get(name, False)) for name in (
+        "variance", "mse", "coefficient", "numerical_certificate"
+    )):
+        return INPUT_PATH_PRESERVED
+    if not bool(checks.get("numerical_certificate", False)):
+        return INPUT_PATH_NUMERICAL_FAILURE
+    if not bool(checks.get("variance", False)):
+        return INPUT_PATH_GEOMETRIC_COLLAPSE
+    if not bool(checks.get("coefficient", False)):
+        return INPUT_PATH_COEFFICIENT_COLLAPSE
+    return INPUT_PATH_PRESERVATION_PERFORMANCE_GATE_FAILED
+
+
 @dataclass(frozen=True)
 class ProfileRegretSelection:
     best_profile: Any
@@ -191,6 +215,7 @@ def input_path_preservation_gate(
             "status": "INPUT_PATH_COLLAPSED",
             "pass": False,
             "reason": "INSUFFICIENT_FINITE_ROWS",
+            "input_path_failure_class": INPUT_PATH_GEOMETRIC_COLLAPSE,
             "finite_rows": int(finite.sum()),
         }
     y = y[finite]
@@ -203,6 +228,7 @@ def input_path_preservation_gate(
             "status": "INPUT_PATH_COLLAPSED",
             "pass": False,
             "reason": "TARGET_VARIANCE_ZERO",
+            "input_path_failure_class": INPUT_PATH_GEOMETRIC_COLLAPSE,
             "finite_rows": len(y),
         }
     input_variance_ratio = float(np.var(input_values, dtype=np.float64) / target_variance)
@@ -233,6 +259,7 @@ def input_path_preservation_gate(
         "status": "INPUT_PATH_PRESERVED" if passed else "INPUT_PATH_COLLAPSED",
         "pass": bool(passed),
         "checks": checks,
+        "input_path_failure_class": input_path_failure_class(checks),
         "finite_rows": len(y),
         "target_variance": target_variance,
         "input_prediction_variance_ratio_to_target": input_variance_ratio,

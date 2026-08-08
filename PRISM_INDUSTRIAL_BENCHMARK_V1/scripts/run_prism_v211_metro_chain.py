@@ -11,12 +11,12 @@ from pathlib import Path
 
 PROJECT_DEFAULT = Path(__file__).resolve().parents[1]
 STAGES = ("m0", "m1", "m2", "m3", "m4", "m5", "m6", "m7", "m8")
-OUTPUT_DIRECTORY = "results_prism_v2_1_1_metro_p60_w_audit"
+OUTPUT_DIRECTORY = "results_prism_v2_1_2_metro_p60_joint_oof_correction"
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Run the frozen Metro-P60 audit in strict M0-to-M8 order."
+        description="Run the Metro-P60 Joint OOF correction in strict stage order."
     )
     parser.add_argument("--project-root", type=Path, default=PROJECT_DEFAULT)
     parser.add_argument(

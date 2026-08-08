@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import time
 import traceback
@@ -10,7 +11,14 @@ from typing import Any, Mapping
 import numpy as np
 import pandas as pd
 
-from .cpu_data import BaseAccessor, load_samples, realized_state_profiles, sha256_file
+from .cpu_data import (
+    BaseAccessor,
+    ViewSpec,
+    inner_folds,
+    load_samples,
+    realized_state_profiles,
+    sha256_file,
+)
 from .cpu_selection import mse, regression_metrics
 from .stage0 import write_json
 from .v2_c import fit_physical_features
@@ -44,6 +52,206 @@ _J_CANDIDATE_CONTEXT: tuple[
     np.ndarray,
     list[tuple[str, float, float, float]],
 ] | None = None
+
+
+class JointFoldProtocolMismatch(RuntimeError):
+    pass
+
+
+def _ordered_id_hash(values: pd.Series) -> str:
+    digest = hashlib.sha256()
+    for value in values.astype(str):
+        digest.update(value.encode("utf-8"))
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def _joint_fold_id_hash(frame: pd.DataFrame) -> dict[str, str]:
+    """Hash both registered row identifiers in their deterministic row order."""
+    missing = [
+        column
+        for column in ("base_origin_id", "view_sample_id")
+        if column not in frame.columns
+    ]
+    if missing:
+        raise JointFoldProtocolMismatch(
+            f"Joint fold provenance frame is missing identifiers: {missing}"
+        )
+    digest = hashlib.sha256()
+    for base_origin_id, view_sample_id in zip(
+        frame["base_origin_id"].astype(str),
+        frame["view_sample_id"].astype(str),
+        strict=True,
+    ):
+        digest.update(base_origin_id.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(view_sample_id.encode("utf-8"))
+        digest.update(b"\n")
+    return {
+        "base_origin_id_sha256": _ordered_id_hash(frame["base_origin_id"]),
+        "view_sample_id_sha256": _ordered_id_hash(frame["view_sample_id"]),
+        "base_origin_and_view_sample_id_sha256": digest.hexdigest(),
+    }
+
+
+def _same_ordered_ids(
+    left: pd.DataFrame,
+    right: pd.DataFrame,
+    columns: tuple[str, ...],
+) -> bool:
+    if len(left) != len(right):
+        return False
+    return all(
+        left[column].astype(str).reset_index(drop=True).equals(
+            right[column].astype(str).reset_index(drop=True)
+        )
+        for column in columns
+    )
+
+
+def registered_joint_inner_fold_frames(
+    development_train: pd.DataFrame,
+    *,
+    fold_count: int,
+    fit_cap: int,
+    evaluation_cap: int,
+) -> list[dict[str, Any]]:
+    """Materialize registered original ``T_i -> V_i`` Joint fold supports."""
+    result = []
+    for fold_index, (fit_index, evaluation_index) in enumerate(
+        inner_folds(development_train, int(fold_count))
+    ):
+        fit_raw = development_train.iloc[fit_index].reset_index(drop=True)
+        evaluation_raw = development_train.iloc[evaluation_index].reset_index(
+            drop=True
+        )
+        result.append(
+            {
+                "fold_index": fold_index,
+                "fit_raw": fit_raw,
+                "evaluation_raw": evaluation_raw,
+                "fit": _cap(fit_raw, int(fit_cap)).reset_index(drop=True),
+                "evaluation": _cap(
+                    evaluation_raw, int(evaluation_cap)
+                ).reset_index(drop=True),
+            }
+        )
+    return result
+
+
+def _input_only_view(view: Any) -> ViewSpec:
+    return ViewSpec(
+        head=view.head,
+        information_set="input_only",
+        availability_scenario=view.availability_scenario,
+        proxy_policy=view.proxy_policy,
+    )
+
+
+def _origin_bounds(frame: pd.DataFrame) -> tuple[int | None, int | None]:
+    if frame.empty:
+        return None, None
+    values = frame["origin"].to_numpy(dtype=np.int64)
+    return int(values.min()), int(values.max())
+
+
+def audit_joint_fold_protocol(
+    fold: Mapping[str, Any],
+    registered_input_fold: Mapping[str, Any],
+    w_evaluation: pd.DataFrame,
+    c_evaluation: pd.DataFrame,
+) -> dict[str, Any]:
+    """Prove Joint uses raw registered support and shares C/W evaluation rows."""
+    fit = fold["fit"]
+    evaluation = fold["evaluation"]
+    input_fit = registered_input_fold["fit"]
+    input_evaluation = registered_input_fold["evaluation"]
+    fit_hash = _joint_fold_id_hash(fit)
+    evaluation_hash = _joint_fold_id_hash(evaluation)
+    input_fit_hash = _joint_fold_id_hash(input_fit)
+    input_evaluation_hash = _joint_fold_id_hash(input_evaluation)
+    w_hash = _joint_fold_id_hash(w_evaluation)
+    c_hash = _joint_fold_id_hash(c_evaluation)
+    checks = {
+        "fold_index_equal": int(fold["fold_index"])
+        == int(registered_input_fold["fold_index"]),
+        "joint_and_registered_input_fit_base_origin_ids_equal": _same_ordered_ids(
+            fit, input_fit, ("base_origin_id",)
+        ),
+        "joint_and_registered_input_evaluation_base_origin_ids_equal": _same_ordered_ids(
+            evaluation, input_evaluation, ("base_origin_id",)
+        ),
+        "registered_input_and_w_evaluation_ids_equal": _same_ordered_ids(
+            input_evaluation,
+            w_evaluation,
+            ("base_origin_id", "view_sample_id"),
+        ),
+        "registered_input_and_c_evaluation_ids_equal": _same_ordered_ids(
+            input_evaluation,
+            c_evaluation,
+            ("base_origin_id", "view_sample_id"),
+        ),
+        "c_and_w_evaluation_ids_equal": _same_ordered_ids(
+            c_evaluation,
+            w_evaluation,
+            ("base_origin_id", "view_sample_id"),
+        ),
+    }
+    minimum_fit_origin, maximum_fit_origin = _origin_bounds(fit)
+    minimum_eval_origin, maximum_eval_origin = _origin_bounds(evaluation)
+    return {
+        "fold_index": int(fold["fold_index"]),
+        "fit_rows_before_cap": len(fold["fit_raw"]),
+        "fit_rows_after_cap": len(fit),
+        "evaluation_rows_before_cap": len(fold["evaluation_raw"]),
+        "evaluation_rows_after_cap": len(evaluation),
+        "fit_base_origin_id_sha256": fit_hash["base_origin_id_sha256"],
+        "fit_view_sample_id_sha256": fit_hash["view_sample_id_sha256"],
+        "fit_joint_id_sha256": fit_hash[
+            "base_origin_and_view_sample_id_sha256"
+        ],
+        "evaluation_base_origin_id_sha256": evaluation_hash[
+            "base_origin_id_sha256"
+        ],
+        "evaluation_view_sample_id_sha256": evaluation_hash[
+            "view_sample_id_sha256"
+        ],
+        "evaluation_joint_id_sha256": evaluation_hash[
+            "base_origin_and_view_sample_id_sha256"
+        ],
+        "registered_input_fit_base_origin_id_sha256": input_fit_hash[
+            "base_origin_id_sha256"
+        ],
+        "registered_input_fit_view_sample_id_sha256": input_fit_hash[
+            "view_sample_id_sha256"
+        ],
+        "registered_input_evaluation_base_origin_id_sha256": input_evaluation_hash[
+            "base_origin_id_sha256"
+        ],
+        "registered_input_evaluation_view_sample_id_sha256": input_evaluation_hash[
+            "view_sample_id_sha256"
+        ],
+        "w_evaluation_base_origin_id_sha256": w_hash[
+            "base_origin_id_sha256"
+        ],
+        "w_evaluation_view_sample_id_sha256": w_hash[
+            "view_sample_id_sha256"
+        ],
+        "c_evaluation_base_origin_id_sha256": c_hash[
+            "base_origin_id_sha256"
+        ],
+        "c_evaluation_view_sample_id_sha256": c_hash[
+            "view_sample_id_sha256"
+        ],
+        "minimum_fit_origin": minimum_fit_origin,
+        "maximum_fit_origin": maximum_fit_origin,
+        "minimum_eval_origin": minimum_eval_origin,
+        "maximum_eval_origin": maximum_eval_origin,
+        "joint_native_view_sample_id_namespace": "dynamic",
+        "c_w_comparison_view_sample_id_namespace": "input_only",
+        "checks": checks,
+        "pass": all(checks.values()),
+    }
 
 
 def _j_inner_workers() -> int:
@@ -303,6 +511,7 @@ def _collapsed_joint_result(
             "ar_only_fallback_allowed": False,
         },
         "test_accessed": False,
+        "ood_accessed": False,
     }
 
 
@@ -345,6 +554,35 @@ def _evaluate_joint_indexed(candidate_index: int) -> tuple[dict[str, Any], float
     )
 
 
+def evaluate_joint_candidates_ordered(
+    train_blocks: Mapping[str, np.ndarray],
+    target: np.ndarray,
+    evaluation_blocks: Mapping[str, np.ndarray],
+    evaluation_target: np.ndarray,
+    candidates: list[tuple[str, float, float, float]],
+    *,
+    workers: int,
+) -> list[tuple[dict[str, Any], float]]:
+    """Evaluate candidates in registered order, identically in serial or fork mode."""
+    global _J_CANDIDATE_CONTEXT
+    _J_CANDIDATE_CONTEXT = (
+        train_blocks,
+        target,
+        evaluation_blocks,
+        evaluation_target,
+        candidates,
+    )
+    try:
+        return ordered_fork_map(
+            _evaluate_joint_indexed,
+            [(index,) for index in range(len(candidates))],
+            workers,
+            label="PRISM_V212_METRO_M5_JOINT_INNER",
+        )
+    finally:
+        _J_CANDIDATE_CONTEXT = None
+
+
 def run_joint_view(
     shared: Path,
     project: Path,
@@ -352,7 +590,6 @@ def run_joint_view(
     view: Any,
     protocol: str = "sru",
 ) -> dict[str, Any]:
-    global _J_CANDIDATE_CONTEXT
     started = time.time()
     destination = (
         output
@@ -415,7 +652,14 @@ def run_joint_view(
             result = _collapsed_joint_result(view, reason="EMPTY_ACTIVE_K_SUPPORT")
             write_json(destination / "RESULT.json", result)
             return result
-        oof = pd.read_parquet(output / w_result["oof_path"])
+        w_oof = pd.read_parquet(
+            output / w_result["oof_path"],
+            columns=["base_origin_id", "view_sample_id", "oof_fold"],
+        )
+        c_oof = pd.read_parquet(
+            output / c_result["oof_prediction_path"],
+            columns=["base_origin_id", "view_sample_id", "oof_fold"],
+        )
         pf_w_contract = w_result["w_contract"]
         w_contract = w_result.get("joint_w_basis_contract")
         if not isinstance(w_contract, Mapping):
@@ -446,16 +690,61 @@ def run_joint_view(
         ] = {candidate: [] for candidate in all_candidates}
         ar_losses = {alpha: [] for alpha in alpha_grid}
         fold_payloads = []
-        target_accessor = BaseAccessor(
+        joint_fold_protocol_audit = []
+        development_train = load_samples(shared, view, "train")
+        registered_input_train = load_samples(
+            shared, _input_only_view(view), "train"
+        )
+        fold_count = int(v21["selection"]["inner_folds"])
+        fit_cap = int(v2["row_caps"]["joint_predictive_fit"])
+        evaluation_cap = int(
+            v2["row_caps"]["validation_selection_per_fold"]
+        )
+        joint_folds = registered_joint_inner_fold_frames(
+            development_train,
+            fold_count=fold_count,
+            fit_cap=fit_cap,
+            evaluation_cap=evaluation_cap,
+        )
+        registered_input_folds = registered_joint_inner_fold_frames(
+            registered_input_train,
+            fold_count=fold_count,
+            fit_cap=fit_cap,
+            evaluation_cap=evaluation_cap,
+        )
+        if len(joint_folds) != fold_count or len(registered_input_folds) != fold_count:
+            raise JointFoldProtocolMismatch(
+                "registered Joint fold count does not match frozen inner_folds"
+            )
+        inner_target_accessor = BaseAccessor(
             shared,
             view.head.dataset,
-            "validation",
+            "train",
             [view.head.target],
         )
-        usable_folds = sorted(int(value) for value in oof["oof_fold"].unique())[1:]
-        for fold in usable_folds:
-            fit = oof[oof["oof_fold"] < fold].reset_index(drop=True)
-            evaluation = oof[oof["oof_fold"] == fold].reset_index(drop=True)
+        for fold_record, registered_input_fold in zip(
+            joint_folds, registered_input_folds, strict=True
+        ):
+            fold = int(fold_record["fold_index"])
+            fit = fold_record["fit"]
+            evaluation = fold_record["evaluation"]
+            w_evaluation = w_oof[w_oof["oof_fold"] == fold].reset_index(
+                drop=True
+            )
+            c_evaluation = c_oof[c_oof["oof_fold"] == fold].reset_index(
+                drop=True
+            )
+            protocol_audit = audit_joint_fold_protocol(
+                fold_record,
+                registered_input_fold,
+                w_evaluation,
+                c_evaluation,
+            )
+            joint_fold_protocol_audit.append(protocol_audit)
+            if not protocol_audit["pass"]:
+                raise JointFoldProtocolMismatch(
+                    f"Joint fold {fold} IDs differ from registered C/W evaluation"
+                )
             features = fit_physical_features(
                 shared,
                 view,
@@ -477,8 +766,17 @@ def run_joint_view(
             best_channel = str(c_result["best_active_k_channel"])
             best_index = features["channels"].index(best_channel)
             best_k_eval = features["compressed_evaluation"][:, best_index]
-            fit_seed = fit["physical_oof"].to_numpy(dtype=np.float64)
-            evaluation_seed = evaluation["physical_oof"].to_numpy(dtype=np.float64)
+            fit_seed, evaluation_seed, _, _, _ = _fit_c_routed(
+                shared,
+                view,
+                fit,
+                evaluation,
+                active,
+                v2,
+                c_result,
+                fit_split="train",
+                evaluation_split="train",
+            )
             if w_contract["family"] == IDENTITY:
                 w_train = np.empty((len(fit), 0), dtype=np.float64)
                 w_eval = np.empty((len(evaluation), 0), dtype=np.float64)
@@ -487,32 +785,24 @@ def run_joint_view(
                     fit_seed, evaluation_seed, w_contract
                 )
             delta, history = a_profile
-            a_train = target_accessor.target_state(
+            a_train = inner_target_accessor.target_state(
                 fit, view.head.target, delta, history
             )
-            a_eval = target_accessor.target_state(
+            a_eval = inner_target_accessor.target_state(
                 evaluation, view.head.target, delta, history
             )
             target = fit["y_true"].to_numpy(dtype=np.float64)
             evaluation_target = evaluation["y_true"].to_numpy(dtype=np.float64)
             train_blocks = {"K": k_train, "W": w_train, "A": a_train}
             evaluation_blocks = {"K": k_eval, "W": w_eval, "A": a_eval}
-            _J_CANDIDATE_CONTEXT = (
+            candidate_results = evaluate_joint_candidates_ordered(
                 train_blocks,
                 target,
                 evaluation_blocks,
                 evaluation_target,
                 all_candidates,
+                workers=inner_workers,
             )
-            try:
-                candidate_results = ordered_fork_map(
-                    _evaluate_joint_indexed,
-                    [(index,) for index in range(len(all_candidates))],
-                    inner_workers,
-                    label="PRISM_V211_METRO_M5_JOINT_INNER",
-                )
-            finally:
-                _J_CANDIDATE_CONTEXT = None
             for candidate, (contract, candidate_loss) in zip(
                 all_candidates, candidate_results, strict=True
             ):
@@ -657,7 +947,7 @@ def run_joint_view(
             **gate_parameters,
         )
         train = _cap(
-            load_samples(shared, view, "train"),
+            development_train,
             int(v2["row_caps"]["joint_predictive_fit"]),
         )
         validation = load_samples(shared, view, "validation")
@@ -696,10 +986,16 @@ def run_joint_view(
                 fit_seed, validation_seed, w_contract
             )
         delta, history = a_profile
-        a_train = target_accessor.target_state(
+        final_target_accessor = BaseAccessor(
+            shared,
+            view.head.dataset,
+            "validation",
+            [view.head.target],
+        )
+        a_train = final_target_accessor.target_state(
             train, view.head.target, delta, history
         )
-        a_validation = target_accessor.target_state(
+        a_validation = final_target_accessor.target_state(
             validation, view.head.target, delta, history
         )
         prediction, contract, components = fit_joint_candidate(
@@ -730,6 +1026,15 @@ def run_joint_view(
             if formal_pass
             else "INPUT_PATH_COLLAPSED",
             "pass": formal_pass,
+            "input_path_failure_class": (
+                oof_gate.get("input_path_failure_class")
+                if not oof_gate["pass"]
+                else (
+                    "INPUT_PATH_PRESERVED"
+                    if final_numerical_pass
+                    else "INPUT_PATH_NUMERICAL_FAILURE"
+                )
+            ),
             "final_refit_numerical_certificate_passed": final_numerical_pass,
         }
         gate = attach_nonselecting_validation_confirmation(
@@ -763,7 +1068,7 @@ def run_joint_view(
             ].copy()
             route_frame["y_pred"] = route_prediction
             route_frame["input_prediction"] = route_components["INPUT"]
-            route_frame["model"] = f"PRISM_V2_1_1_{route}"
+            route_frame["model"] = f"PRISM_V2_1_2_{route}"
             route_frame["dtype"] = "float64"
             route_path = destination / f"validation_{route}.parquet"
             route_frame.to_parquet(route_path, index=False, compression="zstd")
@@ -795,13 +1100,17 @@ def run_joint_view(
         frame["y_pred"] = prediction
         frame["input_prediction"] = components["INPUT"]
         frame["best_active_k_prediction"] = best_k_validation
-        frame["model"] = "PRISM_V2_1_1_JOINT_KWA"
+        frame["model"] = f"PRISM_V2_1_2_{selected_route}"
         frame["dtype"] = "float64"
         prediction_path = destination / "validation.parquet"
         frame.to_parquet(prediction_path, index=False, compression="zstd")
         final_loss = mse(frame["y_true"].to_numpy(dtype=np.float64), prediction)
         result = {
-            "status": "PASS" if gate["pass"] else "JOINT_INPUT_PATH_COLLAPSED",
+            "status": (
+                "PASS"
+                if gate["pass"]
+                else "JOINT_OOF_PROTOCOL_CORRECTED_BUT_MODEL_GATE_FAILED"
+            ),
             "stage": "E5R_JOINT",
             "inner_candidate_workers": inner_workers,
             "inner_parallelism_scope": "ORDERED_INDEPENDENT_CANDIDATES_ONLY",
@@ -834,6 +1143,22 @@ def run_joint_view(
             },
             "input_path_preservation": gate,
             "input_path_gate": gate,
+            "input_path_failure_class": gate.get(
+                "input_path_failure_class", "INPUT_PATH_PRESERVED"
+            ),
+            "joint_fold_protocol_audit": joint_fold_protocol_audit,
+            "joint_fold_protocol_audit_pass": all(
+                item["pass"] for item in joint_fold_protocol_audit
+            ),
+            "joint_fit_source": "ORIGINAL_REGISTERED_INNER_TRAIN_SUPPORT",
+            "joint_evaluation_source": (
+                "ORIGINAL_REGISTERED_INNER_VALIDATION_SUPPORT"
+            ),
+            "nested_oof_training_used": False,
+            "w_physical_oof_used_as_training_pool": False,
+            "w_physical_oof_usage": "CROSS_STAGE_FOLD_ID_AND_PROVENANCE_AUDIT_ONLY",
+            "registered_inner_fold_count": fold_count,
+            "candidate_fold_loss_count": len(losses[selected]),
             "block_correlations_by_fold": correlations,
             "joint_contract": contract,
             "final_selected_candidate": selected_route,
@@ -851,10 +1176,34 @@ def run_joint_view(
                 "fit_source": "train_only",
             },
             "test_accessed": False,
+            "ood_accessed": False,
             "elapsed_seconds": time.time() - started,
             **regression_metrics(
                 frame["y_true"].to_numpy(dtype=np.float64), prediction
             ),
+        }
+    except JointFoldProtocolMismatch as error:
+        result = {
+            "status": "STOP_JOINT_FOLD_PROTOCOL_MISMATCH",
+            "stage": "E5R_JOINT",
+            "target_head": view.head.head_id,
+            "availability_scenario": view.availability_scenario,
+            "proxy_policy": view.proxy_policy,
+            "joint_fit_source": "ORIGINAL_REGISTERED_INNER_TRAIN_SUPPORT",
+            "joint_evaluation_source": (
+                "ORIGINAL_REGISTERED_INNER_VALIDATION_SUPPORT"
+            ),
+            "nested_oof_training_used": False,
+            "w_physical_oof_used_as_training_pool": False,
+            "joint_fold_protocol_audit": locals().get(
+                "joint_fold_protocol_audit", []
+            ),
+            "test_accessed": False,
+            "ood_accessed": False,
+            "error_type": type(error).__name__,
+            "error": str(error),
+            "traceback": traceback.format_exc(),
+            "elapsed_seconds": time.time() - started,
         }
     except Exception as error:
         result = {
@@ -864,6 +1213,7 @@ def run_joint_view(
             "availability_scenario": view.availability_scenario,
             "proxy_policy": view.proxy_policy,
             "test_accessed": False,
+            "ood_accessed": False,
             "error_type": type(error).__name__,
             "error": str(error),
             "traceback": traceback.format_exc(),
@@ -897,7 +1247,11 @@ def run_e5r_joint(shared: Path, project: Path, output: Path) -> dict[str, Any]:
         result = by_key[
             (view.head.head_id, view.availability_scenario, view.proxy_policy)
         ]
-        if result.get("status") not in {"PASS", "JOINT_INPUT_PATH_COLLAPSED"}:
+        if result.get("status") not in {
+            "PASS",
+            "JOINT_INPUT_PATH_COLLAPSED",
+            "JOINT_OOF_PROTOCOL_CORRECTED_BUT_MODEL_GATE_FAILED",
+        }:
             continue
         card = build_joint_card(result)
         card.update(
@@ -925,7 +1279,12 @@ def run_e5r_joint(shared: Path, project: Path, output: Path) -> dict[str, Any]:
         "views": len(results),
         "pass": sum(item["status"] == "PASS" for item in results),
         "collapsed": sum(
-            item["status"] == "JOINT_INPUT_PATH_COLLAPSED" for item in results
+            item["status"]
+            in {
+                "JOINT_INPUT_PATH_COLLAPSED",
+                "JOINT_OOF_PROTOCOL_CORRECTED_BUT_MODEL_GATE_FAILED",
+            }
+            for item in results
         ),
         "test_accessed": False,
     }
