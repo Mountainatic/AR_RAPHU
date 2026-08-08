@@ -105,7 +105,9 @@ def test_m5_recomputation_is_forbidden() -> None:
 
 
 def test_candidate_id_namespace_is_canonical() -> None:
-    assert "METRO_P60_FINAL_V211_JOINT_STABILITY" in inspect.getsource(_canonical_ids)
+    source = inspect.getsource(_canonical_ids)
+    assert '"FINAL_V211_JOINT_STABILITY"' in source
+    assert '"METRO_P60_FINAL_V211_JOINT_STABILITY"' not in source
     assert "FINAL_V22_JOINT" not in inspect.getsource(_canonical_ids)
 
 

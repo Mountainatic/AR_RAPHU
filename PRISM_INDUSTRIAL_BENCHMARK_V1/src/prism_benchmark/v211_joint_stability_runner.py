@@ -269,14 +269,14 @@ def _canonical_ids(view: Any, result: dict[str, Any], decision_sha: str, pf_rout
         "practice_revision": PRACTICE_REVISION,
     }
     ids = {
-        name: stable_candidate_id("METRO_P60_FINAL_V211_PF", {**common, "candidate": name})
+        name: stable_candidate_id("FINAL_V211_PF", {**common, "candidate": name})
         for name in PF_CANDIDATES[:-1]
     }
     ids["PF_SELECTED"] = ids[pf_route]
     for route in JOINT_CANDIDATES:
         descriptor = result["route_materializations"][route]["selected_hyperparameters"]
         ids[route] = stable_candidate_id(
-            "METRO_P60_FINAL_V211_JOINT_STABILITY", {**common, **descriptor}
+            "FINAL_V211_JOINT_STABILITY", {**common, **descriptor}
         )
     ids["J_SELECTED"] = ids[result["final_selected_candidate"]]
     return ids
@@ -476,7 +476,18 @@ def run_m7_preflight(paths: FinalClosurePaths) -> dict[str, Any]:
         "16_prediction_does_not_reapply_ridge": "predictive_eta" not in inspect.getsource(predict_joint_candidate),
         "17_chunked_equals_nonchunked": bool(np.array_equal(pred, chunked)),
         "18_serial_parallel_fixture_regression_pass": "179 passed" in (paths.source_results / "PYTEST_OUTPUT.txt").read_text(encoding="utf-8"),
-        "19_candidate_set_equals_freeze": ids_valid,
+        "19_candidate_set_equals_freeze": ids_valid and all(
+            all(
+                not identifier.startswith("METRO_P60_METRO_P60_")
+                and (
+                    identifier.startswith("METRO_P60_FINAL_V211_JOINT_STABILITY_")
+                    if name.startswith("J_") or name == "J_SELECTED"
+                    else identifier.startswith("METRO_P60_FINAL_V211_PF_")
+                )
+                for name, identifier in item["candidate_ids"].items()
+            )
+            for item in pending.values()
+        ),
         "20_m8_accepts_pf_and_joint": JOINT_VS_PF_COMPARISON["comparison_id"] == "JOINT_SELECTED_VS_PF_SELECTED",
         "21_m8_no_test_reselection": config["post_test_reselection"] is False,
         "22_historical_context_selection_forbidden": config["historical_aggregates_selection_use_forbidden"] is True,
