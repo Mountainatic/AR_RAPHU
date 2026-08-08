@@ -20,9 +20,13 @@ ACTIVE_DATASET = "metropt"
 ACTIVE_HEAD = "METRO_P60__H6__W1"
 RECOMMENDED_BRANCH = "prism-v2-1-2-joint-oof-protocol-correction"
 SOURCE_COMMIT = "29ff09f88ca4d3424cb36e4d508db9e2d220f119"
-DEVELOPMENT_FREEZE_NAME = "METRO_P60_V212_DEVELOPMENT_FREEZE.json"
-DEVELOPMENT_DECISION_NAME = "METRO_P60_V212_DEVELOPMENT_DECISION.json"
-TEST_ACCESS_AUDIT_NAME = "METRO_P60_V212_TEST_OOD_ACCESS_AUDIT.json"
+DEVELOPMENT_FREEZE_NAME = "METRO_P60_V211_JOINT_STABILITY_FINAL_DEVELOPMENT_FREEZE.json"
+DEVELOPMENT_DECISION_NAME = "METRO_P60_V211_JOINT_STABILITY_FINAL_DEVELOPMENT_DECISION.json"
+TEST_ACCESS_AUDIT_NAME = "TEST_OOD_ACCESS_AUDIT.json"
+CANONICAL_CONFIG_RELATIVE = (
+    "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_PACKAGE/"
+    "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_CONFIG.json"
+)
 WORKER_OVERRIDE_ENV = "PRISM_V211_METRO_WORKERS"
 K_MEMORY_GIB_ENV = "PRISM_V211_K_MEMORY_GIB_PER_WORKER"
 K_INNER_WORKERS_ENV = "PRISM_V211_K_INNER_WORKERS"
@@ -44,7 +48,7 @@ class MetroV211Paths:
 
     @property
     def config_path(self) -> Path:
-        return self.plan / CONFIG_NAME
+        return self.project / CANONICAL_CONFIG_RELATIVE
 
     @property
     def theory_path(self) -> Path:
@@ -265,7 +269,7 @@ def require_metro_test_freeze(paths: MetroV211Paths) -> dict[str, Any]:
     if paths.test_access_audit_path.exists():
         raise RuntimeError("Metro-P60 test/OOD was already accessed")
     manifest = json.loads(paths.development_freeze_path.read_text(encoding="utf-8"))
-    if manifest.get("status") != "METRO_P60_V2_1_2_DEVELOPMENT_FROZEN":
+    if manifest.get("status") != "METRO_P60_V2_1_1_DEVELOPMENT_FROZEN":
         raise RuntimeError("Metro-P60 development freeze is not valid")
     if manifest.get("test_accessed") is not False or manifest.get("ood_accessed") is not False:
         raise RuntimeError("Metro-P60 freeze records early test/OOD access")

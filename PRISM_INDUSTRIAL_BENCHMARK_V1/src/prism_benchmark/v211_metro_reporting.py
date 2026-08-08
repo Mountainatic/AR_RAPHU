@@ -35,7 +35,7 @@ from .v211_metro_views import metro_p60_dynamic_views
 from .v211_w import IDENTITY
 
 
-PACKAGE_NAME = "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_RESULTS_bundle"
+PACKAGE_NAME = "PRISM_V2_1_1_METRO_P60_FINAL_RESULTS_bundle"
 BOOTSTRAP_SEED = 20260807
 PF_CANDIDATES = ("KC", "KCW", "KCA", "KCWA", "PF_SELECTED")
 JOINT_CANDIDATES = (J_K, J_KW, J_KA, J_KWA, "J_SELECTED")
@@ -48,8 +48,15 @@ JOINT_COMPARISONS = (
     (J_KW, J_K, "JOINT_W_MARGINAL"),
     (J_KWA, J_KA, "JOINT_W_MARGINAL"),
     ("J_SELECTED", J_K, "JOINT_SELECTED_INCREMENT"),
+    ("J_SELECTED", "PF_SELECTED", "JOINT_VS_PHYSICS_FIRST"),
 )
 COMPARISONS = (*PF_COMPARISONS, *JOINT_COMPARISONS)
+JOINT_VS_PF_COMPARISON = {
+    "comparison_id": "JOINT_SELECTED_VS_PF_SELECTED",
+    "candidate": "J_SELECTED",
+    "comparator": "PF_SELECTED",
+    "comparison_family": "JOINT_VS_PHYSICS_FIRST",
+}
 PRIMARY_W_COMPARISONS = {
     "KCW_vs_KC",
     "KCWA_vs_KCA",
@@ -313,7 +320,11 @@ def _bootstrap_view(
                     "split": split,
                     "candidate": candidate,
                     "comparator": comparator_name,
-                    "comparison_id": f"{candidate}_vs_{comparator_name}",
+                    "comparison_id": (
+                        JOINT_VS_PF_COMPARISON["comparison_id"]
+                        if candidate == "J_SELECTED" and comparator_name == "PF_SELECTED"
+                        else f"{candidate}_vs_{comparator_name}"
+                    ),
                     "comparison_family": family,
                     "mean_mse_difference_candidate_minus_comparator": float(
                         observed_difference[index]
@@ -635,11 +646,11 @@ def _write_report(
         ]
         for item in transfer["views"]
     ]
-    report = paths.output / "FINAL" / "METRO_P60_V211_REPORT.md"
+    report = paths.output / "FINAL" / "METRO_P60_PRISM_V211_FINAL_REPORT.md"
     report.write_text(
         "\n".join(
             [
-                "# PRISM v2.1.1 Metro-P60 Wiener degradation/activation transfer audit",
+                "# PRISM v2.1.1 Metro-P60 final closure report",
                 "",
                 "Status: `COMPLETED`.",
                 "",
@@ -660,6 +671,11 @@ def _write_report(
                 "## Formal selected-model metrics",
                 "",
                 _markdown_table(["proxy", "split", "candidate", "MSE", "R2"], metric_rows),
+                "",
+                "Joint is an optional predictive enhancement; PF remains the independent",
+                "physical-first route. Predictive results are not physical or causal proof.",
+                "PF W identity and PF A exact-zero mean those optional PF stages closed under",
+                "the frozen development rules; they do not establish absence of a physical mechanism.",
                 "",
                 "Paired comparisons use 500 shared-draw moving-block bootstrap replicates,",
                 "the inherited dynamic block-length rule, and Holm correction across all six",
@@ -826,14 +842,32 @@ def run_m8(paths: MetroV211Paths) -> dict[str, Any]:
     metrics = pd.DataFrame(_metric_rows(paths, views)).sort_values(
         ["proxy_policy", "split", "candidate"]
     )
+    metrics["rank_current"] = metrics.groupby(
+        ["proxy_policy", "split"]
+    )["mse"].rank(method="min", ascending=True).astype(int)
     transfer = _selection_transfer_audit(paths, views, bootstrap, formal_routes)
     final = paths.output / "FINAL"
     final.mkdir(parents=True, exist_ok=True)
     metrics.to_csv(final / "METRO_P60_V211_FINAL_METRICS.csv", index=False)
     bootstrap.to_csv(final / "METRO_P60_V211_BOOTSTRAP.csv", index=False)
-    bootstrap[bootstrap["comparison_id"].isin(PRIMARY_W_COMPARISONS)].to_csv(
+    bootstrap[bootstrap["comparison_family"].isin(["PF_W_MARGINAL", "JOINT_W_MARGINAL"])].to_csv(
         final / "METRO_P60_V211_W_MARGINALS.csv", index=False
     )
+    primary = bootstrap[
+        bootstrap["comparison_id"] == JOINT_VS_PF_COMPARISON["comparison_id"]
+    ].copy()
+    if len(primary) != 6:
+        raise RuntimeError("primary Joint-vs-PF comparison is incomplete")
+
+    def conclusion(row: Mapping[str, Any]) -> str:
+        if float(row["holm_p_value"]) <= 0.05 and float(row["mse_difference_ci_upper"]) < 0.0:
+            return f"JOINT_{str(row['split']).upper()}_GAIN_SUPPORTED"
+        if float(row["holm_p_value"]) <= 0.05 and float(row["mse_difference_ci_lower"]) > 0.0:
+            return f"JOINT_{str(row['split']).upper()}_DEGRADATION_SUPPORTED"
+        return f"JOINT_{str(row['split']).upper()}_NEUTRAL"
+
+    primary["formal_conclusion"] = [conclusion(row) for row in primary.to_dict("records")]
+    primary.to_csv(final / "METRO_P60_V211_PRIMARY_JOINT_VS_PF.csv", index=False)
     write_json(final / "METRO_P60_V211_SELECTION_TRANSFER_AUDIT.json", transfer)
     historical = _read(paths.historical_reference_path)
     if historical.get("selection_use_forbidden") is not True:
@@ -851,21 +885,39 @@ def run_m8(paths: MetroV211Paths) -> dict[str, Any]:
         },
     )
     report = _write_report(paths, metrics, transfer)
+    with report.open("a", encoding="utf-8") as handle:
+        handle.write("\n## Primary Joint vs Physics-First comparison\n\n")
+        handle.write(_markdown_table(
+            ["proxy", "split", "MSE difference", "relative gain", "95% CI", "Holm p", "conclusion"],
+            [[
+                row.proxy_policy, row.split,
+                f"{float(row.mean_mse_difference_candidate_minus_comparator):.12g}",
+                f"{float(row.relative_mse_improvement):.6%}",
+                f"[{float(row.mse_difference_ci_lower):.12g}, {float(row.mse_difference_ci_upper):.12g}]",
+                f"{float(row.holm_p_value):.6g}", row.formal_conclusion,
+            ] for row in primary.itertuples(index=False)],
+        ))
+        handle.write("\n\nDevelopment selected the route, representation and eta before lockbox access. ")
+        handle.write("Test/OOD results did not trigger reselection. Historical v1.3 aggregates are retrospective context only and have no paired significance.\n")
     status_path = paths.output / "RUN_STATUS.json"
     run_status = _read(status_path)
     run_status.update(
         {
-            "status": "COMPLETED",
+            "status": "EXPERIMENT_COMPLETED",
             "stage": "M8",
             "development_frozen": True,
             "test_accessed": True,
             "ood_accessed": True,
             "evidence_class": EVIDENCE_CLASS,
+            "formal_routes": formal_routes,
+            "m7_run": True,
+            "m8_run": True,
+            "post_test_reselection": False,
         }
     )
     write_json(status_path, run_status)
     result = {
-        "status": "COMPLETED",
+        "status": "EXPERIMENT_COMPLETED",
         "stage": "M8_STATISTICS_REPORT_PACKAGE",
         "protocol_id": PROTOCOL_ID,
         "evidence_class": EVIDENCE_CLASS,
@@ -876,10 +928,35 @@ def run_m8(paths: MetroV211Paths) -> dict[str, Any]:
         "wall_seconds_before_packaging": time.perf_counter() - started,
         "test_accessed": True,
         "ood_accessed": True,
+        "post_test_reselection": False,
     }
     write_json(final / "M8_RESULT.json", result)
-    package = package_results(paths)
-    result["package"] = package
+    selected_metrics = metrics[metrics["candidate"].isin(["PF_SELECTED", "J_SELECTED"])]
+    selections = freeze["development_selections"]
+    evidence_summary = {
+        "status": "EXPERIMENT_COMPLETED",
+        "model_version": freeze["model_version"],
+        "practice_revision": freeze["practice_revision"],
+        "protocol_id": freeze["protocol_id"],
+        "development_source_commit": freeze["source_execution_commit"],
+        "frozen_code_commit": freeze["code_commit"],
+        "canonical_theory_sha256": freeze["canonical_theory_sha256"],
+        "config_sha256": freeze["config_sha256"],
+        "freeze_sha256": sha256_file(paths.development_freeze_path),
+        "pf_selected_route_by_view": {item["view"]: item["pf_selected_route"] for item in selections},
+        "joint_selected_route_by_view": {item["view"]: item["selected_joint_route"] for item in selections},
+        "joint_representation_by_view": {item["view"]: item["selected_k_representation"] for item in selections},
+        "joint_eta_by_view": {item["view"]: item["selected_predictive_eta"] for item in selections},
+        "selected_metrics": selected_metrics.to_dict("records"),
+        "primary_joint_vs_pf": primary.to_dict("records"),
+        "historical_context": historical,
+        "historical_aggregates_used_for_selection": False,
+        "historical_aggregates_used_for_hyperparameter_tuning": False,
+        "test_accessed": True,
+        "ood_accessed": True,
+        "post_test_reselection": False,
+    }
+    write_json(final / "METRO_P60_V211_FINAL_EVIDENCE_SUMMARY.json", evidence_summary)
     result["wall_seconds"] = time.perf_counter() - started
-    write_json(final / "M8_RESULT_WITH_PACKAGE.json", result)
+    write_json(final / "M8_RESULT.json", result)
     return result

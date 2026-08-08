@@ -1,5 +1,15 @@
 # Changelog
 
+## PRISM v2.1.1 - Joint Predictive Stability Practice Update
+
+- Refines executable estimator practice within canonical PRISM v2.1.1; no standalone v2.2 theory is retained.
+- Separates numerical ridge from explicit predictive ridge and registers compressed/full representations of the same frozen K support.
+- Makes no K/C/W/A estimator, data-split, Joint gate-threshold, or candidate-family change.
+- Reuses M2--M4 and migrates the abf7 M5 development evidence without recomputation or loss changes.
+- Retains PF-independent freeze semantics and registers Joint as an optional predictive enhancement.
+- Freezes `J_SELECTED` vs `PF_SELECTED` as the primary final comparison before lockbox access.
+- Test/OOD remained untouched before the canonical M6 freeze; no post-test reselection is permitted.
+
 ## PRISM v2.1.2 - PF Independent Freeze Semantics
 
 - Clarifies practice-contract, freeze, assembly, and materialization semantics;
@@ -45,12 +55,3 @@
   remains valid after the runner creates its output directory.
 - Test and OOD data were not accessed before this correction and are not used
   to motivate or tune it.
-## PRISM v2.2 - Joint Predictive Stability
-
-- First estimator change after the v2.1.2 protocol and freeze-semantics corrections.
-- Adds `CHANNEL_COMPRESSED` and `FULL_BASIS` representations of the same frozen Joint K support.
-- Separates numerical ridge from explicit predictive ridge with the pre-registered eta grid.
-- Retains corrected v2.1.2 Joint as a non-selecting diagnostic legacy anchor.
-- Makes no K/C/W/A estimator, data-split, gate-threshold, or PF-independent-freeze change.
-- Preserves Joint as an optional predictive enhancement; unsupported Joint remains excluded before test/OOD.
-- No test or OOD data were accessed to define this extension.

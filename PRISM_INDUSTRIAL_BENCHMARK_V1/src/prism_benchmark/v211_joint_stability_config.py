@@ -7,14 +7,20 @@ from typing import Any
 from .cpu_data import sha256_file
 
 
-PROTOCOL_ID = "PRISM_V2_2_METRO_P60_JOINT_PREDICTIVE_STABILITY_V1"
-MODEL_VERSION = "PRISM_V2_2"
-PARENT_COMMIT = "6ebcac898a75b6c1aa05c920a3a39847db052957"
+PROTOCOL_ID = "PRISM_V2_1_1_METRO_P60_JOINT_STABILITY_FINAL_V1"
+MODEL_VERSION = "PRISM_V2_1_1"
+PRACTICE_REVISION = "PRISM_V211_JOINT_PREDICTIVE_STABILITY_PRACTICE_R1"
+JOINT_ESTIMATOR_SEMANTICS = "PREDICTIVE_STABILITY_RIDGE_R1"
+DEVELOPMENT_SOURCE_COMMIT = "abf7edd162b9e4282789d178e1c4415035817a60"
+PARENT_COMMIT = DEVELOPMENT_SOURCE_COMMIT
 DEVELOPMENT_ARTIFACT_COMMIT = "b5a4d672f65d0c5a01135f331d193a996e9c8c2d"
-PACKAGE_DIRECTORY = "PRISM_V2_2_JOINT_PREDICTIVE_STABILITY_PACKAGE"
-CONFIG_NAME = "PRISM_V2_2_JOINT_PREDICTIVE_STABILITY_CONFIG.json"
-OUTPUT_DIRECTORY = "results_prism_v2_2_metro_p60_joint_stability"
-THEORY_NAME = "PRISM_Theory_v2_2_Joint_Predictive_Stability_Extension_Theory_Only.md"
+PACKAGE_DIRECTORY = "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_PACKAGE"
+CONFIG_NAME = "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_CONFIG.json"
+OUTPUT_DIRECTORY = "results_prism_v2_1_1_metro_p60_joint_stability_final"
+THEORY_RELATIVE_PATH = (
+    "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_PACKAGE/reference/"
+    "PRISM_Theory_v2_1_1_Implementation_Safe_Stagewise_Routed_Modular_Assembly_Theory_Only.md"
+)
 CHANNEL_COMPRESSED = "CHANNEL_COMPRESSED"
 FULL_BASIS = "FULL_BASIS"
 K_REPRESENTATIONS = (CHANNEL_COMPRESSED, FULL_BASIS)
@@ -26,15 +32,17 @@ def config_path(project: Path) -> Path:
 
 
 def theory_path(project: Path) -> Path:
-    return project / PACKAGE_DIRECTORY / "reference" / THEORY_NAME
+    return project / THEORY_RELATIVE_PATH
 
 
-def load_v22_config(project: Path) -> dict[str, Any]:
+def load_joint_stability_config(project: Path) -> dict[str, Any]:
     path = config_path(project)
     value = json.loads(path.read_text(encoding="utf-8"))
     expected = {
         "protocol_id": PROTOCOL_ID,
         "model_version": MODEL_VERSION,
+        "practice_revision": PRACTICE_REVISION,
+        "joint_estimator_semantics": JOINT_ESTIMATOR_SEMANTICS,
         "parent_commit": PARENT_COMMIT,
         "development_artifact_commit": DEVELOPMENT_ARTIFACT_COMMIT,
         "output_root": OUTPUT_DIRECTORY,
@@ -55,6 +63,6 @@ def load_v22_config(project: Path) -> dict[str, Any]:
     }
     for key, required in expected.items():
         if value.get(key) != required:
-            raise RuntimeError(f"PRISM v2.2 frozen config mismatch: {key}")
+            raise RuntimeError(f"PRISM v2.1.1 stability-practice config mismatch: {key}")
     value["config_sha256"] = sha256_file(path)
     return value

@@ -1,4 +1,9 @@
-# PRISM Theory v2.2 — Joint Predictive Stability Extension
+# WITHDRAWN AS CANONICAL THEORY
+
+> **HISTORICAL EXECUTION DRAFT ONLY. CONTENT MERGED INTO PRISM v2.1.1 PRACTICE SECTION 11A.11.**
+> `v2.2` is retained only as the historical label of the abf7 development execution and is not a canonical PRISM model/theory version.
+
+# Historical draft: Joint Predictive Stability Extension
 
 > Status: `THEORY_ONLY / ESTIMATOR_EXTENSION`  
 > Parent: amended PRISM v2.1.1 implementation-safe stagewise routed modular assembly theory.  
@@ -84,4 +89,3 @@ If the Joint gate passes, Joint may be added to the formal freeze. If it fails, 
 ## 6. Invariants
 
 This extension does not modify K/C/W/A estimators, the data split, row caps, inner folds, W or A construction, Joint W joint fitting, candidate-binding rules, input-path thresholds, test/OOD guards, or PF-independent freeze semantics. It makes no physical causal claim about which K representation or ridge value is selected.
-

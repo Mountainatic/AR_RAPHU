@@ -45,18 +45,20 @@ from .v211_selection import (
     numerical_contract_passes,
 )
 from .v211_w import IDENTITY, _fit_c_routed
-from .v22_config import (
+from .v211_joint_stability_config import (
     CHANNEL_COMPRESSED,
     ETA_PRED_GRID,
     FULL_BASIS,
+    JOINT_ESTIMATOR_SEMANTICS,
     K_REPRESENTATIONS,
     MODEL_VERSION,
-    load_v22_config,
+    PRACTICE_REVISION,
+    load_joint_stability_config,
 )
 
 
 @dataclass(frozen=True)
-class V22Candidate:
+class StabilityCandidate:
     route: str
     k_representation: str
     numerical_alpha: float
@@ -91,14 +93,14 @@ class PreparedRepresentation:
     raw_k_support: tuple[str, ...]
 
 
-_V22_EVALUATION_CONTEXT: tuple[
+_STABILITY_EVALUATION_CONTEXT: tuple[
     list[dict[str, PreparedRepresentation]],
     list[np.ndarray],
-    list[V22Candidate],
+    list[StabilityCandidate],
 ] | None = None
 
 
-def registered_v22_joint_candidates() -> tuple[str, ...]:
+def registered_joint_stability_candidates() -> tuple[str, ...]:
     return JOINT_CANDIDATES
 
 
@@ -119,7 +121,7 @@ def _matrix(value: np.ndarray, rows: int) -> np.ndarray:
     if matrix.ndim == 1:
         matrix = matrix[:, None]
     if matrix.ndim != 2 or len(matrix) != rows:
-        raise ValueError("v2.2 Joint block has invalid shape")
+        raise ValueError("v2.1.1 Joint stability practice Joint block has invalid shape")
     return matrix
 
 
@@ -130,7 +132,7 @@ def k_representation_blocks(
     channels = tuple(str(value) for value in features["channels"])
     expected = tuple(str(value) for value in active_channels)
     if channels != expected:
-        raise RuntimeError("v2.2 K representation raw support differs from frozen active K")
+        raise RuntimeError("v2.1.1 Joint stability practice K representation raw support differs from frozen active K")
     compressed_train = np.asarray(features["compressed_train"], dtype=np.float64)
     compressed_evaluation = np.asarray(
         features["compressed_evaluation"], dtype=np.float64
@@ -179,7 +181,7 @@ def prepare_joint_representation(
         train = _matrix(train_blocks[block], rows)
         evaluation = _matrix(evaluation_blocks[block], evaluation_rows)
         if train.shape[1] != evaluation.shape[1]:
-            raise ValueError(f"v2.2 Joint {block} train/evaluation columns differ")
+            raise ValueError(f"v2.1.1 Joint stability practice Joint {block} train/evaluation columns differ")
         if train.shape[1] == 0:
             block_slices[block] = (start, start)
             block_contracts[block] = {
@@ -240,7 +242,7 @@ def _route_indices(
     for block in _required_blocks(route):
         left, right = prepared.block_slices[block]
         if right <= left:
-            raise ValueError(f"v2.2 Joint route {route} has empty {block} block")
+            raise ValueError(f"v2.1.1 Joint stability practice Joint route {route} has empty {block} block")
         block_indices = list(range(left, right))
         indices.extend(block_indices)
         stop = start + len(block_indices)
@@ -258,7 +260,7 @@ def _effective_df(gram: np.ndarray, penalty: np.ndarray) -> float:
         return float("nan")
 
 
-def solve_prepared_v22(
+def solve_prepared_stability(
     prepared: PreparedRepresentation,
     *,
     route: str,
@@ -266,7 +268,7 @@ def solve_prepared_v22(
     predictive_eta: float,
 ) -> tuple[np.ndarray, dict[str, Any], dict[str, np.ndarray]]:
     if route not in JOINT_CANDIDATES:
-        raise ValueError("v2.2 Joint cannot select AR-only or K-zero")
+        raise ValueError("v2.1.1 Joint stability practice Joint cannot select AR-only or K-zero")
     if numerical_alpha < 0 or predictive_eta < 0:
         raise ValueError("negative ridge is invalid")
     indices, route_slices = _route_indices(prepared, route)
@@ -295,6 +297,9 @@ def solve_prepared_v22(
     contract = {
         "family": route,
         "estimator_version": MODEL_VERSION,
+        "model_version": MODEL_VERSION,
+        "practice_revision": PRACTICE_REVISION,
+        "joint_estimator_semantics": JOINT_ESTIMATOR_SEMANTICS,
         "k_representation": prepared.k_representation,
         "raw_k_support": list(prepared.raw_k_support),
         "numerical_alpha": float(numerical_alpha),
@@ -362,7 +367,7 @@ def solve_prepared_legacy_anchor(
     return z @ coefficient + prepared.target_mean, certificate.to_json()
 
 
-def fit_joint_candidate_v22(
+def fit_joint_candidate_stability(
     train_blocks: Mapping[str, np.ndarray],
     target: np.ndarray,
     evaluation_blocks: Mapping[str, np.ndarray],
@@ -380,12 +385,18 @@ def fit_joint_candidate_v22(
         k_representation=k_representation,
         raw_k_support=raw_k_support,
     )
-    return solve_prepared_v22(
+    return solve_prepared_stability(
         prepared,
         route=candidate,
         numerical_alpha=numerical_alpha,
         predictive_eta=predictive_eta,
     )
+
+
+# Historical execution compatibility.  This is deliberately an alias to the
+# canonical implementation so the abf7 callable and the renamed callable can
+# be regression-compared without maintaining a second estimator body.
+fit_joint_candidate_v22 = fit_joint_candidate_stability
 
 
 def select_smallest_numerical_alpha(
@@ -451,15 +462,15 @@ def select_k_representation(
     return str(selection.final_selected_candidate), selection.to_json()
 
 
-def v22_candidate_id(view_key: str, candidate: V22Candidate) -> str:
+def stability_candidate_id(view_key: str, candidate: StabilityCandidate) -> str:
     return stable_candidate_id(
-        "V22_JOINT",
+        "JOINT_STABILITY",
         {"view": view_key, **candidate.descriptor()},
     )
 
 
-def v22_guarded_selection_json(selection: Any) -> dict[str, Any]:
-    def descriptor(candidate: V22Candidate) -> dict[str, Any]:
+def stability_guarded_selection_json(selection: Any) -> dict[str, Any]:
+    def descriptor(candidate: StabilityCandidate) -> dict[str, Any]:
         return {"candidate_key": candidate.key(), **candidate.descriptor()}
 
     return {
@@ -500,16 +511,16 @@ def v22_guarded_selection_json(selection: Any) -> dict[str, Any]:
 
 
 def _evaluate_candidate(candidate_index: int) -> dict[str, Any]:
-    if _V22_EVALUATION_CONTEXT is None:
-        raise RuntimeError("v2.2 candidate context is not initialized")
-    prepared_folds, evaluation_targets, candidates = _V22_EVALUATION_CONTEXT
+    if _STABILITY_EVALUATION_CONTEXT is None:
+        raise RuntimeError("v2.1.1 Joint stability practice candidate context is not initialized")
+    prepared_folds, evaluation_targets, candidates = _STABILITY_EVALUATION_CONTEXT
     candidate = candidates[candidate_index]
     fold_losses: list[float] = []
     fold_diagnostics: list[dict[str, Any]] = []
     for fold_index, (prepared_by_representation, target) in enumerate(
         zip(prepared_folds, evaluation_targets, strict=True)
     ):
-        prediction, contract, components = solve_prepared_v22(
+        prediction, contract, components = solve_prepared_stability(
             prepared_by_representation[candidate.k_representation],
             route=candidate.route,
             numerical_alpha=candidate.numerical_alpha,
@@ -578,28 +589,28 @@ def _evaluate_candidate(candidate_index: int) -> dict[str, Any]:
     }
 
 
-def evaluate_v22_candidates_ordered(
+def evaluate_stability_candidates_ordered(
     prepared_folds: list[dict[str, PreparedRepresentation]],
     evaluation_targets: list[np.ndarray],
-    candidates: list[V22Candidate],
+    candidates: list[StabilityCandidate],
     *,
     workers: int,
 ) -> list[dict[str, Any]]:
-    global _V22_EVALUATION_CONTEXT
-    _V22_EVALUATION_CONTEXT = (prepared_folds, evaluation_targets, candidates)
+    global _STABILITY_EVALUATION_CONTEXT
+    _STABILITY_EVALUATION_CONTEXT = (prepared_folds, evaluation_targets, candidates)
     try:
         return ordered_fork_map(
             _evaluate_candidate,
             [(index,) for index in range(len(candidates))],
             workers=workers,
-            label="PRISM_V22_JOINT_PREDICTIVE_PATH",
+            label="PRISM_V211_JOINT_STABILITY_JOINT_PREDICTIVE_PATH",
         )
     finally:
-        _V22_EVALUATION_CONTEXT = None
+        _STABILITY_EVALUATION_CONTEXT = None
 
 
 def _gate_for_candidate(
-    candidate: V22Candidate,
+    candidate: StabilityCandidate,
     prepared_folds: list[dict[str, PreparedRepresentation]],
     fold_records: list[dict[str, Any]],
     gate_parameters: Mapping[str, float],
@@ -613,7 +624,7 @@ def _gate_for_candidate(
     for prepared_by_representation, fold in zip(
         prepared_folds, fold_records, strict=True
     ):
-        prediction, contract, components = solve_prepared_v22(
+        prediction, contract, components = solve_prepared_stability(
             prepared_by_representation[candidate.k_representation],
             route=candidate.route,
             numerical_alpha=candidate.numerical_alpha,
@@ -640,7 +651,7 @@ def _gate_for_candidate(
 
 def _diagnosis(
     selected_route: str,
-    route_best_by_representation: Mapping[str, Mapping[str, V22Candidate]],
+    route_best_by_representation: Mapping[str, Mapping[str, StabilityCandidate]],
     gates: Mapping[str, Mapping[str, Mapping[str, Any]]],
 ) -> str:
     candidates = route_best_by_representation[selected_route]
@@ -667,8 +678,8 @@ def _diagnosis(
         for value in gates.values()
         for representation in K_REPRESENTATIONS
     ):
-        return "JOINT_STABILITY_NOT_RESCUED_BY_REGISTERED_V22_CONTROLS"
-    return "JOINT_V22_STABILITY_SUPPORTED_WITHOUT_UNIQUE_FACTOR_ATTRIBUTION"
+        return "JOINT_STABILITY_NOT_RESCUED_BY_REGISTERED_STABILITY_CONTROLS"
+    return "JOINT_STABILITY_STABILITY_SUPPORTED_WITHOUT_UNIQUE_FACTOR_ATTRIBUTION"
 
 
 def _stability_summary(losses: Sequence[float]) -> dict[str, float]:
@@ -684,7 +695,7 @@ def _stability_summary(losses: Sequence[float]) -> dict[str, float]:
     }
 
 
-def run_joint_v22_view(
+def run_joint_stability_view(
     shared: Path,
     project: Path,
     output: Path,
@@ -702,7 +713,7 @@ def run_joint_v22_view(
     )
     destination.mkdir(parents=True, exist_ok=True)
     try:
-        config = load_v22_config(project)
+        config = load_joint_stability_config(project)
         v211, v21, v2 = load_v211_configs(project, protocol="metro_p60")
         c_path = (
             output
@@ -730,9 +741,9 @@ def run_joint_v22_view(
         w_result = json.loads(w_path.read_text(encoding="utf-8"))
         a_result = json.loads(a_path.read_text(encoding="utf-8"))
         if any(item.get("status") != "PASS" for item in (c_result, w_result, a_result)):
-            raise RuntimeError("v2.2 M2-M4 prerequisite is not PASS")
+            raise RuntimeError("v2.1.1 Joint stability practice M2-M4 prerequisite is not PASS")
         if not bool(c_result.get("input_path_preservation", {}).get("pass")):
-            raise RuntimeError("v2.2 requires the frozen C input path")
+            raise RuntimeError("v2.1.1 Joint stability practice requires the frozen C input path")
         frozen_channel_set = {
             str(value) for value in c_result["active_channels"]
         }
@@ -743,7 +754,7 @@ def run_joint_v22_view(
         ]
         frozen_channels = tuple(str(item["channel"]) for item in active)
         if set(frozen_channels) != frozen_channel_set:
-            raise RuntimeError("v2.2 active K support differs from frozen C support")
+            raise RuntimeError("v2.1.1 Joint stability practice active K support differs from frozen C support")
         w_oof = pd.read_parquet(
             output / w_result["oof_path"],
             columns=["base_origin_id", "view_sample_id", "oof_fold"],
@@ -810,7 +821,7 @@ def run_joint_v22_view(
             protocol_audits.append(protocol_audit)
             if not protocol_audit["pass"]:
                 raise JointFoldProtocolMismatch(
-                    f"v2.2 Joint fold {fold} provenance differs from C/W"
+                    f"v2.1.1 Joint stability practice Joint fold {fold} provenance differs from C/W"
                 )
             features = fit_physical_features(
                 shared,
@@ -893,7 +904,7 @@ def run_joint_v22_view(
                 }
             )
         if len(prepared_folds) != 4:
-            raise JointFoldProtocolMismatch("v2.2 Joint requires all four folds")
+            raise JointFoldProtocolMismatch("v2.1.1 Joint stability practice Joint requires all four folds")
 
         expected_legacy_losses = [
             float(value) for value in legacy["final_selected_fold_losses"]
@@ -946,7 +957,7 @@ def run_joint_v22_view(
                 for alpha in numerical_alpha_grid:
                     contracts = []
                     for prepared_by_representation in prepared_folds:
-                        _, contract, _ = solve_prepared_v22(
+                        _, contract, _ = solve_prepared_stability(
                             prepared_by_representation[representation],
                             route=route,
                             numerical_alpha=alpha,
@@ -963,7 +974,7 @@ def run_joint_v22_view(
                 numerical_audits[f"{route}|{representation}"] = audit
 
         candidates = [
-            V22Candidate(
+            StabilityCandidate(
                 route=route,
                 k_representation=representation,
                 numerical_alpha=numerical_selected[(route, representation)],
@@ -975,10 +986,10 @@ def run_joint_v22_view(
         ]
         workers = int(
             os.environ.get(
-                "PRISM_V22_J_INNER_WORKERS", config["inner_candidate_workers"]
+                "PRISM_V211_JOINT_STABILITY_J_INNER_WORKERS", config["inner_candidate_workers"]
             )
         )
-        evaluations = evaluate_v22_candidates_ordered(
+        evaluations = evaluate_stability_candidates_ordered(
             prepared_folds,
             [fold["evaluation_target"] for fold in fold_records],
             candidates,
@@ -988,7 +999,7 @@ def run_joint_v22_view(
             candidate: evaluation
             for candidate, evaluation in zip(candidates, evaluations, strict=True)
         }
-        eta_selected: dict[tuple[str, str], V22Candidate] = {}
+        eta_selected: dict[tuple[str, str], StabilityCandidate] = {}
         eta_selections: dict[str, Any] = {}
         regularization_path: dict[str, list[dict[str, Any]]] = {}
         for route in JOINT_CANDIDATES:
@@ -1034,9 +1045,9 @@ def run_joint_v22_view(
         minimum_positive = float(
             v21["selection"]["minimum_positive_fold_fraction"]
         )
-        route_best_by_representation: dict[str, dict[str, V22Candidate]] = {}
+        route_best_by_representation: dict[str, dict[str, StabilityCandidate]] = {}
         representation_comparison: dict[str, Any] = {}
-        route_best: dict[str, V22Candidate] = {}
+        route_best: dict[str, StabilityCandidate] = {}
         for route in JOINT_CANDIDATES:
             compressed = eta_selected[(route, CHANNEL_COMPRESSED)]
             full = eta_selected[(route, FULL_BASIS)]
@@ -1095,7 +1106,7 @@ def run_joint_v22_view(
             gates[route] = {}
             for representation in K_REPRESENTATIONS:
                 candidate = route_best_by_representation[route][representation]
-                eta_zero = V22Candidate(
+                eta_zero = StabilityCandidate(
                     route=route,
                     k_representation=representation,
                     numerical_alpha=candidate.numerical_alpha,
@@ -1168,13 +1179,13 @@ def run_joint_v22_view(
                 k_representation=representation,
                 raw_k_support=frozen_channels,
             )
-        prediction, contract, components = solve_prepared_v22(
+        prediction, contract, components = solve_prepared_stability(
             final_prepared[selected.k_representation],
             route=selected.route,
             numerical_alpha=selected.numerical_alpha,
             predictive_eta=selected.predictive_eta,
         )
-        _, bare_contract, _ = solve_prepared_v22(
+        _, bare_contract, _ = solve_prepared_stability(
             final_prepared[selected.k_representation],
             route=selected.route,
             numerical_alpha=selected.numerical_alpha,
@@ -1217,7 +1228,7 @@ def run_joint_v22_view(
         route_materializations: dict[str, Any] = {}
         for route in JOINT_CANDIDATES:
             route_candidate = route_best[route]
-            route_prediction, route_contract, route_components = solve_prepared_v22(
+            route_prediction, route_contract, route_components = solve_prepared_stability(
                 final_prepared[route_candidate.k_representation],
                 route=route,
                 numerical_alpha=route_candidate.numerical_alpha,
@@ -1226,7 +1237,7 @@ def run_joint_v22_view(
             if route in {J_KW, J_KWA} and int(
                 route_contract["blocks"].get("W", {}).get("columns", 0)
             ) <= 0:
-                raise RuntimeError("v2.2 Joint W route lacks jointly fitted W columns")
+                raise RuntimeError("v2.1.1 Joint stability practice Joint W route lacks jointly fitted W columns")
             route_frame = validation[
                 [
                     "base_origin_id",
@@ -1239,11 +1250,11 @@ def run_joint_v22_view(
             ].copy()
             route_frame["y_pred"] = route_prediction
             route_frame["input_prediction"] = route_components["INPUT"]
-            route_frame["model"] = f"PRISM_V2_2_{route}"
+            route_frame["model"] = f"PRISM_V2_1_1_{route}"
             route_frame["dtype"] = "float64"
             route_path = destination / f"validation_{route}.parquet"
             route_frame.to_parquet(route_path, index=False, compression="zstd")
-            route_id = v22_candidate_id(
+            route_id = stability_candidate_id(
                 view.relative_root.as_posix(), route_candidate
             )
             route_materializations[route] = {
@@ -1276,7 +1287,7 @@ def run_joint_v22_view(
         frame["y_pred"] = prediction
         frame["input_prediction"] = components["INPUT"]
         frame["best_active_k_prediction"] = best_k_validation
-        frame["model"] = f"PRISM_V2_2_{selected.route}"
+        frame["model"] = f"PRISM_V2_1_1_{selected.route}"
         frame["dtype"] = "float64"
         prediction_path = destination / "validation.parquet"
         frame.to_parquet(prediction_path, index=False, compression="zstd")
@@ -1289,20 +1300,20 @@ def run_joint_v22_view(
             minimum_positive_fraction=minimum_positive,
         )
         decision_label = (
-            "JOINT_V22_PREDICTIVE_STABILITY_SUPPORTED"
+            "JOINT_STABILITY_PREDICTIVE_STABILITY_SUPPORTED"
             if gate["pass"]
-            else "JOINT_V22_STABILITY_IMPROVED_BUT_NOT_SUPPORTED"
+            else "JOINT_STABILITY_STABILITY_IMPROVED_BUT_NOT_SUPPORTED"
             if legacy_improvement["pass"]
-            else "JOINT_V22_REGISTERED_STABILITY_CONTROLS_INSUFFICIENT"
+            else "JOINT_STABILITY_REGISTERED_STABILITY_CONTROLS_INSUFFICIENT"
         )
         diagnosis = _diagnosis(
             selected.route, route_best_by_representation, gates
         )
         view_key = view.relative_root.as_posix()
-        selected_id = v22_candidate_id(view_key, selected)
+        selected_id = stability_candidate_id(view_key, selected)
         candidate_registry = [
             {
-                "candidate_id": v22_candidate_id(view_key, candidate),
+                "candidate_id": stability_candidate_id(view_key, candidate),
                 **candidate.descriptor(),
                 "fold_losses": evaluation_by_candidate[candidate]["fold_losses"],
             }
@@ -1313,8 +1324,11 @@ def run_joint_v22_view(
             "development_decision": decision_label,
             "development_diagnosis": diagnosis,
             "diagnosis_scope": "DEVELOPMENT_MODEL_SELECTION_NOT_CAUSAL_PROOF",
-            "stage": "M5_JOINT_V22_PREDICTIVE_STABILITY",
+            "stage": "M5_JOINT_STABILITY_PREDICTIVE_STABILITY",
             "estimator_version": MODEL_VERSION,
+            "model_version": MODEL_VERSION,
+            "practice_revision": PRACTICE_REVISION,
+            "joint_estimator_semantics": JOINT_ESTIMATOR_SEMANTICS,
             "dataset": view.head.dataset,
             "target_head": view.head.head_id,
             "availability_scenario": view.availability_scenario,
@@ -1329,11 +1343,11 @@ def run_joint_v22_view(
             "selected_k_representation": selected.k_representation,
             "selected_predictive_eta": selected.predictive_eta,
             "selected_numerical_alpha": selected.numerical_alpha,
-            "selection": v22_guarded_selection_json(route_selection),
+            "selection": stability_guarded_selection_json(route_selection),
             "route_local_selected": {
                 route: {
                     **candidate.descriptor(),
-                    "candidate_id": v22_candidate_id(view_key, candidate),
+                    "candidate_id": stability_candidate_id(view_key, candidate),
                 }
                 for route, candidate in route_best.items()
             },
@@ -1345,7 +1359,7 @@ def run_joint_v22_view(
             "ar_profile": list(a_profile),
             "legacy_v212_joint_anchor": legacy_anchor,
             "legacy_anchor_reproduced": legacy_reproduced,
-            "legacy_vs_v22_selected_activation": legacy_improvement,
+            "legacy_vs_stability_selected_activation": legacy_improvement,
             "candidate_fold_losses": {
                 candidate.key(): evaluation_by_candidate[candidate]["fold_losses"]
                 for candidate in candidates
@@ -1413,7 +1427,7 @@ def run_joint_v22_view(
     except JointFoldProtocolMismatch as error:
         result = {
             "status": "STOP_JOINT_FOLD_PROTOCOL_MISMATCH",
-            "stage": "M5_JOINT_V22_PREDICTIVE_STABILITY",
+            "stage": "M5_JOINT_STABILITY_PREDICTIVE_STABILITY",
             "target_head": view.head.head_id,
             "availability_scenario": view.availability_scenario,
             "proxy_policy": view.proxy_policy,
@@ -1426,8 +1440,8 @@ def run_joint_v22_view(
         }
     except Exception as error:
         result = {
-            "status": "STOP_JOINT_V22_IMPLEMENTATION_OR_NUMERICAL_FAILURE",
-            "stage": "M5_JOINT_V22_PREDICTIVE_STABILITY",
+            "status": "STOP_JOINT_STABILITY_IMPLEMENTATION_OR_NUMERICAL_FAILURE",
+            "stage": "M5_JOINT_STABILITY_PREDICTIVE_STABILITY",
             "target_head": view.head.head_id,
             "availability_scenario": view.availability_scenario,
             "proxy_policy": view.proxy_policy,

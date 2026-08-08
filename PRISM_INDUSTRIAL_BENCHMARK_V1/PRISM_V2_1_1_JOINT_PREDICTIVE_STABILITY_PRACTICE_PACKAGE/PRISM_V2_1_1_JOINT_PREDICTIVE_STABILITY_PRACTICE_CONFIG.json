@@ -1,10 +1,12 @@
 {
-  "protocol_id": "PRISM_V2_2_METRO_P60_JOINT_PREDICTIVE_STABILITY_V1",
-  "model_version": "PRISM_V2_2",
-  "parent_branch": "prism-v2-1-2-pf-independent-freeze-semantics",
-  "parent_commit": "6ebcac898a75b6c1aa05c920a3a39847db052957",
+  "protocol_id": "PRISM_V2_1_1_METRO_P60_JOINT_STABILITY_FINAL_V1",
+  "model_version": "PRISM_V2_1_1",
+  "practice_revision": "PRISM_V211_JOINT_PREDICTIVE_STABILITY_PRACTICE_R1",
+  "joint_estimator_semantics": "PREDICTIVE_STABILITY_RIDGE_R1",
+  "parent_branch": "prism-v2-2-joint-predictive-stability",
+  "parent_commit": "abf7edd162b9e4282789d178e1c4415035817a60",
   "development_artifact_commit": "b5a4d672f65d0c5a01135f331d193a996e9c8c2d",
-  "output_root": "results_prism_v2_2_metro_p60_joint_stability",
+  "output_root": "results_prism_v2_1_1_metro_p60_joint_stability_final",
   "joint_routes": [
     "J_K",
     "J_KW",
@@ -40,4 +42,12 @@
   "blas_threads": 1,
   "outer_view_workers": 2,
   "inner_candidate_workers": 12
+  ,"primary_comparison": {
+    "comparison_id": "JOINT_SELECTED_VS_PF_SELECTED",
+    "candidate": "J_SELECTED",
+    "comparator": "PF_SELECTED",
+    "comparison_family": "JOINT_VS_PHYSICS_FIRST"
+  },
+  "historical_aggregates_selection_use_forbidden": true,
+  "post_test_reselection": false
 }

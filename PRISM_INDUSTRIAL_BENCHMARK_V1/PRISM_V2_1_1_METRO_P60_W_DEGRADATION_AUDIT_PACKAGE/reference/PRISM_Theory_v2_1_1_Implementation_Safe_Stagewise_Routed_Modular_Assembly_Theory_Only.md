@@ -2125,6 +2125,44 @@ assert mature_residual_uses_latest_available_target_index
 
 断言失败属于实现失败，不属于模型负结果。
 
+## 11A.11 Joint 预测稳定性实践 Tips
+
+本节是 PRISM v2.1.1 的实践／可执行算法合同，不建立平行理论版本，也不改变 K/C/W/A、数据划分、Joint route 集合或输入门阈值。
+
+1. Joint 的 `numerical_alpha` 与 `predictive_eta` 必须区分：前者只负责数值稳定证书，后者负责 bias--variance 与预测稳定性；预测正则不得伪装成 numerical rescue。
+2. 在平均损失尺度下，预测 penalty 为 \(P_{pred}=n_{fit}\eta_{pred}I\)。
+3. `predictive_eta=0` 必须作为精确中性边界。
+4. Joint K representation 可以是 `CHANNEL_COMPRESSED` 或 `FULL_BASIS`，但两者共享完全相同的 frozen raw K support。
+5. `CHANNEL_COMPRESSED` 是每个 active K channel 一列，而不是最终 C scalar。
+6. `FULL_BASIS` 使用 frozen K basis 的合法内部列，不得复活 K exact-zero channel。
+7. `FULL_BASIS` 只有在 registered OOF evidence 支持额外自由度时才可击败 compressed representation。
+8. 每个 fold 的 `fit_physical_features()` 只运行一次；compressed/full 从同一 feature construction 提取。
+9. M2--M4 只有在 SHA 与 provenance 完全一致时才可复用；Joint stability 实践不得触发 K/C/W/A 重算。
+10. legacy Joint anchor 必须复现，以证明实践 estimator 未改变已修正的原始四折 OOF protocol。
+11. worst-fold loss 是强制 stability diagnostic，不能只看平均 fold loss。
+12. coefficient norm、effective degrees of freedom 与 prediction variance 应同时保存为 Joint stability diagnostics。
+13. Joint stability diagnosis 是 development predictive evidence，不是物理因果解释。
+14. PF independent freeze semantics 继续成立。
+15. Joint 通过可产生 `PF_AND_JOINT_FROZEN`；Joint 不通过仍可产生 `PF_ONLY_FROZEN`。
+16. test/OOD 不得用于选择 eta、K representation、Joint route、threshold 或 candidate family。
+17. M6 必须发生在全部代码、理论和 config 修正之后；M6 后 source/config/theory 不得变化。
+18. M7 前必须执行不读取 test/OOD 的 lockbox preflight。
+19. M7/M8 的 formal materialization set 只能来自 M6 freeze manifest。
+20. estimator dispatch 不得依赖模型版本字符串，必须依赖显式 estimator semantics contract。
+21. 正式语义为 `joint_estimator_semantics=PREDICTIVE_STABILITY_RIDGE_R1`；该字段要求按 representation、numerical alpha 与 predictive eta 重建 Joint。
+22. development 选出的 eta 与 representation 在 M7 只能重放，不得重新搜索。
+23. M7 只拟合 frozen hyperparameters；predictive eta 在预测阶段不得再次 shrink。
+24. M7 一旦打开 test/OOD，不得再因指标结果修改 estimator 或 config。
+25. 正式 primary 比较 `J_SELECTED` vs `PF_SELECTED` 必须在 M7 前注册。
+
+因此总 penalty 明确分解为
+
+\[
+P=P_{num}+n_{fit}\eta_{pred}I,
+\]
+
+而 `same_gate_contract` 不要求不同 estimator prediction 得到 `same_gate_outcome`。Joint 仍是 PF 之外的可选 predictive enhancement。
+
 # 11B. 必须通过的回归测试
 
 1. `test_profile_one_se_regret_guard`：最简单 profile 虽在 one-SE 内，但超过冻结相对遗憾时必须排除。  
@@ -2454,4 +2492,4 @@ PRISM v2.1.1 的核心问题是：
 - 把不确定性作为预测层；
 - 用 AR-only 作为 Joint 退化候选。
 
-> 后继 Joint predictive-stability estimator extension 见 `PRISM_Theory_v2_2_Joint_Predictive_Stability_Extension_Theory_Only.md`。该后继扩展不回写为 v2.1.1 原始估计器内容。
+> Joint predictive-stability estimator 的执行语义已收口至本理论第 11A.11 节；不存在独立的 canonical v2.2 理论版本。

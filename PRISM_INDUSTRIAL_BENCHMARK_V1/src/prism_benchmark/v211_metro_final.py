@@ -55,8 +55,12 @@ from .v211_w import (
     fit_w_correction,
     predict_w_correction,
 )
-from .v22_config import CHANNEL_COMPRESSED, FULL_BASIS
-from .v22_joint import fit_joint_candidate_v22
+from .v211_joint_stability_config import (
+    CHANNEL_COMPRESSED,
+    FULL_BASIS,
+    JOINT_ESTIMATOR_SEMANTICS,
+)
+from .v211_joint_stability import fit_joint_candidate_stability
 
 
 PF_CANDIDATES = ("KC", "KCW", "KCA", "KCWA", "PF_SELECTED")
@@ -530,7 +534,8 @@ def materialize_view(
         )
         for route in (J_K, J_KW, J_KA, J_KWA):
             selected = joint_result["route_local_selected"][route]
-            if joint_result.get("estimator_version") == "PRISM_V2_2":
+            semantics = joint_result.get("joint_estimator_semantics")
+            if semantics == JOINT_ESTIMATOR_SEMANTICS:
                 representation = str(selected["k_representation"])
                 if representation == CHANNEL_COMPRESSED:
                     k_fit = model["compressed_fit"]
@@ -540,7 +545,7 @@ def materialize_view(
                     raise RuntimeError(
                         f"unsupported frozen v2.2 K representation: {representation}"
                     )
-                _, contract, _ = fit_joint_candidate_v22(
+                _, contract, _ = fit_joint_candidate_stability(
                     {"K": k_fit, "W": joint_w_fit, "A": joint_a_fit},
                     y_fit,
                     {"K": k_fit, "W": joint_w_fit, "A": joint_a_fit},
@@ -550,7 +555,7 @@ def materialize_view(
                     predictive_eta=float(selected["predictive_eta"]),
                     raw_k_support=tuple(model["channels"]),
                 )
-            else:
+            elif semantics == "LEGACY_V211_JOINT":
                 _, alpha, ratio_k, ratio_w = selected
                 _, contract, _ = fit_joint_candidate(
                     {"K": model["joint_fit"], "W": joint_w_fit, "A": joint_a_fit},
@@ -561,6 +566,8 @@ def materialize_view(
                     k_over_a_ratio=float(ratio_k),
                     w_over_a_ratio=float(ratio_w),
                 )
+            else:
+                raise RuntimeError("STOP_ESTIMATOR_SEMANTICS_UNBOUND")
             joint_contracts[route] = contract
         selected_joint = str(joint_result["final_selected_candidate"])
     selected_w_active = pf_w_selected["family"] != IDENTITY
@@ -754,15 +761,19 @@ def run_m7(paths: MetroV211Paths) -> dict[str, Any]:
         raise RuntimeError("PF-only freeze must explicitly exclude Joint from M7")
     freeze_sha256 = sha256_file(paths.development_freeze_path)
     development_decision_sha256 = manifest["development_decision_sha256"]
+    first_access_timestamp = time.time()
     write_json(
         paths.test_access_audit_path,
         {
-            "status": "TEST_OOD_ACCESS_STARTED",
+            "status": "LOCKBOX_ACCESS_STARTED",
             "stage": "M7_TEST_OOD_MATERIALIZATION",
             "freeze_sha256": freeze_sha256,
             "frozen_code_commit": manifest["code_commit"],
-            "test_accessed": True,
-            "ood_accessed": True,
+            "config_sha256": manifest["config_sha256"],
+            "theory_sha256": manifest["canonical_theory_sha256"],
+            "first_access_timestamp": first_access_timestamp,
+            "test_accessed": False,
+            "ood_accessed": False,
             "views": [],
         },
     )
@@ -803,6 +814,9 @@ def run_m7(paths: MetroV211Paths) -> dict[str, Any]:
         "stage": "M7_TEST_OOD_MATERIALIZATION",
         "freeze_sha256": freeze_sha256,
         "frozen_code_commit": manifest["code_commit"],
+        "config_sha256": manifest["config_sha256"],
+        "theory_sha256": manifest["canonical_theory_sha256"],
+        "first_access_timestamp": first_access_timestamp,
         "views": results,
         "candidate_ids_match_m6_freeze": candidate_ids_match,
         "test_accessed": True,

@@ -16,26 +16,26 @@ from prism_benchmark.v211_joint import (
     fit_joint_candidate,
 )
 from prism_benchmark.v211_metro_final import materialize_view
-from prism_benchmark.v22_config import (
+from prism_benchmark.v211_joint_stability_config import (
     CHANNEL_COMPRESSED,
     ETA_PRED_GRID,
     FULL_BASIS,
 )
-from prism_benchmark.v22_joint import (
-    V22Candidate,
-    evaluate_v22_candidates_ordered,
-    fit_joint_candidate_v22,
+from prism_benchmark.v211_joint_stability import (
+    StabilityCandidate,
+    evaluate_stability_candidates_ordered,
+    fit_joint_candidate_stability,
     k_representation_blocks,
     predictive_penalty_scale,
     prepare_joint_representation,
-    registered_v22_joint_candidates,
+    registered_joint_stability_candidates,
     select_k_representation,
     select_predictive_eta,
     select_smallest_numerical_alpha,
     solve_prepared_legacy_anchor,
-    solve_prepared_v22,
-    v22_candidate_id,
-    v22_guarded_selection_json,
+    solve_prepared_stability,
+    stability_candidate_id,
+    stability_guarded_selection_json,
 )
 from prism_benchmark.v21_selection import guarded_local_one_se_select
 
@@ -98,9 +98,9 @@ def test_full_basis_legacy_anchor_matches_v212_solver() -> None:
         w_over_a_ratio=0.3,
     )
     np.testing.assert_allclose(observed, expected, rtol=1e-10, atol=1e-12)
-    import prism_benchmark.v22_joint as module
+    import prism_benchmark.v211_joint_stability as module
 
-    assert "fit_joint_candidate(" in inspect.getsource(module.run_joint_v22_view)
+    assert "fit_joint_candidate(" in inspect.getsource(module.run_joint_stability_view)
 
 
 def test_channel_compressed_columns_equal_active_k_count() -> None:
@@ -161,7 +161,7 @@ def test_zeroed_raw_channel_cannot_be_resurrected() -> None:
 
 def test_eta_zero_is_exact_predictive_ridge_boundary() -> None:
     prepared, _ = _prepared()
-    _, contract, _ = solve_prepared_v22(
+    _, contract, _ = solve_prepared_stability(
         prepared, route=J_K, numerical_alpha=1e-4, predictive_eta=0.0
     )
     assert contract["predictive_eta"] == 0.0
@@ -225,7 +225,7 @@ def test_full_requires_practical_and_fold_consistency_guard() -> None:
 
 
 def test_joint_route_set_remains_exact() -> None:
-    assert registered_v22_joint_candidates() == (J_K, J_KW, J_KA, J_KWA)
+    assert registered_joint_stability_candidates() == (J_K, J_KW, J_KA, J_KWA)
 
 
 def test_ar_only_and_k_zero_cannot_be_fitted() -> None:
@@ -233,7 +233,7 @@ def test_ar_only_and_k_zero_cannot_be_fitted() -> None:
     evaluation = {name: values[::2] for name, values in blocks.items()}
     for forbidden in ("AR_ONLY", "J_A", "K_ZERO", "BOTH_ZERO"):
         with pytest.raises(ValueError):
-            fit_joint_candidate_v22(
+            fit_joint_candidate_stability(
                 blocks,
                 target,
                 evaluation,
@@ -247,21 +247,21 @@ def test_ar_only_and_k_zero_cannot_be_fitted() -> None:
 def test_w_coefficients_remain_jointly_fitted() -> None:
     prepared, _ = _prepared()
     for route in (J_KW, J_KWA):
-        _, contract, _ = solve_prepared_v22(
+        _, contract, _ = solve_prepared_stability(
             prepared, route=route, numerical_alpha=1e-4, predictive_eta=0.01
         )
         assert contract["blocks"]["W"]["columns"] > 0
         assert "kw_scalar" not in repr(contract)
 
 
-def test_candidate_id_binds_all_v22_hyperparameters() -> None:
-    base = V22Candidate(J_K, CHANNEL_COMPRESSED, 0.0, 0.0)
+def test_candidate_id_binds_all_stability_hyperparameters() -> None:
+    base = StabilityCandidate(J_K, CHANNEL_COMPRESSED, 0.0, 0.0)
     identifiers = {
-        v22_candidate_id("view", base),
-        v22_candidate_id("view", V22Candidate(J_KW, CHANNEL_COMPRESSED, 0.0, 0.0)),
-        v22_candidate_id("view", V22Candidate(J_K, FULL_BASIS, 0.0, 0.0)),
-        v22_candidate_id("view", V22Candidate(J_K, CHANNEL_COMPRESSED, 1e-8, 0.0)),
-        v22_candidate_id("view", V22Candidate(J_K, CHANNEL_COMPRESSED, 0.0, 1e-3)),
+        stability_candidate_id("view", base),
+        stability_candidate_id("view", StabilityCandidate(J_KW, CHANNEL_COMPRESSED, 0.0, 0.0)),
+        stability_candidate_id("view", StabilityCandidate(J_K, FULL_BASIS, 0.0, 0.0)),
+        stability_candidate_id("view", StabilityCandidate(J_K, CHANNEL_COMPRESSED, 1e-8, 0.0)),
+        stability_candidate_id("view", StabilityCandidate(J_K, CHANNEL_COMPRESSED, 0.0, 1e-3)),
     }
     assert len(identifiers) == 5
     assert set(base.descriptor()) == {
@@ -272,9 +272,9 @@ def test_candidate_id_binds_all_v22_hyperparameters() -> None:
     }
 
 
-def test_v22_route_selection_serialization_preserves_candidate_identity() -> None:
-    neutral = V22Candidate(J_K, CHANNEL_COMPRESSED, 0.0, 0.1)
-    active = V22Candidate(J_KW, FULL_BASIS, 1e-8, 0.01)
+def test_stability_route_selection_serialization_preserves_candidate_identity() -> None:
+    neutral = StabilityCandidate(J_K, CHANNEL_COMPRESSED, 0.0, 0.1)
+    active = StabilityCandidate(J_KW, FULL_BASIS, 1e-8, 0.01)
     selection = guarded_local_one_se_select(
         {neutral: [1.0, 1.0, 1.0, 1.0], active: [0.95, 0.95, 0.95, 0.95]},
         lambda candidate: (0 if candidate == neutral else 1,),
@@ -283,7 +283,7 @@ def test_v22_route_selection_serialization_preserves_candidate_identity() -> Non
         minimum_positive_fraction=0.75,
         minimum_usable_folds=4,
     )
-    payload = v22_guarded_selection_json(selection)
+    payload = stability_guarded_selection_json(selection)
     assert payload["final_selected_candidate"]["candidate_key"] == active.key()
     assert set(payload["means"]) == {neutral.key(), active.key()}
 
@@ -293,13 +293,13 @@ def test_serial_and_fork_candidate_selection_are_identical() -> None:
     prepared_folds = [{FULL_BASIS: prepared, CHANNEL_COMPRESSED: prepared}] * 4
     targets = [evaluation_target] * 4
     candidates = [
-        V22Candidate(J_K, FULL_BASIS, 1e-4, eta)
+        StabilityCandidate(J_K, FULL_BASIS, 1e-4, eta)
         for eta in ETA_PRED_GRID[:4]
     ]
-    serial = evaluate_v22_candidates_ordered(
+    serial = evaluate_stability_candidates_ordered(
         prepared_folds, targets, candidates, workers=1
     )
-    parallel = evaluate_v22_candidates_ordered(
+    parallel = evaluate_stability_candidates_ordered(
         prepared_folds,
         targets,
         candidates,
@@ -316,7 +316,7 @@ def test_serial_and_fork_candidate_selection_are_identical() -> None:
 
 
 def test_original_four_fold_provenance_code_is_retained() -> None:
-    source = inspect.getsource(__import__("prism_benchmark.v22_joint", fromlist=["run_joint_v22_view"]).run_joint_v22_view)
+    source = inspect.getsource(__import__("prism_benchmark.v211_joint_stability", fromlist=["run_joint_stability_view"]).run_joint_stability_view)
     assert "registered_joint_inner_fold_frames" in source
     assert "audit_joint_fold_protocol" in source
     assert "len(prepared_folds) != 4" in source
@@ -341,9 +341,9 @@ def test_pf_estimators_are_unchanged_from_parent_commit() -> None:
 
 
 def test_m5_never_accesses_test_or_ood_and_m7_is_contract_driven() -> None:
-    import prism_benchmark.v22_joint as module
+    import prism_benchmark.v211_joint_stability as module
 
-    source = inspect.getsource(module.run_joint_v22_view)
+    source = inspect.getsource(module.run_joint_stability_view)
     assert 'load_samples(shared, view, "test")' not in source
     assert 'load_samples(shared, view, "ood")' not in source
     assert '"test_accessed": False' in source
