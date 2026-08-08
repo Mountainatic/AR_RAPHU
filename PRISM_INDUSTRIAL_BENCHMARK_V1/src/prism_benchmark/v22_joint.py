@@ -692,11 +692,16 @@ def run_joint_v22_view(
             raise RuntimeError("v2.2 M2-M4 prerequisite is not PASS")
         if not bool(c_result.get("input_path_preservation", {}).get("pass")):
             raise RuntimeError("v2.2 requires the frozen C input path")
-        active = load_active_channels(output, view)
-        frozen_channels = tuple(str(value) for value in c_result["active_channels"])
-        active_by_name = {str(item["channel"]): item for item in active}
-        active = [active_by_name[channel] for channel in frozen_channels]
-        if tuple(str(item["channel"]) for item in active) != frozen_channels:
+        frozen_channel_set = {
+            str(value) for value in c_result["active_channels"]
+        }
+        active = [
+            item
+            for item in load_active_channels(output, view)
+            if str(item["channel"]) in frozen_channel_set
+        ]
+        frozen_channels = tuple(str(item["channel"]) for item in active)
+        if set(frozen_channels) != frozen_channel_set:
             raise RuntimeError("v2.2 active K support differs from frozen C support")
         w_oof = pd.read_parquet(
             output / w_result["oof_path"],

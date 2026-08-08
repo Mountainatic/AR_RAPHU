@@ -128,6 +128,23 @@ def test_compressed_and_full_share_exact_raw_k_support() -> None:
     assert audit["raw_k_support"] == ["a", "b"]
 
 
+def test_k_representation_preserves_frozen_k_column_order() -> None:
+    features = {
+        "channels": ["k_artifact_first", "k_artifact_second"],
+        "compressed_train": np.ones((8, 2)),
+        "compressed_evaluation": np.ones((4, 2)),
+        "joint_train": np.ones((8, 7)),
+        "joint_evaluation": np.ones((4, 7)),
+    }
+    _, audit = k_representation_blocks(
+        features, ("k_artifact_first", "k_artifact_second")
+    )
+    assert audit["raw_k_support"] == [
+        "k_artifact_first",
+        "k_artifact_second",
+    ]
+
+
 def test_zeroed_raw_channel_cannot_be_resurrected() -> None:
     features = {
         "channels": ["active", "zeroed"],
