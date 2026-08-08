@@ -808,10 +808,12 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
         pf_cards.append(build_physics_first_card(k_result, c_result, w_result, a_result))
     all_development_results = [*bound_results, *joint_results]
     test_accessed = paths.test_access_audit_path.exists() or any(
-        item.get("test_accessed") is not False for item in all_development_results
+        item.get("test_accessed", False) is True
+        for item in all_development_results
     )
     ood_accessed = paths.test_access_audit_path.exists() or any(
-        item.get("ood_accessed") is not False for item in all_development_results
+        item.get("ood_accessed", False) is True
+        for item in all_development_results
     )
     pf_checks = {
         "data_hash_unchanged": comparison["status"] == "PASS",
