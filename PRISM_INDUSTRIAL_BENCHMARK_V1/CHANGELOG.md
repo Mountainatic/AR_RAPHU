@@ -21,5 +21,7 @@
 - Adds a diagnostic failure class so an MSE-only preservation failure is
   reported as `INPUT_PATH_PRESERVATION_PERFORMANCE_GATE_FAILED`, without
   changing PASS/FAIL semantics.
+- Ignores the dedicated v2.1.2 result namespace so the M0 clean-worktree guard
+  remains valid after the runner creates its output directory.
 - Test and OOD data were not accessed before this correction and are not used
   to motivate or tune it.

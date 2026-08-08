@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -21,6 +22,7 @@ from prism_benchmark.v211_joint import (
     registered_joint_inner_fold_frames,
     run_joint_view,
 )
+from prism_benchmark.v211_metro_config import OUTPUT_DIRECTORY
 from prism_benchmark.v211_metro_runner import (
     STAGES,
     run_m0,
@@ -261,3 +263,9 @@ def test_m0_through_m6_precede_any_test_or_ood_stage() -> None:
         source = inspect.getsource(stage_runner)
         assert '"test_accessed": False' in source
         assert '"ood_accessed": False' in source
+
+
+def test_v212_result_namespace_is_ignored_before_m0_clean_check() -> None:
+    project = Path(__file__).resolve().parents[1]
+    ignore_lines = (project / ".gitignore").read_text(encoding="utf-8").splitlines()
+    assert f"{OUTPUT_DIRECTORY}/" in ignore_lines

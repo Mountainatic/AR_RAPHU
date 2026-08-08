@@ -74,11 +74,20 @@ fit.
 ## Regression evidence before formal Metro run
 
 - Python compilation: PASS.
-- Frozen SRU/Metro regression suite plus v2.1.2 tests: `80 passed`.
-- Dedicated v2.1.2 tests: `11 passed`.
+- Frozen SRU/Metro regression suite plus v2.1.2 tests: `81 passed`.
+- Dedicated v2.1.2 tests: `12 passed`.
 - Serial/fork candidate evaluation: exact equality on the deterministic
   fixture.
 - Git whitespace check: PASS.
 
 No formal Metro v2.1.2 result is claimed by this review. It authorizes only the
 development sequence requested by the correction protocol.
+
+## Launch guard correction
+
+The first M0 launch correctly stopped before training because the new result
+directory was not yet listed in `.gitignore`; creation of that empty namespace
+therefore appeared as a dirty source tree. The namespace is now explicitly
+ignored and covered by regression test. That stopped M0 is invalid launch
+diagnostic only, accessed neither test nor OOD, and is removed before the clean
+formal rerun.
