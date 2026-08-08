@@ -35,7 +35,9 @@ from prism_benchmark.v22_joint import (
     solve_prepared_legacy_anchor,
     solve_prepared_v22,
     v22_candidate_id,
+    v22_guarded_selection_json,
 )
+from prism_benchmark.v21_selection import guarded_local_one_se_select
 
 
 def _blocks(rows: int = 120) -> tuple[dict[str, np.ndarray], np.ndarray]:
@@ -268,6 +270,22 @@ def test_candidate_id_binds_all_v22_hyperparameters() -> None:
         "numerical_alpha",
         "predictive_eta",
     }
+
+
+def test_v22_route_selection_serialization_preserves_candidate_identity() -> None:
+    neutral = V22Candidate(J_K, CHANNEL_COMPRESSED, 0.0, 0.1)
+    active = V22Candidate(J_KW, FULL_BASIS, 1e-8, 0.01)
+    selection = guarded_local_one_se_select(
+        {neutral: [1.0, 1.0, 1.0, 1.0], active: [0.95, 0.95, 0.95, 0.95]},
+        lambda candidate: (0 if candidate == neutral else 1,),
+        neutral=neutral,
+        minimum_relative_improvement=0.01,
+        minimum_positive_fraction=0.75,
+        minimum_usable_folds=4,
+    )
+    payload = v22_guarded_selection_json(selection)
+    assert payload["final_selected_candidate"]["candidate_key"] == active.key()
+    assert set(payload["means"]) == {neutral.key(), active.key()}
 
 
 def test_serial_and_fork_candidate_selection_are_identical() -> None:

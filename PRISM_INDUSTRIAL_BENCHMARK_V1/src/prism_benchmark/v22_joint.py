@@ -458,6 +458,47 @@ def v22_candidate_id(view_key: str, candidate: V22Candidate) -> str:
     )
 
 
+def v22_guarded_selection_json(selection: Any) -> dict[str, Any]:
+    def descriptor(candidate: V22Candidate) -> dict[str, Any]:
+        return {"candidate_key": candidate.key(), **candidate.descriptor()}
+
+    return {
+        "best_candidate": descriptor(selection.best_candidate),
+        "best_mean": float(selection.best_mean),
+        "best_standard_error": float(selection.best_standard_error),
+        "acceptable_threshold": float(selection.acceptable_threshold),
+        "acceptable_candidates": [
+            descriptor(candidate) for candidate in selection.acceptable_candidates
+        ],
+        "passing_active_candidates": [
+            descriptor(candidate)
+            for candidate in selection.passing_active_candidates
+        ],
+        "final_selected_candidate": descriptor(
+            selection.final_selected_candidate
+        ),
+        "final_selected_fold_losses": [
+            float(value) for value in selection.final_selected_fold_losses
+        ],
+        "activation_audit": {
+            candidate.key(): audit
+            for candidate, audit in selection.activation_audit.items()
+        },
+        "usable_fold_count": {
+            candidate.key(): int(value)
+            for candidate, value in selection.usable_fold_count.items()
+        },
+        "means": {
+            candidate.key(): float(value)
+            for candidate, value in selection.means.items()
+        },
+        "standard_errors": {
+            candidate.key(): float(value)
+            for candidate, value in selection.standard_errors.items()
+        },
+    }
+
+
 def _evaluate_candidate(candidate_index: int) -> dict[str, Any]:
     if _V22_EVALUATION_CONTEXT is None:
         raise RuntimeError("v2.2 candidate context is not initialized")
@@ -1288,7 +1329,7 @@ def run_joint_v22_view(
             "selected_k_representation": selected.k_representation,
             "selected_predictive_eta": selected.predictive_eta,
             "selected_numerical_alpha": selected.numerical_alpha,
-            "selection": route_selection.to_json(),
+            "selection": v22_guarded_selection_json(route_selection),
             "route_local_selected": {
                 route: {
                     **candidate.descriptor(),
