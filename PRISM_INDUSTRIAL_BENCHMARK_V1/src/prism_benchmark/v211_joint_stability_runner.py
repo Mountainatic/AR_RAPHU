@@ -187,13 +187,21 @@ def migrate_development_evidence(paths: FinalClosurePaths) -> dict[str, Any]:
             }
         )
         write_json(canonical_dir / "RESULT.json", wrapper)
-        numeric_unchanged = all(wrapper[key] == value for key, value in source_value.items())
+        migrated_metadata_fields = {"estimator_version"}
+        numeric_unchanged = all(
+            wrapper[key] == value
+            for key, value in source_value.items()
+            if key not in migrated_metadata_fields
+        )
         wrapper_records.append(
             {
                 "view": view.relative_root.as_posix(),
                 "source_result_sha256": sha256_file(source_path),
                 "canonical_wrapper_sha256": sha256_file(canonical_dir / "RESULT.json"),
-                "all_source_fields_unchanged": numeric_unchanged,
+                "all_numerical_and_evidence_fields_unchanged": numeric_unchanged,
+                "intentionally_migrated_source_metadata_fields": sorted(
+                    migrated_metadata_fields
+                ),
                 "selected_route": source_value["final_selected_candidate"],
                 "selected_k_representation": source_value["selected_k_representation"],
                 "selected_predictive_eta": source_value["selected_predictive_eta"],
@@ -218,8 +226,9 @@ def migrate_development_evidence(paths: FinalClosurePaths) -> dict[str, Any]:
     checks = {
         "m2_m4_reuse_pass": reuse["status"] == "PASS",
         "two_joint_wrappers_created": len(wrapper_records) == 2,
-        "all_source_fields_unchanged": all(
-            item["all_source_fields_unchanged"] for item in wrapper_records
+        "all_numerical_and_evidence_fields_unchanged": all(
+            item["all_numerical_and_evidence_fields_unchanged"]
+            for item in wrapper_records
         ),
         "all_joint_gates_pass": all(
             _read(_result_path(paths.output, view))["input_path_preservation"]["pass"]
