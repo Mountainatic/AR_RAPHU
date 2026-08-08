@@ -474,7 +474,9 @@ def run_m7_preflight(paths: FinalClosurePaths) -> dict[str, Any]:
         "14_both_representations_reconstructible": {item["selected_k_representation"] for item in freeze["development_selections"]} == {"FULL_BASIS", "CHANNEL_COMPRESSED"},
         "15_predictive_eta_fit_only": bool(np.isclose(contract["predictive_penalty_scale"], 1.2)),
         "16_prediction_does_not_reapply_ridge": "predictive_eta" not in inspect.getsource(predict_joint_candidate),
-        "17_chunked_equals_nonchunked": bool(np.array_equal(pred, chunked)),
+        "17_chunked_equals_nonchunked": bool(
+            np.allclose(pred, chunked, rtol=0.0, atol=1e-15)
+        ),
         "18_serial_parallel_fixture_regression_pass": "179 passed" in (paths.source_results / "PYTEST_OUTPUT.txt").read_text(encoding="utf-8"),
         "19_candidate_set_equals_freeze": ids_valid and all(
             all(

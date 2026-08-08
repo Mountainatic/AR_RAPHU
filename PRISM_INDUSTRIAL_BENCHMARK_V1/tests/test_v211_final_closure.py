@@ -114,6 +114,7 @@ def test_candidate_id_namespace_is_canonical() -> None:
 def test_m7_preflight_does_not_load_test_or_ood() -> None:
     source = inspect.getsource(run_m7_preflight)
     assert "load_samples" not in source
+    assert "np.allclose(pred, chunked, rtol=0.0, atol=1e-15)" in source
     assert '"test_or_ood_read_by_preflight": False' in source
 
 
