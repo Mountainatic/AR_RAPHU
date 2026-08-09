@@ -15,6 +15,7 @@ from prism_benchmark.c1_contracts import (
     maximum_registered_history,
     round_half_up_steps,
     target_change,
+    valid_anchor_origins_for_interval,
     valid_origins_for_interval,
 )
 import pandas as pd
@@ -55,6 +56,20 @@ def test_dependency_interval_and_boundary_purge_are_half_open() -> None:
     np.testing.assert_array_equal(right, [137, 200])
 
 
+def test_anchor_universe_uses_w0_not_registered_k_lmax() -> None:
+    origins = valid_anchor_origins_for_interval(
+        100,
+        200,
+        anchor_history_steps=3,
+        h=5,
+        w=3,
+        delay=2,
+        left_buffer=7,
+    )
+    assert origins[0] == 110
+    assert origins[-1] == 190
+
+
 def test_registered_history_uses_eight_h_or_largest_feasible_h_zero_candidate() -> None:
     assert maximum_registered_history(12, 2, [500]) == 96
     assert maximum_registered_history(300, 60, [-284]) == 2400
@@ -86,7 +101,8 @@ def test_view_id_changes_with_availability_and_proxy_but_base_origin_does_not() 
         "split": "train",
         "head": head,
         "information_set": "dynamic",
-        "lmax": 2,
+        "causal_history_floor": 1,
+        "anchor_history_steps": 1,
         "origins": np.asarray([3]),
         "y": np.arange(10, dtype=np.float64),
     }
@@ -98,6 +114,7 @@ def test_view_id_changes_with_availability_and_proxy_but_base_origin_does_not() 
     assert len({main.loc[0, "view_sample_id"], delayed.loc[0, "view_sample_id"], proxy.loc[0, "view_sample_id"]}) == 3
     assert main.loc[0, "latest_available_target_index"] == 2
     assert delayed.loc[0, "latest_available_target_index"] == -8
+    assert main.loc[0, "sample_support_contract"] == "NATIVE_K_COMMON_ASSEMBLY_R1"
 
 
 def test_tep_index_schema_is_stable_across_rdata_numeric_decoders() -> None:

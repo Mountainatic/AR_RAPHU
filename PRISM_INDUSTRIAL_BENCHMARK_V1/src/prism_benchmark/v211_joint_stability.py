@@ -13,7 +13,7 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 import pandas as pd
 
-from .cpu_data import BaseAccessor, load_samples, realized_state_profiles, sha256_file
+from .cpu_data import BaseAccessor, realized_state_profiles, sha256_file
 from .cpu_selection import mse, regression_metrics
 from .stage0 import write_json
 from .v2_c import fit_physical_features
@@ -43,6 +43,12 @@ from .v211_selection import (
     attach_nonselecting_validation_confirmation,
     input_path_preservation_gate,
     numerical_contract_passes,
+)
+from .v211_support import (
+    apply_assembly_support,
+    base_origin_support_hash,
+    load_native_samples,
+    support_id_hash,
 )
 from .v211_w import IDENTITY, _fit_c_routed
 from .v211_joint_stability_config import (
@@ -769,8 +775,10 @@ def run_joint_stability_view(
                 "profile", realized_state_profiles(view.head)[0]
             )
         )
-        development_train = load_samples(shared, view, "train")
-        registered_input_train = load_samples(shared, _input_only_view(view), "train")
+        development_train = load_native_samples(shared, view, "train")
+        registered_input_train = load_native_samples(
+            shared, _input_only_view(view), "train"
+        )
         fold_count = int(v21["selection"]["inner_folds"])
         fit_cap = int(v2["row_caps"]["joint_predictive_fit"])
         evaluation_cap = int(v2["row_caps"]["validation_selection_per_fold"])
@@ -779,12 +787,14 @@ def run_joint_stability_view(
             fold_count=fold_count,
             fit_cap=fit_cap,
             evaluation_cap=evaluation_cap,
+            active=active,
         )
         registered_input_folds = registered_joint_inner_fold_frames(
             registered_input_train,
             fold_count=fold_count,
             fit_cap=fit_cap,
             evaluation_cap=evaluation_cap,
+            active=active,
         )
         inner_target_accessor = BaseAccessor(
             shared, view.head.dataset, "train", [view.head.target]
@@ -1122,10 +1132,16 @@ def run_joint_stability_view(
                 }
         oof_gate = gates[selected.route][selected.k_representation]["selected"]
 
-        train = _cap(
-            development_train, int(v2["row_caps"]["joint_predictive_fit"])
+        assembly_development_train = apply_assembly_support(
+            development_train, active
         )
-        validation = load_samples(shared, view, "validation")
+        train = _cap(
+            assembly_development_train,
+            int(v2["row_caps"]["joint_predictive_fit"]),
+        )
+        validation = apply_assembly_support(
+            load_native_samples(shared, view, "validation"), active
+        )
         final_features = fit_physical_features(
             shared,
             view,
@@ -1401,8 +1417,28 @@ def run_joint_stability_view(
             "joint_fold_protocol_audit_pass": all(
                 item["pass"] for item in protocol_audits
             ),
-            "joint_fit_source": "ORIGINAL_REGISTERED_INNER_TRAIN_SUPPORT",
-            "joint_evaluation_source": "ORIGINAL_REGISTERED_INNER_VALIDATION_SUPPORT",
+            "assembly_support_contract": c_result.get(
+                "assembly_support_contract"
+            ),
+            "joint_raw_input_train_support_hash": support_id_hash(
+                assembly_development_train
+            ),
+            "joint_raw_input_validation_support_hash": support_id_hash(
+                validation
+            ),
+            "joint_raw_input_validation_base_origin_support_hash": base_origin_support_hash(
+                validation
+            ),
+            "c_assembly_validation_support_hash": c_result.get(
+                "assembly_validation_support_hash"
+            ),
+            "joint_raw_input_support_matches_c_assembly": base_origin_support_hash(
+                validation
+            )
+            == c_result.get("assembly_validation_base_origin_support_hash"),
+            "joint_k_representations_share_rows": True,
+            "joint_fit_source": "ORIGINAL_REGISTERED_ANCHOR_INNER_TRAIN_SUPPORT_AFTER_ASSEMBLY_MASK",
+            "joint_evaluation_source": "ORIGINAL_REGISTERED_ANCHOR_INNER_VALIDATION_SUPPORT_AFTER_ASSEMBLY_MASK",
             "nested_oof_training_used": False,
             "w_physical_oof_used_as_training_pool": False,
             "registered_inner_fold_count": 4,

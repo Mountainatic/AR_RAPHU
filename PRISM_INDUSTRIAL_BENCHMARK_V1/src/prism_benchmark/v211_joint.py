@@ -15,7 +15,6 @@ from .cpu_data import (
     BaseAccessor,
     ViewSpec,
     inner_folds,
-    load_samples,
     realized_state_profiles,
     sha256_file,
 )
@@ -35,6 +34,13 @@ from .v211_selection import (
     attach_nonselecting_validation_confirmation,
     input_path_preservation_gate,
     numerical_contract_passes,
+)
+from .v211_support import (
+    apply_assembly_support,
+    base_origin_support_hash,
+    fold_evaluation_causal_floor,
+    load_native_samples,
+    support_id_hash,
 )
 from .v211_w import IDENTITY, _fit_c_routed, build_w_design
 
@@ -115,6 +121,7 @@ def registered_joint_inner_fold_frames(
     fold_count: int,
     fit_cap: int,
     evaluation_cap: int,
+    active: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     """Materialize registered original ``T_i -> V_i`` Joint fold supports."""
     result = []
@@ -125,14 +132,28 @@ def registered_joint_inner_fold_frames(
         evaluation_raw = development_train.iloc[evaluation_index].reset_index(
             drop=True
         )
+        fit_supported = (
+            apply_assembly_support(fit_raw, active) if active is not None else fit_raw
+        )
+        evaluation_supported = (
+            apply_assembly_support(
+                evaluation_raw,
+                active,
+                fold_evaluation_causal_floor(fit_raw, evaluation_raw),
+            )
+            if active is not None
+            else evaluation_raw
+        )
         result.append(
             {
                 "fold_index": fold_index,
                 "fit_raw": fit_raw,
                 "evaluation_raw": evaluation_raw,
-                "fit": _cap(fit_raw, int(fit_cap)).reset_index(drop=True),
+                "fit_supported": fit_supported.reset_index(drop=True),
+                "evaluation_supported": evaluation_supported.reset_index(drop=True),
+                "fit": _cap(fit_supported, int(fit_cap)).reset_index(drop=True),
                 "evaluation": _cap(
-                    evaluation_raw, int(evaluation_cap)
+                    evaluation_supported, int(evaluation_cap)
                 ).reset_index(drop=True),
             }
         )
@@ -202,8 +223,14 @@ def audit_joint_fold_protocol(
     return {
         "fold_index": int(fold["fold_index"]),
         "fit_rows_before_cap": len(fold["fit_raw"]),
+        "fit_rows_after_assembly_support_before_cap": len(
+            fold.get("fit_supported", fold["fit_raw"])
+        ),
         "fit_rows_after_cap": len(fit),
         "evaluation_rows_before_cap": len(fold["evaluation_raw"]),
+        "evaluation_rows_after_assembly_support_before_cap": len(
+            fold.get("evaluation_supported", fold["evaluation_raw"])
+        ),
         "evaluation_rows_after_cap": len(evaluation),
         "fit_base_origin_id_sha256": fit_hash["base_origin_id_sha256"],
         "fit_view_sample_id_sha256": fit_hash["view_sample_id_sha256"],
@@ -691,8 +718,8 @@ def run_joint_view(
         ar_losses = {alpha: [] for alpha in alpha_grid}
         fold_payloads = []
         joint_fold_protocol_audit = []
-        development_train = load_samples(shared, view, "train")
-        registered_input_train = load_samples(
+        development_train = load_native_samples(shared, view, "train")
+        registered_input_train = load_native_samples(
             shared, _input_only_view(view), "train"
         )
         fold_count = int(v21["selection"]["inner_folds"])
@@ -705,12 +732,14 @@ def run_joint_view(
             fold_count=fold_count,
             fit_cap=fit_cap,
             evaluation_cap=evaluation_cap,
+            active=active,
         )
         registered_input_folds = registered_joint_inner_fold_frames(
             registered_input_train,
             fold_count=fold_count,
             fit_cap=fit_cap,
             evaluation_cap=evaluation_cap,
+            active=active,
         )
         if len(joint_folds) != fold_count or len(registered_input_folds) != fold_count:
             raise JointFoldProtocolMismatch(
@@ -946,11 +975,16 @@ def run_joint_view(
             numerical_certificate_passed=all(numeric_passes),
             **gate_parameters,
         )
+        assembly_development_train = apply_assembly_support(
+            development_train, active
+        )
         train = _cap(
-            development_train,
+            assembly_development_train,
             int(v2["row_caps"]["joint_predictive_fit"]),
         )
-        validation = load_samples(shared, view, "validation")
+        validation = apply_assembly_support(
+            load_native_samples(shared, view, "validation"), active
+        )
         final_features = fit_physical_features(
             shared,
             view,
@@ -1150,9 +1184,29 @@ def run_joint_view(
             "joint_fold_protocol_audit_pass": all(
                 item["pass"] for item in joint_fold_protocol_audit
             ),
-            "joint_fit_source": "ORIGINAL_REGISTERED_INNER_TRAIN_SUPPORT",
+            "assembly_support_contract": c_result.get(
+                "assembly_support_contract"
+            ),
+            "joint_raw_input_train_support_hash": support_id_hash(
+                assembly_development_train
+            ),
+            "joint_raw_input_validation_support_hash": support_id_hash(
+                validation
+            ),
+            "joint_raw_input_validation_base_origin_support_hash": base_origin_support_hash(
+                validation
+            ),
+            "c_assembly_validation_support_hash": c_result.get(
+                "assembly_validation_support_hash"
+            ),
+            "joint_raw_input_support_matches_c_assembly": base_origin_support_hash(
+                validation
+            )
+            == c_result.get("assembly_validation_base_origin_support_hash"),
+            "joint_k_representations_share_rows": True,
+            "joint_fit_source": "ORIGINAL_REGISTERED_ANCHOR_INNER_TRAIN_SUPPORT_AFTER_ASSEMBLY_MASK",
             "joint_evaluation_source": (
-                "ORIGINAL_REGISTERED_INNER_VALIDATION_SUPPORT"
+                "ORIGINAL_REGISTERED_ANCHOR_INNER_VALIDATION_SUPPORT_AFTER_ASSEMBLY_MASK"
             ),
             "nested_oof_training_used": False,
             "w_physical_oof_used_as_training_pool": False,
@@ -1174,6 +1228,7 @@ def run_joint_view(
                 "fit_rows": len(train),
                 "validation_rows": len(validation),
                 "fit_source": "train_only",
+                "assembly_support_mask_before_cap": True,
             },
             "test_accessed": False,
             "ood_accessed": False,
@@ -1189,9 +1244,9 @@ def run_joint_view(
             "target_head": view.head.head_id,
             "availability_scenario": view.availability_scenario,
             "proxy_policy": view.proxy_policy,
-            "joint_fit_source": "ORIGINAL_REGISTERED_INNER_TRAIN_SUPPORT",
+            "joint_fit_source": "ORIGINAL_REGISTERED_ANCHOR_INNER_TRAIN_SUPPORT_AFTER_ASSEMBLY_MASK",
             "joint_evaluation_source": (
-                "ORIGINAL_REGISTERED_INNER_VALIDATION_SUPPORT"
+                "ORIGINAL_REGISTERED_ANCHOR_INNER_VALIDATION_SUPPORT_AFTER_ASSEMBLY_MASK"
             ),
             "nested_oof_training_used": False,
             "w_physical_oof_used_as_training_pool": False,

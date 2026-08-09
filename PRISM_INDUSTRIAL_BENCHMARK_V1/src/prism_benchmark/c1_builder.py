@@ -18,11 +18,10 @@ import pyreadr
 from .c1_contracts import (
     RealizedHead,
     ceil_steps,
-    maximum_registered_history,
     realize_heads,
     stable_identifier,
     target_change,
-    valid_origins_for_interval,
+    valid_anchor_origins_for_interval,
 )
 from .stage0 import canonical_json_bytes, read_numeric_text, sha256_file, write_json
 
@@ -154,7 +153,8 @@ def _sample_frame(
     delay: int,
     proxy_policy: str,
     information_set: str,
-    lmax: int,
+    causal_history_floor: int,
+    anchor_history_steps: int,
     origins: np.ndarray,
     y: np.ndarray,
 ) -> pd.DataFrame:
@@ -186,14 +186,19 @@ def _sample_frame(
             "current_stop_exclusive": origins,
             "target_start": origins + head.h_steps,
             "target_stop_exclusive": origins + head.h_steps + head.w_steps,
-            "dependency_start": origins - lmax,
+            "dependency_start": origins - anchor_history_steps,
             "dependency_stop_exclusive": origins + head.h_steps + head.w_steps + delay,
             "latest_available_target_index": origins - 1 - delay,
             "availability_delay_steps": delay,
             "availability_scenario": availability,
             "proxy_policy": proxy_policy,
             "information_set": information_set,
-            "lmax_steps": lmax,
+            "causal_history_floor": causal_history_floor,
+            "anchor_history_steps": anchor_history_steps,
+            "sample_support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+            # Compatibility-only anchor history.  This is not the maximum
+            # registered K history under NATIVE_K_COMMON_ASSEMBLY_R1.
+            "lmax_steps": anchor_history_steps,
             "y_true": targets,
         }
     )
@@ -409,29 +414,6 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
         _prepare_split_cache(dataset, split)
         entities = _dataset_entities(dataset, raw_root)
         first_columns: list[str] | None = None
-        b_for_dataset = ceil_steps(
-            config["extra_dependency_interval_seconds"],
-            float(heads_by_dataset[dataset][0].cadence_seconds),
-        )
-        if dataset == "tep":
-            required_interval_lengths = [500, 960]
-        elif dataset == "debutanizer":
-            required_interval_lengths = [
-                split["train"][1] - split["train"][0],
-                split["validation"][1] - split["validation"][0] - b_for_dataset,
-                split["test"][1] - split["test"][0] - b_for_dataset,
-            ]
-        elif dataset == "sru":
-            required_interval_lengths = [
-                split["train"][1] - split["train"][0],
-                split["validation"][1] - split["validation"][0] - b_for_dataset,
-                split["test"][1] - split["test"][0] - b_for_dataset,
-            ]
-        elif dataset == "pmsm":
-            required_interval_lengths = [int(length) for length in split["profile_rows"].values()]
-        else:
-            required_interval_lengths = [100_000]
-
         for entity_id, source_name, frame in entities:
             frame = frame.copy()
             frame["entity_id"] = entity_id
@@ -462,12 +444,6 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
 
             for head in heads_by_dataset[dataset]:
                 task = task_by_id[head.task_id]
-                maximum_delay = max(int(delay) for delay in task["availability_delays_steps"])
-                dependency_capacities = [
-                    length - head.h_steps - head.w_steps - maximum_delay + 1
-                    for length in required_interval_lengths
-                ]
-                lmax = maximum_registered_history(head.h_steps, head.w0_steps, dependency_capacities)
                 y = frame[head.target].to_numpy(dtype=np.float64, copy=False)
                 for delay in task["availability_delays_steps"]:
                     information_sets = ["dynamic"]
@@ -476,10 +452,11 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
                     for start, stop, split_label, left_buffer in intervals:
                         if split_label in {"discarded", "unused"}:
                             continue
-                        origins = valid_origins_for_interval(
+                        causal_history_floor = start + left_buffer
+                        origins = valid_anchor_origins_for_interval(
                             start,
                             stop,
-                            lmax=lmax,
+                            anchor_history_steps=head.w0_steps,
                             h=head.h_steps,
                             w=head.w_steps,
                             delay=int(delay),
@@ -497,7 +474,8 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
                                     delay=int(delay),
                                     proxy_policy=proxy_policy,
                                     information_set=information_set,
-                                    lmax=lmax,
+                                    causal_history_floor=causal_history_floor,
+                                    anchor_history_steps=head.w0_steps,
                                     origins=origins,
                                     y=y,
                                 )
@@ -521,6 +499,7 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
 
     task_registry = {
         "contract_status": config["contract_status"],
+        "sample_support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
         "heads": [asdict(head) | {"head_id": head.head_id} for head in heads],
     }
     _write_canonical(output_root / "TASK_REGISTRY.json", task_registry)
@@ -539,7 +518,12 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
     )
     _write_canonical(
         output_root / "multiresolution_tabular_views/VIEW_SPEC.json",
-        {"storage": "lazy", "source": "immutable_base_data", "profile_selection": "outer_training_only_C4"},
+        {
+            "storage": "lazy",
+            "source": "immutable_base_data",
+            "profile_selection": "outer_training_only_C4",
+            "sample_support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+        },
     )
     _write_canonical(
         output_root / "graph_views/VIEW_SPEC.json",
@@ -547,7 +531,12 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
     )
     _write_canonical(
         output_root / "masks/PURGE_CONTRACT.json",
-        {"contract": "DEPENDENCY_INTERVAL_V1", "interval": "[t-Lmax,t+h+W+D)", "extra_buffer_seconds": 600},
+        {
+            "contract": "DEPENDENCY_INTERVAL_V1",
+            "interval": "[t-W0,t+h+W+D) at anchor level; candidate-native K history is applied downstream",
+            "extra_buffer_seconds": 600,
+            "sample_support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+        },
     )
     for key, moments in scaler_accumulators.items():
         dataset, task_id, proxy_policy = key
@@ -573,6 +562,8 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
             files.append(entry)
     registry = {
         "contract": "IMMUTABLE_SAMPLE_IDS_V1",
+        "sample_support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+        "anchor_universe": "MAXIMALLY_PERMISSIVE_HEAD_LEGAL_ANCHORS",
         "protocol_sha256": sha256_file(output_root / "PROTOCOL.json"),
         "files": files,
     }
@@ -585,6 +576,7 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
         "- Target index contract: `HALF_OPEN_V1`",
         "- Time realization contract: `ROUND_HALF_UP_V1`",
         "- Purge contract: `DEPENDENCY_INTERVAL_V1`",
+        "- Sample support contract: `NATIVE_K_COMMON_ASSEMBLY_R1` (maximal anchor universe; native K masks downstream).",
         "- Raw test targets were materialized into immutable lockbox artifacts but were not summarized or used for selection.",
         f"- Registered files: {len(files)}",
         f"- Sample registry SHA256: `{registry_hash}`",

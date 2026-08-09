@@ -18,6 +18,8 @@
 
 > **Practice Contract Amendment（2026-08-08）**：实践执行语义补充如下。Physical-First 与 Joint 是两个分层证据路线。PF 是可以独立满足合同、独立冻结并进入正式 test/OOD 评价的结构路线；Joint 是建立在冻结输入支持与基构造规则之上的可选预测增强路线。Joint 未通过自身的 development 稳定性门时，不得进入正式预测、test 或 OOD，但这不否定已经通过自身全部合同的 PF。本补充只澄清冻结、装配和访问资格，不改变任何估计器、候选集合、超参数或判定阈值。
 
+> **Practice Contract Amendment（2026-08-09，Sample Support）**：K 单通道审计与多通道装配的样本支持正式解耦。C1 只建立满足预测头自身目标/可用性/分割边界约束的最大许可 anchor universe；K 候选按自身历史长度取得 candidate-native fit support，并在同一通道的 local common scoring support 上进行公平选择；不同通道分别完成独立 K 审计后，C 才对已激活且已选择的通道取 assembly common support 并重拟合。该补充旨在避免短历史通道因其他通道或更长候选的历史需求而提前丢失合法训练样本，同时保持 one-SE、C 融合与后续 PF/Joint 比较的同支持可比性。它不改变任何已完成历史实验的证据含义；旧结果仍解释为 head-level common-support protocol 下的结果。
+
 ---
 
 # 0. v2.1.1 的核心修订
@@ -2162,6 +2164,158 @@ P=P_{num}+n_{fit}\eta_{pred}I,
 \]
 
 而 `same_gate_contract` 不要求不同 estimator prediction 得到 `same_gate_outcome`。Joint 仍是 PF 之外的可选 predictive enhancement。
+
+
+## 11A.12 Sample-Support Practice Contract：Native-Support K Audit + Common-Support Assembly
+
+本节规定 PRISM v2.1.1 的样本支持执行语义。它不建立新的理论版本，不改变 K/C/W/A/J 的数学对象、候选族、损失函数或选择阈值；它只规定“哪些合法时间锚点可以用于哪个候选的拟合、哪些时间锚点可以用于候选间比较、何时才必须取多通道交集”。
+
+### 11A.12.1 四类支持对象
+
+对给定预测头和一个连续合法区间，先定义不含 K 候选历史要求的最大许可锚点集合
+
+\[
+\mathcal S^{anchor}
+=
+\{t:\ t\text{ 满足 split/purge、目标窗口、availability 与当前目标窗口 }W_0\text{ 的合法性}\}.
+\tag{11A.3}
+\]
+
+C1 的职责是物化 \(\mathcal S^{anchor}\)，而不是预先对所有可能 K profile 的历史长度取最大值。若区间左端加 purge 后的第一个允许依赖位置为 \(b\)，则 anchor 最早只需满足
+
+\[
+t-W_0\ge b,
+\tag{11A.4}
+\]
+
+而不是满足所有未来可能 K 候选的最大历史长度。
+
+对 K 候选 \(c=(j,p,f,\ldots)\)，其中通道为 \(j\)，profile 历史长度为 \(L_c\)，定义 candidate-native support
+
+\[
+\mathcal S_c^{native}
+=
+\{t\in\mathcal S^{anchor}:t-L_c\ge b\}.
+\tag{11A.5}
+\]
+
+候选 \(c\) 的 fit fold 必须尽可能使用其自身 \(\mathcal S_c^{native}\) 内的合法训练锚点。一个短历史候选不得因为另一通道或同通道另一长历史候选的存在而失去本来合法的训练样本。
+
+同一局部选择集合 \(\mathcal C_j\)（例如同一通道的 profile/family 候选）用于 one-SE 或 guarded one-SE 比较时，定义 local common scoring support
+
+\[
+\mathcal S_j^{score}
+=
+\bigcap_{c\in\mathcal C_j}\mathcal S_{c,eval}^{native}.
+\tag{11A.6}
+\]
+
+各候选可以在不同的 candidate-native fit support 上拟合，但必须在相同的 \(\mathcal S_j^{score}\) 上计算配对 validation loss。由此同时满足
+
+\[
+\boxed{\text{native-support fitting}+\text{common-support scoring}.}
+\tag{11A.7}
+\]
+
+当若干通道已分别完成 K 审计并激活，设其最终选择的 K 候选为 \(c_1^*,\ldots,c_m^*\)。只有进入 C 装配时才定义 assembly common support
+
+\[
+\mathcal S^{assembly}
+=
+\bigcap_{r=1}^{m}\mathcal S_{c_r^*}^{native}.
+\tag{11A.8}
+\]
+
+C 及依赖完整多通道输入向量的后续路线只能在 \(\mathcal S^{assembly}\) 上拟合、评分和物化。
+
+### 11A.12.2 K 审计的实践规则
+
+1. C1 不得再用 head-level 最大注册 K history 作为所有 `sample_ids` 的统一左边界；C1 必须建立 maximally permissive anchor universe。
+2. anchor universe 仍必须满足 `w0_steps`、预测 horizon/window、availability delay、split/purge 和连续区间边界；“最大许可”不等于允许跨越因果边界。
+3. `base_origin_id` 的核心身份仍由 dataset/entity/head/origin 决定；support mask 不能通过重新编号 origin 改变样本身份。
+4. 每个 K profile/family 候选在 fit fold 内先应用自己的 native mask，再应用任何 deterministic row cap。row cap 不能先于 native mask，否则新增合法样本可能永远无法进入拟合。
+5. 同一通道不同 profile 可以拥有不同 native fit rows；短 profile 应获得它额外合法的较早训练锚点。
+6. 同一局部 selection set 的 evaluation rows 必须取 local common scoring support，从而保持 fold loss 严格配对。
+7. `EXACT_ZERO` 与非零 K 候选比较时必须使用同一 local common scoring rows；exact-zero 不得因使用更宽或更容易的 evaluation support 获得优势。
+8. 各通道的 K activation 是通道局部门：通道 \(j\) 与自己的 neutral candidate 比较，不要求为了另一通道的长历史而预先收缩 \(\mathcal S_j^{native}\)。
+9. 不得直接用来自不同 channel-native scoring support 的 K-stage raw MSE 对多个通道做 winner-takes-all 排名。
+10. 每个 K RESULT 至少记录：selected profile、native fit row count、local scoring row count、native support 起点、scoring-support hash、fold-wise support hashes 与 row-cap-after-mask 语义。
+
+### 11A.12.3 C 装配与 best-K comparator
+
+当进入 C 时，所有已激活通道的最终 K 候选必须首先映射到同一个 \(\mathcal S^{assembly}\)。此后：
+
+1. C 的 compressed/joint-basis 拟合只读取 assembly common support；
+2. `best_active_k_channel` 不得复用不同 native support 上的 K-stage loss 排名；必须在 \(\mathcal S^{assembly}\) 上重新计算各 active selected-K 的 prediction/loss 后再确定 comparator；
+3. C input-path preservation gate 的 `best_k_pred` 必须来自同一 assembly common support；
+4. C fallback 到 `BEST_ACTIVE_K_CHANNEL` 时，fallback prediction 必须与该 common-support comparator 逐样本对齐；
+5. assembly support 的样本 ID 顺序、hash 与行数必须写入 C contract，避免不同模块悄悄使用不同交集。
+
+因此不同通道可以在 K 阶段获得各自完整的合法训练支持，但一旦它们作为一个多通道对象进入 C，所有结构比较重新恢复严格同支持语义。
+
+### 11A.12.4 W、A 与 Joint 的支持继承
+
+- W 继承 C 的 assembly support；W 不得为了自身基函数重新扩大 raw-input support。
+- PF 中 A 在 assembly support 基础上继续施加 target-history maturity、availability delay 与 `latest_available_target_index` 约束，因此 A 的合法支持可以进一步缩小，但不能越过 C 的输入合法边界。
+- Joint 必须继承冻结的 active K support、K representation 规则和 assembly common support。`CHANNEL_COMPRESSED` 与 `FULL_BASIS` 只改变表示自由度，不得改变 raw sample support。
+- Joint 的 J_K/J_KW/J_KA/J_KWA 候选在同一 formal comparison 中必须保持注册的 common evaluation support；不能通过不同 support 获得表面预测优势。
+
+### 11A.12.5 Fold、mask 与可复现性合同
+
+推荐执行顺序为：
+
+```text
+C1 maximal anchor universe
+    -> registered temporal folds
+    -> candidate-native fit mask inside each fold
+    -> channel-local common evaluation mask
+    -> K local selection
+    -> selected-K refit on its full native fit support
+    -> active selected channels
+    -> assembly common support
+    -> C -> W -> A / Joint
+```
+
+实践中必须满足：
+
+1. temporal fold 边界先注册，candidate mask 只能在 fold 内删除不合法 rows，不能移动 fold 边界以追求更好结果；
+2. support mask 必须由结构合同和时间索引确定，不能读取目标误差后自适应改变；
+3. fit/evaluation support 必须分别 hash；任何 one-SE loss 都应能够追溯到明确的 scoring-support hash；
+4. deterministic subsampling/row cap 在 support mask 之后执行，并以稳定样本 ID 为输入；
+5. 新增 anchor rows 后，原有相同 origin 的 `base_origin_id` 应保持稳定；若 `view_sample_id` 因 support protocol 版本化而变化，必须在 protocol registry 显式记录；
+6. C1 应保存每行可用于 native-mask 计算的 causal left boundary（例如 `causal_history_floor`），而不是要求 K 从 head-global `lmax` 反推边界；
+7. `dependency_start` / `lmax_steps` 若继续保留为兼容字段，必须明确其 anchor-level 或 candidate-level 语义，禁止一个字段同时被两种语义解释；
+8. 任何读取 `dependency_start`、`lmax_steps`、`valid_origins_for_interval()` 的下游审计代码都必须与新的 support contract 同步，避免“样本已放宽但审计仍按旧全局历史”或相反的语义漂移。
+
+### 11A.12.6 历史结果与证据边界
+
+本实践修正不把旧 common-support 实验改写为 native-support 实验。对已经完成并打开 test/OOD 的历史运行，正确表述为：
+
+\[
+\boxed{\text{VALID UNDER HEAD-LEVEL COMMON-SUPPORT PROTOCOL, NOT NATIVE-SUPPORT OPTIMAL}.}
+\tag{11A.9}
+\]
+
+它不构成标签泄漏、未来输入泄漏或 train/test contamination；其主要限制是短历史候选损失合法训练样本，可能降低统计功效并影响 K activation、profile/family selection 以及后续装配。若对已打开 lockbox 的数据重放新 support protocol，只能标记为 retrospective protocol-sensitivity analysis，不得重新宣称 untouched confirmatory evidence。
+
+### 11A.12.7 强制实现不变量
+
+```text
+assert C1_support_semantics == MAXIMALLY_PERMISSIVE_ANCHOR_UNIVERSE
+assert candidate_fit_rows <= candidate_native_support_rows
+assert row_cap_applied_after_native_mask
+assert all_local_candidates_share_identical_scoring_support_hash
+assert exact_zero_scoring_support_hash == nonzero_scoring_support_hash
+assert no_cross_channel_K_loss_ranking_before_common_support_replay
+assert C_support_hash == intersection(selected_active_K_native_support_hashes)
+assert best_active_K_comparator_support_hash == C_support_hash
+assert W_input_support_hash == C_support_hash
+assert Joint_raw_input_support_hash == C_support_hash
+assert support_mask_does_not_read_test_or_target_error
+```
+
+这些断言属于实践执行不变量。其目标不是让所有候选拥有相同训练样本数，而是让每个候选充分使用自己的合法训练信息，同时保证任何直接的模型选择比较发生在完全相同的评分样本上。
+
 
 # 11B. 必须通过的回归测试
 

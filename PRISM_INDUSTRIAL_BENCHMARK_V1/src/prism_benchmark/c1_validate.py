@@ -31,6 +31,9 @@ SAMPLE_COLUMNS = [
     "availability_scenario",
     "proxy_policy",
     "information_set",
+    "causal_history_floor",
+    "anchor_history_steps",
+    "sample_support_contract",
     "lmax_steps",
     "y_true",
 ]
@@ -71,6 +74,10 @@ def _validate_sample_row(row: dict[str, Any], head: dict[str, Any]) -> None:
     assert row["target_start"] == origin + head["h_steps"]
     assert row["target_stop_exclusive"] == origin + head["h_steps"] + head["w_steps"]
     assert row["dependency_start"] == origin - row["lmax_steps"]
+    assert row["dependency_start"] == origin - row["anchor_history_steps"]
+    assert row["anchor_history_steps"] == head["w0_steps"]
+    assert row["sample_support_contract"] == "NATIVE_K_COMMON_ASSEMBLY_R1"
+    assert origin - row["anchor_history_steps"] >= row["causal_history_floor"]
     assert row["dependency_stop_exclusive"] == origin + head["h_steps"] + head["w_steps"] + delay
     assert row["latest_available_target_index"] == origin - 1 - delay
     expected_base = stable_identifier("BASE_ORIGIN_V1", row["dataset"], row["entity_id"], row["target_head"], origin)
@@ -94,6 +101,10 @@ def validate_shared_data(root: Path, output: Path | None = None) -> dict[str, An
     heads = {head["head_id"]: head for head in task_registry["heads"]}
     lockbox = json.loads((root / "LOCKBOX.json").read_text(encoding="utf-8"))
     failures: list[str] = []
+    if registry.get("sample_support_contract") != "NATIVE_K_COMMON_ASSEMBLY_R1":
+        failures.append("SAMPLE_SUPPORT_CONTRACT")
+    if task_registry.get("sample_support_contract") != "NATIVE_K_COMMON_ASSEMBLY_R1":
+        failures.append("TASK_SAMPLE_SUPPORT_CONTRACT")
     checked_parquet = 0
     checked_rows = 0
     sample_counts: dict[tuple[str, str, str, str, str], int] = {}

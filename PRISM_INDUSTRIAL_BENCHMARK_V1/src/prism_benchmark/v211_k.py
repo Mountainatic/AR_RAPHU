@@ -16,7 +16,6 @@ from .cpu_data import (
     ViewSpec,
     inner_folds,
     input_columns,
-    load_samples,
     sha256_file,
 )
 from .cpu_selection import mse, regression_metrics
@@ -28,7 +27,6 @@ from .v2_k import (
     _candidate_valid,
     _cap,
     channel_profiles,
-    evaluate_candidate,
     profile_values,
 )
 from .v2_selection import one_se_select
@@ -38,6 +36,14 @@ from .v21_selection import guarded_local_one_se_select
 from .v21_views import sru_input_views
 from .v211_config import load_v211_configs
 from .v211_selection import profile_one_se_regret_guard
+from .v211_support import (
+    SUPPORT_CONTRACT,
+    apply_native_support,
+    load_native_samples,
+    registered_fold_native_masks,
+    support_audit,
+    support_id_hash,
+)
 
 
 EXACT_ZERO = "EXACT_ZERO"
@@ -176,6 +182,61 @@ def _structural_complexity(candidate: Any) -> tuple[Any, ...]:
     )
 
 
+def evaluate_candidate(
+    accessor: BaseAccessor,
+    train: pd.DataFrame,
+    folds: list[tuple[np.ndarray, np.ndarray]],
+    channel: str,
+    profile: tuple[int, int],
+    m_tau: int,
+    family: str,
+    m_x: int,
+    lambdas: tuple[float, float, float],
+    config: dict[str, Any],
+    scoring_history_steps: int | None = None,
+) -> list[float]:
+    """Fit on candidate-native rows and score on one local common support."""
+    history = int(profile[1])
+    scoring_history = history if scoring_history_steps is None else int(
+        scoring_history_steps
+    )
+    records = registered_fold_native_masks(
+        train,
+        folds,
+        fit_history_steps=history,
+        scoring_history_steps=scoring_history,
+        fit_cap=int(config["row_caps"]["single_channel_k_fit"]),
+        evaluation_cap=int(config["row_caps"]["validation_selection_per_fold"]),
+    )
+    losses = []
+    for record in records:
+        fit = record["fit"]
+        evaluation = record["evaluation"]
+        if family == EXACT_ZERO:
+            prediction = np.zeros(len(evaluation), dtype=np.float64)
+        else:
+            fit_values, _ = profile_values(accessor, fit, channel, profile, m_tau)
+            evaluation_values, _ = profile_values(
+                accessor, evaluation, channel, profile, m_tau
+            )
+            contract = fit_contract(
+                fit_values,
+                fit["y_true"].to_numpy(dtype=np.float64),
+                family,
+                m_x,
+                lambdas,
+                **_als_kwargs(config),
+            )
+            if not _candidate_valid(contract, len(fit), config):
+                losses.append(float("inf"))
+                continue
+            prediction = predict_contract(evaluation_values, contract)
+        losses.append(
+            mse(evaluation["y_true"].to_numpy(dtype=np.float64), prediction)
+        )
+    return losses
+
+
 def _smoothness_selection(
     *,
     accessor: BaseAccessor,
@@ -216,6 +277,7 @@ def _smoothness_selection(
                     m_x,
                     (lambda_0, candidate_tau, candidate_x),
                     v2,
+                    int(profile[1]),
                 )
             )
         scan = dict(
@@ -257,8 +319,10 @@ def run_k_channel(
     try:
         v211, v21, v2 = load_v211_configs(project, protocol=protocol)
         minimum_folds = int(v21["selection"]["minimum_usable_folds"])
-        train = load_samples(shared, view, "train", columns=CHANNEL_SAMPLE_COLUMNS)
-        validation = load_samples(
+        train = load_native_samples(
+            shared, view, "train", columns=CHANNEL_SAMPLE_COLUMNS
+        )
+        validation = load_native_samples(
             shared, view, "validation", columns=CHANNEL_SAMPLE_COLUMNS
         )
         accessor = BaseAccessor(shared, view.head.dataset, "validation", [channel])
@@ -266,6 +330,7 @@ def run_k_channel(
         inner_workers = _k_inner_workers()
         folds = inner_folds(train, int(v21["selection"]["inner_folds"]))
         profiles = channel_profiles(view, channel, v2)
+        profile_comparison_history = max(int(profile[1]) for profile in profiles)
         pilot = v2["K_module"]["penalties"]["pilot"]
         pilot_lambdas = (
             float(pilot["lambda_0"]),
@@ -285,6 +350,7 @@ def run_k_channel(
                 1,
                 pilot_lambdas,
                 v2,
+                profile_comparison_history,
             )
             for profile in profiles
         ]
@@ -306,20 +372,54 @@ def run_k_channel(
             minimum_usable_folds=minimum_folds,
         )
         retained_profiles = [tuple(value) for value in profile_selection.retained_profiles]
+        local_comparison_history = max(
+            int(profile[1]) for profile in retained_profiles
+        )
+        local_scoring_records = registered_fold_native_masks(
+            train,
+            folds,
+            fit_history_steps=local_comparison_history,
+            scoring_history_steps=local_comparison_history,
+            fit_cap=int(v2["row_caps"]["single_channel_k_fit"]),
+            evaluation_cap=int(v2["row_caps"]["validation_selection_per_fold"]),
+        )
+        activation_profile_losses = dict(
+            zip(
+                retained_profiles,
+                _ordered_parallel_map(
+                    evaluate_candidate,
+                    [
+                        (
+                            accessor,
+                            train,
+                            folds,
+                            channel,
+                            profile,
+                            pilot_m_tau,
+                            "LINEAR_DISTRIBUTED_LAG",
+                            1,
+                            pilot_lambdas,
+                            v2,
+                            local_comparison_history,
+                        )
+                        for profile in retained_profiles
+                    ],
+                    inner_workers,
+                ),
+                strict=True,
+            )
+        )
 
         zero_losses = []
-        for _, evaluation_index in folds:
-            subset = _cap(
-                train.iloc[evaluation_index],
-                int(v2["row_caps"]["validation_selection_per_fold"]),
-            )
+        for record in local_scoring_records:
+            subset = record["evaluation"]
             target = subset["y_true"].to_numpy(dtype=np.float64)
             zero_losses.append(float(np.mean(target * target, dtype=np.float64)))
 
         linear_activation_losses: dict[Any, list[float]] = {EXACT_ZERO: zero_losses}
         for profile in retained_profiles:
             linear_activation_losses[(profile, "LINEAR_DISTRIBUTED_LAG")] = (
-                profile_losses[profile]
+                activation_profile_losses[profile]
             )
         activation = guarded_local_one_se_select(
             linear_activation_losses,
@@ -366,6 +466,7 @@ def run_k_channel(
                             1,
                             pilot_lambdas,
                             v2,
+                            local_comparison_history,
                         )
                     )
                     for m_x in v21["K_C"]["m_x"]:
@@ -385,6 +486,7 @@ def run_k_channel(
                                     int(m_x),
                                     pilot_lambdas,
                                     v2,
+                                    local_comparison_history,
                                 )
                             )
             structural_results = _ordered_parallel_map(
@@ -434,12 +536,32 @@ def run_k_channel(
                     parallel_workers=inner_workers,
                 )
 
-        final_train = _cap(train, int(v2["row_caps"]["single_channel_k_fit"]))
+        selected_history = int(selected_profile[1])
+        selected_support_history = (
+            local_comparison_history
+            if selected_family == EXACT_ZERO
+            else selected_history
+        )
+        final_train_native = apply_native_support(train, selected_support_history)
+        final_train = _cap(
+            final_train_native, int(v2["row_caps"]["single_channel_k_fit"])
+        )
+        selected_validation = apply_native_support(
+            validation, selected_support_history
+        )
+        selected_fold_records = registered_fold_native_masks(
+            train,
+            folds,
+            fit_history_steps=selected_support_history,
+            scoring_history_steps=selected_support_history,
+            fit_cap=int(v2["row_caps"]["single_channel_k_fit"]),
+            evaluation_cap=int(v2["row_caps"]["validation_selection_per_fold"]),
+        )
         train_values, intervals = profile_values(
             accessor, final_train, channel, selected_profile, selected_m_tau
         )
         validation_values, _ = profile_values(
-            accessor, validation, channel, selected_profile, selected_m_tau
+            accessor, selected_validation, channel, selected_profile, selected_m_tau
         )
         ridge_audit: list[dict[str, Any]] = []
         certified_fold_payloads: list[dict[str, Any]] = []
@@ -470,15 +592,9 @@ def run_k_channel(
 
             def fit_ridge_folds(lambda_0: float) -> list[dict[str, Any]]:
                 payloads = []
-                for fold, (fit_index, evaluation_index) in enumerate(folds):
-                    fit = _cap(
-                        train.iloc[fit_index],
-                        int(v2["row_caps"]["single_channel_k_fit"]),
-                    )
-                    evaluation = _cap(
-                        train.iloc[evaluation_index],
-                        int(v2["row_caps"]["validation_selection_per_fold"]),
-                    )
+                for fold, record in enumerate(selected_fold_records):
+                    fit = record["fit"]
+                    evaluation = record["evaluation"]
                     fit_values, _ = profile_values(
                         accessor, fit, channel, selected_profile, selected_m_tau
                     )
@@ -517,7 +633,7 @@ def run_k_channel(
                         {
                             "fold": fold,
                             "fit_rows": len(fit),
-                            "evaluation_index": evaluation_index,
+                            "evaluation": evaluation,
                             "contract": fold_contract,
                             "prediction": fold_prediction,
                             "loss": fold_loss,
@@ -551,7 +667,7 @@ def run_k_channel(
             selected_lambdas = (float(lambda_0), lambda_tau, lambda_x)
 
         prediction = predict_contract(validation_values, dict(refit_contract))
-        frame = validation[
+        frame = selected_validation[
             ["base_origin_id", "view_sample_id", "entity_id", "origin", "y_true"]
         ].copy()
         frame["y_pred"] = prediction
@@ -565,20 +681,8 @@ def run_k_channel(
         if selected_family == EXACT_ZERO:
             final_fold_losses = zero_losses
             certified_fold_predictions = [
-                np.zeros(
-                    len(
-                        _cap(
-                            train.iloc[evaluation_index],
-                            int(
-                                v2["row_caps"][
-                                    "validation_selection_per_fold"
-                                ]
-                            ),
-                        )
-                    ),
-                    dtype=np.float64,
-                )
-                for _, evaluation_index in folds
+                np.zeros(len(record["evaluation"]), dtype=np.float64)
+                for record in selected_fold_records
             ]
         else:
             final_fold_losses = [
@@ -590,13 +694,10 @@ def run_k_channel(
             ]
         oof_frames = []
         oof_losses = []
-        for fold, ((_, evaluation_index), fold_prediction) in enumerate(
-            zip(folds, certified_fold_predictions, strict=True)
+        for fold, (record, fold_prediction) in enumerate(
+            zip(selected_fold_records, certified_fold_predictions, strict=True)
         ):
-            evaluation = _cap(
-                train.iloc[evaluation_index],
-                int(v2["row_caps"]["validation_selection_per_fold"]),
-            )
+            evaluation = record["evaluation"]
             oof_loss = mse(
                 evaluation["y_true"].to_numpy(dtype=np.float64), fold_prediction
             )
@@ -620,6 +721,9 @@ def run_k_channel(
             "proxy_policy": view.proxy_policy,
             "channel": channel,
             "selected_profile": list(selected_profile),
+            "support_contract": SUPPORT_CONTRACT,
+            "selected_profile_history_steps": selected_history,
+            "selected_scoring_history_steps": selected_support_history,
             "retained_profiles": [list(value) for value in retained_profiles],
             "selected_intervals": [list(value) for value in intervals],
             "selected_family": selected_family,
@@ -633,6 +737,9 @@ def run_k_channel(
                 str(key): value for key, value in profile_losses.items()
             },
             "linear_activation_selection": activation.to_json(),
+            "linear_activation_profile_fold_losses": {
+                str(key): value for key, value in activation_profile_losses.items()
+            },
             "structural_selection": None
             if structural_selection is None
             else structural_selection.to_json(),
@@ -660,12 +767,48 @@ def run_k_channel(
             "oof_prediction_path": str(oof_path.relative_to(output)),
             "oof_prediction_sha256": sha256_file(oof_path),
             "oof_prediction_fold_losses": oof_losses,
+            "native_fit_rows_by_fold": [
+                len(record["fit_native"]) for record in selected_fold_records
+            ],
+            "native_fit_support_hash_by_fold": [
+                support_id_hash(record["fit_native"])
+                for record in selected_fold_records
+            ],
+            "local_scoring_rows_by_fold": [
+                len(record["evaluation"]) for record in selected_fold_records
+            ],
+            "local_scoring_support_hash_by_fold": [
+                support_id_hash(record["evaluation"])
+                for record in selected_fold_records
+            ],
+            "selected_native_train_rows": len(final_train_native),
+            "selected_native_validation_rows": len(selected_validation),
+            "selected_native_support_hash": {
+                "train": support_id_hash(final_train_native),
+                "validation": support_id_hash(selected_validation),
+            },
+            "selected_native_support_audit": {
+                "train": support_audit(final_train_native),
+                "validation": support_audit(selected_validation),
+            },
+            "row_cap_applied_after_native_mask": True,
+            "cross_channel_loss_comparable": False,
+            "historical_global_lmax_used": False,
+            "exact_zero_scoring_support_hash": [
+                support_id_hash(record["evaluation"])
+                for record in local_scoring_records
+            ],
+            "nonzero_scoring_support_hash": [
+                support_id_hash(record["evaluation"])
+                for record in local_scoring_records
+            ],
             "row_cap_audit": {
                 "cap_name": "single_channel_k_fit",
                 "cap": int(v2["row_caps"]["single_channel_k_fit"]),
                 "fit_rows": len(final_train),
-                "validation_rows": len(validation),
+                "validation_rows": len(selected_validation),
                 "fit_source": "train_only",
+                "row_cap_applied_after_native_mask": True,
             },
             "test_accessed": False,
             "elapsed_seconds": time.time() - started,

@@ -9,7 +9,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from .cpu_data import ViewSpec, inner_folds, load_samples, sha256_file
+from .cpu_data import ViewSpec, inner_folds, sha256_file
 from .cpu_selection import mse, regression_metrics
 from .stage0 import write_json
 from .v2_c import _ridge_fit, fit_physical_features
@@ -23,6 +23,16 @@ from .v211_selection import (
     attach_nonselecting_validation_confirmation,
     input_path_preservation_gate,
     numerical_contract_passes,
+)
+from .v211_support import (
+    SUPPORT_CONTRACT,
+    apply_assembly_support,
+    base_origin_support_hash,
+    fold_evaluation_causal_floor,
+    load_native_samples,
+    selected_k_histories,
+    support_audit,
+    support_id_hash,
 )
 
 
@@ -133,9 +143,12 @@ def run_c_view(
             active,
             key=lambda item: (-_activation_strength(item), item["channel"]),
         )[:maximum]
-        train = load_samples(shared, view, "train")
-        validation = load_samples(shared, view, "validation")
+        train = load_native_samples(shared, view, "train")
+        validation = load_native_samples(shared, view, "validation")
         folds = inner_folds(train, int(v21["selection"]["inner_folds"]))
+        active_histories = selected_k_histories(active)
+        assembly_train = apply_assembly_support(train, active)
+        assembly_validation = apply_assembly_support(validation, active)
         minimum_folds = int(v21["selection"]["minimum_usable_folds"])
         alpha_grid = sorted(
             float(value)
@@ -152,6 +165,7 @@ def run_c_view(
             key: [] for key in candidate_losses
         }
         fold_targets: list[np.ndarray] = []
+        fold_evaluations: list[pd.DataFrame] = []
         fold_best_channel_predictions: dict[str, list[np.ndarray]] = {
             item["channel"]: [] for item in active
         }
@@ -159,11 +173,22 @@ def run_c_view(
             item["channel"]: [] for item in active
         }
         for fit_index, evaluation_index in folds:
-            fit = _cap(train.iloc[fit_index], int(v2["row_caps"]["joint_physical_fit"]))
+            fit_raw = train.iloc[fit_index]
+            evaluation_raw = train.iloc[evaluation_index]
+            fit_native = apply_assembly_support(fit_raw, active)
+            evaluation_common = apply_assembly_support(
+                evaluation_raw,
+                active,
+                fold_evaluation_causal_floor(fit_raw, evaluation_raw),
+            )
+            fit = _cap(
+                fit_native, int(v2["row_caps"]["joint_physical_fit"])
+            )
             evaluation = _cap(
-                train.iloc[evaluation_index],
+                evaluation_common,
                 int(v2["row_caps"]["validation_selection_per_fold"]),
             )
+            fold_evaluations.append(evaluation)
             features = fit_physical_features(
                 shared,
                 view,
@@ -213,9 +238,9 @@ def run_c_view(
 
         if not active:
             intercept = float(
-                np.mean(train["y_true"].to_numpy(dtype=np.float64), dtype=np.float64)
+                np.mean(assembly_train["y_true"].to_numpy(dtype=np.float64), dtype=np.float64)
             )
-            prediction = np.full(len(validation), intercept, dtype=np.float64)
+            prediction = np.full(len(assembly_validation), intercept, dtype=np.float64)
             contract = {
                 "family": "K_EXACT_ZERO",
                 "coefficient": [],
@@ -237,7 +262,7 @@ def run_c_view(
             family_selection_json = None
             ridge_audits: dict[str, Any] = {}
             best_channel = None
-            best_k_validation = np.full(len(validation), intercept, dtype=np.float64)
+            best_k_validation = np.full(len(assembly_validation), intercept, dtype=np.float64)
             final_features = {
                 "channels": [],
                 "channel_contracts": [],
@@ -300,13 +325,13 @@ def run_c_view(
                 requested_family, family_gates
             )
             final_train = _cap(
-                train, int(v2["row_caps"]["joint_physical_fit"])
+                assembly_train, int(v2["row_caps"]["joint_physical_fit"])
             )
             final_features = fit_physical_features(
                 shared,
                 view,
                 final_train,
-                validation,
+                assembly_validation,
                 active,
                 v2,
                 fit_split="train",
@@ -362,7 +387,7 @@ def run_c_view(
                     family_fold_losses = family_losses[family]
                     family_oof_gate = family_gates[family]
                 validation_gate = input_path_preservation_gate(
-                    validation["y_true"].to_numpy(dtype=np.float64),
+                    assembly_validation["y_true"].to_numpy(dtype=np.float64),
                     family_prediction,
                     best_k_validation,
                     nonintercept_coefficients=_coefficient(family_contract),
@@ -430,8 +455,8 @@ def run_c_view(
             selected_oof_predictions = fold_best_channel_predictions[best_channel]
         elif selected_family == "K_EXACT_ZERO":
             selected_oof_predictions = [
-                np.zeros(len(_cap(train.iloc[evaluation_index], int(v2["row_caps"]["validation_selection_per_fold"]))), dtype=np.float64)
-                for _, evaluation_index in folds
+                np.zeros(len(evaluation), dtype=np.float64)
+                for evaluation in fold_evaluations
             ]
         else:
             selected_oof_predictions = candidate_predictions[
@@ -439,13 +464,9 @@ def run_c_view(
             ]
         oof_frames = []
         oof_losses = []
-        for fold, ((_, evaluation_index), fold_prediction) in enumerate(
-            zip(folds, selected_oof_predictions, strict=True)
+        for fold, (evaluation, fold_prediction) in enumerate(
+            zip(fold_evaluations, selected_oof_predictions, strict=True)
         ):
-            evaluation = _cap(
-                train.iloc[evaluation_index],
-                int(v2["row_caps"]["validation_selection_per_fold"]),
-            )
             fold_prediction = np.asarray(fold_prediction, dtype=np.float64)
             fold_loss = mse(
                 evaluation["y_true"].to_numpy(dtype=np.float64), fold_prediction
@@ -466,7 +487,7 @@ def run_c_view(
             raise RuntimeError("selected C OOF predictions do not reproduce fold losses")
         oof_path = destination / "SELECTED_OOF.parquet"
         _write_oof_frames(oof_frames, oof_path)
-        frame = validation[
+        frame = assembly_validation[
             ["base_origin_id", "view_sample_id", "entity_id", "origin", "y_true"]
         ].copy()
         frame["y_pred"] = prediction
@@ -482,6 +503,25 @@ def run_c_view(
             "target_head": view.head.head_id,
             "proxy_policy": view.proxy_policy,
             "active_channels": final_features["channels"],
+            "assembly_support_contract": SUPPORT_CONTRACT,
+            "active_selected_k_histories": active_histories,
+            "assembly_train_rows": len(assembly_train),
+            "assembly_validation_rows": len(assembly_validation),
+            "assembly_train_support_hash": support_id_hash(assembly_train),
+            "assembly_validation_support_hash": support_id_hash(
+                assembly_validation
+            ),
+            "assembly_train_base_origin_support_hash": base_origin_support_hash(
+                assembly_train
+            ),
+            "assembly_validation_base_origin_support_hash": base_origin_support_hash(
+                assembly_validation
+            ),
+            "assembly_support_audit": {
+                "train": support_audit(assembly_train),
+                "validation": support_audit(assembly_validation),
+            },
+            "best_k_common_support_recomputed": True,
             "best_active_k_channel": best_channel,
             "selected_family": selected_family,
             "selected_alpha": float(selected_alpha),
@@ -498,6 +538,18 @@ def run_c_view(
             "best_active_k_fold_losses": []
             if best_channel is None
             else fold_best_channel_losses[best_channel],
+            "best_active_k_common_support_mse": None
+            if best_channel is None
+            else mse(
+                assembly_validation["y_true"].to_numpy(dtype=np.float64),
+                best_k_validation,
+            ),
+            "best_active_k_common_support_oof_mean_mse": None
+            if best_channel is None
+            else float(
+                np.mean(fold_best_channel_losses[best_channel], dtype=np.float64)
+            ),
+            "best_k_selected_from_native_stage_losses": False,
             "input_path_preservation": input_gate,
             "input_path_nonzero": bool(input_gate.get("pass", False)),
             "final_selected_candidate": selected_family,
@@ -518,10 +570,11 @@ def run_c_view(
                 "cap_name": "joint_physical_fit",
                 "cap": int(v2["row_caps"]["joint_physical_fit"]),
                 "fit_rows": min(
-                    len(train), int(v2["row_caps"]["joint_physical_fit"])
+                    len(assembly_train), int(v2["row_caps"]["joint_physical_fit"])
                 ),
-                "validation_rows": len(validation),
+                "validation_rows": len(assembly_validation),
                 "fit_source": "train_only",
+                "support_mask_before_cap": True,
             },
             "test_accessed": False,
             "elapsed_seconds": time.time() - started,

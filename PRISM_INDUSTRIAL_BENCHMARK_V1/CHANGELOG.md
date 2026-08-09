@@ -1,5 +1,24 @@
 # Changelog
 
+## PRISM v2.1.1 - Post-experiment prospective sample-support maintenance
+
+- No new theory version is introduced and no estimator, candidate family,
+  threshold, split, or model-selection rule is changed.
+- Fixes the prospective implementation in which C1 previously truncated all
+  anchors by a head-global maximum registered K history.
+- C1 now materializes the maximal head-legal anchor universe; K candidates fit
+  on profile-native support and direct local comparisons share one scoring
+  support.
+- Multi-channel common support begins only after K channel selection, at C
+  assembly. C recomputes the best active K comparator on that support.
+- W, A, Joint, and final materialization inherit the frozen C assembly support.
+- The completed Metro-P60 experiment was not rerun. Its evidence remains bound
+  to generating commit `76231f3959c15183fbc781eb238034085ee71fc1` and remains
+  valid under the historical head-level common-support protocol, not
+  native-support optimal.
+- No historical FREEZE/FINAL/result/prediction artifact and no test/OOD result
+  was changed or reaccessed by this maintenance.
+
 ## PRISM v2.1.1 - Joint Predictive Stability Practice Update
 
 - Refines executable estimator practice within canonical PRISM v2.1.1; no standalone v2.2 theory is retained.

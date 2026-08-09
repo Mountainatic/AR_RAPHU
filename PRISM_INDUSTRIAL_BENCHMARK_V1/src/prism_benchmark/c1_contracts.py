@@ -73,6 +73,27 @@ def valid_origins_for_interval(
     return np.arange(first, last + 1, dtype=np.int64)
 
 
+def valid_anchor_origins_for_interval(
+    start: int,
+    stop: int,
+    *,
+    anchor_history_steps: int,
+    h: int,
+    w: int,
+    delay: int,
+    left_buffer: int = 0,
+) -> np.ndarray:
+    """Return the maximal head-legal anchor universe without a K-history cut."""
+    if min(anchor_history_steps, h, delay, left_buffer) < 0 or w < 1:
+        raise ValueError("invalid anchor-support arguments")
+    causal_history_floor = start + left_buffer
+    first = causal_history_floor + anchor_history_steps
+    last = stop - h - w - delay
+    if last < first:
+        return np.empty(0, dtype=np.int64)
+    return np.arange(first, last + 1, dtype=np.int64)
+
+
 def stable_identifier(*parts: object) -> str:
     canonical = "|".join(str(part) for part in parts)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()

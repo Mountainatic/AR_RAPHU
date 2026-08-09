@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from scipy import optimize, stats
 
-from .cpu_data import ViewSpec, inner_folds, load_samples, sha256_file
+from .cpu_data import ViewSpec, inner_folds, sha256_file
 from .cpu_selection import mse, regression_metrics
 from .stage0 import write_json
 from .v2_basis import natural_cubic_columns
@@ -27,6 +27,12 @@ from .v211_config import load_v211_configs
 from .v2_runtime import ordered_fork_map, run_parallel
 from .v211_k import load_active_channels
 from .v211_selection import numerical_contract_passes
+from .v211_support import (
+    apply_assembly_support,
+    fold_evaluation_causal_floor,
+    load_native_samples,
+    support_id_hash,
+)
 
 
 IDENTITY = "IDENTITY_CORRECTION"
@@ -658,9 +664,18 @@ def _prepare_w_fold_indexed(
         raise RuntimeError("W fold context was not initialized before fork")
     shared, view, train, active, v2, c_result, rule, folds = _W_FOLD_CONTEXT
     fit_index, evaluation_index = folds[fold_index]
-    fit = _cap(train.iloc[fit_index], int(v2["row_caps"]["wiener_fit"]))
+    fit_raw = train.iloc[fit_index]
+    evaluation_raw = train.iloc[evaluation_index]
+    fit = _cap(
+        apply_assembly_support(fit_raw, active),
+        int(v2["row_caps"]["wiener_fit"]),
+    )
     evaluation = _cap(
-        train.iloc[evaluation_index],
+        apply_assembly_support(
+            evaluation_raw,
+            active,
+            fold_evaluation_causal_floor(fit_raw, evaluation_raw),
+        ),
         int(v2["row_caps"]["validation_selection_per_fold"]),
     )
     (
@@ -727,8 +742,10 @@ def run_w_view(
         active = load_active_channels(output, view)
         frozen_channels = set(c_result.get("active_channels", ()))
         active = [item for item in active if item.get("channel") in frozen_channels]
-        train = load_samples(shared, view, "train")
-        validation = load_samples(shared, view, "validation")
+        train = load_native_samples(shared, view, "train")
+        validation = load_native_samples(shared, view, "validation")
+        assembly_train = apply_assembly_support(train, active)
+        assembly_validation = apply_assembly_support(validation, active)
         fold_inputs: list[tuple[Any, ...]] = []
         correlations: list[float] = []
         fold_latent_audits: list[dict[str, Any]] = []
@@ -935,7 +952,9 @@ def run_w_view(
                 ]
             oof_frames.append(frame)
         oof = pd.concat(oof_frames, ignore_index=True)
-        final_train = _cap(train, int(v2["row_caps"]["wiener_fit"]))
+        final_train = _cap(
+            assembly_train, int(v2["row_caps"]["wiener_fit"])
+        )
         (
             fit_latent,
             validation_latent,
@@ -946,7 +965,7 @@ def run_w_view(
             shared,
             view,
             final_train,
-            validation,
+            assembly_validation,
             active,
             v2,
             c_result,
@@ -991,7 +1010,7 @@ def run_w_view(
         identity_prediction_error = float(
             np.max(np.abs(validation_latent + identity_correction - validation_latent), initial=0.0)
         )
-        validation_target = validation["y_true"].to_numpy(dtype=np.float64)
+        validation_target = assembly_validation["y_true"].to_numpy(dtype=np.float64)
         identity_residual_error = float(
             np.max(
                 np.abs(
@@ -1054,7 +1073,7 @@ def run_w_view(
                 float(smoothness),
                 int(selected_direction),
             )
-        frame = validation[
+        frame = assembly_validation[
             [
                 "base_origin_id",
                 "view_sample_id",
@@ -1130,6 +1149,17 @@ def run_w_view(
                 for item in fold_inputs
             ],
             "nested_candidates_share_fold_mask_and_row_ids": True,
+            "assembly_support_contract": c_result.get(
+                "assembly_support_contract"
+            ),
+            "w_input_support_hash": support_id_hash(assembly_validation),
+            "c_assembly_support_hash": c_result.get(
+                "assembly_validation_support_hash"
+            ),
+            "w_input_support_matches_c_assembly": support_id_hash(
+                assembly_validation
+            )
+            == c_result.get("assembly_validation_support_hash"),
             "identity_equivalence": {
                 "prediction_max_abs_error": identity_prediction_error,
                 "residual_max_abs_error": identity_residual_error,
@@ -1147,7 +1177,7 @@ def run_w_view(
                 "split": "validation",
                 "contract": replay_contract,
                 "mse": mse(
-                    validation["y_true"].to_numpy(dtype=np.float64),
+                    assembly_validation["y_true"].to_numpy(dtype=np.float64),
                     replay_prediction,
                 ),
             },
@@ -1164,8 +1194,9 @@ def run_w_view(
                 "cap_name": "wiener_fit",
                 "cap": int(v2["row_caps"]["wiener_fit"]),
                 "fit_rows": len(final_train),
-                "validation_rows": len(validation),
+                "validation_rows": len(assembly_validation),
                 "fit_source": "train_only",
+                "assembly_support_mask_before_cap": True,
             },
             "test_accessed": False,
             "elapsed_seconds": time.time() - started,

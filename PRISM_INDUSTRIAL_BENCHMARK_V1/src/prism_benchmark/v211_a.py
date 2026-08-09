@@ -10,7 +10,7 @@ from typing import Any, Mapping
 import numpy as np
 import pandas as pd
 
-from .cpu_data import load_samples, realized_state_profiles, sha256_file
+from .cpu_data import realized_state_profiles, sha256_file
 from .cpu_selection import mse, regression_metrics
 from .stage0 import write_json
 from .v2_runtime import ordered_fork_map, run_parallel
@@ -23,6 +23,7 @@ from .v21_a import (
 )
 from .v21_selection import guarded_local_one_se_select
 from .v211_config import load_v211_configs
+from .v211_support import load_native_samples, support_id_hash
 A_INNER_WORKERS_ENV = "PRISM_V211_A_INNER_WORKERS"
 _A_CANDIDATE_CONTEXT: tuple[
     np.ndarray,
@@ -228,8 +229,8 @@ def run_a_view(
             raise RuntimeError("E3R W prerequisite is not PASS")
         oof = pd.read_parquet(output / w_result["oof_path"])
         w_validation = pd.read_parquet(output / w_result["prediction_path"])
-        train = load_samples(shared, view, "train")
-        validation = load_samples(shared, view, "validation")
+        train = load_native_samples(shared, view, "train")
+        validation = load_native_samples(shared, view, "validation")
         contribution_columns = sorted(
             column
             for column in oof.columns
@@ -254,8 +255,8 @@ def run_a_view(
             how="inner",
             validate="one_to_one",
         )
-        if len(validation_frame) != len(validation):
-            raise RuntimeError("dynamic/input-only base_origin_id mismatch")
+        if len(validation_frame) != len(w_validation):
+            raise RuntimeError("A did not inherit the complete W assembly support")
         validation_frame["residual"] = (
             validation_frame["y_true"] - validation_frame["physical_w"]
         )
@@ -616,6 +617,14 @@ def run_a_view(
             "fold_local_residual_centering": True,
             "maturity_rule": "s_plus_h_plus_W_plus_D_le_t",
             "uses_latest_available_target_index": True,
+            "assembly_support_contract": w_result.get(
+                "assembly_support_contract"
+            ),
+            "a_raw_input_support_hash": support_id_hash(validation_frame),
+            "w_input_support_hash": w_result.get("w_input_support_hash"),
+            "a_support_is_subset_of_w_support": set(
+                validation_frame["base_origin_id"].astype(str)
+            ).issubset(set(w_validation["base_origin_id"].astype(str))),
             "observed_mature_feature_fraction": selected_coverage,
             "active_near_zero_audit": active_near_zero_audit,
             "hard_feature_residualization": False,
@@ -644,7 +653,7 @@ def run_a_view(
                 "cap_name": "state_fit",
                 "cap": int(v2["row_caps"]["state_fit"]),
                 "fit_rows": len(oof),
-                "validation_rows": len(validation),
+                "validation_rows": len(validation_frame),
                 "fit_source": "train_inner_oof_only",
                 "within_cap": len(oof) <= int(v2["row_caps"]["state_fit"]),
             },

@@ -15,7 +15,7 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from .cpu_data import BaseAccessor, ViewSpec, load_samples, sha256_file
+from .cpu_data import BaseAccessor, ViewSpec, sha256_file
 from .stage0 import write_json
 from .v2_basis import natural_cubic_columns
 from .v2_c import _ridge_fit, fit_physical_features
@@ -39,6 +39,12 @@ from .v211_joint import (
     predict_joint_candidate,
 )
 from .v211_k import load_active_channels
+from .v211_support import (
+    SUPPORT_CONTRACT,
+    apply_assembly_support,
+    load_native_samples,
+    support_id_hash,
+)
 from .v211_metro_config import (
     MetroV211Paths,
     effective_worker_count,
@@ -459,9 +465,13 @@ def materialize_view(
         for item in load_active_channels(paths.output, view)
         if item.get("channel") in set(c_result["active_channels"])
     ]
-    frames = {
-        split: load_samples(paths.shared, view, split)
+    anchor_frames = {
+        split: load_native_samples(paths.shared, view, split)
         for split in ("train", "validation", "test", "ood")
+    }
+    frames = {
+        split: apply_assembly_support(frame, active)
+        for split, frame in anchor_frames.items()
     }
     development = pd.concat([frames["train"], frames["validation"]], ignore_index=True)
     development = development.sort_values(["entity_id", "origin"]).reset_index(drop=True)
@@ -700,6 +710,14 @@ def materialize_view(
         "fit_row_cap": int(v2["row_caps"]["joint_physical_fit"]),
         "fit_rows": len(fit),
         "fit_row_id_sha256": _row_id_hash(fit),
+        "sample_support_contract": SUPPORT_CONTRACT,
+        "assembly_support_contract": c_result.get(
+            "assembly_support_contract"
+        ),
+        "assembly_support_hashes": {
+            split: support_id_hash(frame) for split, frame in frames.items()
+        },
+        "assembly_support_applied_before_selected_k_features": True,
         "prediction_chunk_rows": chunk_rows,
         "candidate_ids": candidate_ids,
         "formal_routes": list(formal_routes),
