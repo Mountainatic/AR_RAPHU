@@ -1,0 +1,28 @@
+{
+  "additional_filtering": false,
+  "contract": {
+    "acceleration_semantics": "MEASURED_BODY_LINEAR_ACCELERATION_INCLUDING_GRAVITY",
+    "angular_acceleration_semantics": "MEASURED_BODY_ANGULAR_ACCELERATION",
+    "filtering": "OFFICIAL_PROCESSED_SIGNALS_AS_RELEASED_NO_ADDITIONAL_FILTER",
+    "force_frame": "BODY_FRONT_LEFT_UP",
+    "inertia_kg_m2": [
+      0.0025,
+      0.0021,
+      0.0043
+    ],
+    "mass_kg": 0.772,
+    "quaternion_order": "SOURCE_QX_QY_QZ_QW_NOT_USED_BY_GT_FORMULA",
+    "timestamp_alignment": "SAME_ROW_NO_SHIFT",
+    "torque_frame": "BODY_FRONT_LEFT_UP"
+  },
+  "primary_sources": [
+    "Official NeuroBEM dataset README",
+    "RCL-NUS/NeuroMHE ground_truth.m"
+  ],
+  "protocol_id": "PRISM_V2_1_1_NEUROBEM_TRACK_A_FORENSIC_CLOSURE_R1",
+  "released_residual_force_used": false,
+  "released_residual_torque_used": false,
+  "same_row_alignment": true,
+  "status": "GT_RECONSTRUCTION_VALIDATED",
+  "test_trajectory_count": 13
+}

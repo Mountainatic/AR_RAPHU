@@ -1,0 +1,35 @@
+{
+  "generating_commit": "2321099ce319589bcb1a189e3bb6c3440072a76c",
+  "gt_reconstruction_status": "VALIDATED",
+  "literature_baseline_retrained": false,
+  "neurobem_study_status": "CLOSED",
+  "neuromhe_trajectory_reproduction_status": "PASS",
+  "prism": {
+    "Joint": {
+      "F": 0.42264229998605224,
+      "M": 0.013201637719319806
+    },
+    "PF": {
+      "F": 0.4891487067570744,
+      "M": 0.014181829433197048
+    }
+  },
+  "prism_final_rank_if_valid": "NOT_APPLICABLE_COMPARISON_NOT_EXACTLY_VALIDATED",
+  "prism_retrained": false,
+  "protocol_id": "PRISM_V2_1_1_NEUROBEM_TRACK_A_FORENSIC_CLOSURE_R1",
+  "published": {
+    "HDVIO2": {
+      "F": 0.491,
+      "M": 0.012
+    },
+    "NeuroBEM": {
+      "F": 0.335,
+      "M": 0.012
+    }
+  },
+  "rss2021_reproduction_status": "FAIL",
+  "stability_extension_performed": false,
+  "testset_identity_status": "NEUROMHE_EXACT_RSS_TEST_SPLIT_IDENTITY_UNVERIFIED",
+  "track_a_final_comparison_status": "PUBLISHED_AGGREGATE_COMPARISON_ONLY",
+  "track_b_status": "ARCHIVED_BOUNDARY_RESULT"
+}

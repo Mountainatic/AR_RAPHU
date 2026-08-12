@@ -1,0 +1,12 @@
+........................................................................ [ 25%]
+........................................................................ [ 50%]
+........................................................................ [ 75%]
+.....................................................................    [100%]
+=============================== warnings summary ===============================
+PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_neurobem_exact_training.py::test_training_attitude_unroll_injects_gt_velocity
+PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_neurobem_exact_training.py::test_training_attitude_unroll_injects_gt_angular_rate
+  /root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+    scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+285 passed, 2 warnings in 3.21s
