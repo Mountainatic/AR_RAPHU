@@ -6,6 +6,8 @@ __pycache__/
 PRISM_INDUSTRIAL_BENCHMARK_V1/dist/
 PRISM_INDUSTRIAL_BENCHMARK_V1/rust/prism_kernels/target/
 data/private/neurobem/
+runtime/
+neurobem_pytest.txt
 
 logs/
 results/runtime/*.pid
