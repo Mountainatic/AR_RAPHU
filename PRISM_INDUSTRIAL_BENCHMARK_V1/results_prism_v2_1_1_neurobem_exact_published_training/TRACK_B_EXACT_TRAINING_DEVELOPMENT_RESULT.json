@@ -1,0 +1,29 @@
+{
+  "candidate_errors": {
+    "IDENTITY_CORRECTION": "NONFINITE_DEVELOPMENT_VALIDATION:family=IDENTITY_CORRECTION:routes=PF_KC,PF_KCW",
+    "NATURAL_CUBIC_LATENT": "NONFINITE_TRAINING_NORMAL_EQUATIONS",
+    "SIGNED_QUADRATIC_LATENT": "NONFINITE_TRAINING_PREDICTION:route=PF_KCW:branch=velocity:trajectory=merged_2021-02-03-16-10-37_seg_3.csv:step=10"
+  },
+  "candidate_risk": {
+    "IDENTITY_CORRECTION": Infinity,
+    "NATURAL_CUBIC_LATENT": Infinity,
+    "SIGNED_QUADRATIC_LATENT": Infinity
+  },
+  "decision": "STOP_BEFORE_TEST_DEVELOPMENT_COULD_NOT_FREEZE",
+  "development_frozen": false,
+  "evaluator_contract_matched": true,
+  "formal_route_status": {
+    "J_KC": "NOT_EVALUATED_DEVELOPMENT_NOT_FROZEN",
+    "J_KCW": "NOT_EVALUATED_DEVELOPMENT_NOT_FROZEN",
+    "PF_KC": "NOT_EVALUATED_DEVELOPMENT_NOT_FROZEN",
+    "PF_KCW": "NOT_EVALUATED_DEVELOPMENT_NOT_FROZEN"
+  },
+  "formal_test_executed": false,
+  "generating_commit": "08a548922716710b3c2286fd106347cb5877fd09",
+  "previous_test_used_for_stabilization": false,
+  "published_scores_used_for_model_selection": false,
+  "stabilization_added": false,
+  "status": "DEVELOPMENT_TRAINING_NONFINITE_DIVERGENCE",
+  "test_accessed": false,
+  "training_contract_matched": true
+}

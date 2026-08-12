@@ -1,0 +1,90 @@
+{
+  "a_enabled": false,
+  "branch": "prism-v2-1-1-neurobem-exact-published-training",
+  "candidate_family": [
+    "PF_KC",
+    "PF_KCW",
+    "J_KC",
+    "J_KCW"
+  ],
+  "estimator": {
+    "dtype": "float64",
+    "family": "PRISM_FP64_NUMERICALLY_CERTIFIED_RIDGE",
+    "maximum_condition_number": 1000000000000.0,
+    "maximum_relative_kkt_residual": 1e-08,
+    "numerical_ridge_grid": [
+      0.0,
+      1e-12,
+      1e-10,
+      1e-08,
+      1e-06,
+      0.0001,
+      0.01,
+      1.0
+    ],
+    "recursive_fit_method": "ONE_DETERMINISTIC_U10_RECURSIVE_ROLLIN_BLOCK_REFIT",
+    "recursive_refit_passes": 1
+  },
+  "evaluation_rollout_samples": 60,
+  "history_samples": 20,
+  "manuscript_split_counts": {
+    "test": 12,
+    "train": 67,
+    "validation": 17
+  },
+  "official_code_commit": "a8451a119b9096eda980f71b55dbb05012b8c47a",
+  "parent_commit": "dd83cb636dd3548fd62d4a3abe0d591d12018155",
+  "previous_test_divergence_known": true,
+  "previous_test_used_for_stabilization": false,
+  "prohibitions": [
+    "NO_CLIPPING",
+    "NO_SPECTRAL_RADIUS_CONSTRAINT",
+    "NO_LYAPUNOV_REGULARIZATION",
+    "NO_CONTRACTIVE_PENALTY",
+    "NO_STATE_SATURATION_OR_PROJECTION",
+    "NO_TEST_DRIVEN_RIDGE_RETUNING",
+    "NO_CANDIDATE_CHANGE",
+    "NO_TEST_BEFORE_DEVELOPMENT_FREEZE",
+    "NO_HISTORICAL_RESULT_OVERWRITE"
+  ],
+  "protocol_id": "PRISM_V2_1_1_NEUROBEM_TRACK_B_EXACT_PUBLISHED_TRAINING_R1",
+  "published_scores_known_before_training": true,
+  "published_scores_used_for_model_selection": false,
+  "release_membership_count_discrepancy_retained": true,
+  "release_split_directories": [
+    "train",
+    "valid",
+    "test"
+  ],
+  "result_root": "results_prism_v2_1_1_neurobem_exact_published_training",
+  "sampling_hz": 100,
+  "stabilization_added": false,
+  "status": "FROZEN_BEFORE_FORMAL_TEST_ACCESS",
+  "training_information_contract": {
+    "attitude_measured_complement": [
+      "linear_velocity",
+      "angular_velocity"
+    ],
+    "attitude_recursive": [
+      "predicted_normalized_quaternion"
+    ],
+    "future_motor_control_allowed": true,
+    "future_owned_ground_truth_allowed": false,
+    "future_target_residual_allowed": false,
+    "velocity_measured_complement": [
+      "attitude"
+    ],
+    "velocity_recursive": [
+      "predicted_linear_velocity",
+      "predicted_angular_velocity"
+    ]
+  },
+  "training_unroll_samples": 10,
+  "w_candidates": [
+    "IDENTITY_CORRECTION",
+    "NATURAL_CUBIC_LATENT",
+    "SIGNED_QUADRATIC_LATENT"
+  ],
+  "w_minimum_relative_improvement": 0.01,
+  "window_count_formula": "N_MINUS_H_MINUS_U"
+}

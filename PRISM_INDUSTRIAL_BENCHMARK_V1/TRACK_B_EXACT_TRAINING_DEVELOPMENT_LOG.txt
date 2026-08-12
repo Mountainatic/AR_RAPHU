@@ -1,0 +1,1492 @@
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:385: RuntimeWarning: overflow encountered in multiply
+  return latent * np.abs(latent)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: overflow encountered in divide
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: overflow encountered in divide
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:385: RuntimeWarning: overflow encountered in multiply
+  return latent * np.abs(latent)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: overflow encountered in divide
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: overflow encountered in divide
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:271: RuntimeWarning: overflow encountered in square
+  return float(np.mean(np.sum(np.square(target - prediction), axis=-1)))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:332: RuntimeWarning: overflow encountered in multiply
+  velocity * np.abs(velocity),
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:336: RuntimeWarning: overflow encountered in multiply
+  body_rate * np.abs(body_rate),
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:343: RuntimeWarning: overflow encountered in multiply
+  pairwise = np.column_stack([current[:, i] * current[:, j] for i in range(current.shape[1]) for j in range(i + 1, current.shape[1])])
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/_core/fromnumeric.py:86: RuntimeWarning: overflow encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: overflow encountered in divide
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:332: RuntimeWarning: overflow encountered in multiply
+  velocity * np.abs(velocity),
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:336: RuntimeWarning: overflow encountered in multiply
+  body_rate * np.abs(body_rate),
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:343: RuntimeWarning: overflow encountered in multiply
+  pairwise = np.column_stack([current[:, i] * current[:, j] for i in range(current.shape[1]) for j in range(i + 1, current.shape[1])])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:271: RuntimeWarning: overflow encountered in square
+  return float(np.mean(np.sum(np.square(target - prediction), axis=-1)))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/_core/fromnumeric.py:86: RuntimeWarning: overflow encountered in reduce
+  return ufunc.reduce(obj, axis, dtype, out, **passkwargs)
