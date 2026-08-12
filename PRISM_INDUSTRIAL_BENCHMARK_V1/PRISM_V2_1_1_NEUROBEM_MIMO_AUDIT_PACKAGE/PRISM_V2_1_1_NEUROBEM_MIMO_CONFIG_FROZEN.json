@@ -1,0 +1,159 @@
+{
+  "protocol_id": "PRISM_V2_1_1_NEUROBEM_MIMO_AUDIT_R1",
+  "status": "FROZEN_BEFORE_PROCESSED_DATA_VALUE_ACCESS_AND_MODEL_IMPLEMENTATION",
+  "evidence_class": "PROSPECTIVE_PUBLIC_DATASET_EXPERIMENT",
+  "theory_version": "PRISM_V2_1_1_WITH_NATIVE_SUPPORT_PRACTICE_AMENDMENT",
+  "output_root": "results_prism_v2_1_1_neurobem_mimo_audit",
+  "branch": "prism-v2-1-1-neurobem-mimo-audit",
+  "dtype": "float64",
+  "source": {
+    "project_url": "https://rpg.ifi.uzh.ch/NeuroBEM.html",
+    "processed_data_url": "https://download.ifi.uzh.ch/rpg/NeuroBEM/processed_data.zip",
+    "flights_url": "https://download.ifi.uzh.ch/rpg/NeuroBEM/Flights.txt",
+    "testset_url": "https://download.ifi.uzh.ch/rpg/NeuroBEM/testset.txt",
+    "paper": "Bauersfeld et al., NeuroBEM, RSS 2021, arXiv:2106.08015",
+    "sampling_hz": 400.0,
+    "flight_count_expected": 96,
+    "raw_data_must_not_be_committed": true
+  },
+  "entity_contract": {
+    "parent_entity": "FLIGHT_ID",
+    "history_entity": "CONTIGUOUS_PROCESSED_SEGMENT_ID",
+    "history_may_cross_segment": false,
+    "history_may_cross_flight": false,
+    "split_group": "FLIGHT_ID",
+    "test_parent_policy": "ALL_SEGMENTS_OF_ANY_OFFICIAL_TESTSET_PARENT_FLIGHT",
+    "validation_parent_count": 19,
+    "validation_assignment": "FIRST_19_SHA256_SORTED_NONTEST_FLIGHT_IDS",
+    "validation_salt": "PRISM_V211_NEUROBEM_VALIDATION_R1",
+    "remaining_non_test_non_validation_parents": "TRAIN",
+    "inner_folds": 4,
+    "inner_fold_group": "FLIGHT_ID",
+    "inner_fold_assignment": "SHA256_MODULO_4_WITH_SALT",
+    "inner_fold_salt": "PRISM_V211_NEUROBEM_INNER_R1"
+  },
+  "sample_contract": {
+    "forecast_horizon_samples": 1,
+    "target_index": "t",
+    "latest_input_index": "t-1",
+    "current_target_as_input": false,
+    "future_input_used": false,
+    "interpolation": "FORBIDDEN",
+    "nonfinite_policy": "FAIL_SEGMENT_AUDIT",
+    "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+    "row_cap": "NONE_ALL_LEGAL_ROWS",
+    "sample_id": "SHA256(dataset,flight_id,segment_id,target_row_index)",
+    "train_only_scaling": true
+  },
+  "rigid_body_targets": {
+    "mass_kg": 0.772,
+    "inertia_diagonal_kg_m2": [0.0025, 0.0021, 0.0043],
+    "outputs": [
+      "ROLL_GENERALIZED_TORQUE_NM",
+      "PITCH_GENERALIZED_TORQUE_NM",
+      "YAW_GENERALIZED_TORQUE_NM",
+      "BODY_Z_GENERALIZED_FORCE_N"
+    ],
+    "torque_formula": "J*angular_acceleration + angular_velocity CROSS (J*angular_velocity)",
+    "body_z_force_formula": "mass*body_z_acceleration",
+    "body_z_force_interpretation": "GENERALIZED_FORCE_ALONG_THRUST_AXIS_NOT_IDENTIFIED_PROPELLER_THRUST"
+  },
+  "K": {
+    "input_channels": ["mot_1", "mot_2", "mot_3", "mot_4"],
+    "registered_encoding": "CENTERED_SQUARED_MOTOR_SPEED",
+    "interpretation": "LINEAR_DYNAMIC_IN_THRUST_PROXY_NOT_LINEAR_IN_RAW_RPM",
+    "candidate_fir_histories_samples": [4, 8, 12, 20, 32, 64],
+    "candidate_family": "CAUSAL_MISO_FIR",
+    "candidate_native_fit_support": true,
+    "local_common_scoring_history_samples": 64,
+    "exact_zero_required": true,
+    "numerical_ridge_grid": [0.0, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4, 1e-2],
+    "numerical_ridge_semantics": "SMALLEST_CERTIFIED_VALUE_ONLY_NOT_SELECTED_BY_LOSS",
+    "maximum_condition_number": 10000000000.0,
+    "maximum_relative_kkt_residual": 1e-8,
+    "profile_selection": "GUARDED_ONE_SE",
+    "maximum_relative_regret_vs_best": 0.02,
+    "minimum_relative_improvement_vs_zero": 0.01,
+    "minimum_positive_fold_fraction": 0.75,
+    "all_four_outputs_must_preserve_input_variance": true
+  },
+  "W": {
+    "role": "OPTIONAL_AERODYNAMIC_CONTEXT_PREDICTIVE_CORRECTION",
+    "seed": "FROZEN_K_OOF_PREDICTION",
+    "latest_context_index": "t-1",
+    "context": ["body_velocity_xyz", "body_angular_velocity_xyz", "frozen_K_prediction"],
+    "candidates": [
+      "IDENTITY_CORRECTION",
+      "SIGNED_QUADRATIC_AERO_CONTEXT",
+      "NATURAL_CUBIC_SPEED_CONTEXT"
+    ],
+    "natural_cubic_internal_knot_counts": [4, 6, 8],
+    "knots_fit_on_fold_train_only": true,
+    "numerical_ridge_grid": [0.0, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4],
+    "minimum_relative_improvement": 0.01,
+    "minimum_positive_fold_fraction": 0.75,
+    "identity_equivalence_required": true,
+    "causal_claim_forbidden": true,
+    "airflow_is_unobserved": true
+  },
+  "A": {
+    "role": "OPTIONAL_MATURE_PREDICTABLE_RESIDUAL_STATE",
+    "candidates": ["EXACT_ZERO", "MATURE_MULTIVARIATE_RESIDUAL_AR"],
+    "lag_sets_samples": [[1], [1, 2, 4], [1, 2, 4, 8, 12, 20]],
+    "maturity_rule": "RESIDUAL_TARGET_INDEX_LESS_THAN_CURRENT_TARGET_INDEX",
+    "raw_motor_or_velocity_input_forbidden": true,
+    "numerical_ridge_grid": [0.0, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4],
+    "minimum_relative_improvement": 0.01,
+    "minimum_positive_fold_fraction": 0.75,
+    "wind_or_vortex_ring_causal_label_forbidden": true
+  },
+  "assembly": {
+    "formal_routes": ["K", "KW", "KA", "KWA", "PF_SELECTED"],
+    "joint_predictive_route": "NOT_REGISTERED_FOR_THIS_EXPERIMENT",
+    "same_sample_ids_within_direct_comparison": true,
+    "best_K_replayed_on_assembly_common_support": true,
+    "maximum_mse_ratio_vs_best_K_for_input_preservation": 1.02,
+    "W_and_A_optional_neutral_degradation": true
+  },
+  "mimo_realization": {
+    "source": "UNSCALED_FROZEN_K_MARKOV_PARAMETERS_ONLY",
+    "W_or_A_in_hankel_forbidden": true,
+    "method": "ERA_BLOCK_HANKEL_SVD",
+    "block_rows": "MIN(20,FLOOR(SELECTED_K_HISTORY/2))",
+    "block_columns": "SELECTED_K_HISTORY-BLOCK_ROWS",
+    "candidate_orders": [2, 4, 6, 8, 10, 12, 16],
+    "order_selection": "SMALLEST_STABLE_ORDER_WITHIN_ONE_SE_AND_2_PERCENT_REGRET_OF_BEST_VALIDATION_RISK",
+    "maximum_spectral_radius": 1.0,
+    "forced_eigenvalue_clipping": false,
+    "fallback_if_none_stable": "MIMO_REALIZATION_NOT_SUPPORTED",
+    "physical_mode_or_pole_claim_requires_independent_stability": true
+  },
+  "development_freeze": {
+    "K_mandatory": true,
+    "W_optional": true,
+    "A_optional": true,
+    "MIMO_realization_optional": true,
+    "test_access_requires_development_freeze": true,
+    "test_accessed_initial": false,
+    "ood_accessed_initial": false
+  },
+  "locked_evaluation": {
+    "test": "ALL_SEGMENTS_FROM_OFFICIAL_TESTSET_PARENT_FLIGHTS",
+    "high_speed_ood": "LOCKED_TEST_ROWS_WITH_TRAINED_BODY_SPEED_NORM_AT_LEAST_15_M_PER_S",
+    "high_speed_threshold_m_per_s": 15.0,
+    "high_speed_not_used_for_selection": true,
+    "single_access_after_freeze": true,
+    "metrics": ["RMSE", "MAE", "R2", "NORMALIZED_MSE"],
+    "paired_cluster_bootstrap_replicates": 500,
+    "bootstrap_cluster": "CONTIGUOUS_PROCESSED_SEGMENT_ID",
+    "holm_alpha": 0.05
+  },
+  "runtime": {
+    "workers": 16,
+    "blas_threads_per_worker": 1,
+    "deterministic_ordered_map": true,
+    "maximum_resident_memory_gib": 120,
+    "reuse_fold_design_matrices": true,
+    "cache_candidate_matrix_copies": false
+  }
+}
