@@ -729,6 +729,68 @@ def track_b_rollout(
     }
 
 
+def select_track_b_w_family_rollout(
+    train_arrays: tuple[np.ndarray, np.ndarray, np.ndarray],
+    evaluation_trajectories: Sequence[LiteratureTrajectory],
+    ridge_grid: Sequence[float],
+    max_condition: float,
+    max_kkt: float,
+    *,
+    history: int,
+    rollout: int,
+    minimum_relative_improvement: float,
+    candidate_workers: int = 1,
+    trajectory_workers: int = 1,
+) -> tuple[str, dict[str, object]]:
+    """Select W with the registered U-step recursive development risk."""
+    xk_train, state_train, y_train = train_arrays
+    velocity_scale = max(float(np.mean(np.sum(np.square(y_train[:, :6]), axis=1))), np.finfo(float).eps)
+    attitude_scale = max(float(np.mean(np.sum(np.square(y_train[:, 6:]), axis=1))), np.finfo(float).eps)
+
+    def evaluate(family: str) -> tuple[str, dict[str, float], float]:
+        contracts = fit_track_b_route_contracts(
+            xk_train, state_train, y_train, family, ridge_grid,
+            max_condition, max_kkt, history=history,
+        )
+        route_losses: dict[str, float] = {}
+        for route in ("PF_KCW", "J_KCW"):
+            def trajectory_loss(item: LiteratureTrajectory) -> tuple[float, int]:
+                result = track_b_rollout(contracts, route, item.frame, history=history, rollout=rollout)
+                risk = float(result["delta_z"]) / velocity_scale + np.square(float(result["delta_q"])) / attitude_scale
+                return risk, int(result["sliding_windows"])
+
+            workers = max(1, min(int(trajectory_workers), len(evaluation_trajectories)))
+            with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="track-b-valid-trajectory") as executor:
+                values = list(executor.map(trajectory_loss, evaluation_trajectories))
+            total = sum(weight for _, weight in values)
+            route_losses[route] = sum(loss * weight for loss, weight in values) / total
+        return family, route_losses, float(np.mean(list(route_losses.values())))
+
+    losses: dict[str, float] = {}
+    route_losses: dict[str, dict[str, float]] = {}
+    workers = max(1, min(int(candidate_workers), len(CANONICAL_W_CANDIDATES)))
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="track-b-rollout-family") as executor:
+        for family, current, loss in executor.map(evaluate, CANONICAL_W_CANDIDATES):
+            route_losses[family] = current
+            losses[family] = loss
+    neutral = losses["IDENTITY_CORRECTION"]
+    best = min(CANONICAL_W_CANDIDATES, key=lambda key: losses[key])
+    improvement = (neutral - losses[best]) / max(neutral, np.finfo(float).eps)
+    selected = best if best != "IDENTITY_CORRECTION" and improvement >= minimum_relative_improvement else "IDENTITY_CORRECTION"
+    return selected, {
+        "candidate_losses": losses,
+        "route_losses": route_losses,
+        "best_unprotected": best,
+        "relative_improvement_vs_identity": float(improvement),
+        "selected": selected,
+        "published_scores_used": False,
+        "target_blocks_fitted_independently": True,
+        "development_recursive_rollout": rollout,
+        "selection_loss": "NORMALIZED_DELTA_Z_PLUS_SQUARED_DELTA_Q",
+        "coefficient_fit_loss": "ONE_STEP_NUMERICALLY_CERTIFIED_RIDGE",
+    }
+
+
 def legacy_aero_w_classification(candidate: str) -> str:
     if candidate in {"SIGNED_QUADRATIC_AERO_CONTEXT", "NATURAL_CUBIC_SPEED_CONTEXT"} or candidate.startswith("NATURAL_CUBIC_SPEED_CONTEXT_K"):
         return "AERODYNAMIC_CONTEXT_W_EXTENSION_DIAGNOSTIC"

@@ -31,6 +31,7 @@ from prism_benchmark.neurobem_literature import (
     route_contract_from_json,
     route_contract_to_json,
     select_w_family,
+    select_track_b_w_family_rollout,
     track_a_design,
     track_a_force_torque_target,
     track_b_design,
@@ -201,3 +202,10 @@ def test_frozen_protocol_values_and_access_order():
     assert config["track_a"]["a_enabled"] is False and config["track_b"]["a_enabled"] is False
     assert config["global_dual_freeze_required_before_test"] is True
     assert config["published_scores_used_for_selection"] is False
+
+
+def test_track_b_u10_development_selection_uses_recursive_rollout():
+    source = inspect.getsource(select_track_b_w_family_rollout)
+    assert "track_b_rollout" in source
+    assert "rollout=rollout" in source
+    assert "published" not in " ".join(inspect.signature(select_track_b_w_family_rollout).parameters)

@@ -34,7 +34,7 @@ from .neurobem_literature import (
     route_contract_from_json,
     route_contract_to_json,
     select_w_family,
-    select_track_b_w_family,
+    select_track_b_w_family_rollout,
     stable_group_fold,
     track_a_force_torque_target,
     track_a_route_metrics,
@@ -245,12 +245,13 @@ def run_development(project: Path, source_root: Path, release_root: Path, output
     selected_a, selection_a = _select_track_a_w(track_a, config)
     arrays_a = concatenate_track_a_design(track_a)
     contracts_a = fit_route_contracts(*arrays_a, selected_a, ridge_grid, float(selection["maximum_condition_number"]), float(selection["maximum_relative_kkt_residual"]), target_kind="FORCE_TORQUE_6D", history=20)
-    selected_b, selection_b = select_track_b_w_family(
-        concatenate_track_b_design(track_b_train), concatenate_track_b_design(track_b_validation), ridge_grid,
+    selected_b, selection_b = select_track_b_w_family_rollout(
+        concatenate_track_b_design(track_b_train), track_b_validation, ridge_grid,
         float(selection["maximum_condition_number"]), float(selection["maximum_relative_kkt_residual"]),
-        history=20,
+        history=20, rollout=10,
         minimum_relative_improvement=float(selection["minimum_relative_improvement"]),
         candidate_workers=1,
+        trajectory_workers=min(11, int(config["runtime"]["candidate_workers"])),
     )
     # Development selection is frozen, then all official non-test data are
     # used for the final estimator contracts.
@@ -307,8 +308,12 @@ def run_test(project: Path, source_root: Path, release_root: Path, output: Path)
         total_windows = 0
         weighted_z = 0.0
         weighted_q = 0.0
-        for trajectory in track_b_test:
-            result = track_b_rollout(contracts_b, route, trajectory.frame)
+        def evaluate_trajectory(trajectory: LiteratureTrajectory) -> tuple[LiteratureTrajectory, dict[str, object]]:
+            return trajectory, track_b_rollout(contracts_b, route, trajectory.frame)
+
+        with ThreadPoolExecutor(max_workers=min(12, len(track_b_test)), thread_name_prefix="track-b-test-trajectory") as executor:
+            evaluated = list(executor.map(evaluate_trajectory, track_b_test))
+        for trajectory, result in evaluated:
             weight = int(result["sliding_windows"]) * 60
             total_windows += weight
             weighted_z += float(result["delta_z"]) * weight
