@@ -141,7 +141,9 @@ def registry_from_zip(
             flight = match.group("flight")
             if flight not in partitions:
                 raise NeuroBEMProtocolError(f"CSV_PARENT_NOT_IN_FLIGHTS:{flight}")
-            segment_id = Path(info.filename).stem
+            # The ZIP prefixes names with ``merged_`` whereas the official
+            # testset uses the canonical timestamp-based segment identity.
+            segment_id = f"{flight}_seg_{match.group('segment')}"
             if segment_id in seen:
                 raise NeuroBEMProtocolError(f"DUPLICATE_SEGMENT:{segment_id}")
             seen.add(segment_id)

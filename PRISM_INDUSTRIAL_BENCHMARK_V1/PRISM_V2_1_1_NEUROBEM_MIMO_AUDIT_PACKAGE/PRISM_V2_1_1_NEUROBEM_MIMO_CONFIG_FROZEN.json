@@ -16,11 +16,13 @@
     "redistribution_policy": "DO_NOT_REDISTRIBUTE_RAW_OR_PROCESSED_ARCHIVE_IN_PROJECT_BUNDLES",
     "sampling_hz": 400.0,
     "maximum_relative_cadence_deviation": 0.10,
-    "flight_count_expected": 96,
+    "paper_flight_count_reported": 96,
+    "distributed_parent_flight_count_expected": 95,
+    "flight_count_discrepancy_status": "PAPER_REPORTS_96_BUT_DISTRIBUTED_FLIGHTS_TXT_AND_PROCESSED_ARCHIVE_CONTAIN_THE_SAME_95_PARENT_IDS",
     "raw_data_must_not_be_committed": true
   },
   "entity_contract": {
-    "parent_entity": "FLIGHT_ID",
+    "parent_entity": "DISTRIBUTED_FLIGHT_ID_WITH_MERGED_FILENAME_PREFIX_REMOVED",
     "history_entity": "CONTIGUOUS_PROCESSED_SEGMENT_ID",
     "history_may_cross_segment": false,
     "history_may_cross_flight": false,

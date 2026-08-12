@@ -74,8 +74,8 @@ def stage0(repo_root: Path, config_path: Path, data_root: Path, output_root: Pat
     extracted = data_root / "extracted"
     flights_path = source_docs / "Flights.txt"
     testset_path = source_docs / "testset.txt"
-    if len(parse_flights(flights_path)) != int(config["source"]["flight_count_expected"]):
-        raise RuntimeError("EXPECTED_96_PARENT_FLIGHTS")
+    if len(parse_flights(flights_path)) != int(config["source"]["distributed_parent_flight_count_expected"]):
+        raise RuntimeError("DISTRIBUTED_PARENT_FLIGHT_COUNT_MISMATCH")
     records = registry_from_zip(archive, flights_path, testset_path, config)
     assert_partition_disjoint(records)
     extract_processed_archive(archive, extracted)
@@ -102,6 +102,9 @@ def stage0(repo_root: Path, config_path: Path, data_root: Path, output_root: Pat
     result = {
         "status": "PASS",
         "protocol_id": config["protocol_id"],
+        "paper_flight_count_reported": config["source"]["paper_flight_count_reported"],
+        "distributed_parent_flight_count": config["source"]["distributed_parent_flight_count_expected"],
+        "flight_count_discrepancy_status": config["source"]["flight_count_discrepancy_status"],
         "config_sha256": sha256_file(config_path),
         "canonical_theory_sha256": sha256_file(repo_root / "PRISM_INDUSTRIAL_BENCHMARK_V1" / "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_PACKAGE" / "reference" / "PRISM_Theory_v2_1_1_Implementation_Safe_Stagewise_Routed_Modular_Assembly_Theory_Only.md"),
         "sources": {

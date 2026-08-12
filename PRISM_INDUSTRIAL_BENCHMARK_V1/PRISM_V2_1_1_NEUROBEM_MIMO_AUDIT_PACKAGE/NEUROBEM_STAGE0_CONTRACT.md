@@ -14,7 +14,9 @@ or change any registered candidate after seeing development performance.
 Hard stops before fitting are:
 
 - source hash or ZIP integrity failure;
-- flight metadata count other than 96 without a documented publisher reason;
+- any mismatch between the 95 distributed `Flights.txt` parent IDs and the 95
+  processed-archive parent IDs (the paper's reported count of 96 is retained as
+  a documented source discrepancy, not silently rewritten);
 - missing required columns;
 - a segment with non-monotone time, nonfinite required values or unexplained
   large internal gaps;

@@ -28,7 +28,10 @@ of drag, wind, vortex-ring state or another named aerodynamic mechanism.
 
 ## Entity and information isolation
 
-The 96 published flights are parent entities and split groups. Every processed
+The paper reports 96 flights, while the distributed `Flights.txt` and processed
+archive contain the same 95 unique parent flight IDs. Those 95 observable
+parents are the executable universe; no missing 96th entity is fabricated.
+Every distributed flight is a parent entity and split group. Every processed
 continuous segment is a stricter history entity because the publisher splits
 flights at non-flying regions and Vicon dropouts. No lag, residual state,
 standardization statistic, fold or sample identity may cross a segment.
