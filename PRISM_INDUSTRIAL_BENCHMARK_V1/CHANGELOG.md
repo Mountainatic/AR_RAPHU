@@ -1,5 +1,25 @@
 # Changelog
 
+## PRISM v2.1.1 NeuroBEM Literature-Aligned Dual Benchmark
+
+- Adds a published force/torque Track A and an IROS 2024 known-future-control
+  long-horizon Track B without retraining any literature baseline.
+- Keeps the canonical theory file unchanged while repairing the NeuroBEM
+  implementation classification: raw actuator and motion context are
+  registered before K, cross-context interactions belong to C, and canonical
+  W reads only the frozen C latent.
+- Preserves all historical aerodynamic-context W results and labels them
+  `AERODYNAMIC_CONTEXT_W_EXTENSION_DIAGNOSTIC` rather than canonical W.
+- Freezes the official split identities, preprocessing, six-DoF targets,
+  published metric definitions, H/U/T values, candidate routes, and global
+  dual-development freeze before new PRISM test predictions.
+- Track A falls back to published aggregate comparison if official prediction
+  files do not reproduce the later published table within the frozen gate.
+- Track B records the official decoupled evaluator's complementary-state
+  teacher forcing and the stricter PRISM no-future-state rollout as an
+  information-set incompatibility; no exact ranking is claimed across it.
+- `A` is disabled in both tracks. Published scores cannot enter selection.
+
 ## PRISM v2.1.1 - Prospective NeuroBEM MIMO audit
 
 - Adds a new public-dataset experiment; it does not alter or rerun any prior
