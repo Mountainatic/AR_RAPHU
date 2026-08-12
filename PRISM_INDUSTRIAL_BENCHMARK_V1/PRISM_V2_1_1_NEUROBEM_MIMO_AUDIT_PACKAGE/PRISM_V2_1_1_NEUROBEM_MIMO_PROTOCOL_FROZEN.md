@@ -85,6 +85,10 @@ are forbidden. ERA order is selected from the registered order list using
 flight-grouped validation loss, one-SE, 2% regret and a strict stable-realization
 gate. If no order passes, the honest output is
 `MIMO_REALIZATION_NOT_SUPPORTED`; eigenvalues are not clipped after seeing data.
+Any stable ERA realization must additionally preserve the frozen K prediction
+under the already registered 1.02 input-path MSE ratio. A stable but materially
+lossier compressed realization remains development diagnostic only and is not
+registered for test.
 
 ## Evidence boundary
 

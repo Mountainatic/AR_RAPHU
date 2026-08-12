@@ -185,7 +185,7 @@ def development(repo_root: Path, config_path: Path, data_root: Path, output_root
         development_all, history, selected_w, a_lags, config
     )
     final_era = None
-    if era_contract is not None:
+    if era_contract is not None and era_result["status"] == "PASS":
         from .neurobem_linear import era_from_markov, markov_parameters
 
         final_era = era_from_markov(

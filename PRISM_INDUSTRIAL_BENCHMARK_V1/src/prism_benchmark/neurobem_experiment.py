@@ -523,6 +523,11 @@ def run_era_development(k_contract: RidgeContract, history: int, validation: Seq
     center, intercept = _center_for_state_space(k_contract, history)
     mass, inertia = _target_parameters(config)
     per_order_by_flight: dict[int, dict[str, list[tuple[np.ndarray, np.ndarray]]]] = {}
+    k_by_flight: dict[str, list[tuple[np.ndarray, np.ndarray]]] = defaultdict(list)
+    common = int(config["K"]["local_common_scoring_history_samples"])
+    for segment in validation:
+        _, y, prediction, _ = _predict_k_segment(segment, k_contract, history, common, config)
+        k_by_flight[segment.record.flight_id].append((y, prediction))
     contracts: dict[int, EraContract] = {}
     invalid: dict[str, str] = {}
     for order in [int(value) for value in ecfg["candidate_orders"]]:
@@ -561,14 +566,30 @@ def run_era_development(k_contract: RidgeContract, history: int, validation: Seq
     selection = guarded_one_se(losses, sorted(contracts), 0.02)
     selected = int(selection["selected"])
     contract = contracts[selected]
+    k_losses: list[float] = []
+    for pairs in k_by_flight.values():
+        y = np.concatenate([pair[0] for pair in pairs])
+        prediction = np.concatenate([pair[1] for pair in pairs])
+        k_losses.append(normalized_mse(y, prediction, np.var(y, axis=0)))
+    selected_mean = float(np.mean(losses[selected]))
+    k_mean = float(np.mean(k_losses))
+    allowed = float(config["assembly"]["maximum_mse_ratio_vs_best_K_for_input_preservation"]) * k_mean
+    preservation_pass = bool(selected_mean <= allowed)
+    status = "PASS" if preservation_pass else "MIMO_REALIZATION_STABLE_BUT_NOT_PREDICTIVELY_PRESERVED"
     return {
-        "status": "PASS",
+        "status": status,
         "block_rows": block_rows,
         "candidate_flight_losses": {str(key): value for key, value in losses.items()},
         "invalid_orders": invalid,
         "selection": selection,
         "selected_order": selected,
         "selected_spectral_radius": contract.spectral_radius,
+        "frozen_K_flight_losses": k_losses,
+        "frozen_K_mean_loss": k_mean,
+        "selected_ERA_mean_loss": selected_mean,
+        "maximum_allowed_ERA_mean_loss": allowed,
+        "K_prediction_preservation_pass": preservation_pass,
+        "formal_test_eligible": preservation_pass,
         "singular_values": _array(contract.singular_values),
         "markov_parameters": _array(markov),
         "test_accessed": False,
