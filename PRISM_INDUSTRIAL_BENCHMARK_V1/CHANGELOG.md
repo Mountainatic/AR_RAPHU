@@ -137,3 +137,19 @@
 - Generic latent-only W was modest and not uniform, selecting identity at 50 and 100 ms; the registered aerodynamic-context pool added predictive gains at several horizons without supporting causal airflow/drag claims.
 - K selected the 64-sample boundary at 1, 4, 8, and 40 samples, and 32 samples at 20 and 80. The h=20 Roll and h=80 Pitch MSE-preservation diagnostics failed and remain explicitly retained.
 - The extension completed one formal multi-horizon test access with no post-test reselection. The high-speed subset remains a locked challenge, not OOD.
+# PRISM v2.1.1 - NeuroBEM exact published training protocol
+
+- Aligns Track B training with the published U=10 decoupled recursive
+  information contract before a new formal test evaluation.
+- Velocity owns predicted linear/angular velocity and receives measured
+  attitude plus published future motor control.
+- Attitude owns its normalized predicted quaternion and receives measured
+  linear/angular velocity plus published future motor control.
+- Keeps H=20, T=60, A disabled, the four PRISM routes, K/C/W definitions,
+  candidate family, numerical ridge grid, and metrics unchanged.
+- Adds no clipping, projection, spectral constraint, Lyapunov penalty, or other
+  stabilization.
+- Retains the historical fully-recursive divergence and frozen-PRISM published
+  evaluator results without overwrite.
+- Published scores and prior divergence are recorded as known but are not used
+  for model selection or stabilization.
