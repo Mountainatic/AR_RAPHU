@@ -316,8 +316,14 @@ def run_k_horizon(
         "numerical_pass": bool(validation_contract.condition_number <= float(config["K"]["maximum_condition_number"]) and validation_contract.relative_kkt_residual <= float(config["K"]["maximum_relative_kkt_residual"])),
     }
     gate["passed"] = bool(activation and all(gate["variance_pass_by_axis"]) and gate["coefficient_pass"] and all(gate["mse_pass_by_axis"]) and gate["numerical_pass"])
+    # This registered experiment must retain every horizon and every formal
+    # arm.  The gate is a physics-consistency diagnostic at that horizon; it
+    # is not permission to delete a pre-registered horizon from the predictive
+    # audit.  Numerical/protocol failures still raise before reaching here.
     result = {
-        "status": "PASS" if gate["passed"] else "PHYSICS_ROUTE_NOT_SUPPORTED",
+        "status": "PASS",
+        "K_input_gate_status": "PASS" if gate["passed"] else "FAILED_RETAINED_FOR_REGISTERED_HORIZON_AUDIT",
+        "physics_consistency_supported": bool(gate["passed"]),
         "horizon": horizon,
         "candidate_fold_losses": {str(key): value for key, value in losses.items()},
         "exact_zero_fold_losses_by_history": {str(key): value for key, value in zeros.items()},

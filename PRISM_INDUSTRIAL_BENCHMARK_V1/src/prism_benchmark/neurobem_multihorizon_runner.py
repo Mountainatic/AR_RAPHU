@@ -267,8 +267,7 @@ def development(repo_root: Path, data_root: Path, output_root: Path) -> None:
     for horizon, ms in zip(horizons, milliseconds, strict=True):
         k_result, route_folds, validation_frames, validation_k = run_k_horizon(train, validation, horizon, config)
         if k_result["status"] != "PASS":
-            write_json(output_root / "RUN_STATUS.json", {"status": "PHYSICS_ROUTE_NOT_SUPPORTED", "stage": f"HORIZON_{horizon}_K", "test_accessed": False, "ood_accessed": False})
-            raise RuntimeError(f"PHYSICS_ROUTE_NOT_SUPPORTED:h{horizon}")
+            raise RuntimeError(f"K_PROTOCOL_OR_NUMERICAL_FAILURE:h{horizon}")
         w_result, arm_folds, validation_by_arm, _ = run_w_arms(route_folds, validation_frames, config)
         a_result, oof_by_arm, validation_output, _, _ = run_a_arms(arm_folds, validation_by_arm, horizon, config)
         baseline_result, val_baselines, oof_baselines, _, _ = run_baselines(route_folds, validation_frames, horizon, int(k_result["selected_history"]), config)
@@ -289,9 +288,11 @@ def development(repo_root: Path, data_root: Path, output_root: Path) -> None:
             "selected_generic_W": w_result[W1]["final_selected_candidate"],
             "selected_aero_W": w_result[W2]["final_selected_candidate"],
             "selected_A_by_arm": {arm: a_result[arm]["final_selected_candidate"] for arm in (W0, W1, W2)},
+            "K_input_gate_status": k_result["K_input_gate_status"],
+            "physics_consistency_supported": k_result["physics_consistency_supported"],
             "test_accessed": False,
         })
-        k_rows.append({"horizon": horizon, "horizon_ms": ms, "selected_history": k_result["selected_history"], "history_status": k_result["history_status"], "relative_improvement_vs_zero": k_result["relative_improvement_vs_zero"], "positive_fold_fraction": k_result["positive_fold_fraction"]})
+        k_rows.append({"horizon": horizon, "horizon_ms": ms, "selected_history": k_result["selected_history"], "history_status": k_result["history_status"], "K_input_gate_status": k_result["K_input_gate_status"], "physics_consistency_supported": k_result["physics_consistency_supported"], "relative_improvement_vs_zero": k_result["relative_improvement_vs_zero"], "positive_fold_fraction": k_result["positive_fold_fraction"]})
         for arm in (W0, W1, W2):
             a_audit.append({"horizon": horizon, "horizon_ms": ms, "W_arm": arm, "selected_A": a_result[arm]["final_selected_candidate"], "selected_mature_ages": a_result[arm]["selected_mature_ages"], "actual_target_lags": a_result[arm]["selected_actual_target_lags"], "maturity_pass": a_result[arm]["maturity_pass"], "raw_input_used": a_result[arm]["raw_input_used"]})
         topology = integrated_k_topology(validation_k, int(k_result["selected_history"]))

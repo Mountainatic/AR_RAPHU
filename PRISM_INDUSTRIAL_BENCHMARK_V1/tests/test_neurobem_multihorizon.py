@@ -244,3 +244,10 @@ def test_route_support_accounts_for_mature_residual_prediction():
 def test_w0_and_exact_zero_names_are_frozen():
     assert W0 == "W0_IDENTITY"
     assert EXACT_ZERO == "EXACT_ZERO"
+
+
+def test_registered_horizon_gate_failure_is_retained_not_deleted():
+    source = (ROOT / "src" / "prism_benchmark" / "neurobem_multihorizon.py").read_text(encoding="utf-8")
+    runner = (ROOT / "src" / "prism_benchmark" / "neurobem_multihorizon_runner.py").read_text(encoding="utf-8")
+    assert "FAILED_RETAINED_FOR_REGISTERED_HORIZON_AUDIT" in source
+    assert "PHYSICS_ROUTE_NOT_SUPPORTED:h{horizon}" not in runner
