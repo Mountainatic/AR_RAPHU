@@ -404,12 +404,14 @@ def run_published_evaluator_extension(project: Path, release_root: Path, output:
     for route in FORMAL_ROUTE_IDS:
         labels = [row["win_tie_loss"] for row in trajectory_rows if row["route"] == route]
         wins[route] = {label: labels.count(label) for label in ("WIN", "TIE", "LOSS", "NONFINITE_DIVERGENCE")}
+    all_routes_finite = all(bool(values["finite"]) for values in aggregate.values())
     extension = output / "PUBLISHED_DECOUPLED_EVALUATOR"
     extension.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(trajectory_rows).to_csv(extension / "TRACK_B_PUBLISHED_EVALUATOR_TRAJECTORIES.csv", index=False)
     pd.DataFrame([{"route": route, **values, **{f"trajectory_{key.lower()}": count for key, count in wins[route].items()}} for route, values in aggregate.items()]).to_csv(extension / "TRACK_B_PUBLISHED_EVALUATOR_METRICS.csv", index=False)
     result = {
-        "status": "COMPLETED",
+        "status": "COMPLETED" if all_routes_finite else "COMPLETED_WITH_MODEL_DIVERGENCE",
+        "model_divergence_detected": not all_routes_finite,
         "evaluator": "PUBLISHED_DECOUPLED_EVALUATOR",
         "protocol_claim": "EXACT_PUBLISHED_EVALUATOR_ON_FROZEN_PRISM",
         "exact_full_published_protocol": False,
@@ -432,6 +434,8 @@ def run_published_evaluator_extension(project: Path, release_root: Path, output:
         "other_future_information_used": False,
         "published_tcn": {"delta_v": 0.042, "delta_q": 0.006},
         "aggregate": aggregate,
+        "selected_pf_route": "PF_KCW",
+        "selected_joint_route": "J_KCW",
         "trajectory_win_tie_loss": wins,
     }
     _write_json(extension / "TRACK_B_PUBLISHED_EVALUATOR_RESULT.json", result)
