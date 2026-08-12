@@ -1,0 +1,83 @@
+{
+  "status": "COMPLETED",
+  "generating_branch": "prism-v2-1-1-neurobem-mimo-audit",
+  "generating_commit": "6a3b10cb1067cdbfc9df47d275575a7b5d6af198",
+  "config_sha256": "b6a976c7623dc4218f1ad976370f23517b2e5e8666dc3739e603f0b6da049e32",
+  "canonical_theory_sha256": "72b88c151af4e26a994a68bf8919f4f241ec8cfafe42e5cd1be3549b7c443821",
+  "source_archive_sha256": "a3e2e83d156b48a95c346c4fd9b3ded0b62781331dc613f1cb9ab285be2b36a8",
+  "distributed_parent_flights": 95,
+  "paper_reported_flights": 96,
+  "split_parent_flights": {
+    "train": 62,
+    "validation": 19,
+    "test": 13,
+    "excluded_incompatible_cadence": 1
+  },
+  "history_isolation": "CONTIGUOUS_SEGMENT_ENTITY_WITH_PARENT_FLIGHT_SPLIT_GROUP",
+  "K": {
+    "status": "PASS",
+    "selected_history_samples": 64,
+    "selected_history_milliseconds": 160.0,
+    "fold_losses": [0.3510753905958431, 0.4846747878356332, 0.33251994531910883, 0.42826638431253766],
+    "exact_zero_fold_losses": [0.8939906111283868, 1.117018654301212, 0.914642969860207, 1.1252029610068626],
+    "relative_improvement_vs_zero": 0.6058766777142042,
+    "positive_fold_fraction": 1.0,
+    "input_gate_pass": true
+  },
+  "W": {
+    "status": "PASS",
+    "selected": "SIGNED_QUADRATIC_AERO_CONTEXT",
+    "fold_losses": [0.3202841761001276, 0.4354981214088964, 0.2880794458590026, 0.37359140024058096],
+    "relative_improvement_vs_identity": 0.11216991503174235,
+    "positive_fold_fraction": 1.0,
+    "identity_equivalence_pass": true,
+    "causal_aerodynamic_claim_allowed": false
+  },
+  "A": {
+    "status": "PASS",
+    "selected": "L1_2_4_8_12_20",
+    "selected_lags": [1, 2, 4, 8, 12, 20],
+    "fold_losses": [0.010403997759162434, 0.010889959871082528, 0.010464943100665827, 0.012087994273256764],
+    "relative_improvement_vs_exact_zero": 0.9894042082028538,
+    "positive_fold_fraction": 1.0,
+    "causal_wind_or_vortex_claim_allowed": false
+  },
+  "MIMO_ERA": {
+    "status": "MIMO_REALIZATION_STABLE_BUT_NOT_PREDICTIVELY_PRESERVED",
+    "selected_order": 6,
+    "spectral_radius": 0.9384779995510908,
+    "frozen_K_mean_loss": 1.1150704860672174,
+    "maximum_allowed_mean_loss": 1.1373718957885617,
+    "selected_ERA_mean_loss": 1.483578210024231,
+    "formal_test_eligible": false
+  },
+  "formal_routes": ["K", "KW", "KWA", "PF_SELECTED"],
+  "test": {
+    "parent_flights": 13,
+    "segments": 31,
+    "rows": 255781,
+    "normalized_mse": {
+      "K": 0.4632935399920577,
+      "KW": 0.42474456218324647,
+      "KWA": 0.004709009532478214,
+      "PF_SELECTED": 0.004709009532478214,
+      "ERA_K": "NOT_APPLICABLE"
+    }
+  },
+  "locked_high_speed_subset": {
+    "threshold_m_per_s": 15.0,
+    "rows": 4930,
+    "normalized_mse": {
+      "K": 0.4972101521654294,
+      "KW": 0.36370217191428195,
+      "KWA": 0.0044044397436773935,
+      "PF_SELECTED": 0.0044044397436773935,
+      "ERA_K": "NOT_APPLICABLE"
+    }
+  },
+  "test_accessed": true,
+  "ood_accessed": true,
+  "test_access_count": 1,
+  "model_selection_after_test": false,
+  "pytest": "207 passed in 2.49s"
+}
