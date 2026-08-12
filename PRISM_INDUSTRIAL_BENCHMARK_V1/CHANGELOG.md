@@ -102,3 +102,7 @@
 - Declares the experiment a `POST_LOCKBOX_PROSPECTIVE_EXTENSION` and explicitly discloses the completed R1 official-test access.
 - Freezes horizons, candidates, support, baselines, metrics, statistics, and plots before any new multi-horizon test score is computed.
 - Results and retained failures will be appended only after the single formal extension test access.
+- The completed locked-test audit found rapid A-gain decay: the W0 relative gain fell from 99.2% at 2.5 ms to zero at 200 ms, where every A arm selected exact zero during development.
+- Generic latent-only W was modest and not uniform, selecting identity at 50 and 100 ms; the registered aerodynamic-context pool added predictive gains at several horizons without supporting causal airflow/drag claims.
+- K selected the 64-sample boundary at 1, 4, 8, and 40 samples, and 32 samples at 20 and 80. The h=20 Roll and h=80 Pitch MSE-preservation diagnostics failed and remain explicitly retained.
+- The extension completed one formal multi-horizon test access with no post-test reselection. The high-speed subset remains a locked challenge, not OOD.
