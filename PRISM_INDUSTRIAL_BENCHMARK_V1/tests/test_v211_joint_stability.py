@@ -332,7 +332,9 @@ def test_pf_estimators_are_unchanged_from_parent_commit() -> None:
         "src/prism_benchmark/v211_a.py",
     ]
     diff = subprocess.run(
-        ["git", "-C", str(project), "diff", "6ebcac898a75b6c1aa05c920a3a39847db052957", "--", *paths],
+        # The active v2.1.1 parent includes the prospective native-support
+        # maintenance; NeuroBEM must leave that exact estimator baseline intact.
+        ["git", "-C", str(project), "diff", "e47542a319640bc045ca0d31ae9b40763182dde8", "--", *paths],
         check=True,
         text=True,
         capture_output=True,
