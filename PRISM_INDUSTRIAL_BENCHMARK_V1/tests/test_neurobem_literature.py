@@ -223,7 +223,7 @@ def test_published_evaluator_ignores_unregistered_future_columns():
     contracts = small_contracts()
     original = resample_track_b_100hz(frame(500))
     changed = original.copy()
-    ignored = [name for name in changed.columns if name not in {*TRACK_B_STATE_COLUMNS, "mot 1", "mot 2", "mot 3", "mot 4"}]
+    ignored = [name for name in changed.columns if name != "t" and name not in {*TRACK_B_STATE_COLUMNS, "mot 1", "mot 2", "mot 3", "mot 4"}]
     changed.loc[:, ignored] = 1e12
     before = track_b_published_decoupled_evaluator(contracts, "PF_KC", original, history=5, rollout=6)
     after = track_b_published_decoupled_evaluator(contracts, "PF_KC", changed, history=5, rollout=6)
