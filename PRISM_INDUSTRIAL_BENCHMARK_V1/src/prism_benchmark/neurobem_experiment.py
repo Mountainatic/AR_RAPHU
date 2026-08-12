@@ -239,7 +239,7 @@ def _parallel_k_candidate_folds(
     return [_k_candidate_fold_worker(task) for task in tasks]
 
 
-def run_k_development(train: Sequence[SegmentData], validation: Sequence[SegmentData], config: Mapping[str, object]) -> tuple[dict[str, object], RidgeContract, list[dict[str, object]], dict[int, RidgeContract]]:
+def run_k_development(train: Sequence[SegmentData], validation: Sequence[SegmentData], config: Mapping[str, object]) -> tuple[dict[str, object], RidgeContract, dict[int, dict[str, list[dict[str, object]]]], dict[int, RidgeContract]]:
     kcfg = config["K"]
     histories = [int(value) for value in kcfg["candidate_fir_histories_samples"]]
     common = int(kcfg["local_common_scoring_history_samples"])
@@ -266,25 +266,29 @@ def run_k_development(train: Sequence[SegmentData], validation: Sequence[Segment
         relative_improvement >= float(kcfg["minimum_relative_improvement_vs_zero"])
         and positive_fraction >= float(kcfg["minimum_positive_fold_fraction"])
     )
-    oof_frames: list[dict[str, object]] = []
+    route_folds: dict[int, dict[str, list[dict[str, object]]]] = {}
     selected_fold_contracts: dict[int, RidgeContract] = {}
     for fold in range(folds):
         contract = contracts[(fold, selected)]
         selected_fold_contracts[fold] = contract
-        for segment in train:
-            if segment.record.inner_fold != fold:
-                continue
-            rows, y, prediction, context = _predict_k_segment(segment, contract, selected, common, config)
-            oof_frames.append(
-                {
-                    "segment": segment,
-                    "fold": fold,
-                    "rows": rows,
-                    "y": y,
-                    "k_prediction": prediction,
-                    "context": context,
-                }
-            )
+        route_folds[fold] = {"fit": [], "evaluation": []}
+        for role, segments in (
+            ("fit", [value for value in train if value.record.inner_fold != fold]),
+            ("evaluation", [value for value in train if value.record.inner_fold == fold]),
+        ):
+            for segment in segments:
+                rows, y, prediction, context = _predict_k_segment(segment, contract, selected, common, config)
+                route_folds[fold][role].append(
+                    {
+                        "segment": segment,
+                        "fold": fold,
+                        "role": role,
+                        "rows": rows,
+                        "y": y,
+                        "k_prediction": prediction,
+                        "context": context,
+                    }
+                )
     validation_contract = _fit_k(train, selected, config)
     validation_y: list[np.ndarray] = []
     validation_prediction: list[np.ndarray] = []
@@ -328,7 +332,7 @@ def run_k_development(train: Sequence[SegmentData], validation: Sequence[Segment
         "test_accessed": False,
         "ood_accessed": False,
     }
-    return result, validation_contract, oof_frames, selected_fold_contracts
+    return result, validation_contract, route_folds, selected_fold_contracts
 
 
 def _concat_frames(frames: Iterable[dict[str, object]]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -361,14 +365,14 @@ def _fit_w(candidate: str, frames: Iterable[dict[str, object]], config: Mapping[
     )
 
 
-def run_w_development(frames: list[dict[str, object]], config: Mapping[str, object]) -> tuple[dict[str, object], ContextContract | None, list[dict[str, object]]]:
+def run_w_development(route_folds: dict[int, dict[str, list[dict[str, object]]]], config: Mapping[str, object]) -> tuple[dict[str, object], ContextContract | None, dict[int, dict[str, list[dict[str, object]]]]]:
     folds = int(config["entity_contract"]["inner_folds"])
     candidates = _w_candidates(config)
     losses: dict[str, list[float]] = {candidate: [] for candidate in candidates}
     fold_contracts: dict[tuple[int, str], ContextContract] = {}
     for fold in range(folds):
-        fit_frames = [frame for frame in frames if frame["fold"] != fold]
-        eval_frames = [frame for frame in frames if frame["fold"] == fold]
+        fit_frames = route_folds[fold]["fit"]
+        eval_frames = route_folds[fold]["evaluation"]
         fit_context, fit_k, fit_y = _concat_frames(fit_frames)
         eval_context, eval_k, eval_y = _concat_frames(eval_frames)
         fit_variance = np.var(fit_y, axis=0)
@@ -390,16 +394,20 @@ def run_w_development(frames: list[dict[str, object]], config: Mapping[str, obje
         and positive >= float(wcfg["minimum_positive_fold_fraction"])
     ):
         selected = IDENTITY_W
-    selected_frames: list[dict[str, object]] = []
-    for frame in frames:
-        copied = dict(frame)
-        if selected == IDENTITY_W:
-            copied["pf_prediction"] = frame["k_prediction"]
-        else:
-            contract = fold_contracts[(int(frame["fold"]), selected)]
-            copied["pf_prediction"] = frame["k_prediction"] + predict_w(contract, frame["context"], frame["k_prediction"])
-        selected_frames.append(copied)
-    final_contract = None if selected == IDENTITY_W else _fit_w(selected, frames, config)
+    selected_route_folds: dict[int, dict[str, list[dict[str, object]]]] = {}
+    for fold in range(folds):
+        selected_route_folds[fold] = {"fit": [], "evaluation": []}
+        for role in ["fit", "evaluation"]:
+            for frame in route_folds[fold][role]:
+                copied = dict(frame)
+                if selected == IDENTITY_W:
+                    copied["pf_prediction"] = frame["k_prediction"]
+                else:
+                    contract = fold_contracts[(fold, selected)]
+                    copied["pf_prediction"] = frame["k_prediction"] + predict_w(contract, frame["context"], frame["k_prediction"])
+                selected_route_folds[fold][role].append(copied)
+    evaluation_frames = [frame for fold in range(folds) for frame in route_folds[fold]["evaluation"]]
+    final_contract = None if selected == IDENTITY_W else _fit_w(selected, evaluation_frames, config)
     result = {
         "status": "PASS",
         "candidates": candidates,
@@ -408,14 +416,14 @@ def run_w_development(frames: list[dict[str, object]], config: Mapping[str, obje
         "selected_W": selected,
         "relative_improvement_vs_identity": improvement,
         "positive_fold_fraction": positive,
-        "identity_equivalence_pass": bool(selected != IDENTITY_W or all(np.array_equal(frame["pf_prediction"], frame["k_prediction"]) for frame in selected_frames)),
+        "identity_equivalence_pass": bool(selected != IDENTITY_W or all(np.array_equal(frame["pf_prediction"], frame["k_prediction"]) for fold in selected_route_folds.values() for role in fold.values() for frame in role)),
         "final_contract": context_to_json(final_contract),
         "airflow_observed": False,
         "causal_aerodynamic_claim_allowed": False,
         "test_accessed": False,
         "ood_accessed": False,
     }
-    return result, final_contract, selected_frames
+    return result, final_contract, selected_route_folds
 
 
 def _residual_series(frames: Iterable[dict[str, object]]) -> dict[str, tuple[SegmentData, int, np.ndarray]]:
@@ -447,16 +455,15 @@ def _a_xy(series: Iterable[tuple[SegmentData, int, np.ndarray]], lags: Sequence[
     return np.concatenate(xs), np.concatenate(ys), provenance
 
 
-def run_a_development(frames: list[dict[str, object]], config: Mapping[str, object]) -> tuple[dict[str, object], RidgeContract | None, Sequence[int] | None]:
-    series = _residual_series(frames)
+def run_a_development(route_folds: dict[int, dict[str, list[dict[str, object]]]], config: Mapping[str, object]) -> tuple[dict[str, object], RidgeContract | None, Sequence[int] | None]:
     fold_count = int(config["entity_contract"]["inner_folds"])
     lag_sets = [tuple(int(value) for value in values) for values in config["A"]["lag_sets_samples"]]
     losses: dict[str, list[float]] = {EXACT_ZERO_A: []}
     for lags in lag_sets:
         losses["L" + "_".join(map(str, lags))] = []
     for fold in range(fold_count):
-        fit_series = [value for value in series.values() if value[1] != fold]
-        eval_series = [value for value in series.values() if value[1] == fold]
+        fit_series = list(_residual_series(route_folds[fold]["fit"]).values())
+        eval_series = list(_residual_series(route_folds[fold]["evaluation"]).values())
         for lags in lag_sets:
             key = "L" + "_".join(map(str, lags))
             x_fit, y_fit, _ = _a_xy(fit_series, lags)
@@ -483,7 +490,8 @@ def run_a_development(frames: list[dict[str, object]], config: Mapping[str, obje
     selected_lags = None if selected == EXACT_ZERO_A else tuple(int(value) for value in selected[1:].split("_"))
     final_contract = None
     if selected_lags is not None:
-        x, y, _ = _a_xy(series.values(), selected_lags)
+        evaluation_frames = [frame for fold in range(fold_count) for frame in route_folds[fold]["evaluation"]]
+        x, y, _ = _a_xy(_residual_series(evaluation_frames).values(), selected_lags)
         _, condition, kkt = _numeric(config)
         final_contract = fit_numerical_ridge(x, y, [float(v) for v in acfg["numerical_ridge_grid"]], condition, kkt)
     return {
@@ -582,7 +590,7 @@ def final_crossfit_contracts(
         SegmentData(replace(segment.record, inner_fold=frozen_inner_fold(segment.record.flight_id, count, salt)), segment.values)
         for segment in development
     ]
-    frames: list[dict[str, object]] = []
+    route_folds: dict[int, dict[str, list[dict[str, object]]]] = {}
     common = int(config["K"]["local_common_scoring_history_samples"])
     for fold in range(count):
         fit = [segment for segment in remapped if segment.record.inner_fold != fold]
@@ -590,26 +598,34 @@ def final_crossfit_contracts(
         if not fit or not evaluate:
             raise RuntimeError(f"EMPTY_FINAL_OOF_FOLD:{fold}")
         contract = _fit_k(fit, history, config)
-        for segment in evaluate:
-            rows, y, prediction, context = _predict_k_segment(segment, contract, history, common, config)
-            frames.append({"segment": segment, "fold": fold, "rows": rows, "y": y, "k_prediction": prediction, "context": context})
-    w_contract = None if selected_w == IDENTITY_W else _fit_w(selected_w, frames, config)
-    pf_frames: list[dict[str, object]] = []
+        route_folds[fold] = {"fit": [], "evaluation": []}
+        for role, segments in (("fit", fit), ("evaluation", evaluate)):
+            for segment in segments:
+                rows, y, prediction, context = _predict_k_segment(segment, contract, history, common, config)
+                route_folds[fold][role].append(
+                    {"segment": segment, "fold": fold, "role": role, "rows": rows, "y": y, "k_prediction": prediction, "context": context}
+                )
+    pf_evaluation_frames: list[dict[str, object]] = []
     for fold in range(count):
-        fit_frames = [frame for frame in frames if frame["fold"] != fold]
+        fit_frames = route_folds[fold]["fit"]
         contract = None if selected_w == IDENTITY_W else _fit_w(selected_w, fit_frames, config)
-        for frame in (value for value in frames if value["fold"] == fold):
+        for frame in route_folds[fold]["evaluation"]:
             copied = dict(frame)
             copied["pf_prediction"] = frame["k_prediction"] if contract is None else frame["k_prediction"] + predict_w(contract, frame["context"], frame["k_prediction"])
-            pf_frames.append(copied)
+            pf_evaluation_frames.append(copied)
     a_contract = None
     if selected_a_lags is not None:
-        series = _residual_series(pf_frames)
+        series = _residual_series(pf_evaluation_frames)
         x, y, _ = _a_xy(series.values(), selected_a_lags)
         _, condition, kkt = _numeric(config)
         a_contract = fit_numerical_ridge(x, y, [float(v) for v in config["A"]["numerical_ridge_grid"]], condition, kkt)
     k_contract = _fit_k(remapped, history, config)
-    return k_contract, w_contract, a_contract, pf_frames
+    full_frames: list[dict[str, object]] = []
+    for segment in remapped:
+        rows, y, prediction, context = _predict_k_segment(segment, k_contract, history, common, config)
+        full_frames.append({"segment": segment, "fold": -1, "role": "full_fit", "rows": rows, "y": y, "k_prediction": prediction, "context": context})
+    w_contract = None if selected_w == IDENTITY_W else _fit_w(selected_w, full_frames, config)
+    return k_contract, w_contract, a_contract, pf_evaluation_frames
 
 
 def _metrics(y: np.ndarray, prediction: np.ndarray) -> dict[str, object]:

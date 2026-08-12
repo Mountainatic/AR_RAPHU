@@ -175,8 +175,11 @@ def test_small_grouped_k_audit_uses_all_original_folds():
             },
         },
     }
-    result, _, frames, contracts = run_k_development(items[:8], items[8:], config)
+    result, _, route_folds, contracts = run_k_development(items[:8], items[8:], config)
     assert result["status"] == "PASS"
     assert set(contracts) == {0, 1, 2, 3}
-    assert {int(frame["fold"]) for frame in frames} == {0, 1, 2, 3}
+    assert set(route_folds) == {0, 1, 2, 3}
+    for fold, roles in route_folds.items():
+        assert {frame["segment"].record.inner_fold for frame in roles["evaluation"]} == {fold}
+        assert all(frame["segment"].record.inner_fold != fold for frame in roles["fit"])
     assert all(len(value) == 4 for value in result["candidate_fold_losses"].values())

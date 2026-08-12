@@ -33,5 +33,5 @@ The first metadata-only cadence audit found one distributed parent flight,
 164 Hz rather than the registered 400 Hz. It is excluded as one whole parent
 before any model fit. It is not resampled or split, and it was assigned to train,
 so the frozen validation and test parent sets are unchanged. The executable
-universe is 63 train + 19 validation + 13 locked test parents; one additional
+universe is 62 train + 19 validation + 13 locked test parents; one additional
 parent has status `EXCLUDED_INCOMPATIBLE_CADENCE`.

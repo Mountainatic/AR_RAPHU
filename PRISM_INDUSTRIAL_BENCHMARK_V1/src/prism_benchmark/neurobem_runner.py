@@ -167,14 +167,14 @@ def development(repo_root: Path, config_path: Path, data_root: Path, output_root
     extracted = data_root / "extracted"
     train = load_partition(records, extracted, "train")
     validation = load_partition(records, extracted, "validation")
-    k_result, k_contract, frames, _ = run_k_development(train, validation, config)
+    k_result, k_contract, route_folds, _ = run_k_development(train, validation, config)
     write_json(output_root / "N2_K" / "RESULT.json", k_result)
     if k_result["status"] != "PASS":
         write_json(output_root / "RUN_STATUS.json", {"status": "PHYSICS_ROUTE_NOT_SUPPORTED", "stage": "N2", "test_accessed": False, "ood_accessed": False})
         return
-    w_result, _, pf_frames = run_w_development(frames, config)
+    w_result, _, pf_route_folds = run_w_development(route_folds, config)
     write_json(output_root / "N3_W" / "RESULT.json", w_result)
-    a_result, _, a_lags = run_a_development(pf_frames, config)
+    a_result, _, a_lags = run_a_development(pf_route_folds, config)
     write_json(output_root / "N4_A" / "RESULT.json", a_result)
     history = int(k_result["selected_history"])
     era_result, era_contract = run_era_development(k_contract, history, validation, config)
