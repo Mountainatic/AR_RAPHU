@@ -398,7 +398,7 @@ def run_report(project: Path, output: Path) -> None:
         direct_rows.append({
             "method": f"PRISM_{record.pop('route')}",
             "source": "THIS_EXPERIMENT",
-            "information_set": "FULL_STATE_COMPARABLE",
+            "information_set": "PUBLISHED_NEUROBEM_USE_ATT_FALSE_COMPARABLE",
             "history": "50_ms",
             "A_allowed": False,
             "direct_comparison_eligible": reproduction_pass,
@@ -407,10 +407,17 @@ def run_report(project: Path, output: Path) -> None:
     pd.DataFrame(direct_rows).to_csv(output / "TRACK_A_DIRECT_COMPARISON.csv", index=False)
 
     direct_b = [
-        {"method": method, **values, "source": "IROS2024_TABLE_I", "direct_comparison_eligible": False}
+        {"method": method, **values, "status": "PUBLISHED_FINITE", "source": "IROS2024_TABLE_I", "direct_comparison_eligible": False}
         for method, values in PUBLISHED_TRACK_B.items()
     ]
-    direct_b.extend({"method": f"PRISM_{row['route']}", "delta_z": row["delta_z"], "delta_q": row["delta_q"], "source": "THIS_EXPERIMENT", "direct_comparison_eligible": False} for row in prism_b.to_dict("records"))
+    direct_b.extend({
+        "method": f"PRISM_{row['route']}",
+        "delta_z": row["delta_z"],
+        "delta_q": row["delta_q"],
+        "status": "FINITE" if np.isfinite(row["delta_z"]) and np.isfinite(row["delta_q"]) else "NONFINITE_RECURSIVE_DIVERGENCE",
+        "source": "THIS_EXPERIMENT",
+        "direct_comparison_eligible": False,
+    } for row in prism_b.to_dict("records"))
     pd.DataFrame(direct_b).to_csv(output / "TRACK_B_PUBLISHED_DIRECT_COMPARISON.csv", index=False)
 
     table_ii = {row[0]: row for row in TRACK_B_TABLE_II}
@@ -427,11 +434,29 @@ def run_report(project: Path, output: Path) -> None:
         if reference:
             dz = row["PRISM_J_KCW_delta_v"]
             dq = row["PRISM_J_KCW_delta_q"]
-            row["relative_delta_v_vs_TCN"] = (dz - reference[4]) / reference[4]
-            row["relative_delta_q_vs_TCN"] = (dq - reference[5]) / reference[5]
-            row["win_tie_loss"] = "WIN" if dz < reference[4] and dq < reference[5] else ("TIE" if np.isclose(dz, reference[4]) and np.isclose(dq, reference[5]) else "LOSS")
+            if np.isfinite(dz) and np.isfinite(dq):
+                row["relative_delta_v_vs_TCN"] = (dz - reference[4]) / reference[4]
+                row["relative_delta_q_vs_TCN"] = (dq - reference[5]) / reference[5]
+                row["win_tie_loss"] = "WIN" if dz < reference[4] and dq < reference[5] else ("TIE" if np.isclose(dz, reference[4]) and np.isclose(dq, reference[5]) else "LOSS")
+            else:
+                row["relative_delta_v_vs_TCN"] = np.nan
+                row["relative_delta_q_vs_TCN"] = np.nan
+                row["win_tie_loss"] = "NONFINITE_DIVERGENCE"
         comparison_rows.append(row)
     pd.DataFrame(comparison_rows).to_csv(output / "TRACK_B_TRAJECTORY_COMPARISON.csv", index=False)
+
+    stability_rows = []
+    for route, values in trajectory.groupby("route", sort=False):
+        finite = np.isfinite(values.delta_z) & np.isfinite(values.delta_q)
+        stability_rows.append({
+            "route": route,
+            "trajectory_count": len(values),
+            "finite_trajectory_count": int(finite.sum()),
+            "nonfinite_trajectory_count": int((~finite).sum()),
+            "maximum_finite_delta_z": float(values.loc[np.isfinite(values.delta_z), "delta_z"].max()),
+            "status": "FINITE" if bool(finite.all()) else "NONFINITE_RECURSIVE_DIVERGENCE",
+        })
+    pd.DataFrame(stability_rows).to_csv(output / "TRACK_B_STABILITY_AUDIT.csv", index=False)
 
     contracts = _load_contracts(output / "FREEZE" / "TRACK_A_CONTRACTS.json")
     topology = []
@@ -474,11 +499,20 @@ def run_report(project: Path, output: Path) -> None:
     fig.savefig(figures / "FIGURE_B4_ROLLOUT_CURVES.png", dpi=180); fig.savefig(figures / "FIGURE_B4_ROLLOUT_CURVES.pdf"); plt.close(fig)
 
     best_a = prism_a.loc[prism_a.F.idxmin()].to_dict()
-    best_b = prism_b.loc[(prism_b.delta_z / PUBLISHED_TRACK_B["TCN"]["delta_z"] + prism_b.delta_q / PUBLISHED_TRACK_B["TCN"]["delta_q"]).idxmin()].to_dict()
-    competitive = bool(best_a["F"] <= PUBLISHED_TRACK_A["F"] and best_a["M"] <= PUBLISHED_TRACK_A["M"] and best_b["delta_z"] <= 1.2 * PUBLISHED_TRACK_B["TCN"]["delta_z"] and best_b["delta_q"] <= 1.2 * PUBLISHED_TRACK_B["TCN"]["delta_q"])
-    verdict = "B: PRISM is numerically competitive with a clear attribution advantage" if competitive else "C: PRISM is somewhat weaker numerically but offers substantially richer auditable attribution"
+    finite_b = prism_b[np.isfinite(prism_b.delta_z) & np.isfinite(prism_b.delta_q)]
+    track_b_diverged = finite_b.empty
+    best_b = None if track_b_diverged else finite_b.loc[(finite_b.delta_z / PUBLISHED_TRACK_B["TCN"]["delta_z"] + finite_b.delta_q / PUBLISHED_TRACK_B["TCN"]["delta_q"]).idxmin()].to_dict()
+    competitive = bool(not track_b_diverged and best_a["F"] <= PUBLISHED_TRACK_A["F"] and best_a["M"] <= PUBLISHED_TRACK_A["M"] and best_b["delta_z"] <= 1.2 * PUBLISHED_TRACK_B["TCN"]["delta_z"] and best_b["delta_q"] <= 1.2 * PUBLISHED_TRACK_B["TCN"]["delta_q"])
+    verdict = ("B: PRISM is numerically competitive with a clear attribution advantage" if competitive
+               else "D: PRISM is not competitive under the literature-aligned protocol" if track_b_diverged
+               else "C: PRISM is somewhat weaker numerically but offers substantially richer auditable attribution")
+    retained_failures = []
+    if not reproduction_pass:
+        retained_failures.append("TRACK_A_OFFICIAL_PREDICTION_TABLE_REPRODUCTION_FAILED")
+    if track_b_diverged:
+        retained_failures.append("TRACK_B_RECURSIVE_ROLLOUT_NONFINITE_DIVERGENCE")
     summary = {
-        "status": "COMPLETED",
+        "status": "COMPLETED_WITH_TRACK_B_MODEL_FAILURE" if track_b_diverged else "COMPLETED",
         "track_a_metric_reproduction_pass": reproduction_pass,
         "track_a_comparison_class": "EXACT_DIRECT_COMPARISON" if reproduction_pass else "PUBLISHED_AGGREGATE_COMPARISON_ONLY",
         "track_a_best_prism": best_a,
@@ -487,7 +521,8 @@ def run_report(project: Path, output: Path) -> None:
         "published_tcn": PUBLISHED_TRACK_B["TCN"],
         "overall_numerical_verdict": verdict,
         "overall_interpretability_verdict": "AUDITABLE_ACTUATOR_CONTEXT_INTERACTION_AND_LATENT_CURVATURE_SEPARATION",
-        "retained_failures": ["TRACK_A_OFFICIAL_PREDICTION_TABLE_REPRODUCTION_FAILED"] if not reproduction_pass else [],
+        "track_b_status": "NONFINITE_RECURSIVE_DIVERGENCE" if track_b_diverged else "FINITE",
+        "retained_failures": retained_failures,
         "noncomparable_literature_methods": ["NeuroMHE"],
         "test_access": access,
     }
@@ -509,11 +544,15 @@ ranking unless the preregistered official-prediction reproduction gate passed.
 
 ## Track B
 
-The selected numerical reference route is `{best_b['route']}` with
-delta_v={best_b['delta_z']:.6g} and delta_q={best_b['delta_q']:.6g}. Published
-TCN is delta_v=0.042 and delta_q=0.006. These are not asserted to be
-same-information-set ranks. Per-trajectory wins/losses and the genuine PRISM
-60-step curves are provided; no TCN curve was digitized.
+All four frozen PRISM routes produced non-finite aggregate metrics because the
+unconstrained recursive state diverged on at least one official test
+trajectory. Finite trajectories already include extreme delta-v errors up to
+the values recorded in `TRACK_B_STABILITY_AUDIT.csv`. This is a model-stability
+failure, not a metric, target, split, or future-state-access defect. No
+post-test clipping, stabilization, or candidate reselection was applied.
+Published TCN is delta_v=0.042 and delta_q=0.006, but PRISM has no finite
+aggregate to rank against it. Genuine PRISM 60-step curves are retained; no
+TCN curve was digitized.
 
 ## Interpretation limits
 
