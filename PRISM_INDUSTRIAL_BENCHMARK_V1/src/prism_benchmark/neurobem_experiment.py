@@ -7,6 +7,8 @@ from dataclasses import replace
 from hashlib import sha256
 import json
 from pathlib import Path
+import multiprocessing as mp
+import sys
 from typing import Iterable, Mapping, Sequence
 
 import numpy as np
@@ -192,6 +194,51 @@ def _predict_k_segment(
     return rows, y, prediction, context
 
 
+_K_WORKER_SEGMENTS: Sequence[SegmentData] = ()
+_K_WORKER_CONFIG: Mapping[str, object] = {}
+
+
+def _k_candidate_fold_worker(task: tuple[int, int]) -> tuple[int, int, RidgeContract, float, float, int]:
+    fold, history = task
+    train = _K_WORKER_SEGMENTS
+    config = _K_WORKER_CONFIG
+    common = int(config["K"]["local_common_scoring_history_samples"])
+    fit_segments = [segment for segment in train if segment.record.inner_fold != fold]
+    eval_segments = [segment for segment in train if segment.record.inner_fold == fold]
+    if not fit_segments or not eval_segments:
+        raise RuntimeError(f"EMPTY_K_FOLD:{fold}")
+    mass, inertia = _target_parameters(config)
+    contract = _fit_k(fit_segments, history, config)
+    fit_variance = np.var(
+        np.concatenate([generalized_targets(segment, mass, inertia)[history:] for segment in fit_segments]),
+        axis=0,
+    )
+    y_eval: list[np.ndarray] = []
+    prediction_eval: list[np.ndarray] = []
+    for segment in eval_segments:
+        _, y, prediction, _ = _predict_k_segment(segment, contract, history, common, config)
+        y_eval.append(y)
+        prediction_eval.append(prediction)
+    y = np.concatenate(y_eval)
+    prediction = np.concatenate(prediction_eval)
+    loss = normalized_mse(y, prediction, fit_variance)
+    zero = normalized_mse(y, np.broadcast_to(contract.target_mean, y.shape), fit_variance)
+    return fold, history, contract, loss, zero, int(len(y))
+
+
+def _parallel_k_candidate_folds(
+    train: Sequence[SegmentData], tasks: Sequence[tuple[int, int]], config: Mapping[str, object]
+) -> list[tuple[int, int, RidgeContract, float, float, int]]:
+    global _K_WORKER_SEGMENTS, _K_WORKER_CONFIG
+    _K_WORKER_SEGMENTS = train
+    _K_WORKER_CONFIG = config
+    workers = min(int(config["runtime"]["workers"]), len(tasks))
+    if workers > 1 and sys.platform.startswith("linux"):
+        with mp.get_context("fork").Pool(processes=workers) as pool:
+            return pool.map(_k_candidate_fold_worker, tasks)
+    return [_k_candidate_fold_worker(task) for task in tasks]
+
+
 def run_k_development(train: Sequence[SegmentData], validation: Sequence[SegmentData], config: Mapping[str, object]) -> tuple[dict[str, object], RidgeContract, list[dict[str, object]], dict[int, RidgeContract]]:
     kcfg = config["K"]
     histories = [int(value) for value in kcfg["candidate_fir_histories_samples"]]
@@ -199,36 +246,20 @@ def run_k_development(train: Sequence[SegmentData], validation: Sequence[Segment
     folds = int(config["entity_contract"]["inner_folds"])
     mass, inertia = _target_parameters(config)
     losses: dict[int, list[float]] = {history: [] for history in histories}
-    zero_losses: list[float] = []
+    zero_losses_by_history: dict[int, list[float]] = {history: [] for history in histories}
     contracts: dict[tuple[int, int], RidgeContract] = {}
     fold_rows: dict[int, dict[str, int]] = defaultdict(dict)
-    for fold in range(folds):
-        fit_segments = [segment for segment in train if segment.record.inner_fold != fold]
-        eval_segments = [segment for segment in train if segment.record.inner_fold == fold]
-        if not fit_segments or not eval_segments:
-            raise RuntimeError(f"EMPTY_K_FOLD:{fold}")
-        for history in histories:
-            contract = _fit_k(fit_segments, history, config)
-            contracts[(fold, history)] = contract
-            fit_variance = np.var(
-                np.concatenate([generalized_targets(segment, mass, inertia)[history:] for segment in fit_segments]),
-                axis=0,
-            )
-            fold_y: list[np.ndarray] = []
-            fold_prediction: list[np.ndarray] = []
-            for segment in eval_segments:
-                _, y, prediction, _ = _predict_k_segment(segment, contract, history, common, config)
-                fold_y.append(y)
-                fold_prediction.append(prediction)
-            y_eval = np.concatenate(fold_y)
-            prediction_eval = np.concatenate(fold_prediction)
-            losses[history].append(normalized_mse(y_eval, prediction_eval, fit_variance))
-            fold_rows[fold][str(history)] = int(len(y_eval))
-            if history == histories[0]:
-                zero = np.broadcast_to(contract.target_mean, y_eval.shape)
-                zero_losses.append(normalized_mse(y_eval, zero, fit_variance))
+    tasks = [(fold, history) for fold in range(folds) for history in histories]
+    for fold, history, contract, loss, zero_loss, row_count in sorted(
+        _parallel_k_candidate_folds(train, tasks, config), key=lambda value: (value[0], value[1])
+    ):
+        contracts[(fold, history)] = contract
+        losses[history].append(loss)
+        zero_losses_by_history[history].append(zero_loss)
+        fold_rows[fold][str(history)] = row_count
     selection = guarded_one_se(losses, histories, float(kcfg["maximum_relative_regret_vs_best"]))
     selected = int(selection["selected"])
+    zero_losses = zero_losses_by_history[selected]
     relative_improvement = float((np.mean(zero_losses) - np.mean(losses[selected])) / np.mean(zero_losses))
     positive_fraction = float(np.mean(np.asarray(losses[selected]) < np.asarray(zero_losses)))
     activation_pass = (
@@ -282,6 +313,7 @@ def run_k_development(train: Sequence[SegmentData], validation: Sequence[Segment
         "common_scoring_history": common,
         "candidate_fold_losses": {str(key): value for key, value in losses.items()},
         "exact_zero_fold_losses": zero_losses,
+        "exact_zero_fold_losses_by_native_history": {str(key): value for key, value in zero_losses_by_history.items()},
         "selection": selection,
         "selected_history": selected,
         "relative_improvement_vs_zero": relative_improvement,
