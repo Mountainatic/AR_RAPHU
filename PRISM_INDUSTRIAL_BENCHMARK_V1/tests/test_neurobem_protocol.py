@@ -23,7 +23,7 @@ from prism_benchmark.neurobem_linear import (
     predict_ridge,
     simulate_era,
 )
-from prism_benchmark.neurobem_experiment import run_k_development
+from prism_benchmark.neurobem_experiment import aggregate_predictions, run_k_development
 
 
 def record(partition: str = "train", segment: str = "2021-01-01-00-00-00_seg_1") -> SegmentRecord:
@@ -128,6 +128,22 @@ def test_sample_identity_is_segment_aware_and_stable():
     b = record(segment="2021-01-01-00-00-00_seg_2")
     assert sample_id(a, 10) == sample_id(a, 10)
     assert sample_id(a, 10) != sample_id(b, 10)
+
+
+def test_pf_selected_and_kwa_are_same_materialized_prediction():
+    y = np.arange(20, dtype=float).reshape(5, 4)
+    prediction = y + 0.2
+    value = {
+        "y": y,
+        "K": y + 1.0,
+        "KW": y + 0.5,
+        "KWA": prediction,
+        "PF_SELECTED": prediction,
+        "ERA_K": None,
+        "speed": np.ones(5),
+    }
+    metrics = aggregate_predictions([value])
+    assert metrics["KWA"] == metrics["PF_SELECTED"]
 
 
 def test_small_grouped_k_audit_uses_all_original_folds():

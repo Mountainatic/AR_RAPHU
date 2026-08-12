@@ -698,6 +698,7 @@ def predict_test_segment(
         "K": k_prediction,
         "KW": kw_prediction,
         "PF_SELECTED": pf_prediction,
+        "KWA": pf_prediction,
         "ERA_K": era_prediction,
         "speed": speed,
     }
@@ -706,7 +707,7 @@ def predict_test_segment(
 def aggregate_predictions(values: Iterable[dict[str, object]], mask_name: str | None = None, threshold: float = 15.0) -> dict[str, object]:
     values = list(values)
     result: dict[str, object] = {}
-    for route in ["K", "KW", "PF_SELECTED", "ERA_K"]:
+    for route in ["K", "KW", "KWA", "PF_SELECTED", "ERA_K"]:
         pairs = []
         for value in values:
             if value[route] is None:

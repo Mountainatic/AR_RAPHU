@@ -245,8 +245,30 @@ def final(repo_root: Path, config_path: Path, data_root: Path, output_root: Path
     freeze = _load_json(freeze_path)
     if not freeze.get("development_frozen") or not freeze.get("test_access_authorized"):
         raise RuntimeError("TEST_ACCESS_NOT_AUTHORIZED_BY_DEVELOPMENT_FREEZE")
+    if (output_root / "N7_TEST" / "RESULT.json").exists():
+        raise RuntimeError("LOCKED_TEST_ALREADY_ACCESSED")
+    current_commit = _git(repo_root, "rev-parse", "HEAD")
+    if freeze.get("code_commit") != current_commit:
+        raise RuntimeError("CODE_COMMIT_CHANGED_AFTER_DEVELOPMENT_FREEZE")
+    if _git(repo_root, "status", "--porcelain"):
+        raise RuntimeError("DIRTY_CODE_WORKTREE_BEFORE_LOCKBOX")
     if freeze["config_sha256"] != sha256_file(config_path):
         raise RuntimeError("CONFIG_CHANGED_AFTER_FREEZE")
+    run_status = _load_json(output_root / "RUN_STATUS.json")
+    if run_status != {"status": "DEVELOPMENT_FROZEN", "stage": "N6", "test_accessed": False, "ood_accessed": False}:
+        raise RuntimeError("PRELOCKBOX_RUN_STATUS_MISMATCH")
+    write_json(
+        output_root / "N7_TEST" / "TEST_ACCESS_AUDIT.json",
+        {
+            "status": "ACCESS_STARTED",
+            "development_freeze_sha256": sha256_file(freeze_path),
+            "code_commit": current_commit,
+            "config_sha256": sha256_file(config_path),
+            "test_accessed_before": False,
+            "ood_accessed_before": False,
+            "model_selection_after_access_allowed": False,
+        },
+    )
     records = records_from_json(_load_json(output_root / "N1" / "SEGMENT_REGISTRY.json"))
     test = load_partition(records, data_root / "extracted", "test", allow_locked_test=True)
     history = int(freeze["selected_K_history"])
@@ -284,6 +306,20 @@ def final(repo_root: Path, config_path: Path, data_root: Path, output_root: Path
         "runtime": _runtime(repo_root),
     }
     write_json(output_root / "N7_TEST" / "RESULT.json", result)
+    write_json(
+        output_root / "N7_TEST" / "TEST_ACCESS_AUDIT.json",
+        {
+            "status": "ACCESS_COMPLETED_ONCE",
+            "development_freeze_sha256": sha256_file(freeze_path),
+            "code_commit": current_commit,
+            "config_sha256": sha256_file(config_path),
+            "test_accessed_before": False,
+            "ood_accessed_before": False,
+            "test_accessed_after": True,
+            "ood_accessed_after": True,
+            "model_selection_after_access": False,
+        },
+    )
     write_json(output_root / "N8_FINAL" / "FINAL_RESULT.json", result)
     write_json(output_root / "RUN_STATUS.json", {"status": "COMPLETED", "stage": "N8", "test_accessed": True, "ood_accessed": True})
 
