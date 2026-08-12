@@ -23,6 +23,7 @@ from prism_benchmark.neurobem_linear import (
     predict_ridge,
     simulate_era,
 )
+from prism_benchmark.neurobem_experiment import run_k_development
 
 
 def record(partition: str = "train", segment: str = "2021-01-01-00-00-00_seg_1") -> SegmentRecord:
@@ -127,3 +128,55 @@ def test_sample_identity_is_segment_aware_and_stable():
     b = record(segment="2021-01-01-00-00-00_seg_2")
     assert sample_id(a, 10) == sample_id(a, 10)
     assert sample_id(a, 10) != sample_id(b, 10)
+
+
+def test_small_grouped_k_audit_uses_all_original_folds():
+    rng = np.random.default_rng(9)
+    inertia = np.array([0.0025, 0.0021, 0.0043])
+    coefficient = rng.normal(scale=1e-7, size=(4, 4))
+    items = []
+    for index in range(10):
+        rows = 96
+        values = np.zeros((rows, 29), dtype=np.float64)
+        values[:, 0] = np.arange(rows) * 0.0025
+        values[:, 20:24] = rng.uniform(200.0, 900.0, size=(rows, 4))
+        target = np.zeros((rows, 4))
+        target[1:] = np.square(values[:-1, 20:24]) @ coefficient
+        values[:, 1:4] = target[:, :3] / inertia
+        values[:, 13] = target[:, 3] / 0.772
+        partition = "train" if index < 8 else "validation"
+        rec = SegmentRecord(
+            flight_id=f"flight-{index}",
+            segment_id=f"flight-{index}_seg_1",
+            filename=f"flight-{index}_seg_1.csv",
+            partition=partition,
+            inner_fold=index % 4 if partition == "train" else None,
+            zip_uncompressed_bytes=1,
+            zip_crc32="0",
+        )
+        items.append(SegmentData(rec, values))
+    config = {
+        "entity_contract": {"inner_folds": 4},
+        "runtime": {"workers": 2},
+        "rigid_body_targets": {"mass_kg": 0.772, "inertia_diagonal_kg_m2": inertia.tolist()},
+        "K": {
+            "candidate_fir_histories_samples": [4, 8],
+            "local_common_scoring_history_samples": 8,
+            "numerical_ridge_grid": [0.0, 1e-12, 1e-8],
+            "maximum_condition_number": 1e12,
+            "maximum_relative_kkt_residual": 1e-8,
+            "maximum_relative_regret_vs_best": 0.02,
+            "minimum_relative_improvement_vs_zero": 0.01,
+            "minimum_positive_fold_fraction": 0.75,
+            "input_gate": {
+                "minimum_prediction_variance_to_target_variance_ratio": 1e-8,
+                "minimum_nonintercept_coefficient_abs": 1e-12,
+                "maximum_mse_ratio_vs_axis_intercept_baseline": 1.02,
+            },
+        },
+    }
+    result, _, frames, contracts = run_k_development(items[:8], items[8:], config)
+    assert result["status"] == "PASS"
+    assert set(contracts) == {0, 1, 2, 3}
+    assert {int(frame["fold"]) for frame in frames} == {0, 1, 2, 3}
+    assert all(len(value) == 4 for value in result["candidate_fold_losses"].values())
