@@ -93,3 +93,12 @@
   remains valid after the runner creates its output directory.
 - Test and OOD data were not accessed before this correction and are not used
   to motivate or tune it.
+# PRISM v2.1.1 NeuroBEM Multi-Horizon × Wiener-Prior Audit
+
+- Registers a direct forecast grid of 1, 4, 8, 20, 40, and 80 samples instead of relying only on the prior one-step audit.
+- Defines mature residual state by age at the prediction origin, so the actual target lag is `horizon + age`.
+- Preserves canonical latent-only Wiener evidence as W1 and separately labels W2 as an aerodynamic-context extension; W0 remains exact identity.
+- Freezes all W0/W1/W2 arms for formal evaluation without a post-hoc global arm winner.
+- Declares the experiment a `POST_LOCKBOX_PROSPECTIVE_EXTENSION` and explicitly discloses the completed R1 official-test access.
+- Freezes horizons, candidates, support, baselines, metrics, statistics, and plots before any new multi-horizon test score is computed.
+- Results and retained failures will be appended only after the single formal extension test access.
