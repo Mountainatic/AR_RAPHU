@@ -84,6 +84,22 @@ def test_registered_context_k_and_interpretation_labels():
     for channel in ("linear_velocity_context", "attitude_context", "body_rate_context"):
         assert K_CHANNEL_REGISTRY[channel]["interpretation"] == "PREDICTIVE_MOTION_CONTEXT"
         assert "CAUSAL" not in K_CHANNEL_REGISTRY[channel]["interpretation"]
+    assert K_CHANNEL_REGISTRY["attitude_context"]["tracks"] == ["B"]
+
+
+def test_track_a_published_information_set_excludes_attitude():
+    original = frame()
+    changed = original.copy()
+    changed.loc[:, ["quat w", "quat x", "quat y", "quat z"]] = normalize_quaternion(
+        np.random.default_rng(77).normal(size=(len(changed), 4))
+    )
+    xk_original, state_original, y_original, origin_original = track_a_design(original)
+    xk_changed, state_changed, y_changed, origin_changed = track_a_design(changed)
+    np.testing.assert_array_equal(origin_original, origin_changed)
+    np.testing.assert_allclose(xk_original, xk_changed)
+    np.testing.assert_allclose(state_original, state_changed)
+    np.testing.assert_allclose(y_original, y_changed)
+    np.testing.assert_array_equal(state_original.reshape(len(state_original), -1, 10)[:, :, 3:7], 0.0)
 
 
 def test_cross_context_terms_belong_to_c_and_w_is_latent_curvature():

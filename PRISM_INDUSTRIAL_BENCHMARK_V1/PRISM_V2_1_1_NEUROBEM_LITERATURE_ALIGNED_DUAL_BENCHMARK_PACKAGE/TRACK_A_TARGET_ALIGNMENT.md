@@ -1,5 +1,10 @@
 # Track A target and metric alignment
 
+The published NeuroBEM comparator freezes `use_att=False`. Accordingly,
+Track A uses only body linear velocity, body angular velocity, and four motor
+speeds. Quaternion columns are structurally excluded from every Track A model
+block; attitude remains part of Track B only.
+
 Track A predicts six body-frame quantities: `Fx`, `Fy`, `Fz` in N and `Mx`,
 `My`, `Mz` in Nm.  The physical training target is reconstructed from the
 official processed signals using the NeuroBEM rigid-body convention: body

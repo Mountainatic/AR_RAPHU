@@ -39,10 +39,10 @@ MOTOR_COLUMNS = ("mot 1", "mot 2", "mot 3", "mot 4")
 CANONICAL_W_CANDIDATES = ("IDENTITY_CORRECTION", "NATURAL_CUBIC_LATENT", "SIGNED_QUADRATIC_LATENT")
 FORMAL_ROUTE_IDS = ("PF_KC", "PF_KCW", "J_KC", "J_KCW")
 K_CHANNEL_REGISTRY = {
-    "motor_actuator": {"columns": list(MOTOR_COLUMNS), "interpretation": "ACTUATOR_PHYSICS_CONSISTENCY"},
-    "linear_velocity_context": {"columns": ["vel x", "vel y", "vel z"], "interpretation": "PREDICTIVE_MOTION_CONTEXT"},
-    "attitude_context": {"columns": ["quat w", "quat x", "quat y", "quat z"], "interpretation": "PREDICTIVE_MOTION_CONTEXT"},
-    "body_rate_context": {"columns": ["ang vel x", "ang vel y", "ang vel z"], "interpretation": "PREDICTIVE_MOTION_CONTEXT"},
+    "motor_actuator": {"columns": list(MOTOR_COLUMNS), "interpretation": "ACTUATOR_PHYSICS_CONSISTENCY", "tracks": ["A", "B"]},
+    "linear_velocity_context": {"columns": ["vel x", "vel y", "vel z"], "interpretation": "PREDICTIVE_MOTION_CONTEXT", "tracks": ["A", "B"]},
+    "attitude_context": {"columns": ["quat w", "quat x", "quat y", "quat z"], "interpretation": "PREDICTIVE_MOTION_CONTEXT", "tracks": ["B"]},
+    "body_rate_context": {"columns": ["ang vel x", "ang vel y", "ang vel z"], "interpretation": "PREDICTIVE_MOTION_CONTEXT", "tracks": ["A", "B"]},
 }
 
 
@@ -328,7 +328,13 @@ def _context_design(state_history: np.ndarray, k_prediction: np.ndarray) -> np.n
 
 def track_a_design(frame: pd.DataFrame, history: int = 20) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     motor = np.square(frame.loc[:, MOTOR_COLUMNS].to_numpy(dtype=np.float64))
-    context = frame.loc[:, ("vel x", "vel y", "vel z", "quat w", "quat x", "quat y", "quat z", "ang vel x", "ang vel y", "ang vel z")].to_numpy(dtype=np.float64)
+    # NeuroBEM's published bem_settings.yaml freezes use_att=False.  Keep the
+    # common ten-column state layout used by the route helpers, but represent
+    # the unavailable attitude block by structural zeros.  No quaternion value
+    # can therefore enter Track A K, C, W, or Joint predictions.
+    velocity = frame.loc[:, ("vel x", "vel y", "vel z")].to_numpy(dtype=np.float64)
+    body_rate = frame.loc[:, ("ang vel x", "ang vel y", "ang vel z")].to_numpy(dtype=np.float64)
+    context = np.column_stack((velocity, np.zeros((len(frame), 4), dtype=np.float64), body_rate))
     motor_history, origins = _history_matrix(motor, history, 0)
     state_history, state_origins = _history_matrix(context, history, 0)
     if not np.array_equal(origins, state_origins):
