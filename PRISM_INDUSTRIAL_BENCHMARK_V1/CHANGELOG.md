@@ -153,3 +153,14 @@
   evaluator results without overwrite.
 - Published scores and prior divergence are recorded as known but are not used
   for model selection or stabilization.
+# PRISM v2.1.1 NeuroBEM Track A forensic closure R1
+
+- Adds a read-only Track A GT/metric/provenance reproduction stage.
+- Reconstructs force and torque from official processed physical signals with
+  mass 0.772 kg and inertia diag(0.0025, 0.0021, 0.0043) kg m^2; released
+  residual columns are not ground truth.
+- Separates the RSS 2021 axis-normalized grouped metric from the NeuroMHE
+  vector-error trajectory metric.
+- Does not retrain or modify PRISM, K/C/W/A, literature baselines, or Track B.
+- Preserves every historical divergence artifact and permits no test-driven
+  model change or stabilization.
