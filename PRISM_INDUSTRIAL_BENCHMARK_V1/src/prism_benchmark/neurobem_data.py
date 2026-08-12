@@ -272,16 +272,24 @@ def assert_partition_disjoint(records: Iterable[SegmentRecord]) -> None:
         raise NeuroBEMProtocolError(f"PARENT_FLIGHT_SPLIT_LEAKAGE:{bad}")
 
 
-def development_data_audit(segments: Iterable[SegmentData], expected_dt: float = 0.0025) -> dict[str, object]:
+def development_data_audit(
+    segments: Iterable[SegmentData],
+    expected_dt: float = 0.0025,
+    maximum_relative_deviation: float = 0.10,
+) -> dict[str, object]:
     segments = list(segments)
     rows = int(sum(segment.row_count for segment in segments))
     dts = np.concatenate([np.diff(segment.values[:, 0]) for segment in segments])
+    maximum_deviation = float(np.max(np.abs(dts - expected_dt)))
+    cadence_pass = bool(maximum_deviation <= expected_dt * maximum_relative_deviation)
     return {
-        "status": "PASS",
+        "status": "PASS" if cadence_pass else "FAILED_CADENCE_AUDIT",
         "development_segments_parsed": len(segments),
         "development_rows": rows,
         "median_dt_seconds": float(np.median(dts)),
-        "maximum_abs_dt_deviation_seconds": float(np.max(np.abs(dts - expected_dt))),
+        "maximum_abs_dt_deviation_seconds": maximum_deviation,
+        "maximum_relative_cadence_deviation_allowed": maximum_relative_deviation,
+        "cadence_pass": cadence_pass,
         "test_numeric_values_accessed": False,
         "history_entity": "CONTIGUOUS_PROCESSED_SEGMENT_ID",
         "cross_segment_history_allowed": False,

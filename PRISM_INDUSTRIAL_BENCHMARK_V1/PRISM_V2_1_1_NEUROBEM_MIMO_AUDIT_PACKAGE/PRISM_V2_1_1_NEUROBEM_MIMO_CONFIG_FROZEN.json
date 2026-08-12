@@ -12,7 +12,10 @@
     "flights_url": "https://download.ifi.uzh.ch/rpg/NeuroBEM/Flights.txt",
     "testset_url": "https://download.ifi.uzh.ch/rpg/NeuroBEM/testset.txt",
     "paper": "Bauersfeld et al., NeuroBEM, RSS 2021, arXiv:2106.08015",
+    "license_status": "NO_EXPLICIT_DATA_LICENSE_FOUND_IN_DISTRIBUTED_README_OR_DOWNLOAD_INDEX",
+    "redistribution_policy": "DO_NOT_REDISTRIBUTE_RAW_OR_PROCESSED_ARCHIVE_IN_PROJECT_BUNDLES",
     "sampling_hz": 400.0,
+    "maximum_relative_cadence_deviation": 0.10,
     "flight_count_expected": 96,
     "raw_data_must_not_be_committed": true
   },

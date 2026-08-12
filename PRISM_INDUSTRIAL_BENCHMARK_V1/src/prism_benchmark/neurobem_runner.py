@@ -84,7 +84,13 @@ def stage0(repo_root: Path, config_path: Path, data_root: Path, output_root: Pat
         for record in records
         if record.partition in {"train", "validation"}
     ]
-    audit = development_data_audit(development)
+    audit = development_data_audit(
+        development,
+        expected_dt=1.0 / float(config["source"]["sampling_hz"]),
+        maximum_relative_deviation=float(config["source"]["maximum_relative_cadence_deviation"]),
+    )
+    if audit["status"] != "PASS":
+        raise RuntimeError(audit["status"])
     counts: dict[str, dict[str, int]] = {}
     for partition in ["train", "validation", "test"]:
         subset = [record for record in records if record.partition == partition]
