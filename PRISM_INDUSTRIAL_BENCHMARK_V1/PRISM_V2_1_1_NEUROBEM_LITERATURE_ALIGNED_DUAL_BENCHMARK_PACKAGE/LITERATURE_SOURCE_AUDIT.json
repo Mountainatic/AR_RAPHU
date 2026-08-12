@@ -1,0 +1,82 @@
+{
+  "status": "COMPLETED_BEFORE_MODEL_IMPLEMENTATION",
+  "source_type": "PRIMARY_PAPER_OR_OFFICIAL_CODE",
+  "sources": [
+    {
+      "id": "NEUROBEM_PAPER",
+      "url": "https://arxiv.org/pdf/2106.08015",
+      "sha256": "beab4ea71218c12e725f4a447a4bcd613e7b8a3d688fbb88c674744f98062181"
+    },
+    {
+      "id": "HDVIO2_PAPER",
+      "url": "https://arxiv.org/pdf/2504.00969",
+      "sha256": "2635708aecd1b0412e965f6421cbde3ad305a08590004e0363546b501a6aca69"
+    },
+    {
+      "id": "LONG_HORIZON_PAPER",
+      "url": "https://arxiv.org/pdf/2407.12964",
+      "sha256": "82053f091f4cedb75ae81b23462e0e72f1a7e453b259f1920626fc3f3a0db09f"
+    },
+    {
+      "id": "NEUROMHE_PAPER",
+      "url": "https://arxiv.org/pdf/2206.10397",
+      "sha256": "d8d8df54649c30fbb6f328fe31544a42af3aef6395b9427c22eeef2b65205aa5"
+    },
+    {
+      "id": "LONG_HORIZON_OFFICIAL_REPOSITORY",
+      "url": "https://github.com/arplaboratory/long-horizon-dynamics",
+      "commit": "a8451a119b9096eda980f71b55dbb05012b8c47a"
+    },
+    {
+      "id": "HDVIO2_OFFICIAL_REPOSITORY",
+      "url": "https://github.com/uzh-rpg/hdvio2.0",
+      "commit": "7f49194335068f481dd54f78ca990535a4b08228"
+    },
+    {
+      "id": "NEUROMHE_OFFICIAL_REPOSITORY",
+      "url": "https://github.com/RCL-NUS/NeuroMHE",
+      "commit": "3c1a8ccce60f6d509f5a34bde15ee81792eb8352"
+    },
+    {
+      "id": "NEUROBEM_OFFICIAL_CODE_ARCHIVE",
+      "url": "https://download.ifi.uzh.ch/rpg/NeuroBEM/code.tar.xz",
+      "bytes": 301902496,
+      "sha256": "6a2c384491f6c779692ad10e27e64b9ef457440f880239881034ccfc0a9b0386"
+    },
+    {
+      "id": "NEUROBEM_OFFICIAL_PREDICTIONS_ARCHIVE",
+      "url": "https://download.ifi.uzh.ch/rpg/NeuroBEM/predictions.tar.xz",
+      "bytes": 235443588,
+      "sha256": "831017016064f00cfa7668ad24788944e3dc23705d8b5840717ca86c87f3a093"
+    },
+    {
+      "id": "LONG_HORIZON_OFFICIAL_DATA_RELEASE",
+      "url": "https://drive.google.com/file/d/1BB-r63qgiqB5uJ5xVbTcfR-6j9rXCFCA/view",
+      "bytes": 2043979141,
+      "sha256": "3961d47748cac42272c469160108581f2e7d89e3ad4a6b31cb75966d897fd7b0"
+    }
+  ],
+  "track_a_findings": {
+    "history_samples": 20,
+    "history_at_400hz_ms": 50,
+    "network_inputs": ["body_linear_velocity", "body_angular_velocity", "four_motor_speeds"],
+    "network_labels": ["residual_fx", "residual_fy", "residual_fz", "residual_tx", "residual_ty", "residual_tz"],
+    "total_target_construction": "model_force_torque_plus_residual_force_torque",
+    "official_test_segments": 13,
+    "metric_definition": "axis-pooled RMSE; xy pools two axes and F/M pool three axes"
+  },
+  "track_b_findings": {
+    "paper_total_flights": 96,
+    "paper_split_counts": [67, 17, 12],
+    "official_preprocessor": "reset trajectory time; pandas resample 0.01s mean",
+    "history_samples": 20,
+    "training_unroll_samples": 10,
+    "test_rollout_samples": 60,
+    "motor_scale": 0.001,
+    "release_test_files": 12,
+    "official_decoupled_code_teacher_forces_complementary_future_state": true,
+    "registered_prism_future_state_policy": "FORBIDDEN",
+    "direct_comparison_information_set_match": false
+  },
+  "neuromhe_classification": "RELATED_BUT_NOT_DIRECTLY_COMPARABLE"
+}

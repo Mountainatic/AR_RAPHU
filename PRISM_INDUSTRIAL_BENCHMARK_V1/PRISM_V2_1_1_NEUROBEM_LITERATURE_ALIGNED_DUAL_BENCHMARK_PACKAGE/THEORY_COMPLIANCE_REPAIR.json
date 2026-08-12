@@ -1,0 +1,20 @@
+{
+  "THEORY_CHANGED": false,
+  "NEUROBEM_IMPLEMENTATION_CLASSIFICATION_CHANGED": true,
+  "HISTORICAL_RESULTS_PRESERVED": true,
+  "canonical_w_input": "FROZEN_C_LATENT_ONLY",
+  "canonical_w_candidates": [
+    "IDENTITY_CORRECTION",
+    "NATURAL_CUBIC_LATENT",
+    "SIGNED_QUADRATIC_LATENT"
+  ],
+  "historical_aerodynamic_context_w_candidates": [
+    "SIGNED_QUADRATIC_AERO_CONTEXT",
+    "NATURAL_CUBIC_SPEED_CONTEXT"
+  ],
+  "historical_classification": "AERODYNAMIC_CONTEXT_W_EXTENSION_DIAGNOSTIC",
+  "motor_k_label": "CAUSAL_INPUT_RESPONSE",
+  "motion_context_k_label": "PREDICTIVE_MOTION_CONTEXT",
+  "c_role": "CROSS_CONTEXT_AND_MOTOR_RESPONSE_CONTEXT_INTERACTION",
+  "a_enabled_in_dual_benchmark": false
+}
