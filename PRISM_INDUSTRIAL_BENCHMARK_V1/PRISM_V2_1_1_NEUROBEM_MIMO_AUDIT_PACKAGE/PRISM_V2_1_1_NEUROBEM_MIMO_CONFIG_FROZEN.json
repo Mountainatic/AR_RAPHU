@@ -78,7 +78,13 @@
     "maximum_relative_regret_vs_best": 0.02,
     "minimum_relative_improvement_vs_zero": 0.01,
     "minimum_positive_fold_fraction": 0.75,
-    "all_four_outputs_must_preserve_input_variance": true
+    "all_four_outputs_must_preserve_input_variance": true,
+    "input_gate": {
+      "minimum_prediction_variance_to_target_variance_ratio": 1e-8,
+      "minimum_nonintercept_coefficient_abs": 1e-10,
+      "maximum_mse_ratio_vs_axis_intercept_baseline": 1.02,
+      "numerical_certificate_required": true
+    }
   },
   "W": {
     "role": "OPTIONAL_AERODYNAMIC_CONTEXT_PREDICTIVE_CORRECTION",
@@ -147,6 +153,7 @@
     "test_access_requires_development_freeze": true,
     "final_refit_grouped_oof_folds": 5,
     "final_refit_oof_fold_group": "FLIGHT_ID",
+    "final_refit_oof_fold_salt": "PRISM_V211_NEUROBEM_FINAL_OOF_R1",
     "final_refit_sequence": "CROSSFIT_K_ON_TRAIN_PLUS_VALIDATION_THEN_FIT_W_THEN_CROSSFIT_SELECTED_KW_RESIDUAL_FOR_A_THEN_REFIT_K_ON_ALL_DEVELOPMENT",
     "test_accessed_initial": false,
     "ood_accessed_initial": false
