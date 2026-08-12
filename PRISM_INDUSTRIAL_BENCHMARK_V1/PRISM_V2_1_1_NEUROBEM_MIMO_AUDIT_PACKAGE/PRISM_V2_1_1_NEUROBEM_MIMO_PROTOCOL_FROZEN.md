@@ -38,6 +38,12 @@ standardization statistic, fold or sample identity may cross a segment.
 Segments from one parent flight may never be divided among train, validation and
 test.
 
+The metadata-only N0 audit identified one entire parent flight
+(`2021-02-18-16-43-54`) sampled at approximately 164 Hz while the registered
+experiment operates at 400 Hz. That parent is excluded without interpolation or
+resampling. It was a train parent, so validation and test membership remain as
+pre-registered.
+
 All segments belonging to a parent flight named by the official test list are
 locked test. Of the remaining parent flights, exactly 19 are validation groups,
 chosen by the pre-registered SHA256 ordering; the remainder are train. Inner

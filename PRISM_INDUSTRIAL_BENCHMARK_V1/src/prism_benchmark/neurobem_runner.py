@@ -84,6 +84,11 @@ def stage0(repo_root: Path, config_path: Path, data_root: Path, output_root: Pat
         for record in records
         if record.partition in {"train", "validation"}
     ]
+    excluded = [
+        load_segment(extracted, record, allow_locked_test=False)
+        for record in records
+        if record.partition == "excluded_cadence"
+    ]
     audit = development_data_audit(
         development,
         expected_dt=1.0 / float(config["source"]["sampling_hz"]),
@@ -91,8 +96,25 @@ def stage0(repo_root: Path, config_path: Path, data_root: Path, output_root: Pat
     )
     if audit["status"] != "PASS":
         raise RuntimeError(audit["status"])
+    expected_dt = 1.0 / float(config["source"]["sampling_hz"])
+    tolerance = float(config["source"]["maximum_relative_cadence_deviation"])
+    exclusion_audit = []
+    for segment in excluded:
+        dt = np.diff(segment.values[:, 0])
+        median_dt = float(np.median(dt))
+        if abs(median_dt - expected_dt) <= expected_dt * tolerance:
+            raise RuntimeError(f"UNJUSTIFIED_CADENCE_EXCLUSION:{segment.record.segment_id}")
+        exclusion_audit.append(
+            {
+                "flight_id": segment.record.flight_id,
+                "segment_id": segment.record.segment_id,
+                "rows": segment.row_count,
+                "median_dt_seconds": median_dt,
+                "status": "EXCLUDED_INCOMPATIBLE_CADENCE",
+            }
+        )
     counts: dict[str, dict[str, int]] = {}
-    for partition in ["train", "validation", "test"]:
+    for partition in ["train", "validation", "test", "excluded_cadence"]:
         subset = [record for record in records if record.partition == partition]
         counts[partition] = {
             "parent_flights": len({record.flight_id for record in subset}),
@@ -115,6 +137,7 @@ def stage0(repo_root: Path, config_path: Path, data_root: Path, output_root: Pat
         },
         "counts": counts,
         "development_data_audit": audit,
+        "cadence_exclusion_audit": exclusion_audit,
         "test_accessed": False,
         "ood_accessed": False,
         "runtime": _runtime(repo_root),

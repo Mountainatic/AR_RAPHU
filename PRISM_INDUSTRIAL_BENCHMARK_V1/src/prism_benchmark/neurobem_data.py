@@ -92,18 +92,24 @@ def frozen_parent_partitions(
     official_test_segments: Iterable[str],
     validation_parent_count: int,
     validation_salt: str,
+    excluded_parents: Iterable[str] = (),
 ) -> dict[str, str]:
     flights = list(flights)
     test_parents = {parent_flight(value) for value in official_test_segments}
     missing = test_parents.difference(flights)
     if missing:
         raise NeuroBEMProtocolError(f"TEST_PARENT_NOT_IN_FLIGHTS:{sorted(missing)}")
-    eligible = sorted(set(flights).difference(test_parents), key=lambda x: _hash_order(x, validation_salt))
+    excluded = set(excluded_parents)
+    if excluded.intersection(test_parents):
+        raise NeuroBEMProtocolError("CADENCE_EXCLUSION_OVERLAPS_OFFICIAL_TEST")
+    if not excluded.issubset(flights):
+        raise NeuroBEMProtocolError("CADENCE_EXCLUSION_NOT_IN_FLIGHTS")
+    eligible = sorted(set(flights).difference(test_parents).difference(excluded), key=lambda x: _hash_order(x, validation_salt))
     if len(eligible) < validation_parent_count:
         raise NeuroBEMProtocolError("INSUFFICIENT_NONTEST_FLIGHTS")
     validation = set(eligible[:validation_parent_count])
     return {
-        flight: "test" if flight in test_parents else "validation" if flight in validation else "train"
+        flight: "excluded_cadence" if flight in excluded else "test" if flight in test_parents else "validation" if flight in validation else "train"
         for flight in flights
     }
 
@@ -128,6 +134,7 @@ def registry_from_zip(
         test_segments,
         int(entity["validation_parent_count"]),
         str(entity["validation_salt"]),
+        config["source"].get("cadence_incompatible_parent_flights", []),
     )
     records: list[SegmentRecord] = []
     seen: set[str] = set()
