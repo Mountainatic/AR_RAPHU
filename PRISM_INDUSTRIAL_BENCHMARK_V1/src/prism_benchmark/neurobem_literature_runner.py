@@ -214,7 +214,9 @@ def _select_track_a_w(trajectories: list[LiteratureTrajectory], config: Mapping[
         return fold, {"fold": fold, "fit_segments": len(fit), "evaluation_segments": len(evaluation), **audit}
 
     folds = range(int(selection["inner_group_folds"]))
-    with ThreadPoolExecutor(max_workers=len(tuple(folds)), thread_name_prefix="track-a-fold") as executor:
+    # Two folds keep the measured peak below the 60-GiB cgroup while retaining
+    # useful task-level parallelism. Nested family work stays ordered/serial.
+    with ThreadPoolExecutor(max_workers=min(2, len(tuple(folds))), thread_name_prefix="track-a-fold") as executor:
         evaluated = list(executor.map(evaluate_fold, folds))
     for fold, audit in evaluated:
         for family, loss in audit["candidate_losses"].items():
@@ -248,7 +250,7 @@ def run_development(project: Path, source_root: Path, release_root: Path, output
         float(selection["maximum_condition_number"]), float(selection["maximum_relative_kkt_residual"]),
         history=20,
         minimum_relative_improvement=float(selection["minimum_relative_improvement"]),
-        candidate_workers=min(3, int(config["runtime"]["candidate_workers"])),
+        candidate_workers=1,
     )
     # Development selection is frozen, then all official non-test data are
     # used for the final estimator contracts.
