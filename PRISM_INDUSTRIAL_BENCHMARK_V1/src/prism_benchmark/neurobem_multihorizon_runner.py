@@ -412,8 +412,12 @@ def _figures(output_root: Path, metrics: Sequence[Mapping[str, object]], w_gain:
     dev = [row for row in topology if row["phase"] == "DEVELOPMENT"]
     horizons = sorted({int(row["horizon"]) for row in dev})
     matrix = np.array([[next(float(row["integrated_coefficient"]) for row in dev if int(row["horizon"]) == h and int(row["motor"]) == motor and row["axis"] == axis) for motor in range(1, 5) for axis in AXES] for h in horizons])
-    scale = np.maximum(np.max(np.abs(matrix), axis=1, keepdims=True), np.finfo(float).eps)
-    plt.imshow(matrix / scale, aspect="auto", cmap="coolwarm", vmin=-1, vmax=1)
+    # Motor-to-axis coefficients have very different physical units.  Scale
+    # within each horizon/axis across the four motors so torque signs remain
+    # visible instead of being flattened by the body-Z force magnitude.
+    cube = matrix.reshape(len(horizons), 4, 4)
+    scale = np.maximum(np.max(np.abs(cube), axis=1, keepdims=True), np.finfo(float).eps)
+    plt.imshow((cube / scale).reshape(len(horizons), 16), aspect="auto", cmap="coolwarm", vmin=-1, vmax=1)
     plt.yticks(range(len(horizons)), [f"h={h}" for h in horizons]); plt.xticks(range(16), [f"M{m}-{a}" for m in range(1, 5) for a in AXES], rotation=90, fontsize=6); plt.colorbar(label="Row-normalized integrated coefficient"); save("FIGURE_6_K_TOPOLOGY")
 
 
