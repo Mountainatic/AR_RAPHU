@@ -23,6 +23,7 @@ from .neurobem_literature import (
     concatenate_track_a_design,
     concatenate_track_b_design,
     fit_route_contracts,
+    fit_track_b_route_contracts,
     force_torque_metrics,
     metric_reproduction_gate,
     official_prediction_ground_truth_force_torque,
@@ -32,6 +33,7 @@ from .neurobem_literature import (
     route_contract_from_json,
     route_contract_to_json,
     select_w_family,
+    select_track_b_w_family,
     stable_group_fold,
     track_a_force_torque_target,
     track_a_route_metrics,
@@ -233,16 +235,16 @@ def run_development(project: Path, source_root: Path, release_root: Path, output
     selected_a, selection_a = _select_track_a_w(track_a, config)
     arrays_a = concatenate_track_a_design(track_a)
     contracts_a = fit_route_contracts(*arrays_a, selected_a, ridge_grid, float(selection["maximum_condition_number"]), float(selection["maximum_relative_kkt_residual"]), target_kind="FORCE_TORQUE_6D", history=20)
-    selected_b, selection_b = select_w_family(
+    selected_b, selection_b = select_track_b_w_family(
         concatenate_track_b_design(track_b_train), concatenate_track_b_design(track_b_validation), ridge_grid,
         float(selection["maximum_condition_number"]), float(selection["maximum_relative_kkt_residual"]),
-        target_kind="DELTA_Z_AND_ROTATION_VECTOR", history=20,
+        history=20,
         minimum_relative_improvement=float(selection["minimum_relative_improvement"]),
     )
     # Development selection is frozen, then all official non-test data are
     # used for the final estimator contracts.
     arrays_b = concatenate_track_b_design(track_b_train + track_b_validation)
-    contracts_b = fit_route_contracts(*arrays_b, selected_b, ridge_grid, float(selection["maximum_condition_number"]), float(selection["maximum_relative_kkt_residual"]), target_kind="DELTA_Z_AND_ROTATION_VECTOR", history=20)
+    contracts_b = fit_track_b_route_contracts(*arrays_b, selected_b, ridge_grid, float(selection["maximum_condition_number"]), float(selection["maximum_relative_kkt_residual"]), history=20)
     output.mkdir(parents=True, exist_ok=True)
     track_a_result = {"status": "PASS", "selected_w_family": selected_a, "selection": selection_a, "candidate_binding": candidate_binding_audit(contracts_a), "a_enabled": False, "test_accessed": False}
     track_b_result = {"status": "PASS", "selected_w_family": selected_b, "selection": selection_b, "candidate_binding": candidate_binding_audit(contracts_b), "a_enabled": False, "test_accessed": False}

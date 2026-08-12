@@ -71,8 +71,24 @@ class LiteratureRouteContract:
     column_slices: Mapping[str, tuple[int, int]]
 
 
-def route_contract_to_json(contract: LiteratureRouteContract) -> dict[str, object]:
+@dataclass(frozen=True)
+class DecoupledLiteratureRouteContract:
+    route_id: str
+    velocity_contract: LiteratureRouteContract
+    attitude_contract: LiteratureRouteContract
+
+
+def route_contract_to_json(contract: LiteratureRouteContract | DecoupledLiteratureRouteContract) -> dict[str, object]:
+    if isinstance(contract, DecoupledLiteratureRouteContract):
+        return {
+            "contract_type": "DECOUPLED_VELOCITY_ATTITUDE",
+            "route_id": contract.route_id,
+            "velocity_contract": route_contract_to_json(contract.velocity_contract),
+            "attitude_contract": route_contract_to_json(contract.attitude_contract),
+            "a_enabled": False,
+        }
     return {
+        "contract_type": "SINGLE_TARGET_BLOCK",
         "route_id": contract.route_id,
         "target_kind": contract.target_kind,
         "history": contract.history,
@@ -90,7 +106,16 @@ def route_contract_to_json(contract: LiteratureRouteContract) -> dict[str, objec
     }
 
 
-def route_contract_from_json(value: Mapping[str, object]) -> LiteratureRouteContract:
+def route_contract_from_json(value: Mapping[str, object]) -> LiteratureRouteContract | DecoupledLiteratureRouteContract:
+    if value.get("contract_type") == "DECOUPLED_VELOCITY_ATTITUDE":
+        velocity = value["velocity_contract"]
+        attitude = value["attitude_contract"]
+        assert isinstance(velocity, Mapping) and isinstance(attitude, Mapping)
+        return DecoupledLiteratureRouteContract(
+            route_id=str(value["route_id"]),
+            velocity_contract=route_contract_from_json(velocity),  # type: ignore[arg-type]
+            attitude_contract=route_contract_from_json(attitude),  # type: ignore[arg-type]
+        )
     w = value["w_contract"]
     assert isinstance(w, Mapping)
     return LiteratureRouteContract(
@@ -392,6 +417,34 @@ def fit_route_contracts(xk: np.ndarray, state_history: np.ndarray, y: np.ndarray
     }
 
 
+def fit_track_b_route_contracts(
+    xk: np.ndarray,
+    state_history: np.ndarray,
+    y: np.ndarray,
+    w_family: str,
+    ridge_grid: Sequence[float],
+    max_condition: float,
+    max_kkt: float,
+    *,
+    history: int,
+) -> dict[str, DecoupledLiteratureRouteContract]:
+    """Fit independent published-style velocity and attitude predictors."""
+    if y.ndim != 2 or y.shape[1] != 9:
+        raise ValueError("TRACK_B_TARGET_MUST_BE_DELTA_Z_PLUS_ROTATION_VECTOR")
+    velocity = fit_route_contracts(
+        xk, state_history, y[:, :6], w_family, ridge_grid, max_condition, max_kkt,
+        target_kind="DELTA_Z_6D", history=history,
+    )
+    attitude = fit_route_contracts(
+        xk, state_history, y[:, 6:], w_family, ridge_grid, max_condition, max_kkt,
+        target_kind="ROTATION_VECTOR_3D", history=history,
+    )
+    return {
+        route: DecoupledLiteratureRouteContract(route, velocity[route], attitude[route])
+        for route in FORMAL_ROUTE_IDS
+    }
+
+
 def predict_route(contract: LiteratureRouteContract, xk: np.ndarray, state_history: np.ndarray) -> np.ndarray:
     if contract.route_id.startswith("PF_"):
         assert contract.k_ridge is not None and contract.c_ridge is not None
@@ -419,15 +472,29 @@ def predict_joint_route(contract: LiteratureRouteContract, pf_reference: Literat
     return predict_ridge(contract.joint_ridge, np.column_stack(blocks))
 
 
-def route_prediction(contracts: Mapping[str, LiteratureRouteContract], route: str,
+def route_prediction(contracts: Mapping[str, LiteratureRouteContract | DecoupledLiteratureRouteContract], route: str,
                      xk: np.ndarray, state_history: np.ndarray) -> np.ndarray:
     contract = contracts[route]
+    if isinstance(contract, DecoupledLiteratureRouteContract):
+        if route.startswith("PF_"):
+            velocity = predict_route(contract.velocity_contract, xk, state_history)
+            attitude = predict_route(contract.attitude_contract, xk, state_history)
+        else:
+            reference = contracts.get("PF_KCW")
+            if not isinstance(reference, DecoupledLiteratureRouteContract):
+                raise ValueError("DECOUPLED_JOINT_REQUIRES_DECOUPLED_PF_REFERENCE")
+            velocity = predict_joint_route(contract.velocity_contract, reference.velocity_contract, xk, state_history)
+            attitude = predict_joint_route(contract.attitude_contract, reference.attitude_contract, xk, state_history)
+        return np.column_stack((velocity, attitude))
     if route.startswith("PF_"):
         return predict_route(contract, xk, state_history)
-    return predict_joint_route(contract, contracts["PF_KCW"], xk, state_history)
+    reference = contracts["PF_KCW"]
+    if isinstance(reference, DecoupledLiteratureRouteContract):
+        raise TypeError("DECOUPLED_REFERENCE_DISPATCH_FAILED")
+    return predict_joint_route(contract, reference, xk, state_history)
 
 
-def candidate_binding_audit(contracts: Mapping[str, LiteratureRouteContract]) -> dict[str, object]:
+def candidate_binding_audit(contracts: Mapping[str, LiteratureRouteContract | DecoupledLiteratureRouteContract]) -> dict[str, object]:
     ids = tuple(contracts)
     expected = FORMAL_ROUTE_IDS
     passed = ids == expected and all(contracts[key].route_id == key for key in expected)
@@ -494,6 +561,50 @@ def select_w_family(
     }
 
 
+def select_track_b_w_family(
+    train_arrays: tuple[np.ndarray, np.ndarray, np.ndarray],
+    evaluation_arrays: tuple[np.ndarray, np.ndarray, np.ndarray],
+    ridge_grid: Sequence[float],
+    max_condition: float,
+    max_kkt: float,
+    *,
+    history: int,
+    minimum_relative_improvement: float,
+) -> tuple[str, dict[str, object]]:
+    """Development-only W selection with decoupled target contracts."""
+    xk_train, state_train, y_train = train_arrays
+    xk_eval, state_eval, y_eval = evaluation_arrays
+    variance = np.var(y_train, axis=0)
+    losses: dict[str, float] = {}
+    route_losses: dict[str, dict[str, float]] = {}
+    for family in CANONICAL_W_CANDIDATES:
+        contracts = fit_track_b_route_contracts(
+            xk_train, state_train, y_train, family, ridge_grid,
+            max_condition, max_kkt, history=history,
+        )
+        current = {
+            route: normalized_prediction_loss(
+                y_eval, route_prediction(contracts, route, xk_eval, state_eval), variance,
+            )
+            for route in ("PF_KCW", "J_KCW")
+        }
+        route_losses[family] = current
+        losses[family] = float(np.mean(list(current.values())))
+    neutral = losses["IDENTITY_CORRECTION"]
+    best = min(CANONICAL_W_CANDIDATES, key=lambda key: losses[key])
+    improvement = (neutral - losses[best]) / max(neutral, np.finfo(float).eps)
+    selected = best if best != "IDENTITY_CORRECTION" and improvement >= minimum_relative_improvement else "IDENTITY_CORRECTION"
+    return selected, {
+        "candidate_losses": losses,
+        "route_losses": route_losses,
+        "best_unprotected": best,
+        "relative_improvement_vs_identity": float(improvement),
+        "selected": selected,
+        "published_scores_used": False,
+        "target_blocks_fitted_independently": True,
+    }
+
+
 def concatenate_track_a_design(trajectories: Iterable[LiteratureTrajectory], history: int = 20) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     arrays = [track_a_design(item.frame, history)[:3] for item in trajectories]
     if not arrays:
@@ -530,7 +641,7 @@ def track_a_route_metrics(contracts: Mapping[str, LiteratureRouteContract], traj
 
 
 def track_b_rollout(
-    contracts: Mapping[str, LiteratureRouteContract],
+    contracts: Mapping[str, LiteratureRouteContract | DecoupledLiteratureRouteContract],
     route: str,
     frame_100hz: pd.DataFrame,
     *,

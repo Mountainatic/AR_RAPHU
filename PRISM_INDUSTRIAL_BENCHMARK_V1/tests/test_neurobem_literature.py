@@ -20,6 +20,7 @@ from prism_benchmark.neurobem_literature import (
     delta_q_metric,
     delta_z_metric,
     fit_route_contracts,
+    fit_track_b_route_contracts,
     force_torque_metrics,
     latent_w_basis,
     legacy_aero_w_classification,
@@ -55,7 +56,7 @@ def frame(rows: int = 150, seed: int = 0) -> pd.DataFrame:
 def small_contracts():
     current = frame(170)
     xk, state, y, _ = track_b_design(resample_track_b_100hz(current), history=5)
-    return fit_route_contracts(
+    return fit_track_b_route_contracts(
         xk,
         state,
         y,
@@ -63,7 +64,6 @@ def small_contracts():
         [1e-8, 1e-4, 1.0],
         1e16,
         1e-7,
-        target_kind="TEST",
         history=5,
     )
 
@@ -176,6 +176,14 @@ def test_candidate_loss_prediction_materialization_ids_match_roundtrip():
     restored = {key: route_contract_from_json(route_contract_to_json(value)) for key, value in contracts.items()}
     assert tuple(restored) == FORMAL_ROUTE_IDS
     assert all(restored[key].route_id == key for key in FORMAL_ROUTE_IDS)
+
+
+def test_track_b_velocity_and_attitude_are_decoupled_contracts():
+    contracts = small_contracts()
+    for contract in contracts.values():
+        assert contract.velocity_contract.target_kind == "DELTA_Z_6D"
+        assert contract.attitude_contract.target_kind == "ROTATION_VECTOR_3D"
+        assert contract.velocity_contract is not contract.attitude_contract
 
 
 def test_no_published_score_used_for_model_selection():
