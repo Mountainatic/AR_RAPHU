@@ -38,6 +38,7 @@ from .neurobem_literature import (
     stable_group_fold,
     track_a_force_torque_target,
     track_a_route_metrics,
+    track_b_published_decoupled_evaluator,
     track_b_rollout,
     track_b_split_manifest,
 )
@@ -342,6 +343,100 @@ def run_test(project: Path, source_root: Path, release_root: Path, output: Path)
     _write_json(output / "DUAL_TEST_ACCESS_AUDIT.json", {"status": "ACCESSED_AFTER_GLOBAL_DUAL_FREEZE", "global_freeze_sha256": _sha256(freeze_path), "track_a_prism_test_accessed": True, "track_b_prism_test_accessed": True, "future_measured_state_used_in_track_b": False, "future_target_residual_used": False})
 
 
+def run_published_evaluator_extension(project: Path, release_root: Path, output: Path) -> None:
+    """Evaluate frozen Track-B contracts under the official decoupled loop."""
+    freeze_path = output / "GLOBAL_DUAL_DEVELOPMENT_FREEZE.json"
+    freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
+    if freeze.get("status") != "GLOBAL_DUAL_DEVELOPMENT_FROZEN" or not freeze.get("all_candidate_bindings_pass"):
+        raise RuntimeError("GLOBAL_DUAL_FREEZE_GATE_FAILED")
+    contract_path = output / "FREEZE" / "TRACK_B_CONTRACTS.json"
+    if _sha256(contract_path) != freeze["track_b"]["contracts_sha256"]:
+        raise RuntimeError("FROZEN_TRACK_B_CONTRACT_HASH_MISMATCH")
+    contracts = _load_contracts(contract_path)
+    test = _track_b_trajectories(release_root, "test", permit_test=True)
+    if len(test) != 12:
+        raise RuntimeError(f"PUBLISHED_EVALUATOR_EXPECTED_12_TRAJECTORIES:{len(test)}")
+    trajectory_rows: list[dict[str, object]] = []
+    aggregate: dict[str, dict[str, object]] = {}
+    for route in FORMAL_ROUTE_IDS:
+        def evaluate(item: LiteratureTrajectory) -> tuple[LiteratureTrajectory, dict[str, object]]:
+            return item, track_b_published_decoupled_evaluator(contracts, route, item.frame, history=20, rollout=60)
+        with ThreadPoolExecutor(max_workers=12, thread_name_prefix="track-b-published-evaluator") as executor:
+            evaluated = list(executor.map(evaluate, test))
+        total = 0
+        weighted_v = 0.0
+        weighted_q = 0.0
+        finite = True
+        for trajectory, result in evaluated:
+            weight = int(result["sliding_windows"])
+            total += weight
+            weighted_v += float(result["delta_v"]) * weight
+            weighted_q += float(result["delta_q"]) * weight
+            finite = finite and bool(result["finite"])
+            trajectory_rows.append({
+                "trajectory": trajectory.trajectory_id,
+                "route": route,
+                "delta_v": result["delta_v"],
+                "delta_q": result["delta_q"],
+                "sliding_windows": weight,
+                "finite": result["finite"],
+                "maximum_quaternion_norm_error": result["maximum_quaternion_norm_error"],
+            })
+        delta_v = weighted_v / total
+        delta_q = weighted_q / total
+        aggregate[route] = {
+            "delta_v": delta_v,
+            "delta_q": delta_q,
+            "finite": bool(finite and np.isfinite(delta_v) and np.isfinite(delta_q)),
+            "relative_difference_vs_tcn_delta_v": (delta_v - PUBLISHED_TRACK_B["TCN"]["delta_z"]) / PUBLISHED_TRACK_B["TCN"]["delta_z"],
+            "relative_difference_vs_tcn_delta_q": (delta_q - PUBLISHED_TRACK_B["TCN"]["delta_q"]) / PUBLISHED_TRACK_B["TCN"]["delta_q"],
+        }
+    table_ii = {row[0]: row for row in TRACK_B_TABLE_II}
+    for row in trajectory_rows:
+        reference = table_ii[row["trajectory"]]
+        row["TCN_delta_v_published"] = reference[4]
+        row["TCN_delta_q_published"] = reference[5]
+        if bool(row["finite"]):
+            row["win_tie_loss"] = "WIN" if row["delta_v"] < reference[4] and row["delta_q"] < reference[5] else ("TIE" if np.isclose(row["delta_v"], reference[4]) and np.isclose(row["delta_q"], reference[5]) else "LOSS")
+        else:
+            row["win_tie_loss"] = "NONFINITE_DIVERGENCE"
+    wins = {}
+    for route in FORMAL_ROUTE_IDS:
+        labels = [row["win_tie_loss"] for row in trajectory_rows if row["route"] == route]
+        wins[route] = {label: labels.count(label) for label in ("WIN", "TIE", "LOSS", "NONFINITE_DIVERGENCE")}
+    extension = output / "PUBLISHED_DECOUPLED_EVALUATOR"
+    extension.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(trajectory_rows).to_csv(extension / "TRACK_B_PUBLISHED_EVALUATOR_TRAJECTORIES.csv", index=False)
+    pd.DataFrame([{"route": route, **values, **{f"trajectory_{key.lower()}": count for key, count in wins[route].items()}} for route, values in aggregate.items()]).to_csv(extension / "TRACK_B_PUBLISHED_EVALUATOR_METRICS.csv", index=False)
+    result = {
+        "status": "COMPLETED",
+        "evaluator": "PUBLISHED_DECOUPLED_EVALUATOR",
+        "protocol_claim": "EXACT_PUBLISHED_EVALUATOR_ON_FROZEN_PRISM",
+        "exact_full_published_protocol": False,
+        "training_contract_mismatch": True,
+        "training_contract_audit": {
+            "official": "U10_RECURSIVE_BRANCH_TRAINING_WITH_COMPLEMENTARY_GROUND_TRUTH_STATE_INJECTION",
+            "frozen_prism": "ONE_STEP_NUMERICALLY_CERTIFIED_RIDGE_WITH_U10_FULLY_RECURSIVE_DEVELOPMENT_SELECTION",
+            "mismatch": True,
+        },
+        "frozen_contracts_reused": True,
+        "frozen_contract_sha256": _sha256(contract_path),
+        "fully_recursive_stress_test": "NONFINITE_RECURSIVE_DIVERGENCE",
+        "history": 20,
+        "sampling_hz": 100,
+        "rollout": 60,
+        "test_trajectory_count": 12,
+        "future_control_used": True,
+        "complementary_measured_state_used": True,
+        "future_target_residual_used": False,
+        "other_future_information_used": False,
+        "published_tcn": {"delta_v": 0.042, "delta_q": 0.006},
+        "aggregate": aggregate,
+        "trajectory_win_tie_loss": wins,
+    }
+    _write_json(extension / "TRACK_B_PUBLISHED_EVALUATOR_RESULT.json", result)
+
+
 def _published_track_a_rows(project: Path) -> list[dict[str, object]]:
     source = project / "PRISM_V2_1_1_NEUROBEM_LITERATURE_ALIGNED_DUAL_BENCHMARK_PACKAGE" / "PUBLISHED_BASELINE_VALUES.csv"
     frame = pd.read_csv(source)
@@ -567,7 +662,7 @@ Neither context K nor W is presented as causal aerodynamic-law discovery.
 
 def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("stage", choices=("audit", "development", "test", "report"))
+    parser.add_argument("stage", choices=("audit", "development", "test", "published-evaluator", "report"))
     parser.add_argument("--project", type=Path, required=True)
     parser.add_argument("--source-root", type=Path, required=True)
     parser.add_argument("--track-b-release-root", type=Path, required=True)
@@ -588,6 +683,8 @@ def main(argv: Iterable[str] | None = None) -> None:
         run_development(args.project, args.source_root, args.track_b_release_root, args.output)
     elif args.stage == "test":
         run_test(args.project, args.source_root, args.track_b_release_root, args.output)
+    elif args.stage == "published-evaluator":
+        run_published_evaluator_extension(args.project, args.track_b_release_root, args.output)
     else:
         run_report(args.project, args.output)
 

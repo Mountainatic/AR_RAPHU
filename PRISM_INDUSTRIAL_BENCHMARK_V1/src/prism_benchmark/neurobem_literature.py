@@ -283,6 +283,25 @@ def delta_q_metric(target: np.ndarray, prediction: np.ndarray) -> float:
     return float(np.mean(theta))
 
 
+def published_delta_q_metric(target: np.ndarray, prediction: np.ndarray) -> float:
+    """Exact finite form of the official evaluator's quaternion-log metric.
+
+    The reference implementation computes ``q_gt * inverse(q_pred)`` and then
+    ``2*atan2(||q_v||, q_w)`` without sign canonicalization.  The explicit
+    zero-vector branch below only avoids its removable 0/0 singularity; it
+    does not alter any nonzero official value.
+    """
+    if target.shape != prediction.shape or target.shape[-1] != 4:
+        raise ValueError("PUBLISHED_DELTA_Q_METRIC_SHAPE_MISMATCH")
+    relative = quaternion_multiply(
+        normalize_quaternion(target),
+        quaternion_conjugate(normalize_quaternion(prediction)),
+    )
+    vector_norm = np.linalg.norm(relative[..., 1:], axis=-1)
+    theta = 2.0 * np.arctan2(vector_norm, relative[..., 0])
+    return float(np.mean(theta))
+
+
 def _history_matrix(values: np.ndarray, history: int, target_offset: int) -> tuple[np.ndarray, np.ndarray]:
     if history < 1 or target_offset < 0:
         raise ValueError("INVALID_HISTORY_CONTRACT")
@@ -732,6 +751,119 @@ def track_b_rollout(
         "future_controls_used": True,
         "future_measured_states_used": False,
         "future_target_residual_used": False,
+    }
+
+
+def published_evaluator_state_updates(
+    predicted_z: np.ndarray,
+    predicted_q: np.ndarray,
+    measured_next_state: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Build the two branch-local rows used by official ``eval_trajectory``."""
+    predicted_z = np.asarray(predicted_z, dtype=np.float64)
+    predicted_q = normalize_quaternion(predicted_q)
+    measured = np.asarray(measured_next_state, dtype=np.float64)
+    if predicted_z.shape[-1] != 6 or predicted_q.shape[-1] != 4 or measured.shape[-1] != 10:
+        raise ValueError("PUBLISHED_EVALUATOR_STATE_UPDATE_SHAPE_MISMATCH")
+    velocity_row = np.column_stack((predicted_z[:, :3], measured[:, 3:7], predicted_z[:, 3:]))
+    attitude_row = np.column_stack((measured[:, :3], predicted_q, measured[:, 7:10]))
+    return velocity_row, attitude_row
+
+
+def _decoupled_branch_prediction(
+    contracts: Mapping[str, LiteratureRouteContract | DecoupledLiteratureRouteContract],
+    route: str,
+    branch: str,
+    xk: np.ndarray,
+    state_history: np.ndarray,
+) -> np.ndarray:
+    contract = contracts[route]
+    if not isinstance(contract, DecoupledLiteratureRouteContract):
+        raise TypeError("PUBLISHED_EVALUATOR_REQUIRES_DECOUPLED_CONTRACT")
+    selected = contract.velocity_contract if branch == "velocity" else contract.attitude_contract
+    if route.startswith("PF_"):
+        return predict_route(selected, xk, state_history)
+    reference = contracts.get("PF_KCW")
+    if not isinstance(reference, DecoupledLiteratureRouteContract):
+        raise TypeError("PUBLISHED_EVALUATOR_REQUIRES_DECOUPLED_PF_REFERENCE")
+    selected_reference = reference.velocity_contract if branch == "velocity" else reference.attitude_contract
+    return predict_joint_route(selected, selected_reference, xk, state_history)
+
+
+def track_b_published_decoupled_evaluator(
+    contracts: Mapping[str, LiteratureRouteContract | DecoupledLiteratureRouteContract],
+    route: str,
+    frame_100hz: pd.DataFrame,
+    *,
+    history: int = 20,
+    rollout: int = 60,
+) -> dict[str, object]:
+    """Run frozen PRISM contracts with official decoupled evaluator semantics.
+
+    Velocity recursion injects measured attitude; attitude recursion injects
+    measured linear/angular velocity.  Both use the registered future motor
+    controls.  No other future field enters either model history.
+    """
+    if route not in FORMAL_ROUTE_IDS:
+        raise ValueError("UNKNOWN_FORMAL_ROUTE")
+    state = frame_100hz.loc[:, TRACK_B_STATE_COLUMNS].to_numpy(dtype=np.float64)
+    state[:, 3:7] = normalize_quaternion(state[:, 3:7])
+    control = frame_100hz.loc[:, MOTOR_COLUMNS].to_numpy(dtype=np.float64) * 0.001
+    window_count = len(state) - history - rollout
+    if window_count <= 0:
+        raise ValueError("TRACK_B_TRAJECTORY_TOO_SHORT")
+    state_windows = np.lib.stride_tricks.sliding_window_view(state, (history, state.shape[1]))[:, 0]
+    control_windows = np.lib.stride_tricks.sliding_window_view(control, (history + rollout, control.shape[1]))[:, 0]
+    velocity_history = state_windows[:window_count].copy()
+    attitude_history = state_windows[:window_count].copy()
+    controls = control_windows[:window_count]
+    origins = np.arange(history - 1, history - 1 + window_count, dtype=np.int64)
+    predicted_z: list[np.ndarray] = []
+    predicted_q: list[np.ndarray] = []
+    for step in range(rollout):
+        motor_history = np.square(controls[:, step:step + history]).reshape(window_count, -1)
+        velocity_flat = velocity_history.reshape(window_count, -1)
+        attitude_flat = attitude_history.reshape(window_count, -1)
+        velocity_xk = _registered_k_design(motor_history, velocity_flat)
+        attitude_xk = _registered_k_design(motor_history, attitude_flat)
+        velocity_increment = _decoupled_branch_prediction(contracts, route, "velocity", velocity_xk, velocity_flat)
+        attitude_increment = _decoupled_branch_prediction(contracts, route, "attitude", attitude_xk, attitude_flat)
+        velocity_current = velocity_history[:, -1]
+        attitude_current = attitude_history[:, -1]
+        z = np.column_stack((velocity_current[:, :3], velocity_current[:, 7:10])) + velocity_increment
+        q = compose_quaternion_increment(attitude_current[:, 3:7], attitude_increment)
+        predicted_z.append(z)
+        predicted_q.append(q)
+        if step < rollout - 1:
+            measured_index = origins + step + 1
+            velocity_row, attitude_row = published_evaluator_state_updates(z, q, state[measured_index])
+            velocity_history = np.concatenate((velocity_history[:, 1:], velocity_row[:, None]), axis=1)
+            attitude_history = np.concatenate((attitude_history[:, 1:], attitude_row[:, None]), axis=1)
+    prediction_z = np.stack(predicted_z, axis=1)
+    prediction_q = np.stack(predicted_q, axis=1)
+    target_indices = origins[:, None] + np.arange(1, rollout + 1, dtype=np.int64)[None]
+    target_z = np.concatenate((state[target_indices, :3], state[target_indices, 7:10]), axis=2)
+    target_q = state[target_indices, 3:7]
+    per_step_delta_v = [delta_z_metric(target_z[:, step], prediction_z[:, step]) for step in range(rollout)]
+    per_step_delta_q = [published_delta_q_metric(target_q[:, step], prediction_q[:, step]) for step in range(rollout)]
+    return {
+        "trajectory_rows": len(state),
+        "sliding_windows": window_count,
+        "delta_v": delta_z_metric(target_z.reshape(-1, 6), prediction_z.reshape(-1, 6)),
+        "delta_q": published_delta_q_metric(target_q.reshape(-1, 4), prediction_q.reshape(-1, 4)),
+        "per_step_delta_v": per_step_delta_v,
+        "per_step_delta_q": per_step_delta_q,
+        "maximum_quaternion_norm_error": float(np.max(np.abs(np.linalg.norm(prediction_q, axis=2) - 1.0))),
+        "finite": bool(np.isfinite(prediction_z).all() and np.isfinite(prediction_q).all()),
+        "evaluator": "PUBLISHED_DECOUPLED_EVALUATOR",
+        "history": history,
+        "rollout": rollout,
+        "window_count_formula": "N_MINUS_H_MINUS_T",
+        "velocity_branch_future_measured_columns": ["quat w", "quat x", "quat y", "quat z"],
+        "attitude_branch_future_measured_columns": ["vel x", "vel y", "vel z", "ang vel x", "ang vel y", "ang vel z"],
+        "future_controls_used": True,
+        "future_target_residual_used": False,
+        "other_future_information_used": False,
     }
 
 

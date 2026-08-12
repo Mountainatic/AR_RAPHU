@@ -1,5 +1,16 @@
 # Changelog
 
+## PRISM v2.1.1 NeuroBEM Track B published-evaluator extension
+
+- Added the official decoupled `eval_trajectory` semantics as an evaluation-only
+  extension over the already frozen PRISM contracts.
+- Preserved the fully recursive non-finite divergence result unchanged.
+- Did not change or refit any estimator, candidate, hyperparameter, coefficient,
+  development selection, clipping, or stabilization rule.
+- Audited the official complementary-state U-step training contract and marked
+  the frozen PRISM training mismatch explicitly; the result is evaluator-exact
+  on frozen PRISM, not an exact full published-protocol reproduction.
+
 ## PRISM v2.1.1 NeuroBEM Literature-Aligned Dual Benchmark
 
 - Adds a published force/torque Track A and an IROS 2024 known-future-control

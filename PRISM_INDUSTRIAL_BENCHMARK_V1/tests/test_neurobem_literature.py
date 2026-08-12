@@ -13,11 +13,13 @@ from prism_benchmark.neurobem_literature import (
     FORMAL_ROUTE_IDS,
     K_CHANNEL_REGISTRY,
     TRACK_A_COLUMNS,
+    TRACK_B_STATE_COLUMNS,
     LatentWContract,
     assert_no_future_state_access,
     candidate_binding_audit,
     compose_quaternion_increment,
     delta_q_metric,
+    published_delta_q_metric,
     delta_z_metric,
     fit_route_contracts,
     fit_track_b_route_contracts,
@@ -35,7 +37,9 @@ from prism_benchmark.neurobem_literature import (
     track_a_design,
     track_a_force_torque_target,
     track_b_design,
+    track_b_published_decoupled_evaluator,
     track_b_rollout,
+    published_evaluator_state_updates,
 )
 
 
@@ -167,6 +171,7 @@ def test_track_b_quaternion_unit_norm_and_known_error():
     np.testing.assert_allclose(np.linalg.norm(rotated, axis=1), 1.0, atol=1e-14)
     assert delta_q_metric(rotated, identity) == pytest.approx(np.pi / 2)
     assert delta_q_metric(-rotated, rotated) == pytest.approx(0.0, abs=1e-14)
+    assert published_delta_q_metric(identity, rotated) == pytest.approx(np.pi / 2)
 
 
 def test_track_b_delta_z_metric_matches_reference():
@@ -185,6 +190,45 @@ def test_track_b_rollout_access_guards_and_no_a():
     assert result["future_measured_states_used"] is False
     assert result["future_target_residual_used"] is False
     assert result["maximum_quaternion_norm_error"] < 1e-12
+
+
+def test_published_evaluator_injects_only_complementary_measured_state():
+    predicted_z = np.array([[1., 2., 3., 4., 5., 6.]])
+    predicted_q = normalize_quaternion(np.array([[0.8, 0.1, 0.2, 0.3]]))
+    measured = np.array([[11., 12., 13., 0.5, 0.5, 0.5, 0.5, 17., 18., 19.]])
+    velocity_row, attitude_row = published_evaluator_state_updates(predicted_z, predicted_q, measured)
+    np.testing.assert_allclose(velocity_row[:, :3], predicted_z[:, :3])
+    np.testing.assert_allclose(velocity_row[:, 3:7], measured[:, 3:7])
+    np.testing.assert_allclose(velocity_row[:, 7:10], predicted_z[:, 3:])
+    np.testing.assert_allclose(attitude_row[:, :3], measured[:, :3])
+    np.testing.assert_allclose(attitude_row[:, 3:7], predicted_q)
+    np.testing.assert_allclose(attitude_row[:, 7:10], measured[:, 7:10])
+
+
+def test_published_evaluator_exact_indexing_and_information_audit():
+    contracts = small_contracts()
+    sampled = resample_track_b_100hz(frame(500))
+    result = track_b_published_decoupled_evaluator(contracts, "PF_KC", sampled, history=5, rollout=6)
+    assert result["sliding_windows"] == len(sampled) - 5 - 6
+    assert result["window_count_formula"] == "N_MINUS_H_MINUS_T"
+    assert result["future_controls_used"] is True
+    assert result["future_target_residual_used"] is False
+    assert result["other_future_information_used"] is False
+    assert result["velocity_branch_future_measured_columns"] == ["quat w", "quat x", "quat y", "quat z"]
+    assert result["attitude_branch_future_measured_columns"] == ["vel x", "vel y", "vel z", "ang vel x", "ang vel y", "ang vel z"]
+    assert result["maximum_quaternion_norm_error"] < 1e-12
+
+
+def test_published_evaluator_ignores_unregistered_future_columns():
+    contracts = small_contracts()
+    original = resample_track_b_100hz(frame(500))
+    changed = original.copy()
+    ignored = [name for name in changed.columns if name not in {*TRACK_B_STATE_COLUMNS, "mot 1", "mot 2", "mot 3", "mot 4"}]
+    changed.loc[:, ignored] = 1e12
+    before = track_b_published_decoupled_evaluator(contracts, "PF_KC", original, history=5, rollout=6)
+    after = track_b_published_decoupled_evaluator(contracts, "PF_KC", changed, history=5, rollout=6)
+    assert before["delta_v"] == pytest.approx(after["delta_v"])
+    assert before["delta_q"] == pytest.approx(after["delta_q"])
 
 
 def test_candidate_loss_prediction_materialization_ids_match_roundtrip():
