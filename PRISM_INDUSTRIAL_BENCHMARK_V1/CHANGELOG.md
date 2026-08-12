@@ -1,5 +1,24 @@
 # Changelog
 
+## PRISM v2.1.1 - Prospective NeuroBEM MIMO audit
+
+- Adds a new public-dataset experiment; it does not alter or rerun any prior
+  Metro-P60, SRU, v2.1.2, or Joint-stability evidence.
+- Treats each of the 96 flights as a split entity and every published
+  continuous processed segment as a stricter no-crossing history entity.
+- Adds a four-motor, four-output causal MISO FIR K audit using squared motor
+  speed as a registered thrust proxy and rigid-body generalized-force targets.
+- Adds optional W aerodynamic-context prediction and mature residual-state A
+  stages. Their outputs are predictive diagnostics, not causal labels for
+  airflow, drag, wind, or vortex-ring state.
+- Adds ERA block-Hankel/SVD realization from frozen K Markov parameters only;
+  W/A residuals are excluded from the realization.
+- Freezes all splits, candidates, gates, row support, order candidates and the
+  high-speed diagnostic before processed numeric values or test targets are
+  read. Official-test parent flights stay locked until development freeze.
+- Raw/processed NeuroBEM archives and sample-level predictions are excluded
+  from Git and return bundles.
+
 ## PRISM v2.1.1 - Post-experiment prospective sample-support maintenance
 
 - No new theory version is introduced and no estimator, candidate family,
