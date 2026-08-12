@@ -8,6 +8,7 @@ PRISM_INDUSTRIAL_BENCHMARK_V1/rust/prism_kernels/target/
 data/private/neurobem/
 runtime/
 neurobem_pytest.txt
+PRISM_INDUSTRIAL_BENCHMARK_V1/results_prism_v2_1_1_neurobem_literature_aligned_dual/
 
 logs/
 results/runtime/*.pid
