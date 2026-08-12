@@ -68,6 +68,9 @@
     "local_common_scoring_history_samples": 64,
     "exact_zero_required": true,
     "numerical_ridge_grid": [0.0, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4, 1e-2],
+    "standardization": "FIT_FOLD_COLUMN_MEAN_AND_RMS_APPLIED_TO_EVALUATION",
+    "ridge_objective": "MEAN_SQUARED_ERROR_PLUS_ALPHA_TIMES_SLOPE_L2_INTERCEPT_UNPENALIZED",
+    "pooled_loss": "MEAN_OF_FOUR_OUTPUT_MSE_DIVIDED_BY_FIT_FOLD_OUTPUT_VARIANCE",
     "numerical_ridge_semantics": "SMALLEST_CERTIFIED_VALUE_ONLY_NOT_SELECTED_BY_LOSS",
     "maximum_condition_number": 10000000000.0,
     "maximum_relative_kkt_residual": 1e-8,
@@ -87,6 +90,14 @@
       "SIGNED_QUADRATIC_AERO_CONTEXT",
       "NATURAL_CUBIC_SPEED_CONTEXT"
     ],
+    "signed_quadratic_columns": [
+      "velocity_i_times_abs_velocity_i",
+      "speed_norm_times_velocity_i",
+      "body_rate_i_times_abs_body_rate_i",
+      "frozen_k_output_i_times_abs_frozen_k_output_i",
+      "pairwise_body_velocity_products"
+    ],
+    "natural_cubic_columns": "TRAIN_KNOT_NATURAL_CUBIC_OF_SPEED_NORM_PLUS_LINEAR_BODY_VELOCITY_BODY_RATE_AND_FROZEN_K_OUTPUT",
     "natural_cubic_internal_knot_counts": [4, 6, 8],
     "knots_fit_on_fold_train_only": true,
     "numerical_ridge_grid": [0.0, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4],
@@ -134,6 +145,9 @@
     "A_optional": true,
     "MIMO_realization_optional": true,
     "test_access_requires_development_freeze": true,
+    "final_refit_grouped_oof_folds": 5,
+    "final_refit_oof_fold_group": "FLIGHT_ID",
+    "final_refit_sequence": "CROSSFIT_K_ON_TRAIN_PLUS_VALIDATION_THEN_FIT_W_THEN_CROSSFIT_SELECTED_KW_RESIDUAL_FOR_A_THEN_REFIT_K_ON_ALL_DEVELOPMENT",
     "test_accessed_initial": false,
     "ood_accessed_initial": false
   },
