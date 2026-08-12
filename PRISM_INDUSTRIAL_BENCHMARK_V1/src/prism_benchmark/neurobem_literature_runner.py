@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import csv
 from hashlib import sha256
 import json
@@ -198,7 +199,7 @@ def _select_track_a_w(trajectories: list[LiteratureTrajectory], config: Mapping[
     ridge_grid = selection["numerical_ridge_grid"]
     fold_losses = {family: [] for family in CANONICAL_W_CANDIDATES}
     fold_audit = []
-    for fold in range(int(selection["inner_group_folds"])):
+    def evaluate_fold(fold: int) -> tuple[int, dict[str, object]]:
         fit = [item for item in trajectories if stable_group_fold(item.trajectory_id.rsplit("_seg_", 1)[0]) != fold]
         evaluation = [item for item in trajectories if stable_group_fold(item.trajectory_id.rsplit("_seg_", 1)[0]) == fold]
         if not fit or not evaluation:
@@ -208,10 +209,17 @@ def _select_track_a_w(trajectories: list[LiteratureTrajectory], config: Mapping[
             float(selection["maximum_condition_number"]), float(selection["maximum_relative_kkt_residual"]),
             target_kind="FORCE_TORQUE_6D", history=20,
             minimum_relative_improvement=float(selection["minimum_relative_improvement"]),
+            candidate_workers=1,
         )
+        return fold, {"fold": fold, "fit_segments": len(fit), "evaluation_segments": len(evaluation), **audit}
+
+    folds = range(int(selection["inner_group_folds"]))
+    with ThreadPoolExecutor(max_workers=len(tuple(folds)), thread_name_prefix="track-a-fold") as executor:
+        evaluated = list(executor.map(evaluate_fold, folds))
+    for fold, audit in evaluated:
         for family, loss in audit["candidate_losses"].items():
             fold_losses[family].append(loss)
-        fold_audit.append({"fold": fold, "fit_segments": len(fit), "evaluation_segments": len(evaluation), **audit})
+        fold_audit.append(audit)
     means = {family: float(np.mean(values)) for family, values in fold_losses.items()}
     neutral = means["IDENTITY_CORRECTION"]
     best = min(CANONICAL_W_CANDIDATES, key=lambda key: means[key])
@@ -240,6 +248,7 @@ def run_development(project: Path, source_root: Path, release_root: Path, output
         float(selection["maximum_condition_number"]), float(selection["maximum_relative_kkt_residual"]),
         history=20,
         minimum_relative_improvement=float(selection["minimum_relative_improvement"]),
+        candidate_workers=min(3, int(config["runtime"]["candidate_workers"])),
     )
     # Development selection is frozen, then all official non-test data are
     # used for the final estimator contracts.

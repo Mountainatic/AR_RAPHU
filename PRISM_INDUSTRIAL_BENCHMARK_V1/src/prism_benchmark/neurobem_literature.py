@@ -8,6 +8,7 @@ routes.  Published scores never enter any fit or selection function.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha256
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
@@ -404,8 +405,11 @@ def fit_route_contracts(xk: np.ndarray, state_history: np.ndarray, y: np.ndarray
     xw = latent_w_basis(w.family, c_latent, w.knots)
     joint_kc = np.column_stack((xk, xc))
     joint_kcw = np.column_stack((joint_kc, xw))
-    jkc = fit_numerical_ridge(joint_kc, y, ridge_grid, max_condition, max_kkt)
-    jkcw = fit_numerical_ridge(joint_kcw, y, ridge_grid, max_condition, max_kkt)
+    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="joint-route") as executor:
+        jkc_future = executor.submit(fit_numerical_ridge, joint_kc, y, ridge_grid, max_condition, max_kkt)
+        jkcw_future = executor.submit(fit_numerical_ridge, joint_kcw, y, ridge_grid, max_condition, max_kkt)
+        jkc = jkc_future.result()
+        jkcw = jkcw_future.result()
     slices_kc = {"K": (0, xk.shape[1]), "C": (xk.shape[1], joint_kc.shape[1])}
     slices_kcw = {**slices_kc, "W": (joint_kc.shape[1], joint_kcw.shape[1])}
     neutral = LatentWContract("IDENTITY_CORRECTION", None, ())
@@ -431,14 +435,19 @@ def fit_track_b_route_contracts(
     """Fit independent published-style velocity and attitude predictors."""
     if y.ndim != 2 or y.shape[1] != 9:
         raise ValueError("TRACK_B_TARGET_MUST_BE_DELTA_Z_PLUS_ROTATION_VECTOR")
-    velocity = fit_route_contracts(
-        xk, state_history, y[:, :6], w_family, ridge_grid, max_condition, max_kkt,
-        target_kind="DELTA_Z_6D", history=history,
-    )
-    attitude = fit_route_contracts(
-        xk, state_history, y[:, 6:], w_family, ridge_grid, max_condition, max_kkt,
-        target_kind="ROTATION_VECTOR_3D", history=history,
-    )
+    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="decoupled-target") as executor:
+        velocity_future = executor.submit(
+            fit_route_contracts, xk, state_history, y[:, :6], w_family,
+            ridge_grid, max_condition, max_kkt,
+            target_kind="DELTA_Z_6D", history=history,
+        )
+        attitude_future = executor.submit(
+            fit_route_contracts, xk, state_history, y[:, 6:], w_family,
+            ridge_grid, max_condition, max_kkt,
+            target_kind="ROTATION_VECTOR_3D", history=history,
+        )
+        velocity = velocity_future.result()
+        attitude = attitude_future.result()
     return {
         route: DecoupledLiteratureRouteContract(route, velocity[route], attitude[route])
         for route in FORMAL_ROUTE_IDS
@@ -522,6 +531,7 @@ def select_w_family(
     target_kind: str,
     history: int,
     minimum_relative_improvement: float,
+    candidate_workers: int = 1,
 ) -> tuple[str, dict[str, object]]:
     """Select canonical W from development data only.
 
@@ -535,18 +545,24 @@ def select_w_family(
     losses: dict[str, float] = {}
     route_losses: dict[str, dict[str, float]] = {}
     contracts_by_family: dict[str, dict[str, LiteratureRouteContract]] = {}
-    for family in CANONICAL_W_CANDIDATES:
+    def evaluate(family: str) -> tuple[str, dict[str, LiteratureRouteContract], dict[str, float], float]:
         contracts = fit_route_contracts(
             xk_train, state_train, y_train, family, ridge_grid, max_condition, max_kkt,
             target_kind=target_kind, history=history,
         )
-        contracts_by_family[family] = contracts
         current = {}
         for route in ("PF_KCW", "J_KCW"):
             prediction = route_prediction(contracts, route, xk_eval, state_eval)
             current[route] = normalized_prediction_loss(y_eval, prediction, variance)
-        route_losses[family] = current
-        losses[family] = float(np.mean(list(current.values())))
+        return family, contracts, current, float(np.mean(list(current.values())))
+
+    workers = max(1, min(int(candidate_workers), len(CANONICAL_W_CANDIDATES)))
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="w-family") as executor:
+        evaluated = executor.map(evaluate, CANONICAL_W_CANDIDATES)
+        for family, contracts, current, loss in evaluated:
+            contracts_by_family[family] = contracts
+            route_losses[family] = current
+            losses[family] = loss
     neutral = losses["IDENTITY_CORRECTION"]
     best = min(CANONICAL_W_CANDIDATES, key=lambda key: losses[key])
     improvement = (neutral - losses[best]) / max(neutral, np.finfo(float).eps)
@@ -570,6 +586,7 @@ def select_track_b_w_family(
     *,
     history: int,
     minimum_relative_improvement: float,
+    candidate_workers: int = 1,
 ) -> tuple[str, dict[str, object]]:
     """Development-only W selection with decoupled target contracts."""
     xk_train, state_train, y_train = train_arrays
@@ -577,7 +594,7 @@ def select_track_b_w_family(
     variance = np.var(y_train, axis=0)
     losses: dict[str, float] = {}
     route_losses: dict[str, dict[str, float]] = {}
-    for family in CANONICAL_W_CANDIDATES:
+    def evaluate(family: str) -> tuple[str, dict[str, float], float]:
         contracts = fit_track_b_route_contracts(
             xk_train, state_train, y_train, family, ridge_grid,
             max_condition, max_kkt, history=history,
@@ -588,8 +605,13 @@ def select_track_b_w_family(
             )
             for route in ("PF_KCW", "J_KCW")
         }
-        route_losses[family] = current
-        losses[family] = float(np.mean(list(current.values())))
+        return family, current, float(np.mean(list(current.values())))
+
+    workers = max(1, min(int(candidate_workers), len(CANONICAL_W_CANDIDATES)))
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="track-b-w-family") as executor:
+        for family, current, loss in executor.map(evaluate, CANONICAL_W_CANDIDATES):
+            route_losses[family] = current
+            losses[family] = loss
     neutral = losses["IDENTITY_CORRECTION"]
     best = min(CANONICAL_W_CANDIDATES, key=lambda key: losses[key])
     improvement = (neutral - losses[best]) / max(neutral, np.finfo(float).eps)
