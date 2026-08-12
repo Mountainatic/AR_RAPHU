@@ -1,0 +1,177 @@
+{
+  "protocol_id": "PRISM_V2_1_1_NEUROBEM_MULTI_HORIZON_W_PRIOR_AUDIT_R1",
+  "status": "FROZEN_BEFORE_NEW_MULTI_HORIZON_TEST_SCORE_ACCESS",
+  "evidence_class": "POST_LOCKBOX_PROSPECTIVE_EXTENSION",
+  "historical_test_access_exists": true,
+  "historical_test_access_experiment": "PRISM_V2_1_1_NEUROBEM_MIMO_AUDIT_R1",
+  "current_extension_new_test_scores_seen_before_freeze": false,
+  "branch": "prism-v2-1-1-neurobem-multihorizon-wprior",
+  "output_root": "results_prism_v2_1_1_neurobem_multihorizon_wprior",
+  "dtype": "float64",
+  "source_and_split": {
+    "reuse_r1_registry_and_source_hashes": true,
+    "source_archive_sha256": "a3e2e83d156b48a95c346c4fd9b3ded0b62781331dc613f1cb9ab285be2b36a8",
+    "train_parent_flights": 62,
+    "validation_parent_flights": 19,
+    "test_parent_flights": 13,
+    "excluded_cadence_parent_flights": ["2021-02-18-16-43-54"],
+    "history_entity": "CONTIGUOUS_PROCESSED_SEGMENT_ID",
+    "split_group": "PARENT_FLIGHT_ID",
+    "history_may_cross_segment": false,
+    "history_may_cross_flight": false,
+    "interpolation": "FORBIDDEN",
+    "inner_folds": 4,
+    "final_refit_grouped_oof_folds": 5,
+    "final_refit_oof_fold_salt": "PRISM_V211_NEUROBEM_MULTIHORIZON_FINAL_OOF_R1"
+  },
+  "targets": {
+    "sampling_hz": 400.0,
+    "forecast_horizons_samples": [1, 4, 8, 20, 40, 80],
+    "forecast_horizons_milliseconds": [2.5, 10.0, 20.0, 50.0, 100.0, 200.0],
+    "outputs": [
+      "ROLL_GENERALIZED_TORQUE_NM",
+      "PITCH_GENERALIZED_TORQUE_NM",
+      "YAW_GENERALIZED_TORQUE_NM",
+      "BODY_Z_GENERALIZED_FORCE_N"
+    ],
+    "mass_kg": 0.772,
+    "inertia_diagonal_kg_m2": [0.0025, 0.0021, 0.0043],
+    "body_z_force_interpretation": "GENERALIZED_FORCE_ALONG_THRUST_AXIS_NOT_IDENTIFIED_PROPELLER_THRUST"
+  },
+  "information_contract": {
+    "prediction_origin": "target_row_index-horizon",
+    "latest_allowed_input_index": "prediction_origin",
+    "latest_allowed_context_index": "prediction_origin",
+    "latest_allowed_target_history_index": "prediction_origin",
+    "future_input_used": false,
+    "sample_id": "SHA256(dataset,flight_id,segment_id,horizon,prediction_origin,target_row_index)",
+    "native_horizon_support_start": "max_K_history-1+2*horizon+max_mature_age",
+    "common_horizon_support": "INTERSECTION_OF_ALL_REGISTERED_HORIZON_TARGET_ROWS",
+    "same_sample_ids_for_all_routes_within_horizon": true,
+    "train_only_scaling": true,
+    "train_only_spline_knots": true
+  },
+  "K": {
+    "input_channels": ["mot_1_squared", "mot_2_squared", "mot_3_squared", "mot_4_squared"],
+    "candidate_fir_histories_samples": [4, 8, 12, 20, 32, 64],
+    "candidate_family": "CAUSAL_MISO_FIR",
+    "candidate_native_fit_support": true,
+    "local_common_scoring_history_samples": 64,
+    "numerical_ridge_grid": [0.0, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4, 1e-2],
+    "maximum_condition_number": 10000000000.0,
+    "maximum_relative_kkt_residual": 1e-8,
+    "maximum_relative_regret_vs_best": 0.02,
+    "minimum_relative_improvement_vs_zero": 0.01,
+    "minimum_positive_fold_fraction": 0.75,
+    "history_grid_expansion_after_results_forbidden": true,
+    "boundary_selection_label": "K_HISTORY_BOUNDARY_SELECTED"
+  },
+  "W": {
+    "maximum_relative_regret_vs_best": 0.02,
+    "minimum_relative_improvement": 0.01,
+    "minimum_positive_fold_fraction": 0.75,
+    "numerical_ridge_grid": [0.0, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4],
+    "arms": {
+      "W0_IDENTITY": ["IDENTITY_CORRECTION"],
+      "W1_GENERIC": [
+        "IDENTITY_CORRECTION",
+        "NATURAL_CUBIC_K_LATENT_K4",
+        "NATURAL_CUBIC_K_LATENT_K6",
+        "NATURAL_CUBIC_K_LATENT_K8"
+      ],
+      "W2_AERO": [
+        "IDENTITY_CORRECTION",
+        "NATURAL_CUBIC_K_LATENT_K4",
+        "NATURAL_CUBIC_K_LATENT_K6",
+        "NATURAL_CUBIC_K_LATENT_K8",
+        "SIGNED_QUADRATIC_AERO_CONTEXT",
+        "NATURAL_CUBIC_SPEED_CONTEXT_K4",
+        "NATURAL_CUBIC_SPEED_CONTEXT_K6",
+        "NATURAL_CUBIC_SPEED_CONTEXT_K8"
+      ]
+    },
+    "generic_latent_allowed_inputs": ["frozen_K_prediction"],
+    "generic_latent_forbidden_inputs": ["body_velocity", "body_angular_velocity", "speed_norm"],
+    "aerodynamic_context_allowed_inputs": ["body_velocity_xyz", "body_angular_velocity_xyz", "frozen_K_prediction"],
+    "aerodynamic_context_semantics": "AERODYNAMIC_CONTEXT_EXTENSION",
+    "global_arm_winner_selection_forbidden": true,
+    "causal_airflow_drag_wind_claim_forbidden": true
+  },
+  "A": {
+    "mature_residual_age_sets_samples": [[0], [0, 1, 3], [0, 1, 3, 7, 11, 19]],
+    "actual_target_lag_formula": "horizon+mature_age",
+    "exact_zero_required": true,
+    "raw_motor_velocity_body_rate_input_forbidden": true,
+    "numerical_ridge_grid": [0.0, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4],
+    "maximum_relative_regret_vs_best": 0.02,
+    "minimum_relative_improvement": 0.01,
+    "minimum_positive_fold_fraction": 0.75,
+    "causal_wind_or_vortex_claim_forbidden": true
+  },
+  "formal_routes": [
+    "K__W0__NO_A",
+    "K__W1_GENERIC__NO_A",
+    "K__W2_AERO__NO_A",
+    "K__W0__A",
+    "K__W1_GENERIC__A",
+    "K__W2_AERO__A"
+  ],
+  "baselines": {
+    "routes": ["PERSISTENCE", "TARGET_ONLY_VAR_AR", "LINEAR_NARX"],
+    "target_history_age_sets_samples": [[0], [0, 1, 3], [0, 1, 3, 7, 11, 19]],
+    "linear_narx_motor_history": "SELECTED_K_HISTORY_FOR_HORIZON",
+    "selection": "LOCAL_GUARDED_ONE_SE_ON_DEVELOPMENT_ONLY",
+    "information_cutoff": "prediction_origin",
+    "formal_pf_candidate": false
+  },
+  "evaluation": {
+    "metrics": ["MSE", "RMSE", "MAE", "R2", "NRMSE", "NORMALIZED_MSE", "POOLED_FOUR_OUTPUT_NORMALIZED_MSE"],
+    "high_speed_challenge_name": "LOCKED_HIGH_SPEED_CHALLENGE_SUBSET",
+    "high_speed_threshold_m_per_s": 15.0,
+    "speed_value_time": "prediction_origin",
+    "speed_bins_m_per_s": [[0.0, 5.0], [5.0, 10.0], [10.0, 15.0], [15.0, null]],
+    "official_neurobem_h1_comparison": "ONLY_IF_EXISTING_PREDICTIONS_ALIGN_EXACTLY_OTHERWISE_NOT_APPLICABLE",
+    "official_neurobem_higher_horizon_comparison": "NOT_APPLICABLE"
+  },
+  "statistics": {
+    "primary_cluster": "PARENT_FLIGHT_ID",
+    "primary_bootstrap_replicates": 5000,
+    "primary_seed": 21101,
+    "secondary_cluster": "CONTIGUOUS_PROCESSED_SEGMENT_ID",
+    "secondary_bootstrap_replicates": 2000,
+    "secondary_seed": 21102,
+    "statistic": "CANDIDATE_MINUS_BASELINE_POOLED_NORMALIZED_MSE",
+    "contrasts": [
+      ["K__W1_GENERIC__NO_A", "K__W0__NO_A"],
+      ["K__W2_AERO__NO_A", "K__W1_GENERIC__NO_A"],
+      ["K__W0__A", "K__W0__NO_A"],
+      ["K__W1_GENERIC__A", "K__W1_GENERIC__NO_A"],
+      ["K__W2_AERO__A", "K__W2_AERO__NO_A"]
+    ],
+    "p_values_generated": false
+  },
+  "K_topology": {
+    "statistic": "SUM_FIR_COEFFICIENTS_OVER_HISTORY",
+    "expected_roll_signs_by_motor": [-1, -1, 1, 1],
+    "expected_pitch_signs_by_motor": [1, -1, 1, -1],
+    "expected_body_z_force_signs_by_motor": [1, 1, 1, 1],
+    "yaw_template": "DESCRIPTIVE_ONLY_NO_FORMAL_EXPECTED_SIGN",
+    "test_target_used_for_sign_decision": false
+  },
+  "test_access": {
+    "all_development_must_finish_before_global_freeze": true,
+    "generating_commit_must_be_clean": true,
+    "current_extension_test_access_count": 1,
+    "test_driven_reselection": false,
+    "single_formal_multi_horizon_access": true
+  },
+  "runtime": {
+    "outer_parallel_axis": "K_FOLD_HISTORY_WITHIN_ONE_HORIZON",
+    "workers": 12,
+    "blas_threads_per_worker": 1,
+    "deterministic_ordered_map": true,
+    "horizons_run_sequentially": true,
+    "reuse_fold_design_matrices_where_safe": true,
+    "peak_ram_must_be_recorded": true
+  }
+}
