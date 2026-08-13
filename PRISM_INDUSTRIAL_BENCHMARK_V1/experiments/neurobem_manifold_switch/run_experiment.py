@@ -54,13 +54,26 @@ def load_config(path: Path) -> dict:
 def atomic_json(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix(path.suffix + ".tmp")
-    temp.write_text(json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
+    temp.write_text(json.dumps(_json_safe(value), indent=2, sort_keys=True, allow_nan=False) + "\n", encoding="utf-8")
     temp.replace(path)
 
 
 def hash_file(path: Path) -> str:
     h = sha256(path.read_bytes()).hexdigest()
     return h
+
+
+def _json_safe(value: object) -> object:
+    """Map diagnostic non-finite scalars to JSON null without hiding divergence."""
+    if isinstance(value, dict):
+        return {key: _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, (float, np.floating)) and not np.isfinite(value):
+        return None
+    if isinstance(value, np.generic):
+        return value.item()
+    return value
 
 
 def capped_features(trajectories, cap: int) -> np.ndarray:

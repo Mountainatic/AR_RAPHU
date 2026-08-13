@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 from experiments.neurobem_manifold_switch.metrics import divergence_time
+from experiments.neurobem_manifold_switch.run_experiment import _json_safe
 from experiments.neurobem_manifold_switch.monitor import ManifoldTemplate, persistent_alarm
 
 
@@ -72,3 +73,10 @@ def test_trajectory_parallelism_is_ordered_fork_cow():
     assert 'mp.get_context("fork").Pool' in source
     assert "pool.imap(_evaluate_trajectory_index" in source
     assert 'cfg["trajectory_workers"]' in source
+
+
+def test_nonfinite_diagnostic_is_strict_json_null():
+    assert _json_safe({"diverged": True, "error": float("inf")}) == {
+        "diverged": True,
+        "error": None,
+    }
