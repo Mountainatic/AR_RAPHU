@@ -49,8 +49,15 @@ def capped_features(trajectories, cap: int) -> np.ndarray:
     return np.concatenate(values)
 
 
-def fit_assets(source: NeuroBEMSource, global_adapter: FrozenPrismAdapter, cfg: dict, run: Path) -> tuple[ManifoldTemplate, ModelBank, dict]:
-    train_names = source.names("train")
+def fit_assets(source: NeuroBEMSource, cfg: dict, run: Path) -> tuple[FrozenPrismAdapter, ManifoldTemplate, ModelBank, dict, dict]:
+    fit_names, calibration_names, split_audit = source.train_parent_holdout(float(cfg["train_parent_fit_fraction"]))
+    train_names = fit_names
+    fit_trajectories = source.load("train", fit_names)
+    global_adapter = fit_local_adapter(
+        fit_trajectories, "GLOBAL_PRISM_R2_TRAIN_ONLY", cfg["w_family"], int(cfg["row_cap_per_trajectory"]),
+        cfg["ridge_grid"], float(cfg["max_condition"]), float(cfg["max_kkt"]), int(cfg["history"]),
+    )
+    global_adapter.save(run / "checkpoints" / "global_prism_r2_train_only.json")
     n = int(cfg["local_model_trajectories"])
     groups = [train_names[:n], train_names[-n:]]
     local_entries = []
@@ -66,10 +73,12 @@ def fit_assets(source: NeuroBEMSource, global_adapter: FrozenPrismAdapter, cfg: 
         local_entries.append(BankEntry(adapter, template, acceptance))
         adapter.save(run / "checkpoints" / f"local_prism_{index}.json")
 
-    template_train = source.load("train", train_names[:int(cfg["template_trajectories"])])
+    template_count = min(int(cfg["template_trajectories"]), len(train_names))
+    template_names = [train_names[i] for i in np.linspace(0, len(train_names) - 1, template_count, dtype=np.int64)]
+    template_train = source.load("train", template_names)
     global_features = capped_features(template_train, int(cfg["row_cap_per_trajectory"]))
     global_template = ManifoldTemplate.fit(global_features, int(cfg["geometry_rank"]))
-    validation = source.load("validation")
+    validation = source.load("train", calibration_names)
     residual_values, geometry_values, residual_raw = [], [], []
     for item in validation:
         target, prediction, origins = global_adapter.one_step(cfg["routes"][0], item.frame)
@@ -84,9 +93,10 @@ def fit_assets(source: NeuroBEMSource, global_adapter: FrozenPrismAdapter, cfg: 
         residual_values.append(residual)
         geometry_values.append(0.7 * projection + 0.3 * tangent)
     thresholds = calibrate(np.concatenate(residual_values), np.concatenate(geometry_values), float(cfg["monitor_quantile"]))
-    calibration = {"residual_scale": scale.tolist(), "thresholds": thresholds, "source": "VALIDATION_ONLY"}
+    calibration = {"residual_scale": scale.tolist(), "thresholds": thresholds, "source": "TRAIN_PARENT_CHRONOLOGICAL_HOLDOUT_ONLY_R2"}
     atomic_json(run / "checkpoints" / "monitor_calibration.json", calibration)
-    return global_template, ModelBank(local_entries), calibration
+    atomic_json(run / "checkpoints" / "r2_data_contract_audit.json", split_audit)
+    return global_adapter, global_template, ModelBank(local_entries), calibration, split_audit
 
 
 def plot_log(path: Path, log: pd.DataFrame, result: dict) -> None:
@@ -110,7 +120,7 @@ def main(argv=None) -> None:
     p.add_argument("--config", type=Path, required=True); p.add_argument("--data-root", type=Path, required=True)
     p.add_argument("--release-root", type=Path, required=True); p.add_argument("--split-manifest", type=Path, required=True)
     p.add_argument("--global-contracts", type=Path, required=True); p.add_argument("--output-root", type=Path, required=True)
-    p.add_argument("--partition", choices=("validation", "test"), default="validation")
+    p.add_argument("--partition", choices=("calibration", "test"), default="calibration")
     p.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto"); p.add_argument("--resume", type=Path)
     args = p.parse_args(argv); cfg = load_config(args.config); cfg.setdefault("w_family", "IDENTITY_CORRECTION")
     if args.device == "cuda":
@@ -125,29 +135,43 @@ def main(argv=None) -> None:
         "config": str(args.config), "config_sha256": hash_file(args.config), "seed": cfg["seed"], "python": sys.version,
         "numpy": np.__version__, "pandas": pd.__version__, "hostname": socket.gethostname(), "platform": platform.platform(),
         "device": "cpu" if args.device in ("auto", "cpu") else "cuda", "dataset": source.audit(), "partition": args.partition,
-        "test_tuning_prohibited": True, "prism_core_modified": False}
+        "test_tuning_prohibited": True, "prism_core_modified": False,
+        "parent_global_contracts": str(args.global_contracts), "parent_global_contracts_sha256": hash_file(args.global_contracts),
+        "r2_global_contract_refitted_from_train_only": True}
     atomic_json(run / "metadata.json", metadata); atomic_json(run / "config.json", cfg)
-    global_adapter = FrozenPrismAdapter.load(args.global_contracts)
-    template, bank, calibration = fit_assets(source, global_adapter, cfg, run)
+    global_adapter, template, bank, calibration, split_audit = fit_assets(source, cfg, run)
     completed_path = run / "checkpoints" / "completed.json"
     completed = set(json.loads(completed_path.read_text())["keys"]) if completed_path.exists() else set()
     rows = []
-    trajectories = source.load(args.partition)
-    for trajectory in trajectories:
+    if args.partition == "calibration":
+        _, calibration_names, _ = source.train_parent_holdout(float(cfg["train_parent_fit_fraction"]))
+        trajectories = source.load("train", calibration_names)
+    else:
+        trajectories = source.load("test")
+    def evaluate_trajectory(trajectory):
+        values = []
         for route in cfg["routes"]:
             for ablation in cfg["ablations"]:
                 key = f"{trajectory.trajectory_id}|{route}|{ablation}"
                 result_path = run / "trajectories" / (key.replace("|", "__") + ".json")
                 if key in completed and result_path.exists():
-                    rows.append(json.loads(result_path.read_text())); continue
-                # No learned test-time bank state leaks across trajectories or
-                # ablations; only the two train-fitted frozen entries recur.
+                    values.append((key, result_path, json.loads(result_path.read_text()), None))
+                    continue
                 local_bank = ModelBank(list(bank.entries))
                 result, log = evaluate(trajectory.frame, route, global_adapter, template, local_bank, calibration, cfg, ablation)
                 result["trajectory"] = trajectory.trajectory_id
-                atomic_json(result_path, result); log.to_csv(result_path.with_suffix(".csv"), index=False)
-                if ablation in {"static", "combined_switch_reid"}: plot_log(run / "figures" / (result_path.stem + ".png"), log, result)
-                completed.add(key); atomic_json(completed_path, {"keys": sorted(completed)}); rows.append(result)
+                values.append((key, result_path, result, log))
+        return values
+
+    workers = max(1, min(int(cfg["trajectory_workers"]), len(trajectories)))
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="neurobem-trajectory") as executor:
+        for trajectory_values in executor.map(evaluate_trajectory, trajectories):
+            for key, result_path, result, log in trajectory_values:
+                if log is not None:
+                    atomic_json(result_path, result); log.to_csv(result_path.with_suffix(".csv"), index=False)
+                    if result["ablation"] in {"static", "combined_switch_reid"}: plot_log(run / "figures" / (result_path.stem + ".png"), log, result)
+                    completed.add(key); atomic_json(completed_path, {"keys": sorted(completed)})
+                rows.append(result)
     table = pd.DataFrame(rows)
     static_map = {(row.trajectory, row.route): row.t_diverge for row in table.itertuples() if row.ablation == "static"}
     table["t_diverge_static"] = [static_map[(row.trajectory, row.route)] for row in table.itertuples()]
@@ -165,7 +189,7 @@ def main(argv=None) -> None:
             "false_alarm_total": int(((part.t_alarm.notna()) & ~part.static_diverged).sum()), "false_switch_total": int(((part.t_switch.notna()) & ~part.static_diverged).sum()), "new_models_created": int(part.new_models_created.sum())})
     summary = {"status": "COMPLETED", "partition": args.partition, "trajectory_count": len(trajectories), "rows": aggregate,
         "hypothesis": "t_alarm < t_diverge_static", "test_accessed": args.partition == "test", "test_used_for_tuning": False,
-        "historical_exact_training_divergence_retained": True, "run_dir": str(run)}
+        "historical_exact_training_divergence_retained": True, "r2_data_contract": split_audit, "run_dir": str(run)}
     atomic_json(run / "summary.json", summary); pd.DataFrame(aggregate).to_csv(run / "ablation_summary.csv", index=False)
     print(json.dumps(summary, indent=2))
 

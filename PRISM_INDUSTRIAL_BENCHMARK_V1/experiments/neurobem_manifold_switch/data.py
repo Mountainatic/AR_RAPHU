@@ -3,6 +3,7 @@ from __future__ import annotations
 from hashlib import sha256
 import json
 from pathlib import Path
+import numpy as np
 
 from prism_benchmark.neurobem_literature import LiteratureTrajectory, read_neurobem_csv, resample_track_b_100hz
 
@@ -59,6 +60,34 @@ class NeuroBEMSource:
             "all_frozen_identities_present": not any(missing.values()),
             "entity_isolation": "ONE_CSV_ONE_TRAJECTORY_NO_CROSS_BOUNDARY_HISTORY",
         }
+
+    def train_parent_holdout(self, fit_fraction: float = 0.75) -> tuple[list[str], list[str], dict[str, object]]:
+        names = self.names("train")
+        parents = sorted({name.rsplit("_seg_", 1)[0] for name in names})
+        cut = int(np.ceil(len(parents) * fit_fraction))
+        fit_parents, calibration_parents = set(parents[:cut]), set(parents[cut:])
+        test_hashes = {self._file_sha(self.path(name)): name for name in self.names("test")}
+        collisions = []
+        clean = []
+        for name in names:
+            digest = self._file_sha(self.path(name))
+            if digest in test_hashes:
+                collisions.append({"train": name, "test": test_hashes[digest], "sha256": digest})
+            else:
+                clean.append(name)
+        fit = [name for name in clean if name.rsplit("_seg_", 1)[0] in fit_parents]
+        calibration = [name for name in clean if name.rsplit("_seg_", 1)[0] in calibration_parents]
+        return fit, calibration, {
+            "contract": "CHRONOLOGICAL_PARENT_FLIGHT_TRAIN_FIT_CALIBRATION_R2",
+            "fit_fraction": fit_fraction, "parent_count": len(parents), "fit_parent_count": len(fit_parents),
+            "calibration_parent_count": len(calibration_parents), "fit_segments": len(fit),
+            "calibration_segments": len(calibration), "excluded_test_sha_collisions": collisions,
+            "test_sha_excluded_from_fit_and_calibration": True,
+        }
+
+    @staticmethod
+    def _file_sha(path: Path) -> str:
+        return _sha(path)
 
     def _exists(self, name: str) -> bool:
         if (self.processed / name).is_file():

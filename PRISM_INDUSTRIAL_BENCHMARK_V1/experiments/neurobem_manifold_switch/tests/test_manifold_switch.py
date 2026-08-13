@@ -54,3 +54,20 @@ def test_reid_excludes_current_prediction_target():
     source = (Path(__file__).parents[1] / "rollout.py").read_text(encoding="utf-8")
     assert "history + step - 1" in source
     assert "row history+s is the target about to be predicted" in source
+
+
+def test_r2_excludes_test_sha_from_development():
+    source = (Path(__file__).parents[1] / "data.py").read_text(encoding="utf-8")
+    assert "test_sha_excluded_from_fit_and_calibration" in source
+    assert "excluded_test_sha_collisions" in source
+
+
+def test_r2_keeps_frozen_natural_cubic_w_family():
+    cfg = (Path(__file__).parents[1] / "configs" / "full.yaml").read_text(encoding="utf-8")
+    assert '"w_family": "NATURAL_CUBIC_LATENT"' in cfg
+
+
+def test_trajectory_parallelism_is_ordered():
+    source = (Path(__file__).parents[1] / "run_experiment.py").read_text(encoding="utf-8")
+    assert "executor.map(evaluate_trajectory, trajectories)" in source
+    assert 'cfg["trajectory_workers"]' in source

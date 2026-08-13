@@ -1,5 +1,5 @@
 {
-  "status": "DEVELOPMENT_HYPOTHESIS_NOT_SUPPORTED",
+  "status": "R1_INVALIDATED_R2_NOT_YET_RUN",
   "test_accessed": false,
   "test_used_for_tuning": false,
   "validation_trajectories": 11,
@@ -8,8 +8,10 @@
     "J_KCW": {"static_diverged": 11, "combined_alarms": 1, "positive_lead_trajectories": 0}
   },
   "primary_hypothesis": "t_alarm < t_diverge_static",
-  "decision": "RUN_ONE_FROZEN_FORMAL_TEST_AS_NEGATIVE_RESULT_CONFIRMATION",
+  "decision": "RUN_R2_TRAIN_ONLY_CALIBRATION_THEN_ONE_VALID_FORMAL_TEST",
   "thresholds_changed_after_validation": false,
   "track_2_3_validation_status": "NOT_TRIGGERED_BEFORE_STATIC_DIVERGENCE",
-  "historical_divergence_results_overwritten": false
+  "historical_divergence_results_overwritten": false,
+  "r1_invalidation": "INVALID_TEST_DUPLICATED_IN_CALIBRATION_SET",
+  "r2_change_class": "DATA_CONTRACT_CORRECTION_ONLY_NUMERICAL_THRESHOLDS_UNCHANGED"
 }
