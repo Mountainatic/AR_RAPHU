@@ -1,0 +1,64 @@
+{
+  "common_horizons": [
+    {
+      "common_reliable_horizon_ms": 100,
+      "common_reliable_horizon_steps": 10,
+      "route": "J_KCW",
+      "sampling_rate_hz": 100
+    },
+    {
+      "common_reliable_horizon_ms": 100,
+      "common_reliable_horizon_steps": 20,
+      "route": "J_KCW",
+      "sampling_rate_hz": 200
+    },
+    {
+      "common_reliable_horizon_ms": 100,
+      "common_reliable_horizon_steps": 40,
+      "route": "J_KCW",
+      "sampling_rate_hz": 400
+    },
+    {
+      "common_reliable_horizon_ms": 200,
+      "common_reliable_horizon_steps": 20,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 100
+    },
+    {
+      "common_reliable_horizon_ms": 200,
+      "common_reliable_horizon_steps": 40,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 200
+    },
+    {
+      "common_reliable_horizon_ms": 200,
+      "common_reliable_horizon_steps": 80,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 400
+    }
+  ],
+  "deterministic_replay_performed": true,
+  "existing_logs_sufficient": false,
+  "git_commit": "cf9bf080fcf95364925e87ea71816ce7322ccb6d",
+  "model_retrained": false,
+  "new_test_decision_access": false,
+  "r3_r4_reproduction_gate": {
+    "reproduction_sha256": "5ed56c98eef9ee95c1f6e353268830e56e09af6b1af85eeda98d151f5bea6f0d",
+    "resynchronization_sha256": "f74b743912a3869e514970c48a3017c7af6f20daa3bbeb206879f4ec9c3b56fd",
+    "routes": {
+      "J_KCW": {
+        "divergence_count": 51,
+        "median_t_diverge_steps": 417.0
+      },
+      "PF_KCW": {
+        "divergence_count": 56,
+        "median_t_diverge_steps": 284.5
+      }
+    },
+    "sampling_freeze_r3_flag": true,
+    "status": "PASS"
+  },
+  "status": "COMPLETED_DETERMINISTIC_REPRODUCTION_REPLAY",
+  "test_used_for_tuning": false,
+  "threshold_changed": false
+}

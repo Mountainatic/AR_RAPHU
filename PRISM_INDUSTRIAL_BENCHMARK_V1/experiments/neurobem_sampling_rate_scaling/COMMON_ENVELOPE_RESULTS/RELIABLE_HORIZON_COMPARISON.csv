@@ -1,0 +1,7 @@
+route,sampling_rate_hz,rate_specific_reliable_horizon_steps,rate_specific_reliable_horizon_ms,common_reliable_horizon_ms,common_reliable_horizon_steps
+J_KCW,100,10,100.0,100,10
+PF_KCW,100,20,200.0,200,20
+J_KCW,200,10,50.0,100,20
+PF_KCW,200,20,100.0,200,40
+J_KCW,400,4,10.0,100,40
+PF_KCW,400,20,50.0,200,80

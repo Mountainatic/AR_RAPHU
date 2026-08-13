@@ -231,3 +231,19 @@
 - Records broader increases in crossing frequency without conflating them with
   larger amplitude, since the frozen higher-rate envelopes are narrower.
 - Adds no new threshold, stabilization, model selection, or formal test access.
+
+# PRISM v2.1.1 NeuroBEM common-envelope reliability audit
+
+- Re-evaluates frozen 100/200/400-Hz paths using each route's unchanged 100-Hz
+  R3/R4 calibration bounds as a common envelope.
+- Preserves every original rate-specific bound and reliability result as the
+  formal protocol comparator; no threshold is overwritten or retuned.
+- Replays per-step errors deterministically because prior committed summaries
+  do not retain enough intermediate state for exact crossing/reentry metrics.
+- Under the unchanged nested 90% rule, common-envelope reliable horizons become
+  PF 200/200/200 ms and Joint 100/100/100 ms, versus rate-specific PF
+  200/100/50 ms and Joint 100/50/10 ms.
+- Quantifies 400-Hz bounds at only 24–26% of their 100-Hz values and concludes
+  that envelope normalization explains the prior horizon contraction.
+- Adds no model fitting, PRISM change, stabilization, test tuning, or new formal
+  test decision access.

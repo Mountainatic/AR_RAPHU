@@ -14,7 +14,7 @@ from .composition_consistency import RATE_KEYS, RATES, ROUTES, exact_time_index,
 from .path_excursion import CHANNELS, excursion_metrics, replay_path
 from .resampling import resample_track_b
 from .run_composition_audit import _load_frozen_adapters, audit_frozen_r3_r4_reproduction_gate
-from .run_experiment import atomic_json
+from .run_experiment import _safe, atomic_json
 
 _C={}
 def _sha(p:Path)->str:return sha256(p.read_bytes()).hexdigest()
@@ -74,5 +74,5 @@ def main():
     run=a.output_root/f"{cfg['protocol_id']}_{time.strftime('%Y%m%dT%H%M%S')}";run.mkdir(parents=True)
     detailed.to_csv(run/"COMMON_ENVELOPE_DETAILED.csv",index=False);agg.to_csv(run/"COMMON_ENVELOPE_AGGREGATE.csv",index=False);rel.to_csv(run/"COMMON_RELIABILITY_TRAJECTORIES.csv",index=False);passed.to_csv(run/"COMMON_RELIABILITY_GRID.csv",index=False);pd.DataFrame(horizons).to_csv(run/"COMMON_RELIABLE_HORIZONS.csv",index=False);pd.DataFrame(boundrows).to_csv(run/"BOUND_RATIOS.csv",index=False)
     meta={"status":"COMPLETED_DETERMINISTIC_REPRODUCTION_REPLAY","git_commit":subprocess.check_output(("git","rev-parse","HEAD"),text=True).strip(),"existing_logs_sufficient":False,"deterministic_replay_performed":True,"new_test_decision_access":False,"test_used_for_tuning":False,"model_retrained":False,"threshold_changed":False,"r3_r4_reproduction_gate":gate,"common_horizons":horizons}
-    atomic_json(run/"COMMON_ENVELOPE_SUMMARY.json",meta);print(json.dumps(meta,indent=2))
+    atomic_json(run/"COMMON_ENVELOPE_SUMMARY.json",meta);print(json.dumps(_safe(meta),indent=2))
 if __name__=="__main__":main()
