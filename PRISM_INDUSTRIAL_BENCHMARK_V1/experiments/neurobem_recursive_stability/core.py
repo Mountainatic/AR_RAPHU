@@ -169,6 +169,22 @@ def newest_state_jacobian(
     return matrix
 
 
+def newest_state_block_product(
+    adapter: FrozenPrismAdapter, route: str, history: np.ndarray,
+    controls: np.ndarray, epsilon: float, horizon: int,
+) -> tuple[float, float]:
+    """Finite product of newest-state blocks, not the full augmented Jacobian."""
+    current = history.copy(); product = np.eye(9, dtype=np.float64); used = 0
+    for step in range(horizon):
+        matrix = newest_state_jacobian(adapter, route, current, controls[step:], epsilon)
+        product = matrix @ product; used += 1
+        nxt = adapter.next_state(route, current, controls[step:step + adapter.history])
+        if not np.isfinite(nxt).all(): return float("inf"), float("inf")
+        current = np.vstack((current[1:], nxt))
+    amplification = float(np.linalg.svd(product, compute_uv=False)[0])
+    return amplification, float(np.log(max(amplification, 1e-300)) / used)
+
+
 def block_growth(growth_delta: np.ndarray, epsilon: float) -> dict[str, float]:
     return {
         "velocity": float(np.linalg.norm(growth_delta[:3]) / epsilon),

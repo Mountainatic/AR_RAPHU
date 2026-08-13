@@ -15,6 +15,7 @@
   "perturbation_scale_fractions": [0.00001, 0.0001, 0.001],
   "perturbation_directions": ["velocity_x", "velocity_y", "velocity_z", "attitude_x", "attitude_y", "attitude_z", "body_rate_x", "body_rate_y", "body_rate_z", "random_0", "random_1"],
   "jacobian_scale_indices": [0, 1],
+  "jacobian_product_horizon": 5,
   "expansion_quantile": 0.995,
   "expansion_persistence": 2,
   "reliability_error_quantile": 0.99,

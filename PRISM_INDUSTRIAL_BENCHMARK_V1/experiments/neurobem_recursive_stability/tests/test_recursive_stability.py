@@ -87,3 +87,9 @@ def test_registered_component_routes_are_audited_without_refit():
     assert config["component_routes"] == ["PF_KC", "PF_KCW", "J_KC", "J_KCW"]
     source = (__import__("pathlib").Path(__file__).parents[1] / "run_experiment.py").read_text()
     assert "component_route_attribution.csv" in source
+
+
+def test_jacobian_product_scope_is_not_overclaimed():
+    source = (__import__("pathlib").Path(__file__).parents[1] / "run_experiment.py").read_text()
+    assert "newest_block_product_growth_rate" in source
+    assert "NEWEST_STATE_9X9_BLOCK_NOT_FULL_20_STEP_AUGMENTED_JACOBIAN" in source

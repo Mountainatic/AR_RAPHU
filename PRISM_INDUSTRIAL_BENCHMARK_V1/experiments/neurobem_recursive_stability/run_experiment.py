@@ -18,7 +18,7 @@ from experiments.neurobem_manifold_switch.data import NeuroBEMSource
 from experiments.neurobem_manifold_switch.prism_adapter import FrozenPrismAdapter
 from .core import (
     ABLATION_BLOCKS, direction_vector, effective_delta, frame_arrays,
-    history_at_anchor, newest_state_jacobian, paired_growth_with_channels, rollout,
+    history_at_anchor, newest_state_block_product, newest_state_jacobian, paired_growth_with_channels, rollout,
 )
 
 
@@ -128,9 +128,19 @@ def _task(task: tuple[int, str]):
             fraction = float(cfg["perturbation_scale_fractions"][scale_index])
             epsilon = max(min(c["state_scales"].values()) * fraction, 1e-10)
             matrix = newest_state_jacobian(adapter, route, history, controls, epsilon)
+            product_amplification = None; product_rate = None
+            if scale_index == cfg["jacobian_scale_indices"][0]:
+                product_amplification, product_rate = newest_state_block_product(
+                    adapter, route, history, controls, epsilon,
+                    min(int(cfg["jacobian_product_horizon"]), remaining),
+                )
             jacobians.append({"trajectory_id": item.trajectory_id, "route": route, "anchor_step": anchor,
                 "epsilon_fraction": fraction, "sigma_max_J": float(np.linalg.svd(matrix, compute_uv=False)[0]),
-                "jacobian_frobenius": float(np.linalg.norm(matrix)), "baseline_t_diverge": baseline.t_diverge})
+                "jacobian_frobenius": float(np.linalg.norm(matrix)),
+                "newest_block_product_amplification": product_amplification,
+                "newest_block_product_growth_rate": product_rate,
+                "product_scope": "NEWEST_STATE_9X9_BLOCK_NOT_FULL_20_STEP_AUGMENTED_JACOBIAN",
+                "baseline_t_diverge": baseline.t_diverge})
     return base_row, resync, channels, perturbations, jacobians
 
 
