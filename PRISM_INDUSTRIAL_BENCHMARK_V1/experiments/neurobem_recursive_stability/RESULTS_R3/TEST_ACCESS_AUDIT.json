@@ -1,0 +1,10 @@
+{
+  "calibration_freeze_committed_before_test": true,
+  "formal_test_run": "/root/autodl-tmp/PRISM_V211_NEUROBEM_RECURSIVE_STABILITY_R3_RUNTIME/formal_test/PRISM_V2_1_1_NEUROBEM_RECURSIVE_STABILITY_R3_test_20260813T113855",
+  "generating_commit": "3562d71d183603b5c12332a8bdcb689762f59060",
+  "prism_predictor_modified": false,
+  "stabilization_added": false,
+  "test_access_count": 1,
+  "test_accessed": true,
+  "test_used_for_tuning": false
+}

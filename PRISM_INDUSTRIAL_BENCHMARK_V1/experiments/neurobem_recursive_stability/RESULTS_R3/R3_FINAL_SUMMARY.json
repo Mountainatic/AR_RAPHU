@@ -1,0 +1,95 @@
+{
+  "channel_divergence_rate": {
+    "J_KCW": {
+      "attitude_body_rate": 1.0,
+      "attitude_only": 0.5833333333333334,
+      "body_rate_only": 0.8333333333333334,
+      "full_recursive": 1.0,
+      "velocity_attitude": 0.75,
+      "velocity_only": 0.0
+    },
+    "PF_KCW": {
+      "attitude_body_rate": 1.0,
+      "attitude_only": 0.6666666666666666,
+      "body_rate_only": 0.75,
+      "full_recursive": 1.0,
+      "velocity_attitude": 1.0,
+      "velocity_only": 1.0
+    }
+  },
+  "component_route_divergence_rate": {
+    "J_KC": 1.0,
+    "J_KCW": 1.0,
+    "PF_KC": 1.0,
+    "PF_KCW": 1.0
+  },
+  "expansion_thresholds": {
+    "J_KCW": 3.4091030928583574,
+    "PF_KCW": 37.949649753945955
+  },
+  "experiment_id": "PRISM_V2_1_1_NEUROBEM_R3_RECURSIVE_STABILITY_AUDIT",
+  "formal_lyapunov_claim": false,
+  "generating_commit": "3562d71d183603b5c12332a8bdcb689762f59060",
+  "median_newest_block_product_growth_rate": {
+    "J_KCW": 0.0505622931280096,
+    "PF_KCW": 0.0499564577433532
+  },
+  "median_perturbation_growth_by_epsilon": {
+    "J_KCW": {
+      "1e-05": 1.0406857201150577,
+      "0.0001": 1.0406464037807992,
+      "0.001": 1.0402547197165215
+    },
+    "PF_KCW": {
+      "1e-05": 1.2205307014487325,
+      "0.0001": 1.2205827894162584,
+      "0.001": 1.2206892311078095
+    }
+  },
+  "median_sigma_max_J_by_epsilon": {
+    "J_KCW": {
+      "1e-05": 1.0551660096802529,
+      "0.0001": 1.055166009571849
+    },
+    "PF_KCW": {
+      "1e-05": 1.0553035432539044,
+      "0.0001": 1.0553035414214036
+    }
+  },
+  "position_channel_status": "NOT_APPLICABLE_CHANNEL_NOT_PRESENT",
+  "primary_expansion_hypothesis_supported": false,
+  "prism_predictor_modified": false,
+  "r2_baseline_reproduced": true,
+  "registered_outcomes": [
+    "OUTCOME_B_RESYNCHRONIZATION_HORIZON",
+    "OUTCOME_C_NO_CALIBRATED_EXPANSION_EVENT",
+    "OUTCOME_D_CHANNEL_LOCALIZATION"
+  ],
+  "reliable_open_loop_horizon_seconds_at_100hz": {
+    "J_KCW": 0.1,
+    "PF_KCW": 0.2
+  },
+  "reliable_open_loop_horizon_steps": {
+    "J_KCW": 10,
+    "PF_KCW": 20
+  },
+  "routes": {
+    "J_KCW": {
+      "divergence_count": 12,
+      "median_expansion_lead_time": null,
+      "median_t_diverge": 380.0,
+      "positive_expansion_lead_fraction": 0.0,
+      "trajectory_count": 12
+    },
+    "PF_KCW": {
+      "divergence_count": 12,
+      "median_expansion_lead_time": null,
+      "median_t_diverge": 347.0,
+      "positive_expansion_lead_fraction": 0.0,
+      "trajectory_count": 12
+    }
+  },
+  "status": "COMPLETED",
+  "test_accessed": true,
+  "test_used_for_tuning": false
+}

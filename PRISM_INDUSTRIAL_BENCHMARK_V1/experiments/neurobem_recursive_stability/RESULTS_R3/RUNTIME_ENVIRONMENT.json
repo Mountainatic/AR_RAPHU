@@ -1,0 +1,19 @@
+{
+  "cpu_model": "AMD EPYC 9654 96-Core Processor",
+  "hostname": "autodl-container-418c45acc9-bbcb9702",
+  "logical_cpu_count": 192,
+  "memory_total": "395707264 kB",
+  "mkl_threads_per_worker": 1,
+  "numexpr_threads_per_worker": 1,
+  "numpy": "2.2.6",
+  "omp_threads_per_worker": 1,
+  "openblas_threads_per_worker": 1,
+  "ordered_map": true,
+  "pandas": "2.2.3",
+  "platform": "Linux-5.15.0-86-generic-x86_64-with-glibc2.35",
+  "process_start_method": "fork",
+  "python": "3.10.20",
+  "python_executable": "/root/AR_RAPHU_AUTODL/.venv/bin/python",
+  "runtime_manager": "existing_uv_environment",
+  "trajectory_workers": 24
+}

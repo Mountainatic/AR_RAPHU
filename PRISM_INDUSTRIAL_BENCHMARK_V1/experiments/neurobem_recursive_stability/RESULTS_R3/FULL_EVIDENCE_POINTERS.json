@@ -1,0 +1,22 @@
+{
+  "channel_attribution.csv": {
+    "path": "/root/autodl-tmp/PRISM_V211_NEUROBEM_RECURSIVE_STABILITY_R3_RUNTIME/formal_test/PRISM_V2_1_1_NEUROBEM_RECURSIVE_STABILITY_R3_test_20260813T113855/channel_attribution.csv",
+    "sha256": "a8b832f251fa3bdfe15dd64eaf0c2eb493f3813afe6a14d58143367931ad3b7a",
+    "size_bytes": 14989
+  },
+  "jacobian.csv": {
+    "path": "/root/autodl-tmp/PRISM_V211_NEUROBEM_RECURSIVE_STABILITY_R3_RUNTIME/formal_test/PRISM_V2_1_1_NEUROBEM_RECURSIVE_STABILITY_R3_test_20260813T113855/jacobian.csv",
+    "sha256": "9ff80befdef264d00aac38c4f6d6ee1f78d8bb68681e2631cd594392a98de6ec",
+    "size_bytes": 57728
+  },
+  "perturbation_growth.csv": {
+    "path": "/root/autodl-tmp/PRISM_V211_NEUROBEM_RECURSIVE_STABILITY_R3_RUNTIME/formal_test/PRISM_V2_1_1_NEUROBEM_RECURSIVE_STABILITY_R3_test_20260813T113855/perturbation_growth.csv",
+    "sha256": "2a3041fbd80d735a6791fffe058efaafa66a27cf201e8ce512a18c26839dbfde",
+    "size_bytes": 11239225
+  },
+  "resynchronization.csv": {
+    "path": "/root/autodl-tmp/PRISM_V211_NEUROBEM_RECURSIVE_STABILITY_R3_RUNTIME/formal_test/PRISM_V2_1_1_NEUROBEM_RECURSIVE_STABILITY_R3_test_20260813T113855/resynchronization.csv",
+    "sha256": "80c10eacfed6e643abe837a500ef353c500d66957e23c7f225ba64b1fbab764a",
+    "size_bytes": 23802
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "expansion_thresholds": {
+    "J_KCW": 3.4091030928583574,
+    "PF_KCW": 37.949649753945955
+  },
+  "formal_lyapunov_claim": false,
+  "parallelism": "LINUX_FORK_COW",
+  "r2_baseline_mismatches": [],
+  "r2_baseline_reproduced": true,
+  "reliability_bounds": {
+    "J_KCW": {
+      "attitude": 0.6057670625310627,
+      "body_rate": 3.0477559598461434,
+      "velocity": 0.5527986765084768
+    },
+    "PF_KCW": {
+      "attitude": 0.5407743884950784,
+      "body_rate": 2.821175231757614,
+      "velocity": 2.497894578213217
+    }
+  },
+  "reliable_open_loop_horizon_steps": {
+    "J_KCW": 10,
+    "PF_KCW": 20
+  },
+  "routes": {
+    "J_KCW": {
+      "divergence_count": 51,
+      "median_expansion_lead_time": null,
+      "median_t_diverge": 417.0,
+      "positive_expansion_lead_fraction": 0.0,
+      "trajectory_count": 60
+    },
+    "PF_KCW": {
+      "divergence_count": 56,
+      "median_expansion_lead_time": null,
+      "median_t_diverge": 284.5,
+      "positive_expansion_lead_fraction": 0.0,
+      "trajectory_count": 60
+    }
+  },
+  "stage": "calibration",
+  "status": "COMPLETED",
+  "test_accessed": false,
+  "test_used_for_tuning": false,
+  "workers": 24
+}

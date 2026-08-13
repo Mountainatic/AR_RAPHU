@@ -1,0 +1,95 @@
+{
+  "anchor_stride": 50,
+  "channel_ablations": [
+    "velocity_only",
+    "attitude_only",
+    "body_rate_only",
+    "velocity_attitude",
+    "attitude_body_rate",
+    "full_recursive"
+  ],
+  "component_routes": [
+    "PF_KC",
+    "PF_KCW",
+    "J_KC",
+    "J_KCW"
+  ],
+  "divergence_persistence": 5,
+  "divergence_thresholds": {
+    "attitude": 1.5,
+    "body_rate": 15.0,
+    "velocity": 15.0
+  },
+  "expansion_persistence": 2,
+  "expansion_quantile": 0.995,
+  "history": 20,
+  "jacobian_product_horizon": 5,
+  "jacobian_scale_indices": [
+    0,
+    1
+  ],
+  "max_rollout_steps": 1200,
+  "perturbation_directions": [
+    "velocity_x",
+    "velocity_y",
+    "velocity_z",
+    "attitude_x",
+    "attitude_y",
+    "attitude_z",
+    "body_rate_x",
+    "body_rate_y",
+    "body_rate_z",
+    "random_0",
+    "random_1"
+  ],
+  "perturbation_horizon": 20,
+  "perturbation_scale_fractions": [
+    1e-05,
+    0.0001,
+    0.001
+  ],
+  "position_channel_status": "NOT_APPLICABLE_CHANNEL_NOT_PRESENT",
+  "protocol_id": "PRISM_V2_1_1_NEUROBEM_RECURSIVE_STABILITY_R3",
+  "r2_baseline_median_tolerance_steps": 0.0,
+  "r2_baseline_reference": {
+    "calibration": {
+      "J_KCW": {
+        "divergence_count": 51,
+        "median_t_diverge": 417.0
+      },
+      "PF_KCW": {
+        "divergence_count": 56,
+        "median_t_diverge": 284.5
+      }
+    },
+    "test": {
+      "J_KCW": {
+        "divergence_count": 12,
+        "median_t_diverge": 380.0
+      },
+      "PF_KCW": {
+        "divergence_count": 12,
+        "median_t_diverge": 347.0
+      }
+    }
+  },
+  "reliability_error_multiplier": 5.0,
+  "reliability_error_quantile": 0.99,
+  "reliability_probability_minimum": 0.9,
+  "resync_intervals": [
+    1,
+    5,
+    10,
+    20,
+    50,
+    100,
+    "infinity"
+  ],
+  "routes": [
+    "PF_KCW",
+    "J_KCW"
+  ],
+  "seed": 21103,
+  "test_tuning_prohibited": true,
+  "trajectory_workers": 24
+}

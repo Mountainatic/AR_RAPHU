@@ -1,0 +1,29 @@
+{
+  "adapter_sha256": "41267b8b69f0f1f5ca27bdfbd6aa581612a66717bf63daa0af64678dc580eb23",
+  "calibration_trajectory_count": 60,
+  "config_sha256": "1a99e3146b21fe6a303be44d0eddb14d35899d175d0754c18417cf16f0c75696",
+  "expansion_thresholds": {
+    "J_KCW": 3.4091030928583574,
+    "PF_KCW": 37.949649753945955
+  },
+  "reliability_bounds": {
+    "J_KCW": {
+      "attitude": 0.6057670625310627,
+      "body_rate": 3.0477559598461434,
+      "velocity": 0.5527986765084768
+    },
+    "PF_KCW": {
+      "attitude": 0.5407743884950784,
+      "body_rate": 2.821175231757614,
+      "velocity": 2.497894578213217
+    }
+  },
+  "state_scales": {
+    "attitude": 1.0,
+    "body_rate": 1.6612146025079357,
+    "velocity": 3.4771535278762875
+  },
+  "status": "R3_CALIBRATION_FROZEN",
+  "test_accessed": false,
+  "test_used_for_tuning": false
+}

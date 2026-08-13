@@ -1,0 +1,745 @@
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:145: RuntimeWarning: invalid value encountered in matmul
+  return contract.target_mean + ((x - contract.feature_mean) / contract.feature_scale) @ contract.coefficient_standardized
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/numpy/linalg/_linalg.py:2780: RuntimeWarning: overflow encountered in multiply
+  s = (x.conj() * x).real
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in sin
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:261: RuntimeWarning: invalid value encountered in cos
+  return normalize_quaternion(np.concatenate((np.cos(half), value * scale), axis=-1))
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:246: RuntimeWarning: overflow encountered in power
+  d = np.maximum(x - knot, 0.0) ** 3
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: overflow encountered in power
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:247: RuntimeWarning: invalid value encountered in subtract
+  d -= np.maximum(x - knots[-2], 0.0) ** 3 * (knots[-1] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_linear.py:248: RuntimeWarning: overflow encountered in power
+  d += np.maximum(x - knots[-1], 0.0) ** 3 * (knots[-2] - knot) / (knots[-1] - knots[-2])
+/root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+  scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+{
+  "status": "COMPLETED",
+  "stage": "test",
+  "routes": {
+    "J_KCW": {
+      "divergence_count": 12,
+      "trajectory_count": 12,
+      "median_t_diverge": 380.0,
+      "positive_expansion_lead_fraction": 0.0,
+      "median_expansion_lead_time": null
+    },
+    "PF_KCW": {
+      "divergence_count": 12,
+      "trajectory_count": 12,
+      "median_t_diverge": 347.0,
+      "positive_expansion_lead_fraction": 0.0,
+      "median_expansion_lead_time": null
+    }
+  },
+  "reliable_open_loop_horizon_steps": {
+    "J_KCW": 10,
+    "PF_KCW": 20
+  },
+  "expansion_thresholds": {
+    "J_KCW": 3.4091030928583574,
+    "PF_KCW": 37.949649753945955
+  },
+  "reliability_bounds": {
+    "J_KCW": {
+      "attitude": 0.6057670625310627,
+      "body_rate": 3.0477559598461434,
+      "velocity": 0.5527986765084768
+    },
+    "PF_KCW": {
+      "attitude": 0.5407743884950784,
+      "body_rate": 2.821175231757614,
+      "velocity": 2.497894578213217
+    }
+  },
+  "parallelism": "LINUX_FORK_COW",
+  "workers": 24,
+  "test_accessed": true,
+  "test_used_for_tuning": false,
+  "formal_lyapunov_claim": false,
+  "r2_baseline_reproduced": true,
+  "r2_baseline_mismatches": []
+}

@@ -1,5 +1,27 @@
 # Changelog
 
+## PRISM v2.1.1 NeuroBEM R3 recursive stability audit
+
+- Reproduces the frozen R2 `PF_KCW` and `J_KCW` fully recursive baseline
+  exactly before running any new diagnostic track.
+- Adds calibration-frozen finite-time paired perturbation, newest-state-block
+  numerical Jacobian, periodic state re-synchronization, channel recursion,
+  and existing-component route diagnostics without changing or refitting the
+  PRISM predictor.
+- Uses 24 deterministic Linux fork workers with one BLAS thread per process;
+  parallelism changes throughput only.
+- Finds no registered sustained expansion event before divergence, so the
+  primary expansion-event hypothesis is not supported and no Lyapunov claim
+  is made.
+- Identifies reliable observed-loop horizons of 20 steps for `PF_KCW` and 10
+  steps for `J_KCW` at 100 Hz under calibration-frozen error bounds.
+- Localizes PF instability strongly to recursive velocity feedback and Joint
+  instability to attitude/body-rate feedback. KC-only routes also diverge;
+  W delays but does not eliminate divergence.
+- Does not add clipping, state saturation, spectral constraints, Lyapunov
+  penalties, retraining, or test-driven thresholds. The held-out test is used
+  once after the R3 protocol and calibration evidence are committed.
+
 ## PRISM v2.1.1 NeuroBEM Track B published-evaluator extension
 
 - Added the official decoupled `eval_trajectory` semantics as an evaluation-only
