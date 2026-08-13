@@ -201,3 +201,18 @@
 - Finds a mixed step-count/higher-rate-worse result: reliable physical time
   contracts as sampling rate rises despite improved one-step error.
 - Adds no clipping, stabilization, spectral constraint, or Lyapunov claim.
+
+# PRISM v2.1.1 NeuroBEM composition-consistency audit
+
+- Reuses the frozen 100/200/400-Hz fixed-time adapters without retraining or
+  modifying PRISM core.
+- Compares terminal predictions at shared native-400-Hz physical timestamps
+  over 10, 20, 50, 100, 200, and 500 ms horizons.
+- Reports GT endpoint errors, quaternion-aware channel errors, and direct
+  cross-rate composition defects relative to the frozen 100-Hz map.
+- Confirms one-step MSE improves strictly with sampling rate for both routes,
+  while cross-rate composition defect grows with rate separation and horizon.
+- Retains a mixed conclusion because GT composition-error ordering is not
+  uniformly 400 Hz > 200 Hz > 100 Hz across route and horizon.
+- Keeps the four 164-Hz segments excluded and accesses formal test once only
+  after a clean calibration-freeze commit; no stabilization is introduced.

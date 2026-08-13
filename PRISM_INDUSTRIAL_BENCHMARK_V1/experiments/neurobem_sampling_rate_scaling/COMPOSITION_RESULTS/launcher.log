@@ -1,0 +1,83 @@
+{
+  "anchor_count": 192,
+  "blas_threads_per_worker": 1,
+  "config_sha256": "7d3aadb2f98d6478809e27a803787fd8f7b2e145519fd550e86358b1f1d3bede",
+  "git_commit": "4f7db4d889485d0e67c4921af7b05028ff6cca3e",
+  "model_retrained": false,
+  "overall_decision": "COMPOSITION_CONSISTENCY_MIXED",
+  "prism_core_modified": false,
+  "r3_r4_reproduction_gate": {
+    "reproduction_sha256": "5ed56c98eef9ee95c1f6e353268830e56e09af6b1af85eeda98d151f5bea6f0d",
+    "resynchronization_sha256": "f74b743912a3869e514970c48a3017c7af6f20daa3bbeb206879f4ec9c3b56fd",
+    "routes": {
+      "J_KCW": {
+        "divergence_count": 51,
+        "median_t_diverge_steps": 417.0
+      },
+      "PF_KCW": {
+        "divergence_count": 56,
+        "median_t_diverge_steps": 284.5
+      }
+    },
+    "sampling_freeze_r3_flag": true,
+    "status": "PASS"
+  },
+  "routes": {
+    "J_KCW": {
+      "composition_100ms_class": "COMPOSITION_CONSISTENCY_MIXED",
+      "composition_100ms_gt_full_state_error": {
+        "100": 0.20182682825139792,
+        "200": 0.20288872578572098,
+        "400": 0.19803652487158874
+      },
+      "one_step_mse": {
+        "100": 0.0009425182713866574,
+        "200": 0.0002459259687140791,
+        "400": 6.38060198663689e-05
+      },
+      "one_step_order_supported": true
+    },
+    "PF_KCW": {
+      "composition_100ms_class": "COMPOSITION_CONSISTENCY_FAILURE_NOT_SUPPORTED",
+      "composition_100ms_gt_full_state_error": {
+        "100": 0.3478851432556035,
+        "200": 0.3456066483118214,
+        "400": 0.34038403177434967
+      },
+      "one_step_mse": {
+        "100": 0.0015283988376601262,
+        "200": 0.00038843254615493266,
+        "400": 9.945511521708205e-05
+      },
+      "one_step_order_supported": true
+    }
+  },
+  "sampling_freeze_sha256": "1d62b7ac8017ea1e3078d9bb1eff07d28ead1e5438b3e45ee08924174fcd2917",
+  "split_audit": {
+    "calibration_parent_count": 23,
+    "calibration_segments": 60,
+    "contract": "CHRONOLOGICAL_PARENT_FLIGHT_TRAIN_FIT_CALIBRATION_R2_NO_TEST_READ",
+    "excluded_non400hz_train_names": [
+      "merged_2021-02-18-16-43-54_seg_1.csv",
+      "merged_2021-02-18-16-43-54_seg_2.csv",
+      "merged_2021-02-18-16-43-54_seg_3.csv",
+      "merged_2021-02-18-16-43-54_seg_4.csv"
+    ],
+    "excluded_train_test_duplicate_names": [
+      "merged_2021-02-23-22-26-25_seg_2.csv"
+    ],
+    "fit_fraction": 0.75,
+    "fit_parent_count": 69,
+    "fit_segments": 171,
+    "parent_count": 92,
+    "sampling_scaling_fit_support": "COMMON_NATIVE_400HZ_TRAIN_SUPPORT_EXCLUDING_164HZ_FLIGHT",
+    "test_trajectory_opened": false
+  },
+  "stabilization_added": false,
+  "stage": "test",
+  "status": "COMPLETED",
+  "test_accessed": true,
+  "test_used_for_tuning": false,
+  "trajectory_count": 12,
+  "workers": 24
+}
