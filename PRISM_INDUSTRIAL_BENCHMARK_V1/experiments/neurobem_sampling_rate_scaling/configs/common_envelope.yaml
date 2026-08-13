@@ -1,0 +1,18 @@
+{
+  "protocol_id": "PRISM_V2_1_1_NEUROBEM_COMMON_ENVELOPE_RELIABILITY_AUDIT_R1",
+  "execution_mode": "DETERMINISTIC_REPRODUCTION_REPLAY_EXISTING_FORMAL_TEST",
+  "common_envelope_source": "HZ100_H20_FROZEN_RATE_SPECIFIC_CALIBRATION_BOUNDS",
+  "physical_horizons_ms": [10, 20, 50, 100, 200, 500],
+  "reliability_candidate_ms": [10, 50, 100, 200, 500, 1000],
+  "reliability_probability_minimum": 0.90,
+  "rollout_duration_seconds": 12.0,
+  "history_duration_ms": 200,
+  "anchor_spacing_ms": 500,
+  "maximum_anchors_per_trajectory": 16,
+  "workers": 24,
+  "model_retraining": false,
+  "threshold_changed": false,
+  "test_tuning": false,
+  "prism_core_modified": false,
+  "stabilization_added": false
+}
