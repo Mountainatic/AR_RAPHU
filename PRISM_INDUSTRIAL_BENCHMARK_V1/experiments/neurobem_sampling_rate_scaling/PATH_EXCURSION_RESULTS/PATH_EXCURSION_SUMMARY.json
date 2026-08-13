@@ -1,0 +1,120 @@
+{
+  "composition_summary_sha256": "b85a511d0ddc87f0ad095f86abf3a3564b5baf322bdf2bd9dc7a76240d9f0bb6",
+  "config_sha256": "6e94d07ff3c0677869c6411670b80958cbc75c058d1f34461db592caa2b7f635",
+  "deterministic_replay_performed": true,
+  "existing_logs_sufficient": false,
+  "git_commit": "cbf4157b475429ed9e329437f1862704e647118d",
+  "model_retrained": false,
+  "new_test_decision_access": false,
+  "overall_decision": "HIGHER_RATE_TRANSIENT_PATH_EXCURSION_MIXED",
+  "prism_core_modified": false,
+  "r3_r4_reproduction_gate": {
+    "reproduction_sha256": "5ed56c98eef9ee95c1f6e353268830e56e09af6b1af85eeda98d151f5bea6f0d",
+    "resynchronization_sha256": "f74b743912a3869e514970c48a3017c7af6f20daa3bbeb206879f4ec9c3b56fd",
+    "routes": {
+      "J_KCW": {
+        "divergence_count": 51,
+        "median_t_diverge_steps": 417.0
+      },
+      "PF_KCW": {
+        "divergence_count": 56,
+        "median_t_diverge_steps": 284.5
+      }
+    },
+    "sampling_freeze_r3_flag": true,
+    "status": "PASS"
+  },
+  "registered_evidence": [
+    {
+      "channel": "velocity",
+      "crossing_rate_difference_400_minus_100": 0.20833333333333334,
+      "emax_400_over_100": 0.9281837401746652,
+      "horizon_ms": 100,
+      "max_path": {
+        "100": 0.24626329389069007,
+        "200": 0.2359750573458298,
+        "400": 0.22857758519119348
+      },
+      "max_path_class": "HIGHER_RATE_TRANSIENT_PATH_EXCURSION_NOT_SUPPORTED",
+      "rms_400_over_100": 0.9195365019291062,
+      "route": "PF_KCW"
+    },
+    {
+      "channel": "velocity",
+      "crossing_rate_difference_400_minus_100": 0.35416666666666663,
+      "emax_400_over_100": 1.0023471660758305,
+      "horizon_ms": 200,
+      "max_path": {
+        "100": 0.46021234591105153,
+        "200": 0.4508959697166939,
+        "400": 0.46129254071705234
+      },
+      "max_path_class": "HIGHER_RATE_TRANSIENT_PATH_EXCURSION_NOT_SUPPORTED",
+      "rms_400_over_100": 1.0097211802993107,
+      "route": "PF_KCW"
+    },
+    {
+      "channel": "attitude",
+      "crossing_rate_difference_400_minus_100": 0.18229166666666669,
+      "emax_400_over_100": 1.0419075176549433,
+      "horizon_ms": 100,
+      "max_path": {
+        "100": 0.046284606869243385,
+        "200": 0.04664468364544218,
+        "400": 0.048224279848768314
+      },
+      "max_path_class": "HIGHER_RATE_TRANSIENT_PATH_EXCURSION_SUPPORTED",
+      "rms_400_over_100": 1.010849460820044,
+      "route": "J_KCW"
+    },
+    {
+      "channel": "attitude",
+      "crossing_rate_difference_400_minus_100": 0.3333333333333333,
+      "emax_400_over_100": 1.0705089300930377,
+      "horizon_ms": 200,
+      "max_path": {
+        "100": 0.09690069436422437,
+        "200": 0.10065860002776772,
+        "400": 0.10373305864911828
+      },
+      "max_path_class": "HIGHER_RATE_TRANSIENT_PATH_EXCURSION_SUPPORTED",
+      "rms_400_over_100": 1.002643606699043,
+      "route": "J_KCW"
+    },
+    {
+      "channel": "body_rate",
+      "crossing_rate_difference_400_minus_100": 0.046875,
+      "emax_400_over_100": 0.9403686288707753,
+      "horizon_ms": 100,
+      "max_path": {
+        "100": 0.1765455136223553,
+        "200": 0.1646581313792626,
+        "400": 0.16601786257834103
+      },
+      "max_path_class": "HIGHER_RATE_TRANSIENT_PATH_EXCURSION_NOT_SUPPORTED",
+      "rms_400_over_100": 0.8998067029540133,
+      "route": "J_KCW"
+    },
+    {
+      "channel": "body_rate",
+      "crossing_rate_difference_400_minus_100": 0.25,
+      "emax_400_over_100": 1.022485211171893,
+      "horizon_ms": 200,
+      "max_path": {
+        "100": 0.31813736010146887,
+        "200": 0.3257314964487895,
+        "400": 0.32529074582501893
+      },
+      "max_path_class": "HIGHER_RATE_TRANSIENT_PATH_EXCURSION_MIXED",
+      "rms_400_over_100": 0.969191800573529,
+      "route": "J_KCW"
+    }
+  ],
+  "sampling_freeze_sha256": "1d62b7ac8017ea1e3078d9bb1eff07d28ead1e5438b3e45ee08924174fcd2917",
+  "stabilization_added": false,
+  "status": "COMPLETED_DETERMINISTIC_REPRODUCTION_REPLAY",
+  "test_used_for_tuning": false,
+  "threshold_changed": false,
+  "trajectory_count": 12,
+  "workers": 24
+}

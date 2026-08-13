@@ -216,3 +216,18 @@
   uniformly 400 Hz > 200 Hz > 100 Hz across route and horizon.
 - Keeps the four 164-Hz segments excluded and accesses formal test once only
   after a clean calibration-freeze commit; no stabilization is introduced.
+
+# PRISM v2.1.1 NeuroBEM trajectory path-excursion diagnostic
+
+- Deterministically replays the already accessed composition test because its
+  endpoint-only logs do not retain intermediate recursive states.
+- Reuses the frozen models, anchors, sampling operators, test identities, and
+  rate-specific R3/R4 calibration envelopes without retraining or retuning.
+- Reports terminal, maximum, RMS, q90 maximum, first crossing, crossing/reentry
+  counts, and fraction inside for registered physical windows through 500 ms.
+- Finds mixed evidence: Joint attitude maximum excursion increases strictly
+  with rate at 100/200 ms, while PF velocity and Joint body-rate do not show a
+  uniform higher-rate maximum-excursion ordering.
+- Records broader increases in crossing frequency without conflating them with
+  larger amplitude, since the frozen higher-rate envelopes are narrower.
+- Adds no new threshold, stabilization, model selection, or formal test access.

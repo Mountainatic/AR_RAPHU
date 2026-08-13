@@ -1,0 +1,37 @@
+........................................................................ [ 48%]
+........................................................................ [ 96%]
+......                                                                   [100%]
+=============================== warnings summary ===============================
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:64
+  /root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'
+    prop = Group((name + Suppress("=") + comma_separated(value)) | oneOf(_CONSTANTS))
+
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:85
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:85
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:85
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:85
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:85
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:85
+  /root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'
+    parse = parser.parseString(pattern)
+
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:89
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:89
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:89
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:89
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:89
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:89
+  /root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'
+    parser.resetCache()
+
+../../../AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_mathtext.py:45
+  /root/AR_RAPHU_AUTODL/.venv/lib/python3.10/site-packages/matplotlib/_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_neurobem_exact_training.py::test_training_attitude_unroll_injects_gt_velocity
+PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_neurobem_exact_training.py::test_training_attitude_unroll_injects_gt_angular_rate
+  /root/autodl-tmp/PRISM_V211_NEUROBEM_MANIFOLD_SWITCH_R1/PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/neurobem_literature.py:260: RuntimeWarning: invalid value encountered in divide
+    scale = np.where(angle > 1e-14, np.sin(half) / angle, 0.5)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+150 passed, 16 warnings in 1.14s
