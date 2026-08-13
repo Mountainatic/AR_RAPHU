@@ -1,0 +1,41 @@
+{
+  "config": "experiments/neurobem_manifold_switch/configs/full.yaml",
+  "config_sha256": "d73a9c80ef246791b83711804fc57534c9f403001fbbfc5e607b3f437da96b75",
+  "dataset": {
+    "all_frozen_identities_present": true,
+    "entity_isolation": "ONE_CSV_ONE_TRAJECTORY_NO_CROSS_BOUNDARY_HISTORY",
+    "missing": {
+      "test": [],
+      "train": [],
+      "validation": []
+    },
+    "paper_counts": {
+      "test": 12,
+      "train": 67,
+      "validation": 17
+    },
+    "processed_root": "/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/data/private/neurobem/extracted/processed_data",
+    "release_count_discrepancy_retained": true,
+    "release_counts": {
+      "test": 12,
+      "train": 236,
+      "validation": 11
+    },
+    "split_manifest": "/root/autodl-tmp/PRISM_V211_NEUROBEM_MIMO/PRISM_INDUSTRIAL_BENCHMARK_V1/results_prism_v2_1_1_neurobem_exact_published_training/TRACK_B_SPLIT_MANIFEST.json",
+    "split_manifest_sha256": "b609413295bde19c925634ca9b9ece19ad02e7f739939ab7ac51b906226881c5"
+  },
+  "device": "cpu",
+  "git_commit": "0775fa819957db9679f5fbcfb3f97f9cc7b32107",
+  "hostname": "autodl-container-418c45acc9-bbcb9702",
+  "numpy": "2.2.6",
+  "pandas": "2.2.3",
+  "parent_global_contracts": "/root/autodl-tmp/PRISM_V211_NEUROBEM_LITERATURE_RUNTIME/PRISM_V2_1_1_NEUROBEM_LITERATURE_ALIGNED_DUAL_BENCHMARK_RESULTS_bundle/RESULTS/results_prism_v2_1_1_neurobem_literature_aligned_dual/FREEZE/TRACK_B_CONTRACTS.json",
+  "parent_global_contracts_sha256": "702963238fa38fc048df0eee6b679ee7c326c8a120717f65b461bd812bf0ece9",
+  "partition": "test",
+  "platform": "Linux-5.15.0-86-generic-x86_64-with-glibc2.35",
+  "prism_core_modified": false,
+  "python": "3.10.20 (main, Jul 18 2026, 17:02:35) [Clang 22.1.3 ]",
+  "r2_global_contract_refitted_from_train_only": true,
+  "seed": 21101,
+  "test_tuning_prohibited": true
+}

@@ -1,0 +1,13 @@
+route,ablation,trajectories,divergence_rate,alarm_rate,positive_lead_fraction,median_lead_time,mean_velocity_error,mean_attitude_error,static_divergence_rate,divergence_avoided_count,false_alarm_total,false_switch_total,new_models_created
+J_KCW,combined,12,1.0,0.0,0.0,,3.363552969188622e+147,1.0655668196409849,1.0,0,0,0,0
+J_KCW,combined_switch,12,1.0,0.0,0.0,,3.363552969188622e+147,1.0655668196409849,1.0,0,0,0,0
+J_KCW,combined_switch_reid,12,1.0,0.0,0.0,,3.363552969188622e+147,1.0655668196409849,1.0,0,0,0,0
+J_KCW,geometry_only,12,1.0,0.0,0.0,,3.363552969188622e+147,1.0655668196409849,1.0,0,0,0,0
+J_KCW,residual_only,12,1.0,0.0,0.0,,3.363552969188622e+147,1.0655668196409849,1.0,0,0,0,0
+J_KCW,static,12,1.0,0.0,0.0,,3.363552969188622e+147,1.0655668196409849,1.0,0,0,0,0
+PF_KCW,combined,12,1.0,0.0,0.0,,3.3171872763215654e+132,0.748080322642509,1.0,0,0,0,0
+PF_KCW,combined_switch,12,1.0,0.0,0.0,,3.3171872763215654e+132,0.748080322642509,1.0,0,0,0,0
+PF_KCW,combined_switch_reid,12,1.0,0.0,0.0,,3.3171872763215654e+132,0.748080322642509,1.0,0,0,0,0
+PF_KCW,geometry_only,12,1.0,0.0,0.0,,3.3171872763215654e+132,0.748080322642509,1.0,0,0,0,0
+PF_KCW,residual_only,12,1.0,0.0,0.0,,3.3171872763215654e+132,0.748080322642509,1.0,0,0,0,0
+PF_KCW,static,12,1.0,0.0,0.0,,3.3171872763215654e+132,0.748080322642509,1.0,0,0,0,0

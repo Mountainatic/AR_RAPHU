@@ -1,0 +1,50 @@
+{
+  "calibration_trajectories": 60,
+  "data_contract": "CHRONOLOGICAL_PARENT_FLIGHT_TRAIN_FIT_CALIBRATION_R2",
+  "diagnosis": "RECURSIVE_PREDICTOR_INSTABILITY_NOT_CAUSALLY_PRECEDED_BY_REGISTERED_MANIFOLD_MONITOR",
+  "experiment_id": "PRISM_V2_1_1_NEUROBEM_MANIFOLD_SWITCH_R2",
+  "formal_test_trajectories": 12,
+  "generating_commit": "0775fa819957db9679f5fbcfb3f97f9cc7b32107",
+  "historical_divergence_results_retained": true,
+  "hypothesis": "t_alarm < t_diverge_static",
+  "hypothesis_supported": false,
+  "inter_manifold_transition_established": false,
+  "known_switches": 0,
+  "new_models_created": 0,
+  "parallelism": {
+    "blas_threads_per_worker": 1,
+    "method": "LINUX_FORK_COW",
+    "workers": 24
+  },
+  "r1_status": "INVALID_CALIBRATION_TEST_CONTENT_OVERLAP_RETAINED_AS_AUDIT",
+  "routes": {
+    "J_KCW": {
+      "median_first_divergence_step": 380.0,
+      "static_divergence_count": 12,
+      "static_divergence_rate": 1.0,
+      "test_alarm_count": 0
+    },
+    "PF_KCW": {
+      "median_first_divergence_step": 347.0,
+      "static_divergence_count": 12,
+      "static_divergence_rate": 1.0,
+      "test_alarm_count": 0
+    }
+  },
+  "status": "COMPLETED_NEGATIVE_RESULT",
+  "test_accessed": true,
+  "test_used_for_tuning": false,
+  "threshold_sensitivity_divergence_rate": {
+    "J_KCW": {
+      "0.8": 1.0,
+      "1.0": 1.0,
+      "1.2": 1.0
+    },
+    "PF_KCW": {
+      "0.8": 1.0,
+      "1.0": 1.0,
+      "1.2": 1.0
+    }
+  },
+  "universal_ood_claim": false
+}

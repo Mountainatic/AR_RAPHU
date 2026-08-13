@@ -1,0 +1,17 @@
+{
+  "calibration_parent_count": 23,
+  "calibration_segments": 60,
+  "contract": "CHRONOLOGICAL_PARENT_FLIGHT_TRAIN_FIT_CALIBRATION_R2",
+  "excluded_test_sha_collisions": [
+    {
+      "sha256": "afc5ab9021ad12ab216d1f98e59b79265e295dc06349d9d37a6723d568e612dd",
+      "test": "random_points.csv",
+      "train": "merged_2021-02-23-22-26-25_seg_2.csv"
+    }
+  ],
+  "fit_fraction": 0.75,
+  "fit_parent_count": 69,
+  "fit_segments": 175,
+  "parent_count": 92,
+  "test_sha_excluded_from_fit_and_calibration": true
+}
