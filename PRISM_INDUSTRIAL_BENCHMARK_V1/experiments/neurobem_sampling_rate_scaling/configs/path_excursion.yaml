@@ -1,0 +1,22 @@
+{
+  "protocol_id": "PRISM_V2_1_1_NEUROBEM_TRAJECTORY_PATH_EXCURSION_DIAGNOSTIC_R1",
+  "source_experiment": "PRISM_V2_1_1_NEUROBEM_COMPOSITION_CONSISTENCY_AUDIT_R1",
+  "execution_mode": "DETERMINISTIC_REPRODUCTION_REPLAY_EXISTING_FORMAL_TEST",
+  "sampling_rates_hz": [100, 200, 400],
+  "fixed_time_adapter_keys": {"100": "hz100_h20", "200": "hz200_h40", "400": "hz400_h80"},
+  "physical_horizons_ms": [10, 20, 50, 100, 200, 500],
+  "anchor_contract": "EXACT_COMPOSITION_AUDIT_ANCHORS_500MS_GRID_MAX16_PER_TRAJECTORY",
+  "history_duration_ms": 200,
+  "anchor_spacing_ms": 500,
+  "maximum_anchors_per_trajectory": 16,
+  "routes": ["PF_KCW", "J_KCW"],
+  "channels": ["full_state", "velocity", "attitude", "body_rate"],
+  "envelope_source": "FROZEN_SAMPLING_RATE_CALIBRATION_RELIABILITY_BOUNDS_UNCHANGED",
+  "aggregate": "MEDIAN_OVER_TRAJECTORY_ANCHORS_WITH_Q90_MAX_PATH",
+  "workers": 24,
+  "model_retraining": false,
+  "new_threshold": false,
+  "prism_core_modified": false,
+  "stabilization_added": false,
+  "test_selection_or_tuning": false
+}
