@@ -26,24 +26,24 @@ from .rollout import evaluate
 _WORKER_CONTEXT = {}
 
 
-def _evaluate_trajectory_index(index: int):
+def _evaluate_trajectory_route(task: tuple[int, str]):
     context = _WORKER_CONTEXT
+    index, route = task
     trajectory = context["trajectories"][index]
     values = []
-    for route in context["cfg"]["routes"]:
-        for ablation in context["cfg"]["ablations"]:
-            key = f"{trajectory.trajectory_id}|{route}|{ablation}"
-            result_path = context["run"] / "trajectories" / (key.replace("|", "__") + ".json")
-            if key in context["completed"] and result_path.exists():
-                values.append((key, result_path, json.loads(result_path.read_text()), None))
-                continue
-            local_bank = ModelBank(list(context["bank"].entries))
-            result, log = evaluate(
-                trajectory.frame, route, context["global_adapter"], context["template"],
-                local_bank, context["calibration"], context["cfg"], ablation,
-            )
-            result["trajectory"] = trajectory.trajectory_id
-            values.append((key, result_path, result, log))
+    for ablation in context["cfg"]["ablations"]:
+        key = f"{trajectory.trajectory_id}|{route}|{ablation}"
+        result_path = context["run"] / "trajectories" / (key.replace("|", "__") + ".json")
+        if key in context["completed"] and result_path.exists():
+            values.append((key, result_path, json.loads(result_path.read_text()), None))
+            continue
+        local_bank = ModelBank(list(context["bank"].entries))
+        result, log = evaluate(
+            trajectory.frame, route, context["global_adapter"], context["template"],
+            local_bank, context["calibration"], context["cfg"], ablation,
+        )
+        result["trajectory"] = trajectory.trajectory_id
+        values.append((key, result_path, result, log))
     return values
 
 
@@ -185,18 +185,19 @@ def main(argv=None) -> None:
         trajectories = source.load("train", calibration_names)
     else:
         trajectories = source.load("test")
-    workers = max(1, min(int(cfg["trajectory_workers"]), len(trajectories)))
+    tasks = [(index, route) for index in range(len(trajectories)) for route in cfg["routes"]]
+    workers = max(1, min(int(cfg["trajectory_workers"]), len(tasks)))
     global _WORKER_CONTEXT
     _WORKER_CONTEXT = {"trajectories": trajectories, "cfg": cfg, "run": run, "completed": completed,
         "bank": bank, "global_adapter": global_adapter, "template": template, "calibration": calibration}
     multiprocessing_start = "serial"
     if workers == 1:
-        evaluated = map(_evaluate_trajectory_index, range(len(trajectories)))
+        evaluated = map(_evaluate_trajectory_route, tasks)
     else:
         if "fork" not in mp.get_all_start_methods():
             raise RuntimeError("NEUROBEM_PROCESS_PARALLELISM_REQUIRES_LINUX_FORK")
         pool = mp.get_context("fork").Pool(processes=workers)
-        evaluated = pool.imap(_evaluate_trajectory_index, range(len(trajectories)), chunksize=1)
+        evaluated = pool.imap(_evaluate_trajectory_route, tasks, chunksize=1)
         multiprocessing_start = "fork_cow"
     try:
         for trajectory_values in evaluated:
