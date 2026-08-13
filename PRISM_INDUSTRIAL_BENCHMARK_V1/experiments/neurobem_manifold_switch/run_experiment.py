@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor
+import multiprocessing as mp
 from hashlib import sha256
 import json
 import os
@@ -21,6 +21,30 @@ from .model_bank import BankEntry, ModelBank
 from .monitor import ManifoldTemplate, calibrate, component_scores, residual_score
 from .prism_adapter import FrozenPrismAdapter, fit_local_adapter, geometry_features
 from .rollout import evaluate
+
+
+_WORKER_CONTEXT = {}
+
+
+def _evaluate_trajectory_index(index: int):
+    context = _WORKER_CONTEXT
+    trajectory = context["trajectories"][index]
+    values = []
+    for route in context["cfg"]["routes"]:
+        for ablation in context["cfg"]["ablations"]:
+            key = f"{trajectory.trajectory_id}|{route}|{ablation}"
+            result_path = context["run"] / "trajectories" / (key.replace("|", "__") + ".json")
+            if key in context["completed"] and result_path.exists():
+                values.append((key, result_path, json.loads(result_path.read_text()), None))
+                continue
+            local_bank = ModelBank(list(context["bank"].entries))
+            result, log = evaluate(
+                trajectory.frame, route, context["global_adapter"], context["template"],
+                local_bank, context["calibration"], context["cfg"], ablation,
+            )
+            result["trajectory"] = trajectory.trajectory_id
+            values.append((key, result_path, result, log))
+    return values
 
 
 def load_config(path: Path) -> dict:
@@ -148,30 +172,31 @@ def main(argv=None) -> None:
         trajectories = source.load("train", calibration_names)
     else:
         trajectories = source.load("test")
-    def evaluate_trajectory(trajectory):
-        values = []
-        for route in cfg["routes"]:
-            for ablation in cfg["ablations"]:
-                key = f"{trajectory.trajectory_id}|{route}|{ablation}"
-                result_path = run / "trajectories" / (key.replace("|", "__") + ".json")
-                if key in completed and result_path.exists():
-                    values.append((key, result_path, json.loads(result_path.read_text()), None))
-                    continue
-                local_bank = ModelBank(list(bank.entries))
-                result, log = evaluate(trajectory.frame, route, global_adapter, template, local_bank, calibration, cfg, ablation)
-                result["trajectory"] = trajectory.trajectory_id
-                values.append((key, result_path, result, log))
-        return values
-
     workers = max(1, min(int(cfg["trajectory_workers"]), len(trajectories)))
-    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="neurobem-trajectory") as executor:
-        for trajectory_values in executor.map(evaluate_trajectory, trajectories):
+    global _WORKER_CONTEXT
+    _WORKER_CONTEXT = {"trajectories": trajectories, "cfg": cfg, "run": run, "completed": completed,
+        "bank": bank, "global_adapter": global_adapter, "template": template, "calibration": calibration}
+    multiprocessing_start = "serial"
+    if workers == 1:
+        evaluated = map(_evaluate_trajectory_index, range(len(trajectories)))
+    else:
+        if "fork" not in mp.get_all_start_methods():
+            raise RuntimeError("NEUROBEM_PROCESS_PARALLELISM_REQUIRES_LINUX_FORK")
+        pool = mp.get_context("fork").Pool(processes=workers)
+        evaluated = pool.imap(_evaluate_trajectory_index, range(len(trajectories)), chunksize=1)
+        multiprocessing_start = "fork_cow"
+    try:
+        for trajectory_values in evaluated:
             for key, result_path, result, log in trajectory_values:
                 if log is not None:
                     atomic_json(result_path, result); log.to_csv(result_path.with_suffix(".csv"), index=False)
                     if result["ablation"] in {"static", "combined_switch_reid"}: plot_log(run / "figures" / (result_path.stem + ".png"), log, result)
                     completed.add(key); atomic_json(completed_path, {"keys": sorted(completed)})
                 rows.append(result)
+    finally:
+        if workers > 1:
+            pool.close(); pool.join()
+    _WORKER_CONTEXT = {}
     table = pd.DataFrame(rows)
     static_map = {(row.trajectory, row.route): row.t_diverge for row in table.itertuples() if row.ablation == "static"}
     table["t_diverge_static"] = [static_map[(row.trajectory, row.route)] for row in table.itertuples()]
@@ -189,7 +214,8 @@ def main(argv=None) -> None:
             "false_alarm_total": int(((part.t_alarm.notna()) & ~part.static_diverged).sum()), "false_switch_total": int(((part.t_switch.notna()) & ~part.static_diverged).sum()), "new_models_created": int(part.new_models_created.sum())})
     summary = {"status": "COMPLETED", "partition": args.partition, "trajectory_count": len(trajectories), "rows": aggregate,
         "hypothesis": "t_alarm < t_diverge_static", "test_accessed": args.partition == "test", "test_used_for_tuning": False,
-        "historical_exact_training_divergence_retained": True, "r2_data_contract": split_audit, "run_dir": str(run)}
+        "historical_exact_training_divergence_retained": True, "r2_data_contract": split_audit, "run_dir": str(run),
+        "trajectory_workers": workers, "parallelism": multiprocessing_start, "blas_threads_per_worker": 1}
     atomic_json(run / "summary.json", summary); pd.DataFrame(aggregate).to_csv(run / "ablation_summary.csv", index=False)
     print(json.dumps(summary, indent=2))
 

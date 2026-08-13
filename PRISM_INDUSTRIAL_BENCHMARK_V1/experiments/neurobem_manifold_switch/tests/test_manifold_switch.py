@@ -67,7 +67,8 @@ def test_r2_keeps_frozen_natural_cubic_w_family():
     assert '"w_family": "NATURAL_CUBIC_LATENT"' in cfg
 
 
-def test_trajectory_parallelism_is_ordered():
+def test_trajectory_parallelism_is_ordered_fork_cow():
     source = (Path(__file__).parents[1] / "run_experiment.py").read_text(encoding="utf-8")
-    assert "executor.map(evaluate_trajectory, trajectories)" in source
+    assert 'mp.get_context("fork").Pool' in source
+    assert "pool.imap(_evaluate_trajectory_index" in source
     assert 'cfg["trajectory_workers"]' in source

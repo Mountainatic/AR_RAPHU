@@ -6,7 +6,7 @@
   "w_family": "NATURAL_CUBIC_LATENT",
   "ablations": ["static", "residual_only", "geometry_only", "combined", "combined_switch", "combined_switch_reid"],
   "max_rollout_steps": 1200,
-  "trajectory_workers": 8,
+  "trajectory_workers": 24,
   "monitor_quantile": 0.995,
   "alarm_persistence": 3,
   "geometry_rank": 6,
