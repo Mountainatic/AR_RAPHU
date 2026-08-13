@@ -83,7 +83,9 @@ def split_train_without_test_reads(source: NeuroBEMSource, cfg: dict) -> tuple[l
     parents = sorted({name.rsplit("_seg_", 1)[0] for name in names})
     cut = int(math.ceil(len(parents) * float(cfg["train_parent_fit_fraction"])))
     fit_parents, calibration_parents = set(parents[:cut]), set(parents[cut:])
-    excluded = set(cfg["excluded_train_test_duplicate_names"])
+    duplicate_excluded = set(cfg["excluded_train_test_duplicate_names"])
+    non400_excluded = set(cfg["excluded_non400hz_train_names"])
+    excluded = duplicate_excluded | non400_excluded
     clean = [name for name in names if name not in excluded]
     if len(clean) + len(excluded) != len(names) or not excluded.issubset(names):
         raise RuntimeError("FROZEN_TRAIN_DUPLICATE_EXCLUSION_MISMATCH")
@@ -97,10 +99,12 @@ def split_train_without_test_reads(source: NeuroBEMSource, cfg: dict) -> tuple[l
         "calibration_parent_count": len(calibration_parents),
         "fit_segments": len(fit),
         "calibration_segments": len(calibration),
-        "excluded_train_names": sorted(excluded),
+        "excluded_train_test_duplicate_names": sorted(duplicate_excluded),
+        "excluded_non400hz_train_names": sorted(non400_excluded),
+        "sampling_scaling_fit_support": cfg["sampling_scaling_fit_support"],
         "test_trajectory_opened": False,
     }
-    if (len(fit), len(calibration)) != (175, 60):
+    if (len(fit), len(calibration)) != (171, 60):
         raise RuntimeError("R2_TRAIN_CALIBRATION_SUPPORT_COUNT_MISMATCH")
     return fit, calibration, audit
 
@@ -156,23 +160,12 @@ def _fit_condition(payload: tuple[dict, str, str, str, str, str]) -> dict[str, o
     }
 
 
-def fit_rate_adapters(args, cfg: dict, run: Path, frozen_100hz: Path) -> dict[str, dict[str, object]]:
+def fit_rate_adapters(args, cfg: dict, run: Path) -> dict[str, dict[str, object]]:
     adapter_dir = run / "rate_adapters"
     adapter_dir.mkdir(exist_ok=True)
     conditions = unique_evaluation_conditions()
-    hz100 = next(value for value in conditions if value.evaluation_key == "hz100_h20")
-    output: dict[str, dict[str, object]] = {
-        hz100.evaluation_key: {
-            "evaluation_key": hz100.evaluation_key,
-            "sampling_rate_hz": 100,
-            "history_steps": 20,
-            "adapter_path": str(frozen_100hz),
-            "adapter_sha256": _sha(frozen_100hz),
-            "source": "FROZEN_R2_R3_ADAPTER",
-            "test_accessed": False,
-        }
-    }
-    pending = [value for value in conditions if value.evaluation_key != "hz100_h20"]
+    output: dict[str, dict[str, object]] = {}
+    pending = conditions
     payloads = [
         (
             cfg,
@@ -437,13 +430,15 @@ def main(argv=None) -> None:
     run = args.output_root / f"{cfg['protocol_id']}_{args.stage}_{time.strftime('%Y%m%dT%H%M%S')}"
     run.mkdir(parents=True)
     if args.stage == "calibration":
-        adapter_manifest = fit_rate_adapters(args, cfg, run, args.frozen_100hz_adapter)
+        adapter_manifest = fit_rate_adapters(args, cfg, run)
     else:
         if args.calibration_freeze is None:
             raise ValueError("TEST_REQUIRES_RATE_CALIBRATION_FREEZE")
         freeze = json.loads(args.calibration_freeze.read_text())
         if freeze["config_sha256"] != _sha(args.config):
             raise RuntimeError("RATE_CONFIG_HASH_MISMATCH")
+        if freeze["track0_adapter_sha256"] != _sha(args.frozen_100hz_adapter):
+            raise RuntimeError("TRACK0_ADAPTER_HASH_MISMATCH")
         adapter_manifest = freeze["rate_adapters"]
         for value in adapter_manifest.values():
             if _sha(Path(value["adapter_path"])) != value["adapter_sha256"]:
@@ -453,6 +448,7 @@ def main(argv=None) -> None:
         key: load_adapter(Path(adapter_manifest[key]["adapter_path"]), int(condition["history_steps"]), key)
         for key, condition in condition_values.items()
     }
+    frozen_track0_adapter = FrozenPrismAdapter.load(args.frozen_100hz_adapter, "FROZEN_R3_TRACK0")
     if args.stage == "calibration":
         partition, names = "train", calibration_names
     else:
@@ -472,8 +468,13 @@ def main(argv=None) -> None:
             key: {route: one_step_bounds(adapters[key], route, datasets[key], cfg) for route in cfg["routes"]}
             for key in condition_values
         }
+        track0_reliability_bounds = {
+            route: one_step_bounds(frozen_track0_adapter, route, datasets["hz100_h20"], cfg)
+            for route in cfg["routes"]
+        }
     else:
         reliability_bounds = freeze["reliability_bounds"]
+        track0_reliability_bounds = freeze["track0_reliability_bounds"]
     metadata = {
         "stage": args.stage,
         "git_commit": subprocess.check_output(("git", "rev-parse", "HEAD"), text=True).strip(),
@@ -497,14 +498,16 @@ def main(argv=None) -> None:
     atomic_json(run / "metadata.json", metadata)
     atomic_json(run / "config.json", cfg)
     atomic_json(run / "rate_adapter_manifest.json", adapter_manifest)
-    # 100-Hz hard gate executes first. Higher-rate evaluation does not begin
-    # unless the frozen R3 baseline and reliability horizon reproduce exactly.
-    baseline100, resync100, channels100 = run_conditions(
-        ["hz100_h20"], datasets, adapters, condition_values, reliability_bounds, cfg,
+    # Frozen-adapter Track 0 executes first. No newly fitted scaling condition
+    # begins unless the R3 baseline and reliability horizon reproduce exactly.
+    baseline_track0, resync_track0, _ = run_conditions(
+        ["hz100_h20"], datasets, {"hz100_h20": frozen_track0_adapter}, condition_values,
+        {"hz100_h20": track0_reliability_bounds}, cfg,
     )
-    reliable100 = reliable_horizons(resync100, cfg)
-    mismatches = r3_reproduction_check(args.stage, baseline100, reliable100, cfg)
-    baseline100.to_csv(run / "R3_100HZ_REPRODUCTION.csv", index=False)
+    reliable_track0 = reliable_horizons(resync_track0, cfg)
+    mismatches = r3_reproduction_check(args.stage, baseline_track0, reliable_track0, cfg)
+    baseline_track0.to_csv(run / "R3_100HZ_REPRODUCTION.csv", index=False)
+    resync_track0.to_csv(run / "R3_100HZ_RESYNCHRONIZATION_REPRODUCTION.csv", index=False)
     if mismatches:
         blocked = {
             "status": "BLOCKED_R3_100HZ_REPRODUCTION_MISMATCH",
@@ -515,13 +518,10 @@ def main(argv=None) -> None:
         atomic_json(run / "summary.json", blocked)
         print(json.dumps(blocked, indent=2))
         return
-    other_keys = [key for key in condition_values if key != "hz100_h20"]
-    baseline_other, resync_other, channels_other = run_conditions(
-        other_keys, datasets, adapters, condition_values, reliability_bounds, cfg,
+    all_keys = list(condition_values)
+    baseline, resync, channels = run_conditions(
+        all_keys, datasets, adapters, condition_values, reliability_bounds, cfg,
     )
-    baseline = pd.concat((baseline100, baseline_other), ignore_index=True)
-    resync = pd.concat((resync100, resync_other), ignore_index=True)
-    channels = pd.concat((channels100, channels_other), ignore_index=True)
     reliable = reliable_horizons(resync, cfg)
     aggregate, summary = aggregate_results(baseline, resync, channels, reliable, cfg)
     summary.update({
@@ -545,8 +545,10 @@ def main(argv=None) -> None:
             "status": "SAMPLING_RATE_CALIBRATION_FROZEN",
             "config_sha256": _sha(args.config),
             "rate_adapters": adapter_manifest,
+            "track0_adapter_sha256": _sha(args.frozen_100hz_adapter),
             "condition_manifest": condition_manifest(),
             "reliability_bounds": reliability_bounds,
+            "track0_reliability_bounds": track0_reliability_bounds,
             "calibration_aggregate": aggregate_modes.to_dict("records"),
             "r3_100hz_reproduced": True,
             "test_accessed": False,

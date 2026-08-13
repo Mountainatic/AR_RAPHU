@@ -4,9 +4,14 @@
 - Sampling rates: 100, 200, and native 400 Hz.
 - History modes: fixed 20 steps and fixed 200 ms (20/40/80 steps).
 - 100 Hz must exactly reproduce R3 before any higher-rate result is valid.
-- The 100-Hz model is the frozen R2/R3 adapter. Higher-rate models reuse the
-  frozen R2 train-parent partition, W family, ridge grid, row cap, routes, and
-  estimator semantics. No test row enters fitting or calibration.
+- Track 0 uses the frozen 100-Hz R2/R3 adapter only to reproduce R3 exactly.
+- A source audit found four segments from one train-fit flight at native 164 Hz
+  while all other fit/calibration/test segments are 400 Hz. Per user direction,
+  all four are excluded from every newly fitted 100/200/400-Hz scaling model.
+  No interpolation or synthetic high-rate row is introduced.
+- Scaling models reuse the resulting common native-400-Hz train-parent support,
+  frozen W family, ridge grid, row cap, routes, and estimator semantics. No test
+  row enters fitting or calibration.
 - 100/200 Hz use the same offline, left-labelled, left-closed bin mean as the
   published Track-B preprocessing (10 ms and 5 ms); 400 Hz is native.
 - Reliability bounds are separately derived from each rate/history calibration

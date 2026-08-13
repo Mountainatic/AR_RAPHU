@@ -106,3 +106,16 @@ def test_no_prism_core_or_stabilization_change():
     source = (ROOT / "run_experiment.py").read_text()
     for forbidden in ("clip(", "spectral_radius", "lyapunov_penalty", "state_saturation"):
         assert forbidden not in source.lower()
+
+
+def test_164hz_flight_is_excluded_from_every_scaling_fit():
+    cfg = json.loads((ROOT / "configs" / "calibration.yaml").read_text())
+    assert len(cfg["excluded_non400hz_train_names"]) == 4
+    assert {name.rsplit("_seg_", 1)[0] for name in cfg["excluded_non400hz_train_names"]} == {"merged_2021-02-18-16-43-54"}
+    assert cfg["sampling_scaling_fit_support"] == "COMMON_NATIVE_400HZ_TRAIN_SUPPORT_EXCLUDING_164HZ_FLIGHT"
+
+
+def test_frozen_r3_adapter_is_track0_only():
+    source = (ROOT / "run_experiment.py").read_text()
+    assert 'FrozenPrismAdapter.load(args.frozen_100hz_adapter, "FROZEN_R3_TRACK0")' in source
+    assert "pending = conditions" in source
