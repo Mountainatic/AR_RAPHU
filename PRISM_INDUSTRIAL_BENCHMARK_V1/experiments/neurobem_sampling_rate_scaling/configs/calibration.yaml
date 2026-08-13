@@ -1,0 +1,41 @@
+{
+  "protocol_id": "PRISM_V2_1_1_NEUROBEM_SAMPLING_RATE_SCALING_R1",
+  "seed": 21104,
+  "sampling_rates_hz": [100, 200, 400],
+  "base_sampling_rate_hz": 100,
+  "base_history_steps": 20,
+  "history_modes": ["FIXED_STEP", "FIXED_TIME"],
+  "routes": ["PF_KCW", "J_KCW"],
+  "component_routes": ["PF_KC", "PF_KCW", "J_KC", "J_KCW"],
+  "w_family": "NATURAL_CUBIC_LATENT",
+  "physical_rollout_duration_seconds": 12.0,
+  "trajectory_workers": 24,
+  "model_fit_workers": 4,
+  "row_cap_per_trajectory": 1500,
+  "train_parent_fit_fraction": 0.75,
+  "excluded_train_test_duplicate_names": ["merged_2021-02-23-22-26-25_seg_2.csv"],
+  "ridge_grid": [0.0, 1e-12, 1e-10, 1e-8, 1e-6, 0.0001, 0.01, 1.0],
+  "max_condition": 1000000000000.0,
+  "max_kkt": 1e-8,
+  "divergence_persistence": 5,
+  "divergence_thresholds": {"velocity": 15.0, "attitude": 1.5, "body_rate": 15.0},
+  "reliability_error_quantile": 0.99,
+  "reliability_error_multiplier": 5.0,
+  "reliability_probability_minimum": 0.90,
+  "channel_ablations": ["velocity_only", "attitude_only", "body_rate_only", "velocity_attitude", "attitude_body_rate", "full_recursive"],
+  "r3_100hz_reference": {
+    "calibration": {
+      "PF_KCW": {"divergence_count": 56, "median_t_diverge": 284.5, "reliable_horizon_steps": 20},
+      "J_KCW": {"divergence_count": 51, "median_t_diverge": 417.0, "reliable_horizon_steps": 10}
+    },
+    "test": {
+      "PF_KCW": {"divergence_count": 12, "median_t_diverge": 347.0, "reliable_horizon_steps": 20},
+      "J_KCW": {"divergence_count": 12, "median_t_diverge": 380.0, "reliable_horizon_steps": 10}
+    }
+  },
+  "r3_baseline_median_tolerance_steps": 0.0,
+  "test_access_policy": "ONLY_AFTER_RATE_CONFIG_ADAPTERS_AND_CALIBRATION_FREEZE_COMMIT",
+  "test_tuning_prohibited": true,
+  "published_scores_used_for_selection": false,
+  "stabilization_added": false
+}
