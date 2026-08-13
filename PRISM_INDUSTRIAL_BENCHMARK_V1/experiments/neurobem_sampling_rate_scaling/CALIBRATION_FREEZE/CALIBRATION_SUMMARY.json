@@ -1,0 +1,337 @@
+{
+  "aggregate": [
+    {
+      "divergence_rate": 0.85,
+      "evaluation_key": "hz100_h20",
+      "history_duration_ms": 200.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 4150.0,
+      "median_t_diverge_steps": 415.0,
+      "one_step_error_mean": 0.0008720085419409742,
+      "reliable_horizon_ms": 100.0,
+      "reliable_horizon_steps": 10,
+      "route": "J_KCW",
+      "sampling_rate_hz": 100,
+      "trajectory_count": 60
+    },
+    {
+      "divergence_rate": 0.9333333333333333,
+      "evaluation_key": "hz100_h20",
+      "history_duration_ms": 200.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 2910.0,
+      "median_t_diverge_steps": 291.0,
+      "one_step_error_mean": 0.0013865006296637265,
+      "reliable_horizon_ms": 200.0,
+      "reliable_horizon_steps": 20,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 100,
+      "trajectory_count": 60
+    },
+    {
+      "divergence_rate": 0.8666666666666667,
+      "evaluation_key": "hz200_h20",
+      "history_duration_ms": 100.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 3805.0,
+      "median_t_diverge_steps": 761.0,
+      "one_step_error_mean": 0.0002605906999950627,
+      "reliable_horizon_ms": 100.0,
+      "reliable_horizon_steps": 20,
+      "route": "J_KCW",
+      "sampling_rate_hz": 200,
+      "trajectory_count": 60
+    },
+    {
+      "divergence_rate": 0.8833333333333333,
+      "evaluation_key": "hz200_h20",
+      "history_duration_ms": 100.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 2925.0,
+      "median_t_diverge_steps": 585.0,
+      "one_step_error_mean": 0.0003677161034951334,
+      "reliable_horizon_ms": 100.0,
+      "reliable_horizon_steps": 20,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 200,
+      "trajectory_count": 60
+    },
+    {
+      "divergence_rate": 0.8666666666666667,
+      "evaluation_key": "hz200_h40",
+      "history_duration_ms": 200.0,
+      "history_steps": 40,
+      "median_t_diverge_ms": 3822.5,
+      "median_t_diverge_steps": 764.5,
+      "one_step_error_mean": 0.00022673043378540649,
+      "reliable_horizon_ms": 100.0,
+      "reliable_horizon_steps": 20,
+      "route": "J_KCW",
+      "sampling_rate_hz": 200,
+      "trajectory_count": 60
+    },
+    {
+      "divergence_rate": 0.9166666666666666,
+      "evaluation_key": "hz200_h40",
+      "history_duration_ms": 200.0,
+      "history_steps": 40,
+      "median_t_diverge_ms": 2715.0,
+      "median_t_diverge_steps": 543.0,
+      "one_step_error_mean": 0.00034898883238936804,
+      "reliable_horizon_ms": 100.0,
+      "reliable_horizon_steps": 20,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 200,
+      "trajectory_count": 60
+    },
+    {
+      "divergence_rate": 0.85,
+      "evaluation_key": "hz400_h20",
+      "history_duration_ms": 50.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 3462.5,
+      "median_t_diverge_steps": 1385.0,
+      "one_step_error_mean": 8.074301252623399e-05,
+      "reliable_horizon_ms": 50.0,
+      "reliable_horizon_steps": 20,
+      "route": "J_KCW",
+      "sampling_rate_hz": 400,
+      "trajectory_count": 60
+    },
+    {
+      "divergence_rate": 0.8833333333333333,
+      "evaluation_key": "hz400_h20",
+      "history_duration_ms": 50.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 3187.5,
+      "median_t_diverge_steps": 1275.0,
+      "one_step_error_mean": 0.00010399807304921333,
+      "reliable_horizon_ms": 50.0,
+      "reliable_horizon_steps": 20,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 400,
+      "trajectory_count": 60
+    },
+    {
+      "divergence_rate": 0.8333333333333334,
+      "evaluation_key": "hz400_h80",
+      "history_duration_ms": 200.0,
+      "history_steps": 80,
+      "median_t_diverge_ms": 3663.75,
+      "median_t_diverge_steps": 1465.5,
+      "one_step_error_mean": 5.742040808192655e-05,
+      "reliable_horizon_ms": 50.0,
+      "reliable_horizon_steps": 20,
+      "route": "J_KCW",
+      "sampling_rate_hz": 400,
+      "trajectory_count": 60
+    },
+    {
+      "divergence_rate": 0.8833333333333333,
+      "evaluation_key": "hz400_h80",
+      "history_duration_ms": 200.0,
+      "history_steps": 80,
+      "median_t_diverge_ms": 2777.5,
+      "median_t_diverge_steps": 1111.0,
+      "one_step_error_mean": 8.765463689088276e-05,
+      "reliable_horizon_ms": 50.0,
+      "reliable_horizon_steps": 20,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 400,
+      "trajectory_count": 60
+    }
+  ],
+  "formal_stability_claim": false,
+  "r3_100hz_reproduced": true,
+  "rate_adapters": {
+    "hz100_h20": {
+      "adapter_path": "/root/autodl-tmp/PRISM_V211_NEUROBEM_SAMPLING_RATE_RUNTIME/calibration/PRISM_V2_1_1_NEUROBEM_SAMPLING_RATE_SCALING_R1_calibration_20260813T130130/rate_adapters/hz100_h20.json",
+      "adapter_sha256": "4c8a8f30a4d015838fd05bec25b1f25929b1ee0814fa5d6d34b8b739a6abb965",
+      "evaluation_key": "hz100_h20",
+      "fit_segments": 171,
+      "history_steps": 20,
+      "resampling_operator": "OFFLINE_LEFT_CLOSED_10MS_BIN_MEAN_EXACT_R3",
+      "sampling_rate_hz": 100,
+      "test_accessed": false
+    },
+    "hz200_h20": {
+      "adapter_path": "/root/autodl-tmp/PRISM_V211_NEUROBEM_SAMPLING_RATE_RUNTIME/calibration/PRISM_V2_1_1_NEUROBEM_SAMPLING_RATE_SCALING_R1_calibration_20260813T130130/rate_adapters/hz200_h20.json",
+      "adapter_sha256": "971eecd6aba0fddc90f0ebfa46dc15d3216c40b71db1a869d7d672f7d7c946ad",
+      "evaluation_key": "hz200_h20",
+      "fit_segments": 171,
+      "history_steps": 20,
+      "resampling_operator": "OFFLINE_LEFT_CLOSED_5MS_BIN_MEAN",
+      "sampling_rate_hz": 200,
+      "test_accessed": false
+    },
+    "hz200_h40": {
+      "adapter_path": "/root/autodl-tmp/PRISM_V211_NEUROBEM_SAMPLING_RATE_RUNTIME/calibration/PRISM_V2_1_1_NEUROBEM_SAMPLING_RATE_SCALING_R1_calibration_20260813T130130/rate_adapters/hz200_h40.json",
+      "adapter_sha256": "46c0ebed1449860875ace5dcbd3bbd4959303cf510d0c535932ad368e8e4e76c",
+      "evaluation_key": "hz200_h40",
+      "fit_segments": 171,
+      "history_steps": 40,
+      "resampling_operator": "OFFLINE_LEFT_CLOSED_5MS_BIN_MEAN",
+      "sampling_rate_hz": 200,
+      "test_accessed": false
+    },
+    "hz400_h20": {
+      "adapter_path": "/root/autodl-tmp/PRISM_V211_NEUROBEM_SAMPLING_RATE_RUNTIME/calibration/PRISM_V2_1_1_NEUROBEM_SAMPLING_RATE_SCALING_R1_calibration_20260813T130130/rate_adapters/hz400_h20.json",
+      "adapter_sha256": "36b7572bd971f2f26180f54d52cb2629a233afc972ac7ba058f114fac121c429",
+      "evaluation_key": "hz400_h20",
+      "fit_segments": 171,
+      "history_steps": 20,
+      "resampling_operator": "NATIVE_2P5MS_NO_DOWNSAMPLING",
+      "sampling_rate_hz": 400,
+      "test_accessed": false
+    },
+    "hz400_h80": {
+      "adapter_path": "/root/autodl-tmp/PRISM_V211_NEUROBEM_SAMPLING_RATE_RUNTIME/calibration/PRISM_V2_1_1_NEUROBEM_SAMPLING_RATE_SCALING_R1_calibration_20260813T130130/rate_adapters/hz400_h80.json",
+      "adapter_sha256": "93188dffe857d35cdc0bc22e44642ae40e4c3525c3ecde9fdfcbe353247c3d13",
+      "evaluation_key": "hz400_h80",
+      "fit_segments": 171,
+      "history_steps": 80,
+      "resampling_operator": "NATIVE_2P5MS_NO_DOWNSAMPLING",
+      "sampling_rate_hz": 400,
+      "test_accessed": false
+    }
+  },
+  "reliability_bounds": {
+    "hz100_h20": {
+      "J_KCW": {
+        "attitude": 0.6059313573594306,
+        "body_rate": 3.027838659794603,
+        "velocity": 0.5553400116399875
+      },
+      "PF_KCW": {
+        "attitude": 0.5424197260758727,
+        "body_rate": 2.8069358526994224,
+        "velocity": 2.4978705155035117
+      }
+    },
+    "hz200_h20": {
+      "J_KCW": {
+        "attitude": 0.29804173424440666,
+        "body_rate": 1.7053775299268834,
+        "velocity": 0.26978426408132183
+      },
+      "PF_KCW": {
+        "attitude": 0.2698194447336231,
+        "body_rate": 1.5470339502770765,
+        "velocity": 1.1401623613378524
+      }
+    },
+    "hz200_h40": {
+      "J_KCW": {
+        "attitude": 0.30430873340974207,
+        "body_rate": 1.5440938527464654,
+        "velocity": 0.26774545950521433
+      },
+      "PF_KCW": {
+        "attitude": 0.27345110369273945,
+        "body_rate": 1.4093171822734765,
+        "velocity": 1.233529106680167
+      }
+    },
+    "hz400_h20": {
+      "J_KCW": {
+        "attitude": 0.14935439623340038,
+        "body_rate": 0.9539670353965513,
+        "velocity": 0.13447238963210784
+      },
+      "PF_KCW": {
+        "attitude": 0.1354547450745641,
+        "body_rate": 0.8965995684482355,
+        "velocity": 0.5433288398009188
+      }
+    },
+    "hz400_h80": {
+      "J_KCW": {
+        "attitude": 0.15113259807879298,
+        "body_rate": 0.7791675286404353,
+        "velocity": 0.1316683347247098
+      },
+      "PF_KCW": {
+        "attitude": 0.13673897783841601,
+        "body_rate": 0.7156496253323175,
+        "velocity": 0.6088844478131744
+      }
+    }
+  },
+  "scaling_diagnostics": [
+    {
+      "R_step": 1.0,
+      "R_time": 1.0,
+      "evaluation_key": "hz100_h20",
+      "route": "J_KCW",
+      "sampling_rate_hz": 100
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 1.0,
+      "evaluation_key": "hz100_h20",
+      "route": "PF_KCW",
+      "sampling_rate_hz": 100
+    },
+    {
+      "R_step": 2.0,
+      "R_time": 1.0,
+      "evaluation_key": "hz200_h20",
+      "route": "J_KCW",
+      "sampling_rate_hz": 200
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 0.5,
+      "evaluation_key": "hz200_h20",
+      "route": "PF_KCW",
+      "sampling_rate_hz": 200
+    },
+    {
+      "R_step": 2.0,
+      "R_time": 1.0,
+      "evaluation_key": "hz200_h40",
+      "route": "J_KCW",
+      "sampling_rate_hz": 200
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 0.5,
+      "evaluation_key": "hz200_h40",
+      "route": "PF_KCW",
+      "sampling_rate_hz": 200
+    },
+    {
+      "R_step": 2.0,
+      "R_time": 0.5,
+      "evaluation_key": "hz400_h20",
+      "route": "J_KCW",
+      "sampling_rate_hz": 400
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 0.25,
+      "evaluation_key": "hz400_h20",
+      "route": "PF_KCW",
+      "sampling_rate_hz": 400
+    },
+    {
+      "R_step": 2.0,
+      "R_time": 0.5,
+      "evaluation_key": "hz400_h80",
+      "route": "J_KCW",
+      "sampling_rate_hz": 400
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 0.25,
+      "evaluation_key": "hz400_h80",
+      "route": "PF_KCW",
+      "sampling_rate_hz": 400
+    }
+  ],
+  "stabilization_added": false,
+  "stage": "calibration",
+  "status": "COMPLETED",
+  "test_accessed": false,
+  "test_used_for_tuning": false
+}
