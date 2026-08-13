@@ -1,0 +1,52 @@
+{
+  "adapter_sha256": {
+    "100": "4c8a8f30a4d015838fd05bec25b1f25929b1ee0814fa5d6d34b8b739a6abb965",
+    "200": "46c0ebed1449860875ace5dcbd3bbd4959303cf510d0c535932ad368e8e4e76c",
+    "400": "93188dffe857d35cdc0bc22e44642ae40e4c3525c3ecde9fdfcbe353247c3d13"
+  },
+  "calibration_decision": {
+    "overall_decision": "COMPOSITION_CONSISTENCY_MIXED",
+    "routes": {
+      "J_KCW": {
+        "composition_100ms_class": "COMPOSITION_CONSISTENCY_FAILURE_SUPPORTED",
+        "composition_100ms_gt_full_state_error": {
+          "100": 0.08541356806616529,
+          "200": 0.08652885963100117,
+          "400": 0.08730769517524516
+        },
+        "one_step_mse": {
+          "100": 0.000872008541940974,
+          "200": 0.0002267304337854065,
+          "400": 5.742040808192656e-05
+        },
+        "one_step_order_supported": true
+      },
+      "PF_KCW": {
+        "composition_100ms_class": "COMPOSITION_CONSISTENCY_FAILURE_NOT_SUPPORTED",
+        "composition_100ms_gt_full_state_error": {
+          "100": 0.14585193490719348,
+          "200": 0.13542251126434396,
+          "400": 0.13079752418508153
+        },
+        "one_step_mse": {
+          "100": 0.0013865006296637265,
+          "200": 0.000348988832389368,
+          "400": 8.765463689088276e-05
+        },
+        "one_step_order_supported": true
+      }
+    }
+  },
+  "config_sha256": "7d3aadb2f98d6478809e27a803787fd8f7b2e145519fd550e86358b1f1d3bede",
+  "physical_horizons_ms": [
+    10,
+    20,
+    50,
+    100,
+    200,
+    500
+  ],
+  "sampling_freeze_sha256": "1d62b7ac8017ea1e3078d9bb1eff07d28ead1e5438b3e45ee08924174fcd2917",
+  "status": "COMPOSITION_CALIBRATION_FROZEN",
+  "test_accessed": false
+}
