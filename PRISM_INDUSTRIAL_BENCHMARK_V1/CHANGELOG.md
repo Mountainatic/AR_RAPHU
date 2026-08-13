@@ -186,3 +186,18 @@
 - Does not retrain or modify PRISM, K/C/W/A, literature baselines, or Track B.
 - Preserves every historical divergence artifact and permits no test-driven
   model change or stabilization.
+
+# PRISM v2.1.1 NeuroBEM sampling-rate scaling audit
+
+- Audits 100, 200, and native 400 Hz under both fixed-step and fixed-time
+  histories without changing PRISM core, routes, ridge grid, or reliability
+  thresholds.
+- Preserves an exact frozen-adapter 100-Hz R3 reproduction gate before any
+  higher-rate result is accepted.
+- Excludes four native 164-Hz segments from one train-fit flight from all new
+  scaling adapters by explicit user direction; no interpolation is introduced.
+- Freezes five rate/history adapters and calibration-only reliability bounds
+  before one formal access to the unchanged 12-trajectory test split.
+- Finds a mixed step-count/higher-rate-worse result: reliable physical time
+  contracts as sampling rate rises despite improved one-step error.
+- Adds no clipping, stabilization, spectral constraint, or Lyapunov claim.

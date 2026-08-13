@@ -1,0 +1,187 @@
+{
+  "channel_attribution": [
+    {
+      "attitude_body_rate": 1.0,
+      "attitude_only": 0.5833333333333334,
+      "body_rate_only": 0.75,
+      "full_recursive": 1.0,
+      "route": "J_KCW",
+      "sampling_rate_hz": 100,
+      "velocity_attitude": 0.75,
+      "velocity_only": 0.0
+    },
+    {
+      "attitude_body_rate": 1.0,
+      "attitude_only": 0.6666666666666666,
+      "body_rate_only": 0.75,
+      "full_recursive": 1.0,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 100,
+      "velocity_attitude": 1.0,
+      "velocity_only": 1.0
+    },
+    {
+      "attitude_body_rate": 1.0,
+      "attitude_only": 0.6666666666666666,
+      "body_rate_only": 0.75,
+      "full_recursive": 1.0,
+      "route": "J_KCW",
+      "sampling_rate_hz": 200,
+      "velocity_attitude": 0.75,
+      "velocity_only": 0.0
+    },
+    {
+      "attitude_body_rate": 1.0,
+      "attitude_only": 0.6666666666666666,
+      "body_rate_only": 0.75,
+      "full_recursive": 1.0,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 200,
+      "velocity_attitude": 1.0,
+      "velocity_only": 1.0
+    },
+    {
+      "attitude_body_rate": 1.0,
+      "attitude_only": 0.6666666666666666,
+      "body_rate_only": 0.9166666666666666,
+      "full_recursive": 1.0,
+      "route": "J_KCW",
+      "sampling_rate_hz": 400,
+      "velocity_attitude": 0.75,
+      "velocity_only": 0.0
+    },
+    {
+      "attitude_body_rate": 1.0,
+      "attitude_only": 0.6666666666666666,
+      "body_rate_only": 0.75,
+      "full_recursive": 1.0,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 400,
+      "velocity_attitude": 1.0,
+      "velocity_only": 1.0
+    }
+  ],
+  "experiment_id": "PRISM_V2_1_1_NEUROBEM_SAMPLING_RATE_SCALING_R1",
+  "formal_stability_claim": false,
+  "generating_commit": "97e68c662199e001f9f50214e39e93bd98ddfa37",
+  "interpretation": {
+    "J_KCW": "OUTCOME_B_TO_D_STEP_COUNT_CONTRACTION_AT_400HZ",
+    "PF_KCW": "OUTCOME_B_STEP_COUNT_HORIZON_WITH_OUTCOME_D_PHYSICAL_TIME_CONTRACTION",
+    "higher_rate_physical_time_benefit_supported": false,
+    "physical_time_horizon_supported": false
+  },
+  "primary_fixed_time_results": {
+    "J_KCW": {
+      "100": {
+        "condition_id": "hz100_fixed_time_h20",
+        "divergence_rate": 1.0,
+        "evaluation_key": "hz100_h20",
+        "history_duration_ms": 200.0,
+        "history_mode": "FIXED_TIME",
+        "history_steps": 20,
+        "median_t_diverge_ms": 3825.0,
+        "median_t_diverge_steps": 382.5,
+        "one_step_error_mean": 0.0009425182713866,
+        "reliable_horizon_ms": 100.0,
+        "reliable_horizon_steps": 10,
+        "route": "J_KCW",
+        "sampling_rate_hz": 100,
+        "trajectory_count": 12
+      },
+      "200": {
+        "condition_id": "hz200_fixed_time_h40",
+        "divergence_rate": 1.0,
+        "evaluation_key": "hz200_h40",
+        "history_duration_ms": 200.0,
+        "history_mode": "FIXED_TIME",
+        "history_steps": 40,
+        "median_t_diverge_ms": 4067.5,
+        "median_t_diverge_steps": 813.5,
+        "one_step_error_mean": 0.000245925968714,
+        "reliable_horizon_ms": 50.0,
+        "reliable_horizon_steps": 10,
+        "route": "J_KCW",
+        "sampling_rate_hz": 200,
+        "trajectory_count": 12
+      },
+      "400": {
+        "condition_id": "hz400_fixed_time_h80",
+        "divergence_rate": 1.0,
+        "evaluation_key": "hz400_h80",
+        "history_duration_ms": 200.0,
+        "history_mode": "FIXED_TIME",
+        "history_steps": 80,
+        "median_t_diverge_ms": 4138.75,
+        "median_t_diverge_steps": 1655.5,
+        "one_step_error_mean": 6.38060198663689e-05,
+        "reliable_horizon_ms": 10.0,
+        "reliable_horizon_steps": 4,
+        "route": "J_KCW",
+        "sampling_rate_hz": 400,
+        "trajectory_count": 12
+      }
+    },
+    "PF_KCW": {
+      "100": {
+        "condition_id": "hz100_fixed_time_h20",
+        "divergence_rate": 1.0,
+        "evaluation_key": "hz100_h20",
+        "history_duration_ms": 200.0,
+        "history_mode": "FIXED_TIME",
+        "history_steps": 20,
+        "median_t_diverge_ms": 3440.0,
+        "median_t_diverge_steps": 344.0,
+        "one_step_error_mean": 0.0015283988376601,
+        "reliable_horizon_ms": 200.0,
+        "reliable_horizon_steps": 20,
+        "route": "PF_KCW",
+        "sampling_rate_hz": 100,
+        "trajectory_count": 12
+      },
+      "200": {
+        "condition_id": "hz200_fixed_time_h40",
+        "divergence_rate": 1.0,
+        "evaluation_key": "hz200_h40",
+        "history_duration_ms": 200.0,
+        "history_mode": "FIXED_TIME",
+        "history_steps": 40,
+        "median_t_diverge_ms": 2857.5,
+        "median_t_diverge_steps": 571.5,
+        "one_step_error_mean": 0.0003884325461549,
+        "reliable_horizon_ms": 100.0,
+        "reliable_horizon_steps": 20,
+        "route": "PF_KCW",
+        "sampling_rate_hz": 200,
+        "trajectory_count": 12
+      },
+      "400": {
+        "condition_id": "hz400_fixed_time_h80",
+        "divergence_rate": 1.0,
+        "evaluation_key": "hz400_h80",
+        "history_duration_ms": 200.0,
+        "history_mode": "FIXED_TIME",
+        "history_steps": 80,
+        "median_t_diverge_ms": 2838.75,
+        "median_t_diverge_steps": 1135.5,
+        "one_step_error_mean": 9.945511521708208e-05,
+        "reliable_horizon_ms": 50.0,
+        "reliable_horizon_steps": 20,
+        "route": "PF_KCW",
+        "sampling_rate_hz": 400,
+        "trajectory_count": 12
+      }
+    }
+  },
+  "r3_100hz_reproduced": true,
+  "registered_outcome": "MIXED_OUTCOME_B_STEP_COUNT_AND_D_HIGHER_RATE_WORSE_RELIABLE_TIME",
+  "source_rate_audit": {
+    "excluded_native_164hz_segments": 4,
+    "excluded_scope": "ALL_NEW_SCALING_ADAPTER_FITS",
+    "interpolation_used": false,
+    "track0_frozen_r3_adapter_unchanged": true
+  },
+  "stabilization_added": false,
+  "status": "COMPLETED",
+  "test_access_count": 1,
+  "test_used_for_tuning": false
+}

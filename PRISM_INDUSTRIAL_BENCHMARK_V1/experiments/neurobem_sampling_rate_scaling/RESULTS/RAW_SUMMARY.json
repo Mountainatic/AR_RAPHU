@@ -1,0 +1,337 @@
+{
+  "aggregate": [
+    {
+      "divergence_rate": 1.0,
+      "evaluation_key": "hz100_h20",
+      "history_duration_ms": 200.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 3825.0,
+      "median_t_diverge_steps": 382.5,
+      "one_step_error_mean": 0.0009425182713866577,
+      "reliable_horizon_ms": 100.0,
+      "reliable_horizon_steps": 10,
+      "route": "J_KCW",
+      "sampling_rate_hz": 100,
+      "trajectory_count": 12
+    },
+    {
+      "divergence_rate": 1.0,
+      "evaluation_key": "hz100_h20",
+      "history_duration_ms": 200.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 3440.0,
+      "median_t_diverge_steps": 344.0,
+      "one_step_error_mean": 0.0015283988376601262,
+      "reliable_horizon_ms": 200.0,
+      "reliable_horizon_steps": 20,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 100,
+      "trajectory_count": 12
+    },
+    {
+      "divergence_rate": 1.0,
+      "evaluation_key": "hz200_h20",
+      "history_duration_ms": 100.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 3752.5,
+      "median_t_diverge_steps": 750.5,
+      "one_step_error_mean": 0.00026107882027320676,
+      "reliable_horizon_ms": 50.0,
+      "reliable_horizon_steps": 10,
+      "route": "J_KCW",
+      "sampling_rate_hz": 200,
+      "trajectory_count": 12
+    },
+    {
+      "divergence_rate": 1.0,
+      "evaluation_key": "hz200_h20",
+      "history_duration_ms": 100.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 2880.0,
+      "median_t_diverge_steps": 576.0,
+      "one_step_error_mean": 0.00041053797893167145,
+      "reliable_horizon_ms": 100.0,
+      "reliable_horizon_steps": 20,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 200,
+      "trajectory_count": 12
+    },
+    {
+      "divergence_rate": 1.0,
+      "evaluation_key": "hz200_h40",
+      "history_duration_ms": 200.0,
+      "history_steps": 40,
+      "median_t_diverge_ms": 4067.5,
+      "median_t_diverge_steps": 813.5,
+      "one_step_error_mean": 0.0002459259687140791,
+      "reliable_horizon_ms": 50.0,
+      "reliable_horizon_steps": 10,
+      "route": "J_KCW",
+      "sampling_rate_hz": 200,
+      "trajectory_count": 12
+    },
+    {
+      "divergence_rate": 1.0,
+      "evaluation_key": "hz200_h40",
+      "history_duration_ms": 200.0,
+      "history_steps": 40,
+      "median_t_diverge_ms": 2857.5,
+      "median_t_diverge_steps": 571.5,
+      "one_step_error_mean": 0.0003884325461549326,
+      "reliable_horizon_ms": 100.0,
+      "reliable_horizon_steps": 20,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 200,
+      "trajectory_count": 12
+    },
+    {
+      "divergence_rate": 1.0,
+      "evaluation_key": "hz400_h20",
+      "history_duration_ms": 50.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 3913.75,
+      "median_t_diverge_steps": 1565.5,
+      "one_step_error_mean": 7.50106065191056e-05,
+      "reliable_horizon_ms": 10.0,
+      "reliable_horizon_steps": 4,
+      "route": "J_KCW",
+      "sampling_rate_hz": 400,
+      "trajectory_count": 12
+    },
+    {
+      "divergence_rate": 1.0,
+      "evaluation_key": "hz400_h20",
+      "history_duration_ms": 50.0,
+      "history_steps": 20,
+      "median_t_diverge_ms": 3315.0,
+      "median_t_diverge_steps": 1326.0,
+      "one_step_error_mean": 0.00011223923639353716,
+      "reliable_horizon_ms": 50.0,
+      "reliable_horizon_steps": 20,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 400,
+      "trajectory_count": 12
+    },
+    {
+      "divergence_rate": 1.0,
+      "evaluation_key": "hz400_h80",
+      "history_duration_ms": 200.0,
+      "history_steps": 80,
+      "median_t_diverge_ms": 4138.75,
+      "median_t_diverge_steps": 1655.5,
+      "one_step_error_mean": 6.38060198663689e-05,
+      "reliable_horizon_ms": 10.0,
+      "reliable_horizon_steps": 4,
+      "route": "J_KCW",
+      "sampling_rate_hz": 400,
+      "trajectory_count": 12
+    },
+    {
+      "divergence_rate": 1.0,
+      "evaluation_key": "hz400_h80",
+      "history_duration_ms": 200.0,
+      "history_steps": 80,
+      "median_t_diverge_ms": 2838.75,
+      "median_t_diverge_steps": 1135.5,
+      "one_step_error_mean": 9.945511521708207e-05,
+      "reliable_horizon_ms": 50.0,
+      "reliable_horizon_steps": 20,
+      "route": "PF_KCW",
+      "sampling_rate_hz": 400,
+      "trajectory_count": 12
+    }
+  ],
+  "formal_stability_claim": false,
+  "r3_100hz_reproduced": true,
+  "rate_adapters": {
+    "hz100_h20": {
+      "adapter_path": "experiments/neurobem_sampling_rate_scaling/CALIBRATION_FREEZE/rate_adapters/hz100_h20.json",
+      "adapter_sha256": "4c8a8f30a4d015838fd05bec25b1f25929b1ee0814fa5d6d34b8b739a6abb965",
+      "evaluation_key": "hz100_h20",
+      "fit_segments": 171,
+      "history_steps": 20,
+      "resampling_operator": "OFFLINE_LEFT_CLOSED_10MS_BIN_MEAN_EXACT_R3",
+      "sampling_rate_hz": 100,
+      "test_accessed": false
+    },
+    "hz200_h20": {
+      "adapter_path": "experiments/neurobem_sampling_rate_scaling/CALIBRATION_FREEZE/rate_adapters/hz200_h20.json",
+      "adapter_sha256": "971eecd6aba0fddc90f0ebfa46dc15d3216c40b71db1a869d7d672f7d7c946ad",
+      "evaluation_key": "hz200_h20",
+      "fit_segments": 171,
+      "history_steps": 20,
+      "resampling_operator": "OFFLINE_LEFT_CLOSED_5MS_BIN_MEAN",
+      "sampling_rate_hz": 200,
+      "test_accessed": false
+    },
+    "hz200_h40": {
+      "adapter_path": "experiments/neurobem_sampling_rate_scaling/CALIBRATION_FREEZE/rate_adapters/hz200_h40.json",
+      "adapter_sha256": "46c0ebed1449860875ace5dcbd3bbd4959303cf510d0c535932ad368e8e4e76c",
+      "evaluation_key": "hz200_h40",
+      "fit_segments": 171,
+      "history_steps": 40,
+      "resampling_operator": "OFFLINE_LEFT_CLOSED_5MS_BIN_MEAN",
+      "sampling_rate_hz": 200,
+      "test_accessed": false
+    },
+    "hz400_h20": {
+      "adapter_path": "experiments/neurobem_sampling_rate_scaling/CALIBRATION_FREEZE/rate_adapters/hz400_h20.json",
+      "adapter_sha256": "36b7572bd971f2f26180f54d52cb2629a233afc972ac7ba058f114fac121c429",
+      "evaluation_key": "hz400_h20",
+      "fit_segments": 171,
+      "history_steps": 20,
+      "resampling_operator": "NATIVE_2P5MS_NO_DOWNSAMPLING",
+      "sampling_rate_hz": 400,
+      "test_accessed": false
+    },
+    "hz400_h80": {
+      "adapter_path": "experiments/neurobem_sampling_rate_scaling/CALIBRATION_FREEZE/rate_adapters/hz400_h80.json",
+      "adapter_sha256": "93188dffe857d35cdc0bc22e44642ae40e4c3525c3ecde9fdfcbe353247c3d13",
+      "evaluation_key": "hz400_h80",
+      "fit_segments": 171,
+      "history_steps": 80,
+      "resampling_operator": "NATIVE_2P5MS_NO_DOWNSAMPLING",
+      "sampling_rate_hz": 400,
+      "test_accessed": false
+    }
+  },
+  "reliability_bounds": {
+    "hz100_h20": {
+      "J_KCW": {
+        "attitude": 0.6059313573594306,
+        "body_rate": 3.027838659794603,
+        "velocity": 0.5553400116399875
+      },
+      "PF_KCW": {
+        "attitude": 0.5424197260758727,
+        "body_rate": 2.8069358526994224,
+        "velocity": 2.4978705155035117
+      }
+    },
+    "hz200_h20": {
+      "J_KCW": {
+        "attitude": 0.29804173424440666,
+        "body_rate": 1.7053775299268834,
+        "velocity": 0.26978426408132183
+      },
+      "PF_KCW": {
+        "attitude": 0.2698194447336231,
+        "body_rate": 1.5470339502770765,
+        "velocity": 1.1401623613378524
+      }
+    },
+    "hz200_h40": {
+      "J_KCW": {
+        "attitude": 0.30430873340974207,
+        "body_rate": 1.5440938527464654,
+        "velocity": 0.26774545950521433
+      },
+      "PF_KCW": {
+        "attitude": 0.27345110369273945,
+        "body_rate": 1.4093171822734765,
+        "velocity": 1.233529106680167
+      }
+    },
+    "hz400_h20": {
+      "J_KCW": {
+        "attitude": 0.14935439623340038,
+        "body_rate": 0.9539670353965513,
+        "velocity": 0.13447238963210784
+      },
+      "PF_KCW": {
+        "attitude": 0.1354547450745641,
+        "body_rate": 0.8965995684482355,
+        "velocity": 0.5433288398009188
+      }
+    },
+    "hz400_h80": {
+      "J_KCW": {
+        "attitude": 0.15113259807879298,
+        "body_rate": 0.7791675286404353,
+        "velocity": 0.1316683347247098
+      },
+      "PF_KCW": {
+        "attitude": 0.13673897783841601,
+        "body_rate": 0.7156496253323175,
+        "velocity": 0.6088844478131744
+      }
+    }
+  },
+  "scaling_diagnostics": [
+    {
+      "R_step": 1.0,
+      "R_time": 1.0,
+      "evaluation_key": "hz100_h20",
+      "route": "J_KCW",
+      "sampling_rate_hz": 100
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 1.0,
+      "evaluation_key": "hz100_h20",
+      "route": "PF_KCW",
+      "sampling_rate_hz": 100
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 0.5,
+      "evaluation_key": "hz200_h20",
+      "route": "J_KCW",
+      "sampling_rate_hz": 200
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 0.5,
+      "evaluation_key": "hz200_h20",
+      "route": "PF_KCW",
+      "sampling_rate_hz": 200
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 0.5,
+      "evaluation_key": "hz200_h40",
+      "route": "J_KCW",
+      "sampling_rate_hz": 200
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 0.5,
+      "evaluation_key": "hz200_h40",
+      "route": "PF_KCW",
+      "sampling_rate_hz": 200
+    },
+    {
+      "R_step": 0.4,
+      "R_time": 0.1,
+      "evaluation_key": "hz400_h20",
+      "route": "J_KCW",
+      "sampling_rate_hz": 400
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 0.25,
+      "evaluation_key": "hz400_h20",
+      "route": "PF_KCW",
+      "sampling_rate_hz": 400
+    },
+    {
+      "R_step": 0.4,
+      "R_time": 0.1,
+      "evaluation_key": "hz400_h80",
+      "route": "J_KCW",
+      "sampling_rate_hz": 400
+    },
+    {
+      "R_step": 1.0,
+      "R_time": 0.25,
+      "evaluation_key": "hz400_h80",
+      "route": "PF_KCW",
+      "sampling_rate_hz": 400
+    }
+  ],
+  "stabilization_added": false,
+  "stage": "test",
+  "status": "COMPLETED",
+  "test_accessed": true,
+  "test_used_for_tuning": false
+}

@@ -1,0 +1,52 @@
+{
+  "hz100_h20": {
+    "adapter_path": "experiments/neurobem_sampling_rate_scaling/CALIBRATION_FREEZE/rate_adapters/hz100_h20.json",
+    "adapter_sha256": "4c8a8f30a4d015838fd05bec25b1f25929b1ee0814fa5d6d34b8b739a6abb965",
+    "evaluation_key": "hz100_h20",
+    "fit_segments": 171,
+    "history_steps": 20,
+    "resampling_operator": "OFFLINE_LEFT_CLOSED_10MS_BIN_MEAN_EXACT_R3",
+    "sampling_rate_hz": 100,
+    "test_accessed": false
+  },
+  "hz200_h20": {
+    "adapter_path": "experiments/neurobem_sampling_rate_scaling/CALIBRATION_FREEZE/rate_adapters/hz200_h20.json",
+    "adapter_sha256": "971eecd6aba0fddc90f0ebfa46dc15d3216c40b71db1a869d7d672f7d7c946ad",
+    "evaluation_key": "hz200_h20",
+    "fit_segments": 171,
+    "history_steps": 20,
+    "resampling_operator": "OFFLINE_LEFT_CLOSED_5MS_BIN_MEAN",
+    "sampling_rate_hz": 200,
+    "test_accessed": false
+  },
+  "hz200_h40": {
+    "adapter_path": "experiments/neurobem_sampling_rate_scaling/CALIBRATION_FREEZE/rate_adapters/hz200_h40.json",
+    "adapter_sha256": "46c0ebed1449860875ace5dcbd3bbd4959303cf510d0c535932ad368e8e4e76c",
+    "evaluation_key": "hz200_h40",
+    "fit_segments": 171,
+    "history_steps": 40,
+    "resampling_operator": "OFFLINE_LEFT_CLOSED_5MS_BIN_MEAN",
+    "sampling_rate_hz": 200,
+    "test_accessed": false
+  },
+  "hz400_h20": {
+    "adapter_path": "experiments/neurobem_sampling_rate_scaling/CALIBRATION_FREEZE/rate_adapters/hz400_h20.json",
+    "adapter_sha256": "36b7572bd971f2f26180f54d52cb2629a233afc972ac7ba058f114fac121c429",
+    "evaluation_key": "hz400_h20",
+    "fit_segments": 171,
+    "history_steps": 20,
+    "resampling_operator": "NATIVE_2P5MS_NO_DOWNSAMPLING",
+    "sampling_rate_hz": 400,
+    "test_accessed": false
+  },
+  "hz400_h80": {
+    "adapter_path": "experiments/neurobem_sampling_rate_scaling/CALIBRATION_FREEZE/rate_adapters/hz400_h80.json",
+    "adapter_sha256": "93188dffe857d35cdc0bc22e44642ae40e4c3525c3ecde9fdfcbe353247c3d13",
+    "evaluation_key": "hz400_h80",
+    "fit_segments": 171,
+    "history_steps": 80,
+    "resampling_operator": "NATIVE_2P5MS_NO_DOWNSAMPLING",
+    "sampling_rate_hz": 400,
+    "test_accessed": false
+  }
+}

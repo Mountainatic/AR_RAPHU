@@ -1,0 +1,125 @@
+{
+  "blas_threads_per_worker": 1,
+  "condition_manifest": [
+    {
+      "alias_of": null,
+      "condition_id": "hz100_fixed_step_h20",
+      "evaluation_key": "hz100_h20",
+      "history_duration_ms": 200.0,
+      "history_mode": "FIXED_STEP",
+      "history_steps": 20,
+      "sampling_rate_hz": 100
+    },
+    {
+      "alias_of": "hz100_fixed_step_h20",
+      "condition_id": "hz100_fixed_time_h20",
+      "evaluation_key": "hz100_h20",
+      "history_duration_ms": 200.0,
+      "history_mode": "FIXED_TIME",
+      "history_steps": 20,
+      "sampling_rate_hz": 100
+    },
+    {
+      "alias_of": null,
+      "condition_id": "hz200_fixed_step_h20",
+      "evaluation_key": "hz200_h20",
+      "history_duration_ms": 100.0,
+      "history_mode": "FIXED_STEP",
+      "history_steps": 20,
+      "sampling_rate_hz": 200
+    },
+    {
+      "alias_of": null,
+      "condition_id": "hz200_fixed_time_h40",
+      "evaluation_key": "hz200_h40",
+      "history_duration_ms": 200.0,
+      "history_mode": "FIXED_TIME",
+      "history_steps": 40,
+      "sampling_rate_hz": 200
+    },
+    {
+      "alias_of": null,
+      "condition_id": "hz400_fixed_step_h20",
+      "evaluation_key": "hz400_h20",
+      "history_duration_ms": 50.0,
+      "history_mode": "FIXED_STEP",
+      "history_steps": 20,
+      "sampling_rate_hz": 400
+    },
+    {
+      "alias_of": null,
+      "condition_id": "hz400_fixed_time_h80",
+      "evaluation_key": "hz400_h80",
+      "history_duration_ms": 200.0,
+      "history_mode": "FIXED_TIME",
+      "history_steps": 80,
+      "sampling_rate_hz": 400
+    }
+  ],
+  "config_sha256": "2fd369b8458504ebd284e71ba70cc5560c815c50b6764b9ebe3fbca54a447b08",
+  "git_commit": "97e68c662199e001f9f50214e39e93bd98ddfa37",
+  "hostname": "autodl-container-418c45acc9-bbcb9702",
+  "model_fit_workers": 4,
+  "numpy": "2.2.6",
+  "pandas": "2.2.3",
+  "platform": "Linux-5.15.0-86-generic-x86_64-with-glibc2.35",
+  "prism_core_modified": false,
+  "python": "3.10.20 (main, Jul 18 2026, 17:02:35) [Clang 22.1.3 ]",
+  "resampling_audit": {
+    "hz100_h20": {
+      "maximum_dt_error_seconds": 9.0951551845464e-15,
+      "missing_registered_fields": false,
+      "operator": "OFFLINE_LEFT_CLOSED_10MS_BIN_MEAN_EXACT_R3",
+      "trajectory_count": 12
+    },
+    "hz200_h20": {
+      "maximum_dt_error_seconds": 9.663277122928804e-15,
+      "missing_registered_fields": false,
+      "operator": "OFFLINE_LEFT_CLOSED_5MS_BIN_MEAN",
+      "trajectory_count": 12
+    },
+    "hz200_h40": {
+      "maximum_dt_error_seconds": 9.663277122928804e-15,
+      "missing_registered_fields": false,
+      "operator": "OFFLINE_LEFT_CLOSED_5MS_BIN_MEAN",
+      "trajectory_count": 12
+    },
+    "hz400_h20": {
+      "maximum_dt_error_seconds": 3.069549822654061e-14,
+      "missing_registered_fields": false,
+      "operator": "NATIVE_2P5MS_NO_DOWNSAMPLING",
+      "trajectory_count": 12
+    },
+    "hz400_h80": {
+      "maximum_dt_error_seconds": 3.069549822654061e-14,
+      "missing_registered_fields": false,
+      "operator": "NATIVE_2P5MS_NO_DOWNSAMPLING",
+      "trajectory_count": 12
+    }
+  },
+  "split_audit": {
+    "calibration_parent_count": 23,
+    "calibration_segments": 60,
+    "contract": "CHRONOLOGICAL_PARENT_FLIGHT_TRAIN_FIT_CALIBRATION_R2_NO_TEST_READ",
+    "excluded_non400hz_train_names": [
+      "merged_2021-02-18-16-43-54_seg_1.csv",
+      "merged_2021-02-18-16-43-54_seg_2.csv",
+      "merged_2021-02-18-16-43-54_seg_3.csv",
+      "merged_2021-02-18-16-43-54_seg_4.csv"
+    ],
+    "excluded_train_test_duplicate_names": [
+      "merged_2021-02-23-22-26-25_seg_2.csv"
+    ],
+    "fit_fraction": 0.75,
+    "fit_parent_count": 69,
+    "fit_segments": 171,
+    "parent_count": 92,
+    "sampling_scaling_fit_support": "COMMON_NATIVE_400HZ_TRAIN_SUPPORT_EXCLUDING_164HZ_FLIGHT",
+    "test_trajectory_opened": false
+  },
+  "split_manifest_sha256": "b609413295bde19c925634ca9b9ece19ad02e7f739939ab7ac51b906226881c5",
+  "stage": "test",
+  "test_accessed": true,
+  "test_used_for_tuning": false,
+  "trajectory_workers": 24
+}
