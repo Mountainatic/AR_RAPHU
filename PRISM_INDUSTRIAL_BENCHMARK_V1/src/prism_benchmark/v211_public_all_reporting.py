@@ -89,6 +89,34 @@ def _repair_manifest(paths: PublicAllPaths) -> dict[str, Any]:
     return value
 
 
+def _raw_audit_summary(value: Mapping[str, Any]) -> dict[str, Any]:
+    summary = value.get("summary", {})
+    dataset_status = value.get("dataset_status", {})
+    files = value.get("files", ())
+    datasets_total = int(summary.get("datasets_total", len(dataset_status)))
+    datasets_pass = int(
+        summary.get(
+            "datasets_pass",
+            sum(status == "PASS" for status in dataset_status.values()),
+        )
+    )
+    files_total = int(summary.get("files_total", len(files)))
+    files_pass = int(
+        summary.get("files_pass", sum(item.get("match") is True for item in files))
+    )
+    return {
+        "datasets": datasets_total,
+        "datasets_pass": datasets_pass,
+        "files": files_total,
+        "files_pass": files_pass,
+        "pass": (
+            value.get("status") == "PASS"
+            and datasets_pass == datasets_total
+            and files_pass == files_total
+        ),
+    }
+
+
 def _write_json(path: Path, value: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -1099,10 +1127,7 @@ def _evidence(
         "reporting_commit": reporting_commit or _git(paths.project, "rev-parse", "HEAD"),
         "canonical_theory_sha256": freeze.get("canonical_theory_sha256"),
         "support_contract": SUPPORT_CONTRACT,
-        "raw_data_hash_audit": {
-            "datasets": len(raw.get("datasets", raw.get("audits", []))),
-            "pass": raw.get("status") == "PASS",
-        },
+        "raw_data_hash_audit": _raw_audit_summary(raw),
         "shared_data_sha": freeze.get("shared_development_metadata_sha256"),
         "development_freeze_sha": sha256_file(paths.development_freeze_path),
         "test_access_audit_sha": sha256_file(paths.test_access_audit_path),

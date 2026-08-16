@@ -13,6 +13,7 @@ from prism_benchmark.v211_public_all_reporting import (
     _add_ranks,
     _full_repro_manifest,
     _holm,
+    _raw_audit_summary,
     _repair_manifest,
 )
 
@@ -131,3 +132,26 @@ def test_full_repro_manifest_includes_reused_development_files(
     )
     observed = _full_repro_manifest(paths)
     assert reused in observed["files"]
+
+
+def test_raw_audit_summary_uses_registry_audit_schema() -> None:
+    observed = _raw_audit_summary(
+        {
+            "status": "PASS",
+            "summary": {
+                "datasets_total": 5,
+                "datasets_pass": 5,
+                "files_total": 8,
+                "files_pass": 8,
+            },
+            "dataset_status": {"dataset": "PASS"},
+            "files": [{"match": True}],
+        }
+    )
+    assert observed == {
+        "datasets": 5,
+        "datasets_pass": 5,
+        "files": 8,
+        "files_pass": 8,
+        "pass": True,
+    }
