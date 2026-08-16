@@ -20,7 +20,26 @@ from .v211_public_all_closure import common_support_record
 from .v211_public_all_config import PublicAllPaths
 from .v211_support import load_native_samples, support_id_hash
 from .v211_w import IDENTITY, _fit_c_routed, fit_w_correction
-from .v211_joint import fit_joint_candidate, joint_w_basis
+from .v211_joint import joint_w_basis
+from .v211_joint_stability import (
+    fit_joint_candidate_stability,
+    k_representation_blocks,
+    registered_joint_stability_candidates,
+)
+from .v211_joint_stability_config import (
+    JOINT_ESTIMATOR_SEMANTICS,
+    K_REPRESENTATIONS,
+)
+
+
+_JOINT_MATERIALIZATION_FIELDS = (
+    "family",
+    "joint_estimator_semantics",
+    "k_representation",
+    "numerical_alpha",
+    "predictive_eta",
+    "raw_k_support",
+)
 
 
 def _read_pass(path: Path) -> dict[str, Any]:
@@ -28,6 +47,123 @@ def _read_pass(path: Path) -> dict[str, Any]:
     if value.get("status") != "PASS":
         raise RuntimeError(f"prerequisite is not PASS: {path}")
     return value
+
+
+def _validate_joint_materialization_contract(
+    value: Mapping[str, Any],
+) -> dict[str, Any]:
+    missing = [key for key in _JOINT_MATERIALIZATION_FIELDS if key not in value]
+    if missing:
+        raise RuntimeError(
+            "Joint materialization contract is missing stability fields: "
+            + ", ".join(missing)
+        )
+    contract = dict(value)
+    if contract["joint_estimator_semantics"] != JOINT_ESTIMATOR_SEMANTICS:
+        raise RuntimeError("Joint materialization estimator semantics mismatch")
+    if contract["family"] not in registered_joint_stability_candidates():
+        raise RuntimeError("Joint materialization route is not registered")
+    if contract["k_representation"] not in K_REPRESENTATIONS:
+        raise RuntimeError("Joint materialization K representation is not registered")
+    if float(contract["numerical_alpha"]) < 0:
+        raise RuntimeError("Joint materialization numerical alpha is negative")
+    if float(contract["predictive_eta"]) < 0:
+        raise RuntimeError("Joint materialization predictive eta is negative")
+    raw_k_support = contract["raw_k_support"]
+    if (
+        not isinstance(raw_k_support, list)
+        or not raw_k_support
+        or not all(isinstance(channel, str) and channel for channel in raw_k_support)
+    ):
+        raise RuntimeError("Joint materialization raw K support is invalid")
+    return contract
+
+
+def _joint_result_path(paths: PublicAllPaths, view: ViewSpec) -> Path:
+    return (
+        paths.output
+        / "DEVELOPMENT"
+        / "JOINT"
+        / view.head.head_id
+        / view.availability_scenario
+        / view.proxy_policy
+        / "RESULT.json"
+    )
+
+
+def preflight_public_all_materialization(
+    paths: PublicAllPaths, views: Iterable[ViewSpec]
+) -> dict[str, Any]:
+    records: list[dict[str, Any]] = []
+    for view in views:
+        path = _joint_result_path(paths, view)
+        result = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+        if result.get("status") != "PASS":
+            continue
+        if result.get("ar_profile") is None:
+            raise RuntimeError("formal Joint result has no frozen AR profile")
+        contract = _validate_joint_materialization_contract(
+            result.get("joint_contract", {})
+        )
+        frozen_fields = {
+            "selected_k_representation": "k_representation",
+            "selected_predictive_eta": "predictive_eta",
+            "selected_numerical_alpha": "numerical_alpha",
+        }
+        for result_key, contract_key in frozen_fields.items():
+            if result.get(result_key) != contract.get(contract_key):
+                raise RuntimeError(
+                    f"Joint materialization frozen field mismatch: {result_key}"
+                )
+        records.append(
+            {
+                "target_head": view.head.head_id,
+                "availability_scenario": view.availability_scenario,
+                "proxy_policy": view.proxy_policy,
+                "family": contract["family"],
+                "k_representation": contract["k_representation"],
+                "numerical_alpha": float(contract["numerical_alpha"]),
+                "predictive_eta": float(contract["predictive_eta"]),
+                "raw_k_support": list(contract["raw_k_support"]),
+            }
+        )
+    return {
+        "status": "PASS",
+        "joint_estimator_semantics": JOINT_ESTIMATOR_SEMANTICS,
+        "formal_joint_views": len(records),
+        "views": records,
+        "test_accessed": False,
+        "ood_accessed": False,
+    }
+
+
+def _joint_evaluation_k_block(
+    features: Mapping[str, Any], contract: Mapping[str, Any]
+) -> np.ndarray:
+    validated = _validate_joint_materialization_contract(contract)
+    blocks, _ = k_representation_blocks(
+        features, tuple(validated["raw_k_support"])
+    )
+    return blocks[str(validated["k_representation"])][1]
+
+
+def _fit_frozen_joint_candidate(
+    train_blocks: Mapping[str, np.ndarray],
+    target: np.ndarray,
+    evaluation_blocks: Mapping[str, np.ndarray],
+    contract: Mapping[str, Any],
+) -> tuple[np.ndarray, dict[str, Any], dict[str, np.ndarray]]:
+    validated = _validate_joint_materialization_contract(contract)
+    return fit_joint_candidate_stability(
+        train_blocks,
+        target,
+        evaluation_blocks,
+        candidate=str(validated["family"]),
+        k_representation=str(validated["k_representation"]),
+        numerical_alpha=float(validated["numerical_alpha"]),
+        predictive_eta=float(validated["predictive_eta"]),
+        raw_k_support=tuple(validated["raw_k_support"]),
+    )
 
 
 def _requirements(values: Iterable[Mapping[str, Any]]) -> tuple[SupportRequirement, ...]:
@@ -382,15 +518,7 @@ def materialize_dynamic_prism_view(
             / "RESULT.json"
         ).read_text(encoding="utf-8")
     )
-    joint_path = (
-        paths.output
-        / "DEVELOPMENT"
-        / "JOINT"
-        / view.head.head_id
-        / view.availability_scenario
-        / view.proxy_policy
-        / "RESULT.json"
-    )
+    joint_path = _joint_result_path(paths, view)
     joint = json.loads(joint_path.read_text(encoding="utf-8")) if joint_path.is_file() else {}
     active = [
         item
@@ -638,9 +766,13 @@ def materialize_dynamic_prism_view(
             fit_split="validation",
             evaluation_split=split,
         )
+        contract = _validate_joint_materialization_contract(
+            joint["joint_contract"]
+        )
+        combined_k = _joint_evaluation_k_block(features, contract)
         n_joint = len(joint_development)
-        joint_k = features["joint_evaluation"][:n_joint]
-        test_k = features["joint_evaluation"][n_joint:]
+        joint_k = combined_k[:n_joint]
+        test_k = combined_k[n_joint:]
         _, combined_w, _ = joint_w_basis(
             c_w_test["fit_seed"],
             c_w_joint["evaluation_seed"],
@@ -656,15 +788,11 @@ def materialize_dynamic_prism_view(
             joint_development, view.head.target, delta, history
         )
         test_a = target_accessor.target_state(evaluation, view.head.target, delta, history)
-        contract = joint["joint_contract"]
-        joint_prediction, refit_contract, _ = fit_joint_candidate(
+        joint_prediction, refit_contract, _ = _fit_frozen_joint_candidate(
             {"K": joint_k, "W": joint_w, "A": joint_a},
             joint_development["y_true"].to_numpy(dtype=np.float64),
             {"K": test_k, "W": test_w, "A": test_a},
-            candidate=contract["family"],
-            alpha=float(contract["alpha"]),
-            k_over_a_ratio=float(contract["k_over_a_ratio"]),
-            w_over_a_ratio=float(contract["w_over_a_ratio"]),
+            contract,
         )
         audits.append(
             _write_prediction(

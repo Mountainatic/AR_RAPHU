@@ -98,6 +98,16 @@ def test_run_public_all_test_materializes_registered_ood_once(
 
     monkeypatch.setattr(materialization, "materialize_input_prism_view", fake_input)
     monkeypatch.setattr(materialization, "materialize_dynamic_prism_view", fake_dynamic)
+    monkeypatch.setattr(
+        materialization,
+        "preflight_public_all_materialization",
+        lambda *args: {
+            "status": "PASS",
+            "formal_joint_views": 1,
+            "test_accessed": False,
+            "ood_accessed": False,
+        },
+    )
     monkeypatch.setattr(baseline, "materialize_baseline_view", fake_baseline)
 
     result = closure.run_public_all_test(paths)
@@ -108,6 +118,8 @@ def test_run_public_all_test_materializes_registered_ood_once(
     assert result["ood_accessed"] is True
     assert result["test_y_read"] is True
     assert result["ood_y_read"] is True
+    access_audit = json.loads(paths.test_access_audit_path.read_text(encoding="utf-8"))
+    assert access_audit["materialization_contract_preflight"]["status"] == "PASS"
     assert sorted(prism_calls) == sorted(
         [
             ("INPUT_HEAD", "test"),

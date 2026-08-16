@@ -579,6 +579,16 @@ def run_public_all_test(paths: PublicAllPaths) -> dict[str, Any]:
         view for view in dynamic_views if _has_registered_split(paths, view, "ood")
     ]
     ood_views = [*ood_input_views, *ood_dynamic_views]
+    from .v211_public_all_materialization import (
+        materialize_dynamic_prism_view,
+        materialize_input_prism_view,
+        preflight_public_all_materialization,
+    )
+    from .v211_public_all_baseline_materialization import materialize_baseline_view
+
+    materialization_preflight = preflight_public_all_materialization(
+        paths, dynamic_views
+    )
     write_json(
         paths.test_access_audit_path,
         {
@@ -595,13 +605,9 @@ def run_public_all_test(paths: PublicAllPaths) -> dict[str, Any]:
             "ood_accessed": False,
             "test_y_read": False,
             "ood_y_read": False,
+            "materialization_contract_preflight": materialization_preflight,
         },
     )
-    from .v211_public_all_materialization import (
-        materialize_dynamic_prism_view,
-        materialize_input_prism_view,
-    )
-    from .v211_public_all_baseline_materialization import materialize_baseline_view
 
     def write_baseline_summary(
         split: str, baseline_audits: list[dict[str, Any]]
@@ -672,6 +678,7 @@ def run_public_all_test(paths: PublicAllPaths) -> dict[str, Any]:
                 "ood_accessed": ood_accessed,
                 "test_y_read": test_y_read,
                 "ood_y_read": ood_y_read,
+                "materialization_contract_preflight": materialization_preflight,
             },
         )
         raise
@@ -698,6 +705,7 @@ def run_public_all_test(paths: PublicAllPaths) -> dict[str, Any]:
         "ood_accessed": ood_accessed,
         "test_y_read": test_y_read,
         "ood_y_read": ood_y_read,
+        "materialization_contract_preflight": materialization_preflight,
     }
     write_json(paths.test_access_audit_path, result)
     return result
