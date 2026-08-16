@@ -32,6 +32,11 @@ from .v211_support import SUPPORT_CONTRACT, load_native_samples, support_id_hash
 BOOTSTRAP_REPLICATES = 500
 BOOTSTRAP_SEED = 20260815
 PACKAGE_NAME = "PRISM_V2_1_1_NATIVE_SUPPORT_PUBLIC_ALL_RESULTS_bundle"
+REPAIR_MANIFEST_NAME = "POST_FREEZE_MATERIALIZATION_REPAIR.json"
+REUSED_ARTIFACT_MANIFEST_NAME = "REUSED_DEVELOPMENT_ARTIFACT_MANIFEST.json"
+REPAIR_EVIDENCE_CLASS = (
+    "POST_LOCKBOX_MATERIALIZATION_REPAIR_WITH_FROZEN_DEVELOPMENT_REUSE"
+)
 INPUT_PRISM_MODELS = {"PRISM_V2_1_1_K_C_W"}
 DYNAMIC_PRISM_MODELS = {
     "PRISM_V2_1_1_PHYSICS_FIRST",
@@ -69,6 +74,18 @@ def _read_json(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
         raise TypeError(f"expected JSON object: {path}")
+    return value
+
+
+def _repair_manifest(paths: PublicAllPaths) -> dict[str, Any]:
+    path = paths.freeze / REPAIR_MANIFEST_NAME
+    if not path.is_file():
+        return {}
+    value = _read_json(path)
+    if value.get("status") != "ACCEPTED_AUDITED_REUSE":
+        raise RuntimeError("materialization repair manifest is not accepted")
+    if value.get("post_test_reselection") is not False:
+        raise RuntimeError("materialization repair cannot include reselection")
     return value
 
 
@@ -816,12 +833,25 @@ def _final_report(
     native: pd.DataFrame,
     evidence: Mapping[str, Any],
 ) -> None:
+    if evidence.get("materialization_repair_after_lockbox_failure"):
+        evidence_summary = (
+            "The first lockbox access ended in a final-materialization runtime "
+            "failure. This result reuses the unchanged frozen development artifacts "
+            "after a code-equivalence and SHA256 audit, applies only the accepted "
+            "materialization repair, and records two lockbox access attempts. No "
+            "test result was used for reselection."
+        )
+    else:
+        evidence_summary = (
+            "This is a prospective Native Support protocol rerun with prior "
+            "historical context. Historical aggregates were not used for selection."
+        )
     lines = [
         "# PRISM v2.1.1 Native Support Public-All Final Report",
         "",
         f"Evidence class: `{evidence['evidence_class']}`.",
         "",
-        "This is a prospective Native Support protocol rerun with prior historical context. Historical aggregates were not used for selection.",
+        evidence_summary,
         "",
         "## Scope",
         "",
@@ -891,6 +921,12 @@ def _full_repro_manifest(paths: PublicAllPaths) -> dict[str, Any]:
                 "generated_by_stage": stage,
             }
         )
+    reused_path = paths.freeze / REUSED_ARTIFACT_MANIFEST_NAME
+    if reused_path.is_file():
+        reused = _read_json(reused_path)
+        if reused.get("status") != "PASS":
+            raise RuntimeError("reused development artifact manifest is not PASS")
+        records.extend(dict(item) for item in reused.get("files", ()))
     value = {"status": "PASS", "files": records}
     _write_json(paths.final / "FULL_REPRO_MANIFEST.json", value)
     return value
@@ -905,6 +941,7 @@ def _copy_small_artifacts(paths: PublicAllPaths, stage: Path, reporting_commit: 
         shutil.copy2(source, target)
 
     descriptor = load_public_all_descriptor(paths.project)
+    repair = _repair_manifest(paths)
     copy(paths.project / "configs/prism_v211_native_public_all.json", "protocol/prism_v211_native_public_all.json")
     copy(paths.project / "configs/cpu_model_freeze_v1.json", "protocol/cpu_model_freeze_v1.json")
     theory = theory_path(paths.project)
@@ -919,6 +956,10 @@ def _copy_small_artifacts(paths: PublicAllPaths, stage: Path, reporting_commit: 
         paths.freeze / "K_NATIVE_SUPPORT_AUDIT.json",
         paths.freeze / "TASK_LEADERBOARD_COMMON_SUPPORT.json",
         paths.development_freeze_path,
+        paths.freeze / REPAIR_MANIFEST_NAME,
+        paths.freeze / REUSED_ARTIFACT_MANIFEST_NAME,
+        paths.freeze / "R1_LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
+        paths.freeze / "R1_PUBLIC_ALL_TEST_OOD_ACCESS_AUDIT.json",
         paths.test_access_audit_path,
         paths.final / "FULL_REPRO_MANIFEST.json",
     ):
@@ -926,13 +967,19 @@ def _copy_small_artifacts(paths: PublicAllPaths, stage: Path, reporting_commit: 
     for source in sorted(paths.final.glob("*")):
         if source.is_file() and source.suffix.lower() in {".json", ".csv", ".md", ".txt"}:
             copy(source, f"results/{source.name}")
+    access_note = (
+        "- The first test access failed in final materialization; this repaired "
+        "result records two lockbox access attempts and no reselection.\n"
+        if repair
+        else "- Test/OOD access occurred once after global development freeze.\n"
+    )
     changelog = stage / "CHANGELOG.md"
     changelog.write_text(
         "# PRISM v2.1.1 Native Support Public-All\n\n"
         "- Fresh C1: `NATIVE_K_COMMON_ASSEMBLY_R1`.\n"
         "- Five datasets, seven primary heads, primary views.\n"
         "- GPU baselines and scale sweeps are out of scope.\n"
-        "- Test/OOD access occurred once after global development freeze.\n",
+        + access_note,
         encoding="utf-8",
     )
     (stage / "GENERATING_COMMIT.txt").write_text(
@@ -943,6 +990,11 @@ def _copy_small_artifacts(paths: PublicAllPaths, stage: Path, reporting_commit: 
         (reporting_commit or _git(paths.project, "rev-parse", "HEAD")) + "\n",
         encoding="utf-8",
     )
+    if repair:
+        (stage / "MATERIALIZATION_REPAIR_COMMIT.txt").write_text(
+            str(repair.get("materialization_repair_commit", "")) + "\n",
+            encoding="utf-8",
+        )
     (stage / "GIT_STATUS.txt").write_text(
         _git(paths.project, "status", "--short") + "\n", encoding="utf-8"
     )
@@ -1024,6 +1076,7 @@ def _evidence(
     reporting_commit: str | None,
 ) -> dict[str, Any]:
     freeze = _read_json(paths.development_freeze_path)
+    repair = _repair_manifest(paths)
     raw = _read_json(paths.run_root / "PUBLIC_ALL_RAW_DATA_REAUDIT.json")
     primary = [item for item in head_summary if item.get("pf_status") == "PASS"]
     joint_count = sum(item.get("joint_development_status") == "PASS" for item in head_summary)
@@ -1033,11 +1086,16 @@ def _evidence(
     ]
     result = {
         "status": "PASS" if access.get("status") == "PASS" else "FAILED",
-        "evidence_class": freeze.get("evidence_class"),
+        "evidence_class": (
+            REPAIR_EVIDENCE_CLASS if repair else freeze.get("evidence_class")
+        ),
         "source_branch": SOURCE_BRANCH,
         "source_commit": SOURCE_COMMIT,
         "execution_branch": EXECUTION_BRANCH,
         "generating_commit": freeze.get("generating_commit"),
+        "materialization_repair_commit": repair.get(
+            "materialization_repair_commit"
+        ),
         "reporting_commit": reporting_commit or _git(paths.project, "rev-parse", "HEAD"),
         "canonical_theory_sha256": freeze.get("canonical_theory_sha256"),
         "support_contract": SUPPORT_CONTRACT,
@@ -1065,6 +1123,16 @@ def _evidence(
         "test_accessed": access.get("test_accessed") is True,
         "ood_accessed": access.get("ood_accessed") is True,
         "post_test_reselection": False,
+        "materialization_repair_after_lockbox_failure": bool(repair),
+        "development_artifacts_reused": bool(repair),
+        "lockbox_access_attempts": int(repair.get("lockbox_access_attempts", 1)),
+        "one_shot_test_access": not bool(repair),
+        "original_lockbox_failure_sha256": repair.get(
+            "original_lockbox_failure_sha256"
+        ),
+        "development_code_equivalence_audit": repair.get(
+            "development_code_equivalence_audit"
+        ),
     }
     for information_set, key in (("input_only", "input_only_best_models"), ("dynamic", "dynamic_best_models")):
         subset = metrics[
