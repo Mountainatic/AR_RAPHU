@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import tempfile
@@ -928,15 +929,37 @@ def _final_report(
     report.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def _repro_files(root: Path, excluded_root: Path) -> list[Path]:
+    files: list[Path] = []
+    visited_directories: set[tuple[int, int]] = set()
+    for directory, dirnames, filenames in os.walk(
+        root, topdown=True, followlinks=True
+    ):
+        current = Path(directory)
+        if current == excluded_root or excluded_root in current.parents:
+            dirnames.clear()
+            continue
+        stat = current.stat()
+        identity = (stat.st_dev, stat.st_ino)
+        if identity in visited_directories:
+            dirnames.clear()
+            continue
+        visited_directories.add(identity)
+        dirnames[:] = sorted(
+            name for name in dirnames if current / name != excluded_root
+        )
+        for name in sorted(filenames):
+            path = current / name
+            if path.is_file():
+                files.append(path)
+    return files
+
+
 def _full_repro_manifest(paths: PublicAllPaths) -> dict[str, Any]:
     records = []
-    for path in sorted(paths.run_root.rglob("*")):
-        if not path.is_file() or paths.return_root in path.parents:
-            continue
+    for path in _repro_files(paths.run_root, paths.return_root):
         rel = path.relative_to(paths.run_root).as_posix()
         if rel.startswith("final/FULL_REPRO_MANIFEST.json"):
-            continue
-        if rel.startswith("final/") and path.suffix not in {".json", ".csv", ".md", ".txt"}:
             continue
         role = "shared_data" if rel.startswith("shared/") else "prediction" if "prediction" in rel else "artifact"
         stage = rel.split("/", 1)[0]

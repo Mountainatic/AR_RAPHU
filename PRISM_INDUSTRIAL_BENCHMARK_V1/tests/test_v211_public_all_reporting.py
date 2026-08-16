@@ -156,6 +156,40 @@ def test_full_repro_manifest_includes_reused_development_files(
     assert reused in observed["files"]
 
 
+def test_full_repro_manifest_follows_routed_prediction_directory(
+    tmp_path: Path,
+) -> None:
+    run_root = tmp_path / "run"
+    final = run_root / "final"
+    freeze = run_root / "freeze"
+    return_root = run_root / "return"
+    external = tmp_path / "external_predictions"
+    final.mkdir(parents=True)
+    freeze.mkdir()
+    external.mkdir()
+    prediction = external / "PREDICTION.parquet"
+    prediction.write_bytes(b"prediction")
+    routed = final / "baseline_test_predictions"
+    routed.symlink_to(external, target_is_directory=True)
+    paths = SimpleNamespace(
+        run_root=run_root,
+        return_root=return_root,
+        final=final,
+        freeze=freeze,
+    )
+
+    observed = _full_repro_manifest(paths)
+
+    record = next(
+        item
+        for item in observed["files"]
+        if item["path"]
+        == "final/baseline_test_predictions/PREDICTION.parquet"
+    )
+    assert record["bytes"] == len(b"prediction")
+    assert record["role"] == "prediction"
+
+
 def test_raw_audit_summary_uses_registry_audit_schema() -> None:
     observed = _raw_audit_summary(
         {
