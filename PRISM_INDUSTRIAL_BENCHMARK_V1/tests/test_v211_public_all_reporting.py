@@ -108,6 +108,28 @@ def test_reporting_requires_an_accepted_repair_without_reselection(
         _repair_manifest(paths)
 
 
+def test_reporting_preserves_multiple_lockbox_failures(tmp_path: Path) -> None:
+    paths = SimpleNamespace(freeze=tmp_path)
+    history = [
+        {"attempt": 1, "failure_sha256": "a" * 64},
+        {"attempt": 2, "failure_sha256": "b" * 64},
+    ]
+    (tmp_path / REPAIR_MANIFEST_NAME).write_text(
+        json.dumps(
+            {
+                "status": "ACCEPTED_AUDITED_REUSE",
+                "post_test_reselection": False,
+                "lockbox_access_attempts": 3,
+                "lockbox_failure_history": history,
+            }
+        ),
+        encoding="utf-8",
+    )
+    observed = _repair_manifest(paths)
+    assert observed["lockbox_access_attempts"] == 3
+    assert observed["lockbox_failure_history"] == history
+
+
 def test_full_repro_manifest_includes_reused_development_files(
     tmp_path: Path,
 ) -> None:

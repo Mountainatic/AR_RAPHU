@@ -986,21 +986,31 @@ def _copy_small_artifacts(paths: PublicAllPaths, stage: Path, reporting_commit: 
         paths.development_freeze_path,
         paths.freeze / REPAIR_MANIFEST_NAME,
         paths.freeze / REUSED_ARTIFACT_MANIFEST_NAME,
-        paths.freeze / "R1_LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
-        paths.freeze / "R1_PUBLIC_ALL_TEST_OOD_ACCESS_AUDIT.json",
         paths.test_access_audit_path,
         paths.final / "FULL_REPRO_MANIFEST.json",
     ):
         copy(source, f"audit/{source.name}")
+    for pattern in (
+        "*LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
+        "*PUBLIC_ALL_TEST_OOD_ACCESS_AUDIT.json",
+    ):
+        for source in sorted(paths.freeze.glob(pattern)):
+            copy(source, f"audit/{source.name}")
     for source in sorted(paths.final.glob("*")):
         if source.is_file() and source.suffix.lower() in {".json", ".csv", ".md", ".txt"}:
             copy(source, f"results/{source.name}")
-    access_note = (
-        "- The first test access failed in final materialization; this repaired "
-        "result records two lockbox access attempts and no reselection.\n"
-        if repair
-        else "- Test/OOD access occurred once after global development freeze.\n"
-    )
+    if repair:
+        attempts = max(int(repair.get("lockbox_access_attempts", 1)), 1)
+        failures = attempts - 1
+        access_note = (
+            f"- {failures} test/OOD materialization attempt(s) failed after lockbox "
+            f"access; the repaired result records {attempts} attempts and no "
+            "reselection.\n"
+        )
+    else:
+        access_note = (
+            "- Test/OOD access occurred once after global development freeze.\n"
+        )
     changelog = stage / "CHANGELOG.md"
     changelog.write_text(
         "# PRISM v2.1.1 Native Support Public-All\n\n"
@@ -1155,6 +1165,7 @@ def _evidence(
         "original_lockbox_failure_sha256": repair.get(
             "original_lockbox_failure_sha256"
         ),
+        "lockbox_failure_history": repair.get("lockbox_failure_history", []),
         "development_code_equivalence_audit": repair.get(
             "development_code_equivalence_audit"
         ),

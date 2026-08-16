@@ -20,7 +20,7 @@ from .v211_public_all_closure import common_support_record
 from .v211_public_all_config import PublicAllPaths
 from .v211_support import load_native_samples, support_id_hash
 from .v211_w import IDENTITY, _fit_c_routed, fit_w_correction
-from .v211_joint import joint_w_basis
+from .v211_joint import J_KW, J_KWA, joint_w_basis
 from .v211_joint_stability import (
     fit_joint_candidate_stability,
     k_representation_blocks,
@@ -40,6 +40,7 @@ _JOINT_MATERIALIZATION_FIELDS = (
     "predictive_eta",
     "raw_k_support",
 )
+_JOINT_W_ROUTES = {J_KW, J_KWA}
 
 
 def _read_pass(path: Path) -> dict[str, Any]:
@@ -79,6 +80,25 @@ def _validate_joint_materialization_contract(
     return contract
 
 
+def _joint_w_materialization_contract(
+    w_result: Mapping[str, Any],
+    joint_result: Mapping[str, Any],
+    joint_contract: Mapping[str, Any],
+) -> dict[str, Any]:
+    value = w_result.get("joint_w_basis_contract")
+    if not isinstance(value, Mapping):
+        raise RuntimeError("Joint materialization W basis contract is missing")
+    frozen = joint_result.get("joint_w_basis_contract")
+    if frozen != value:
+        raise RuntimeError("Joint materialization W basis contract drifted")
+    if (
+        joint_contract.get("family") in _JOINT_W_ROUTES
+        and value.get("family") == IDENTITY
+    ):
+        raise RuntimeError("Joint materialization W route has an identity basis")
+    return dict(value)
+
+
 def _joint_result_path(paths: PublicAllPaths, view: ViewSpec) -> Path:
     return (
         paths.output
@@ -105,6 +125,17 @@ def preflight_public_all_materialization(
         contract = _validate_joint_materialization_contract(
             result.get("joint_contract", {})
         )
+        w_result = _read_pass(
+            paths.output
+            / "DEVELOPMENT"
+            / "W"
+            / view.head.head_id
+            / view.proxy_policy
+            / "RESULT.json"
+        )
+        joint_w_contract = _joint_w_materialization_contract(
+            w_result, result, contract
+        )
         frozen_fields = {
             "selected_k_representation": "k_representation",
             "selected_predictive_eta": "predictive_eta",
@@ -125,6 +156,7 @@ def preflight_public_all_materialization(
                 "numerical_alpha": float(contract["numerical_alpha"]),
                 "predictive_eta": float(contract["predictive_eta"]),
                 "raw_k_support": list(contract["raw_k_support"]),
+                "joint_w_family": joint_w_contract["family"],
             }
         )
     return {
@@ -769,6 +801,7 @@ def materialize_dynamic_prism_view(
         contract = _validate_joint_materialization_contract(
             joint["joint_contract"]
         )
+        joint_w_contract = _joint_w_materialization_contract(w, joint, contract)
         combined_k = _joint_evaluation_k_block(features, contract)
         n_joint = len(joint_development)
         joint_k = combined_k[:n_joint]
@@ -776,7 +809,7 @@ def materialize_dynamic_prism_view(
         _, combined_w, _ = joint_w_basis(
             c_w_test["fit_seed"],
             c_w_joint["evaluation_seed"],
-            w_contract,
+            joint_w_contract,
         )
         joint_w = combined_w[:n_joint]
         test_w = combined_w[n_joint:]

@@ -13,7 +13,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from prism_benchmark.cpu_data import HeadSpec, ViewSpec
-from prism_benchmark.v211_joint import J_KA
+from prism_benchmark.v211_joint import J_KA, J_KW
 from prism_benchmark.v211_joint_stability_config import (
     CHANNEL_COMPRESSED,
     FULL_BASIS,
@@ -22,9 +22,11 @@ from prism_benchmark.v211_joint_stability_config import (
 from prism_benchmark.v211_public_all_materialization import (
     _fit_frozen_joint_candidate,
     _joint_evaluation_k_block,
+    _joint_w_materialization_contract,
     _validate_joint_materialization_contract,
     preflight_public_all_materialization,
 )
+from prism_benchmark.v211_w import IDENTITY
 
 
 def _contract(representation: str = CHANNEL_COMPRESSED) -> dict[str, object]:
@@ -35,6 +37,13 @@ def _contract(representation: str = CHANNEL_COMPRESSED) -> dict[str, object]:
         "numerical_alpha": 0.0,
         "predictive_eta": 1.0,
         "raw_k_support": ["k1", "k2"],
+    }
+
+
+def _joint_w_contract() -> dict[str, object]:
+    return {
+        "family": "NATURAL_CUBIC_CORRECTION",
+        "knot_count": 4,
     }
 
 
@@ -114,6 +123,30 @@ def test_joint_materialization_rejects_legacy_contract_schema() -> None:
         )
 
 
+def test_joint_w_materialization_uses_joint_basis_when_pf_w_is_identity() -> None:
+    basis = _joint_w_contract()
+    w_result = {
+        "w_contract": {"family": IDENTITY},
+        "joint_w_basis_contract": basis,
+    }
+    joint_result = {"joint_w_basis_contract": basis}
+    contract = {**_contract(), "family": J_KW}
+    assert (
+        _joint_w_materialization_contract(w_result, joint_result, contract)
+        == basis
+    )
+
+
+def test_joint_w_materialization_rejects_identity_for_w_route() -> None:
+    basis = {"family": IDENTITY}
+    with pytest.raises(RuntimeError, match="identity basis"):
+        _joint_w_materialization_contract(
+            {"joint_w_basis_contract": basis},
+            {"joint_w_basis_contract": basis},
+            {**_contract(), "family": J_KW},
+        )
+
+
 def test_materialization_preflight_validates_frozen_joint_fields(
     tmp_path: Path,
 ) -> None:
@@ -129,6 +162,7 @@ def test_materialization_preflight_validates_frozen_joint_fields(
     )
     result_path.parent.mkdir(parents=True)
     contract = _contract()
+    joint_w_contract = _joint_w_contract()
     result_path.write_text(
         json.dumps(
             {
@@ -138,6 +172,25 @@ def test_materialization_preflight_validates_frozen_joint_fields(
                 "selected_predictive_eta": contract["predictive_eta"],
                 "selected_numerical_alpha": contract["numerical_alpha"],
                 "joint_contract": contract,
+                "joint_w_basis_contract": joint_w_contract,
+            }
+        ),
+        encoding="utf-8",
+    )
+    w_path = (
+        tmp_path
+        / "DEVELOPMENT"
+        / "W"
+        / view.head.head_id
+        / view.proxy_policy
+        / "RESULT.json"
+    )
+    w_path.parent.mkdir(parents=True)
+    w_path.write_text(
+        json.dumps(
+            {
+                "status": "PASS",
+                "joint_w_basis_contract": joint_w_contract,
             }
         ),
         encoding="utf-8",
@@ -146,6 +199,7 @@ def test_materialization_preflight_validates_frozen_joint_fields(
     observed = preflight_public_all_materialization(paths, [view])
     assert observed["status"] == "PASS"
     assert observed["formal_joint_views"] == 1
+    assert observed["views"][0]["joint_w_family"] == joint_w_contract["family"]
     assert observed["test_accessed"] is False
 
     payload = json.loads(result_path.read_text(encoding="utf-8"))
