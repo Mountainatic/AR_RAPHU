@@ -13,6 +13,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from prism_benchmark.cpu_data import HeadSpec, ViewSpec
 from prism_benchmark.v211_public_all_baseline_materialization import (
+    _static_native,
     _static_model,
     _write,
     materialize_baseline_view,
@@ -125,6 +126,42 @@ def test_static_materialization_uses_the_requested_evaluation_accessor(
         split="test",
     )
     assert accessor_splits == ["validation", "test"]
+
+
+def test_static_materialization_uses_frozen_model_specific_fit_caps(
+    monkeypatch,
+) -> None:
+    from prism_benchmark import v211_public_all_baseline_materialization as module
+
+    observed_caps: list[int] = []
+    monkeypatch.setattr(
+        module,
+        "_development",
+        lambda *args: _samples("validation", rows=10),
+    )
+    monkeypatch.setattr(
+        module,
+        "_freeze",
+        lambda *args: {
+            "selection": {
+                "fit_row_cap_default": 250_000,
+                "fit_row_cap_svr": 5_000,
+                "fit_row_cap_xgboost": 100_000,
+            }
+        },
+    )
+
+    def capture_cap(fit, cap):
+        observed_caps.append(cap)
+        return fit
+
+    monkeypatch.setattr(module, "_cap_after_support", capture_cap)
+    paths = SimpleNamespace(project=Path("project"), shared=Path("shared"))
+
+    for model in ("RIDGE", "RBF_SVR", "XGBOOST"):
+        _static_native(paths, _view(), model)
+
+    assert observed_caps == [250_000, 5_000, 100_000]
 
 
 def test_prediction_writer_persists_real_parameter_count(tmp_path: Path) -> None:

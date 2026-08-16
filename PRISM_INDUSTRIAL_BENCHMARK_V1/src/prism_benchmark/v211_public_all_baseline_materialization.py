@@ -146,10 +146,14 @@ def _not_run(
     }
 
 
-def _static_native(paths: PublicAllPaths, view: ViewSpec):
+def _static_native(paths: PublicAllPaths, view: ViewSpec, model: str):
     requirement = SupportRequirement(input_history_steps=1)
     fit = _development(paths.shared, view, [requirement])
-    cap = int(_freeze(paths.project)["selection"]["fit_row_cap_default"])
+    cap_key = {
+        "RBF_SVR": "fit_row_cap_svr",
+        "XGBOOST": "fit_row_cap_xgboost",
+    }.get(model, "fit_row_cap_default")
+    cap = int(_freeze(paths.project)["selection"][cap_key])
     return _cap_after_support(fit, cap)
 
 
@@ -188,7 +192,7 @@ def _static_model(
     split: str,
 ) -> tuple[np.ndarray, np.ndarray, dict[str, Any], int]:
     freeze = _freeze(paths.project)
-    fit = _static_native(paths, view)
+    fit = _static_native(paths, view, model)
     test = _common_test(paths, view, split)
     columns = input_columns(paths.shared, view.head.task_id, view.proxy_policy)
     fit_accessor = BaseAccessor(paths.shared, view.head.dataset, "validation", columns)
