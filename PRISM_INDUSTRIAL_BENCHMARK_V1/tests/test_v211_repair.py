@@ -6,6 +6,7 @@ import pytest
 
 from prism_benchmark.cpu_selection import mse
 from prism_benchmark.v21_selection import assert_final_prediction_contract
+from prism_benchmark.v211_a import _merge_w_validation_for_a
 from prism_benchmark.v211_assembly import pf_and_joint_input_status_match
 from prism_benchmark.v211_c import (
     BEST_ACTIVE_K,
@@ -155,6 +156,56 @@ def test_w_exact_zero_k_forces_identity():
     assert candidates == [IDENTITY]
     assert audit["identity_forced"] is True
     assert audit["reason"] == "K_EXACT_ZERO"
+
+
+def test_w_exact_zero_identity_has_a_registered_identity_ablation():
+    from prism_benchmark.v211_w import _pf_ablation_candidate
+
+    assert _pf_ablation_candidate(IDENTITY, None) == IDENTITY
+    nonlinear = ("NATURAL_CUBIC_CORRECTION", 4, 0.0, 0.0, 1)
+    assert _pf_ablation_candidate(IDENTITY, nonlinear) == nonlinear
+    assert _pf_ablation_candidate(nonlinear, None) == nonlinear
+
+
+def test_a_uses_dynamic_w_support_intersection():
+    validation = pd.DataFrame(
+        {
+            "base_origin_id": ["dynamic-only", "shared-1", "shared-2"],
+            "y_true": [0.0, 1.0, 2.0],
+        }
+    )
+    w_validation = pd.DataFrame(
+        {
+            "base_origin_id": ["shared-1", "shared-2", "w-only"],
+            "physical_latent": [0.8, 1.8, 3.0],
+            "delta_w": [0.1, 0.1, 0.0],
+            "delta_w_ablation": [0.0, 0.0, 0.0],
+            "physical_w_ablation": [0.8, 1.8, 3.0],
+            "y_pred": [0.9, 1.9, 3.0],
+        }
+    )
+
+    merged = _merge_w_validation_for_a(validation, w_validation)
+
+    assert merged["base_origin_id"].tolist() == ["shared-1", "shared-2"]
+    assert merged["physical_w"].tolist() == [0.9, 1.9]
+
+
+def test_a_rejects_empty_dynamic_w_support_intersection():
+    validation = pd.DataFrame({"base_origin_id": ["dynamic-only"]})
+    w_validation = pd.DataFrame(
+        {
+            "base_origin_id": ["w-only"],
+            "physical_latent": [1.0],
+            "delta_w": [0.0],
+            "delta_w_ablation": [0.0],
+            "physical_w_ablation": [1.0],
+            "y_pred": [1.0],
+        }
+    )
+
+    with pytest.raises(RuntimeError, match="no rows"):
+        _merge_w_validation_for_a(validation, w_validation)
 
 
 def test_pf_and_joint_share_input_path_gate():

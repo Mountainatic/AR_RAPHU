@@ -89,6 +89,16 @@ def _candidate_descriptor(candidate: Any) -> dict[str, Any]:
     }
 
 
+def _pf_ablation_candidate(selected: Any, joint_basis_candidate: Any) -> Any:
+    if selected != IDENTITY:
+        return selected
+    return (
+        joint_basis_candidate
+        if joint_basis_candidate is not None
+        else IDENTITY
+    )
+
+
 @dataclass(frozen=True)
 class WDesign:
     train: np.ndarray
@@ -887,9 +897,7 @@ def run_w_view(
         # ablation when PF selects identity.  Freeze that ablation from the
         # development-loss-best applicable non-identity construction; it is
         # never selection eligible and never changes ``selected``.
-        pf_ablation_candidate = (
-            selected if selected != IDENTITY else joint_basis_candidate
-        )
+        pf_ablation_candidate = _pf_ablation_candidate(selected, joint_basis_candidate)
         if pf_ablation_candidate is None:
             raise RuntimeError(
                 "no applicable non-identity W construction for the registered ablation"

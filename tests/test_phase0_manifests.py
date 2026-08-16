@@ -5,10 +5,16 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SOURCE = PROJECT_ROOT / "实验数据1.xlsx"
 MANIFEST_DIR = PROJECT_ROOT / "data_manifests" / "cz"
+pytestmark = pytest.mark.skipif(
+    not SOURCE.is_file() or not MANIFEST_DIR.is_dir(),
+    reason="private CZ source and manifests are not present in this public checkout",
+)
 EXPECTED_SOURCE_SHA256 = (
     "c46e0d35d26903386fd80408f36660c4f8925a5dbc56c92527f020e433ef04de"
 )

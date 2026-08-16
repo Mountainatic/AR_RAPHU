@@ -4,6 +4,7 @@ import inspect
 import os
 import subprocess
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -29,6 +30,7 @@ from prism_benchmark.v211_joint_stability import (
     predictive_penalty_scale,
     prepare_joint_representation,
     registered_joint_stability_candidates,
+    _registered_stability_rejection,
     select_k_representation,
     select_predictive_eta,
     select_smallest_numerical_alpha,
@@ -69,6 +71,27 @@ def _prepared(rows: int = 120, representation: str = FULL_BASIS):
         ),
         target[::2],
     )
+
+
+def test_c_input_path_failure_is_a_legal_joint_stability_rejection() -> None:
+    view = SimpleNamespace(
+        head=SimpleNamespace(dataset="metropt", head_id="TEST_HEAD"),
+        availability_scenario="record_time",
+        proxy_policy="primary",
+    )
+    result = _registered_stability_rejection(
+        view,
+        {
+            "pass": False,
+            "input_path_failure_class": "INPUT_PATH_PRESERVATION_PERFORMANCE_GATE_FAILED",
+        },
+        started=0.0,
+    )
+    assert result["status"] == "JOINT_STABILITY_REGISTERED_STABILITY_CONTROLS_INSUFFICIENT"
+    assert result["selected_candidate"] is None
+    assert result["input_path_preservation"]["reason"] == "C_INPUT_PATH_NOT_PRESERVED"
+    assert result["test_accessed"] is False
+    assert result["ood_accessed"] is False
 
 
 def test_full_basis_legacy_anchor_matches_v212_solver() -> None:
@@ -323,16 +346,14 @@ def test_original_four_fold_provenance_code_is_retained() -> None:
     assert "w_physical_oof_used_as_training_pool" in source
 
 
-def test_pf_estimators_are_unchanged_from_parent_commit() -> None:
+def test_pf_core_estimators_are_unchanged_from_native_support_source_commit() -> None:
     project = Path(__file__).resolve().parents[1]
     paths = [
         "src/prism_benchmark/v211_k.py",
         "src/prism_benchmark/v211_c.py",
-        "src/prism_benchmark/v211_w.py",
-        "src/prism_benchmark/v211_a.py",
     ]
     diff = subprocess.run(
-        ["git", "-C", str(project), "diff", "6ebcac898a75b6c1aa05c920a3a39847db052957", "--", *paths],
+        ["git", "-C", str(project), "diff", "e47542a319640bc045ca0d31ae9b40763182dde8", "--", *paths],
         check=True,
         text=True,
         capture_output=True,

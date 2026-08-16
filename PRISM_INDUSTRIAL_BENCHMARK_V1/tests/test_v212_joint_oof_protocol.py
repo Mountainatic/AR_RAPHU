@@ -3,6 +3,7 @@ from __future__ import annotations
 import inspect
 import os
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pandas as pd
@@ -14,10 +15,14 @@ from prism_benchmark.v211_joint import (
     J_KA,
     J_KW,
     J_KWA,
+    _input_only_view,
+    align_joint_oof_rows,
+    align_registered_joint_fold,
     audit_joint_fold_protocol,
     build_w_design,
     evaluate_joint_candidates_ordered,
     fit_joint_candidate,
+    intersect_by_base_origin_id,
     registered_joint_candidates,
     registered_joint_inner_fold_frames,
     run_joint_view,
@@ -127,6 +132,66 @@ def test_joint_evaluation_fold_matches_c_and_w_registered_ids() -> None:
         input_folds[0]["evaluation"][["base_origin_id", "view_sample_id"]],
     )
     assert audit["pass"] is False
+
+
+def test_availability_specific_joint_support_reuses_record_time_input_namespace() -> None:
+    view = SimpleNamespace(
+        head=object(),
+        availability_scenario="delay_10_steps",
+        proxy_policy="primary",
+    )
+    input_view = _input_only_view(view)
+    assert input_view.information_set == "input_only"
+    assert input_view.availability_scenario == "record_time"
+
+    registered = _train_frame(rows=12, information_set="input")
+    dynamic = _train_frame(rows=12, information_set="dynamic").iloc[
+        [0, 2, 4, 7, 9]
+    ].reset_index(drop=True)
+    frame_names = (
+        "fit_raw",
+        "evaluation_raw",
+        "fit_supported",
+        "evaluation_supported",
+        "fit",
+        "evaluation",
+    )
+    joint_fold = {
+        "fold_index": 0,
+        **{name: dynamic.copy() for name in frame_names},
+    }
+    registered_fold = {
+        "fold_index": 0,
+        **{name: registered.copy() for name in frame_names},
+    }
+    aligned_fold = align_registered_joint_fold(joint_fold, registered_fold)
+    aligned_oof = align_joint_oof_rows(
+        registered[["base_origin_id", "view_sample_id"]],
+        dynamic,
+        label="test OOF",
+    )
+    audit = audit_joint_fold_protocol(
+        joint_fold,
+        aligned_fold,
+        aligned_oof,
+        aligned_oof.copy(),
+    )
+    assert audit["pass"] is True
+    assert aligned_fold["evaluation"]["base_origin_id"].tolist() == dynamic[
+        "base_origin_id"
+    ].tolist()
+    assert aligned_fold["evaluation"]["view_sample_id"].str.startswith(
+        "input-sample-"
+    ).all()
+
+    intersection = intersect_by_base_origin_id(
+        dynamic,
+        registered.iloc[[0, 4, 9]],
+        label="test intersection",
+    )
+    assert intersection["base_origin_id"].tolist() == registered.iloc[
+        [0, 4, 9]
+    ]["base_origin_id"].tolist()
 
 
 def test_joint_does_not_skip_fold_zero() -> None:

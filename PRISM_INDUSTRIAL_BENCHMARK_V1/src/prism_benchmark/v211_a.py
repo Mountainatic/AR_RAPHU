@@ -113,6 +113,43 @@ def _merge_w_oof_for_a(
     )
 
 
+def _merge_w_validation_for_a(
+    validation: pd.DataFrame,
+    w_validation: pd.DataFrame,
+) -> pd.DataFrame:
+    """Restrict a dynamic view to its legal intersection with W assembly support."""
+    columns = [
+        "base_origin_id",
+        "physical_latent",
+        "delta_w",
+        "delta_w_ablation",
+        "physical_w_ablation",
+        "y_pred",
+    ]
+    missing = [column for column in columns if column not in w_validation.columns]
+    if missing:
+        raise RuntimeError(
+            f"W validation is missing registered A-route columns: {missing}"
+        )
+    frame = validation.merge(
+        w_validation[columns].rename(columns={"y_pred": "physical_w"}),
+        on="base_origin_id",
+        how="inner",
+        validate="one_to_one",
+    )
+    validation_ids = set(validation["base_origin_id"].astype(str))
+    w_support_ids = set(w_validation["base_origin_id"].astype(str))
+    expected_ids = validation_ids.intersection(w_support_ids)
+    observed_ids = set(frame["base_origin_id"].astype(str))
+    if observed_ids != expected_ids or len(frame) != len(expected_ids):
+        raise RuntimeError(
+            "A did not inherit the complete dynamic/W assembly support intersection"
+        )
+    if frame.empty:
+        raise RuntimeError("A has no rows on the dynamic/W assembly support intersection")
+    return frame
+
+
 def _fit_frozen_a_route(
     oof: pd.DataFrame,
     validation: pd.DataFrame,
@@ -240,23 +277,7 @@ def run_a_view(
         if len(oof) > int(v2["row_caps"]["state_fit"]):
             raise RuntimeError("A OOF fit rows exceed the frozen state_fit cap")
         oof["residual"] = oof["y_true"] - oof["physical_w_oof"]
-        validation_frame = validation.merge(
-            w_validation[
-                [
-                    "base_origin_id",
-                    "physical_latent",
-                    "delta_w",
-                    "delta_w_ablation",
-                    "physical_w_ablation",
-                    "y_pred",
-                ]
-            ].rename(columns={"y_pred": "physical_w"}),
-            on="base_origin_id",
-            how="inner",
-            validate="one_to_one",
-        )
-        if len(validation_frame) != len(w_validation):
-            raise RuntimeError("A did not inherit the complete W assembly support")
+        validation_frame = _merge_w_validation_for_a(validation, w_validation)
         validation_frame["residual"] = (
             validation_frame["y_true"] - validation_frame["physical_w"]
         )
@@ -625,6 +646,9 @@ def run_a_view(
             "a_support_is_subset_of_w_support": set(
                 validation_frame["base_origin_id"].astype(str)
             ).issubset(set(w_validation["base_origin_id"].astype(str))),
+            "a_validation_anchor_rows": len(validation),
+            "w_assembly_validation_rows": len(w_validation),
+            "a_validation_intersection_rows": len(validation_frame),
             "observed_mature_feature_fraction": selected_coverage,
             "active_near_zero_audit": active_near_zero_audit,
             "hard_feature_residualization": False,

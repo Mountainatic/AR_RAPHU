@@ -161,12 +161,99 @@ def registered_joint_inner_fold_frames(
 
 
 def _input_only_view(view: Any) -> ViewSpec:
+    """Return the frozen input-only record-time namespace for a view."""
     return ViewSpec(
         head=view.head,
         information_set="input_only",
-        availability_scenario=view.availability_scenario,
+        availability_scenario="record_time",
         proxy_policy=view.proxy_policy,
     )
+
+
+def _align_frame_by_base_origin_id(
+    source: pd.DataFrame,
+    reference: pd.DataFrame,
+    *,
+    label: str,
+) -> pd.DataFrame:
+    """Project a frozen support frame into the reference row namespace."""
+    for frame_name, frame in (("source", source), ("reference", reference)):
+        if "base_origin_id" not in frame.columns:
+            raise JointFoldProtocolMismatch(
+                f"{label} {frame_name} is missing base_origin_id"
+            )
+    source_ids = source["base_origin_id"].astype(str).reset_index(drop=True)
+    reference_ids = reference["base_origin_id"].astype(str).reset_index(drop=True)
+    if source_ids.duplicated().any() or reference_ids.duplicated().any():
+        raise JointFoldProtocolMismatch(
+            f"{label} requires unique base_origin_id rows"
+        )
+    positions = pd.Index(source_ids).get_indexer(reference_ids)
+    if np.any(positions < 0):
+        missing = reference_ids[positions < 0].tolist()[:3]
+        raise JointFoldProtocolMismatch(
+            f"{label} is missing registered base_origin_id rows: {missing}"
+        )
+    return source.iloc[positions].reset_index(drop=True)
+
+
+def align_registered_joint_fold(
+    joint_fold: Mapping[str, Any],
+    registered_input_fold: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Align input-only fold provenance to an availability-specific Joint fold."""
+    aligned = dict(registered_input_fold)
+    for name in (
+        "fit_raw",
+        "evaluation_raw",
+        "fit_supported",
+        "evaluation_supported",
+        "fit",
+        "evaluation",
+    ):
+        if name in joint_fold and name in registered_input_fold:
+            aligned[name] = _align_frame_by_base_origin_id(
+                registered_input_fold[name],
+                joint_fold[name],
+                label=f"registered input {name}",
+            )
+    return aligned
+
+
+def align_joint_oof_rows(
+    oof_rows: pd.DataFrame,
+    joint_evaluation: pd.DataFrame,
+    *,
+    label: str,
+) -> pd.DataFrame:
+    """Align frozen C/W OOF rows to the Joint evaluation support."""
+    return _align_frame_by_base_origin_id(
+        oof_rows,
+        joint_evaluation,
+        label=label,
+    )
+
+
+def intersect_by_base_origin_id(
+    samples: pd.DataFrame,
+    registered_support: pd.DataFrame,
+    *,
+    label: str,
+) -> pd.DataFrame:
+    """Apply availability-specific support as an intersection with frozen C/W."""
+    if "base_origin_id" not in samples or "base_origin_id" not in registered_support:
+        raise JointFoldProtocolMismatch(
+            f"{label} support intersection is missing base_origin_id"
+        )
+    registered_ids = set(registered_support["base_origin_id"].astype(str))
+    result = samples.loc[
+        samples["base_origin_id"].astype(str).isin(registered_ids)
+    ].copy()
+    if result.empty:
+        raise JointFoldProtocolMismatch(
+            f"{label} has no rows on the frozen C/W support intersection"
+        )
+    return result.reset_index(drop=True)
 
 
 def _origin_bounds(frame: pd.DataFrame) -> tuple[int | None, int | None]:
@@ -757,11 +844,18 @@ def run_joint_view(
             fold = int(fold_record["fold_index"])
             fit = fold_record["fit"]
             evaluation = fold_record["evaluation"]
-            w_evaluation = w_oof[w_oof["oof_fold"] == fold].reset_index(
-                drop=True
+            registered_input_fold = align_registered_joint_fold(
+                fold_record, registered_input_fold
             )
-            c_evaluation = c_oof[c_oof["oof_fold"] == fold].reset_index(
-                drop=True
+            w_evaluation = align_joint_oof_rows(
+                w_oof[w_oof["oof_fold"] == fold].reset_index(drop=True),
+                evaluation,
+                label=f"W OOF fold {fold}",
+            )
+            c_evaluation = align_joint_oof_rows(
+                c_oof[c_oof["oof_fold"] == fold].reset_index(drop=True),
+                evaluation,
+                label=f"C OOF fold {fold}",
             )
             protocol_audit = audit_joint_fold_protocol(
                 fold_record,
@@ -975,15 +1069,40 @@ def run_joint_view(
             numerical_certificate_passed=all(numeric_passes),
             **gate_parameters,
         )
-        assembly_development_train = apply_assembly_support(
-            development_train, active
+        registered_assembly_train = apply_assembly_support(
+            registered_input_train, active
+        )
+        if support_id_hash(registered_assembly_train) != c_result.get(
+            "assembly_train_support_hash"
+        ):
+            raise JointFoldProtocolMismatch(
+                "frozen C assembly train support could not be replayed"
+            )
+        assembly_development_train = intersect_by_base_origin_id(
+            apply_assembly_support(development_train, active),
+            registered_assembly_train,
+            label="Joint development train",
         )
         train = _cap(
             assembly_development_train,
             int(v2["row_caps"]["joint_predictive_fit"]),
         )
-        validation = apply_assembly_support(
-            load_native_samples(shared, view, "validation"), active
+        registered_assembly_validation = apply_assembly_support(
+            load_native_samples(shared, _input_only_view(view), "validation"),
+            active,
+        )
+        if support_id_hash(registered_assembly_validation) != c_result.get(
+            "assembly_validation_support_hash"
+        ):
+            raise JointFoldProtocolMismatch(
+                "frozen C assembly validation support could not be replayed"
+            )
+        validation = intersect_by_base_origin_id(
+            apply_assembly_support(
+                load_native_samples(shared, view, "validation"), active
+            ),
+            registered_assembly_validation,
+            label="Joint validation",
         )
         final_features = fit_physical_features(
             shared,
@@ -1203,6 +1322,14 @@ def run_joint_view(
                 validation
             )
             == c_result.get("assembly_validation_base_origin_support_hash"),
+            "joint_raw_input_support_is_subset_of_c_assembly": set(
+                validation["base_origin_id"].astype(str)
+            ).issubset(
+                set(registered_assembly_validation["base_origin_id"].astype(str))
+            ),
+            "joint_raw_input_support_contract": (
+                "DYNAMIC_AVAILABILITY_INTERSECTION_C_ASSEMBLY"
+            ),
             "joint_k_representations_share_rows": True,
             "joint_fit_source": "ORIGINAL_REGISTERED_ANCHOR_INNER_TRAIN_SUPPORT_AFTER_ASSEMBLY_MASK",
             "joint_evaluation_source": (

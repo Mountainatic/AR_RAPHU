@@ -32,8 +32,11 @@ from .v211_joint import (
     JOINT_CANDIDATES,
     JointFoldProtocolMismatch,
     _input_only_view,
+    align_joint_oof_rows,
+    align_registered_joint_fold,
     audit_joint_fold_protocol,
     fit_joint_candidate,
+    intersect_by_base_origin_id,
     joint_w_basis,
     registered_joint_inner_fold_frames,
 )
@@ -701,12 +704,62 @@ def _stability_summary(losses: Sequence[float]) -> dict[str, float]:
     }
 
 
+def _registered_stability_rejection(
+    view: Any,
+    gate: Mapping[str, Any],
+    *,
+    started: float,
+) -> dict[str, Any]:
+    preservation = dict(gate)
+    preservation.update(
+        {
+            "status": "INPUT_PATH_COLLAPSED",
+            "pass": False,
+            "reason": "C_INPUT_PATH_NOT_PRESERVED",
+        }
+    )
+    return {
+        "status": "JOINT_STABILITY_REGISTERED_STABILITY_CONTROLS_INSUFFICIENT",
+        "development_decision": (
+            "JOINT_STABILITY_REGISTERED_STABILITY_CONTROLS_INSUFFICIENT"
+        ),
+        "development_diagnosis": "C_INPUT_PATH_NOT_PRESERVED",
+        "diagnosis_scope": "DEVELOPMENT_MODEL_SELECTION_NOT_CAUSAL_PROOF",
+        "stage": "M5_JOINT_STABILITY_PREDICTIVE_STABILITY",
+        "dataset": view.head.dataset,
+        "target_head": view.head.head_id,
+        "availability_scenario": view.availability_scenario,
+        "proxy_policy": view.proxy_policy,
+        "registered_candidates": list(JOINT_CANDIDATES),
+        "applicable_candidates": [],
+        "selected_candidate": None,
+        "selected_k_representation": None,
+        "selected_predictive_eta": None,
+        "selected_numerical_alpha": None,
+        "final_selected_candidate": None,
+        "input_path_preservation": preservation,
+        "input_path_gate": preservation,
+        "input_path_failure_class": preservation.get(
+            "input_path_failure_class", "INPUT_PATH_COLLAPSED"
+        ),
+        "joint_contract": {
+            "status": "NOT_FIT_INPUT_PATH_UNAVAILABLE",
+            "input_path_required": True,
+            "ar_only_fallback_allowed": False,
+        },
+        "test_accessed": False,
+        "ood_accessed": False,
+        "elapsed_seconds": time.time() - started,
+    }
+
+
 def run_joint_stability_view(
     shared: Path,
     project: Path,
     output: Path,
-    legacy_results_root: Path,
+    legacy_results_root: Path | None,
     view: Any,
+    protocol: str = "metro_p60",
 ) -> dict[str, Any]:
     started = time.time()
     destination = (
@@ -720,7 +773,7 @@ def run_joint_stability_view(
     destination.mkdir(parents=True, exist_ok=True)
     try:
         config = load_joint_stability_config(project)
-        v211, v21, v2 = load_v211_configs(project, protocol="metro_p60")
+        v211, v21, v2 = load_v211_configs(project, protocol=protocol)
         c_path = (
             output
             / "DEVELOPMENT/C"
@@ -749,7 +802,13 @@ def run_joint_stability_view(
         if any(item.get("status") != "PASS" for item in (c_result, w_result, a_result)):
             raise RuntimeError("v2.1.1 Joint stability practice M2-M4 prerequisite is not PASS")
         if not bool(c_result.get("input_path_preservation", {}).get("pass")):
-            raise RuntimeError("v2.1.1 Joint stability practice requires the frozen C input path")
+            result = _registered_stability_rejection(
+                view,
+                c_result.get("input_path_preservation", {}),
+                started=started,
+            )
+            write_json(destination / "RESULT.json", result)
+            return result
         frozen_channel_set = {
             str(value) for value in c_result["active_channels"]
         }
@@ -799,18 +858,26 @@ def run_joint_stability_view(
         inner_target_accessor = BaseAccessor(
             shared, view.head.dataset, "train", [view.head.target]
         )
-        legacy_path = (
-            legacy_results_root
-            / "DEVELOPMENT/JOINT"
-            / view.head.head_id
-            / view.availability_scenario
-            / view.proxy_policy
-            / "RESULT.json"
-        )
-        legacy = json.loads(legacy_path.read_text(encoding="utf-8"))
-        legacy_route = str(legacy["final_selected_candidate"])
-        legacy_selected = legacy["route_local_selected"][legacy_route]
-        _, legacy_alpha, legacy_ratio_k, legacy_ratio_w = legacy_selected
+        legacy_anchor_available = legacy_results_root is not None
+        legacy = None
+        legacy_route = None
+        legacy_alpha = None
+        legacy_ratio_k = None
+        legacy_ratio_w = None
+        if legacy_anchor_available:
+            assert legacy_results_root is not None
+            legacy_path = (
+                legacy_results_root
+                / "DEVELOPMENT/JOINT"
+                / view.head.head_id
+                / view.availability_scenario
+                / view.proxy_policy
+                / "RESULT.json"
+            )
+            legacy = json.loads(legacy_path.read_text(encoding="utf-8"))
+            legacy_route = str(legacy["final_selected_candidate"])
+            legacy_selected = legacy["route_local_selected"][legacy_route]
+            _, legacy_alpha, legacy_ratio_k, legacy_ratio_w = legacy_selected
         observed_legacy_losses: list[float] = []
         prepared_folds: list[dict[str, PreparedRepresentation]] = []
         fold_records: list[dict[str, Any]] = []
@@ -822,11 +889,22 @@ def run_joint_stability_view(
             fold = int(fold_record["fold_index"])
             fit = fold_record["fit"]
             evaluation = fold_record["evaluation"]
+            registered_input_fold = align_registered_joint_fold(
+                fold_record, registered_input_fold
+            )
             protocol_audit = audit_joint_fold_protocol(
                 fold_record,
                 registered_input_fold,
-                w_oof[w_oof["oof_fold"] == fold].reset_index(drop=True),
-                c_oof[c_oof["oof_fold"] == fold].reset_index(drop=True),
+                align_joint_oof_rows(
+                    w_oof[w_oof["oof_fold"] == fold].reset_index(drop=True),
+                    evaluation,
+                    label=f"W OOF fold {fold}",
+                ),
+                align_joint_oof_rows(
+                    c_oof[c_oof["oof_fold"] == fold].reset_index(drop=True),
+                    evaluation,
+                    label=f"C OOF fold {fold}",
+                ),
             )
             protocol_audits.append(protocol_audit)
             if not protocol_audit["pass"]:
@@ -877,24 +955,27 @@ def run_joint_stability_view(
             )
             target = fit["y_true"].to_numpy(dtype=np.float64)
             evaluation_target = evaluation["y_true"].to_numpy(dtype=np.float64)
-            legacy_prediction, _, _ = fit_joint_candidate(
-                {
-                    "K": k_blocks[FULL_BASIS][0],
-                    "W": w_train,
-                    "A": a_train,
-                },
-                target,
-                {
-                    "K": k_blocks[FULL_BASIS][1],
-                    "W": w_eval,
-                    "A": a_eval,
-                },
-                candidate=legacy_route,
-                alpha=float(legacy_alpha),
-                k_over_a_ratio=float(legacy_ratio_k),
-                w_over_a_ratio=float(legacy_ratio_w),
-            )
-            observed_legacy_losses.append(mse(evaluation_target, legacy_prediction))
+            if legacy_anchor_available:
+                legacy_prediction, _, _ = fit_joint_candidate(
+                    {
+                        "K": k_blocks[FULL_BASIS][0],
+                        "W": w_train,
+                        "A": a_train,
+                    },
+                    target,
+                    {
+                        "K": k_blocks[FULL_BASIS][1],
+                        "W": w_eval,
+                        "A": a_eval,
+                    },
+                    candidate=legacy_route,
+                    alpha=float(legacy_alpha),
+                    k_over_a_ratio=float(legacy_ratio_k),
+                    w_over_a_ratio=float(legacy_ratio_w),
+                )
+                observed_legacy_losses.append(
+                    mse(evaluation_target, legacy_prediction)
+                )
             prepared_by_representation = {}
             for representation in K_REPRESENTATIONS:
                 k_train, k_evaluation = k_blocks[representation]
@@ -916,39 +997,52 @@ def run_joint_stability_view(
         if len(prepared_folds) != 4:
             raise JointFoldProtocolMismatch("v2.1.1 Joint stability practice Joint requires all four folds")
 
-        expected_legacy_losses = [
-            float(value) for value in legacy["final_selected_fold_losses"]
-        ]
-        legacy_reproduced = bool(
-            np.allclose(
-                observed_legacy_losses,
-                expected_legacy_losses,
-                rtol=1e-10,
-                atol=1e-12,
-            )
-        )
-        if not legacy_reproduced:
-            raise RuntimeError("LEGACY_V212_JOINT_ANCHOR_NOT_REPRODUCED")
-        legacy_anchor = {
-            "name": "LEGACY_V212_JOINT_ANCHOR",
-            "selection_eligible": False,
-            "route": legacy_route,
-            "k_representation": FULL_BASIS,
-            "alpha": float(legacy_alpha),
-            "k_over_a_ratio": float(legacy_ratio_k),
-            "w_over_a_ratio": float(legacy_ratio_w),
-            "expected_fold_losses": expected_legacy_losses,
-            "observed_fold_losses": observed_legacy_losses,
-            "maximum_absolute_difference": float(
-                np.max(
-                    np.abs(
-                        np.asarray(observed_legacy_losses)
-                        - np.asarray(expected_legacy_losses)
-                    )
+        if legacy_anchor_available:
+            assert legacy is not None
+            expected_legacy_losses = [
+                float(value) for value in legacy["final_selected_fold_losses"]
+            ]
+            legacy_reproduced = bool(
+                np.allclose(
+                    observed_legacy_losses,
+                    expected_legacy_losses,
+                    rtol=1e-10,
+                    atol=1e-12,
                 )
-            ),
-            "reproduced": True,
-        }
+            )
+            if not legacy_reproduced:
+                raise RuntimeError("LEGACY_V212_JOINT_ANCHOR_NOT_REPRODUCED")
+            legacy_anchor = {
+                "name": "LEGACY_V212_JOINT_ANCHOR",
+                "selection_eligible": False,
+                "route": legacy_route,
+                "k_representation": FULL_BASIS,
+                "alpha": float(legacy_alpha),
+                "k_over_a_ratio": float(legacy_ratio_k),
+                "w_over_a_ratio": float(legacy_ratio_w),
+                "expected_fold_losses": expected_legacy_losses,
+                "observed_fold_losses": observed_legacy_losses,
+                "maximum_absolute_difference": float(
+                    np.max(
+                        np.abs(
+                            np.asarray(observed_legacy_losses)
+                            - np.asarray(expected_legacy_losses)
+                        )
+                    )
+                ),
+                "reproduced": True,
+            }
+        else:
+            expected_legacy_losses = []
+            legacy_reproduced = None
+            legacy_anchor = {
+                "name": "LEGACY_V212_JOINT_ANCHOR",
+                "selection_eligible": False,
+                "available": False,
+                "status": "NOT_PROVIDED_PUBLIC_ALL",
+                "reason": "public-all selection has no legacy anchor input",
+                "reproduced": False,
+            }
 
         numerical_alpha_grid = sorted(
             {
@@ -1132,15 +1226,40 @@ def run_joint_stability_view(
                 }
         oof_gate = gates[selected.route][selected.k_representation]["selected"]
 
-        assembly_development_train = apply_assembly_support(
-            development_train, active
+        registered_assembly_train = apply_assembly_support(
+            registered_input_train, active
+        )
+        if support_id_hash(registered_assembly_train) != c_result.get(
+            "assembly_train_support_hash"
+        ):
+            raise JointFoldProtocolMismatch(
+                "frozen C assembly train support could not be replayed"
+            )
+        assembly_development_train = intersect_by_base_origin_id(
+            apply_assembly_support(development_train, active),
+            registered_assembly_train,
+            label="Joint stability development train",
         )
         train = _cap(
             assembly_development_train,
             int(v2["row_caps"]["joint_predictive_fit"]),
         )
-        validation = apply_assembly_support(
-            load_native_samples(shared, view, "validation"), active
+        registered_assembly_validation = apply_assembly_support(
+            load_native_samples(shared, _input_only_view(view), "validation"),
+            active,
+        )
+        if support_id_hash(registered_assembly_validation) != c_result.get(
+            "assembly_validation_support_hash"
+        ):
+            raise JointFoldProtocolMismatch(
+                "frozen C assembly validation support could not be replayed"
+            )
+        validation = intersect_by_base_origin_id(
+            apply_assembly_support(
+                load_native_samples(shared, view, "validation"), active
+            ),
+            registered_assembly_validation,
+            label="Joint stability validation",
         )
         final_features = fit_physical_features(
             shared,
@@ -1309,11 +1428,19 @@ def run_joint_stability_view(
         frame.to_parquet(prediction_path, index=False, compression="zstd")
         final_loss = mse(frame["y_true"].to_numpy(dtype=np.float64), prediction)
         selected_losses = evaluation_by_candidate[selected]["fold_losses"]
-        legacy_improvement = practical_activation(
-            expected_legacy_losses,
-            selected_losses,
-            minimum_relative_improvement=minimum_relative,
-            minimum_positive_fraction=minimum_positive,
+        legacy_improvement = (
+            practical_activation(
+                expected_legacy_losses,
+                selected_losses,
+                minimum_relative_improvement=minimum_relative,
+                minimum_positive_fraction=minimum_positive,
+            )
+            if legacy_anchor_available
+            else {
+                "status": "NOT_AVAILABLE",
+                "pass": False,
+                "selection_eligible": False,
+            }
         )
         decision_label = (
             "JOINT_STABILITY_PREDICTIVE_STABILITY_SUPPORTED"
@@ -1374,6 +1501,7 @@ def run_joint_stability_view(
             "minimal_stabilizing_numerical_alpha_audits": numerical_audits,
             "ar_profile": list(a_profile),
             "legacy_v212_joint_anchor": legacy_anchor,
+            "legacy_anchor_available": legacy_anchor_available,
             "legacy_anchor_reproduced": legacy_reproduced,
             "legacy_vs_stability_selected_activation": legacy_improvement,
             "candidate_fold_losses": {
@@ -1436,6 +1564,14 @@ def run_joint_stability_view(
                 validation
             )
             == c_result.get("assembly_validation_base_origin_support_hash"),
+            "joint_raw_input_support_is_subset_of_c_assembly": set(
+                validation["base_origin_id"].astype(str)
+            ).issubset(
+                set(registered_assembly_validation["base_origin_id"].astype(str))
+            ),
+            "joint_raw_input_support_contract": (
+                "DYNAMIC_AVAILABILITY_INTERSECTION_C_ASSEMBLY"
+            ),
             "joint_k_representations_share_rows": True,
             "joint_fit_source": "ORIGINAL_REGISTERED_ANCHOR_INNER_TRAIN_SUPPORT_AFTER_ASSEMBLY_MASK",
             "joint_evaluation_source": "ORIGINAL_REGISTERED_ANCHOR_INNER_VALIDATION_SUPPORT_AFTER_ASSEMBLY_MASK",
@@ -1450,7 +1586,11 @@ def run_joint_stability_view(
                 for fold in fold_records
             ],
             "selected_stability": _stability_summary(selected_losses),
-            "legacy_stability": _stability_summary(expected_legacy_losses),
+            "legacy_stability": (
+                _stability_summary(expected_legacy_losses)
+                if legacy_anchor_available
+                else {"status": "NOT_AVAILABLE"}
+            ),
             "validation_mse": final_loss,
             "test_accessed": False,
             "ood_accessed": False,
