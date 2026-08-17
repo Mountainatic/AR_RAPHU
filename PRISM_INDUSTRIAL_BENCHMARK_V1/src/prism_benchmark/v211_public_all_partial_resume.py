@@ -228,7 +228,7 @@ def prepare_partial_resume(
     _require(parent_freeze.get("status") == "FROZEN", "parent freeze is not FROZEN")
     _require(
         sha256_file(parent.development_freeze_path)
-        == "e1d040c170da495888c37e3d45b39273b8bf6f3599b223868f141ab51e192ce7e",
+        == "e1d040c170da49588c37e3d45b39273b8bf6f3599b223868f141ab51e192ce7e",
         "partial-resume development freeze SHA mismatch",
     )
 
