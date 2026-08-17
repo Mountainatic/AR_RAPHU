@@ -82,6 +82,32 @@ def _require(condition: bool, message: str) -> None:
         raise RuntimeError(message)
 
 
+def _partial_resume_prefix(repair_generation: int) -> str:
+    _require(repair_generation > 0, "repair generation must be positive")
+    return f"R{repair_generation}_PARTIAL_RESUME"
+
+
+def _resume_identity(paths: PublicAllPaths) -> tuple[int, int]:
+    repair = _read_json(
+        paths.freeze / "POST_FREEZE_MATERIALIZATION_REPAIR.json"
+    )
+    generation = int(repair["repair_generation"])
+    attempt = int(repair["lockbox_access_attempts"])
+    _require(
+        attempt == generation + 1,
+        "partial-resume repair generation/access attempt mismatch",
+    )
+    history_attempts = sorted(
+        int(item["attempt"])
+        for item in repair.get("lockbox_failure_history", [])
+    )
+    _require(
+        history_attempts == list(range(1, attempt)),
+        "partial-resume failure history is incomplete",
+    )
+    return generation, attempt
+
+
 def _git(project: Path, *arguments: str) -> str:
     return subprocess.check_output(
         ["git", *arguments],
@@ -197,7 +223,15 @@ def prepare_partial_resume(
     *,
     materialization_commit: str,
     memory_repair_commit: str,
+    repair_generation: int,
+    lockbox_access_attempt: int,
+    additional_failure_parents: tuple[PublicAllPaths, ...] = (),
 ) -> dict[str, Any]:
+    prefix = _partial_resume_prefix(repair_generation)
+    _require(
+        lockbox_access_attempt == repair_generation + 1,
+        "partial-resume repair generation/access attempt mismatch",
+    )
     _require(
         not paths.run_root.exists(),
         f"partial-resume run root already exists: {paths.run_root}",
@@ -223,7 +257,19 @@ def prepare_partial_resume(
         ancestor.returncode == 0,
         "partial-resume memory repair commit is not an ancestor of HEAD",
     )
-    parent_failure = _parent_failure_entry(parent)
+    failure_sources = (
+        (parent, _parent_failure_entry(parent)),
+        *(
+            (failure_parent, _parent_failure_entry(failure_parent))
+            for failure_parent in additional_failure_parents
+        ),
+    )
+    parent_failure = failure_sources[0][1]
+    parent_repair_path = (
+        parent.freeze / "POST_FREEZE_MATERIALIZATION_REPAIR.json"
+    )
+    parent_repair = _read_json(parent_repair_path)
+    parent_generation = int(parent_repair["repair_generation"])
     parent_freeze = _read_json(parent.development_freeze_path)
     _require(parent_freeze.get("status") == "FROZEN", "parent freeze is not FROZEN")
     _require(
@@ -267,29 +313,55 @@ def prepare_partial_resume(
         excluded_names=frozenset(
             {
                 "POST_FREEZE_MATERIALIZATION_REPAIR.json",
-                "R3_PRE_LOCKBOX_GATE.json",
+                f"R{parent_generation}_PRE_LOCKBOX_GATE.json",
+                f"R{parent_generation}_PARTIAL_RESUME_PRE_LOCKBOX_GATE.json",
             }
         ),
     )
     log_records = _link_regular_files(parent.logs, paths.logs)
     _hardlink(
-        parent.freeze / "POST_FREEZE_MATERIALIZATION_REPAIR.json",
-        paths.freeze / "PARENT_R3_POST_FREEZE_MATERIALIZATION_REPAIR.json",
+        parent_repair_path,
+        paths.freeze
+        / f"PARENT_R{parent_generation}_POST_FREEZE_MATERIALIZATION_REPAIR.json",
     )
-    _hardlink(
-        parent.test_access_audit_path,
-        paths.freeze / "ATTEMPT_4_PUBLIC_ALL_TEST_OOD_ACCESS_AUDIT.json",
-    )
-    _hardlink(
-        parent.final / "LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
-        paths.freeze / "ATTEMPT_4_LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
-    )
-
-    parent_repair = _read_json(
-        parent.freeze / "POST_FREEZE_MATERIALIZATION_REPAIR.json"
-    )
+    failure_link_records: list[dict[str, Any]] = []
+    for failure_parent, failure_entry in failure_sources:
+        attempt = int(failure_entry["attempt"])
+        failure_link_records.append(
+            _hardlink(
+                failure_parent.test_access_audit_path,
+                paths.freeze
+                / f"ATTEMPT_{attempt}_PUBLIC_ALL_TEST_OOD_ACCESS_AUDIT.json",
+            )
+        )
+        failure_link_records.append(
+            _hardlink(
+                failure_parent.final
+                / "LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
+                paths.freeze
+                / f"ATTEMPT_{attempt}_LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
+            )
+        )
     history = list(parent_repair.get("lockbox_failure_history", []))
-    history.append(parent_failure)
+    known_attempts = {int(item["attempt"]) for item in history}
+    for _, failure_entry in failure_sources:
+        attempt = int(failure_entry["attempt"])
+        _require(
+            attempt not in known_attempts,
+            f"duplicate lockbox failure attempt: {attempt}",
+        )
+        history.append(failure_entry)
+        known_attempts.add(attempt)
+    history.sort(key=lambda item: int(item["attempt"]))
+    _require(
+        [int(item["attempt"]) for item in history]
+        == list(range(1, lockbox_access_attempt)),
+        "partial-resume failure history does not cover every prior attempt",
+    )
+    _require(
+        int(parent_failure["attempt"]) < lockbox_access_attempt,
+        "partial-resume parent failure is not prior to current attempt",
+    )
     repair = {
         **parent_repair,
         "status": "ACCEPTED_AUDITED_PARTIAL_RESUME",
@@ -297,9 +369,13 @@ def prepare_partial_resume(
             "POST_LOCKBOX_MATERIALIZATION_REPAIR_WITH_FROZEN_DEVELOPMENT_"
             "AND_VALIDATED_PARTIAL_ARTIFACT_REUSE"
         ),
-        "repair_generation": 4,
-        "lockbox_access_attempts": 5,
+        "repair_generation": repair_generation,
+        "lockbox_access_attempts": lockbox_access_attempt,
         "repair_parent_run_root": str(parent.run_root),
+        "additional_failure_run_roots": [
+            str(failure_parent.run_root)
+            for failure_parent in additional_failure_parents
+        ],
         "repair_run_root": str(paths.run_root),
         "materialization_repair_commit": materialization_commit,
         "previous_materialization_repair_commit": parent_repair.get(
@@ -334,7 +410,7 @@ def prepare_partial_resume(
 
     gate = {
         "status": "PASS",
-        "stage": "R4_PARTIAL_RESUME_PRE_LOCKBOX_GATE",
+        "stage": f"{prefix}_PRE_LOCKBOX_GATE",
         "generated_at_unix": time.time(),
         "development_freeze_sha256": sha256_file(
             paths.development_freeze_path
@@ -345,7 +421,8 @@ def prepare_partial_resume(
             paths.freeze / "POST_FREEZE_MATERIALIZATION_REPAIR.json"
         ),
         "checks": {
-            "access_attempt_is_five": True,
+            "access_attempt_matches_generation": True,
+            "failure_history_complete": True,
             "development_freeze_frozen": True,
             "parent_runtime_failure_retained": True,
             "parent_ood_not_accessed": True,
@@ -356,13 +433,15 @@ def prepare_partial_resume(
         },
         "metadata_hardlinks": {
             "root": len(root_records),
-            "freeze": len(freeze_records) + 3,
+            "freeze": (
+                len(freeze_records) + 1 + len(failure_link_records)
+            ),
             "logs": len(log_records),
         },
         "test_accessed": False,
         "ood_accessed": False,
     }
-    _write_json(paths.freeze / "R4_PARTIAL_RESUME_PRE_LOCKBOX_GATE.json", gate)
+    _write_json(paths.freeze / f"{prefix}_PRE_LOCKBOX_GATE.json", gate)
     return gate
 
 
@@ -691,7 +770,7 @@ def _reuse_prism_test(
             )
             audits.append(dict(audit))
         _require(canonical is not None, f"no PRISM support canonical: {view}")
-        fingerprints[view.relative_root] = canonical
+        fingerprints[str(view.relative_root)] = canonical
         _hardlink(
             source_result,
             paths.final
@@ -762,7 +841,7 @@ def _native_fit_audit(
 ) -> dict[str, Any]:
     requirement, cap = _baseline_requirement_and_cap(paths, model, result)
     key = (
-        view.relative_root,
+        str(view.relative_root),
         requirement.input_history_steps,
         requirement.target_delta_steps,
         requirement.target_history_steps,
@@ -830,7 +909,7 @@ def _reuse_baseline_test(
         )
         for family, model, output_model in baseline_candidates(view):
             result = _result(paths, family, model, view)
-            key = (view.relative_root, output_model)
+            key = (str(view.relative_root), output_model)
             if result is None:
                 slots[key] = _not_run(
                     view,
@@ -883,7 +962,9 @@ def _reuse_baseline_test(
                 / f"{output_model}.parquet"
             )
             if not source.is_file():
-                pending.setdefault(view.relative_root, set()).add(output_model)
+                pending.setdefault(
+                    str(view.relative_root), set()
+                ).add(output_model)
                 continue
             validation = _validate_prediction(
                 source,
@@ -893,7 +974,7 @@ def _reuse_baseline_test(
                 expected_rows,
                 expected_support_hash,
                 canonical_support_fingerprint=support_fingerprints[
-                    view.relative_root
+                    str(view.relative_root)
                 ],
             )
             parameter_count = int(validation["parameter_count"])
@@ -968,7 +1049,7 @@ def _canonical_baseline_audits(
     audits: list[dict[str, Any]] = []
     for view in views:
         for _, _, output_model in baseline_candidates(view):
-            key = (view.relative_root, output_model)
+            key = (str(view.relative_root), output_model)
             _require(key in slots, f"baseline audit slot is absent: {key}")
             audits.append(dict(slots[key]))
     return audits
@@ -1012,6 +1093,8 @@ def _access_started_payload(
     materialization_preflight: Mapping[str, Any],
     registered_ood_views: int,
     materialization_commit: str,
+    repair_generation: int,
+    lockbox_access_attempt: int,
 ) -> dict[str, Any]:
     freeze = _read_json(paths.development_freeze_path)
     descriptor = load_public_all_descriptor(paths.project)
@@ -1026,8 +1109,8 @@ def _access_started_payload(
         "shared_sha256": freeze.get("shared_development_metadata_sha256"),
         "config_sha": descriptor.get("config_sha256"),
         "theory_sha": freeze.get("canonical_theory_sha256"),
-        "repair_generation": 4,
-        "lockbox_access_attempt": 5,
+        "repair_generation": repair_generation,
+        "lockbox_access_attempt": lockbox_access_attempt,
         "partial_resume": True,
         "parent_run_root": str(parent.run_root),
         "registered_ood_views": registered_ood_views,
@@ -1059,6 +1142,8 @@ def run_partial_resume(
     expected_reused_baselines: int = 129,
     expected_pending_baselines: int = 7,
 ) -> dict[str, Any]:
+    repair_generation, lockbox_access_attempt = _resume_identity(paths)
+    prefix = _partial_resume_prefix(repair_generation)
     freeze = _read_json(paths.development_freeze_path)
     _require(freeze.get("status") == "FROZEN", "test resume requires FROZEN")
     _require(
@@ -1073,7 +1158,7 @@ def run_partial_resume(
         not paths.test_access_audit_path.exists(),
         "partial-resume access audit already exists",
     )
-    gate_path = paths.freeze / "R4_PARTIAL_RESUME_PRE_LOCKBOX_GATE.json"
+    gate_path = paths.freeze / f"{prefix}_PRE_LOCKBOX_GATE.json"
     gate = _read_json(gate_path)
     _require(gate.get("status") == "PASS", "partial-resume gate is not PASS")
 
@@ -1098,12 +1183,14 @@ def run_partial_resume(
         materialization_preflight=preflight,
         registered_ood_views=len(ood_views),
         materialization_commit=materialization_commit,
+        repair_generation=repair_generation,
+        lockbox_access_attempt=lockbox_access_attempt,
     )
     _write_json(paths.test_access_audit_path, access)
 
     progress: dict[str, Any] = {
         "status": "RUNNING",
-        "stage": "R4_PARTIAL_RESUME",
+        "stage": prefix,
         "started_at_unix": time.time(),
         "reused_prism_views": 0,
         "reused_prism_predictions": 0,
@@ -1114,7 +1201,7 @@ def run_partial_resume(
         "ood_baseline_predictions": 0,
         "post_test_reselection": False,
     }
-    progress_path = paths.logs / "R4_PARTIAL_RESUME_STATUS.json"
+    progress_path = paths.logs / f"{prefix}_STATUS.json"
     _write_json(progress_path, progress)
 
     test_y_read = False
@@ -1170,7 +1257,7 @@ def run_partial_resume(
 
         reuse_audit = {
             "status": "PASS",
-            "stage": "R4_VALIDATED_PARTIAL_ARTIFACT_REUSE",
+            "stage": f"R{repair_generation}_VALIDATED_PARTIAL_ARTIFACT_REUSE",
             "parent_run_root": str(parent.run_root),
             "destination_run_root": str(paths.run_root),
             "validation_contract": (
@@ -1193,7 +1280,7 @@ def run_partial_resume(
             "post_test_reselection": False,
         }
         reuse_audit_path = (
-            paths.freeze / "R4_PARTIAL_RESUME_ARTIFACT_REAUDIT.json"
+            paths.freeze / f"{prefix}_ARTIFACT_REAUDIT.json"
         )
         _write_json(reuse_audit_path, reuse_audit)
         access["partial_resume_artifact_reaudit_sha256"] = sha256_file(
@@ -1201,7 +1288,10 @@ def run_partial_resume(
         )
         _write_json(paths.test_access_audit_path, access)
 
-        view_map = {view.relative_root: view for view in all_views}
+        view_map = {
+            str(view.relative_root): view
+            for view in all_views
+        }
         for relative_root, models in pending.items():
             view = view_map[relative_root]
             new_audits = materialize_baseline_view(
@@ -1253,7 +1343,7 @@ def run_partial_resume(
             )
             ood_audits.extend(values)
             progress["ood_prism_predictions"] += len(values)
-            progress["last_completed_ood_view"] = view.relative_root
+            progress["last_completed_ood_view"] = str(view.relative_root)
             _write_json(progress_path, progress)
         for view in ood_dynamic_views:
             values = materialize_dynamic_prism_view(
@@ -1261,7 +1351,7 @@ def run_partial_resume(
             )
             ood_audits.extend(values)
             progress["ood_prism_predictions"] += len(values)
-            progress["last_completed_ood_view"] = view.relative_root
+            progress["last_completed_ood_view"] = str(view.relative_root)
             _write_json(progress_path, progress)
 
         baseline_ood_audits: list[dict[str, Any]] = []
@@ -1274,7 +1364,7 @@ def run_partial_resume(
                 audit.get("status") == "PASS" for audit in values
             )
             progress["last_completed_baseline_ood_view"] = (
-                view.relative_root
+                str(view.relative_root)
             )
             _write_json(progress_path, progress)
         baseline_ood_summary = _write_baseline_summary(
@@ -1289,8 +1379,8 @@ def run_partial_resume(
         failure = {
             "status": "LOCKBOX_ACCESSED_RUNTIME_FAILURE",
             "stage": "T1_PUBLIC_ALL_TEST_OOD_ACCESS",
-            "repair_generation": 4,
-            "lockbox_access_attempt": 5,
+            "repair_generation": repair_generation,
+            "lockbox_access_attempt": lockbox_access_attempt,
             "materialization_commit": materialization_commit,
             "error_type": type(error).__name__,
             "error": str(error),

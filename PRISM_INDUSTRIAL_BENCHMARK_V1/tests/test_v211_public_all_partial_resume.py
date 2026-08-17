@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -15,8 +16,12 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 from prism_benchmark import v211_public_all_baseline_materialization as baseline
 from prism_benchmark.cpu_data import HeadSpec, ViewSpec
 from prism_benchmark.v211_public_all_partial_resume import (
+    _canonical_baseline_audits,
+    _partial_resume_prefix,
+    _resume_identity,
     _hardlink,
     _link_regular_files,
+    _reuse_baseline_test,
     _logical_support_hash,
     _physical_support_fingerprint,
     _validate_prediction,
@@ -207,3 +212,81 @@ def test_nonrecursive_metadata_link_does_not_copy_prediction_tree(
         "audit.json"
     ]
     assert not (destination / "final").exists()
+
+
+def test_pending_baseline_manifest_uses_json_keys(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from prism_benchmark import v211_public_all_partial_resume as module
+
+    view = _view()
+    monkeypatch.setattr(
+        module,
+        "baseline_candidates",
+        lambda selected_view: (
+            ("C2", "RIDGE", "RIDGE"),
+            ("C2", "PLS", "PLS"),
+        ),
+    )
+    monkeypatch.setattr(
+        module,
+        "_result",
+        lambda _paths, _family, model, _view: (
+            None
+            if model == "PLS"
+            else {"status": "PASS", "selection": {}}
+        ),
+    )
+    monkeypatch.setattr(
+        module,
+        "_expected_support",
+        lambda *args: (7, "a" * 64),
+    )
+    paths = SimpleNamespace(
+        project=tmp_path,
+        shared=tmp_path / "shared",
+        output=tmp_path / "results",
+        final=tmp_path / "destination",
+    )
+    parent = SimpleNamespace(final=tmp_path / "parent")
+
+    slots, pending, records = _reuse_baseline_test(
+        paths,
+        parent,
+        [view],
+        {str(view.relative_root): "b" * 64},
+    )
+
+    assert records == []
+    assert pending == {str(view.relative_root): {"RIDGE"}}
+    json.dumps(
+        {relative_root: sorted(models) for relative_root, models in pending.items()}
+    )
+    root = str(view.relative_root)
+    assert (root, "PLS") in slots
+    slots[(root, "RIDGE")] = {"model": "RIDGE"}
+    audits = _canonical_baseline_audits([view], slots)
+    assert [audit["model"] for audit in audits] == ["RIDGE", "PLS"]
+
+
+def test_resume_identity_uses_manifest_generation(tmp_path: Path) -> None:
+    manifest = {
+        "repair_generation": 5,
+        "lockbox_access_attempts": 6,
+        "lockbox_failure_history": [
+            {"attempt": attempt}
+            for attempt in range(1, 6)
+        ],
+    }
+    path = tmp_path / "POST_FREEZE_MATERIALIZATION_REPAIR.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    paths = SimpleNamespace(freeze=tmp_path)
+
+    assert _partial_resume_prefix(5) == "R5_PARTIAL_RESUME"
+    assert _resume_identity(paths) == (5, 6)
+
+    manifest["lockbox_failure_history"].pop()
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="failure history is incomplete"):
+        _resume_identity(paths)

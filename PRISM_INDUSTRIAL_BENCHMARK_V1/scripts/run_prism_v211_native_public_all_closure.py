@@ -38,6 +38,11 @@ def main() -> None:
     parser.add_argument("--artifact-root", type=Path)
     parser.add_argument("--materialization-commit")
     parser.add_argument("--memory-repair-commit")
+    parser.add_argument("--repair-generation", type=int)
+    parser.add_argument("--lockbox-access-attempt", type=int)
+    parser.add_argument(
+        "--additional-failure-root", type=Path, action="append", default=[]
+    )
     parser.add_argument(
         "--project", type=Path, default=Path(__file__).resolve().parents[1]
     )
@@ -62,17 +67,31 @@ def main() -> None:
             if (
                 args.artifact_root is None
                 or args.memory_repair_commit is None
+                or args.repair_generation is None
+                or args.lockbox_access_attempt is None
             ):
                 parser.error(
-                    "prepare-resume requires --artifact-root and "
-                    "--memory-repair-commit"
+                    "prepare-resume requires --artifact-root, "
+                    "--memory-repair-commit, --repair-generation, and "
+                    "--lockbox-access-attempt"
                 )
+            additional_failure_parents = tuple(
+                PublicAllPaths(
+                    project=args.project.resolve(),
+                    shared=args.shared.resolve(),
+                    run_root=root.resolve(),
+                )
+                for root in args.additional_failure_root
+            )
             result = prepare_partial_resume(
                 paths,
                 parent,
                 args.artifact_root.resolve(),
                 materialization_commit=args.materialization_commit,
                 memory_repair_commit=args.memory_repair_commit,
+                repair_generation=args.repair_generation,
+                lockbox_access_attempt=args.lockbox_access_attempt,
+                additional_failure_parents=additional_failure_parents,
             )
         else:
             result = run_partial_resume(

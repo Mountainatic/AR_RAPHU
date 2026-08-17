@@ -1026,11 +1026,11 @@ def _copy_small_artifacts(paths: PublicAllPaths, stage: Path, reporting_commit: 
         paths.development_freeze_path,
         paths.freeze / REPAIR_MANIFEST_NAME,
         paths.freeze / REUSED_ARTIFACT_MANIFEST_NAME,
-        paths.freeze / "R4_PARTIAL_RESUME_PRE_LOCKBOX_GATE.json",
-        paths.freeze / "R4_PARTIAL_RESUME_ARTIFACT_REAUDIT.json",
         paths.test_access_audit_path,
         paths.final / "FULL_REPRO_MANIFEST.json",
     ):
+        copy(source, f"audit/{source.name}")
+    for source in sorted(paths.freeze.glob("R*_PARTIAL_RESUME*.json")):
         copy(source, f"audit/{source.name}")
     for pattern in (
         "*LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
