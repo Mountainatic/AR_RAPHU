@@ -1,0 +1,1007 @@
+{
+  "details": [
+    {
+      "channel": "u1",
+      "dataset": "debutanizer",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/DEB_C4__H5__W1/primary/u1/RESULT.json",
+      "status": "PASS",
+      "target_head": "DEB_C4__H5__W1"
+    },
+    {
+      "channel": "u2",
+      "dataset": "debutanizer",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/DEB_C4__H5__W1/primary/u2/RESULT.json",
+      "status": "PASS",
+      "target_head": "DEB_C4__H5__W1"
+    },
+    {
+      "channel": "u3",
+      "dataset": "debutanizer",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/DEB_C4__H5__W1/primary/u3/RESULT.json",
+      "status": "PASS",
+      "target_head": "DEB_C4__H5__W1"
+    },
+    {
+      "channel": "u4",
+      "dataset": "debutanizer",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/DEB_C4__H5__W1/primary/u4/RESULT.json",
+      "status": "PASS",
+      "target_head": "DEB_C4__H5__W1"
+    },
+    {
+      "channel": "u5",
+      "dataset": "debutanizer",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/DEB_C4__H5__W1/primary/u5/RESULT.json",
+      "status": "PASS",
+      "target_head": "DEB_C4__H5__W1"
+    },
+    {
+      "channel": "u6",
+      "dataset": "debutanizer",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/DEB_C4__H5__W1/primary/u6/RESULT.json",
+      "status": "PASS",
+      "target_head": "DEB_C4__H5__W1"
+    },
+    {
+      "channel": "u7",
+      "dataset": "debutanizer",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/DEB_C4__H5__W1/primary/u7/RESULT.json",
+      "status": "PASS",
+      "target_head": "DEB_C4__H5__W1"
+    },
+    {
+      "channel": "TP2",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/TP2/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "TP3",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/TP3/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "H1",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/H1/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "DV_pressure",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/DV_pressure/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "Reservoirs",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/Reservoirs/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "Motor_current",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/Motor_current/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "COMP",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/COMP/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "DV_eletric",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/DV_eletric/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "Towers",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/Towers/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "MPG",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/MPG/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "LPS",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/LPS/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "Pressure_switch",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/Pressure_switch/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "Oil_level",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/Oil_level/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "Caudal_impulses",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_OIL20__H120__W12/primary/Caudal_impulses/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "channel": "TP2",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/TP2/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "H1",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/H1/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "DV_pressure",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/DV_pressure/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Oil_temperature",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/Oil_temperature/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Motor_current",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/Motor_current/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "COMP",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/COMP/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "DV_eletric",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/DV_eletric/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Towers",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/Towers/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "MPG",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/MPG/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "LPS",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/LPS/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Pressure_switch",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/Pressure_switch/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Oil_level",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/Oil_level/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Caudal_impulses",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/Caudal_impulses/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "TP3",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/full_sensor_secondary/TP3/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "TP2",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/TP2/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "H1",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/H1/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "DV_pressure",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/DV_pressure/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Oil_temperature",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/Oil_temperature/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Motor_current",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/Motor_current/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "COMP",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/COMP/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "DV_eletric",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/DV_eletric/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Towers",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/Towers/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "MPG",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/MPG/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "LPS",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/LPS/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Pressure_switch",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/Pressure_switch/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Oil_level",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/Oil_level/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "Caudal_impulses",
+      "dataset": "metropt",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/METRO_P60__H6__W1/proxy_excluded/Caudal_impulses/RESULT.json",
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "channel": "ambient",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/full_sensor_secondary/ambient/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "coolant",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/full_sensor_secondary/coolant/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "u_d",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/full_sensor_secondary/u_d/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "u_q",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/full_sensor_secondary/u_q/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "i_d",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/full_sensor_secondary/i_d/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "i_q",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/full_sensor_secondary/i_q/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "motor_speed",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/full_sensor_secondary/motor_speed/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "torque",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/full_sensor_secondary/torque/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "stator_winding",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/full_sensor_secondary/stator_winding/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "stator_tooth",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/full_sensor_secondary/stator_tooth/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "stator_yoke",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/full_sensor_secondary/stator_yoke/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "ambient",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/proxy_excluded/ambient/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "coolant",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/proxy_excluded/coolant/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "u_d",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/proxy_excluded/u_d/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "u_q",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/proxy_excluded/u_q/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "i_d",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/proxy_excluded/i_d/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "i_q",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/proxy_excluded/i_q/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "motor_speed",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/proxy_excluded/motor_speed/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "torque",
+      "dataset": "pmsm",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/PMSM_PM5__H600__W60/proxy_excluded/torque/RESULT.json",
+      "status": "PASS",
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "channel": "u1",
+      "dataset": "sru",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/SRU_H2S__H5__W1/primary/u1/RESULT.json",
+      "status": "PASS",
+      "target_head": "SRU_H2S__H5__W1"
+    },
+    {
+      "channel": "u2",
+      "dataset": "sru",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/SRU_H2S__H5__W1/primary/u2/RESULT.json",
+      "status": "PASS",
+      "target_head": "SRU_H2S__H5__W1"
+    },
+    {
+      "channel": "u3",
+      "dataset": "sru",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/SRU_H2S__H5__W1/primary/u3/RESULT.json",
+      "status": "PASS",
+      "target_head": "SRU_H2S__H5__W1"
+    },
+    {
+      "channel": "u4",
+      "dataset": "sru",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/SRU_H2S__H5__W1/primary/u4/RESULT.json",
+      "status": "PASS",
+      "target_head": "SRU_H2S__H5__W1"
+    },
+    {
+      "channel": "u5",
+      "dataset": "sru",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/SRU_H2S__H5__W1/primary/u5/RESULT.json",
+      "status": "PASS",
+      "target_head": "SRU_H2S__H5__W1"
+    },
+    {
+      "channel": "u1",
+      "dataset": "sru",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/SRU_SO2__H5__W1/primary/u1/RESULT.json",
+      "status": "PASS",
+      "target_head": "SRU_SO2__H5__W1"
+    },
+    {
+      "channel": "u2",
+      "dataset": "sru",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/SRU_SO2__H5__W1/primary/u2/RESULT.json",
+      "status": "PASS",
+      "target_head": "SRU_SO2__H5__W1"
+    },
+    {
+      "channel": "u3",
+      "dataset": "sru",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/SRU_SO2__H5__W1/primary/u3/RESULT.json",
+      "status": "PASS",
+      "target_head": "SRU_SO2__H5__W1"
+    },
+    {
+      "channel": "u4",
+      "dataset": "sru",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/SRU_SO2__H5__W1/primary/u4/RESULT.json",
+      "status": "PASS",
+      "target_head": "SRU_SO2__H5__W1"
+    },
+    {
+      "channel": "u5",
+      "dataset": "sru",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/SRU_SO2__H5__W1/primary/u5/RESULT.json",
+      "status": "PASS",
+      "target_head": "SRU_SO2__H5__W1"
+    },
+    {
+      "channel": "xmeas_1",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_1/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_2",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_2/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_3",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_3/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_4",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_4/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_5",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_5/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_6",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_6/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_7",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_7/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_8",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_8/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_9",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_9/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_10",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_10/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_11",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_11/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_12",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_12/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_13",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_13/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_14",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_14/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_15",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_15/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_16",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_16/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_17",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_17/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_18",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_18/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_19",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_19/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_20",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_20/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_21",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_21/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_22",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_22/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_23",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_23/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_24",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_24/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_25",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_25/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_26",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_26/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_27",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_27/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_28",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_28/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_29",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_29/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_30",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_30/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_31",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_31/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_32",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_32/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_33",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_33/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_34",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_34/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_35",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_35/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmeas_36",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmeas_36/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmv_1",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmv_1/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmv_2",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmv_2/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmv_3",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmv_3/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmv_4",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmv_4/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmv_5",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmv_5/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmv_6",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmv_6/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmv_7",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmv_7/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmv_8",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmv_8/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmv_9",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmv_9/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmv_10",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmv_10/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "channel": "xmv_11",
+      "dataset": "tep",
+      "errors": [],
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/results/DEVELOPMENT/K/TEP_G12__H4__W2/proxy_excluded/xmv_11/RESULT.json",
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2"
+    }
+  ],
+  "errors": [],
+  "jobs_expected": 124,
+  "jobs_observed": 124,
+  "ood_accessed": false,
+  "pass": 124,
+  "retained_failures": 0,
+  "shared_development_metadata_sha256": "811304ee110b5d950791ea9d934097ae8fda44dd9041beda91afad5797a8a5b9",
+  "stage": "G4_PUBLIC_ALL_K_NATIVE_SUPPORT_AUDIT",
+  "status": "PASS",
+  "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+  "test_accessed": false
+}

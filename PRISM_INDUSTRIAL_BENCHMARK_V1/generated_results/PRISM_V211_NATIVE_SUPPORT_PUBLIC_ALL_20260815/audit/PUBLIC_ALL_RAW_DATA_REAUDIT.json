@@ -1,0 +1,101 @@
+{
+  "dataset_status": {
+    "debutanizer": "PASS",
+    "metropt": "PASS",
+    "pmsm": "PASS",
+    "sru": "PASS",
+    "tep": "PASS"
+  },
+  "files": [
+    {
+      "bytes": 308978,
+      "bytes_match": true,
+      "dataset": "debutanizer",
+      "expected_bytes": 308978,
+      "expected_sha256": "e963abcd668e2bc3282815ffd21f73b4b4ccd89d34600feaecc6d5a42aad3438",
+      "match": true,
+      "observed_sha256": "e963abcd668e2bc3282815ffd21f73b4b4ccd89d34600feaecc6d5a42aad3438",
+      "relative_path": "industrial-debutanizer-soft-sensor/data/debutanizer_data.txt"
+    },
+    {
+      "bytes": 218381995,
+      "bytes_match": true,
+      "dataset": "metropt",
+      "expected_bytes": 218381995,
+      "expected_sha256": "aab991a970e58210de853bb8078ce0e63abb4d9412fdc5c79792dae3d8e1721a",
+      "match": true,
+      "observed_sha256": "aab991a970e58210de853bb8078ce0e63abb4d9412fdc5c79792dae3d8e1721a",
+      "relative_path": "metropt/metropt_3.zip"
+    },
+    {
+      "bytes": 300061411,
+      "bytes_match": true,
+      "dataset": "pmsm",
+      "expected_bytes": 300061411,
+      "expected_sha256": "78f3d150f0f2ad9c5dc7ff24dd12c00d386ad530f48c1589ad24fcd88867d3ad",
+      "match": true,
+      "observed_sha256": "78f3d150f0f2ad9c5dc7ff24dd12c00d386ad530f48c1589ad24fcd88867d3ad",
+      "relative_path": "pmsm_original/measures_v2.csv"
+    },
+    {
+      "bytes": 1149283,
+      "bytes_match": true,
+      "dataset": "sru",
+      "expected_bytes": 1149283,
+      "expected_sha256": "6a8f1a632e7618b5aee2a3b50e80bad5af8c5730b17bc40c6072c8033f30a1ef",
+      "match": true,
+      "observed_sha256": "6a8f1a632e7618b5aee2a3b50e80bad5af8c5730b17bc40c6072c8033f30a1ef",
+      "relative_path": "sru/SRU_data.txt"
+    },
+    {
+      "bytes": 24678017,
+      "bytes_match": true,
+      "dataset": "tep",
+      "expected_bytes": 24678017,
+      "expected_sha256": "12d1055b852763fac09ef36bd7c9612a800c8bf7b6f75f344d12119206f9e940",
+      "match": true,
+      "observed_sha256": "12d1055b852763fac09ef36bd7c9612a800c8bf7b6f75f344d12119206f9e940",
+      "relative_path": "tep_rieth/TEP_FaultFree_Training.RData"
+    },
+    {
+      "bytes": 47327663,
+      "bytes_match": true,
+      "dataset": "tep",
+      "expected_bytes": 47327663,
+      "expected_sha256": "4f45afafa469793eeb7203fb9ed10ed0b1724c73c9c95537f15a0889ade0ebd4",
+      "match": true,
+      "observed_sha256": "4f45afafa469793eeb7203fb9ed10ed0b1724c73c9c95537f15a0889ade0ebd4",
+      "relative_path": "tep_rieth/TEP_FaultFree_Testing.RData"
+    },
+    {
+      "bytes": 494063194,
+      "bytes_match": true,
+      "dataset": "tep",
+      "expected_bytes": 494063194,
+      "expected_sha256": "058df8bd90c5f575f44d2f6085bdd3bc3662e3e9cc25a50e34af42be3748952b",
+      "match": true,
+      "observed_sha256": "058df8bd90c5f575f44d2f6085bdd3bc3662e3e9cc25a50e34af42be3748952b",
+      "relative_path": "tep_rieth/TEP_Faulty_Training.RData"
+    },
+    {
+      "bytes": 836882037,
+      "bytes_match": true,
+      "dataset": "tep",
+      "expected_bytes": 836882037,
+      "expected_sha256": "c2f1aabc77498efda4d5f9ad81ecc829e2fcd98752b84cf5b2a06558cabacc36",
+      "match": true,
+      "observed_sha256": "c2f1aabc77498efda4d5f9ad81ecc829e2fcd98752b84cf5b2a06558cabacc36",
+      "relative_path": "tep_rieth/TEP_Faulty_Testing.RData"
+    }
+  ],
+  "generated_at_utc": "2026-08-15T12:51:05.266372+00:00",
+  "raw_root": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources",
+  "registry_root": "/root/AR_RAPHU/PRISM_INDUSTRIAL_BENCHMARK_V1/dataset_registry",
+  "status": "PASS",
+  "summary": {
+    "datasets_pass": 5,
+    "datasets_total": 5,
+    "files_pass": 8,
+    "files_total": 8
+  }
+}

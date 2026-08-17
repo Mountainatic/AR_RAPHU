@@ -1,0 +1,955 @@
+{
+  "ood_accessed": false,
+  "ood_y_read": false,
+  "stage": "F2_TASK_LEADERBOARD_COMMON_SUPPORT",
+  "status": "PASS",
+  "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+  "test_accessed": false,
+  "test_y_read": false,
+  "views": [
+    {
+      "availability_scenario": "record_time",
+      "dataset": "debutanizer",
+      "information_set": "input_only",
+      "proxy_policy": "primary",
+      "requirements": [
+        {
+          "input_history_steps": 10,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 20,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 40,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "test": {
+          "rows": 432,
+          "source_rows": 471,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "e107c4890295f96cd60572174283542db1855e00ad83d541b041337f006a4fe7"
+        },
+        "train": {
+          "rows": 1391,
+          "source_rows": 1430,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "1500bd16d6203c7816a39d7e19b5c263d7e9309ab89396fb17b641709afef6e0"
+        },
+        "validation": {
+          "rows": 432,
+          "source_rows": 471,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "8f2b9d24faf7b37d8cde8c80aba1d6ee10a1396baa7b44e60e113b358e7ef7ff"
+        }
+      },
+      "target_head": "DEB_C4__H5__W1"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "metropt",
+      "information_set": "input_only",
+      "proxy_policy": "primary",
+      "requirements": [
+        {
+          "input_history_steps": 240,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 480,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 960,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "ood": {
+          "rows": 25350,
+          "source_rows": 29142,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "3db43a51a87302cc299e16c7a82bd361a25734648b515c96ef4aa624b9dfda20"
+        },
+        "test": {
+          "rows": 637196,
+          "source_rows": 640040,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "9a69e2ac41ecc6173211f8b5ff1bcc38598247c900a205c2f95f674a1855c945"
+        },
+        "train": {
+          "rows": 633133,
+          "source_rows": 635029,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "f5c353092d529f01df6c897c0fcbda5a6ec36ce84bafb4756638ef2be3b45962"
+        },
+        "validation": {
+          "rows": 208138,
+          "source_rows": 210034,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "bdb292d04d73d91244eca80373136fb4e788e2c05d307ed5ed7babb6684ab179"
+        }
+      },
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "metropt",
+      "information_set": "input_only",
+      "proxy_policy": "full_sensor_secondary",
+      "requirements": [
+        {
+          "input_history_steps": 12,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 24,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 48,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "ood": {
+          "rows": 29498,
+          "source_rows": 29686,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "c94b9e2cb50cc4efc67ab9f75e92e7a0767925e337140d597d23b12a9bc907b2"
+        },
+        "test": {
+          "rows": 640307,
+          "source_rows": 640448,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "9cc3d7d148023031f68e4a84c55343a01dce1336080c3843a0f5eac3ea4b4c33"
+        },
+        "train": {
+          "rows": 635207,
+          "source_rows": 635301,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "d2d805482603b3acd17c607f82f9225bb22e84a62ff4f011947d31f616d62ec8"
+        },
+        "validation": {
+          "rows": 210212,
+          "source_rows": 210306,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "0272b50752b1b068b89985c4723f9fc9f317b5e2dfae0b468994142857a52108"
+        }
+      },
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "metropt",
+      "information_set": "input_only",
+      "proxy_policy": "proxy_excluded",
+      "requirements": [
+        {
+          "input_history_steps": 12,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 24,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 48,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "ood": {
+          "rows": 29498,
+          "source_rows": 29686,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "85e42820d7da63de6bb8894df4f2eb4233e837dfdc85bedda0ef06056c0b53bf"
+        },
+        "test": {
+          "rows": 640307,
+          "source_rows": 640448,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "251b1f60064b9c1e8c402d85c49937d59a6a3804be387c07e7404e304d1a97a9"
+        },
+        "train": {
+          "rows": 635207,
+          "source_rows": 635301,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "42d5777d0d14c677e1eeb5b1328abd95315e0f07b70c9b07322f3cc2e9725e22"
+        },
+        "validation": {
+          "rows": 210212,
+          "source_rows": 210306,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "961f1c8761744e768589046c70b31cdfaecad7991d12e4266d8b9d6ae93be07a"
+        }
+      },
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "pmsm",
+      "information_set": "input_only",
+      "proxy_policy": "full_sensor_secondary",
+      "requirements": [
+        {
+          "input_history_steps": 1200,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 2400,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "test": {
+          "rows": 203931,
+          "source_rows": 232011,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "68bfea2c65528ce9cff638faf175718ba4fcbec38d52f661684144cd7d2bf863"
+        },
+        "train": {
+          "rows": 710328,
+          "source_rows": 807729,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "d0287173e174dfdbb4eee4f1c5abc2d50f739e4c3f751409fee03c87e6eb2fbd"
+        },
+        "validation": {
+          "rows": 207248,
+          "source_rows": 241465,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "67974399dff1ceaa967f2905b6780021527ebf3a9d36df3e774375ecf485f758"
+        }
+      },
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "pmsm",
+      "information_set": "input_only",
+      "proxy_policy": "proxy_excluded",
+      "requirements": [
+        {
+          "input_history_steps": 2400,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "test": {
+          "rows": 203931,
+          "source_rows": 232011,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "83d5c2fc2787babad1a6a639e11af5a27e5a09ddc3cb9d7e127844768c877e3c"
+        },
+        "train": {
+          "rows": 710328,
+          "source_rows": 807729,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "bf20c7c518f10b4e5c542df2aa617392f54d7254dca214a0e23101a0719d1b12"
+        },
+        "validation": {
+          "rows": 207248,
+          "source_rows": 241465,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "08e8c440a4ffe7d72a116172f6fe98c5603f5f7fa9510e19ecb13f70080deb61"
+        }
+      },
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "sru",
+      "information_set": "input_only",
+      "proxy_policy": "primary",
+      "requirements": [
+        {
+          "input_history_steps": 10,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "test": {
+          "rows": 1992,
+          "source_rows": 2001,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "60a7f31f225866458e7d6317b2342a5c388937f49cb247a6f45726e4e2a034ce"
+        },
+        "train": {
+          "rows": 6033,
+          "source_rows": 6042,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "55b2f8028a805903e7a95d424ad640981d3ff37a58ff717451b40b14272a97be"
+        },
+        "validation": {
+          "rows": 1991,
+          "source_rows": 2000,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "b5e0e71cbf28ede5a104fa729f9851c3bf8867c59d45b420f4a803f6b0d1d821"
+        }
+      },
+      "target_head": "SRU_H2S__H5__W1"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "sru",
+      "information_set": "input_only",
+      "proxy_policy": "primary",
+      "requirements": [
+        {
+          "input_history_steps": 10,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 20,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "test": {
+          "rows": 1982,
+          "source_rows": 2001,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "bb146726e505bb46b96dfd370cf2f6edf4bd98be705a181039836e8f45091412"
+        },
+        "train": {
+          "rows": 6023,
+          "source_rows": 6042,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "d43dd8be39b7bcbbdca0d878d13f2f2d9e6bdcf1e12f7f41ec6a646a1d4c2f46"
+        },
+        "validation": {
+          "rows": 1981,
+          "source_rows": 2000,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "0db98064549a2992772c334ccd6b84e80b724d080c9004db5567368b79ed68e4"
+        }
+      },
+      "target_head": "SRU_SO2__H5__W1"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "tep",
+      "information_set": "input_only",
+      "proxy_policy": "proxy_excluded",
+      "requirements": [
+        {
+          "input_history_steps": 8,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "ood": {
+          "rows": 2367500,
+          "source_rows": 2382500,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "3a06b216996c089a78073b23ad72fc6211a14b9f5b28419fa96337e932db7d9b"
+        },
+        "test": {
+          "rows": 7576000,
+          "source_rows": 7624000,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "2e95de4bf6faac6646bb08ef50533fdd1b59724ebb4b23c3baa298115c17ed07"
+        },
+        "train": {
+          "rows": 3116800,
+          "source_rows": 3155200,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "6214e39f460260a41825ccf95993466d672eefb8ac1e3ab2b893769fc33282e7"
+        },
+        "validation": {
+          "rows": 779200,
+          "source_rows": 788800,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "63cc866e55d9632101b6df7d71a39995b9d05fe3b3b2bfe7166777a75456779c"
+        }
+      },
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "availability_scenario": "delay_10_steps",
+      "dataset": "debutanizer",
+      "information_set": "dynamic",
+      "proxy_policy": "primary",
+      "requirements": [
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 2,
+          "target_history_steps": 10
+        },
+        {
+          "input_history_steps": 10,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 10,
+          "target_delta_steps": 2,
+          "target_history_steps": 10
+        },
+        {
+          "input_history_steps": 20,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 40,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "test": {
+          "rows": 422,
+          "source_rows": 461,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "be2b8b2a8854fe3d40a67a6d31228f494e6cafa8d2a043fc5ea6f35ab7c78ad1"
+        },
+        "train": {
+          "rows": 1381,
+          "source_rows": 1420,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "1233fe70ce7ab576a628a3bcf182232e36952c8bbdce720e542f43aae841adfa"
+        },
+        "validation": {
+          "rows": 422,
+          "source_rows": 461,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "f2385a0065dbc4830aa01c4bbe85cc200730ed20ba157c79f865b0efc07d99d6"
+        }
+      },
+      "target_head": "DEB_C4__H5__W1"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "debutanizer",
+      "information_set": "dynamic",
+      "proxy_policy": "primary",
+      "requirements": [
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 2,
+          "target_history_steps": 10
+        },
+        {
+          "input_history_steps": 10,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 10,
+          "target_delta_steps": 2,
+          "target_history_steps": 10
+        },
+        {
+          "input_history_steps": 20,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 40,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "test": {
+          "rows": 432,
+          "source_rows": 471,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "d85cbf692f4b5cfd026eb1802bdf433ebb60b302cf76f8553b75fafb5d51e38d"
+        },
+        "train": {
+          "rows": 1391,
+          "source_rows": 1430,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "eb1bab15047748ca983494959433c484bbd0b384556346c30293c1e8aea1995d"
+        },
+        "validation": {
+          "rows": 432,
+          "source_rows": 471,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "5ca9fd89c27559bf59be438717cd75d6bf3db47968095120e15862b4b414e50c"
+        }
+      },
+      "target_head": "DEB_C4__H5__W1"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "metropt",
+      "information_set": "dynamic",
+      "proxy_policy": "primary",
+      "requirements": [
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 24,
+          "target_history_steps": 240
+        },
+        {
+          "input_history_steps": 240,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 240,
+          "target_delta_steps": 24,
+          "target_history_steps": 240
+        },
+        {
+          "input_history_steps": 480,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 960,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "ood": {
+          "rows": 25350,
+          "source_rows": 29142,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "fd3839a4b4b1d0ab5313a0b62e22825bfe317931d37e5b81140e9a6cbf000b02"
+        },
+        "test": {
+          "rows": 637196,
+          "source_rows": 640040,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "b97f0ef705d8f21d9976aa3331068e81376417c46c02f05d2a9066ba51f07491"
+        },
+        "train": {
+          "rows": 633133,
+          "source_rows": 635029,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "aa5007d65406a232e330d586bb8ca435ce73193580bd90193f017f01e6549073"
+        },
+        "validation": {
+          "rows": 208138,
+          "source_rows": 210034,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "94211bed9b3754021d583db61ed22f412f6a1acf3f42d96e0b3338737bd11672"
+        }
+      },
+      "target_head": "METRO_OIL20__H120__W12"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "metropt",
+      "information_set": "dynamic",
+      "proxy_policy": "full_sensor_secondary",
+      "requirements": [
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 1,
+          "target_history_steps": 12
+        },
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 2,
+          "target_history_steps": 12
+        },
+        {
+          "input_history_steps": 12,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 12,
+          "target_delta_steps": 2,
+          "target_history_steps": 12
+        },
+        {
+          "input_history_steps": 48,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "ood": {
+          "rows": 29498,
+          "source_rows": 29686,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "8c9fb520b953bf871a64b01151ae731601e5426d83c13d139430f37d08141672"
+        },
+        "test": {
+          "rows": 640307,
+          "source_rows": 640448,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "864c0fc2a163ed7acbae1c627c0fa0303476f8fce738a13b4252dcfd0711ef09"
+        },
+        "train": {
+          "rows": 635207,
+          "source_rows": 635301,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "fa51c5966d47d1eacba91aa1104fc61fee63272f6ff0afbd8526619987c50662"
+        },
+        "validation": {
+          "rows": 210212,
+          "source_rows": 210306,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "9999fc2faff2a7a8c0f82eb8a46423905ddaf4c82004da26623f728893d98357"
+        }
+      },
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "metropt",
+      "information_set": "dynamic",
+      "proxy_policy": "proxy_excluded",
+      "requirements": [
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 1,
+          "target_history_steps": 12
+        },
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 2,
+          "target_history_steps": 12
+        },
+        {
+          "input_history_steps": 12,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 12,
+          "target_delta_steps": 2,
+          "target_history_steps": 12
+        },
+        {
+          "input_history_steps": 48,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "ood": {
+          "rows": 29498,
+          "source_rows": 29686,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "64fa3ef11e4b58baf13260476e44c5f5cef7a682ec78ef714797545db17c6a43"
+        },
+        "test": {
+          "rows": 640307,
+          "source_rows": 640448,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "e8996a664fff766671d856c01c82a7f640c12441b10c3470ac7e31e0d794ae57"
+        },
+        "train": {
+          "rows": 635207,
+          "source_rows": 635301,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "e8d7ab87a22edd148e618fe8cfed69399088bede53b74f1940f52a6e0442e61d"
+        },
+        "validation": {
+          "rows": 210212,
+          "source_rows": 210306,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "a3ea3be42592e85dd3cb50467711d29e0fe4e888d22655734230a08f5e0440cf"
+        }
+      },
+      "target_head": "METRO_P60__H6__W1"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "pmsm",
+      "information_set": "dynamic",
+      "proxy_policy": "full_sensor_secondary",
+      "requirements": [
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 120,
+          "target_history_steps": 1200
+        },
+        {
+          "input_history_steps": 1200,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 1200,
+          "target_delta_steps": 120,
+          "target_history_steps": 1200
+        },
+        {
+          "input_history_steps": 2400,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "test": {
+          "rows": 203931,
+          "source_rows": 232011,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "12cd10bcf130752cb20a419d3a7cfb64b220b5fbfec44865b170ed4c8eeb8ca4"
+        },
+        "train": {
+          "rows": 710328,
+          "source_rows": 807729,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "1884f9bedb7677f4f389b325e20b34767b71c92c63ee670081375dc7c9afdf32"
+        },
+        "validation": {
+          "rows": 207248,
+          "source_rows": 241465,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "d12f50fde7598436db451dd17ec28baaeb52cc33c40a25de6c97bccb48f7473b"
+        }
+      },
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "pmsm",
+      "information_set": "dynamic",
+      "proxy_policy": "proxy_excluded",
+      "requirements": [
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 60,
+          "target_history_steps": 1200
+        },
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 120,
+          "target_history_steps": 1200
+        },
+        {
+          "input_history_steps": 1200,
+          "target_delta_steps": 120,
+          "target_history_steps": 1200
+        }
+      ],
+      "splits": {
+        "test": {
+          "rows": 218331,
+          "source_rows": 232011,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "531880ad702f086d3abaf2c7f6ed27e73be065cb5ec602f5a12c56cbc2486006"
+        },
+        "train": {
+          "rows": 759849,
+          "source_rows": 807729,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "ff9be2ddb88df23a4b2169702b3c93fa3e53f33fa72142336659bd615453a3ad"
+        },
+        "validation": {
+          "rows": 224365,
+          "source_rows": 241465,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "217a18d48c9cd456b6b4f11fa2140682ac8478b9531b52398b6319b69985e81f"
+        }
+      },
+      "target_head": "PMSM_PM5__H600__W60"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "sru",
+      "information_set": "dynamic",
+      "proxy_policy": "primary",
+      "requirements": [
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 2,
+          "target_history_steps": 10
+        },
+        {
+          "input_history_steps": 10,
+          "target_delta_steps": 2,
+          "target_history_steps": 10
+        }
+      ],
+      "splits": {
+        "test": {
+          "rows": 1992,
+          "source_rows": 2001,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "fdf209c61a26fb5289f6a69e9cb432c19f6e1206fbfe992a01ff312bfb26bd16"
+        },
+        "train": {
+          "rows": 6033,
+          "source_rows": 6042,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "64af9e050bfe41649d747fbd2ee32396f2e6e28b048fd0958ae9a0e1da94c7e3"
+        },
+        "validation": {
+          "rows": 1991,
+          "source_rows": 2000,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "7aba7a55e9fc2201cac91c9d3b5cf4da38091b6f5606c2dd2fbc27752438e4e5"
+        }
+      },
+      "target_head": "SRU_H2S__H5__W1"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "sru",
+      "information_set": "dynamic",
+      "proxy_policy": "primary",
+      "requirements": [
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 2,
+          "target_history_steps": 10
+        },
+        {
+          "input_history_steps": 10,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        },
+        {
+          "input_history_steps": 10,
+          "target_delta_steps": 2,
+          "target_history_steps": 10
+        },
+        {
+          "input_history_steps": 20,
+          "target_delta_steps": 0,
+          "target_history_steps": 0
+        }
+      ],
+      "splits": {
+        "test": {
+          "rows": 1982,
+          "source_rows": 2001,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "f977a33c9354c100548332ac7f23b3900ecb3c1a3bc143ddc7059ccaf65dac88"
+        },
+        "train": {
+          "rows": 6023,
+          "source_rows": 6042,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "aaf634cebb01fa300cea98dd685484aa394aab2624a92d220b946e8c809bdad0"
+        },
+        "validation": {
+          "rows": 1981,
+          "source_rows": 2000,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "0b7ef9e0206b5b3b2db4fa15af721ce3bcb62ada355380e6750ef8d3903a7271"
+        }
+      },
+      "target_head": "SRU_SO2__H5__W1"
+    },
+    {
+      "availability_scenario": "analyzer_maturity_5_steps",
+      "dataset": "tep",
+      "information_set": "dynamic",
+      "proxy_policy": "proxy_excluded",
+      "requirements": [
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 1,
+          "target_history_steps": 16
+        },
+        {
+          "input_history_steps": 16,
+          "target_delta_steps": 1,
+          "target_history_steps": 16
+        }
+      ],
+      "splits": {
+        "ood": {
+          "rows": 2322500,
+          "source_rows": 2370000,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "43030e1aa543c3eafabd077804e1d62d63c822705337de69494926717ea9431e"
+        },
+        "test": {
+          "rows": 7432000,
+          "source_rows": 7584000,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "840dc81d9d18350573f21fe5c27074bd83202f8eee3db1702b6a04d6e2bce057"
+        },
+        "train": {
+          "rows": 3001600,
+          "source_rows": 3123200,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "7c6eebd75b9ace2222af8bc15970e0eb44b724fd33550aae90498e88d5ca74e3"
+        },
+        "validation": {
+          "rows": 750400,
+          "source_rows": 780800,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "510b9dde6b109d62e27aed36ede1ce6262ce8e8a81789e637a4c8a0895f904fe"
+        }
+      },
+      "target_head": "TEP_G12__H4__W2"
+    },
+    {
+      "availability_scenario": "record_time",
+      "dataset": "tep",
+      "information_set": "dynamic",
+      "proxy_policy": "proxy_excluded",
+      "requirements": [
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 1,
+          "target_history_steps": 8
+        },
+        {
+          "input_history_steps": 0,
+          "target_delta_steps": 1,
+          "target_history_steps": 32
+        },
+        {
+          "input_history_steps": 32,
+          "target_delta_steps": 1,
+          "target_history_steps": 32
+        }
+      ],
+      "splits": {
+        "ood": {
+          "rows": 2307500,
+          "source_rows": 2382500,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "b82c7dc58120a03d33076e822e0162ccda91250ec21e87a82ee5a6d31d97438d"
+        },
+        "test": {
+          "rows": 7384000,
+          "source_rows": 7624000,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "e9c1c7dc31eacf7888e9fcb7515b4490b2eb8b4a364ece7f6d40cf0150750ebe"
+        },
+        "train": {
+          "rows": 2963200,
+          "source_rows": 3155200,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "2ddf5a69e00a3d6efaa33c7054b73814f6fb0f2b9092e2235a762190f1e0787e"
+        },
+        "validation": {
+          "rows": 740800,
+          "source_rows": 788800,
+          "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+          "support_hash": "24f4269bfd662a2ed88c409a936387b47111a12338cc98caf53ea259096d27fa"
+        }
+      },
+      "target_head": "TEP_G12__H4__W2"
+    }
+  ]
+}

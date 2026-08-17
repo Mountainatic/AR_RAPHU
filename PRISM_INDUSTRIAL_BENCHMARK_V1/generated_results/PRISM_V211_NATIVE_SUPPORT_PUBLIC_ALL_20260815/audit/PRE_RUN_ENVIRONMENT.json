@@ -1,0 +1,65 @@
+{
+  "declared_deviations": [
+    {
+      "item": "python_version",
+      "observed": "3.12.3",
+      "project_declared": "3.10",
+      "reason": "User approved the faster existing base environment; full pytest passes in this environment."
+    }
+  ],
+  "environment": {
+    "conda_environment": null,
+    "kernel": "5.15.0-78-generic",
+    "platform": "Linux-5.15.0-78-generic-x86_64-with-glibc2.35",
+    "python_executable": "/root/miniconda3/bin/python",
+    "python_implementation": "CPython",
+    "python_prefix": "/root/miniconda3",
+    "python_version": "3.12.3"
+  },
+  "generated_at_utc": "2026-08-16T03:56:23Z",
+  "git": {
+    "source_branch": "prism-v2-1-1-metro-p60-joint-stability-final",
+    "source_commit": "e47542a319640bc045ca0d31ae9b40763182dde8",
+    "status_short": [],
+    "worktree_dirty": false,
+    "execution_branch": "prism-v2-1-1-native-support-public-all-20260815",
+    "generating_commit": "36ec58ee553ec0de392c6cefe2e05861845b53c2"
+  },
+  "hardware": {
+    "cpu_model": "Intel(R) Xeon(R) Platinum 8470Q",
+    "gpu": [
+      "NVIDIA GeForce RTX 5090, 32607"
+    ],
+    "logical_cpu_count": 208,
+    "memory_available_bytes_at_capture": 710948425728,
+    "memory_total_bytes": 810158206976
+  },
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "2.2.3",
+    "pyarrow": "24.0.0",
+    "pytest": "9.0.3",
+    "scipy": "1.15.3",
+    "sklearn": "1.7.1",
+    "xgboost": "3.0.2"
+  },
+  "pytest": {
+    "command": "PYTHONPATH=PRISM_INDUSTRIAL_BENCHMARK_V1:PRISM_INDUSTRIAL_BENCHMARK_V1/src pytest -q",
+    "exit_code": 0,
+    "log_path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/logs/PRE_RUN_PYTEST.txt",
+    "log_sha256": "02e110dd81ea6a431970b31d6879ee409de574de25896cba2b72292a5613292d",
+    "result": "426 passed, 8 skipped, 17 warnings"
+  },
+  "raw_data_audit": {
+    "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815/PUBLIC_ALL_RAW_DATA_REAUDIT.json",
+    "sha256": "9db0bf8cea3c2844f5ae53f0c5817571f34631322b51da79381be582ae52dc45",
+    "status": "PASS"
+  },
+  "threading_policy": {
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "status": "REQUIRED_FOR_FORMAL_RUNS"
+  }
+}

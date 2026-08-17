@@ -1,0 +1,25 @@
+{
+  "created_at_unix": 1786947691.1191654,
+  "failed_attempt_predictions_reused": true,
+  "links": {
+    "baseline_ood_predictions": {
+      "is_symlink": true,
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R5/final/baseline_ood_predictions",
+      "target": "/root/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R5_ARTIFACTS/baseline_ood_predictions"
+    },
+    "baseline_test_predictions": {
+      "is_symlink": true,
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R5/final/baseline_test_predictions",
+      "target": "/root/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R5_ARTIFACTS/baseline_test_predictions"
+    },
+    "ood_predictions": {
+      "is_symlink": true,
+      "path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R5/final/ood_predictions",
+      "target": "/root/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R5_ARTIFACTS/ood_predictions"
+    }
+  },
+  "protocol_or_model_changed": false,
+  "reason": "PREDICTION_ARTIFACT_CAPACITY_ROUTING_ONLY",
+  "sample_support_changed": false,
+  "status": "PASS"
+}

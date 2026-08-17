@@ -1,0 +1,917 @@
+{
+  "Joint_formal_count": 2,
+  "OOD_conclusions": [
+    {
+      "model": "AR",
+      "mse": 2.7546643991461863,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "ARX",
+      "mse": 2.7544102711262743,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "LINEAR_NARX",
+      "mse": 4.941109678864968,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "MEAN",
+      "mse": 2.1234624719249884,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "N4SID",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "PERSISTENCE",
+      "mse": 2.1235678649075878,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "PRISM_V2_1_1_JOINT_KWA",
+      "mse": 2.929306392766569,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_A_ABLATION",
+      "mse": 1.909659600015228,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_DYNAMIC",
+      "mse": 1.983792918395064,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_W_DYNAMIC",
+      "mse": 1.983792918395064,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "PRISM_V2_1_1_PHYSICS_FIRST",
+      "mse": 1.909659600015228,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "SEASONAL_PERSISTENCE",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "AR",
+      "mse": 0.03166386408289605,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "AR",
+      "mse": 0.03166386408289605,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "ARX",
+      "mse": 0.021444433809384975,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "ARX",
+      "mse": 0.02106462889637268,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "LINEAR_NARX",
+      "mse": 0.0615201016374642,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "LINEAR_NARX",
+      "mse": 0.0613572373764707,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "MEAN",
+      "mse": 0.01158667447587619,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "MEAN",
+      "mse": 0.01158667447587619,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "N4SID",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "N4SID",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PERSISTENCE",
+      "mse": 0.011586670959584721,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PERSISTENCE",
+      "mse": 0.011586670959584721,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_JOINT_KWA",
+      "mse": 0.01346577224746655,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_JOINT_KWA",
+      "mse": 0.012610524940970737,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_A_ABLATION",
+      "mse": 0.01157324949957355,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_A_ABLATION",
+      "mse": 0.01196380382630719,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_DYNAMIC",
+      "mse": 0.01157324949957355,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_DYNAMIC",
+      "mse": 0.01196380382630719,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_W_DYNAMIC",
+      "mse": 0.01157324949957355,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_W_DYNAMIC",
+      "mse": 0.01196380382630719,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_PHYSICS_FIRST",
+      "mse": 0.01157324949957355,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_PHYSICS_FIRST",
+      "mse": 0.01196380382630719,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "SEASONAL_PERSISTENCE",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "SEASONAL_PERSISTENCE",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "AR",
+      "mse": 0.4475898564181484,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "AR",
+      "mse": 0.29004352700960634,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "ARX",
+      "mse": 0.5289950549815401,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "ARX",
+      "mse": 0.2791295518942593,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "LINEAR_NARX",
+      "mse": 0.44666334923073514,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "LINEAR_NARX",
+      "mse": 0.26201484400293723,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "MEAN",
+      "mse": 0.4564959929670176,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "MEAN",
+      "mse": 0.45652201667120246,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "N4SID",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "N4SID",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PERSISTENCE",
+      "mse": 0.4564931751951625,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PERSISTENCE",
+      "mse": 0.45652125013803474,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_A_ABLATION",
+      "mse": 0.4564959929670176,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_A_ABLATION",
+      "mse": 0.3206101021218825,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_DYNAMIC",
+      "mse": 0.4564959929670176,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_DYNAMIC",
+      "mse": 0.45652201667120246,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_W_DYNAMIC",
+      "mse": 0.4564959929670176,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_W_DYNAMIC",
+      "mse": 0.45652201667120246,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PRISM_V2_1_1_PHYSICS_FIRST",
+      "mse": 0.4564959929670176,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PRISM_V2_1_1_PHYSICS_FIRST",
+      "mse": 0.3206101021218825,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "SEASONAL_PERSISTENCE",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "SEASONAL_PERSISTENCE",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "DPLS",
+      "mse": 25.763588111234363,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "HAMMERSTEIN_WIENER",
+      "mse": 2.609094047276042,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "MEAN",
+      "mse": 2.1234624719249884,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "PARALLEL_HAMMERSTEIN",
+      "mse": 2.609094047276042,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "PERSISTENCE",
+      "mse": 2.1235678649075878,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "PLS",
+      "mse": 18.362817607374705,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C",
+      "mse": 1.983792918395064,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_W",
+      "mse": 1.983792918395064,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "RBF_SVR",
+      "mse": 2.8614284475237297,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "RIDGE",
+      "mse": 4.20186960532167,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "SEASONAL_PERSISTENCE",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "XGBOOST",
+      "mse": 2.424052499709156,
+      "status": "PASS",
+      "target_head": "METRO_OIL20__H120__W12",
+      "task_id": "METRO_OIL20"
+    },
+    {
+      "model": "DPLS",
+      "mse": 0.024517025066407853,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "DPLS",
+      "mse": 0.018779293891165807,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "HAMMERSTEIN_WIENER",
+      "mse": 0.018883109577983292,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "HAMMERSTEIN_WIENER",
+      "mse": 0.02043718936593552,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "MEAN",
+      "mse": 0.01158667447587619,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "MEAN",
+      "mse": 0.01158667447587619,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PARALLEL_HAMMERSTEIN",
+      "mse": 0.01819775010147743,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PARALLEL_HAMMERSTEIN",
+      "mse": 0.01801713675402189,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PERSISTENCE",
+      "mse": 0.011586670959584721,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PERSISTENCE",
+      "mse": 0.011586670959584721,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PLS",
+      "mse": 0.050319954352890224,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PLS",
+      "mse": 0.02417048377683981,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C",
+      "mse": 0.01157324949957355,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C",
+      "mse": 0.01196380382630719,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_W",
+      "mse": 0.01157324949957355,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_W",
+      "mse": 0.01196380382630719,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "RBF_SVR",
+      "mse": 0.02236890187797921,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "RBF_SVR",
+      "mse": 0.019172640749136324,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "RIDGE",
+      "mse": 0.05802407509724007,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "RIDGE",
+      "mse": 0.0449917732606761,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "SEASONAL_PERSISTENCE",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "SEASONAL_PERSISTENCE",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "XGBOOST",
+      "mse": 0.01862540782475453,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "XGBOOST",
+      "mse": 0.01947785164092705,
+      "status": "PASS",
+      "target_head": "METRO_P60__H6__W1",
+      "task_id": "METRO_P60"
+    },
+    {
+      "model": "DPLS",
+      "mse": 0.4948753380741086,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "HAMMERSTEIN_WIENER",
+      "mse": 0.47855332182288296,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "MEAN",
+      "mse": 0.4564806581403117,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PARALLEL_HAMMERSTEIN",
+      "mse": 0.47855332182288296,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PERSISTENCE",
+      "mse": 0.45647992942809523,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PLS",
+      "mse": 0.45522124582558837,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C",
+      "mse": 0.4564806581403117,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "PRISM_V2_1_1_K_C_W",
+      "mse": 0.4564806581403117,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "RBF_SVR",
+      "mse": 0.4561791394541027,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "RIDGE",
+      "mse": 0.456452809345654,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "SEASONAL_PERSISTENCE",
+      "mse": NaN,
+      "status": "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    },
+    {
+      "model": "XGBOOST",
+      "mse": 0.45465042713144627,
+      "status": "PASS",
+      "target_head": "TEP_G12__H4__W2",
+      "task_id": "TEP_G12"
+    }
+  ],
+  "PF_formal_count": 7,
+  "PRISM_mean_rank": 3.0,
+  "PRISM_median_rank": 3.0,
+  "canonical_theory_sha256": "72b88c151af4e26a994a68bf8919f4f241ec8cfafe42e5cd1be3549b7c443821",
+  "datasets": 5,
+  "development_artifacts_reused": true,
+  "development_code_equivalence_audit": {
+    "allowed_paths": [
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/v211_public_all_baseline_materialization.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/v211_public_all_closure.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/v211_public_all_materialization.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/v211_public_all_reporting.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_public_all_baseline_materialization.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_public_all_closure.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_public_all_materialization.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_public_all_reporting.py"
+    ],
+    "changed_paths": [
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/v211_public_all_baseline_materialization.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/v211_public_all_closure.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/v211_public_all_materialization.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/v211_public_all_reporting.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_public_all_baseline_materialization.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_public_all_closure.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_public_all_materialization.py",
+      "PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_public_all_reporting.py"
+    ],
+    "development_estimator_or_config_changed": false,
+    "development_generating_commit": "36ec58ee553ec0de392c6cefe2e05861845b53c2",
+    "diff_sha256": "c81661bbb204e74c07c9a83ed9fe430681f2a72ec6436e4aef9832b408adb443",
+    "materialization_repair_commit": "139762358c9b51cc4b882fd711f3710a340a2e6c",
+    "previous_materialization_repair_commit": "3fd2e6ff2c9ce9548a0e2f4c13b36cd1c7ae72c4",
+    "selection_code_changed": false,
+    "status": "PASS",
+    "test_materialization_only_changes": true,
+    "unexpected_paths": []
+  },
+  "development_freeze_sha": "e1d040c170da49588c37e3d45b39273b8bf6f3599b223868f141ab51e192ce7e",
+  "dynamic_best_models": {
+    "DEB_C4": "ARX",
+    "METRO_OIL20": "PRISM_V2_1_1_JOINT_KWA",
+    "METRO_P60": "PRISM_V2_1_1_PHYSICS_FIRST",
+    "PMSM_PM5": "LINEAR_NARX",
+    "SRU_H2S": "PRISM_V2_1_1_PHYSICS_FIRST",
+    "SRU_SO2": "PRISM_V2_1_1_PHYSICS_FIRST",
+    "TEP_G12": "ARX"
+  },
+  "evidence_class": "POST_LOCKBOX_MATERIALIZATION_REPAIR_WITH_FROZEN_DEVELOPMENT_AND_VALIDATED_PARTIAL_ARTIFACT_REUSE",
+  "execution_branch": "prism-v2-1-1-native-support-public-all-20260815",
+  "failed_attempt_predictions_reused": true,
+  "generating_commit": "36ec58ee553ec0de392c6cefe2e05861845b53c2",
+  "heads_failed": 0,
+  "heads_passed": 7,
+  "heads_unsupported": 0,
+  "input_only_best_models": {
+    "DEB_C4": "HAMMERSTEIN_WIENER",
+    "METRO_OIL20": "DPLS",
+    "METRO_P60": "PARALLEL_HAMMERSTEIN",
+    "PMSM_PM5": "DPLS",
+    "SRU_H2S": "HAMMERSTEIN_WIENER",
+    "SRU_SO2": "PRISM_V2_1_1_K_C_W",
+    "TEP_G12": "HAMMERSTEIN_WIENER"
+  },
+  "lockbox_access_attempts": 6,
+  "lockbox_failure_history": [
+    {
+      "access_audit_path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R2/freeze/R1_PUBLIC_ALL_TEST_OOD_ACCESS_AUDIT.json",
+      "access_audit_sha256": "865ddf3905b82ba6f33089ce80e72384df135363f7e11031ecf7801f86b6aacb",
+      "attempt": 1,
+      "error": "'alpha'",
+      "error_type": "KeyError",
+      "failure_path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R2/freeze/R1_LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
+      "failure_sha256": "cc7dd650b4f9f2939b9f83d18024bd4d63dc6043e5d109b09da8c01af66c5a76",
+      "materialization_commit": "36ec58ee553ec0de392c6cefe2e05861845b53c2",
+      "namespace": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815",
+      "ood_y_read": false,
+      "test_y_read": true
+    },
+    {
+      "access_audit_path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R2/freeze/R2_PUBLIC_ALL_TEST_OOD_ACCESS_AUDIT.json",
+      "access_audit_sha256": "8dba544804be72683aedbc8bb47ac14c6a85c3424f723a8ff03b2fda0021bd39",
+      "attempt": 2,
+      "error": "v2.1.1 Joint stability practice Joint route J_KW has empty W block",
+      "error_type": "ValueError",
+      "failure_path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R2/freeze/R2_LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
+      "failure_sha256": "d0c5c77a010570082545789b4530a251baa6062410a40bd1546fd1d983659c5d",
+      "materialization_commit": "d46b7ae349506e4500bae90ffc9d4a3afc11b986",
+      "namespace": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R1",
+      "ood_y_read": false,
+      "test_y_read": true
+    },
+    {
+      "access_audit_path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R3/freeze/R3_PUBLIC_ALL_TEST_OOD_ACCESS_AUDIT.json",
+      "access_audit_sha256": "956ab4947c640f4252deb70fafdf47ca0eb2e8d050700af152404d53ec6a21a8",
+      "attempt": 3,
+      "baseline_test_parquets_materialized": 13,
+      "error": "baseline test materialization refit RBF_SVR and XGBOOST with fit_row_cap_default instead of their frozen model-specific fit caps",
+      "error_type": "FrozenBaselineFitCapMismatch",
+      "failed_attempt_predictions_reused": false,
+      "failed_model": "RBF_SVR",
+      "failed_view": "METRO_OIL20__H120__W12/input_only/record_time/primary",
+      "failure_path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R3/freeze/R3_LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
+      "failure_sha256": "73f91198c77a1919b3b6c1b7ddcc8849a6a4e62aad3d2f95fda5c51e62333b17",
+      "materialization_commit": "3fd2e6ff2c9ce9548a0e2f4c13b36cd1c7ae72c4",
+      "namespace": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R2",
+      "ood_y_read": false,
+      "prism_test_views_materialized": 20,
+      "test_y_read": true
+    },
+    {
+      "access_audit_path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R3/final/PUBLIC_ALL_TEST_OOD_ACCESS_AUDIT.json",
+      "access_audit_sha256": "f2006c55d9b4cf06e55f1af8695ae784837ac11797998d80ae4f46c05d874309",
+      "attempt": 4,
+      "baseline_test_parquets_materialized": 129,
+      "error": "TEP ARX final materialization exited without a Python traceback while constructing and standardizing the full leaderboard-common test matrix; the raw and standardized matrices together exceed the cgroup memory.high threshold.",
+      "error_type": "BaselineMaterializationMemoryPressureTermination",
+      "failed_model": "ARX",
+      "failed_view": "TEP_G12__H4__W2/dynamic/analyzer_maturity_5_steps/proxy_excluded",
+      "failure_path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R3/final/LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
+      "failure_sha256": "d354abf8818dedad94ce3cda6f6014f74ea76a49ee3b8fb1c34bc0ffcfb765ae",
+      "materialization_commit": "139762358c9b51cc4b882fd711f3710a340a2e6c",
+      "namespace": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R3",
+      "ood_y_read": false,
+      "prism_test_views_materialized": 20,
+      "test_y_read": true
+    },
+    {
+      "access_audit_path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R4/final/PUBLIC_ALL_TEST_OOD_ACCESS_AUDIT.json",
+      "access_audit_sha256": "363d33be486d366ebb0e926d66d443ea0bd2fa35244284bfa3dff1e804b70619",
+      "attempt": 5,
+      "baseline_test_parquets_materialized": null,
+      "error": "keys must be str, int, float, bool or None, not PosixPath",
+      "error_type": "TypeError",
+      "failed_model": null,
+      "failed_view": null,
+      "failure_path": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R4/final/LOCKBOX_ACCESSED_RUNTIME_FAILURE.json",
+      "failure_sha256": "21e41504825992fde93c84f86100461c227d10b31954e2b498180318f0612859",
+      "materialization_commit": "70560be08b4f2f1de9035b1b3827fe3fd1f1bd88",
+      "namespace": "/root/autodl-tmp/PRISM_V211_NATIVE_PUBLIC_ALL_20260815_MATERIALIZATION_REPAIR_R4",
+      "ood_y_read": false,
+      "prism_test_views_materialized": null,
+      "test_y_read": true
+    }
+  ],
+  "materialization_repair_after_lockbox_failure": true,
+  "materialization_repair_commit": "1a609c0c641ad53aea9f8e617109d2526b7be977",
+  "one_shot_test_access": false,
+  "ood_accessed": true,
+  "original_lockbox_failure_sha256": "cc7dd650b4f9f2939b9f83d18024bd4d63dc6043e5d109b09da8c01af66c5a76",
+  "partial_resume_new_baseline_test_predictions": 7,
+  "partial_resume_reused_baseline_predictions": 129,
+  "partial_resume_reused_prism_views": 20,
+  "post_test_reselection": false,
+  "primary_heads": 7,
+  "raw_data_hash_audit": {
+    "datasets": 5,
+    "datasets_pass": 5,
+    "files": 8,
+    "files_pass": 8,
+    "pass": true
+  },
+  "reporting_commit": "e2e191316f17415470120c6db84f456c131e76c5",
+  "shared_data_sha": "811304ee110b5d950791ea9d934097ae8fda44dd9041beda91afad5797a8a5b9",
+  "source_branch": "prism-v2-1-1-metro-p60-joint-stability-final",
+  "source_commit": "e47542a319640bc045ca0d31ae9b40763182dde8",
+  "status": "PASS",
+  "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+  "test_access_audit_sha": "def6a956d133ce723eb451ff84d36d473d43e781e598f6bf8c3d7d8cbc8aad4e",
+  "test_accessed": true,
+  "user_authorized_partial_resume": true
+}

@@ -1,0 +1,27 @@
+{
+  "checks": {
+    "access_attempt_matches_generation": true,
+    "destination_prediction_roots_empty": true,
+    "development_freeze_frozen": true,
+    "failure_history_complete": true,
+    "hardlink_only_reuse_required": true,
+    "parent_ood_not_accessed": true,
+    "parent_runtime_failure_retained": true,
+    "post_test_reselection_false": true,
+    "user_authorized_partial_resume": true
+  },
+  "development_freeze_sha256": "e1d040c170da49588c37e3d45b39273b8bf6f3599b223868f141ab51e192ce7e",
+  "generated_at_unix": 1786947691.11926,
+  "materialization_commit": "1a609c0c641ad53aea9f8e617109d2526b7be977",
+  "memory_repair_commit": "0a34da46f2a38ac11adb549f7d24b80b51de76d1",
+  "metadata_hardlinks": {
+    "freeze": 19,
+    "logs": 5,
+    "root": 7
+  },
+  "ood_accessed": false,
+  "repair_manifest_sha256": "070c5c98ca733e4dcfb8a0357c29243c973904c7f44e452fa0218040d7e351ff",
+  "stage": "R5_PARTIAL_RESUME_PRE_LOCKBOX_GATE",
+  "status": "PASS",
+  "test_accessed": false
+}

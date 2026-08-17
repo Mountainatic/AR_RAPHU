@@ -1,0 +1,21 @@
+{
+  "completed_pending_baseline_predictions": 0,
+  "error": "keys must be str, int, float, bool or None, not PosixPath",
+  "error_type": "TypeError",
+  "lockbox_access_attempt": 5,
+  "materialization_commit": "70560be08b4f2f1de9035b1b3827fe3fd1f1bd88",
+  "ood_accessed": false,
+  "ood_baseline_predictions": 0,
+  "ood_prism_predictions": 0,
+  "ood_y_read": false,
+  "pending_baseline_predictions": 7,
+  "post_test_reselection": false,
+  "repair_generation": 4,
+  "reused_baseline_predictions": 129,
+  "reused_prism_predictions": 65,
+  "reused_prism_views": 20,
+  "stage": "T1_PUBLIC_ALL_TEST_OOD_ACCESS",
+  "status": "LOCKBOX_ACCESSED_RUNTIME_FAILURE",
+  "test_accessed": true,
+  "test_y_read": true
+}

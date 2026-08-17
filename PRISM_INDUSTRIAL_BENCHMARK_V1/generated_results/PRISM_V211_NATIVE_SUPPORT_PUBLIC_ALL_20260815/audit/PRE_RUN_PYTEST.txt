@@ -1,0 +1,16 @@
+.......................................s................................ [ 16%]
+........................................................................ [ 32%]
+........................................................................ [ 48%]
+........................................................................ [ 64%]
+........................................................................ [ 80%]
+............................sssssss..................................... [ 96%]
+..............                                                           [100%]
+=============================== warnings summary ===============================
+PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_joint_stability.py: 3 warnings
+PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_metro_audit.py: 11 warnings
+PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v212_joint_oof_protocol.py: 3 warnings
+  /root/miniconda3/lib/python3.12/multiprocessing/popen_fork.py:66: DeprecationWarning: This process (pid=54786) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    self.pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+438 passed, 8 skipped, 17 warnings in 12.22s

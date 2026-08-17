@@ -1,0 +1,78 @@
+{
+  "error": "v2.1.1 Joint stability practice Joint route J_KW has empty W block",
+  "error_type": "ValueError",
+  "materialization_contract_preflight": {
+    "formal_joint_views": 3,
+    "joint_estimator_semantics": "PREDICTIVE_STABILITY_RIDGE_R1",
+    "ood_accessed": false,
+    "status": "PASS",
+    "test_accessed": false,
+    "views": [
+      {
+        "availability_scenario": "record_time",
+        "family": "J_KA",
+        "k_representation": "CHANNEL_COMPRESSED",
+        "numerical_alpha": 0.0,
+        "predictive_eta": 1.0,
+        "proxy_policy": "primary",
+        "raw_k_support": [
+          "COMP",
+          "DV_eletric",
+          "H1",
+          "MPG",
+          "Motor_current",
+          "Reservoirs",
+          "TP2",
+          "TP3",
+          "Towers"
+        ],
+        "target_head": "METRO_OIL20__H120__W12"
+      },
+      {
+        "availability_scenario": "record_time",
+        "family": "J_KW",
+        "k_representation": "FULL_BASIS",
+        "numerical_alpha": 0.0,
+        "predictive_eta": 1.0,
+        "proxy_policy": "full_sensor_secondary",
+        "raw_k_support": [
+          "COMP",
+          "DV_eletric",
+          "H1",
+          "MPG",
+          "Motor_current",
+          "Oil_temperature",
+          "TP2",
+          "TP3",
+          "Towers"
+        ],
+        "target_head": "METRO_P60__H6__W1"
+      },
+      {
+        "availability_scenario": "record_time",
+        "family": "J_KW",
+        "k_representation": "CHANNEL_COMPRESSED",
+        "numerical_alpha": 0.0,
+        "predictive_eta": 1.0,
+        "proxy_policy": "proxy_excluded",
+        "raw_k_support": [
+          "COMP",
+          "DV_eletric",
+          "H1",
+          "MPG",
+          "Motor_current",
+          "Oil_temperature",
+          "TP2",
+          "Towers"
+        ],
+        "target_head": "METRO_P60__H6__W1"
+      }
+    ]
+  },
+  "ood_accessed": false,
+  "ood_y_read": false,
+  "stage": "T1_PUBLIC_ALL_TEST_OOD_ACCESS",
+  "status": "LOCKBOX_ACCESSED_RUNTIME_FAILURE",
+  "test_accessed": true,
+  "test_y_read": true
+}
