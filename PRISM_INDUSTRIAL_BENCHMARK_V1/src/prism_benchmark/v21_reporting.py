@@ -107,19 +107,18 @@ def _moving_block_means(
         values = group["loss_difference"].to_numpy(dtype=np.float64)
         length = min(block_length, len(values))
         starts = np.arange(max(1, len(values) - length + 1), dtype=np.int64)
-        entities.append((values, length, starts))
+        offsets = np.arange(length, dtype=np.int64)
+        blocks = (len(values) + length - 1) // length
+        entities.append((values, starts, offsets, blocks))
     result = np.empty(replicates, dtype=np.float64)
     for replicate in range(replicates):
         pieces = []
-        for values, length, starts in entities:
-            sampled = []
-            total = 0
-            while total < len(values):
-                start = int(rng.choice(starts))
-                block = values[start : start + length]
-                sampled.append(block)
-                total += len(block)
-            pieces.append(np.concatenate(sampled)[: len(values)])
+        for values, starts, offsets, blocks in entities:
+            sampled_starts = rng.choice(starts, size=blocks)
+            indices = (
+                sampled_starts[:, np.newaxis] + offsets[np.newaxis, :]
+            ).reshape(-1)[: len(values)]
+            pieces.append(values[indices])
         result[replicate] = float(np.mean(np.concatenate(pieces), dtype=np.float64))
     return result
 

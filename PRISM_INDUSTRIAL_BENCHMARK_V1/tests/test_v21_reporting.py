@@ -22,6 +22,13 @@ def test_moving_block_bootstrap_is_deterministic_and_entity_local():
     second = _moving_block_means(paired, block_length=3, replicates=20, seed=7)
     np.testing.assert_array_equal(first, second)
     assert len(first) == 20
+    np.testing.assert_array_equal(
+        first,
+        np.array(
+            [5.1, 4.6, 3.7, 4.6, 3.9, 4.2, 4.7, 4.3, 5.0, 4.8, 4.2, 4.1, 3.8, 5.1, 4.6, 3.8, 3.9, 4.9, 4.4, 4.3],
+            dtype=np.float64,
+        ),
+    )
 
 
 def test_holm_adjustment_is_monotone_within_family():
