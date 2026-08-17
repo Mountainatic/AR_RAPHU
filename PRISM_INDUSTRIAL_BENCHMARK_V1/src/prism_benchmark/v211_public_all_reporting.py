@@ -479,8 +479,17 @@ def _bootstrap_row(
         BOOTSTRAP_REPLICATES,
         _stable_seed(identifier),
     )
-    observed = float(np.mean(paired["loss_difference"], dtype=np.float64))
-    comparator_mse = float(np.mean(np.square(right["y_true"] - right["y_pred"])))
+    observed = float(
+        np.mean(paired["loss_difference"].to_numpy(dtype=np.float64))
+    )
+    comparator_mse = float(
+        np.mean(
+            np.square(
+                right["y_true"].to_numpy(dtype=np.float64)
+                - right["y_pred"].to_numpy(dtype=np.float64)
+            )
+        )
+    )
     better = int(np.sum(samples < 0.0))
     opposite = int(np.sum(samples > 0.0))
     raw_p = min(1.0, 2.0 * min(better + 1, opposite + 1) / (BOOTSTRAP_REPLICATES + 1))
