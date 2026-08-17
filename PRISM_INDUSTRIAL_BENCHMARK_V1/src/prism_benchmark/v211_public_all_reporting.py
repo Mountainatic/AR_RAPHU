@@ -33,6 +33,7 @@ from .v211_support import SUPPORT_CONTRACT, load_native_samples, support_id_hash
 BOOTSTRAP_REPLICATES = 500
 BOOTSTRAP_SEED = 20260815
 PACKAGE_NAME = "PRISM_V2_1_1_NATIVE_SUPPORT_PUBLIC_ALL_RESULTS_bundle"
+MAX_SMALL_PACKAGE_ARTIFACT_BYTES = 2 * 1024 * 1024
 REPAIR_MANIFEST_NAME = "POST_FREEZE_MATERIALIZATION_REPAIR.json"
 REUSED_ARTIFACT_MANIFEST_NAME = "REUSED_DEVELOPMENT_ARTIFACT_MANIFEST.json"
 REPAIR_EVIDENCE_CLASS = (
@@ -1020,6 +1021,14 @@ def _full_repro_manifest(paths: PublicAllPaths) -> dict[str, Any]:
     return value
 
 
+def _is_small_package_artifact(path: Path) -> bool:
+    return (
+        path.is_file()
+        and path.suffix.lower() in {".json", ".csv", ".md", ".txt"}
+        and path.stat().st_size <= MAX_SMALL_PACKAGE_ARTIFACT_BYTES
+    )
+
+
 def _copy_small_artifacts(paths: PublicAllPaths, stage: Path, reporting_commit: str | None) -> None:
     def copy(source: Path, destination: str) -> None:
         if not source.is_file():
@@ -1059,7 +1068,7 @@ def _copy_small_artifacts(paths: PublicAllPaths, stage: Path, reporting_commit: 
         for source in sorted(paths.freeze.glob(pattern)):
             copy(source, f"audit/{source.name}")
     for source in sorted(paths.final.glob("*")):
-        if source.is_file() and source.suffix.lower() in {".json", ".csv", ".md", ".txt"}:
+        if _is_small_package_artifact(source):
             copy(source, f"results/{source.name}")
     if repair:
         attempts = max(int(repair.get("lockbox_access_attempts", 1)), 1)
@@ -1079,6 +1088,8 @@ def _copy_small_artifacts(paths: PublicAllPaths, stage: Path, reporting_commit: 
         "- Fresh C1: `NATIVE_K_COMMON_ASSEMBLY_R1`.\n"
         "- Five datasets, seven primary heads, primary views.\n"
         "- GPU baselines and scale sweeps are out of scope.\n"
+        "- Artifacts above 2 MiB remain server-side and are indexed by "
+        "`FULL_REPRO_MANIFEST.json`.\n"
         + access_note,
         encoding="utf-8",
     )

@@ -8,11 +8,13 @@ import pandas as pd
 import pytest
 
 from prism_benchmark.v211_public_all_reporting import (
+    MAX_SMALL_PACKAGE_ARTIFACT_BYTES,
     REPAIR_MANIFEST_NAME,
     REUSED_ARTIFACT_MANIFEST_NAME,
     _add_ranks,
     _full_repro_manifest,
     _holm,
+    _is_small_package_artifact,
     _raw_audit_summary,
     _repair_manifest,
 )
@@ -82,6 +84,18 @@ def test_reporting_holm_uses_finite_sample_p_values() -> None:
     _holm(rows)
     assert all(row["holm_p_value"] is not None for row in rows)
     assert all(row["holm_p_value"] > 0.0 for row in rows)
+
+
+def test_reporting_excludes_large_files_from_small_package(tmp_path: Path) -> None:
+    small = tmp_path / "small.csv"
+    small.write_text("value\n1\n", encoding="utf-8")
+    large = tmp_path / "large.csv"
+    with large.open("wb") as stream:
+        stream.seek(MAX_SMALL_PACKAGE_ARTIFACT_BYTES)
+        stream.write(b"x")
+
+    assert _is_small_package_artifact(small)
+    assert not _is_small_package_artifact(large)
 
 
 def test_reporting_requires_an_accepted_repair_without_reselection(
