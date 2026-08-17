@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import time
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
@@ -15,7 +16,6 @@ from .c2_models import (
 )
 from .c3_models import (
     _arx_features,
-    _narx_expand,
     _nonlinear_features,
     _ridge_block_predict,
 )
@@ -25,7 +25,7 @@ from .cpu_data import (
     input_columns,
     sha256_file,
 )
-from .cpu_selection import regression_metrics
+from .cpu_selection import Standardizer, regression_metrics
 from .v211_public_all_baselines import (
     SupportRequirement,
     _cap_after_support,
@@ -39,6 +39,133 @@ from .v211_public_all_materialization import (
     _prediction_root,
 )
 from .v211_support import support_id_hash
+from .v2_runtime import release_process_memory
+
+
+_MATERIALIZATION_PREDICTION_BLOCK_ROWS = 100_000
+
+
+def _fit_ridge_block_model(
+    x_train: np.ndarray,
+    y_train: np.ndarray,
+    penalties: np.ndarray | float,
+) -> tuple[Standardizer, np.ndarray, float, dict[str, Any]]:
+    """Fit the frozen ridge model without materializing an evaluation matrix."""
+    scaler = Standardizer().fit(x_train)
+    train = scaler.transform(x_train)
+    y_mean = float(np.mean(y_train, dtype=np.float64))
+    centered_y = np.asarray(y_train, dtype=np.float64) - y_mean
+    penalty = np.broadcast_to(np.asarray(penalties, dtype=np.float64), train.shape[1])
+    gram = train.T @ train
+    rhs = train.T @ centered_y
+    system = gram + np.diag(penalty)
+    try:
+        coefficient = np.linalg.solve(system, rhs)
+        solver = "solve"
+    except np.linalg.LinAlgError:
+        coefficient = np.linalg.lstsq(system, rhs, rcond=1e-12)[0]
+        solver = "svd_rescue"
+    residual = system @ coefficient - rhs
+    relative_kkt = float(np.linalg.norm(residual) / max(np.linalg.norm(rhs), 1.0))
+    condition = float(np.linalg.cond(system))
+    certificate = {
+        "solver": solver,
+        "relative_kkt": relative_kkt,
+        "condition_number": condition,
+    }
+    return scaler, np.asarray(coefficient, dtype=np.float64), y_mean, certificate
+
+
+def _ridge_blockwise_predict(
+    blocks: Iterator[np.ndarray],
+    rows: int,
+    scaler: Standardizer,
+    coefficient: np.ndarray,
+    y_mean: float,
+) -> np.ndarray:
+    prediction = np.empty(rows, dtype=np.float64)
+    cursor = 0
+    for block in blocks:
+        block_rows = len(block)
+        if cursor + block_rows > rows:
+            raise RuntimeError(
+                "blockwise ridge prediction exceeded frozen support rows"
+            )
+        evaluation = scaler.transform(block)
+        prediction[cursor : cursor + block_rows] = evaluation @ coefficient + y_mean
+        cursor += block_rows
+        del evaluation, block
+        release_process_memory()
+    if cursor != rows:
+        raise RuntimeError(
+            f"blockwise ridge prediction row mismatch: expected={rows} observed={cursor}"
+        )
+    return prediction
+
+
+def _iter_arx_feature_blocks(
+    accessor: BaseAccessor,
+    samples,
+    view: ViewSpec,
+    columns: list[str],
+    profile: tuple[int, int],
+    maximum_input_lags: int,
+    *,
+    feature_width: int | None = None,
+    block_rows: int | None = None,
+) -> Iterator[np.ndarray]:
+    rows_per_block = (
+        _MATERIALIZATION_PREDICTION_BLOCK_ROWS
+        if block_rows is None
+        else int(block_rows)
+    )
+    if rows_per_block <= 0:
+        raise ValueError("materialization block_rows must be positive")
+    for start in range(0, len(samples), rows_per_block):
+        subset = samples.iloc[start : start + rows_per_block]
+        features, _ = _arx_features(
+            accessor,
+            subset,
+            view,
+            columns,
+            profile,
+            maximum_input_lags,
+        )
+        if feature_width is not None:
+            features = features[:, :feature_width]
+        yield features
+
+
+def _fit_narx_expansion(
+    raw_train: np.ndarray,
+    y_train: np.ndarray,
+    maximum: int,
+) -> tuple[np.ndarray, Standardizer, np.ndarray]:
+    """Freeze NARX feature order on fit data for blockwise evaluation."""
+    scaler = Standardizer().fit(raw_train)
+    standardized = scaler.transform(raw_train)
+    centered_y = np.asarray(y_train, dtype=np.float64) - np.mean(
+        y_train, dtype=np.float64
+    )
+    denominator = np.sqrt(
+        np.sum(np.square(standardized), axis=0) * np.sum(np.square(centered_y))
+    )
+    correlations = np.abs(
+        (standardized.T @ centered_y) / np.where(denominator > 0, denominator, np.inf)
+    )
+    order = np.lexsort((np.arange(len(correlations)), -correlations))[:maximum]
+    selected_train = standardized[:, order]
+    expanded_train = np.concatenate([selected_train, np.square(selected_train)], axis=1)
+    return expanded_train, scaler, order
+
+
+def _expand_narx_block(
+    raw_block: np.ndarray,
+    scaler: Standardizer,
+    order: np.ndarray,
+) -> np.ndarray:
+    selected = scaler.transform(raw_block)[:, order]
+    return np.concatenate([selected, np.square(selected)], axis=1)
 
 
 def _freeze(project: Path) -> dict[str, Any]:
@@ -380,20 +507,12 @@ def _arx_model(
         profile,
         int(freeze["c3"]["arx"]["maximum_input_lags_per_channel"]),
     )
-    x_test, _ = _arx_features(
-        test_accessor,
-        test,
-        view,
-        columns,
-        profile,
-        int(freeze["c3"]["arx"]["maximum_input_lags_per_channel"]),
-    )
     alpha = float(selection["ar_alpha"])
     selected_ratio = selection["selected_x_penalty_ratio"]
     if selected_ratio == "EXACT_X_ZERO":
         x_fit = x_fit[:, :ar_width]
-        x_test = x_test[:, :ar_width]
         penalties: float | np.ndarray = alpha
+        feature_width: int | None = ar_width
     else:
         ratio = float(selected_ratio)
         penalties = np.concatenate(
@@ -402,10 +521,31 @@ def _arx_model(
                 np.full(x_fit.shape[1] - ar_width, alpha * ratio),
             ]
         )
-    prediction, _ = _ridge_block_predict(
-        x_fit, fit["y_true"].to_numpy(dtype=np.float64), x_test, penalties
+        feature_width = None
+    parameter_count = int(x_fit.shape[1] + 1)
+    scaler, coefficient, y_mean, _ = _fit_ridge_block_model(
+        x_fit,
+        fit["y_true"].to_numpy(dtype=np.float64),
+        penalties,
     )
-    return prediction, fit, selection, int(x_fit.shape[1] + 1)
+    del x_fit
+    release_process_memory()
+    prediction = _ridge_blockwise_predict(
+        _iter_arx_feature_blocks(
+            test_accessor,
+            test,
+            view,
+            columns,
+            profile,
+            int(freeze["c3"]["arx"]["maximum_input_lags_per_channel"]),
+            feature_width=feature_width,
+        ),
+        len(test),
+        scaler,
+        coefficient,
+        y_mean,
+    )
+    return prediction, fit, selection, parameter_count
 
 
 def _narx_model(
@@ -440,7 +580,27 @@ def _narx_model(
         profile,
         int(freeze["c3"]["arx"]["maximum_input_lags_per_channel"]),
     )
-    raw_test, _ = _arx_features(
+    y_fit = fit["y_true"].to_numpy(dtype=np.float64)
+    x_fit, raw_scaler, selected_features = _fit_narx_expansion(
+        raw_fit,
+        y_fit,
+        int(
+            freeze["c3"]["linear_narx"][
+                "maximum_linear_state_features_before_expansion"
+            ]
+        ),
+    )
+    del raw_fit
+    release_process_memory()
+    parameter_count = int(x_fit.shape[1] + 1)
+    scaler, coefficient, y_mean, _ = _fit_ridge_block_model(
+        x_fit,
+        y_fit,
+        float(selection["selected_alpha"]),
+    )
+    del x_fit
+    release_process_memory()
+    raw_blocks = _iter_arx_feature_blocks(
         test_accessor,
         test,
         view,
@@ -448,27 +608,18 @@ def _narx_model(
         profile,
         int(freeze["c3"]["arx"]["maximum_input_lags_per_channel"]),
     )
-    x_fit, _, selected_features = _narx_expand(
-        raw_fit,
-        fit["y_true"].to_numpy(dtype=np.float64),
-        raw_fit[:1],
-        int(freeze["c3"]["linear_narx"]["maximum_linear_state_features_before_expansion"]),
+    expanded_blocks = (
+        _expand_narx_block(raw_block, raw_scaler, selected_features)
+        for raw_block in raw_blocks
     )
-    _, x_test, observed_features = _narx_expand(
-        raw_fit,
-        fit["y_true"].to_numpy(dtype=np.float64),
-        raw_test,
-        int(freeze["c3"]["linear_narx"]["maximum_linear_state_features_before_expansion"]),
+    prediction = _ridge_blockwise_predict(
+        expanded_blocks,
+        len(test),
+        scaler,
+        coefficient,
+        y_mean,
     )
-    if not np.array_equal(selected_features, observed_features):
-        raise RuntimeError("frozen NARX feature selection drifted")
-    prediction, _ = _ridge_block_predict(
-        x_fit,
-        fit["y_true"].to_numpy(dtype=np.float64),
-        x_test,
-        float(selection["selected_alpha"]),
-    )
-    return prediction, fit, selection, int(x_fit.shape[1] + 1)
+    return prediction, fit, selection, parameter_count
 
 
 def materialize_baseline_view(

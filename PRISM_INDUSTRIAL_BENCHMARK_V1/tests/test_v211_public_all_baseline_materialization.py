@@ -12,7 +12,14 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from prism_benchmark.cpu_data import HeadSpec, ViewSpec
+from prism_benchmark.c3_models import _narx_expand, _ridge_block_predict
 from prism_benchmark.v211_public_all_baseline_materialization import (
+    _arx_model,
+    _expand_narx_block,
+    _fit_narx_expansion,
+    _fit_ridge_block_model,
+    _narx_model,
+    _ridge_blockwise_predict,
     _static_native,
     _static_model,
     _write,
@@ -162,6 +169,131 @@ def test_static_materialization_uses_frozen_model_specific_fit_caps(
         _static_native(paths, _view(), model)
 
     assert observed_caps == [250_000, 5_000, 100_000]
+
+
+def test_blockwise_ridge_prediction_matches_frozen_reference(monkeypatch) -> None:
+    from prism_benchmark import v211_public_all_baseline_materialization as module
+
+    monkeypatch.setattr(module, "release_process_memory", lambda: None)
+    rng = np.random.default_rng(20260817)
+    x_train = rng.normal(size=(37, 7))
+    y_train = rng.normal(size=37)
+    x_eval = rng.normal(size=(23, 7))
+    penalties = np.linspace(0.01, 0.07, x_train.shape[1])
+
+    expected, expected_certificate = _ridge_block_predict(
+        x_train, y_train, x_eval, penalties
+    )
+    scaler, coefficient, y_mean, certificate = _fit_ridge_block_model(
+        x_train, y_train, penalties
+    )
+    observed = _ridge_blockwise_predict(
+        iter((x_eval[:5], x_eval[5:17], x_eval[17:])),
+        len(x_eval),
+        scaler,
+        coefficient,
+        y_mean,
+    )
+
+    np.testing.assert_allclose(observed, expected, rtol=1e-12, atol=1e-12)
+    assert certificate["solver"] == expected_certificate["solver"]
+    np.testing.assert_allclose(
+        certificate["relative_kkt"], expected_certificate["relative_kkt"]
+    )
+    np.testing.assert_allclose(
+        certificate["condition_number"], expected_certificate["condition_number"]
+    )
+
+
+def test_blockwise_narx_expansion_matches_frozen_reference() -> None:
+    rng = np.random.default_rng(20260817)
+    raw_train = rng.normal(size=(41, 9))
+    y_train = rng.normal(size=41)
+    raw_eval = rng.normal(size=(19, 9))
+
+    expected_train, expected_eval, expected_order = _narx_expand(
+        raw_train, y_train, raw_eval, 5
+    )
+    observed_train, scaler, observed_order = _fit_narx_expansion(raw_train, y_train, 5)
+    observed_eval = _expand_narx_block(raw_eval, scaler, observed_order)
+
+    np.testing.assert_array_equal(observed_order, expected_order)
+    np.testing.assert_allclose(observed_train, expected_train, rtol=0.0, atol=0.0)
+    np.testing.assert_allclose(observed_eval, expected_eval, rtol=0.0, atol=0.0)
+
+
+def test_arx_and_narx_materialization_bound_test_feature_frames(
+    monkeypatch,
+) -> None:
+    from prism_benchmark import v211_public_all_baseline_materialization as module
+
+    fit = _samples("validation", rows=3)
+    test = _samples("test", rows=11)
+    observed_test_rows: list[int] = []
+
+    class StubAccessor:
+        def __init__(self, *args) -> None:
+            del args
+
+    def arx_features(accessor, samples, view, columns, profile, maximum_lags):
+        del accessor, view, columns, profile, maximum_lags
+        if samples["split"].iloc[0] == "test":
+            observed_test_rows.append(len(samples))
+        origin = samples["origin"].to_numpy(dtype=np.float64)
+        return np.column_stack((origin, origin * 0.5 + 1.0, np.ones(len(samples)))), 1
+
+    monkeypatch.setattr(module, "_MATERIALIZATION_PREDICTION_BLOCK_ROWS", 4)
+    monkeypatch.setattr(module, "release_process_memory", lambda: None)
+    monkeypatch.setattr(module, "_development", lambda *args: fit)
+    monkeypatch.setattr(module, "_cap_after_support", lambda samples, cap: samples)
+    monkeypatch.setattr(module, "_common_test", lambda *args: test)
+    monkeypatch.setattr(module, "input_columns", lambda *args: ["x"])
+    monkeypatch.setattr(module, "BaseAccessor", StubAccessor)
+    monkeypatch.setattr(module, "_arx_features", arx_features)
+    monkeypatch.setattr(
+        module,
+        "_freeze",
+        lambda *args: {
+            "selection": {"fit_row_cap_default": 100},
+            "c3": {
+                "arx": {"maximum_input_lags_per_channel": 2},
+                "linear_narx": {"maximum_linear_state_features_before_expansion": 2},
+            },
+        },
+    )
+    paths = SimpleNamespace(project=Path("project"), shared=Path("shared"))
+    view = _view("dynamic")
+
+    arx_prediction, _, _, _ = _arx_model(
+        paths,
+        view,
+        "ARX",
+        {
+            "selection": {
+                "selected_profile": [1, 1],
+                "ar_alpha": 0.1,
+                "selected_x_penalty_ratio": 1.0,
+            }
+        },
+        split="test",
+    )
+    assert len(arx_prediction) == len(test)
+    assert observed_test_rows == [4, 4, 3]
+
+    observed_test_rows.clear()
+    narx_prediction, _, _, _ = _narx_model(
+        paths,
+        view,
+        {
+            "selection": {
+                "selected_profile": [1, 1],
+                "selected_alpha": 0.1,
+            }
+        },
+        split="test",
+    )
+    assert len(narx_prediction) == len(test)
+    assert observed_test_rows == [4, 4, 3]
 
 
 def test_prediction_writer_persists_real_parameter_count(tmp_path: Path) -> None:
