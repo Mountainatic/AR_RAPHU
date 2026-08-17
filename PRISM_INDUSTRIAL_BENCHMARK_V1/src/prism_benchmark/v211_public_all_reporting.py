@@ -164,8 +164,8 @@ def _prediction_path(paths: PublicAllPaths, audit: Mapping[str, Any]) -> Path:
 
 def _read_prediction(paths: PublicAllPaths, audit: Mapping[str, Any]) -> pd.DataFrame:
     path = _prediction_path(paths, audit)
-    frame = pd.read_parquet(path)
     required = {"sample_id", "entity_id", "origin", "y_true", "y_pred"}
+    frame = pd.read_parquet(path, columns=sorted(required))
     missing = required.difference(frame.columns)
     if missing:
         raise RuntimeError(f"prediction artifact lacks columns {sorted(missing)}")
@@ -532,21 +532,29 @@ def _bootstrap_rows(
             ("PRISM_V2_1_1_PHYSICS_FIRST", "PRISM_V2_1_1_K_C_W_DYNAMIC", "KCWA_VS_KCW"),
         ],
     }
-    frame_cache: dict[tuple[str, str, str, str, str, str], pd.DataFrame] = {}
-    for key, audit in audit_index.items():
-        if audit.get("status") == "PASS" and audit.get("prediction_path"):
-            frame_cache[key] = _read_prediction(paths, audit)
     for view in views.values():
         for candidate, comparator, family in comparisons[view.information_set]:
             left_key = (*_view_key(view), candidate, "test")
             right_key = (*_view_key(view), comparator, "test")
-            if left_key not in frame_cache or right_key not in frame_cache:
+            left_audit = audit_index.get(left_key)
+            right_audit = audit_index.get(right_key)
+            if (
+                left_audit is None
+                or right_audit is None
+                or left_audit.get("status") != "PASS"
+                or right_audit.get("status") != "PASS"
+                or not left_audit.get("prediction_path")
+                or not right_audit.get("prediction_path")
+            ):
                 continue
+            left = right = None
             try:
+                left = _read_prediction(paths, left_audit)
+                right = _read_prediction(paths, right_audit)
                 row = _bootstrap_row(
                     paths,
-                    frame_cache[left_key],
-                    frame_cache[right_key],
+                    left,
+                    right,
                     view=view,
                     candidate=candidate,
                     comparator=comparator,
@@ -563,6 +571,9 @@ def _bootstrap_rows(
                     "comparison_family": family,
                     "error": str(error),
                 }
+            finally:
+                del left
+                del right
             rows.append(row)
     _holm([row for row in rows if row.get("status") == "PASS"])
     return rows
