@@ -38,6 +38,11 @@ REUSED_ARTIFACT_MANIFEST_NAME = "REUSED_DEVELOPMENT_ARTIFACT_MANIFEST.json"
 REPAIR_EVIDENCE_CLASS = (
     "POST_LOCKBOX_MATERIALIZATION_REPAIR_WITH_FROZEN_DEVELOPMENT_REUSE"
 )
+REPAIR_ACCEPTED_STATUSES = {
+    "ACCEPTED_AUDITED_REUSE",
+    "ACCEPTED_AUDITED_PARTIAL_RESUME",
+    "COMPLETED_AUDITED_PARTIAL_RESUME",
+}
 INPUT_PRISM_MODELS = {"PRISM_V2_1_1_K_C_W"}
 DYNAMIC_PRISM_MODELS = {
     "PRISM_V2_1_1_PHYSICS_FIRST",
@@ -83,7 +88,7 @@ def _repair_manifest(paths: PublicAllPaths) -> dict[str, Any]:
     if not path.is_file():
         return {}
     value = _read_json(path)
-    if value.get("status") != "ACCEPTED_AUDITED_REUSE":
+    if value.get("status") not in REPAIR_ACCEPTED_STATUSES:
         raise RuntimeError("materialization repair manifest is not accepted")
     if value.get("post_test_reselection") is not False:
         raise RuntimeError("materialization repair cannot include reselection")
@@ -863,12 +868,24 @@ def _final_report(
     evidence: Mapping[str, Any],
 ) -> None:
     if evidence.get("materialization_repair_after_lockbox_failure"):
+        attempts = int(evidence.get("lockbox_access_attempts", 1))
+        reused_predictions = int(
+            evidence.get("partial_resume_reused_baseline_predictions", 0)
+        )
+        reuse_note = (
+            f" The final resume reused {reused_predictions} baseline test "
+            "prediction artifacts only after per-artifact validation."
+            if evidence.get("failed_attempt_predictions_reused")
+            else ""
+        )
         evidence_summary = (
             "The first lockbox access ended in a final-materialization runtime "
             "failure. This result reuses the unchanged frozen development artifacts "
             "after a code-equivalence and SHA256 audit, applies only the accepted "
-            "materialization repair, and records two lockbox access attempts. No "
-            "test result was used for reselection."
+            f"materialization repair, and records {attempts} lockbox access "
+            "attempts."
+            + reuse_note
+            + " No test result was used for reselection."
         )
     else:
         evidence_summary = (
@@ -1009,6 +1026,8 @@ def _copy_small_artifacts(paths: PublicAllPaths, stage: Path, reporting_commit: 
         paths.development_freeze_path,
         paths.freeze / REPAIR_MANIFEST_NAME,
         paths.freeze / REUSED_ARTIFACT_MANIFEST_NAME,
+        paths.freeze / "R4_PARTIAL_RESUME_PRE_LOCKBOX_GATE.json",
+        paths.freeze / "R4_PARTIAL_RESUME_ARTIFACT_REAUDIT.json",
         paths.test_access_audit_path,
         paths.final / "FULL_REPRO_MANIFEST.json",
     ):
@@ -1148,7 +1167,9 @@ def _evidence(
     result = {
         "status": "PASS" if access.get("status") == "PASS" else "FAILED",
         "evidence_class": (
-            REPAIR_EVIDENCE_CLASS if repair else freeze.get("evidence_class")
+            repair.get("evidence_class", REPAIR_EVIDENCE_CLASS)
+            if repair
+            else freeze.get("evidence_class")
         ),
         "source_branch": SOURCE_BRANCH,
         "source_commit": SOURCE_COMMIT,
@@ -1191,6 +1212,21 @@ def _evidence(
         "lockbox_failure_history": repair.get("lockbox_failure_history", []),
         "development_code_equivalence_audit": repair.get(
             "development_code_equivalence_audit"
+        ),
+        "failed_attempt_predictions_reused": bool(
+            repair.get("failed_attempt_predictions_reused")
+        ),
+        "user_authorized_partial_resume": bool(
+            repair.get("user_authorized_partial_resume")
+        ),
+        "partial_resume_reused_prism_views": repair.get(
+            "partial_resume_reused_prism_views"
+        ),
+        "partial_resume_reused_baseline_predictions": repair.get(
+            "partial_resume_reused_baseline_predictions"
+        ),
+        "partial_resume_new_baseline_test_predictions": repair.get(
+            "partial_resume_new_baseline_test_predictions"
         ),
     }
     for information_set, key in (("input_only", "input_only_best_models"), ("dynamic", "dynamic_best_models")):

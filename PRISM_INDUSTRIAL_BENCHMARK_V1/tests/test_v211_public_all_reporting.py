@@ -102,6 +102,10 @@ def test_reporting_requires_an_accepted_repair_without_reselection(
     )
     assert _repair_manifest(paths)["lockbox_access_attempts"] == 2
     payload = json.loads(manifest.read_text(encoding="utf-8"))
+    payload["status"] = "COMPLETED_AUDITED_PARTIAL_RESUME"
+    manifest.write_text(json.dumps(payload), encoding="utf-8")
+    assert _repair_manifest(paths)["lockbox_access_attempts"] == 2
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
     payload["post_test_reselection"] = True
     manifest.write_text(json.dumps(payload), encoding="utf-8")
     with pytest.raises(RuntimeError, match="cannot include reselection"):

@@ -622,11 +622,8 @@ def _narx_model(
     return prediction, fit, selection, parameter_count
 
 
-def materialize_baseline_view(
-    paths: PublicAllPaths, view: ViewSpec, *, split: str = "test"
-) -> list[dict[str, Any]]:
-    audits: list[dict[str, Any]] = []
-    candidates: list[tuple[str, str, str]] = [
+def baseline_candidates(view: ViewSpec) -> tuple[tuple[str, str, str], ...]:
+    candidates = [
         ("C2", "MEAN", "MEAN"),
         ("C2", "PERSISTENCE", "PERSISTENCE"),
         ("C2", "SEASONAL_PERSISTENCE", "SEASONAL_PERSISTENCE"),
@@ -651,6 +648,32 @@ def materialize_baseline_view(
                 ("C3", "LINEAR_NARX", "LINEAR_NARX"),
                 ("C3", "N4SID", "N4SID"),
             ]
+        )
+    return tuple(candidates)
+
+
+def materialize_baseline_view(
+    paths: PublicAllPaths,
+    view: ViewSpec,
+    *,
+    split: str = "test",
+    models: set[str] | frozenset[str] | None = None,
+) -> list[dict[str, Any]]:
+    audits: list[dict[str, Any]] = []
+    candidates = baseline_candidates(view)
+    if models is not None:
+        requested = set(models)
+        registered = {output_model for _, _, output_model in candidates}
+        unknown = requested.difference(registered)
+        if unknown:
+            raise ValueError(
+                "unregistered baseline materialization models: "
+                f"{sorted(unknown)}"
+            )
+        candidates = tuple(
+            candidate
+            for candidate in candidates
+            if candidate[2] in requested
         )
     for family, model, output_model in candidates:
         result = _result(paths, family, model, view)
