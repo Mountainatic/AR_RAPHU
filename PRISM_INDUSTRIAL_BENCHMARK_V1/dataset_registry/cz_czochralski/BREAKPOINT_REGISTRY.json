@@ -1,0 +1,16 @@
+{
+  "boundary_definition": "breakpoints_are_after_data_rows",
+  "cross_breakpoint_aggregation": false,
+  "cross_breakpoint_windows": false,
+  "rod_breakpoints_after_row": {
+    "Rod_1": [
+      334,
+      688,
+      734
+    ],
+    "Rod_2": [
+      745
+    ]
+  },
+  "status": "FROZEN"
+}

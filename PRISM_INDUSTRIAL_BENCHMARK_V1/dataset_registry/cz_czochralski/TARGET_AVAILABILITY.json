@@ -1,0 +1,9 @@
+{
+  "availability_delay_steps": 0,
+  "h_steps": 120,
+  "latest_available_target_index": "origin_minus_one",
+  "target": "crystal_diameter",
+  "target_definition": "future_2_minute_mean_minus_current_2_minute_mean",
+  "w0_steps": 12,
+  "w_steps": 12
+}

@@ -38,6 +38,8 @@ def channel_class(dataset: str, channel: str) -> str:
         return "FAST" if lower.startswith("xmv_") else "MEDIUM"
     if dataset in {"debutanizer", "sru"}:
         return "MEDIUM"
+    if dataset == "cz_czochralski":
+        return "MEDIUM"
     if dataset == "pmsm":
         return "SLOW" if lower in {"ambient", "coolant", "stator_winding", "stator_tooth", "stator_yoke"} else "FAST"
     if dataset == "metropt":

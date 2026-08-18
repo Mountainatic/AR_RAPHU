@@ -1,0 +1,17 @@
+{
+  "raw_file_sha256": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+  "rods": [
+    {
+      "raw_rows": 20103,
+      "raw_sha256_parent": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+      "rod_id": "Rod_1",
+      "sheet_name": "Sheet1"
+    },
+    {
+      "raw_rows": 20627,
+      "raw_sha256_parent": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+      "rod_id": "Rod_2",
+      "sheet_name": "Sheet2"
+    }
+  ]
+}

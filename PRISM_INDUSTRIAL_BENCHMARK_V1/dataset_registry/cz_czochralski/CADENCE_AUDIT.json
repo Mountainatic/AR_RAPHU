@@ -1,0 +1,8 @@
+{
+  "allowed_error_fraction": 0.05,
+  "cadence_source": "CADENCE_FROM_FROZEN_EXPERIMENT_METADATA",
+  "model_period_sec": 10.0,
+  "sample_period_sec": 2.0,
+  "status": "PASS",
+  "timestamp_available": false
+}

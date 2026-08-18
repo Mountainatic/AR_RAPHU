@@ -1,0 +1,15 @@
+{
+  "directions": [
+    "Rod_1_to_Rod_2",
+    "Rod_2_to_Rod_1"
+  ],
+  "outer_protocol": "cross_rod_transfer",
+  "random_row_split": false,
+  "source_split": "source_rod_expanding_time_train_validation",
+  "source_train_validation_dependencies_overlap": false,
+  "source_train_validation_purge_definition": "H_STEPS_PLUS_W_STEPS_PLUS_W0_STEPS",
+  "source_train_validation_purge_steps": 144,
+  "status": "FROZEN",
+  "target_rod_used_for_selection": false,
+  "target_split": "target_rod_test_only"
+}

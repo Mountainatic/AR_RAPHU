@@ -1,0 +1,7 @@
+rod_id,segment_id,raw_start_inclusive,raw_stop_exclusive,breakpoint_before_segment
+Rod_1,Rod_1_segment_0,0,334,
+Rod_1,Rod_1_segment_1,334,688,334
+Rod_1,Rod_1_segment_2,688,734,688
+Rod_1,Rod_1_segment_3,734,20103,734
+Rod_2,Rod_2_segment_0,0,745,
+Rod_2,Rod_2_segment_1,745,20627,745

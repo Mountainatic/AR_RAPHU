@@ -81,6 +81,31 @@ def test_tep_inner_folds_keep_same_run_across_faults() -> None:
             assert sum(samples.iloc[validation].entity_id.str.endswith(f"run={run}")) == 2
 
 
+def test_short_entity_sets_use_causal_time_folds() -> None:
+    rows = []
+    for entity in ("segment-a", "segment-b"):
+        for origin in range(1, 13):
+            rows.append(
+                {
+                    "dataset": "cz_czochralski",
+                    "entity_id": entity,
+                    "dependency_start": origin,
+                    "dependency_stop_exclusive": origin + 1,
+                }
+            )
+    samples = pd.DataFrame(rows)
+
+    folds = inner_folds(samples, count=4)
+
+    assert len(folds) == 4
+    for train, validation in folds:
+        assert len(train) > 0
+        assert len(validation) > 0
+        assert set(samples.iloc[train].entity_id).issubset(
+            {"segment-a", "segment-b"}
+        )
+
+
 def test_one_se_prefers_declared_simpler_candidate() -> None:
     losses = {1: [1.0, 1.2, 0.8, 1.0], 2: [0.99, 1.19, 0.79, 0.99]}
     selected = select_one_se(losses, lambda value: (value,))

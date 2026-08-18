@@ -5,7 +5,7 @@ import json
 import math
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Sequence
 
 import numpy as np
 import pandas as pd
@@ -347,6 +347,51 @@ def deterministic_subsample(samples: pd.DataFrame, cap: int) -> np.ndarray:
     return np.sort(np.argpartition(hashes, cap - 1)[:cap])
 
 
+def _temporal_entity_folds(
+    samples: pd.DataFrame,
+    groups: pd.Series,
+    unique_entities: Sequence[str],
+    count: int,
+    extra_buffer_steps: int,
+) -> list[tuple[np.ndarray, np.ndarray]]:
+    """Build causal time folds independently inside each short entity set."""
+    parts: list[tuple[list[np.ndarray], list[np.ndarray]]] = [
+        ([], []) for _ in range(count)
+    ]
+    group_values = groups.to_numpy(dtype=object)
+    for entity in unique_entities:
+        positions = np.flatnonzero(group_values == entity)
+        subset = samples.iloc[positions]
+        minimum = int(subset["dependency_start"].min())
+        maximum = int(subset["dependency_stop_exclusive"].max())
+        boundaries = np.rint(
+            np.linspace(minimum, maximum, count + 2)
+        ).astype(np.int64)
+        starts = subset["dependency_start"].to_numpy(dtype=np.int64)
+        stops = subset["dependency_stop_exclusive"].to_numpy(dtype=np.int64)
+        for index in range(count):
+            boundary = int(boundaries[index + 1])
+            next_boundary = int(boundaries[index + 2])
+            train_local = np.flatnonzero(stops <= boundary)
+            validation_local = np.flatnonzero(
+                (starts >= boundary + extra_buffer_steps)
+                & (stops <= next_boundary)
+            )
+            if len(train_local) and len(validation_local):
+                parts[index][0].append(positions[train_local])
+                parts[index][1].append(positions[validation_local])
+    folds: list[tuple[np.ndarray, np.ndarray]] = []
+    for train_parts, validation_parts in parts:
+        if train_parts and validation_parts:
+            folds.append(
+                (
+                    np.concatenate(train_parts).astype(np.int64),
+                    np.concatenate(validation_parts).astype(np.int64),
+                )
+            )
+    return folds
+
+
 def inner_folds(samples: pd.DataFrame, count: int = 4, extra_buffer_steps: int = 1) -> list[tuple[np.ndarray, np.ndarray]]:
     entities = samples["entity_id"].astype(str)
     dataset = str(samples["dataset"].iloc[0])
@@ -356,7 +401,15 @@ def inner_folds(samples: pd.DataFrame, count: int = 4, extra_buffer_steps: int =
         groups = entities
     unique_entities = sorted(groups.unique(), key=lambda value: (len(value), value))
     folds: list[tuple[np.ndarray, np.ndarray]] = []
-    if len(unique_entities) > 1:
+    if 1 < len(unique_entities) <= count:
+        folds = _temporal_entity_folds(
+            samples,
+            groups,
+            unique_entities,
+            count,
+            extra_buffer_steps,
+        )
+    elif len(unique_entities) > 1:
         chunks = [chunk.tolist() for chunk in np.array_split(np.asarray(unique_entities, dtype=object), count + 1)]
         for index in range(count):
             train_entities = set(value for chunk in chunks[: index + 1] for value in chunk)

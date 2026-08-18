@@ -1,0 +1,19 @@
+{
+  "duplicate_required_variable_rows": {
+    "Rod_1": 0,
+    "Rod_2": 0
+  },
+  "missing_values": {
+    "Rod_1": 0,
+    "Rod_2": 0
+  },
+  "required_columns_missing": {
+    "Rod_1": [],
+    "Rod_2": []
+  },
+  "rows": {
+    "Rod_1": 20103,
+    "Rod_2": 20627
+  },
+  "status": "PASS"
+}

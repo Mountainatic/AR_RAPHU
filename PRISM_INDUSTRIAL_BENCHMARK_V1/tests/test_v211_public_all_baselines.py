@@ -151,3 +151,19 @@ def test_n4sid_sequence_check_rejects_grouped_or_gapped_training_rows() -> None:
     assert _has_contiguous_entity_sequence(contiguous) is True
     assert _has_contiguous_entity_sequence(gapped) is False
     assert _has_contiguous_entity_sequence(grouped) is False
+
+
+def test_unavailable_long_baseline_history_is_filtered_before_scoring() -> None:
+    short = SupportRequirement(input_history_steps=2)
+    long = SupportRequirement(input_history_steps=1_000)
+    folds, audit = candidate_fold_supports(
+        _samples(),
+        _view(),
+        [short, long],
+        fit_cap=10_000,
+        evaluation_cap=10_000,
+    )
+
+    assert short in folds
+    assert long not in folds
+    assert audit["unavailable_requirements"] == [long.to_json()]

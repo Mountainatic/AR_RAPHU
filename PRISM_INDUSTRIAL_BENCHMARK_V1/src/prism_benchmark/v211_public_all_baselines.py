@@ -187,26 +187,79 @@ def candidate_fold_supports(
     registered = tuple(sorted(set(requirements)))
     if not registered:
         raise ValueError("at least one support requirement is required")
-    result = {requirement: [] for requirement in registered}
+    raw_folds = list(_folds(train, view))
+    active = list(registered)
+    unavailable: list[SupportRequirement] = []
+    selected_folds: list[
+        tuple[pd.DataFrame, pd.DataFrame, dict[SupportRequirement, pd.DataFrame]]
+    ] = []
+
+    def severity(requirement: SupportRequirement) -> tuple[int, int, int]:
+        return (
+            requirement.input_history_steps
+            + requirement.target_history_steps
+            + requirement.target_delta_steps,
+            requirement.input_history_steps,
+            requirement.target_history_steps,
+        )
+
+    while active:
+        candidate_folds = []
+        invalid_requirements: set[SupportRequirement] = set()
+        for fit_index, evaluation_index in raw_folds:
+            fit_raw = train.iloc[fit_index]
+            evaluation_raw = train.iloc[evaluation_index]
+            evaluation_floor = fold_evaluation_causal_floor(
+                fit_raw, evaluation_raw
+            )
+            fit_by_requirement = {
+                requirement: apply_requirement(fit_raw, requirement)
+                for requirement in active
+            }
+            common = apply_common_requirements(
+                evaluation_raw,
+                active,
+                evaluation_floor,
+            )
+            missing = {
+                requirement
+                for requirement, fit in fit_by_requirement.items()
+                if fit.empty
+            }
+            if missing or common.empty:
+                invalid_requirements.update(missing or set(active))
+                continue
+            candidate_folds.append((fit_raw, common, fit_by_requirement))
+        if len(candidate_folds) == len(raw_folds) and len(candidate_folds) >= 2:
+            selected_folds = candidate_folds
+            break
+        if len(active) == 1:
+            if len(candidate_folds) < 2:
+                raise ValueError(
+                    "no support-compatible inner folds for baseline candidates"
+                )
+            selected_folds = candidate_folds
+            break
+        remove = max(invalid_requirements or set(active), key=severity)
+        active.remove(remove)
+        unavailable.append(remove)
+
+    if not active or not selected_folds:
+        raise ValueError("no support-compatible baseline candidates")
+    active_requirements = tuple(active)
+    result = {requirement: [] for requirement in active_requirements}
     common_rows: list[int] = []
     common_hashes: list[str] = []
-    for fit_index, evaluation_index in _folds(train, view):
-        fit_raw = train.iloc[fit_index]
-        evaluation_raw = train.iloc[evaluation_index]
-        evaluation_floor = fold_evaluation_causal_floor(fit_raw, evaluation_raw)
+    for fit_raw, evaluation_common, fit_by_requirement in selected_folds:
         evaluation_common = _cap_after_support(
-            apply_common_requirements(
-                evaluation_raw,
-                registered,
-                evaluation_floor,
-            ),
+            evaluation_common,
             evaluation_cap,
         )
         evaluation_hash = support_id_hash(evaluation_common)
         common_rows.append(len(evaluation_common))
         common_hashes.append(evaluation_hash)
-        for requirement in registered:
-            fit_native = apply_requirement(fit_raw, requirement)
+        for requirement in active_requirements:
+            fit_native = fit_by_requirement[requirement]
             fit = _cap_after_support(fit_native, fit_cap)
             result[requirement].append(
                 FoldSupport(
@@ -225,20 +278,30 @@ def candidate_fold_supports(
         "row_cap_applied_after_native_mask": True,
         "fit_cap": int(fit_cap),
         "evaluation_cap": int(evaluation_cap),
+        "available_requirements": [
+            requirement.to_json() for requirement in active_requirements
+        ],
+        "unavailable_requirements": [
+            requirement.to_json() for requirement in unavailable
+        ],
+        "raw_fold_count": len(raw_folds),
+        "selected_fold_count": len(selected_folds),
         "common_validation_rows_by_fold": common_rows,
         "common_validation_support_hash_by_fold": common_hashes,
-        "requirements": [requirement.to_json() for requirement in registered],
+        "requirements": [
+            requirement.to_json() for requirement in active_requirements
+        ],
         "fit_rows_by_requirement": {
             json.dumps(requirement.to_json(), sort_keys=True): [
                 fold.fit_native_rows for fold in result[requirement]
             ]
-            for requirement in registered
+            for requirement in active_requirements
         },
         "fit_support_hash_by_requirement": {
             json.dumps(requirement.to_json(), sort_keys=True): [
                 fold.fit_support_hash for fold in result[requirement]
             ]
-            for requirement in registered
+            for requirement in active_requirements
         },
     }
     return result, audit
@@ -536,6 +599,16 @@ def run_dpls_job(
                 freeze["selection"]["selection_validation_row_cap_default"]
             ),
         )
+        histories = [
+            history
+            for history in histories
+            if requirements[history] in fold_supports
+        ]
+        requirements = {
+            history: requirements[history] for history in histories
+        }
+        if not histories:
+            raise ValueError("no support-compatible DPLS histories")
         candidates = [
             (history, int(components))
             for history in histories
@@ -698,6 +771,16 @@ def run_ar_job(
                 freeze["selection"]["selection_validation_row_cap_default"]
             ),
         )
+        profiles = [
+            profile
+            for profile in profiles
+            if requirements[profile] in fold_supports
+        ]
+        requirements = {
+            profile: requirements[profile] for profile in profiles
+        }
+        if not profiles:
+            raise ValueError("no support-compatible AR profiles")
         accessor = BaseAccessor(
             shared, view.head.dataset, "train", [view.head.target]
         )
@@ -1217,6 +1300,16 @@ def run_hammerstein_job(
                 freeze["selection"]["selection_validation_row_cap_default"]
             ),
         )
+        profiles = [
+            profile
+            for profile in profiles
+            if requirements[profile] in fold_supports
+        ]
+        requirements = {
+            profile: requirements[profile] for profile in profiles
+        }
+        if not profiles:
+            raise ValueError("no support-compatible Hammerstein profiles")
         if wiener:
             candidates = [
                 (profile, nonlinearity, output_map)

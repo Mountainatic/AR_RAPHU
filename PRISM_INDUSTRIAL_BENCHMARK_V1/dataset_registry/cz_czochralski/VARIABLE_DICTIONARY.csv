@@ -1,0 +1,11 @@
+canonical_name,original_name,role,unit
+main_heater_power,主加热功率,U_X,UNKNOWN_NOT_FROZEN
+crystal_lift,晶升速度,U_X,UNKNOWN_NOT_FROZEN
+crucible_lift,埚升速度,U_X,UNKNOWN_NOT_FROZEN
+crystal_rotation,晶转速度,U_X,UNKNOWN_NOT_FROZEN
+crucible_rotation,埚转速度,U_X,UNKNOWN_NOT_FROZEN
+crystal_diameter,晶体直径,Y_BY_TASK,UNKNOWN_NOT_FROZEN
+crystal_length,晶体长度,EXCLUDED,UNKNOWN_NOT_FROZEN
+heater_element_temperature,加热元件温度,EXCLUDED,UNKNOWN_NOT_FROZEN
+argon_flow_setpoint,氩气流量设定,EXCLUDED,UNKNOWN_NOT_FROZEN
+furnace_pressure,炉压,EXCLUDED,UNKNOWN_NOT_FROZEN

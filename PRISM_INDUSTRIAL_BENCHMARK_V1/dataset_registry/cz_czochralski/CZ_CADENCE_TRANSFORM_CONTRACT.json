@@ -1,0 +1,11 @@
+{
+  "aggregation": "within_segment_trailing_nonoverlapping_block_mean",
+  "causal": true,
+  "centered_rolling": false,
+  "cross_breakpoint": false,
+  "incomplete_terminal_block_dropped": true,
+  "model_period_sec": 10.0,
+  "raw_period_sec": 2.0,
+  "raw_samples_per_model_sample": 5,
+  "status": "FROZEN"
+}
