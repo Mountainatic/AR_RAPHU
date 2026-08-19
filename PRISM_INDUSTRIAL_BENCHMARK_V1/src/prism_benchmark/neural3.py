@@ -171,13 +171,14 @@ class TimeMixerModel(nn.Module):
         channels_first = values.transpose(1, 2)
         scale_vectors = []
         for index, stride in enumerate((1, 2, 4)):
+            effective_stride = min(stride, channels_first.shape[-1])
             length = channels_first.shape[-1] - (
-                channels_first.shape[-1] % stride
+                channels_first.shape[-1] % effective_stride
             )
             pooled = F.avg_pool1d(
                 channels_first[..., :length],
-                kernel_size=stride,
-                stride=stride,
+                kernel_size=effective_stride,
+                stride=effective_stride,
             ).transpose(1, 2)
             mixed = self.past_mixers[index](self.projection(pooled))
             scale_vectors.append(mixed.mean(dim=1))

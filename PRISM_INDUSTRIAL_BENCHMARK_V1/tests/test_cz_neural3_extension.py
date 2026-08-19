@@ -263,12 +263,13 @@ def test_sequence_materialization_is_past_only_for_inputs_and_targets() -> None:
 
 
 def test_itransformer_uses_variable_tokens_and_timemixer_shapes() -> None:
-    values = torch.randn(3, 16, 7)
     itransformer = ITransformerModel(7, "SMALL")
     timemixer = TimeMixerModel(7, "SMALL")
     assert itransformer.variable_embedding.shape[1] == 7
-    assert itransformer(values).shape == (3,)
-    assert timemixer(values).shape == (3,)
+    for tokens in (1, 2, 3, 16):
+        values = torch.randn(3, tokens, 7)
+        assert itransformer(values).shape == (3,)
+        assert timemixer(values).shape == (3,)
 
 
 def test_all_frozen_capacities_stay_within_parameter_budget() -> None:
