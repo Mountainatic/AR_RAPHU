@@ -383,12 +383,15 @@ def _source_files(project: Path) -> list[Path]:
         "src/prism_benchmark/six_dataset_materialization.py",
         "src/prism_benchmark/six_dataset_reporting.py",
         "src/prism_benchmark/six_dataset_package.py",
+        "scripts/level_r2_reporting.py",
+        "src/prism_benchmark/level_reconstruction.py",
         "src/prism_benchmark/v211_k.py",
         "src/prism_benchmark/v211_public_all_baselines.py",
         "src/prism_benchmark/cpu_data.py",
         "tests/test_cz_neural3_extension.py",
         "tests/test_v211_native_support.py",
         "tests/test_v211_public_all_baselines.py",
+        "tests/test_level_reconstruction.py",
     ]
     result = [
         project / name
