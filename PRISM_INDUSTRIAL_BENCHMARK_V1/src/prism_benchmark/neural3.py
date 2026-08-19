@@ -16,7 +16,12 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from .cpu_data import BaseAccessor, ViewSpec, input_columns as registered_input_columns
+from .cpu_data import (
+    BaseAccessor,
+    ViewSpec,
+    deterministic_subsample,
+    input_columns as registered_input_columns,
+)
 from .v211_support import (
     SUPPORT_CONTRACT,
     load_native_samples,
@@ -35,6 +40,8 @@ PATIENCE = 12
 GRADIENT_CLIP_NORM = 1.0
 EFFECTIVE_BATCH_SIZE = 256
 PHYSICAL_BATCH_SIZE = 256
+NEURAL_FIT_ROW_CAP = 250_000
+NEURAL_VALIDATION_ROW_CAP = 50_000
 MAX_SEQUENCE_TOKENS = 256
 ITRANSFORMER_TEMPORAL_TOKENS = 16
 PARAMETER_BUDGET = 250_000
@@ -239,6 +246,14 @@ def native_support(
         latest = samples["latest_available_target_index"].to_numpy(dtype=np.int64)
         mask &= latest - int(history_steps) + 1 >= floor
     return samples.loc[mask].copy()
+def _cap_after_native_support(
+    samples: pd.DataFrame,
+    cap: int,
+) -> pd.DataFrame:
+    if cap < 1:
+        raise ValueError("native support row cap must be positive")
+    indices = deterministic_subsample(samples, cap)
+    return samples.iloc[indices].reset_index(drop=True)
 
 
 def _partition_candidate_support(
@@ -755,6 +770,10 @@ def select_candidate(
     common_validation = native_support(
         validation, max_history, dynamic=dynamic
     )
+    common_validation_rows_before_cap = len(common_validation)
+    common_validation = _cap_after_native_support(
+        common_validation, NEURAL_VALIDATION_ROW_CAP
+    )
     scaler_fit = native_support(train, max_history, dynamic=dynamic)
     if common_validation.empty or scaler_fit.empty:
         raise AssertionError("available neural candidates lost common support")
@@ -767,6 +786,8 @@ def select_candidate(
     )
     candidate_results = []
     for candidate, fit in native_candidates:
+        native_fit_rows_before_cap = len(fit)
+        fit = _cap_after_native_support(fit, NEURAL_FIT_ROW_CAP)
         result = _fit_one(
             candidate,
             accessor,
@@ -782,8 +803,12 @@ def select_candidate(
         result.update(
             {
                 "native_fit_rows": int(len(fit)),
+                "native_fit_rows_before_cap": int(native_fit_rows_before_cap),
+                "native_fit_row_cap": NEURAL_FIT_ROW_CAP,
                 "native_fit_support_hash": support_hash(fit),
                 "common_validation_rows": int(len(common_validation)),
+                "common_validation_rows_before_cap": int(common_validation_rows_before_cap),
+                "common_validation_row_cap": NEURAL_VALIDATION_ROW_CAP,
                 "common_validation_support_hash": support_hash(common_validation),
                 "row_cap_applied_after_native_mask": True,
                 "test_metrics_used_for_selection": False,
@@ -858,6 +883,8 @@ def select_candidate(
             "common_validation_rows": selected["common_validation_rows"],
             "common_validation_support_hash": selected["common_validation_support_hash"],
             "common_support_history_steps": max_history,
+            "fit_row_cap": NEURAL_FIT_ROW_CAP,
+            "validation_row_cap": NEURAL_VALIDATION_ROW_CAP,
             "cross_candidate_validation_rows_equal": len(
                 {value["common_validation_support_hash"] for value in candidate_results}
             )
