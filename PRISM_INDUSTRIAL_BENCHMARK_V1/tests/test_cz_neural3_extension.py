@@ -45,6 +45,7 @@ from prism_benchmark.neural3 import (
     support_hash,
 )
 from prism_benchmark.v211_support import SUPPORT_CONTRACT, support_id_hash
+from prism_benchmark.six_dataset_materialization import _registered_splits
 from prism_benchmark.six_dataset_package import _small_files
 from prism_benchmark.six_dataset_extension import _support_record
 from prism_benchmark.six_dataset_reporting import (
@@ -470,6 +471,20 @@ def test_support_record_uses_native_support_hash_identity(tmp_path: Path) -> Non
         "support_hash": support_id_hash(empty_ood),
         "support_contract": SUPPORT_CONTRACT,
     }
+
+
+def test_final_materialization_skips_explicitly_empty_ood_split(
+    tmp_path: Path,
+) -> None:
+    _, view = _cz_view(tmp_path, "Rod_1_to_Rod_2", "input_only")
+    shared = tmp_path / "shared"
+    sample_dir = shared / "sample_ids" / view.relative_root
+    sample_dir.mkdir(parents=True)
+    test = _native_samples([10], [9])
+    test.to_parquet(sample_dir / "test.parquet", index=False)
+    test.iloc[0:0].to_parquet(sample_dir / "ood.parquet", index=False)
+
+    assert _registered_splits(shared, view) == ("test",)
 
 
 def test_bootstrap_finite_sample_p_value_is_never_zero() -> None:

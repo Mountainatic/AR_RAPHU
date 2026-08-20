@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 from typing import Any, Mapping
 
+import pyarrow.parquet as pq
 import torch
 
 from .cpu_data import ViewSpec, sha256_file
@@ -72,7 +73,8 @@ def _registered_splits(shared: Path, view: ViewSpec) -> tuple[str, ...]:
     result = tuple(
         split
         for split in ("test", "ood")
-        if (root / f"{split}.parquet").is_file()
+        if (path := root / f"{split}.parquet").is_file()
+        and pq.ParquetFile(path).metadata.num_rows > 0
     )
     if "test" not in result:
         raise FileNotFoundError(root / "test.parquet")
