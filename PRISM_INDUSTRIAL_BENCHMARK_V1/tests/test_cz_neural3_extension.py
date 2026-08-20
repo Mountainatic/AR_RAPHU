@@ -449,6 +449,8 @@ def test_support_record_uses_native_support_hash_identity(tmp_path: Path) -> Non
         }
     )
     frame.to_parquet(sample_dir / "train.parquet", index=False)
+    empty_ood = frame.iloc[0:0].copy()
+    empty_ood.to_parquet(sample_dir / "ood.parquet", index=False)
 
     record = _support_record(
         shared,
@@ -462,6 +464,12 @@ def test_support_record_uses_native_support_hash_identity(tmp_path: Path) -> Non
     assert observed == support_id_hash(frame)
     assert observed != _stable_hash(frame["view_sample_id"])
     assert support_id_hash(frame.iloc[::-1].reset_index(drop=True)) != observed
+    assert record["splits"]["ood"] == {
+        "rows": 0,
+        "source_rows": 0,
+        "support_hash": support_id_hash(empty_ood),
+        "support_contract": SUPPORT_CONTRACT,
+    }
 
 
 def test_bootstrap_finite_sample_p_value_is_never_zero() -> None:

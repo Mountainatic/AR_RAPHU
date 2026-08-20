@@ -255,7 +255,15 @@ def _support_record(
         if not path.is_file():
             continue
         frame = _sample_metadata(shared, view, split)
-        common = apply_common_requirements(frame, requirements)
+        # An explicitly materialized empty split has no row value from which to
+        # observe the support contract.  Preserve it as an empty support set;
+        # non-empty splits still pass the strict native-contract validation in
+        # apply_common_requirements.
+        common = (
+            frame.copy()
+            if frame.empty
+            else apply_common_requirements(frame, requirements)
+        )
         split_details[split] = {
             "rows": int(len(common)),
             "source_rows": int(len(frame)),
