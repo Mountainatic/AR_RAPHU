@@ -15,6 +15,8 @@ import numpy as np
 
 R2_LEVEL_RECONSTRUCTED = "R2_LEVEL_RECONSTRUCTED"
 R2_DELTA = "R2_DELTA"
+LEVEL_TARGET_SEMANTICS = "REGISTERED_FUTURE_WINDOW_LEVEL"
+IDENTITY_TOLERANCE = 1e-10
 
 
 def _as_float_array(values: Iterable[float], name: str) -> np.ndarray:
@@ -89,11 +91,35 @@ def metric_bundle_delta_and_level(
     delta_true: Iterable[float],
     delta_pred: Iterable[float],
     current_level: Iterable[float],
+    *,
+    future_level_true: Iterable[float] | None = None,
 ) -> dict[str, float | str]:
-    """Return both representations while asserting their shared error identity."""
+    """Return both representations while asserting their shared error identity.
+
+    ``future_level_true`` should be supplied by reporting passes that can read
+    the registered target window directly.  Keeping it optional preserves the
+    small-array API used by unit tests and downstream callers, while the
+    reporting path can independently verify that the frozen change target is
+    exactly the registered future-window level minus the current-window level.
+    """
 
     truth, prediction, current = _paired_arrays(delta_true, delta_pred, current_level)
-    future_truth = current + truth
+    if future_level_true is None:
+        future_truth = current + truth
+    else:
+        future_truth = _as_float_array(future_level_true, "future_level_true")
+        if len(future_truth) != len(truth):
+            raise ValueError(
+                "future_level_true and delta arrays must have equal length"
+            )
+    target_identity_error = (future_truth - current) - truth
+    if not np.allclose(
+        future_truth - current,
+        truth,
+        rtol=IDENTITY_TOLERANCE,
+        atol=IDENTITY_TOLERANCE,
+    ):
+        raise AssertionError("STOP_LEVEL_RECONSTRUCTION_TARGET_IDENTITY_FAILED")
     future_prediction = reconstruct_registered_level(current, prediction)
     delta_metrics = _regression_metrics(truth, prediction)
     level_metrics = _regression_metrics(future_truth, future_prediction)
@@ -101,15 +127,24 @@ def metric_bundle_delta_and_level(
     residual = truth - prediction
     level_residual = future_truth - future_prediction
     max_abs_error = float(np.max(np.abs(residual - level_residual)))
-    tolerance = 1e-10
-    if max_abs_error > tolerance:
+    if not np.allclose(
+        residual,
+        level_residual,
+        rtol=IDENTITY_TOLERANCE,
+        atol=IDENTITY_TOLERANCE,
+    ):
         raise AssertionError("STOP_LEVEL_RECONSTRUCTION_IDENTITY_FAILED")
     for left, right, name in (
         (delta_metrics["mse"], level_metrics["mse"], "MSE"),
         (delta_metrics["rmse"], level_metrics["rmse"], "RMSE"),
         (delta_metrics["mae"], level_metrics["mae"], "MAE"),
     ):
-        if not np.isclose(left, right, rtol=tolerance, atol=tolerance):
+        if not np.isclose(
+            left,
+            right,
+            rtol=IDENTITY_TOLERANCE,
+            atol=IDENTITY_TOLERANCE,
+        ):
             raise AssertionError(f"STOP_LEVEL_RECONSTRUCTION_{name}_IDENTITY_FAILED")
     persistence_mse = float(persistence["mse_persistence"])
     model_mse = float(level_metrics["mse"])
@@ -137,6 +172,13 @@ def metric_bundle_delta_and_level(
         "std_level_target": float(np.std(future_truth, dtype=np.float64)),
         "std_delta_target": float(np.std(truth, dtype=np.float64)),
         "variance_ratio": variance_ratio,
+        "level_target_semantics": LEVEL_TARGET_SEMANTICS,
+        "same_prediction_error": True,
+        "different_target_variance": True,
+        "target_identity_max_abs_error": float(
+            np.max(np.abs(target_identity_error))
+        ),
+        "residual_identity_max_abs_error": max_abs_error,
         "future_level_true": future_truth,
         "future_level_pred": future_prediction,
     }
@@ -154,16 +196,30 @@ def reconstruction_identity_audit(
     delta_true: Iterable[float],
     delta_pred: Iterable[float],
     current_level: Iterable[float],
+    *,
+    future_level_true: Iterable[float] | None = None,
 ) -> dict[str, Any]:
     """Return a serializable audit without changing any prediction values."""
 
-    result = metric_bundle_delta_and_level(delta_true, delta_pred, current_level)
+    result = metric_bundle_delta_and_level(
+        delta_true,
+        delta_pred,
+        current_level,
+        future_level_true=future_level_true,
+    )
     return {
         "status": "PASS",
         "model_retrained": False,
         "model_reselected": False,
         "hyperparameters_changed": False,
         "sample_support_changed": False,
+        "identity_checks_passed": True,
+        "target_identity_max_abs_error": result[
+            "target_identity_max_abs_error"
+        ],
+        "residual_identity_max_abs_error": result[
+            "residual_identity_max_abs_error"
+        ],
         "mse_identity_max_abs_error": abs(float(result["mse"] - result["mse_delta"])),
         "rmse_identity_max_abs_error": abs(float(result["rmse"] - result["rmse_delta"])),
         "mae_identity_max_abs_error": abs(float(result["mae"] - result["mae_delta"])),
