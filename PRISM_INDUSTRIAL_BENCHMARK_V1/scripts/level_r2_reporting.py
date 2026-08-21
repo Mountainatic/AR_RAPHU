@@ -128,11 +128,49 @@ def _window_mean(
             f"registered window width mismatch: {start_column}; "
             f"observed={sorted(set(widths.tolist()))}, expected={expected_width}"
         )
-    indices = start[:, None] + np.arange(int(widths[0]), dtype=np.int64)[None, :]
-    return accessor.gather(samples, [target], indices).reshape(len(samples), -1).mean(
-        axis=1,
-        dtype=np.float64,
-    )
+
+    # Frozen C1 targets were materialized by target_change(), which computes
+    # every window from a full-entity FP64 prefix sum.  Reuse that exact
+    # numerical path: a direct gather(...).mean() is mathematically equivalent
+    # but can differ by several e-9 after a long cumulative history.
+    result = np.empty(len(samples), dtype=np.float64)
+    entities = samples["entity_id"].astype(str).to_numpy()
+    codes, labels = pd.factorize(entities, sort=False)
+    order = np.argsort(codes, kind="stable")
+    counts = np.bincount(codes, minlength=len(labels))
+    groups = np.split(order, np.cumsum(counts)[:-1])
+    for entity_id, mask in zip(labels, groups, strict=True):
+        dense_min, value_prefix, count_prefix = accessor._prefixes(
+            str(entity_id), target
+        )
+        if dense_min != 0:
+            raise ValueError(
+                "registered window cannot reproduce the frozen full-entity "
+                f"prefix path: entity={entity_id!r}, dense_min={dense_min}"
+            )
+        starts = start[mask] - dense_min
+        stops = stop[mask] - dense_min
+        dense_length = len(count_prefix) - 1
+        if np.any(starts < 0) or np.any(stops > dense_length):
+            raise ValueError(
+                "registered window outside entity support: "
+                f"entity={entity_id!r}, window={start_column}"
+            )
+        window_counts = count_prefix[stops] - count_prefix[starts]
+        if np.any(window_counts != expected_width):
+            raise ValueError(
+                "registered window contains missing entity rows: "
+                f"entity={entity_id!r}, window={start_column}"
+            )
+        if np.any(count_prefix[stops] != stops):
+            raise ValueError(
+                "entity prefix contains gaps before a registered window: "
+                f"entity={entity_id!r}, window={start_column}"
+            )
+        result[mask] = (
+            value_prefix[stops] - value_prefix[starts]
+        ) / expected_width
+    return result
 
 
 def _registered_levels(

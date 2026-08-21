@@ -1,14 +1,28 @@
 import hashlib
+import importlib.util
+from pathlib import Path
 import zipfile
 
+import numpy as np
 import pandas as pd
 
+from prism_benchmark.c1_contracts import target_change
+from prism_benchmark.cpu_data import BaseAccessor
 from prism_benchmark.public5_level_r2_reporting import (
     PACKAGE_ROOT_NAME,
     add_dual_rankings,
     select_frozen_comparison_rows,
     verify_zip_checksums,
 )
+
+_SCRIPT_SPEC = importlib.util.spec_from_file_location(
+    "level_r2_reporting_script",
+    Path(__file__).resolve().parents[1] / "scripts" / "level_r2_reporting.py",
+)
+assert _SCRIPT_SPEC is not None and _SCRIPT_SPEC.loader is not None
+_SCRIPT_MODULE = importlib.util.module_from_spec(_SCRIPT_SPEC)
+_SCRIPT_SPEC.loader.exec_module(_SCRIPT_MODULE)
+_registered_levels = _SCRIPT_MODULE._registered_levels
 
 
 def _row(model: str, level_r2: float, skill: float, frozen_rank: int) -> dict:
@@ -74,3 +88,49 @@ def test_zip_checksum_verification_reads_packaged_members(tmp_path) -> None:
         )
 
     verify_zip_checksums(path)
+
+
+def test_registered_levels_reproduce_frozen_prefix_sum_path() -> None:
+    row_count = 100_000
+    values = 1.0e8 + np.arange(row_count, dtype=np.float64) * 0.001
+    origin = 80_000
+    horizon = 120
+    width = 12
+    accessor = object.__new__(BaseAccessor)
+    accessor.entities = {
+        "ENTITY": (
+            np.arange(row_count, dtype=np.int64),
+            {"target": values},
+        )
+    }
+    samples = pd.DataFrame(
+        {
+            "entity_id": ["ENTITY"],
+            "current_start": [origin - width],
+            "current_stop_exclusive": [origin],
+            "target_start": [origin + horizon],
+            "target_stop_exclusive": [origin + horizon + width],
+        }
+    )
+
+    current, future = _registered_levels(
+        accessor,
+        samples,
+        "target",
+        current_width=width,
+        future_width=width,
+    )
+    frozen_delta = target_change(
+        values,
+        np.array([origin], dtype=np.int64),
+        h=horizon,
+        w=width,
+        w0=width,
+    )
+    direct_delta = (
+        values[origin + horizon : origin + horizon + width].mean(dtype=np.float64)
+        - values[origin - width : origin].mean(dtype=np.float64)
+    )
+
+    assert np.array_equal(future - current, frozen_delta)
+    assert abs(float(frozen_delta[0]) - float(direct_delta)) > 1e-10
