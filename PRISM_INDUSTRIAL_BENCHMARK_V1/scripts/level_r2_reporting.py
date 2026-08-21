@@ -254,14 +254,31 @@ def collect_level_r2(
                     joined["view_sample_id"].astype(str).to_numpy(),
                 ):
                     raise RuntimeError(f"STOP_SAMPLE_ID_MISMATCH: {spec.path}")
-                bundle = metric_bundle_delta_and_level(
-                    joined["y_true"].to_numpy(dtype=np.float64),
-                    joined["y_pred"].to_numpy(dtype=np.float64),
-                    joined["_current_level"].to_numpy(dtype=np.float64),
-                    future_level_true=joined["_future_level_true"].to_numpy(
-                        dtype=np.float64
-                    ),
+                delta_true = joined["y_true"].to_numpy(dtype=np.float64)
+                current_level = joined["_current_level"].to_numpy(dtype=np.float64)
+                future_level_true = joined["_future_level_true"].to_numpy(
+                    dtype=np.float64
                 )
+                try:
+                    bundle = metric_bundle_delta_and_level(
+                        delta_true,
+                        joined["y_pred"].to_numpy(dtype=np.float64),
+                        current_level,
+                        future_level_true=future_level_true,
+                    )
+                except AssertionError as error:
+                    target_error = (future_level_true - current_level) - delta_true
+                    absolute_error = np.abs(target_error)
+                    scale = np.maximum(np.abs(delta_true), 1e-300)
+                    relative_error = absolute_error / scale
+                    worst = int(np.argmax(absolute_error))
+                    raise AssertionError(
+                        f"{error}; path={spec.path}; target_head={spec.target_head}; "
+                        f"information_set={spec.information_set}; split={spec.split}; "
+                        f"model={spec.model}; max_abs_error={absolute_error[worst]:.17g}; "
+                        f"relative_error_at_max_abs={relative_error[worst]:.17g}; "
+                        f"sample_id={joined.iloc[worst]['sample_id']}"
+                    ) from error
                 sample_ids = joined["sample_id"].astype(str).tolist()
                 hashed_support = support_hash(sample_ids)
                 prediction_sha256 = (
