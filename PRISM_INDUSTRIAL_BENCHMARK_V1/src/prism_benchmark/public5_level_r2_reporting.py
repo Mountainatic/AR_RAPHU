@@ -278,9 +278,13 @@ def verify_frozen_reporting_inputs(
     }
     expected: set[str] = {"shared/TASK_REGISTRY.json"}
     prediction_relatives: dict[str, str] = {}
+    # Level reconstruction uses the complete frozen entity to reproduce the
+    # FP64 prefix-sum path that materialized target_change().  This is a
+    # reporting read only; it does not expose rows to model fitting/inference.
+    frozen_entity_partitions = ("train", "validation", "test", "ood")
     partitions = {
-        "test": ("train", "validation", "test"),
-        "ood": ("train", "validation", "test", "ood"),
+        "test": frozen_entity_partitions,
+        "ood": frozen_entity_partitions,
     }
     for spec in specs:
         key = (

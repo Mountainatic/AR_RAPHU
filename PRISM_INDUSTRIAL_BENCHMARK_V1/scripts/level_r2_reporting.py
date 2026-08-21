@@ -244,7 +244,12 @@ def collect_level_r2(
             w_steps,
         ) = accessor_key
         shared = Path(shared_value)
-        accessor = BaseAccessor(shared, dataset, split, [target])
+        # The frozen target_change() prefix runs over the complete entity, not
+        # only the chronological partitions permitted as model inputs for this
+        # evaluation split.  Reading every frozen base-data partition here is
+        # reporting-only and is required to reproduce that numerical path;
+        # model features, predictions, and selection remain untouched.
+        accessor = BaseAccessor(shared, dataset, "ood", [target])
         view_groups: dict[tuple[str, str, str, str, str], list[PredictionSpec]] = (
             defaultdict(list)
         )
