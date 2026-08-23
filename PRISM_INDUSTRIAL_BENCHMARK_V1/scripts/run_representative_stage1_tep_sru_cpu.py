@@ -52,10 +52,8 @@ def _require_uv_runtime() -> None:
     virtual_environment = os.environ.get("VIRTUAL_ENV")
     if not virtual_environment:
         raise RuntimeError("VIRTUAL_ENV is missing; launch through uv run --frozen")
-    if not Path(sys.executable).resolve().is_relative_to(
-        Path(virtual_environment).resolve()
-    ):
-        raise RuntimeError("interpreter is outside the uv-managed VIRTUAL_ENV")
+    if Path(sys.prefix).resolve() != Path(virtual_environment).resolve():
+        raise RuntimeError("interpreter prefix does not match the uv-managed VIRTUAL_ENV")
 
 
 def _write_json(path: Path, value: dict[str, Any]) -> None:

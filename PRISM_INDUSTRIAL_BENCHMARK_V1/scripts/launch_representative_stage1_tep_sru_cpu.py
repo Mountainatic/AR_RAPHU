@@ -63,11 +63,14 @@ def _runtime_audit() -> dict[str, Any]:
     virtual_environment = os.environ.get("VIRTUAL_ENV")
     if not virtual_environment:
         raise RuntimeError("VIRTUAL_ENV is missing; launch through uv run --frozen")
-    executable = Path(sys.executable).resolve()
+    executable = Path(sys.executable).absolute()
+    resolved_executable = Path(sys.executable).resolve()
     environment_root = Path(virtual_environment).resolve()
-    if not executable.is_relative_to(environment_root):
+    interpreter_prefix = Path(sys.prefix).resolve()
+    if interpreter_prefix != environment_root:
         raise RuntimeError(
-            f"interpreter is outside VIRTUAL_ENV: {executable} vs {environment_root}"
+            "interpreter prefix does not match VIRTUAL_ENV: "
+            f"{interpreter_prefix} vs {environment_root}"
         )
 
     uv_executable_value = os.environ.get("AR_RAPHU_UV_EXECUTABLE")
@@ -100,6 +103,8 @@ def _runtime_audit() -> dict[str, Any]:
         "status": "PASS",
         "runtime_manager": "uv",
         "python_executable": str(executable),
+        "python_executable_resolved": str(resolved_executable),
+        "python_prefix": str(interpreter_prefix),
         "python_version": sys.version,
         "virtual_environment": str(environment_root),
         "uv_executable": str(uv_executable),
@@ -147,7 +152,28 @@ def main() -> None:
     run_root = args.run_root.resolve()
     shared = run_root / "shared"
     status_path = run_root / "logs" / "LAUNCH_STATUS.json"
-    runtime_audit = _runtime_audit()
+    try:
+        runtime_audit = _runtime_audit()
+    except Exception as error:
+        _write_json(
+            status_path,
+            {
+                "schema_version": 1,
+                "protocol": "REPRESENTATIVE_HORIZON_STAGE1_TEP_SRU_CPU_DEVELOPMENT_V1",
+                "status": "FAILED_RUNTIME_PREFLIGHT",
+                "failed_utc": _utc(),
+                "run_root": str(run_root),
+                "development_only": True,
+                "model_fitting_started": False,
+                "test_accessed": False,
+                "ood_accessed": False,
+                "global_freeze_created": False,
+                "error": str(error),
+                "python_executable": sys.executable,
+                "python_version": sys.version,
+            },
+        )
+        raise
     status: dict[str, Any] = {
         "schema_version": 1,
         "protocol": "REPRESENTATIVE_HORIZON_STAGE1_TEP_SRU_CPU_DEVELOPMENT_V1",
