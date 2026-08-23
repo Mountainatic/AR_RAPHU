@@ -87,6 +87,16 @@ def practical_activation(
 ) -> dict[str, Any]:
     neutral = np.asarray(neutral_losses, dtype=np.float64)
     candidate = np.asarray(candidate_losses, dtype=np.float64)
+    if neutral.ndim != 1 or candidate.ndim != 1:
+        raise ValueError(
+            "paired fold losses must be one-dimensional: "
+            f"neutral shape={neutral.shape}, candidate shape={candidate.shape}"
+        )
+    if neutral.shape != candidate.shape:
+        raise ValueError(
+            "paired fold losses must have identical shape: "
+            f"neutral shape={neutral.shape}, candidate shape={candidate.shape}"
+        )
     mask = np.isfinite(neutral) & np.isfinite(candidate)
     if int(mask.sum()) < 3:
         return {"pass": False, "reason": "INSUFFICIENT_FINITE_FOLDS", "finite_folds": int(mask.sum())}

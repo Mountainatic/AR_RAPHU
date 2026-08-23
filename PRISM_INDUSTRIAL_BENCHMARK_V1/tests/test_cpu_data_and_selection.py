@@ -3,7 +3,14 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from prism_benchmark.cpu_data import BaseAccessor, deterministic_subsample, geometric_intervals, inner_folds
+from prism_benchmark.cpu_data import (
+    BaseAccessor,
+    HeadSpec,
+    deterministic_subsample,
+    geometric_intervals,
+    inner_folds,
+    realized_state_profiles,
+)
 from prism_benchmark.cpu_selection import select_one_se
 
 
@@ -13,6 +20,34 @@ def test_geometric_intervals_are_contiguous_and_cover_history() -> None:
     assert intervals[-1][1] == 64
     assert all(left[1] == right[0] for left, right in zip(intervals, intervals[1:]))
     assert all(stop > start for start, stop in intervals)
+
+
+def test_h1_w2_realized_state_profiles_are_ordered_and_unique() -> None:
+    head = HeadSpec(
+        head_id="TEP_G_REP_H1__H1__W2",
+        task_id="TEP_G_REP_H1",
+        dataset="tep",
+        target="G",
+        cadence_seconds=180.0,
+        h_steps=1,
+        w_steps=2,
+        w0_steps=2,
+        primary=True,
+    )
+
+    profiles = realized_state_profiles(head)
+
+    assert profiles == [
+        (1, 2),
+        (1, 4),
+        (1, 8),
+        (2, 2),
+        (2, 4),
+        (2, 8),
+        (4, 4),
+        (4, 8),
+    ]
+    assert len(profiles) == len(set(profiles))
 
 
 def test_accessor_uses_strict_past_and_block_means() -> None:

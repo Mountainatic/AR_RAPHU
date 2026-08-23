@@ -23,6 +23,11 @@ def test_practical_activation_requires_three_of_four_positive() -> None:
     assert not failed["pass"]
 
 
+def test_practical_activation_rejects_unpaired_fold_losses() -> None:
+    with np.testing.assert_raises_regex(ValueError, "identical shape"):
+        practical_activation([1.0] * 3, [0.9] * 6)
+
+
 def test_full_sha_order_is_deterministic() -> None:
     values = ["z", "a", "m", "x"]
     np.testing.assert_array_equal(deterministic_hash_order(values), deterministic_hash_order(values))

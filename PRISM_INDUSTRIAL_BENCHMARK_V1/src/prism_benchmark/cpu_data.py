@@ -449,4 +449,8 @@ def realized_state_profiles(head: HeadSpec) -> list[tuple[int, int]]:
         else:
             histories = [multiplier * delta for multiplier in (4, 16, 64)]
         result.extend((delta, history) for history in histories)
-    return result
+    # Rounding and the ``max(delta, multiplier * h)`` maturity floor can map
+    # different registered grid points to the same realized profile.  A
+    # realized profile is a semantic candidate, so preserve registration order
+    # while evaluating each unique candidate exactly once.
+    return list(dict.fromkeys(result))

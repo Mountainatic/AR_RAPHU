@@ -31,6 +31,15 @@ def test_guarded_local_one_se_returns_neutral_without_practical_gain():
     assert selected.final_selected_candidate == "ZERO"
 
 
+def test_guarded_local_one_se_rejects_unpaired_fold_losses():
+    with np.testing.assert_raises_regex(ValueError, "identical length"):
+        guarded_local_one_se_select(
+            {"ZERO": [1.0] * 3, "ACTIVE": [0.9] * 6},
+            lambda value: (0 if value == "ZERO" else 1,),
+            neutral="ZERO",
+        )
+
+
 def test_final_prediction_contract_requires_same_materialized_selection():
     result = {
         "final_selected_candidate": "ACTIVE",

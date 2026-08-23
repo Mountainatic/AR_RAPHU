@@ -13,6 +13,7 @@ Status values are `NOT_STARTED`, `IMPLEMENTED`, `TESTED`, `RUN`, `PASS`,
 | Mean/Persistence/Seasonal/Trend | CPU 4.1, C2 | `cpu_simple_baselines.py` | `test_cpu_simple_baselines.py` | `SIMPLE_BASELINES_DEVELOPMENT.csv` | TESTED |
 | Ridge/PLS/DPLS/SVR/XGBoost | CPU 4.2, C2 | `c2_models.py` | leakage/budget/one-SE | `CLASSICAL_SOFT_SENSOR_DEVELOPMENT.csv` | TESTED |
 | AR/ARX/NARX/N4SID/Hammerstein/HW | CPU 4.3, C3 | `c3_models.py` | nestedness/stability | `SYSTEM_IDENTIFICATION_DEVELOPMENT.csv` | TESTED |
+| Unique realized state-profile candidates and paired-fold activation | CPU 4.3, 5.3--5.4 | `cpu_data.py`, `v2_selection.py`, `v21_selection.py` | `test_cpu_data_and_selection.py`, `test_v2_frozen_core.py`, `test_v21_selection.py` | A/Joint and system-identification development results | TESTED |
 | Per-channel profile and scale-matched AR | Master 7; CPU 5--6, C4 | `c4_prism.py` | profile isolation/sample equality | `PRISM_PROFILE_AUDIT.csv`, joint predictions | TESTED |
 | Exact nested Urysohn ladder | Theory M3--M8, N4; CPU 5.2 | `urysohn.py`, `c4_prism.py` | exact nesting/rank/FP64 | channel contracts and numerical certificates | TESTED |
 | Physics-First mature OOF residual | Theory P2--P7; CPU 5.3, C5 | `c5_models.py` | rolling OOF/maturity/frozen-K/zero | OOF residuals and predictions | TESTED |

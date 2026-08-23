@@ -61,9 +61,27 @@ def guarded_local_one_se_select(
     """
     if neutral not in fold_losses:
         raise KeyError(f"neutral candidate is absent: {neutral!r}")
+    neutral_values = np.asarray(fold_losses[neutral], dtype=np.float64)
+    if neutral_values.ndim != 1:
+        raise ValueError(
+            "neutral fold losses must be one-dimensional: "
+            f"shape={neutral_values.shape}"
+        )
+    neutral_fold_count = len(neutral_values)
     usable: dict[Hashable, np.ndarray] = {}
     for candidate, values in fold_losses.items():
         array = np.asarray(values, dtype=np.float64)
+        if array.ndim != 1:
+            raise ValueError(
+                "candidate fold losses must be one-dimensional: "
+                f"candidate={candidate!r}, shape={array.shape}"
+            )
+        if len(array) != neutral_fold_count:
+            raise ValueError(
+                "paired fold losses must have identical length: "
+                f"neutral={neutral_fold_count}, candidate={candidate!r}, "
+                f"candidate_length={len(array)}"
+            )
         finite = array[np.isfinite(array)]
         if len(finite) >= minimum_usable_folds:
             usable[candidate] = finite

@@ -1,5 +1,22 @@
 # Changelog
 
+## Representative H1/W2 realized-profile uniqueness correction
+
+- Fixes a prospective H1/W2 implementation defect discovered during the
+  development-only TEP/SRU representative-horizon run.  The registered state
+  grid could realize `(delta=4, history=4)` twice after integer rounding and
+  the maturity floor were applied.
+- Preserves registration order and removes only exactly duplicated realized
+  candidates.  No unique candidate, split, target, threshold, model family, or
+  test/OOD contract changes.
+- Adds strict paired-fold shape/length checks before practical activation so a
+  future fold-identity mismatch fails explicitly instead of reaching NumPy
+  broadcasting or silently changing a selection statistic.
+- The pre-correction development run remains retained as invalid diagnostic
+  evidence.  TEP/SRU CPU development must be rerun under one clean
+  post-correction commit before its results are accepted; test and OOD remain
+  unaccessed and no global freeze is created.
+
 ## PRISM v2.1.1 - Post-experiment prospective sample-support maintenance
 
 - No new theory version is introduced and no estimator, candidate family,
