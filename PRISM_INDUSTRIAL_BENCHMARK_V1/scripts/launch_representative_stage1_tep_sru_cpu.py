@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import importlib.metadata
 import json
 import os
 import subprocess
@@ -12,6 +14,20 @@ from typing import Any
 
 PROJECT = Path(__file__).resolve().parents[1]
 C1_CONFIG = PROJECT / "configs/representative_horizon_stage1_tep_sru_c1_tasks.json"
+REPOSITORY_ROOT = PROJECT.parent
+
+RUNTIME_DISTRIBUTIONS = (
+    "numpy",
+    "pandas",
+    "pyarrow",
+    "pyreadr",
+    "scipy",
+    "scikit-learn",
+    "statsmodels",
+    "xgboost",
+    "nfoursid",
+    "torch",
+)
 
 
 def _utc() -> str:
@@ -26,6 +42,74 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
         encoding="utf-8",
     )
     os.replace(temporary, path)
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _runtime_audit() -> dict[str, Any]:
+    if os.environ.get("AR_RAPHU_RUNTIME_MANAGER") != "uv":
+        raise RuntimeError("AR_RAPHU_RUNTIME_MANAGER must be exactly 'uv'")
+    if sys.version_info[:2] != (3, 10):
+        raise RuntimeError(
+            f"representative Stage1 requires Python 3.10, got {sys.version.split()[0]}"
+        )
+
+    virtual_environment = os.environ.get("VIRTUAL_ENV")
+    if not virtual_environment:
+        raise RuntimeError("VIRTUAL_ENV is missing; launch through uv run --frozen")
+    executable = Path(sys.executable).resolve()
+    environment_root = Path(virtual_environment).resolve()
+    if not executable.is_relative_to(environment_root):
+        raise RuntimeError(
+            f"interpreter is outside VIRTUAL_ENV: {executable} vs {environment_root}"
+        )
+
+    uv_executable_value = os.environ.get("AR_RAPHU_UV_EXECUTABLE")
+    if not uv_executable_value:
+        raise RuntimeError("AR_RAPHU_UV_EXECUTABLE is required")
+    uv_executable = Path(uv_executable_value).resolve()
+    if not uv_executable.is_file():
+        raise RuntimeError(f"uv executable is missing: {uv_executable}")
+    uv_version = subprocess.run(
+        [str(uv_executable), "--version"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+    lock_path = REPOSITORY_ROOT / "uv.lock"
+    project_path = REPOSITORY_ROOT / "pyproject.toml"
+    if not lock_path.is_file() or not project_path.is_file():
+        raise RuntimeError("pyproject.toml/uv.lock is missing from repository root")
+    packages = {
+        name: importlib.metadata.version(name) for name in RUNTIME_DISTRIBUTIONS
+    }
+    commit = subprocess.run(
+        ["git", "-C", str(REPOSITORY_ROOT), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    return {
+        "status": "PASS",
+        "runtime_manager": "uv",
+        "python_executable": str(executable),
+        "python_version": sys.version,
+        "virtual_environment": str(environment_root),
+        "uv_executable": str(uv_executable),
+        "uv_version": uv_version,
+        "uv_sha256": _sha256(uv_executable),
+        "pyproject_sha256": _sha256(project_path),
+        "uv_lock_sha256": _sha256(lock_path),
+        "git_commit": commit,
+        "package_versions": packages,
+    }
 
 
 def _run(
@@ -63,6 +147,7 @@ def main() -> None:
     run_root = args.run_root.resolve()
     shared = run_root / "shared"
     status_path = run_root / "logs" / "LAUNCH_STATUS.json"
+    runtime_audit = _runtime_audit()
     status: dict[str, Any] = {
         "schema_version": 1,
         "protocol": "REPRESENTATIVE_HORIZON_STAGE1_TEP_SRU_CPU_DEVELOPMENT_V1",
@@ -75,6 +160,7 @@ def main() -> None:
         "test_accessed": False,
         "ood_accessed": False,
         "global_freeze_created": False,
+        "runtime_environment": runtime_audit,
         "stages": {},
     }
     if status_path.is_file():
@@ -89,7 +175,6 @@ def main() -> None:
         status["resumed_utc"] = _utc()
     else:
         status["first_started_utc"] = status["started_utc"]
-    _write_json(status_path, status)
 
     env = os.environ.copy()
     existing_pythonpath = env.get("PYTHONPATH", "")
@@ -103,6 +188,17 @@ def main() -> None:
         "NUMEXPR_NUM_THREADS",
     ):
         env[name] = "1"
+    runtime_audit["thread_environment"] = {
+        name: env[name]
+        for name in (
+            "OMP_NUM_THREADS",
+            "OPENBLAS_NUM_THREADS",
+            "MKL_NUM_THREADS",
+            "NUMEXPR_NUM_THREADS",
+        )
+    }
+    _write_json(run_root / "logs" / "RUNTIME_ENVIRONMENT.json", runtime_audit)
+    _write_json(status_path, status)
 
     try:
         if not (shared / "TASK_REGISTRY.json").is_file():

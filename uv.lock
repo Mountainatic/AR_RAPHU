@@ -14,6 +14,7 @@ dependencies = [
     { name = "pandas" },
     { name = "pyarrow" },
     { name = "pypdf" },
+    { name = "pyreadr" },
     { name = "scikit-learn" },
     { name = "scipy" },
     { name = "statsmodels" },
@@ -36,6 +37,7 @@ requires-dist = [
     { name = "pandas", specifier = "==2.2.3" },
     { name = "pyarrow", specifier = "==24.0.0" },
     { name = "pypdf", specifier = ">=6.14.2" },
+    { name = "pyreadr", specifier = "==0.5.6" },
     { name = "scikit-learn", specifier = "==1.7.1" },
     { name = "scipy", specifier = "==1.15.3" },
     { name = "statsmodels", specifier = "==0.14.5" },
@@ -552,6 +554,22 @@ dependencies = [
 sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/03/72/7dfd5ff1c9c37de97a731701f51af091325f123d9d4270361c9c69e4431f/pypdf-6.14.2.tar.gz", hash = "sha256:7873f502fe4385e79539b21d872392dc0c4e3714327c15881cbc7fbfd1f95b25", size = 6491182, upload-time = "2026-06-23T14:18:30.859Z" }
 wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/49/e6/136aa8993a2ae7214e0b0ef2edaa0d2e08d1d4e4982635b08a835ff31ec8/pypdf-6.14.2-py3-none-any.whl", hash = "sha256:3f07891af76dc002657e04993ab9b4de81de29f9013b9761d0b7968bff12e946", size = 349514, upload-time = "2026-06-23T14:18:28.867Z" },
+]
+
+[[package]]
+name = "pyreadr"
+version = "0.5.6"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+dependencies = [
+    { name = "pandas" },
+]
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/f5/a8/6235ba50870da6b9b5b1d651ff64fdfb36716e1c2d63b347f1abe9c7ce3b/pyreadr-0.5.6.tar.gz", hash = "sha256:ec10bef1798a4d9e91ff75ab69fbcd009a3fad2250c79f5377e19e787c949b8f", size = 1300692, upload-time = "2026-04-13T16:57:32.922Z" }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/ae/5a/418c23e854c7a153cbf35e190607640dd1e66d76e43f7c2063af584d52d4/pyreadr-0.5.6-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:97b0885cc41e437465b78b2d41ec574d98ac2733ccf52c6181f5a19186690906", size = 319414, upload-time = "2026-04-13T16:56:48.488Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/26/10/78c55925b22a321e6143a870ff03fcb8648f39bb1f2ac7af2f015f82aa88/pyreadr-0.5.6-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:6fdfc5071c1620e48a61a0ec42a5e08ea5d3b643cd892a474a26f09471d9a965", size = 320139, upload-time = "2026-04-13T16:56:50.265Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/5c/49/dc8bd69ae20d56a78d992be7ceeea894f6131f2875b81716b9a85676a1cb/pyreadr-0.5.6-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:0d70ad2cfe2ad3684e9596cefebc328b88585a1f882d8fa8a364d73d456df120", size = 788067, upload-time = "2026-04-13T16:56:52.058Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/71/82/b5d2827100766d0efd657ad40d2660779b8df29cf0f940a058b845dc429e/pyreadr-0.5.6-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:586b816f0e9ea04246f9c632ddc3c20ac12e9bdd80d906275f53b7765a5524b8", size = 786295, upload-time = "2026-04-13T16:56:53.901Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/dd/ed/63d1bd713b948a01e8c6a2c4355747715516d92c840f93255e4e5075a14c/pyreadr-0.5.6-cp310-cp310-win_amd64.whl", hash = "sha256:6a5935da52656b945ddfb46b5fb50102c763775d9bb2edbeaf9ef4cb4b186e5c", size = 2361406, upload-time = "2026-04-13T16:56:55.962Z" },
 ]
 
 [[package]]

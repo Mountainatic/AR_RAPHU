@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Any, Callable
 
@@ -39,6 +40,22 @@ from prism_benchmark.v211_w import run_w_view
 DEFAULT_RUN_ROOT = Path(
     "/root/autodl-tmp/PRISM_V211_REPRESENTATIVE_STAGE1_TEP_SRU_CPU_20260823_R1"
 )
+
+
+def _require_uv_runtime() -> None:
+    if os.environ.get("AR_RAPHU_RUNTIME_MANAGER") != "uv":
+        raise RuntimeError("AR_RAPHU_RUNTIME_MANAGER must be exactly 'uv'")
+    if sys.version_info[:2] != (3, 10):
+        raise RuntimeError(
+            f"representative Stage1 requires Python 3.10, got {sys.version.split()[0]}"
+        )
+    virtual_environment = os.environ.get("VIRTUAL_ENV")
+    if not virtual_environment:
+        raise RuntimeError("VIRTUAL_ENV is missing; launch through uv run --frozen")
+    if not Path(sys.executable).resolve().is_relative_to(
+        Path(virtual_environment).resolve()
+    ):
+        raise RuntimeError("interpreter is outside the uv-managed VIRTUAL_ENV")
 
 
 def _write_json(path: Path, value: dict[str, Any]) -> None:
@@ -268,6 +285,7 @@ def run_baselines(
 
 
 def main() -> None:
+    _require_uv_runtime()
     parser = argparse.ArgumentParser(
         description="Run development-only TEP/SRU representative H1 CPU stages."
     )
