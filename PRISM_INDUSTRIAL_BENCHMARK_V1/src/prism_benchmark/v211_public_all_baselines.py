@@ -1647,11 +1647,25 @@ def run_public_all_baseline_development(
     project: Path,
     output: Path,
     workers: int,
+    *,
+    input_views_override: Sequence[ViewSpec] | None = None,
+    dynamic_views_override: Sequence[ViewSpec] | None = None,
+    stage_name: str = "B1_PUBLIC_ALL_CPU_BASELINE_DEVELOPMENT",
 ) -> dict[str, Any]:
     root = output / "BASELINE_DEVELOPMENT"
     root.mkdir(parents=True, exist_ok=True)
-    input_views = public_all_input_views(shared)
-    dynamic_views = public_all_dynamic_views(shared)
+    input_views = (
+        public_all_input_views(shared)
+        if input_views_override is None
+        else list(input_views_override)
+    )
+    dynamic_views = (
+        public_all_dynamic_views(shared)
+        if dynamic_views_override is None
+        else list(dynamic_views_override)
+    )
+    if not input_views or not dynamic_views:
+        raise RuntimeError("baseline development requires non-empty registered views")
     all_views = [*input_views, *dynamic_views]
     results: list[dict[str, Any]] = []
 
@@ -1797,7 +1811,7 @@ def run_public_all_baseline_development(
     ).to_csv(root / "PUBLIC_ALL_BASELINE_DEVELOPMENT.csv", index=False)
     summary = {
         "status": _development_summary_status(results),
-        "stage": "B1_PUBLIC_ALL_CPU_BASELINE_DEVELOPMENT",
+        "stage": stage_name,
         "support_contract": SUPPORT_CONTRACT,
         "jobs": len(results),
         "status_counts": {

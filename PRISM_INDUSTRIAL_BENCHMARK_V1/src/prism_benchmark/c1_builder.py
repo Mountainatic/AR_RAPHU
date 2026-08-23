@@ -26,6 +26,23 @@ from .c1_contracts import (
 from .stage0 import canonical_json_bytes, read_numeric_text, sha256_file, write_json
 
 
+DATASET_ORDER = ("tep", "debutanizer", "sru", "pmsm", "metropt")
+
+
+def _selected_datasets(
+    heads_by_dataset: dict[str, list[RealizedHead]],
+) -> tuple[str, ...]:
+    unknown = sorted(set(heads_by_dataset).difference(DATASET_ORDER))
+    if unknown:
+        raise ValueError(f"unsupported C1 datasets: {unknown}")
+    selected = tuple(
+        dataset for dataset in DATASET_ORDER if heads_by_dataset.get(dataset)
+    )
+    if not selected:
+        raise ValueError("C1 config contains no tasks")
+    return selected
+
+
 def _write_canonical(path: Path, value: Any) -> str:
     payload = canonical_json_bytes(value)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -397,6 +414,10 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
     if any(head.status != "PASS" for head in heads):
         raise RuntimeError("one or more registered heads are unsupported by cadence")
     if output_root.exists():
+        if config.get("output_policy") == "REFUSE_EXISTING":
+            raise FileExistsError(
+                f"C1 output root already exists under REFUSE_EXISTING policy: {output_root}"
+            )
         shutil.rmtree(output_root)
     output_root.mkdir(parents=True)
     writers = BufferedParquet(output_root)
@@ -404,12 +425,14 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
     heads_by_dataset: dict[str, list[RealizedHead]] = defaultdict(list)
     for head in heads:
         heads_by_dataset[head.dataset].append(head)
+    selected_datasets = _selected_datasets(heads_by_dataset)
 
     all_view_specs: list[dict[str, Any]] = []
     scaler_accumulators: dict[tuple[str, str, str], OnlineMoments] = {}
     target_moments: dict[str, list[float]] = defaultdict(lambda: [0.0, 0.0, 0.0])
 
-    for dataset in ("tep", "debutanizer", "sru", "pmsm", "metropt"):
+    for dataset in selected_datasets:
+        dataset_heads = heads_by_dataset[dataset]
         split = _split_lookup(registry_root, dataset)
         _prepare_split_cache(dataset, split)
         entities = _dataset_entities(dataset, raw_root)
@@ -420,7 +443,7 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
             frame["row_in_entity"] = np.arange(len(frame), dtype=np.int64)
             if first_columns is None:
                 first_columns = list(frame.columns)
-                for task in (task_by_id[head.task_id] for head in heads_by_dataset[dataset]):
+                for task in (task_by_id[head.task_id] for head in dataset_heads):
                     for spec in _view_specs(dataset, task, first_columns):
                         if spec not in all_view_specs:
                             all_view_specs.append(spec)
@@ -431,7 +454,10 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
                 split_label = _entity_split(dataset, entity_id, split)
                 intervals = [(0, len(frame), split_label, 0)]
             else:
-                b_steps = ceil_steps(config["extra_dependency_interval_seconds"], float(heads_by_dataset[dataset][0].cadence_seconds))
+                b_steps = ceil_steps(
+                    config["extra_dependency_interval_seconds"],
+                    float(dataset_heads[0].cadence_seconds),
+                )
                 intervals = _continuous_intervals(dataset, frame, split, b_steps)
 
             for start, stop, split_label, _ in intervals:
@@ -442,7 +468,7 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
                         if spec["dataset"] == dataset:
                             scaler_accumulators[(dataset, spec["task_id"], spec["proxy_policy"])].update(base_chunk)
 
-            for head in heads_by_dataset[dataset]:
+            for head in dataset_heads:
                 task = task_by_id[head.task_id]
                 y = frame[head.target].to_numpy(dtype=np.float64, copy=False)
                 for delay in task["availability_delays_steps"]:
@@ -501,12 +527,27 @@ def build_shared_data(raw_root: Path, registry_root: Path, config_path: Path, ou
         "contract_status": config["contract_status"],
         "sample_support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
         "heads": [asdict(head) | {"head_id": head.head_id} for head in heads],
+        "task_lineage": {
+            task["task_id"]: {
+                key: task[key]
+                for key in (
+                    "parent_task_id",
+                    "changed_field",
+                    "parent_horizon",
+                    "new_horizon",
+                    "W_unchanged",
+                    "W0_unchanged",
+                )
+                if key in task
+            }
+            for task in config["tasks"]
+        },
     }
     _write_canonical(output_root / "TASK_REGISTRY.json", task_registry)
     _write_canonical(output_root / "PROTOCOL.json", config)
     dataset_hashes = {}
     split_registry = {}
-    for dataset in ("tep", "debutanizer", "sru", "pmsm", "metropt"):
+    for dataset in selected_datasets:
         dataset_hashes[dataset] = json.loads((registry_root / dataset / "RAW_FILE_HASHES.json").read_text())
         split_registry[dataset] = json.loads((registry_root / dataset / "SPLIT_REGISTRY.json").read_text())
     _write_canonical(output_root / "DATASET_HASHES.json", dataset_hashes)

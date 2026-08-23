@@ -1,0 +1,200 @@
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+
+PROJECT = Path(__file__).resolve().parents[1]
+C1_CONFIG = PROJECT / "configs/representative_horizon_stage1_tep_sru_c1_tasks.json"
+
+
+def _utc() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _write_json(path: Path, value: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    temporary.write_text(
+        json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
+
+
+def _run(
+    command: list[str], log_path: Path, env: dict[str, str]
+) -> None:
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with log_path.open("a", encoding="utf-8") as log:
+        log.write(f"\n[{_utc()}] RUN {' '.join(command)}\n")
+        log.flush()
+        result = subprocess.run(
+            command,
+            cwd=PROJECT,
+            env=env,
+            stdout=log,
+            stderr=subprocess.STDOUT,
+            check=False,
+        )
+    if result.returncode:
+        raise RuntimeError(
+            f"command failed with exit code {result.returncode}: {command}"
+        )
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Build fresh TEP/SRU H1 C1 and run CPU development only."
+    )
+    parser.add_argument("--raw-root", type=Path, required=True)
+    parser.add_argument("--registry-root", type=Path, required=True)
+    parser.add_argument("--run-root", type=Path, required=True)
+    parser.add_argument("--workers", type=int, default=6)
+    parser.add_argument("--per-worker-gib", type=float, default=4.0)
+    args = parser.parse_args()
+
+    run_root = args.run_root.resolve()
+    shared = run_root / "shared"
+    status_path = run_root / "logs" / "LAUNCH_STATUS.json"
+    status: dict[str, Any] = {
+        "schema_version": 1,
+        "protocol": "REPRESENTATIVE_HORIZON_STAGE1_TEP_SRU_CPU_DEVELOPMENT_V1",
+        "status": "RUNNING",
+        "started_utc": _utc(),
+        "run_root": str(run_root),
+        "shared": str(shared),
+        "development_only": True,
+        "neural_in_scope": False,
+        "test_accessed": False,
+        "ood_accessed": False,
+        "global_freeze_created": False,
+        "stages": {},
+    }
+    if status_path.is_file():
+        previous = json.loads(status_path.read_text(encoding="utf-8"))
+        if previous.get("test_accessed") is not False or previous.get(
+            "ood_accessed"
+        ) is not False:
+            raise RuntimeError("existing partial run reports test/OOD access")
+        status["first_started_utc"] = previous.get(
+            "first_started_utc", previous.get("started_utc")
+        )
+        status["resumed_utc"] = _utc()
+    else:
+        status["first_started_utc"] = status["started_utc"]
+    _write_json(status_path, status)
+
+    env = os.environ.copy()
+    existing_pythonpath = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = os.pathsep.join(
+        [str(PROJECT / "src"), existing_pythonpath]
+    ).rstrip(os.pathsep)
+    for name in (
+        "OMP_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+    ):
+        env[name] = "1"
+
+    try:
+        if not (shared / "TASK_REGISTRY.json").is_file():
+            if shared.exists():
+                raise RuntimeError(
+                    "incomplete fresh C1 output exists; use a new run root"
+                )
+            status["stages"]["C1_BUILD"] = {
+                "status": "RUNNING",
+                "started_utc": _utc(),
+            }
+            _write_json(status_path, status)
+            _run(
+                [
+                    sys.executable,
+                    str(PROJECT / "scripts/build_shared_data.py"),
+                    "--raw-root",
+                    str(args.raw_root.resolve()),
+                    "--registry-root",
+                    str(args.registry_root.resolve()),
+                    "--config",
+                    str(C1_CONFIG),
+                    "--output",
+                    str(shared),
+                ],
+                run_root / "logs" / "C1_BUILD.log",
+                env,
+            )
+            status["stages"]["C1_BUILD"]["status"] = "PASS"
+            status["stages"]["C1_BUILD"]["completed_utc"] = _utc()
+            _write_json(status_path, status)
+
+        status["stages"]["C1_VALIDATE"] = {
+            "status": "RUNNING",
+            "started_utc": _utc(),
+        }
+        _write_json(status_path, status)
+        _run(
+            [
+                sys.executable,
+                str(PROJECT / "scripts/validate_shared_data.py"),
+                "--shared",
+                str(shared),
+                "--output",
+                str(run_root / "logs" / "C1_VALIDATION.json"),
+            ],
+            run_root / "logs" / "C1_VALIDATE.log",
+            env,
+        )
+        status["stages"]["C1_VALIDATE"]["status"] = "PASS"
+        status["stages"]["C1_VALIDATE"]["completed_utc"] = _utc()
+        _write_json(status_path, status)
+
+        status["stages"]["CPU_DEVELOPMENT"] = {
+            "status": "RUNNING",
+            "started_utc": _utc(),
+        }
+        _write_json(status_path, status)
+        _run(
+            [
+                sys.executable,
+                str(
+                    PROJECT
+                    / "scripts/run_representative_stage1_tep_sru_cpu.py"
+                ),
+                "all",
+                "--shared",
+                str(shared),
+                "--project",
+                str(PROJECT),
+                "--run-root",
+                str(run_root),
+                "--workers",
+                str(max(1, args.workers)),
+                "--per-worker-gib",
+                str(args.per_worker_gib),
+            ],
+            run_root / "logs" / "CPU_DEVELOPMENT.log",
+            env,
+        )
+        status["stages"]["CPU_DEVELOPMENT"]["status"] = "PASS"
+        status["stages"]["CPU_DEVELOPMENT"]["completed_utc"] = _utc()
+        status["status"] = "PARTIAL_DEVELOPMENT_CPU_ONLY"
+        status["completed_utc"] = _utc()
+        _write_json(status_path, status)
+    except Exception as error:
+        status["status"] = "FAILED"
+        status["error"] = str(error)
+        status["failed_utc"] = _utc()
+        _write_json(status_path, status)
+        raise
+
+
+if __name__ == "__main__":
+    main()

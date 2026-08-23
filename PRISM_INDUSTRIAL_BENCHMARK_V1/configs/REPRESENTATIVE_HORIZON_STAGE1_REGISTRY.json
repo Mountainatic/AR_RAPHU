@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.1",
+  "protocol_id": "REPRESENTATIVE_HORIZON_STAGE1",
+  "evidence_class": "POST_HOC_HORIZON_EXTENSION_WITH_PREDECLARED_SETTINGS",
+  "status": "REGISTRY_FROZEN_BEFORE_PARTIAL_DEVELOPMENT",
+  "user_override_2026_08_23": {
+    "field": "CZ task semantics",
+    "supersedes_prompt2_cz_h120": true,
+    "value": "raw 2-second H1 absolute-level forecast with fixed L128 history"
+  },
+  "tasks": [
+    {
+      "task_id": "TEP_G_REP_H1",
+      "parent_task_id": "TEP_G12",
+      "dataset": "tep",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 180,
+      "h_steps": 1,
+      "horizon_seconds": 180,
+      "w_steps": 2,
+      "w0_steps": 2,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "DEB_C4_REP_H3",
+      "parent_task_id": "DEB_C4",
+      "dataset": "debutanizer",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 360,
+      "h_steps": 3,
+      "horizon_seconds": 1080,
+      "w_steps": 1,
+      "w0_steps": 1,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "SRU_H2S_REP_H1",
+      "parent_task_id": "SRU_H2S",
+      "dataset": "sru",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 60,
+      "h_steps": 1,
+      "horizon_seconds": 60,
+      "w_steps": 1,
+      "w0_steps": 1,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "SRU_SO2_REP_H1",
+      "parent_task_id": "SRU_SO2",
+      "dataset": "sru",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 60,
+      "h_steps": 1,
+      "horizon_seconds": 60,
+      "w_steps": 1,
+      "w0_steps": 1,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "PMSM_PM_REP_H10",
+      "parent_task_id": "PMSM_PM5",
+      "dataset": "pmsm",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 0.5,
+      "h_steps": 10,
+      "horizon_seconds": 5,
+      "w_steps": 60,
+      "w0_steps": 60,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "METRO_P_REP_H360",
+      "parent_task_id": "METRO_P60",
+      "dataset": "metropt",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 10,
+      "h_steps": 360,
+      "horizon_seconds": 3600,
+      "w_steps": 1,
+      "w0_steps": 1,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "METRO_OIL_REP_H360",
+      "parent_task_id": "METRO_OIL20",
+      "dataset": "metropt",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 10,
+      "h_steps": 360,
+      "horizon_seconds": 3600,
+      "w_steps": 12,
+      "w0_steps": 12,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "CZ_DIAM_RAW2S_H1_L128",
+      "parent_task_id": "CZ_D20",
+      "dataset": "cz_czochralski",
+      "target_representation": "DIRECT_ABSOLUTE_LEVEL",
+      "target_semantics": "D(t+2s)",
+      "cadence_seconds": 2,
+      "aggregation": "NONE_RAW_ROWS",
+      "h_steps": 1,
+      "horizon_seconds": 2,
+      "target_window_steps": 1,
+      "lookback_steps": 128,
+      "lookback_seconds": 256,
+      "changed_field": "user_override_target_cadence_horizon_and_history"
+    }
+  ],
+  "global_order": [
+    "ALL_STAGE1_DEVELOPMENT",
+    "GLOBAL_SELECTION_FREEZE",
+    "FINAL_FIT_ONCE_AND_IMMUTABLE_CHECKPOINT",
+    "ALL_FINAL_TEST_AND_OOD_INFERENCE_ONLY"
+  ],
+  "test_accessed": false,
+  "ood_accessed": false,
+  "global_freeze_created": false
+}

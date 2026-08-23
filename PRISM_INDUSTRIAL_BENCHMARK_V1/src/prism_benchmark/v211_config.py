@@ -20,6 +20,7 @@ METRO_P60_PROTOCOL = "metro_p60"
 
 
 PUBLIC_ALL_PROTOCOL = "public_all"
+REPRESENTATIVE_STAGE1_PROTOCOL = "representative_stage1"
 @dataclass(frozen=True)
 class V211Paths:
     project: Path
@@ -123,6 +124,12 @@ def load_v211_configs(
         from .v211_public_all_config import load_public_all_algorithm_config
 
         patch = load_public_all_algorithm_config(project)
+    elif protocol == REPRESENTATIVE_STAGE1_PROTOCOL:
+        from .v211_representative_stage1_config import (
+            load_representative_stage1_algorithm_config,
+        )
+
+        patch = load_representative_stage1_algorithm_config(project)
     else:
         raise ValueError(f"unsupported PRISM v2.1.1 protocol: {protocol}")
     return patch, load_v21_config(project), load_frozen_config(project)
@@ -133,6 +140,12 @@ def input_views_for_protocol(shared: Path, protocol: str):
         from .v211_public_all_views import public_all_input_views
 
         return public_all_input_views(shared)
+    if protocol == REPRESENTATIVE_STAGE1_PROTOCOL:
+        from .v211_representative_stage1_views import (
+            representative_stage1_input_views,
+        )
+
+        return representative_stage1_input_views(shared)
     from .v21_views import sru_input_views
 
     return sru_input_views(shared)
@@ -143,6 +156,12 @@ def dynamic_views_for_protocol(shared: Path, protocol: str):
         from .v211_public_all_views import public_all_dynamic_views
 
         return public_all_dynamic_views(shared)
+    if protocol == REPRESENTATIVE_STAGE1_PROTOCOL:
+        from .v211_representative_stage1_views import (
+            representative_stage1_dynamic_views,
+        )
+
+        return representative_stage1_dynamic_views(shared)
     from .v21_views import sru_dynamic_views
 
     return sru_dynamic_views(shared)

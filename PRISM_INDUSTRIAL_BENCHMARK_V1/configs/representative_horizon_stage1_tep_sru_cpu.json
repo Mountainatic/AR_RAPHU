@@ -1,0 +1,49 @@
+{
+  "protocol_id": "REPRESENTATIVE_HORIZON_STAGE1_TEP_SRU_CPU_DEVELOPMENT_V1",
+  "evidence_class": "POST_HOC_HORIZON_EXTENSION_WITH_PREDECLARED_SETTINGS",
+  "base_commit": "70537060b4d6713db7a557fc37e6771fd07b6a6b",
+  "execution_branch": "prism-v2-1-1-representative-horizon-stage1-six-datasets-20260818",
+  "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+  "active_datasets": ["tep", "sru"],
+  "primary_tasks": [
+    "TEP_G_REP_H1",
+    "SRU_H2S_REP_H1",
+    "SRU_SO2_REP_H1"
+  ],
+  "expected_input_views": 3,
+  "expected_dynamic_views": 4,
+  "expected_k_channel_jobs": 57,
+  "c1_config": {
+    "path": "configs/representative_horizon_stage1_tep_sru_c1_tasks.json",
+    "sha256": "948afe58c7f0a4278bd1500cbf3404d3dbdf86ff60efd7ac8c06b932d2a32268"
+  },
+  "algorithm_config": {
+    "path": "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_PACKAGE/PRISM_V2_1_2_JOINT_OOF_PROTOCOL_CORRECTION_CONFIG.json",
+    "sha256": "a14c05cb51d94c4af3f5aed33f6ec810f93170acfdf2e513292ae49e2566f1f7"
+  },
+  "joint_config": {
+    "path": "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_PACKAGE/PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_CONFIG.json",
+    "sha256": "a7073b0bfd1e64de1e9f2d9f336ff0c246c88165000eb743f6611be39fa8c95f"
+  },
+  "sru_patch": {
+    "path": "PRISM_V2_1_1_SRU_IMPLEMENTATION_CORRECTION/PRISM_V2_1_1_SRU_CONFIG_PATCH.json",
+    "sha256": "9878bb90f8d7862de3de07259ee86ed078d85b67c865e02fd627fe8f743f7a80"
+  },
+  "cpu_model_freeze": {
+    "path": "configs/cpu_model_freeze_v1.json",
+    "sha256": "14cefef2b0b4307ca208d0f0d43b50146de9edf78e93c59d67bf6fdd5d9cf65a"
+  },
+  "development_only": true,
+  "neural_in_scope": false,
+  "global_freeze_created": false,
+  "test_access_before_global_freeze": false,
+  "ood_access_before_global_freeze": false,
+  "resource": {
+    "outer_workers": 6,
+    "k_inner_workers": 2,
+    "stage_inner_workers": 2,
+    "blas_threads": 1,
+    "prediction_chunk_rows": 50000,
+    "memory_safety_fraction": 0.2
+  }
+}
