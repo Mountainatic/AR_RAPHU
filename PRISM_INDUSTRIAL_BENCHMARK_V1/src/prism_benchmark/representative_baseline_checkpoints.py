@@ -276,13 +276,19 @@ def _fit_one(
             raw_scale = raw.std(axis=0, dtype=np.float64)
             raw_scale[raw_scale == 0.0] = 1.0
             standardized = (raw - raw_mean) / raw_scale
-            centered_y = y - y.mean(dtype=np.float64)
-            denominator = np.sqrt(np.sum(np.square(standardized), axis=0) * np.sum(np.square(centered_y)))
-            correlations = np.abs((standardized.T @ centered_y) / np.where(denominator > 0, denominator, np.inf))
             maximum_features = int(
                 freeze["c3"]["linear_narx"]["maximum_linear_state_features_before_expansion"]
             )
-            order = np.lexsort((np.arange(len(correlations)), -correlations))[:maximum_features]
+            order = np.asarray(
+                selection["selected_linear_feature_indices"], dtype=np.int64
+            )
+            if (
+                len(order) > maximum_features
+                or len(np.unique(order)) != len(order)
+                or np.any(order < 0)
+                or np.any(order >= raw.shape[1])
+            ):
+                raise RuntimeError("STOP_FROZEN_NARX_FEATURE_ORDER_INVALID")
             selected = standardized[:, order]
             expanded = np.concatenate([selected, np.square(selected)], axis=1)
             x = expanded

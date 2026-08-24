@@ -132,8 +132,14 @@ def _input_manifest(args: argparse.Namespace) -> dict[str, Any]:
         "protocol_hash": hashlib.sha256(
             "".join(_sha256(path) for path in protocol_files).encode("ascii")
         ).hexdigest(),
-        "public_raw_inventory": _file_inventory(args.raw_public_root),
-        "registry_inventory": _file_inventory(args.registry_root),
+        "public_raw_inventory": {
+            "tep": _file_inventory(args.raw_public_root / "tep_rieth"),
+            "sru": _file_inventory(args.raw_public_root / "sru"),
+        },
+        "registry_inventory": {
+            "tep": _file_inventory(args.registry_root / "tep"),
+            "sru": _file_inventory(args.registry_root / "sru"),
+        },
         "cz_raw_inventory": _file_inventory(args.raw_cz),
     }
 

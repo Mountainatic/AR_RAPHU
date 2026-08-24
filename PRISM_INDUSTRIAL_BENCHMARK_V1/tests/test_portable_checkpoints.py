@@ -14,6 +14,11 @@ from prism_benchmark.portable_checkpoints import (
     predict_codec,
     write_portable_checkpoint,
 )
+from prism_benchmark.representative_formal import (
+    _assert_no_out_of_scope_artifacts,
+    _rankings,
+    _support_acceptance,
+)
 
 
 def _fixture() -> tuple[np.ndarray, np.ndarray]:
@@ -65,3 +70,44 @@ def test_level_delta_metric_identity_and_persistence() -> None:
     assert "r2_level_persistence" in result
     assert "persistence_skill" in result
     assert "variance_ratio" in result
+
+
+def _formal_record(model: str, level_r2: float, support: str = "support") -> dict:
+    return {
+        "status": "PASS",
+        "namespace": "public",
+        "dataset": "sru",
+        "target_head": "SRU_H2S_REP_H1__H1__W1",
+        "information_set": "input_only",
+        "availability_scenario": "record_time",
+        "proxy_policy": "primary",
+        "model": model,
+        "rows": 10,
+        "scoring_support_hash": support,
+        "sample_id_order_hash": "order",
+        "r2_level_reconstructed": level_r2,
+        "r2_delta": level_r2 - 0.1,
+    }
+
+
+def test_rankings_are_separate_per_information_set_and_view() -> None:
+    rankings = _rankings([_formal_record("A", 0.5), _formal_record("B", 0.8)])
+    assert len(rankings["input_only"]) == 1
+    assert [row["model"] for row in rankings["input_only"][0]["leaderboard"]] == [
+        "B",
+        "A",
+    ]
+    assert rankings["dynamic"] == []
+
+
+def test_support_acceptance_rejects_method_row_or_order_drift() -> None:
+    records = [_formal_record("A", 0.5), _formal_record("B", 0.6, "different")]
+    with pytest.raises(RuntimeError, match="SUPPORT_MISMATCH"):
+        _support_acceptance(records)
+
+
+def test_out_of_scope_artifact_guard(tmp_path) -> None:
+    _assert_no_out_of_scope_artifacts(tmp_path)
+    (tmp_path / "stage2_output.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="OUT_OF_SCOPE_ARTIFACT"):
+        _assert_no_out_of_scope_artifacts(tmp_path)

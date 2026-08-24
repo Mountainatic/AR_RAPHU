@@ -629,19 +629,52 @@ def _rankings(records: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
             if item.get("status") == "PASS"
             and item.get("information_set") == information_set
         ]
-        selected.sort(
-            key=lambda item: (
-                -float(item["r2_level_reconstructed"]),
-                -float(item["r2_delta"]),
+        groups: dict[tuple[str, str, str, str, str], list[dict[str, Any]]] = {}
+        for item in selected:
+            key = (
+                str(item["namespace"]),
                 str(item["dataset"]),
                 str(item["target_head"]),
-                str(item["model"]),
+                str(item["availability_scenario"]),
+                str(item["proxy_policy"]),
             )
-        )
-        result[information_set] = [
-            {"rank": index + 1, **item} for index, item in enumerate(selected)
-        ]
+            groups.setdefault(key, []).append(item)
+        for key, rows in sorted(groups.items()):
+            rows.sort(
+                key=lambda item: (
+                    -float(item["r2_level_reconstructed"]),
+                    -float(item["r2_delta"]),
+                    str(item["model"]),
+                )
+            )
+            result[information_set].append(
+                {
+                    "view": {
+                        "namespace": key[0],
+                        "dataset": key[1],
+                        "target_head": key[2],
+                        "availability_scenario": key[3],
+                        "proxy_policy": key[4],
+                        "information_set": information_set,
+                    },
+                    "leaderboard": [
+                        {"rank": index + 1, **item}
+                        for index, item in enumerate(rows)
+                    ],
+                }
+            )
     return result
+
+
+def _assert_no_out_of_scope_artifacts(run_root: Path) -> None:
+    forbidden = ("neural3", "debutanizer", "pmsm", "metropt", "stage2")
+    violations = [
+        path.relative_to(run_root).as_posix()
+        for path in run_root.rglob("*")
+        if any(token in path.name.lower() for token in forbidden)
+    ]
+    if violations:
+        raise RuntimeError(f"STOP_OUT_OF_SCOPE_ARTIFACT_PRESENT:{violations[:20]}")
 
 
 def run_formal_test_inference(
@@ -686,6 +719,7 @@ def run_formal_test_inference(
             )
     support = _support_acceptance(records)
     _verify_checkpoint_inventory(run_root / "checkpoints", manifest["entries"])
+    _assert_no_out_of_scope_artifacts(run_root)
     rankings = _rankings(records)
     report = {
         "status": "PASS",
