@@ -141,6 +141,10 @@ def _input_manifest(args: argparse.Namespace) -> dict[str, Any]:
             "sru": _file_inventory(args.registry_root / "sru"),
         },
         "cz_raw_inventory": _file_inventory(args.raw_cz),
+        "old_recovery_running_at_launch": bool(args.old_recovery_running_at_launch),
+        "concurrent_old_recovery_explicitly_authorized": bool(
+            args.allow_concurrent_old_recovery
+        ),
     }
 
 
@@ -221,12 +225,21 @@ def main() -> None:
     parser.add_argument("--raw-cz", type=Path, required=True)
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--per-worker-gib", type=float, default=4.0)
+    parser.add_argument(
+        "--allow-concurrent-old-recovery",
+        action="store_true",
+        help=(
+            "Allow this formal run to start beside the unrelated legacy CZ/Neural3 "
+            "recovery when the user has explicitly authorized sufficient compute."
+        ),
+    )
     args = parser.parse_args()
     args.run_root = args.run_root.resolve()
     args.raw_public_root = args.raw_public_root.resolve()
     args.registry_root = args.registry_root.resolve()
     args.raw_cz = args.raw_cz.resolve()
-    if _old_recovery_running():
+    args.old_recovery_running_at_launch = _old_recovery_running()
+    if args.old_recovery_running_at_launch and not args.allow_concurrent_old_recovery:
         raise RuntimeError("STOP_OLD_CZ_NEURAL3_RECOVERY_STILL_RUNNING")
     if args.run_root.exists() and any(args.run_root.iterdir()):
         raise RuntimeError(f"refusing nonempty formal run namespace: {args.run_root}")
@@ -241,6 +254,10 @@ def main() -> None:
         "stages": [],
         "neural3_status": "NOT_RUN_BY_USER_SCOPE",
         "stage2_status": "NOT_RUN_BY_USER_SCOPE",
+        "old_recovery_running_at_launch": bool(args.old_recovery_running_at_launch),
+        "concurrent_old_recovery_explicitly_authorized": bool(
+            args.allow_concurrent_old_recovery
+        ),
     }
     _write(status_path, state)
     try:

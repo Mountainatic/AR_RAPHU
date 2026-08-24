@@ -110,13 +110,22 @@ def main() -> None:
         type=Path,
         default=APPROVED_PARENT / "approved_r3_r4_evidence_20260824.zip",
     )
+    parser.add_argument(
+        "--allow-concurrent-old-recovery",
+        action="store_true",
+        help=(
+            "Allow the explicitly authorized R3/R4 cleanup while the unrelated "
+            "legacy CZ/Neural3 recovery is still running. The default remains fail-closed."
+        ),
+    )
     parser.add_argument("targets", type=Path, nargs="*")
     args = parser.parse_args()
     targets = args.targets or [APPROVED_PARENT / name for name in sorted(APPROVED_NAMES)]
     resolved = [_validate_target(path) for path in targets]
     if {path.name for path in resolved} != APPROVED_NAMES or len(resolved) != 2:
         raise RuntimeError("STOP_DELETE_SCOPE_MUST_BE_EXACT_APPROVED_R3_AND_R4")
-    if _old_recovery_running():
+    old_recovery_running = _old_recovery_running()
+    if old_recovery_running and not args.allow_concurrent_old_recovery:
         raise RuntimeError("STOP_OLD_CZ_NEURAL3_RECOVERY_STILL_RUNNING")
     archive = args.archive.resolve()
     if archive.exists():
@@ -137,6 +146,10 @@ def main() -> None:
             if item["kind"] == "file"
         ),
         "preservation_rule": "all logs, JSON/CSV, acceptance/audit, TXT/MD/YAML",
+        "old_recovery_running_at_cleanup": old_recovery_running,
+        "concurrent_old_recovery_explicitly_authorized": bool(
+            args.allow_concurrent_old_recovery
+        ),
     }
     with zipfile.ZipFile(archive, "x", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as bundle:
         for root in resolved:
@@ -180,6 +193,10 @@ def main() -> None:
         "free_gib_after_cleanup": free_gib,
         "minimum_required_gib": 20.0,
         "no_other_directory_deleted": True,
+        "old_recovery_running_at_cleanup": old_recovery_running,
+        "concurrent_old_recovery_explicitly_authorized": bool(
+            args.allow_concurrent_old_recovery
+        ),
     }
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
     if result["status"] != "PASS":
