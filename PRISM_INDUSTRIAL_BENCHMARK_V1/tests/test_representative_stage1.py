@@ -13,6 +13,12 @@ sys.path.insert(0, str(PROJECT / "src"))
 
 from prism_benchmark.c1_builder import _selected_datasets
 from prism_benchmark.c1_contracts import realize_heads
+from prism_benchmark.cz_only_pilot import (
+    PILOT_ACTIVE_DATASETS,
+    PILOT_PROTOCOL_ID,
+    pilot_path_views,
+)
+from prism_benchmark.representative_formal import checkpoint_namespace_root
 from prism_benchmark.v211_representative_stage1_config import (
     load_representative_stage1_descriptor,
 )
@@ -93,3 +99,29 @@ def test_formal_scope_registers_only_tep_sru_cz_as_active() -> None:
         "metropt": "NOT_RUN_BY_USER_SCOPE",
     }
     assert value["neural3_status"] == "NOT_RUN_BY_USER_SCOPE"
+
+
+def test_formal_checkpoint_namespaces_keep_cz_directions_disjoint(tmp_path: Path) -> None:
+    rod_1_to_rod_2 = checkpoint_namespace_root(
+        tmp_path, "cz:Rod_1_to_Rod_2"
+    )
+    rod_2_to_rod_1 = checkpoint_namespace_root(
+        tmp_path, "cz:Rod_2_to_Rod_1"
+    )
+    assert rod_1_to_rod_2 != rod_2_to_rod_1
+    assert rod_1_to_rod_2 == tmp_path / "cz" / "Rod_1_to_Rod_2"
+    assert rod_2_to_rod_1 == tmp_path / "cz" / "Rod_2_to_Rod_1"
+    assert checkpoint_namespace_root(tmp_path, "public") == tmp_path / "public"
+    with pytest.raises(RuntimeError, match="UNKNOWN_CZ_CHECKPOINT_DIRECTION"):
+        checkpoint_namespace_root(tmp_path, "cz:invalid")
+
+
+def test_cz_pilot_contains_both_directions_and_is_single_dataset(tmp_path: Path) -> None:
+    views = pilot_path_views(PROJECT, tmp_path)
+    assert PILOT_PROTOCOL_ID == "CZ_ONLY_L256_DELTA_NOWCAST_PILOT_V1"
+    assert PILOT_ACTIVE_DATASETS == ("cz_czochralski",)
+    assert [namespace for namespace, _, _ in views] == [
+        "cz:Rod_1_to_Rod_2",
+        "cz:Rod_2_to_Rod_1",
+    ]
+    assert all(len(candidates) == 2 for _, _, candidates in views)

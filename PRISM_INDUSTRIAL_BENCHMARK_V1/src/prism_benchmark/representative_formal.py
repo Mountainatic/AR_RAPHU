@@ -442,6 +442,20 @@ def _formal_path_views(project: Path, run_root: Path) -> list[tuple[str, PublicA
     return result
 
 
+def checkpoint_namespace_root(checkpoint_root: Path, namespace: str) -> Path:
+    """Keep public and both cross-rod checkpoint trees physically disjoint."""
+
+    if namespace == "public":
+        return checkpoint_root / "public"
+    prefix = "cz:"
+    if namespace.startswith(prefix):
+        direction = namespace[len(prefix) :]
+        if direction not in DIRECTIONS:
+            raise RuntimeError(f"STOP_UNKNOWN_CZ_CHECKPOINT_DIRECTION:{direction}")
+        return checkpoint_root / "cz" / direction
+    raise RuntimeError(f"STOP_UNKNOWN_CHECKPOINT_NAMESPACE:{namespace}")
+
+
 def _checkpoint_inventory(checkpoint_root: Path) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
     for manifest_path in sorted(checkpoint_root.rglob("MANIFEST.json")):
@@ -510,19 +524,20 @@ def fit_and_seal_formal_checkpoints(project: Path, run_root: Path) -> dict[str, 
     descriptor = load_representative_stage1_descriptor(project)
     records: list[dict[str, Any]] = []
     for namespace, paths, views in _formal_path_views(project, run_root):
+        namespace_root = checkpoint_namespace_root(checkpoint_root, namespace)
         if free_gib(run_root.parent) < float(descriptor["minimum_runtime_free_gib"]):
             raise RuntimeError("STOP_LOW_STORAGE_BEFORE_NEXT_CHECKPOINT_VIEW")
         for candidate in views:
             records.append(
                 {
                     "namespace": namespace,
-                    **fit_prism_checkpoint_for_view(paths, candidate, checkpoint_root),
+                    **fit_prism_checkpoint_for_view(paths, candidate, namespace_root),
                 }
             )
             records.extend(
                 {"namespace": namespace, **item}
                 for item in fit_baseline_checkpoints_for_view(
-                    paths, candidate, checkpoint_root
+                    paths, candidate, namespace_root
                 )
             )
     # Reload every newly written checkpoint with the same guard used by test.
@@ -702,19 +717,22 @@ def run_formal_test_inference(
     ]
     records: list[dict[str, Any]] = []
     for namespace, paths, views in _formal_path_views(project, run_root):
+        namespace_root = checkpoint_namespace_root(
+            run_root / "checkpoints", namespace
+        )
         if free_gib(run_root.parent) < float(descriptor["minimum_runtime_free_gib"]):
             raise RuntimeError("STOP_LOW_STORAGE_DURING_TEST_INFERENCE")
         for candidate in views:
             records.extend(
                 {"namespace": namespace, **item}
                 for item in predict_prism_checkpoint_for_view(
-                    paths, candidate, run_root / "checkpoints", split="test"
+                    paths, candidate, namespace_root, split="test"
                 )
             )
             records.extend(
                 {"namespace": namespace, **item}
                 for item in predict_baseline_checkpoints_for_view(
-                    paths, candidate, run_root / "checkpoints", split="test"
+                    paths, candidate, namespace_root, split="test"
                 )
             )
     support = _support_acceptance(records)
