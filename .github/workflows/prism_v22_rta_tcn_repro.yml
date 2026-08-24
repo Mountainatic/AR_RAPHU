@@ -1,0 +1,66 @@
+name: PRISM v2.2 RTA-TCN reproduction
+
+on:
+  push:
+    branches:
+      - prism-v2-2-beta-debutanizer-benchmark-20260824
+    paths:
+      - '.github/workflows/prism_v22_rta_tcn_repro.yml'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  rta-tcn-exact-author:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MPLBACKEND: Agg
+      PYTHONHASHSEED: '1024'
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas scikit-learn matplotlib torchinfo
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Fetch author-published code and data
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/DC/RTA-TCN-DC.py -o RTA-TCN-DC.py
+          curl -fsSL https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/DC/Debutanizer_data.txt -o Debutanizer_data.txt
+          # The paper reports a Windows environment. The script requests Debutanizer_Data.txt
+          # while the repository stores Debutanizer_data.txt. Copy only to reproduce Windows
+          # case-insensitive filename semantics; no model/training semantics are changed.
+          cp Debutanizer_data.txt Debutanizer_Data.txt
+          sha256sum RTA-TCN-DC.py Debutanizer_data.txt
+          wc -l Debutanizer_data.txt
+
+      - name: Run exact author implementation
+        run: |
+          set -o pipefail
+          python RTA-TCN-DC.py 2>&1 | tee rta_tcn_exact_author.log
+
+      - name: Extract final reported metrics
+        if: always()
+        run: |
+          echo '=== Tail ==='
+          tail -n 30 rta_tcn_exact_author.log || true
+          echo '=== Metric lines ==='
+          grep -E 'MSE|RMSE|相关系数|Optimization finished|总耗时' rta_tcn_exact_author.log || true
+
+      - name: Upload reproduction log and predictions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rta-tcn-exact-author
+          path: |
+            rta_tcn_exact_author.log
+            OFFLINE y_pred.txt
+            OFFLINE y_true.txt
+            OFFLINE error.txt
+          if-no-files-found: warn
