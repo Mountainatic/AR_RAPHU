@@ -1,0 +1,43 @@
+name: PRISM v2.2 Debutanizer benchmark
+
+on:
+  push:
+    branches:
+      - prism-v2-2-beta-debutanizer-benchmark-20260824
+    paths:
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_20260824/**'
+      - '.github/workflows/prism_v22_debutanizer_benchmark.yml'
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout benchmark branch
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install minimal dependency
+        run: python -m pip install --disable-pip-version-check numpy
+
+      - name: Run Debutanizer multi-step benchmark
+        run: |
+          python PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_20260824/run_debutanizer_msa_benchmark.py \
+            > PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_20260824/benchmark_stdout.json
+
+      - name: Show compact result
+        run: cat PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_20260824/results/results.csv
+
+      - name: Upload reproducible results
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-v22-debutanizer-results
+          path: |
+            PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_20260824/results/
+            PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_20260824/benchmark_stdout.json
+          if-no-files-found: error
