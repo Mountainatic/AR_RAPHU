@@ -41,7 +41,7 @@
     {"path": "src/prism_benchmark/cz_k_support.py", "sha256": "f8424b8eae5ff1af1ee6fd811d609b60f2c7d40b5dab60f5bdfe68e313e10a67"},
     {"path": "src/prism_benchmark/level_reconstruction.py", "sha256": "0091ef5e07d92e97aa9198284cf3585e64101eaf28e8129cc3cf778bb8953705"},
     {"path": "scripts/run_representative_stage1_formal.py", "sha256": "595b502a09d9e7811b7776f457a1fd176cfc6b2938daf895a39a5cdce1c2b79d"},
-    {"path": "scripts/launch_representative_stage1_formal.py", "sha256": "b2bba954137c7d6f1db2597ad2688435506b0106886f17fcb5c2cf26c3f04fd3"},
+    {"path": "scripts/launch_representative_stage1_formal.py", "sha256": "19cadf2f752b033713872c83a9d30249881cdce1749efbbc38abe07b5da5a5ed"},
     {"path": "scripts/archive_and_remove_approved_r3_r4.py", "sha256": "be290998608b4816512cd67e2802fb21f2da85664f4eed87ae296abfb987fd3b"}
   ],
   "algorithm_config": {
