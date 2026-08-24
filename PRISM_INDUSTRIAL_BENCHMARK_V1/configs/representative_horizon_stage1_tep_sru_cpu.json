@@ -31,8 +31,18 @@
   },
   "cz_contract": {
     "path": "src/prism_benchmark/cz_l256_nowcast.py",
-    "sha256": "1c8ff7901bd80730f896d1072e7a6e2b4ccc46a28e3ede5d10e1e9223175d323"
+    "sha256": "98b0cec51fb2446e17a2f8f038c746d5d47612a7209ce4e344befa54930464a4"
   },
+  "formal_code_bindings": [
+    {"path": "src/prism_benchmark/portable_checkpoints.py", "sha256": "33709cfc877a3661045443191228e0e2ab9791f7c0801653689d07fafbf4e97a"},
+    {"path": "src/prism_benchmark/representative_baseline_checkpoints.py", "sha256": "ced1b29d22e0292df3fe6ee10ed1e70248bea06d8b81cf5090a95bd400bcb126"},
+    {"path": "src/prism_benchmark/representative_prism_checkpoints.py", "sha256": "6814390c8b601e76b30b5532d7a49cd5e5e319edc207c7403df350f6ff6af086"},
+    {"path": "src/prism_benchmark/representative_formal.py", "sha256": "2e6372329b896f1bacf86b264dc327d2a6a2c5ebc9a72dc03afec5250f3faa2a"},
+    {"path": "src/prism_benchmark/level_reconstruction.py", "sha256": "0091ef5e07d92e97aa9198284cf3585e64101eaf28e8129cc3cf778bb8953705"},
+    {"path": "scripts/run_representative_stage1_formal.py", "sha256": "595b502a09d9e7811b7776f457a1fd176cfc6b2938daf895a39a5cdce1c2b79d"},
+    {"path": "scripts/launch_representative_stage1_formal.py", "sha256": "013422b0972b1c00564d4d4dd3197d9dcbabf5a8fbe98dace8a3b48b3bdbedc4"},
+    {"path": "scripts/archive_and_remove_approved_r3_r4.py", "sha256": "f8a30ec30764518baa7639b871a78a6b920027f33d985146d60649928571bfb1"}
+  ],
   "algorithm_config": {
     "path": "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_PACKAGE/PRISM_V2_1_2_JOINT_OOF_PROTOCOL_CORRECTION_CONFIG.json",
     "sha256": "a14c05cb51d94c4af3f5aed33f6ec810f93170acfdf2e513292ae49e2566f1f7"

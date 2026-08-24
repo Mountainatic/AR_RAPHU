@@ -143,6 +143,10 @@ def load_representative_stage1_descriptor(project: Path) -> dict[str, Any]:
         "cz_contract",
     ):
         _require_bound_file(project, value[label], label)
+    bindings = value.get("formal_code_bindings")
+    _require(isinstance(bindings, list) and len(bindings) == 8, "formal_code_bindings")
+    for index, record in enumerate(bindings):
+        _require_bound_file(project, record, f"formal_code_bindings[{index}]")
     resource = value["resource"]
     _require(int(resource["outer_workers"]) >= 1, "resource.outer_workers")
     _require(int(resource["k_inner_workers"]) >= 1, "resource.k_inner_workers")
