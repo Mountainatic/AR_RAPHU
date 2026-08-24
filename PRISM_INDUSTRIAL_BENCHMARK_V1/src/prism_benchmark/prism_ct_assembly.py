@@ -39,10 +39,12 @@ def fit_simplex_assembly(
     max_iterations: int = 20000,
     tolerance: float = 1e-12,
 ) -> AssemblyState:
-    """Fit an interpretable PRISM A-level convex assembly.
+    """Fit the interpretable PRISM v2.2(beta) Gamma_CT convex assembly.
 
-    Each dynamic branch contributes a predicted future increment. An additional zero-delta
-    column represents persistence. The fitted weights solve
+    Gamma_CT is a prediction-level temporal-branch assembler. It is deliberately not named
+    ``A`` because PRISM v2.1.1 reserves the A module for the mature second-stage residual
+    state. Each dynamic temporal branch contributes a predicted future increment. An
+    additional zero-delta column represents persistence. The fitted weights solve
 
         min_w ||P_aug w - delta_y||^2 / n + ridge * ||w_dynamic||^2
         s.t. w >= 0, sum(w) = 1.
