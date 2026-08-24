@@ -1,0 +1,44 @@
+{
+  "version": "PRISM v2.2 (beta)",
+  "branch": "prism-v2-2-beta-ct",
+  "status": "isolated_experimental_minor_version",
+  "parent_stable_version": "PRISM v2.1.1",
+  "parent_stable_branch": "prism-v2-1-1-metro-p60-joint-stability-final",
+  "development_predecessor_branch": "prism-ct-v0-2-silicon-20260823",
+  "rollback_policy": {
+    "authoritative_parent_on_rollback": "PRISM v2.1.1",
+    "ignore_v2_2_beta_files_for_stable_reconstruction_unless_explicitly_requested": true
+  },
+  "temporal_decomposition": {
+    "branches": ["discrete_delay", "ct_multires", "ct_absolute_optional_certified", "persistence_anchor"],
+    "preferred_fusion": "prediction_level_late_assembly",
+    "raw_early_concatenation": "ablation_only"
+  },
+  "ct_basis": {
+    "cadence_seconds_silicon_beta": 2.0,
+    "time_constants_seconds": [10, 30, 60, 120, 300, 600, 1200, 2400, 4800, 7200],
+    "continuous_dynamics": "dz_r/dt = -(1/tau_r) z_r + (1/tau_r) x",
+    "discretization": "exact_zero_order_hold",
+    "multiresolution_transform": "increment_only_adjacent_scales"
+  },
+  "assembly": {
+    "type": "nonnegative_simplex_with_persistence_anchor",
+    "nonnegative_weights": true,
+    "sum_to_one_including_persistence": true,
+    "final_holdout_may_train_weights": false
+  },
+  "certificates": {
+    "conditioning": {"standardized_design_condition_number_limit_beta": 100000000.0},
+    "ct_support": {"status": "diagnostic_only_beta", "used_as_mandatory_rejection_rule": false}
+  },
+  "silicon_horizons_steps": [1, 5, 15, 30, 60, 120, 300, 600],
+  "excluded_from_this_version": [
+    "learned_time_constants",
+    "input_dependent_poles",
+    "unrestricted_time_varying_state_matrix",
+    "mamba_or_selective_ssm_in_physics_first_trunk",
+    "unconstrained_neural_router",
+    "end_to_end_black_box_replacement_of_K_C_A",
+    "claiming_ct_latent_states_are_measured_physical_quantities"
+  ]
+}
