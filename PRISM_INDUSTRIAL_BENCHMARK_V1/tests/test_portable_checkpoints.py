@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import numpy as np
+import pandas as pd
 import pytest
 
 from prism_benchmark.level_reconstruction import metric_bundle_delta_and_level
@@ -19,6 +22,7 @@ from prism_benchmark.representative_formal import (
     _rankings,
     _support_acceptance,
 )
+from prism_benchmark import representative_baseline_checkpoints as baseline_checkpoints
 from prism_benchmark.representative_prism_checkpoints import _predict_joint
 
 
@@ -132,3 +136,43 @@ def test_joint_replay_uses_frozen_slice_order_not_json_key_order() -> None:
     observed = _predict_joint(blocks, contract)
     expected = np.array([325.0, 646.0])
     assert np.array_equal(observed, expected)
+
+
+def test_target_state_checkpoint_replay_materializes_target_column(monkeypatch) -> None:
+    requested: dict[str, list[str]] = {}
+
+    class StubAccessor:
+        def __init__(self, shared, dataset, split, columns):
+            requested["columns"] = list(columns)
+
+        def target_state(self, samples, target, *profile):
+            assert target == "crystal_diameter"
+            return np.zeros((len(samples), 2), dtype=np.float64)
+
+    monkeypatch.setattr(baseline_checkpoints, "BaseAccessor", StubAccessor)
+    paths = SimpleNamespace(shared=object())
+    view = SimpleNamespace(
+        head=SimpleNamespace(dataset="cz", target="crystal_diameter")
+    )
+    state = {
+        "feature": {
+            "family": "TARGET_STATE",
+            # Common development metadata can retain non-target columns.
+            "columns": ["pull_rate", "heater_power"],
+            "profile": [1, 2],
+        }
+    }
+    observed = baseline_checkpoints._evaluation_features(
+        paths,
+        view,
+        pd.DataFrame(index=range(3)),
+        "test",
+        state,
+        {},
+    )
+    assert requested["columns"] == [
+        "crystal_diameter",
+        "pull_rate",
+        "heater_power",
+    ]
+    assert observed.shape == (3, 2)

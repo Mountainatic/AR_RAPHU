@@ -35,7 +35,7 @@
   },
   "formal_code_bindings": [
     {"path": "src/prism_benchmark/portable_checkpoints.py", "sha256": "33709cfc877a3661045443191228e0e2ab9791f7c0801653689d07fafbf4e97a"},
-    {"path": "src/prism_benchmark/representative_baseline_checkpoints.py", "sha256": "29f73c434fafe7ede8dfc73f5e4ab81d31d6a0cb87b8a54a66cce85b97a86d19"},
+    {"path": "src/prism_benchmark/representative_baseline_checkpoints.py", "sha256": "e9a0b0b0cf7127bed1d1c1c8049a1bfcf738f7c16aa89fc265aa2f535eed3558"},
     {"path": "src/prism_benchmark/representative_prism_checkpoints.py", "sha256": "4a5cc95b1a53fd7d7d9a564d00c8fd97650a5887397757d0463faafb41369ee9"},
     {"path": "src/prism_benchmark/representative_formal.py", "sha256": "cb8ad33bcbe7791af9f4322a2cb3219307086cbf20eb2aa85d0822526cc3c567"},
     {"path": "src/prism_benchmark/cz_k_support.py", "sha256": "f8424b8eae5ff1af1ee6fd811d609b60f2c7d40b5dab60f5bdfe68e313e10a67"},

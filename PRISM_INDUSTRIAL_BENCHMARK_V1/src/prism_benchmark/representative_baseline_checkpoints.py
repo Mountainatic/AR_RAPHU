@@ -403,7 +403,16 @@ def _evaluation_features(
     columns = list(feature.get("columns", []))
     if family == "NONE":
         return np.zeros((len(samples), 0), dtype=np.float64)
-    accessor_columns = [view.head.target, *columns] if family in {"ARX", "LINEAR_NARX"} else columns
+    # TARGET_STATE checkpoints (for example AR) retain the process-column list
+    # from the common development record, but their replay features are built
+    # from target history.  Always materialize the target for every target-state
+    # family; otherwise a sealed AR checkpoint fails only after test unlock.
+    target_state_families = {"TARGET_STATE", "ARX", "LINEAR_NARX"}
+    accessor_columns = (
+        list(dict.fromkeys([view.head.target, *columns]))
+        if family in target_state_families
+        else columns
+    )
     accessor = BaseAccessor(paths.shared, view.head.dataset, split, accessor_columns or [view.head.target])
     if family == "SNAPSHOT_T_MINUS_1":
         return accessor.snapshot(samples, columns)
