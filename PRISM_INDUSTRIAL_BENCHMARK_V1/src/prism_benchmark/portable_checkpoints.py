@@ -251,11 +251,22 @@ def fit_pls_codec(
         "coefficient": coefficient,
         "intercept": np.asarray(model.intercept_, dtype=np.float64).reshape(-1),
     }
-    metadata = {"codec": "PLS_REGRESSION", "components": int(components)}
-    replay = predict_pls_codec(matrix, metadata, arrays)
     reference = np.asarray(model.predict(matrix), dtype=np.float64).reshape(-1)
-    if not np.allclose(replay, reference, rtol=1e-10, atol=1e-10):
+    centered = (matrix - arrays["x_mean"]) @ coefficient.T + arrays["intercept"]
+    standardized = (
+        (matrix - arrays["x_mean"]) / arrays["x_std"]
+    ) @ coefficient.T + arrays["intercept"]
+    if np.allclose(centered.reshape(-1), reference, rtol=1e-10, atol=1e-10):
+        transform = "CENTER_ONLY_COEFFICIENT_ALREADY_SCALED"
+    elif np.allclose(standardized.reshape(-1), reference, rtol=1e-10, atol=1e-10):
+        transform = "STANDARDIZE_X"
+    else:
         raise RuntimeError("STOP_PLS_PORTABLE_REPLAY_MISMATCH")
+    metadata = {
+        "codec": "PLS_REGRESSION",
+        "components": int(components),
+        "x_transform": transform,
+    }
     return metadata, arrays
 
 
@@ -263,7 +274,11 @@ def predict_pls_codec(
     x: np.ndarray, metadata: Mapping[str, Any], arrays: Mapping[str, np.ndarray]
 ) -> np.ndarray:
     del metadata
-    matrix = (np.asarray(x, dtype=np.float64) - arrays["x_mean"]) / arrays["x_std"]
+    matrix = np.asarray(x, dtype=np.float64) - arrays["x_mean"]
+    if metadata["x_transform"] == "STANDARDIZE_X":
+        matrix = matrix / arrays["x_std"]
+    elif metadata["x_transform"] != "CENTER_ONLY_COEFFICIENT_ALREADY_SCALED":
+        raise ValueError(f"unsupported PLS transform: {metadata['x_transform']}")
     return (matrix @ arrays["coefficient"].T + arrays["intercept"]).reshape(-1)
 
 
