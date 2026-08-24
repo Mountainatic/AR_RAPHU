@@ -11,7 +11,11 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from prism_benchmark.cz_k_support import _profile_support_availability
+from prism_benchmark import cz_k_support
+from prism_benchmark.cz_k_support import (
+    _available_profiles,
+    _profile_support_availability,
+)
 from prism_benchmark.v211_support import (
     LEGACY_SUPPORT_ERROR,
     SUPPORT_CONTRACT,
@@ -76,3 +80,51 @@ def test_k_profile_with_empty_registered_fold_support_is_unavailable() -> None:
     assert audit[0]["scoring_rows_by_fold"] == [1]
     assert audit[1]["status"] == "UNAVAILABLE_BY_SUPPORT"
     assert audit[1]["zero_scoring_folds"] == [0]
+
+
+def test_cz_available_profiles_uses_unpatched_registered_provider(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    frame = pd.DataFrame({"sample_id": ["x"]})
+    monkeypatch.setattr(
+        cz_k_support,
+        "load_v211_configs",
+        lambda project, protocol: (
+            {},
+            {"selection": {"inner_folds": 1}},
+            {
+                "row_caps": {
+                    "single_channel_k_fit": 10,
+                    "validation_selection_per_fold": 10,
+                }
+            },
+        ),
+    )
+    monkeypatch.setattr(
+        cz_k_support, "load_native_samples", lambda *args, **kwargs: frame
+    )
+    monkeypatch.setattr(
+        cz_k_support, "inner_folds", lambda *args, **kwargs: [(None, None)]
+    )
+    monkeypatch.setattr(
+        cz_k_support,
+        "registered_channel_profiles",
+        lambda *args, **kwargs: [(1, 2)],
+    )
+    monkeypatch.setattr(
+        cz_k_support,
+        "registered_fold_native_masks",
+        lambda *args, **kwargs: [
+            {"fit_native": frame, "evaluation_common": frame}
+        ],
+    )
+
+    def recursive_provider(*args: object, **kwargs: object) -> object:
+        raise AssertionError("mutable provider must not be called")
+
+    monkeypatch.setattr(cz_k_support.v211_k, "channel_profiles", recursive_provider)
+    profiles, audit = _available_profiles(
+        Path("shared"), Path("project"), object(), "channel", "protocol"
+    )
+    assert profiles == [(1, 2)]
+    assert audit[0]["status"] == "AVAILABLE"

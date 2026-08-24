@@ -7,7 +7,10 @@ import pandas as pd
 
 from . import v211_k
 from .cpu_data import ViewSpec, inner_folds
-from .v2_k import CHANNEL_SAMPLE_COLUMNS
+from .v2_k import (
+    CHANNEL_SAMPLE_COLUMNS,
+    channel_profiles as registered_channel_profiles,
+)
 
 
 def _profile_support_availability(
@@ -79,7 +82,9 @@ def _available_profiles(
         columns=CHANNEL_SAMPLE_COLUMNS,
     )
     folds = inner_folds(train, int(v21["selection"]["inner_folds"]))
-    profiles = v211_k.channel_profiles(view, channel, v2)
+    # run_cz_k_channel temporarily replaces v211_k.channel_profiles with the
+    # support-filtering closure. Calling that mutable symbol here would recurse.
+    profiles = registered_channel_profiles(view, channel, v2)
     fit_cap = int(v2["row_caps"]["single_channel_k_fit"])
     evaluation_cap = int(v2["row_caps"]["validation_selection_per_fold"])
     available: list[tuple[int, int]] = []
@@ -183,7 +188,8 @@ def run_cz_k_channel(
 
     if isinstance(result, dict):
         result["native_profile_support_adapter"] = "CZ_SUPPORT_FILTER_R1"
-        result["profile_support_availability"] = cache[
-            f"{view.relative_root}|{channel}"
-        ][1]
+        key = f"{view.relative_root}|{channel}"
+        result["profile_support_availability"] = (
+            cache[key][1] if key in cache else []
+        )
     return result

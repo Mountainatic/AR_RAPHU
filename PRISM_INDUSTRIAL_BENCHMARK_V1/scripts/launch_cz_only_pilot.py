@@ -21,6 +21,7 @@ PILOT_CODE_FILES = (
     PROJECT / "src" / "prism_benchmark" / "cz_only_pilot.py",
     PROJECT / "src" / "prism_benchmark" / "representative_formal.py",
     PROJECT / "src" / "prism_benchmark" / "cz_l256_nowcast.py",
+    PROJECT / "src" / "prism_benchmark" / "cz_k_support.py",
     PROJECT / "src" / "prism_benchmark" / "portable_checkpoints.py",
     PROJECT / "src" / "prism_benchmark" / "representative_baseline_checkpoints.py",
     PROJECT / "src" / "prism_benchmark" / "representative_prism_checkpoints.py",
