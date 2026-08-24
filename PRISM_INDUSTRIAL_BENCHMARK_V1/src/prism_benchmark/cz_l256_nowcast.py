@@ -144,7 +144,7 @@ def _split_source_origins(
     desired_train = int(math.floor(0.8 * total))
     assigned_train = 0
     validation_started = False
-    for segment, valid in eligible:
+    for eligible_index, (segment, valid) in enumerate(eligible):
         if validation_started:
             validation[segment.segment_id] = set(valid)
             continue
@@ -162,8 +162,20 @@ def _split_source_origins(
             # A short breakpoint segment cannot hold both sides and the purge;
             # keep it on the training side and start validation at the next
             # independent segment.
-            train[segment.segment_id] = set(valid)
-            assigned_train += len(valid)
+            if eligible_index + 1 < len(eligible):
+                train[segment.segment_id] = set(valid)
+                assigned_train += len(valid)
+                continue
+            desired_validation = max(1, total - desired_train)
+            adjusted_train = len(valid) - purge - desired_validation
+            if adjusted_train <= 0:
+                raise RuntimeError(
+                    "CZ final eligible segment cannot hold a purged validation tail"
+                )
+            train[segment.segment_id] = set(valid[:adjusted_train])
+            validation[segment.segment_id] = set(valid[adjusted_train + purge :])
+            assigned_train += adjusted_train
+            validation_started = True
             continue
         train[segment.segment_id] = set(valid[:needed])
         validation[segment.segment_id] = set(valid[validation_start:])
