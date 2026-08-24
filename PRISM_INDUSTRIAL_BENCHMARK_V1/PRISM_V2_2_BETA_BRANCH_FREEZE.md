@@ -36,7 +36,7 @@ PRISM v2.2(beta) inherits the v2.1.1 philosophy and does not redefine the stable
 
 The temporal representation is extended from a primarily discrete/profile view to an explicit **delay-state-scale decomposition**:
 
-`T/E -> {Discrete Delay || Stable CT-Multires || optional certified CT-Absolute} -> branch predictors -> constrained A-level late assembly -> DeltaW -> output`
+`T/E -> {Discrete Delay || Stable CT-Multires || optional certified CT-Absolute} -> branch predictors -> constrained prediction-level late assembly Gamma_CT -> DeltaW -> residual-state A -> output`
 
 The branch semantics are:
 
@@ -45,7 +45,9 @@ The branch semantics are:
 3. **Stable CT-Absolute (S):** slow continuous-time state levels; interprets *what slow dynamical state the system is in*. This branch is optional and must pass conditioning certification.
 4. **Persistence anchor (P):** explicit zero-correction fallback available to the assembly layer.
 
-The preferred hybridization point is the **A/assembly level**, not unrestricted raw feature concatenation.
+The preferred hybridization point is the **prediction/assembly level**, denoted `Gamma_CT`, not unrestricted raw feature concatenation.
+
+**Notation clarification:** `Gamma_CT` is not the v2.1.1 module `A`. In v2.1.1, `A` remains reserved for the mature second-stage residual-state module. Earlier development wording such as “A-level late assembly” meant only “assembly level” and is superseded by the unambiguous `Gamma_CT` notation.
 
 ## Frozen continuous-time basis
 
@@ -69,7 +71,7 @@ This choice is deliberate: direct stacking of absolute CT states produced severe
 
 ## Frozen assembly rule
 
-The beta late assembly combines separately fitted branch corrections through a nonnegative simplex with an explicit persistence anchor:
+The beta late assembly `Gamma_CT` combines separately fitted branch corrections through a nonnegative simplex with an explicit persistence anchor:
 
 `Delta_y_hat = w_D Delta_D + w_M Delta_M + w_S Delta_S + w_P * 0`
 
@@ -124,7 +126,8 @@ The intended interpretation hierarchy is:
 - Delay branch -> event timing / explicit delay;
 - CT-Multires -> active dynamical timescale band;
 - CT-Absolute -> slow dynamical state proxy;
-- A weights -> auditable contribution/fallback fractions;
+- `Gamma_CT` weights -> auditable temporal-representation contribution/fallback fractions;
+- residual-state `A` -> mature predictable residual state outside the frozen input pathway;
 - certificates -> whether a representation is numerically/support admissible.
 
 Thus v2.2(beta) aims to extend PRISM from historical-feature interpretability toward dynamical-state interpretability without turning the physics-first route into a generic Mamba-like black box.
