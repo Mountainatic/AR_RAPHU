@@ -273,7 +273,6 @@ def fit_pls_codec(
 def predict_pls_codec(
     x: np.ndarray, metadata: Mapping[str, Any], arrays: Mapping[str, np.ndarray]
 ) -> np.ndarray:
-    del metadata
     matrix = np.asarray(x, dtype=np.float64) - arrays["x_mean"]
     if metadata["x_transform"] == "STANDARDIZE_X":
         matrix = matrix / arrays["x_std"]
