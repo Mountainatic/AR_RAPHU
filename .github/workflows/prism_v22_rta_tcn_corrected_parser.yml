@@ -1,4 +1,4 @@
-name: RTA-TCN corrected parser reproduction
+name: RTA-TCN matched target-history reproduction
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 jobs:
-  rta-tcn-corrected-parser:
+  rta-tcn-target-history:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -29,45 +29,51 @@ jobs:
           pip install numpy pandas scikit-learn matplotlib torchinfo
           pip install torch --index-url https://download.pytorch.org/whl/cpu
 
-      - name: Fetch author code and data, patch parser only
+      - name: Fetch author code/data and apply information-contract patch
         run: |
           curl -fsSL https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/DC/RTA-TCN-DC.py -o RTA-TCN-DC.py
           curl -fsSL https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/DC/Debutanizer_data.txt -o Debutanizer_Data.txt
           sha256sum RTA-TCN-DC.py Debutanizer_Data.txt > source_sha256.txt
           python - <<'PY'
           from pathlib import Path
-          p = Path('RTA-TCN-DC.py')
-          s = p.read_text(encoding='utf-8')
-          old = "data = pd.read_csv('Debutanizer_Data.txt', sep='\\\\s+')"
-          if old not in s:
-              old = "data = pd.read_csv('Debutanizer_Data.txt', sep='\\s+')"
+          p=Path('RTA-TCN-DC.py')
+          s=p.read_text(encoding='utf-8')
+          old="data = pd.read_csv('Debutanizer_Data.txt', sep='\\s+')"
           assert old in s, 'author parser line not found'
-          s = s.replace(old, "data = pd.read_csv('Debutanizer_Data.txt', sep='\\\\s+', header=None)", 1)
-          p.write_text(s, encoding='utf-8')
+          s=s.replace(old,"data = pd.read_csv('Debutanizer_Data.txt', sep='\\s+', header=None)",1)
+          old_block="""train_X = x_temp[:TRAIN_SIZE, :]\ny_train = y_temp[:TRAIN_SIZE]\ntrain_y = y_train[SEQ_LEN-1:TRAIN_SIZE]\n\ntest_X = x_temp[TRAIN_SIZE-SEQ_LEN+1:, :]\ny_test = y_temp[TRAIN_SIZE:]\ny_test = y_test.reshape(-1, 1)"""
+          new_block="""x_new = np.zeros([data.shape[0], 8])\nx_new[:, :7] = x_temp\nx_new[0, 7] = y_temp[0]\nx_new[1:, 7] = y_temp[:-1]\n\ntrain_X = x_new[:TRAIN_SIZE, :]\ny_train = y_temp[:TRAIN_SIZE]\ntrain_y = y_train[SEQ_LEN-1:TRAIN_SIZE]\n\ntest_X = x_new[TRAIN_SIZE-SEQ_LEN+1:, :]\ny_test = y_temp[TRAIN_SIZE:]\ny_test = y_test.reshape(-1, 1)"""
+          assert old_block in s, 'author train/test block not found'
+          s=s.replace(old_block,new_block,1)
+          oldmdl="mdl = TCANModel(input_size=7, output_size=1, num_channels=[40, 40, 40], seq_length=SEQ_LEN, n_epoch=240, batch_size=64,"
+          assert oldmdl in s, 'author active model line not found'
+          s=s.replace(oldmdl,"mdl = TCANModel(input_size=8, output_size=1, num_channels=[40, 40, 40], seq_length=SEQ_LEN, n_epoch=240, batch_size=64,",1)
+          p.write_text(s,encoding='utf-8')
           PY
-          grep 'pd.read_csv' RTA-TCN-DC.py
+          grep -n "read_csv\|x_new =\|input_size=8" RTA-TCN-DC.py | head -n 20
 
-      - name: Run author model with parser correction only
+      - name: Run author RTA-TCN with same causal previous-target channel
         id: author_run
         continue-on-error: true
         run: |
           set -o pipefail
-          python RTA-TCN-DC.py 2>&1 | tee rta_tcn_corrected_parser.log
+          python RTA-TCN-DC.py 2>&1 | tee rta_tcn_target_history.log
 
       - name: Build persistent result record
         if: always()
         run: |
-          TEST_RMSE="$(grep 'RMSE:' rta_tcn_corrected_parser.log 2>/dev/null | tail -n 1 | sed 's/.*RMSE:[[:space:]]*//' || true)"
-          TEST_R2="$(grep '相关系数' rta_tcn_corrected_parser.log 2>/dev/null | tail -n 1 | sed 's/.*：[[:space:]]*//' || true)"
-          TRAIN_RMSE="$(grep 'RMSE:' rta_tcn_corrected_parser.log 2>/dev/null | head -n 1 | sed 's/.*RMSE:[[:space:]]*//' || true)"
-          TRAIN_R2="$(grep '相关系数' rta_tcn_corrected_parser.log 2>/dev/null | head -n 1 | sed 's/.*：[[:space:]]*//' || true)"
+          TEST_RMSE="$(grep 'RMSE:' rta_tcn_target_history.log 2>/dev/null | tail -n 1 | sed 's/.*RMSE:[[:space:]]*//' || true)"
+          TEST_R2="$(grep '相关系数' rta_tcn_target_history.log 2>/dev/null | tail -n 1 | sed 's/.*：[[:space:]]*//' || true)"
+          TRAIN_RMSE="$(grep 'RMSE:' rta_tcn_target_history.log 2>/dev/null | head -n 1 | sed 's/.*RMSE:[[:space:]]*//' || true)"
+          TRAIN_R2="$(grep '相关系数' rta_tcn_target_history.log 2>/dev/null | head -n 1 | sed 's/.*：[[:space:]]*//' || true)"
           {
-            echo '# RTA-TCN corrected-parser reproduction'
+            echo '# RTA-TCN target-history matched reproduction'
             echo
-            echo '- Source model/training code: author `DC/RTA-TCN-DC.py`.'
-            echo '- Data: author `DC/Debutanizer_data.txt`.'
-            echo '- Only scientific correction: `pd.read_csv(..., header=None)` so the first numeric record is not consumed as a header.'
-            echo '- All model/training semantics remain author-original: seed 1024, sequence length 40, train boundary 1687, 240 epochs, batch size 64, learning rate 0.001, 7 process inputs and no target history.'
+            echo '- Upstream: author `DC/RTA-TCN-DC.py` and `DC/Debutanizer_data.txt`.'
+            echo '- Parser correction: `header=None`.'
+            echo '- Information contract: active 8th input is strictly causal `x8[t]=y[t-1]`; current `y[t]` is never an input.'
+            echo '- Same sequence length 40, train boundary 1687, 1648 training targets, 240 epochs, batch size 64, learning rate 0.001, seed 1024.'
+            echo '- Author optimizer semantics otherwise preserved.'
             echo "- Workflow run outcome: ${{ steps.author_run.outcome }}"
             echo
             echo '## Metrics'
@@ -76,32 +82,32 @@ jobs:
             echo "- Test RMSE: ${TEST_RMSE:-NOT_AVAILABLE}"
             echo "- Test R2: ${TEST_R2:-NOT_AVAILABLE}"
             echo
-            echo '## Upstream source hashes before parser patch'
+            echo '## Upstream hashes before patch'
             echo '```text'
             cat source_sha256.txt 2>/dev/null || true
             echo '```'
             echo
             echo '## Log tail'
             echo '```text'
-            tail -n 40 rta_tcn_corrected_parser.log 2>/dev/null || true
+            tail -n 50 rta_tcn_target_history.log 2>/dev/null || true
             echo '```'
-          } > /tmp/RTA_TCN_CORRECTED_PARSER_RESULT.md
+          } > /tmp/RTA_TCN_TARGET_HISTORY_RESULT.md
 
-      - name: Checkout only after external model execution
+      - name: Checkout benchmark branch after external execution
         if: always()
         uses: actions/checkout@v4
         with:
           ref: prism-v2-2-beta-debutanizer-benchmark-20260824
 
-      - name: Commit result
+      - name: Commit target-history result
         if: always()
         run: |
           mkdir -p PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824
-          cp /tmp/RTA_TCN_CORRECTED_PARSER_RESULT.md PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824/RTA_TCN_CORRECTED_PARSER_RESULT.md
+          cp /tmp/RTA_TCN_TARGET_HISTORY_RESULT.md PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824/RTA_TCN_TARGET_HISTORY_RESULT.md
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824/RTA_TCN_CORRECTED_PARSER_RESULT.md
+          git add PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824/RTA_TCN_TARGET_HISTORY_RESULT.md
           if ! git diff --cached --quiet; then
-            git commit -m 'benchmark: record corrected-parser RTA-TCN reproduction'
+            git commit -m 'benchmark: record target-history RTA-TCN reproduction'
             git push origin HEAD:prism-v2-2-beta-debutanizer-benchmark-20260824
           fi
