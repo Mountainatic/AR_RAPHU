@@ -1,0 +1,227 @@
+name: PRISM v2.2 Debutanizer target-history benchmark
+
+on:
+  push:
+    branches:
+      - prism-v2-2-beta-debutanizer-benchmark-20260824
+    paths:
+      - '.github/workflows/prism_v22_debutanizer_target_history.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  target-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      MPLBACKEND: Agg
+      PYTHONHASHSEED: '1024'
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas scipy scikit-learn matplotlib torchinfo
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Fetch upstream author code and data
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/DC/RTA-TCN-DC.py -o RTA-TCN-DC.py
+          curl -fsSL https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/DC/Debutanizer_data.txt -o Debutanizer_Data.txt
+          sha256sum RTA-TCN-DC.py Debutanizer_Data.txt | tee upstream_hashes.txt
+
+      - name: Run PRISM v2.2 with legal past-target state
+        run: |
+          cat > run_prism_target_history.py <<'PY'
+          import json, math
+          import numpy as np
+          import pandas as pd
+          from sklearn.linear_model import Ridge
+          from sklearn.metrics import mean_squared_error, r2_score
+          from sklearn.preprocessing import StandardScaler
+          from scipy.optimize import minimize
+
+          SEQ=40
+          TRAIN_SIZE=1648+SEQ-1
+          LAGS=[0,1,2,4,8,16,32]
+          TAUS=[1.,2.,4.,8.,16.,32.]
+          LAMBDAS=[1e-4,1e-3,1e-2,1e-1,1.]
+          ASSEMBLY_RIDGE=1e-3
+
+          raw=pd.read_csv('Debutanizer_Data.txt',sep=r'\s+',header=None).values.astype(float)
+          x=raw[:,:7]
+          y=raw[:,7]
+          x8=np.zeros((len(raw),8),dtype=float)
+          x8[:,:7]=x
+          x8[0,7]=y[0]
+          x8[1:,7]=y[:-1]
+
+          def ct_features(win):
+              # win: [40,8], state initialized only inside legal 40-step window.
+              states=[]
+              for tau in TAUS:
+                  a=math.exp(-1.0/tau)
+                  z=win[0].copy()
+                  for row in win[1:]:
+                      z=a*z+(1-a)*row
+                  states.append(z)
+              states=np.asarray(states) # [6,8]
+              m=[win[-1]-states[0]]
+              for i in range(len(states)-1):
+                  m.append(states[i]-states[i+1])
+              return np.concatenate(m), states.reshape(-1)
+
+          def make_rows(endpoints):
+              D=[]; M=[]; S=[]; P=[]; Y=[]
+              for t in endpoints:
+                  win=x8[t-SEQ+1:t+1]
+                  D.append(np.concatenate([win[-1-l] for l in LAGS]))
+                  m,s=ct_features(win)
+                  M.append(m); S.append(s)
+                  P.append(y[t-1])
+                  Y.append(y[t])
+              return {'D':np.asarray(D),'M':np.asarray(M),'S':np.asarray(S),'P':np.asarray(P),'Y':np.asarray(Y)}
+
+          train_ep=np.arange(SEQ-1,TRAIN_SIZE)
+          test_ep=np.arange(TRAIN_SIZE,len(raw))
+          tr=make_rows(train_ep); te=make_rows(test_ep)
+          n=len(train_ep)
+          n70=int(np.floor(.70*n)); n85=int(np.floor(.85*n))
+
+          class StdRidge:
+              def __init__(self,lam): self.lam=lam
+              def fit(self,X,y):
+                  self.s=StandardScaler().fit(X)
+                  Z=self.s.transform(X)
+                  self.m=Ridge(alpha=self.lam*len(X),fit_intercept=True).fit(Z,y)
+                  return self
+              def predict(self,X): return self.m.predict(self.s.transform(X))
+
+          chosen={}; branch_models={}; val_preds={}; final_preds={}
+          for b in ['D','M','S']:
+              scores=[]
+              for lam in LAMBDAS:
+                  m=StdRidge(lam).fit(tr[b][:n70],tr['Y'][:n70])
+                  pred=m.predict(tr[b][n70:n85])
+                  scores.append((mean_squared_error(tr['Y'][n70:n85],pred),lam))
+              lam=min(scores)[1]; chosen[b]=lam
+              m85=StdRidge(lam).fit(tr[b][:n85],tr['Y'][:n85])
+              val_preds[b]=m85.predict(tr[b][n85:])
+              mall=StdRidge(lam).fit(tr[b],tr['Y'])
+              branch_models[b]=mall
+              final_preds[b]=mall.predict(te[b])
+
+          def simplex_fit(names):
+              Q=np.column_stack([val_preds[n] if n!='P' else tr['P'][n85:] for n in names])
+              yy=tr['Y'][n85:]
+              k=len(names)
+              def obj(w):
+                  e=Q@w-yy
+                  return float(np.mean(e*e)+ASSEMBLY_RIDGE*np.sum(w*w))
+              res=minimize(obj,np.ones(k)/k,method='SLSQP',bounds=[(0,1)]*k,
+                           constraints={'type':'eq','fun':lambda w:np.sum(w)-1},
+                           options={'maxiter':500,'ftol':1e-14})
+              w=np.maximum(res.x,0); w=w/w.sum()
+              Qt=np.column_stack([final_preds[n] if n!='P' else te['P'] for n in names])
+              pred=Qt@w
+              return {n:float(v) for n,v in zip(names,w)}, pred
+
+          def metrics(pred):
+              return {'rmse':float(mean_squared_error(te['Y'],pred)**0.5),
+                      'mae':float(np.mean(np.abs(te['Y']-pred))),
+                      'r2':float(r2_score(te['Y'],pred))}
+
+          w_no,p_no=simplex_fit(['D','M','S'])
+          w_p,p_p=simplex_fit(['D','M','S','P'])
+          p_only=te['P']
+
+          def audit(X):
+              Z=StandardScaler().fit_transform(X)
+              sv=np.linalg.svd(Z,compute_uv=False)
+              rank=int(np.linalg.matrix_rank(Z))
+              cond=float(sv[0]/sv[-1]) if sv[-1]>0 else float('inf')
+              return {'features':int(X.shape[1]),'rank':rank,'condition':cond}
+
+          out={
+            'rows':int(len(raw)),'train_targets':int(len(train_ep)),'test_targets':int(len(test_ep)),
+            'selected_lambdas':chosen,
+            'audits':{b:audit(tr[b]) for b in ['D','M','S']},
+            'persistence':metrics(p_only),
+            'prism_DMS':{'weights':w_no,'metrics':metrics(p_no)},
+            'prism_DMSP':{'weights':w_p,'metrics':metrics(p_p)}
+          }
+          print(json.dumps(out,indent=2))
+          open('prism_target_history.json','w').write(json.dumps(out,indent=2))
+          PY
+          python run_prism_target_history.py | tee prism_target_history.log
+
+      - name: Patch author RTA-TCN to corrected parser plus the same causal previous-y channel
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('RTA-TCN-DC.py')
+          s=p.read_text()
+          s=s.replace("data = pd.read_csv('Debutanizer_Data.txt', sep='\\s+')",
+                      "data = pd.read_csv('Debutanizer_Data.txt', sep='\\\\s+', header=None)")
+          old="""train_X = x_temp[:TRAIN_SIZE, :]\ny_train = y_temp[:TRAIN_SIZE]\ntrain_y = y_train[SEQ_LEN-1:TRAIN_SIZE]\n\ntest_X = x_temp[TRAIN_SIZE-SEQ_LEN+1:, :]\ny_test = y_temp[TRAIN_SIZE:]\ny_test = y_test.reshape(-1, 1)"""
+          new="""x_new = np.zeros([data.shape[0], 8])\nx_new[:, :7] = x_temp\nx_new[0, 7] = y_temp[0]\nx_new[1:, 7] = y_temp[:-1]\n\ntrain_X = x_new[:TRAIN_SIZE, :]\ny_train = y_temp[:TRAIN_SIZE]\ntrain_y = y_train[SEQ_LEN-1:TRAIN_SIZE]\n\ntest_X = x_new[TRAIN_SIZE-SEQ_LEN+1:, :]\ny_test = y_temp[TRAIN_SIZE:]\ny_test = y_test.reshape(-1, 1)"""
+          if old not in s: raise SystemExit('train/test block not found')
+          s=s.replace(old,new)
+          oldmdl="mdl = TCANModel(input_size=7, output_size=1, num_channels=[40, 40, 40], seq_length=SEQ_LEN, n_epoch=240, batch_size=64,"
+          newmdl="mdl = TCANModel(input_size=8, output_size=1, num_channels=[40, 40, 40], seq_length=SEQ_LEN, n_epoch=240, batch_size=64,"
+          if oldmdl not in s: raise SystemExit('model line not found')
+          s=s.replace(oldmdl,newmdl)
+          p.write_text(s)
+          PY
+          grep -n "read_csv\|x_new\|TCANModel(input_size=8" RTA-TCN-DC.py | head -n 20
+
+      - name: Run RTA-TCN with same target-history information
+        run: |
+          set -o pipefail
+          python RTA-TCN-DC.py 2>&1 | tee rta_tcn_target_history.log
+
+      - name: Build auditable result report
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,re
+          from pathlib import Path
+          prism=json.loads(Path('prism_target_history.json').read_text())
+          log=Path('rta_tcn_target_history.log').read_text(errors='replace') if Path('rta_tcn_target_history.log').exists() else ''
+          rmses=[float(x) for x in re.findall(r'RMSE:\s*([0-9.eE+-]+)',log)]
+          r2s=[float(x) for x in re.findall(r'相关系数：\s*([0-9.eE+-]+)',log)]
+          rta={'train_rmse':rmses[-2] if len(rmses)>=2 else None,'test_rmse':rmses[-1] if rmses else None,
+               'train_r2':r2s[-2] if len(r2s)>=2 else None,'test_r2':r2s[-1] if r2s else None}
+          out={'prism':prism,'rta_tcn':rta}
+          Path('target_history_combined.json').write_text(json.dumps(out,indent=2))
+          md=f'''# PRISM v2.2(beta) vs RTA-TCN — target-history-enabled Debutanizer\n\nStatus: benchmark-branch evidence only.\n\n## Information contract\nBoth models receive the same 40-sample window of 7 process variables plus one strictly causal previous-target channel `x8[t]=y[t-1]`. The current target `y[t]` is never an input. Parser is corrected with `header=None`; train boundary and RTA-TCN training settings are otherwise unchanged.\n\n## PRISM results\n- Persistence-only: RMSE `{prism['persistence']['rmse']:.9f}`, R2 `{prism['persistence']['r2']:.9f}`.\n- D/M/S only: RMSE `{prism['prism_DMS']['metrics']['rmse']:.9f}`, R2 `{prism['prism_DMS']['metrics']['r2']:.9f}`.\n- D/M/S + legal persistence anchor: RMSE `{prism['prism_DMSP']['metrics']['rmse']:.9f}`, R2 `{prism['prism_DMSP']['metrics']['r2']:.9f}`.\n- D/M/S weights: `{prism['prism_DMS']['weights']}`.\n- D/M/S/P weights: `{prism['prism_DMSP']['weights']}`.\n- Selected lambdas: `{prism['selected_lambdas']}`.\n- Numerical audits: `{prism['audits']}`.\n\n## RTA-TCN result with same previous-target channel\n- Train RMSE: `{rta['train_rmse']}`\n- Train R2: `{rta['train_r2']}`\n- Test RMSE: `{rta['test_rmse']}`\n- Test R2: `{rta['test_r2']}`\n\n## Important interpretation\nThis is a legal past-target-state experiment, not target leakage: `y[t]` is never supplied to either model. The persistence anchor uses only `y[t-1]`.\n'''
+          Path('TARGET_HISTORY_MATCHED_RESULT.md').write_text(md)
+          print(md)
+          PY
+
+      - name: Checkout benchmark branch after external-code execution
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          ref: prism-v2-2-beta-debutanizer-benchmark-20260824
+          path: repo
+
+      - name: Commit result back to isolated benchmark branch
+        if: always()
+        run: |
+          mkdir -p repo/PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824
+          cp TARGET_HISTORY_MATCHED_RESULT.md repo/PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824/ || true
+          cp target_history_combined.json repo/PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824/ || true
+          cd repo
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824/
+          git diff --cached --quiet && exit 0
+          git commit -m 'benchmark: record target-history matched Debutanizer result'
+          git push origin HEAD:prism-v2-2-beta-debutanizer-benchmark-20260824
