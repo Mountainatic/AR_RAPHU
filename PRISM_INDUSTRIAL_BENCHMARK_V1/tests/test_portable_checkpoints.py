@@ -77,10 +77,15 @@ def test_level_delta_metric_identity_and_persistence() -> None:
     assert "variance_ratio" in result
 
 
-def _formal_record(model: str, level_r2: float, support: str = "support") -> dict:
+def _formal_record(
+    model: str,
+    level_r2: float,
+    support: str = "support",
+    namespace: str = "public",
+) -> dict:
     return {
         "status": "PASS",
-        "namespace": "public",
+        "namespace": namespace,
         "dataset": "sru",
         "target_head": "SRU_H2S_REP_H1__H1__W1",
         "information_set": "input_only",
@@ -109,6 +114,21 @@ def test_support_acceptance_rejects_method_row_or_order_drift() -> None:
     records = [_formal_record("A", 0.5), _formal_record("B", 0.6, "different")]
     with pytest.raises(RuntimeError, match="SUPPORT_MISMATCH"):
         _support_acceptance(records)
+
+
+def test_support_acceptance_separates_cz_directions() -> None:
+    records = [
+        _formal_record("A", 0.5, "rod1-support", "cz:Rod_1_to_Rod_2"),
+        _formal_record("B", 0.6, "rod1-support", "cz:Rod_1_to_Rod_2"),
+        _formal_record("A", 0.7, "rod2-support", "cz:Rod_2_to_Rod_1"),
+        _formal_record("B", 0.8, "rod2-support", "cz:Rod_2_to_Rod_1"),
+    ]
+    audits = _support_acceptance(records)
+    assert len(audits) == 2
+    assert {tuple(item["view"][:1]) for item in audits} == {
+        ("cz:Rod_1_to_Rod_2",),
+        ("cz:Rod_2_to_Rod_1",),
+    }
 
 
 def test_out_of_scope_artifact_guard(tmp_path) -> None:

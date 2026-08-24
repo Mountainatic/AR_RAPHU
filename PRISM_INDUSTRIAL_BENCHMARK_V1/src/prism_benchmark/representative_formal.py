@@ -603,11 +603,12 @@ def require_checkpoint_manifest(run_root: Path) -> dict[str, Any]:
 
 
 def _support_acceptance(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    groups: dict[tuple[str, str, str, str, str], list[dict[str, Any]]] = {}
+    groups: dict[tuple[str, str, str, str, str, str], list[dict[str, Any]]] = {}
     for record in records:
         if record.get("status") != "PASS":
             continue
         key = (
+            str(record["namespace"]),
             str(record["dataset"]),
             str(record["target_head"]),
             str(record["information_set"]),
