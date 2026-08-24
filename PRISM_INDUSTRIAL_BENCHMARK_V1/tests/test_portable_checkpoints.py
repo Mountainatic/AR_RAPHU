@@ -19,6 +19,7 @@ from prism_benchmark.representative_formal import (
     _rankings,
     _support_acceptance,
 )
+from prism_benchmark.representative_prism_checkpoints import _predict_joint
 
 
 def _fixture() -> tuple[np.ndarray, np.ndarray]:
@@ -111,3 +112,23 @@ def test_out_of_scope_artifact_guard(tmp_path) -> None:
     (tmp_path / "stage2_output.json").write_text("{}", encoding="utf-8")
     with pytest.raises(RuntimeError, match="OUT_OF_SCOPE_ARTIFACT"):
         _assert_no_out_of_scope_artifacts(tmp_path)
+
+
+def test_joint_replay_uses_frozen_slice_order_not_json_key_order() -> None:
+    blocks = {
+        "K": np.array([[1.0], [2.0]]),
+        "W": np.array([[10.0], [20.0]]),
+        "A": np.array([[100.0], [200.0]]),
+    }
+    contract = {
+        # Deliberately mimic alphabetically sorted checkpoint JSON.
+        "block_slices": {"A": [2, 3], "K": [0, 1], "W": [1, 2]},
+        "blocks": {
+            name: {"mean": [0.0], "scale": [1.0]} for name in blocks
+        },
+        "coefficient": [1.0, 2.0, 3.0],
+        "intercept": 4.0,
+    }
+    observed = _predict_joint(blocks, contract)
+    expected = np.array([325.0, 646.0])
+    assert np.array_equal(observed, expected)

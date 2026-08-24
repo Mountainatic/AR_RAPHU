@@ -243,7 +243,13 @@ def _w_basis_from_contract(latent: np.ndarray, contract: Mapping[str, Any]) -> n
 
 def _predict_joint(blocks: Mapping[str, np.ndarray], contract: Mapping[str, Any]) -> np.ndarray:
     pieces: list[np.ndarray] = []
-    for block in contract["block_slices"]:
+    # JSON checkpoint serialization sorts mapping keys. Reconstruct the fitted
+    # design from the frozen slice offsets, not from post-reload key order.
+    ordered_blocks = sorted(
+        contract["block_slices"],
+        key=lambda block: int(contract["block_slices"][block][0]),
+    )
+    for block in ordered_blocks:
         matrix = np.asarray(blocks[block], dtype=np.float64)
         block_contract = contract["blocks"][block]
         pieces.append(
