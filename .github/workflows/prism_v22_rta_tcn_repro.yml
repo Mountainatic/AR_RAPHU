@@ -8,7 +8,8 @@ on:
       - '.github/workflows/prism_v22_rta_tcn_repro.yml'
   workflow_dispatch:
 
-permissions: {}
+permissions:
+  contents: write
 
 jobs:
   rta-tcn-exact-author:
@@ -33,27 +34,56 @@ jobs:
         run: |
           curl -fsSL https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/DC/RTA-TCN-DC.py -o RTA-TCN-DC.py
           curl -fsSL https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/DC/Debutanizer_data.txt -o Debutanizer_data.txt
-          # The paper reports a Windows environment. The script requests Debutanizer_Data.txt
-          # while the repository stores Debutanizer_data.txt. Copy only to reproduce Windows
-          # case-insensitive filename semantics; no model/training semantics are changed.
+          # The paper reports Windows. Its script requests Debutanizer_Data.txt while
+          # GitHub stores Debutanizer_data.txt. This copy reproduces Windows filename semantics.
           cp Debutanizer_data.txt Debutanizer_Data.txt
-          sha256sum RTA-TCN-DC.py Debutanizer_data.txt
-          wc -l Debutanizer_data.txt
+          sha256sum RTA-TCN-DC.py Debutanizer_data.txt > source_sha256.txt
+          wc -l Debutanizer_data.txt > data_rows.txt
 
       - name: Run exact author implementation
+        id: author_run
+        continue-on-error: true
         run: |
           set -o pipefail
           python RTA-TCN-DC.py 2>&1 | tee rta_tcn_exact_author.log
 
-      - name: Extract final reported metrics
+      - name: Build persistent result record
         if: always()
         run: |
-          echo '=== Tail ==='
-          tail -n 30 rta_tcn_exact_author.log || true
-          echo '=== Metric lines ==='
-          grep -E 'MSE|RMSE|相关系数|Optimization finished|总耗时' rta_tcn_exact_author.log || true
+          TEST_RMSE="$(grep 'RMSE:' rta_tcn_exact_author.log 2>/dev/null | tail -n 1 | sed 's/.*RMSE:[[:space:]]*//' || true)"
+          TEST_R2="$(grep '相关系数' rta_tcn_exact_author.log 2>/dev/null | tail -n 1 | sed 's/.*：[[:space:]]*//' || true)"
+          TRAIN_RMSE="$(grep 'RMSE:' rta_tcn_exact_author.log 2>/dev/null | head -n 1 | sed 's/.*RMSE:[[:space:]]*//' || true)"
+          TRAIN_R2="$(grep '相关系数' rta_tcn_exact_author.log 2>/dev/null | head -n 1 | sed 's/.*：[[:space:]]*//' || true)"
+          {
+            echo '# RTA-TCN exact-author reproduction'
+            echo
+            echo '- Source: CHM00/RTA-TCN-and-JITL-RTA-TCN, `DC/RTA-TCN-DC.py`.'
+            echo '- Data: author-published `DC/Debutanizer_data.txt`.'
+            echo '- Parser semantics: exact author `pd.read_csv(..., sep="\\s+")` without `header=None`.'
+            echo '- Linux compatibility only: copied `Debutanizer_data.txt` to `Debutanizer_Data.txt` to emulate the paper-reported Windows case-insensitive filesystem.'
+            echo '- Model/training semantics otherwise unmodified, including seed 1024, sequence length 40, 240 epochs, batch size 64 and the author optimizer definition.'
+            echo "- Workflow run outcome: ${{ steps.author_run.outcome }}"
+            echo
+            echo '## Metrics printed by author code'
+            echo
+            echo "- Train RMSE: ${TRAIN_RMSE:-NOT_AVAILABLE}"
+            echo "- Train R2: ${TRAIN_R2:-NOT_AVAILABLE}"
+            echo "- Test RMSE: ${TEST_RMSE:-NOT_AVAILABLE}"
+            echo "- Test R2: ${TEST_R2:-NOT_AVAILABLE}"
+            echo
+            echo '## Source hashes'
+            echo '```text'
+            cat source_sha256.txt 2>/dev/null || true
+            cat data_rows.txt 2>/dev/null || true
+            echo '```'
+            echo
+            echo '## Reproduction log tail'
+            echo '```text'
+            tail -n 50 rta_tcn_exact_author.log 2>/dev/null || true
+            echo '```'
+          } > /tmp/RTA_TCN_EXACT_AUTHOR_RESULT.md
 
-      - name: Upload reproduction log and predictions
+      - name: Upload log and predictions
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -64,3 +94,26 @@ jobs:
             OFFLINE y_true.txt
             OFFLINE error.txt
           if-no-files-found: warn
+
+      # Checkout happens only after the externally published author script has finished.
+      # The author script therefore never receives a checked-out repository or persisted git credential.
+      - name: Checkout benchmark branch after execution
+        if: always()
+        uses: actions/checkout@v4
+        with:
+          ref: prism-v2-2-beta-debutanizer-benchmark-20260824
+
+      - name: Commit reproduction record
+        if: always()
+        run: |
+          mkdir -p PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824
+          cp /tmp/RTA_TCN_EXACT_AUTHOR_RESULT.md PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824/RTA_TCN_EXACT_AUTHOR_RESULT.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_debutanizer_rta_tcn_20260824/RTA_TCN_EXACT_AUTHOR_RESULT.md
+          if git diff --cached --quiet; then
+            echo 'No result change to commit.'
+          else
+            git commit -m 'benchmark: record exact-author RTA-TCN reproduction'
+            git push origin HEAD:prism-v2-2-beta-debutanizer-benchmark-20260824
+          fi
