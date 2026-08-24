@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
 import os
 import shutil
@@ -75,6 +76,21 @@ def _file_inventory(root: Path) -> list[dict[str, Any]]:
     ]
 
 
+def _installed_dependency_inventory() -> list[str]:
+    """Return a deterministic environment snapshot without requiring pip.
+
+    uv-managed environments intentionally need not contain the pip module.  The
+    authoritative resolver state is still sealed by pyproject.toml + uv.lock;
+    this inventory records the distributions actually importable at launch.
+    """
+    installed = {
+        f"{name}=={distribution.version}"
+        for distribution in importlib.metadata.distributions()
+        if (name := distribution.metadata.get("Name"))
+    }
+    return sorted(installed, key=str.casefold)
+
+
 def _input_manifest(args: argparse.Namespace) -> dict[str, Any]:
     commit = subprocess.run(
         ["git", "-C", str(PROJECT.parent), "rev-parse", "HEAD"],
@@ -90,12 +106,10 @@ def _input_manifest(args: argparse.Namespace) -> dict[str, Any]:
     ).stdout.strip()
     if dirty:
         raise RuntimeError("STOP_FORMAL_PROJECT_WORKTREE_NOT_CLEAN")
-    dependencies = subprocess.run(
-        [sys.executable, "-m", "pip", "freeze", "--all"],
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.splitlines()
+    dependencies = _installed_dependency_inventory()
+    repository_root = PROJECT.parent
+    pyproject_path = repository_root / "pyproject.toml"
+    uv_lock_path = repository_root / "uv.lock"
     protocol_files = [
         PROJECT / "configs" / "representative_horizon_stage1_tep_sru_cpu.json",
         PROJECT / "configs" / "representative_horizon_stage1_tep_sru_c1_tasks.json",
@@ -117,6 +131,12 @@ def _input_manifest(args: argparse.Namespace) -> dict[str, Any]:
         "source_commit": commit,
         "worktree_clean": True,
         "python": sys.version,
+        "python_executable": str(Path(sys.executable).resolve()),
+        "runtime_manager": os.environ.get("AR_RAPHU_RUNTIME_MANAGER"),
+        "virtual_environment": os.environ.get("VIRTUAL_ENV"),
+        "uv_executable": os.environ.get("AR_RAPHU_UV_EXECUTABLE"),
+        "pyproject_sha256": _sha256(pyproject_path),
+        "uv_lock_sha256": _sha256(uv_lock_path),
         "dependency_lock": dependencies,
         "dependency_lock_sha256": hashlib.sha256(
             "\n".join(dependencies).encode("utf-8")

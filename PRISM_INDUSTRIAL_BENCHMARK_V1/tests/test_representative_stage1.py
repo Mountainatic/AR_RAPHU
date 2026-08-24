@@ -4,6 +4,7 @@ import json
 import sys
 from collections import defaultdict
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -22,6 +23,7 @@ from prism_benchmark.representative_formal import checkpoint_namespace_root
 from prism_benchmark.v211_representative_stage1_config import (
     load_representative_stage1_descriptor,
 )
+from scripts import launch_representative_stage1_formal as formal_launcher
 
 
 CONFIG = PROJECT / "configs/representative_horizon_stage1_tep_sru_c1_tasks.json"
@@ -125,3 +127,21 @@ def test_cz_pilot_contains_both_directions_and_is_single_dataset(tmp_path: Path)
         "cz:Rod_2_to_Rod_1",
     ]
     assert all(len(candidates) == 2 for _, _, candidates in views)
+
+
+def test_formal_dependency_inventory_does_not_require_pip(monkeypatch) -> None:
+    distributions = [
+        SimpleNamespace(metadata={"Name": "zeta"}, version="2.0"),
+        SimpleNamespace(metadata={"Name": "Alpha"}, version="1.0"),
+        SimpleNamespace(metadata={"Name": "Alpha"}, version="1.0"),
+        SimpleNamespace(metadata={}, version="ignored"),
+    ]
+    monkeypatch.setattr(
+        formal_launcher.importlib.metadata,
+        "distributions",
+        lambda: distributions,
+    )
+    assert formal_launcher._installed_dependency_inventory() == [
+        "Alpha==1.0",
+        "zeta==2.0",
+    ]
