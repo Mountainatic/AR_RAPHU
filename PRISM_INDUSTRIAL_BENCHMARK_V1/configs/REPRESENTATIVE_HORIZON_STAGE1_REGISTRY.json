@@ -1,16 +1,25 @@
 {
-  "schema_version": "1.1",
-  "protocol_id": "REPRESENTATIVE_HORIZON_STAGE1",
+  "schema_version": "1.2",
+  "protocol_id": "REPRESENTATIVE_STAGE1_TEP_SRU_CZ_L256_FORMAL_V1",
   "evidence_class": "POST_HOC_HORIZON_EXTENSION_WITH_PREDECLARED_SETTINGS",
-  "status": "REGISTRY_FROZEN_BEFORE_PARTIAL_DEVELOPMENT",
-  "user_override_2026_08_23": {
+  "status": "FORMAL_RERUN_PROTOCOL_FROZEN_BEFORE_FRESH_C1",
+  "user_override_2026_08_24": {
     "field": "CZ task semantics",
-    "supersedes_prompt2_cz_h120": true,
-    "value": "raw 2-second H1 absolute-level forecast with fixed L128 history"
+    "supersedes_prompt2_cz_h120_and_l128_direct_level": true,
+    "value": "raw 2-second L256 past-only delta-nowcast with reconstructed-level primary R2"
   },
+  "active_datasets": ["tep", "sru", "cz_czochralski"],
+  "reserved_datasets": {
+    "debutanizer": "NOT_RUN_BY_USER_SCOPE",
+    "pmsm": "NOT_RUN_BY_USER_SCOPE",
+    "metropt": "NOT_RUN_BY_USER_SCOPE"
+  },
+  "neural3_status": "NOT_RUN_BY_USER_SCOPE",
+  "stage2_status": "NOT_RUN_BY_USER_SCOPE",
   "tasks": [
     {
       "task_id": "TEP_G_REP_H1",
+      "execution_status": "ACTIVE_FRESH_RERUN",
       "parent_task_id": "TEP_G12",
       "dataset": "tep",
       "target_representation": "REGISTERED_CHANGE",
@@ -23,6 +32,7 @@
     },
     {
       "task_id": "DEB_C4_REP_H3",
+      "execution_status": "NOT_RUN_BY_USER_SCOPE",
       "parent_task_id": "DEB_C4",
       "dataset": "debutanizer",
       "target_representation": "REGISTERED_CHANGE",
@@ -35,6 +45,7 @@
     },
     {
       "task_id": "SRU_H2S_REP_H1",
+      "execution_status": "ACTIVE_FRESH_RERUN",
       "parent_task_id": "SRU_H2S",
       "dataset": "sru",
       "target_representation": "REGISTERED_CHANGE",
@@ -47,6 +58,7 @@
     },
     {
       "task_id": "SRU_SO2_REP_H1",
+      "execution_status": "ACTIVE_FRESH_RERUN",
       "parent_task_id": "SRU_SO2",
       "dataset": "sru",
       "target_representation": "REGISTERED_CHANGE",
@@ -59,6 +71,7 @@
     },
     {
       "task_id": "PMSM_PM_REP_H10",
+      "execution_status": "NOT_RUN_BY_USER_SCOPE",
       "parent_task_id": "PMSM_PM5",
       "dataset": "pmsm",
       "target_representation": "REGISTERED_CHANGE",
@@ -71,6 +84,7 @@
     },
     {
       "task_id": "METRO_P_REP_H360",
+      "execution_status": "NOT_RUN_BY_USER_SCOPE",
       "parent_task_id": "METRO_P60",
       "dataset": "metropt",
       "target_representation": "REGISTERED_CHANGE",
@@ -83,6 +97,7 @@
     },
     {
       "task_id": "METRO_OIL_REP_H360",
+      "execution_status": "NOT_RUN_BY_USER_SCOPE",
       "parent_task_id": "METRO_OIL20",
       "dataset": "metropt",
       "target_representation": "REGISTERED_CHANGE",
@@ -94,18 +109,23 @@
       "changed_field": "horizon_only"
     },
     {
-      "task_id": "CZ_DIAM_RAW2S_H1_L128",
+      "task_id": "CZ_DIAM_RAW2S_CURRENT_L256",
       "parent_task_id": "CZ_D20",
+      "execution_status": "ACTIVE_FRESH_RERUN",
       "dataset": "cz_czochralski",
-      "target_representation": "DIRECT_ABSOLUTE_LEVEL",
-      "target_semantics": "D(t+2s)",
+      "target_representation": "DELTA_FROM_LAST_OBSERVED_LEVEL",
+      "target_semantics": "D[t]-D[t-1] with D[t-1]+delta_pred level reconstruction",
+      "origin_semantics": "current target row t at exclusive history stop",
       "cadence_seconds": 2,
       "aggregation": "NONE_RAW_ROWS",
-      "h_steps": 1,
-      "horizon_seconds": 2,
+      "h_steps": 0,
+      "horizon_seconds": 0,
       "target_window_steps": 1,
-      "lookback_steps": 128,
-      "lookback_seconds": 256,
+      "lookback_steps": 256,
+      "lookback_seconds": 512,
+      "history_interval": "[t-256,t)",
+      "max_input_index": "t-1",
+      "target_index": "t",
       "changed_field": "user_override_target_cadence_horizon_and_history"
     }
   ],

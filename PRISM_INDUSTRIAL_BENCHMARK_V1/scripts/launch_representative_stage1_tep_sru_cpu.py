@@ -140,7 +140,7 @@ def _run(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Build fresh TEP/SRU H1 C1 and run CPU development only."
+        description="Build fresh TEP/SRU representative C1 and run the formal development phase."
     )
     parser.add_argument("--raw-root", type=Path, required=True)
     parser.add_argument("--registry-root", type=Path, required=True)
@@ -159,11 +159,11 @@ def main() -> None:
             status_path,
             {
                 "schema_version": 1,
-                "protocol": "REPRESENTATIVE_HORIZON_STAGE1_TEP_SRU_CPU_DEVELOPMENT_V1",
+                "protocol": "REPRESENTATIVE_STAGE1_TEP_SRU_CZ_L256_FORMAL_V1",
                 "status": "FAILED_RUNTIME_PREFLIGHT",
                 "failed_utc": _utc(),
                 "run_root": str(run_root),
-                "development_only": True,
+                "formal_protocol_development_phase": True,
                 "model_fitting_started": False,
                 "test_accessed": False,
                 "ood_accessed": False,
@@ -176,12 +176,12 @@ def main() -> None:
         raise
     status: dict[str, Any] = {
         "schema_version": 1,
-        "protocol": "REPRESENTATIVE_HORIZON_STAGE1_TEP_SRU_CPU_DEVELOPMENT_V1",
+        "protocol": "REPRESENTATIVE_STAGE1_TEP_SRU_CZ_L256_FORMAL_V1",
         "status": "RUNNING",
         "started_utc": _utc(),
         "run_root": str(run_root),
         "shared": str(shared),
-        "development_only": True,
+        "formal_protocol_development_phase": True,
         "neural_in_scope": False,
         "test_accessed": False,
         "ood_accessed": False,

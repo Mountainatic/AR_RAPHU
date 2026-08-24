@@ -13,6 +13,9 @@ sys.path.insert(0, str(PROJECT / "src"))
 
 from prism_benchmark.c1_builder import _selected_datasets
 from prism_benchmark.c1_contracts import realize_heads
+from prism_benchmark.v211_representative_stage1_config import (
+    load_representative_stage1_descriptor,
+)
 
 
 CONFIG = PROJECT / "configs/representative_horizon_stage1_tep_sru_c1_tasks.json"
@@ -73,3 +76,20 @@ def test_representative_stage1_subset_selects_only_tep_and_sru() -> None:
 def test_representative_stage1_refuses_existing_c1_output() -> None:
     value = json.loads(CONFIG.read_text(encoding="utf-8"))
     assert value["output_policy"] == "REFUSE_EXISTING"
+
+
+def test_formal_scope_registers_only_tep_sru_cz_as_active() -> None:
+    value = load_representative_stage1_descriptor(PROJECT)
+    assert value["active_datasets"] == ["tep", "sru", "cz_czochralski"]
+    assert set(value["primary_tasks"]) == {
+        "TEP_G_REP_H1",
+        "SRU_H2S_REP_H1",
+        "SRU_SO2_REP_H1",
+        "CZ_DIAM_RAW2S_CURRENT_L256",
+    }
+    assert value["reserved_datasets"] == {
+        "debutanizer": "NOT_RUN_BY_USER_SCOPE",
+        "pmsm": "NOT_RUN_BY_USER_SCOPE",
+        "metropt": "NOT_RUN_BY_USER_SCOPE",
+    }
+    assert value["neural3_status"] == "NOT_RUN_BY_USER_SCOPE"

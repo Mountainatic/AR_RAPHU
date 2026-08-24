@@ -1,6 +1,6 @@
 {
   "contract_status": "C1_SEMANTICS_APPROVED",
-  "protocol_id": "REPRESENTATIVE_HORIZON_STAGE1_TEP_SRU_CPU_DEVELOPMENT_V1",
+  "protocol_id": "REPRESENTATIVE_STAGE1_TEP_SRU_CZ_L256_FORMAL_V1",
   "evidence_class": "POST_HOC_HORIZON_EXTENSION_WITH_PREDECLARED_SETTINGS",
   "target_index_contract": "HALF_OPEN_V1",
   "time_realization_contract": "ROUND_HALF_UP_V1",

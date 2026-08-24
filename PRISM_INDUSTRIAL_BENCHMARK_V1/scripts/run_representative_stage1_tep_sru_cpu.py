@@ -25,7 +25,7 @@ from prism_benchmark.v211_public_all_baselines import (
     run_public_all_baseline_development,
 )
 from prism_benchmark.v211_representative_stage1_config import (
-    PRIMARY_TASKS,
+    PUBLIC_PRIMARY_TASKS,
     RepresentativeStage1Paths,
     load_representative_stage1_descriptor,
 )
@@ -140,11 +140,11 @@ def run_scope(paths: RepresentativeStage1Paths) -> dict[str, Any]:
     tasks = sorted(
         {view.head.task_id for view in [*input_views, *dynamic_views]}
     )
-    if tasks != sorted(PRIMARY_TASKS):
+    if tasks != sorted(PUBLIC_PRIMARY_TASKS):
         raise RuntimeError("representative Stage-1 task scope changed")
     result = {
         "status": "PASS",
-        "stage": "REPRESENTATIVE_STAGE1_TEP_SRU_CPU_SCOPE",
+        "stage": "REPRESENTATIVE_STAGE1_TEP_SRU_DEVELOPMENT_SCOPE",
         "protocol_id": descriptor["protocol_id"],
         "config_sha256": descriptor["config_sha256"],
         "base_commit": descriptor["base_commit"],
@@ -152,7 +152,7 @@ def run_scope(paths: RepresentativeStage1Paths) -> dict[str, Any]:
         "input_views": len(input_views),
         "dynamic_views": len(dynamic_views),
         "k_channel_jobs": len(k_jobs),
-        "development_only": True,
+        "formal_protocol_development_phase": True,
         "neural_in_scope": False,
         "test_accessed": False,
         "ood_accessed": False,
