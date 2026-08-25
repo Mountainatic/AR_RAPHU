@@ -8,6 +8,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -44,7 +45,12 @@ from prism_benchmark.representative_prism_checkpoints import (
     predict_prism_checkpoint_for_view,
 )
 from prism_benchmark.cpu_data import sha256_file
+from prism_benchmark.level_reconstruction import (
+    metric_bundle_delta_and_level,
+    support_hash,
+)
 from prism_benchmark.stage0 import write_json
+from prism_benchmark.v211_support import support_id_hash
 from prism_benchmark.v211_representative_stage1_config import (
     load_representative_stage1_descriptor,
 )
@@ -118,9 +124,17 @@ def _worker(args: argparse.Namespace) -> None:
         original = baseline_module.baseline_candidates
         baseline_module.baseline_candidates = lambda _view: selected
         try:
-            records = baseline_module.predict_baseline_checkpoints_for_view(
-                paths, view, checkpoint_root, split="test"
-            )
+            records = [
+                _predict_one_baseline_chunked(
+                    formal_root=args.run_root,
+                    paths=paths,
+                    view=view,
+                    checkpoint_root=checkpoint_root,
+                    model=str(selected[0][1]),
+                    output_model=str(selected[0][2]),
+                    split="test",
+                )
+            ]
         finally:
             baseline_module.baseline_candidates = original
     else:
@@ -138,6 +152,176 @@ def _worker(args: argparse.Namespace) -> None:
             "records": records,
         },
     )
+
+
+def _predict_one_baseline_chunked(
+    *,
+    formal_root: Path,
+    paths: Any,
+    view: Any,
+    checkpoint_root: Path,
+    model: str,
+    output_model: str,
+    split: str,
+) -> dict[str, Any]:
+    baseline_module.assert_inference_only()
+    checkpoint = baseline_module._checkpoint_dir(checkpoint_root, view, output_model)
+    if not checkpoint.is_dir():
+        return {
+            "status": (
+                "NOT_RUN_PROTOCOL_INCOMPATIBLE"
+                if model not in baseline_module.FORMAL_COMPATIBLE
+                else "FAILED_RETAINED"
+            ),
+            "model": output_model,
+            "reason": "SEALED_CHECKPOINT_ABSENT",
+            "test_accessed": False,
+        }
+    started = time.time()
+    state, arrays, manifest = baseline_module.load_portable_checkpoint(checkpoint)
+    samples = baseline_module._common_test(paths, view, split)
+    feature = state["feature"]
+    family = str(feature["family"])
+    columns = list(feature.get("columns", []))
+    target_state_families = {"TARGET_STATE", "ARX", "LINEAR_NARX"}
+    accessor_columns = (
+        list(dict.fromkeys([view.head.target, *columns]))
+        if family in target_state_families
+        else columns
+    )
+    accessor = None
+    if family != "NONE":
+        accessor = baseline_module.BaseAccessor(
+            paths.shared,
+            view.head.dataset,
+            split,
+            accessor_columns or [view.head.target],
+        )
+
+    native_xgboost = None
+    if state["codec"] == "XGBOOST_NATIVE_JSON":
+        from xgboost import XGBRegressor
+
+        native_xgboost = XGBRegressor()
+        native_xgboost.load_model(checkpoint / "xgboost.json")
+
+    destination = (
+        baseline_module._prediction_root(paths, split, baseline=True)
+        / view.relative_root
+        / f"{output_model}.y_pred.fp64.npy"
+    )
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_suffix(destination.suffix + ".tmp")
+    predictions = np.lib.format.open_memmap(
+        temporary, mode="w+", dtype=np.float64, shape=(len(samples),)
+    )
+    chunk_rows = int(os.environ.get("PRISM_LOW_MEMORY_TEST_CHUNK_ROWS", "50000"))
+    for start in range(0, len(samples), chunk_rows):
+        stop = min(start + chunk_rows, len(samples))
+        chunk = samples.iloc[start:stop]
+        if family == "NONE":
+            x = np.zeros((len(chunk), 0), dtype=np.float64)
+        elif family == "SNAPSHOT_T_MINUS_1":
+            x = accessor.snapshot(chunk, columns)
+        elif family == "INPUT_LAGS":
+            x = accessor.input_lags(
+                chunk,
+                columns,
+                int(feature["history"]),
+                int(feature["maximum_lags"]),
+            )
+        elif family == "HAMMERSTEIN":
+            raw = accessor.input_regular_lags(
+                chunk,
+                columns,
+                *tuple(feature["profile"]),
+                int(feature["maximum_lags"]),
+            )
+            x = baseline_module._nonlinear_predict(
+                raw, feature["nonlinear"], baseline_module._prefixed(arrays, "p0__")
+            )
+            del raw
+        elif family == "TARGET_STATE":
+            x = accessor.target_state(
+                chunk, view.head.target, *tuple(feature["profile"])
+            )
+        elif family in {"ARX", "LINEAR_NARX"}:
+            raw, _ = baseline_module._arx_features(
+                accessor,
+                chunk,
+                view,
+                columns,
+                tuple(feature["profile"]),
+                int(feature["maximum_input_lags"]),
+            )
+            if family == "ARX":
+                x = (
+                    raw[:, : int(feature["feature_width"])]
+                    if "feature_width" in feature
+                    else raw
+                )
+            else:
+                standardized = (raw - arrays["raw_mean"]) / arrays["raw_scale"]
+                selected_features = arrays["selected_features"].astype(np.int64)
+                selected_values = standardized[:, selected_features]
+                x = np.concatenate([selected_values, np.square(selected_values)], axis=1)
+                del standardized, selected_features, selected_values
+            if x is not raw:
+                del raw
+        else:
+            raise ValueError(f"unknown feature family: {family}")
+        prediction = (
+            np.asarray(native_xgboost.predict(x), dtype=np.float64)
+            if native_xgboost is not None
+            else baseline_module._predict_loaded(checkpoint, x, state, arrays)
+        )
+        predictions[start:stop] = prediction
+        del chunk, x, prediction
+        gc.collect()
+    predictions.flush()
+    del predictions
+    os.replace(temporary, destination)
+    prediction = np.load(destination, mmap_mode="r")
+    if prediction.shape != (len(samples),) or prediction.dtype != np.float64:
+        raise RuntimeError(f"STOP_LOW_MEMORY_DIRECT_RELOAD:{destination}")
+    current_levels = baseline_module._current_levels(paths, view, samples, split)
+    metrics = metric_bundle_delta_and_level(
+        samples["y_true"].to_numpy(dtype=np.float64), prediction, current_levels
+    )
+    metrics.pop("future_level_true")
+    metrics.pop("future_level_pred")
+    record = {
+        "status": "PASS",
+        "dataset": view.head.dataset,
+        "target_head": view.head.head_id,
+        "information_set": view.information_set,
+        "availability_scenario": view.availability_scenario,
+        "proxy_policy": view.proxy_policy,
+        "model": output_model,
+        "split": split,
+        "rows": int(len(samples)),
+        "sample_id_order_hash": support_hash(samples["view_sample_id"].astype(str)),
+        "scoring_support_hash": support_id_hash(samples),
+        "fit_support_hash": state["fit_support_hash"],
+        "checkpoint_hash": manifest["checkpoint_hash"],
+        "checkpoint_dir": str(checkpoint),
+        "prediction_path": str(destination.relative_to(formal_root)),
+        "prediction_sha256": sha256_file(destination),
+        "prediction_bytes": destination.stat().st_size,
+        "prediction_storage": "NPY_FP64_Y_PRED_ONLY",
+        "sample_identity_storage": "ROWS_AND_ORDER_HASH_IN_METHOD_RECORD",
+        "test_accessed": split == "test",
+        "ood_accessed": split == "ood",
+        "fit_called_in_inference": False,
+        "elapsed_seconds": time.time() - started,
+        "low_memory_chunk_rows": chunk_rows,
+        **metrics,
+    }
+    write_json(
+        destination.parent / f"{output_model}.LOW_MEMORY_INFERENCE_RESULT.json",
+        {"status": "PASS", "model": record, "inference_only": True},
+    )
+    return record
 
 
 def _target_worker(args: argparse.Namespace) -> None:
@@ -161,6 +345,15 @@ def _compact_prediction(
 ) -> dict[str, Any]:
     relative = record.get("prediction_path")
     if record.get("status") != "PASS" or not relative:
+        return record
+    if record.get("prediction_storage") == "NPY_FP64_Y_PRED_ONLY":
+        artifact = formal_root / str(relative)
+        replay = np.load(artifact, mmap_mode="r")
+        if replay.dtype != np.float64 or replay.shape != (int(record["rows"]),):
+            raise RuntimeError(f"STOP_LOW_MEMORY_DIRECT_ARTIFACT_RELOAD:{artifact}")
+        del replay
+        if sha256_file(artifact) != record["prediction_sha256"]:
+            raise RuntimeError(f"STOP_LOW_MEMORY_DIRECT_ARTIFACT_HASH:{artifact}")
         return record
     parquet = (namespace_root / str(relative)).resolve()
     allowed = (formal_root / ("public/final" if "public" in parquet.parts else "cz")).resolve()
