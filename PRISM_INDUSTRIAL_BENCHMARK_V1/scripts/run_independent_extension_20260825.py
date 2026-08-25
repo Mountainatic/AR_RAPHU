@@ -293,7 +293,7 @@ def environment(run_root: Path) -> dict[str, Any]:
 def _imports() -> dict[str, Any]:
     # Delayed imports keep `scope` usable even when a developer only wants to
     # inspect hashes on a machine without the numerical stack.
-    from prism_benchmark.cpu_data import BaseAccessor, HeadSpec, ViewSpec
+    from prism_benchmark.cpu_data import BaseAccessor, HeadSpec, SAMPLE_RUNTIME_COLUMNS, ViewSpec
     from prism_benchmark import v211_representative_stage1_config as representative_config
     representative_config.CONFIG_RELATIVE_PATH = Path(
         "configs/representative_horizon_stage1_tep_sru_cpu_extension_20260825.json"
@@ -322,13 +322,14 @@ def _imports() -> dict[str, Any]:
         fit_prism_checkpoint_for_view,
         predict_prism_checkpoint_for_view,
     )
-    from prism_benchmark.representative_formal import build_common_support_for_views
+    from prism_benchmark.v211_public_all_baselines import apply_common_requirements
+    from prism_benchmark.v211_public_all_closure import view_support_requirements
     from prism_benchmark.v211_a import run_a_view
     from prism_benchmark.v211_c import run_c_view
     from prism_benchmark.v211_config import REPRESENTATIVE_STAGE1_PROTOCOL
     from prism_benchmark.v211_joint_stability import run_joint_stability_view
     from prism_benchmark.v211_public_all_config import PublicAllPaths
-    from prism_benchmark.v211_support import support_id_hash
+    from prism_benchmark.v211_support import SUPPORT_COLUMNS, SUPPORT_CONTRACT, support_id_hash
     from prism_benchmark.v211_w import run_w_view
     return locals()
 
@@ -806,6 +807,65 @@ def formal_freeze(run_root: Path) -> dict[str, Any]:
     return result
 
 
+def _build_safe_common_support_for_views(
+    paths: Any, views: Iterable[Any], mod: Mapping[str, Any]
+) -> dict[str, Any]:
+    metadata_columns = [
+        column for column in mod["SAMPLE_RUNTIME_COLUMNS"] if column != "y_true"
+    ]
+    requested_columns = list(
+        dict.fromkeys([*metadata_columns, *mod["SUPPORT_COLUMNS"]])
+    )
+    records: list[dict[str, Any]] = []
+    for view in views:
+        requirements = mod["view_support_requirements"](paths, view)
+        splits: dict[str, Any] = {}
+        for split in ("train", "validation", "test", "ood"):
+            sample_path = paths.shared / "sample_ids" / view.relative_root / f"{split}.parquet"
+            if not sample_path.is_file():
+                continue
+            source = pd.read_parquet(sample_path, columns=requested_columns)
+            common = (
+                mod["apply_common_requirements"](source, requirements).reset_index(drop=True)
+                if len(source)
+                else source
+            )
+            splits[split] = {
+                "rows": int(len(common)),
+                "source_rows": int(len(source)),
+                "support_hash": mod["support_id_hash"](common),
+                "support_contract": (
+                    str(source["sample_support_contract"].iloc[0])
+                    if len(source)
+                    else mod["SUPPORT_CONTRACT"]
+                ),
+            }
+        records.append(
+            {
+                "target_head": view.head.head_id,
+                "dataset": view.head.dataset,
+                "information_set": view.information_set,
+                "availability_scenario": view.availability_scenario,
+                "proxy_policy": view.proxy_policy,
+                "requirements": [item.to_json() for item in requirements],
+                "splits": splits,
+            }
+        )
+    result = {
+        "status": "PASS",
+        "stage": "FORMAL_COMMON_SUPPORT_REQUIREMENTS_FREEZE",
+        "support_contract": mod["SUPPORT_CONTRACT"],
+        "views": records,
+        "y_true_column_read": False,
+        "test_y_read": False,
+        "ood_y_read": False,
+        "test_accessed": False,
+        "ood_accessed": False,
+    }
+    write_json(paths.leaderboard_support_path, result)
+    return result
+
+
 def freeze_cz_common_support(run_root: Path) -> dict[str, Any]:
     """Derive and seal per-horizon common support after selection freeze."""
 
@@ -836,8 +896,8 @@ def freeze_cz_common_support(run_root: Path) -> dict[str, Any]:
             support = (
                 read_json(paths.leaderboard_support_path)
                 if paths.leaderboard_support_path.exists()
-                else mod["build_common_support_for_views"](
-                    paths, [input_view, dynamic_view]
+                else _build_safe_common_support_for_views(
+                    paths, [input_view, dynamic_view], mod
                 )
             )
             observed_views = {
@@ -861,6 +921,8 @@ def freeze_cz_common_support(run_root: Path) -> dict[str, Any]:
             if (
                 support.get("status") != "PASS"
                 or observed_views != expected_views
+                or support.get("support_contract") != load_config()["support_contract"]
+                or support.get("y_true_column_read") is not False
                 or support.get("test_y_read") is not False
                 or support.get("ood_y_read") is not False
                 or support.get("test_accessed") is not False
