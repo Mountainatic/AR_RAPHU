@@ -233,6 +233,51 @@ def _run_child(command: list[str], env: dict[str, str]) -> None:
     subprocess.run(command, cwd=PROJECT, env=env, check=True)
 
 
+def _existing_target_audit(
+    *, run_root: Path, raw_cz: Path, direction: str
+) -> dict[str, Any] | None:
+    direction_root = run_root / "cz" / "shared" / direction
+    audit_path = direction_root / "CZ_TARGET_TEST_ACCESS_AUDIT.json"
+    if not audit_path.is_file():
+        return None
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    expected = {
+        "status": "PASS",
+        "direction": direction,
+        "test_accessed": True,
+        "target_rod_first_access_after_freeze": True,
+        "raw_file_sha256": sha256_file(raw_cz),
+        "global_freeze_sha256": sha256_file(run_root / "freeze" / GLOBAL_FREEZE_NAME),
+        "checkpoint_manifest_sha256": sha256_file(
+            run_root / "freeze" / CHECKPOINT_MANIFEST_NAME
+        ),
+    }
+    if any(audit.get(key) != value for key, value in expected.items()):
+        raise RuntimeError(f"STOP_LOW_MEMORY_EXISTING_TARGET_AUDIT_DRIFT:{audit_path}")
+    required = [
+        direction_root
+        / "sample_ids"
+        / "CZ_DIAM_RAW2S_CURRENT_L256"
+        / information_set
+        / "record_time"
+        / "primary"
+        / "test.parquet"
+        for information_set in ("input_only", "dynamic")
+    ]
+    required.extend(
+        [
+            direction_root / "base_data" / "cz_czochralski" / "test.parquet",
+            direction_root
+            / "targets"
+            / "CZ_DIAM_RAW2S_CURRENT_L256__H0__W1"
+            / "test.parquet",
+        ]
+    )
+    if not all(path.is_file() for path in required):
+        raise RuntimeError(f"STOP_LOW_MEMORY_EXISTING_TARGET_PARTITION_INCOMPLETE:{direction}")
+    return audit
+
+
 def _completed_unit_is_valid(formal_root: Path, output: Path) -> bool:
     if not output.is_file():
         return False
@@ -272,24 +317,37 @@ def _main(args: argparse.Namespace) -> None:
         output = recovery_root / "targets" / f"{direction}.json"
         output.parent.mkdir(parents=True, exist_ok=True)
         if not output.is_file():
-            _run_child(
-                [
-                    sys.executable,
-                    str(Path(__file__).resolve()),
-                    "--target-worker",
-                    "--project",
-                    str(args.project),
-                    "--run-root",
-                    str(args.run_root),
-                    "--raw-cz",
-                    str(args.raw_cz),
-                    "--direction",
-                    direction,
-                    "--output",
-                    str(output),
-                ],
-                env,
+            existing = _existing_target_audit(
+                run_root=args.run_root, raw_cz=args.raw_cz, direction=direction
             )
+            if existing is not None:
+                write_json(
+                    output,
+                    {
+                        "status": "PASS",
+                        "audit": existing,
+                        "reused_from_memory_safe_stopped_test": True,
+                    },
+                )
+            else:
+                _run_child(
+                    [
+                        sys.executable,
+                        str(Path(__file__).resolve()),
+                        "--target-worker",
+                        "--project",
+                        str(args.project),
+                        "--run-root",
+                        str(args.run_root),
+                        "--raw-cz",
+                        str(args.raw_cz),
+                        "--direction",
+                        direction,
+                        "--output",
+                        str(output),
+                    ],
+                    env,
+                )
         target_audits.append(json.loads(output.read_text(encoding="utf-8"))["audit"])
 
     unit_files: list[Path] = []
