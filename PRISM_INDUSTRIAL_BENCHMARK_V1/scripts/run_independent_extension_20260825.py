@@ -242,6 +242,9 @@ def scope(run_root: Path) -> dict[str, Any]:
         "baseline_commit": BASELINE_COMMIT,
         "source_commit": git_commit(),
         "config_sha256": config_hash(),
+        "formal_protocol_config_sha256": sha256_file(
+            PROJECT / "configs/representative_horizon_stage1_tep_sru_cpu_extension_20260825.json"
+        ),
         "support_contract": config["support_contract"],
         "tep_history_steps": config["tep"]["history_steps"],
         "cz_h_steps": config["cz"]["h_steps"],
@@ -291,6 +294,10 @@ def _imports() -> dict[str, Any]:
     # Delayed imports keep `scope` usable even when a developer only wants to
     # inspect hashes on a machine without the numerical stack.
     from prism_benchmark.cpu_data import BaseAccessor, HeadSpec, ViewSpec
+    from prism_benchmark import v211_representative_stage1_config as representative_config
+    representative_config.CONFIG_RELATIVE_PATH = Path(
+        "configs/representative_horizon_stage1_tep_sru_cpu_extension_20260825.json"
+    )
     from prism_benchmark.cz_baselines import run_cz_baseline_development
     from prism_benchmark.cz_k_support import run_cz_k_channel
     from prism_benchmark.cz_l256_nowcast import (
@@ -624,6 +631,36 @@ def pilot_accept(run_root: Path) -> dict[str, Any]:
     return result
 
 
+def formal_pilot_accept(run_root: Path) -> dict[str, Any]:
+    """Accept the CPU/PRISM pilot without enabling Neural3 artifacts."""
+
+    cz = read_json(run_root / "logs" / "CZ_PILOT.json")
+    accepted_solver_statuses = {"PASS", "SOLVER_FAILED_RETAINED", "FAILED_RETAINED", "NOT_RUN_PROTOCOL_INCOMPATIBLE"}
+    checks = {
+        "c1_status": cz.get("c1_audit_status") == "PASS",
+        "single_formal_solver_registered": cz.get("single_channel_status") in accepted_solver_statuses,
+        "test_not_accessed": cz.get("test_accessed") is False,
+        "source_rod_only": cz.get("source_rod_only") is True,
+        "h_unit_sampling_points": cz.get("h_unit") == "sampling_points",
+        "memory_below_hard_limit": float(cz.get("memory", {}).get("vmhwm_gib", 0.0)) < MEMORY_HARD_LIMIT_GIB,
+        "storage_above_stopline": free_gib(run_root.parent) >= STORAGE_STOPLINE_GIB,
+    }
+    result = {
+        "status": "PASS" if all(checks.values()) else "FAILED",
+        "stage": "FORMAL_CPU_PRISM_PILOT_ACCEPTANCE",
+        "scope": "CPU_PRISM_ONLY",
+        "neural3_status": "NOT_RUN_BY_USER_SCOPE",
+        "checks": checks,
+        "solver_status_retained": cz.get("single_channel_status"),
+        "test_accessed": False,
+        "ood_accessed": False,
+    }
+    write_json(run_root / "logs" / "FORMAL_PILOT_ACCEPTANCE.json", result)
+    if result["status"] != "PASS":
+        raise RuntimeError("STOP_FORMAL_PILOT_ACCEPTANCE_FAILED")
+    return result
+
+
 def _development_manifest(run_root: Path) -> list[dict[str, Any]]:
     records = []
     for path in sorted((run_root / "logs").glob("*.json")):
@@ -651,6 +688,41 @@ def freeze(run_root: Path) -> dict[str, Any]:
         "config_sha256": config_hash(),
         "support_contract": config["support_contract"],
         "tep_selected_history_records": tep["records"],
+        "cz_development_records": cz["records"],
+        "development_manifest": manifest,
+        "development_manifest_sha256": stable_hash(manifest),
+        "test_accessed": False,
+        "ood_accessed": False,
+        "deletion_forbidden": True,
+    }
+    destination = run_root / "freeze" / "SELECTION_FREEZE.json"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists():
+        raise RuntimeError("REFUSING_TO_OVERWRITE_SELECTION_FREEZE")
+    write_json(destination, result)
+    destination.chmod(0o444)
+    return result
+
+
+def formal_freeze(run_root: Path) -> dict[str, Any]:
+    config = load_config()
+    pilot = read_json(run_root / "logs" / "FORMAL_PILOT_ACCEPTANCE.json")
+    cz = read_json(run_root / "logs" / "CZ_DEVELOPMENT.json")
+    if pilot.get("status") != "PASS" or cz.get("status") != "PASS":
+        raise RuntimeError("STOP_FORMAL_CPU_PRISM_DEVELOPMENT_NOT_COMPLETE")
+    if cz.get("test_accessed") is not False:
+        raise RuntimeError("STOP_CZ_TEST_ACCESSED_BEFORE_FREEZE")
+    manifest = _development_manifest(run_root)
+    result = {
+        "status": "GLOBAL_SELECTION_FROZEN",
+        "sealed": True,
+        "sealed_utc": utc(),
+        "scope": "CPU_PRISM_ONLY",
+        "neural3_status": "NOT_RUN_BY_USER_SCOPE",
+        "baseline_commit": BASELINE_COMMIT,
+        "config_sha256": config_hash(),
+        "support_contract": config["support_contract"],
+        "tep_status": "NOT_RUN_BY_USER_SCOPE",
         "cz_development_records": cz["records"],
         "development_manifest": manifest,
         "development_manifest_sha256": stable_hash(manifest),
@@ -848,45 +920,47 @@ def run_test(run_root: Path) -> dict[str, Any]:
             # TEP test uses only the selected development profiles.  Test rows
             # are first touched in this function, after both seals above.
             shared = Path(str(config["tep"]["shared_readonly"]))
-            tep_dev = read_json(run_root / "logs" / "TEP_DEVELOPMENT.json")
+            tep_dev_path = run_root / "logs" / "TEP_DEVELOPMENT.json"
+            tep_dev = read_json(tep_dev_path) if tep_dev_path.is_file() else None
             tep_records: list[dict[str, Any]] = []
-            for view in tep_views(shared, config):
-                matching = [
-                    item
-                    for item in tep_dev["records"]
-                    if item["view"] == view.relative_root.as_posix()
-                ]
-                for item in matching:
-                    selection = read_json(Path(item["selection_path"]))
-                    result = mod["materialize_model"](
-                        shared=shared,
-                        view=view,
-                        selection=selection,
-                        split="test",
-                        output=run_root / "tep" / "test",
-                        device=torch.device(
-                            "cuda" if torch.cuda.is_available() else "cpu"
-                        ),
-                        final_fit=True,
-                    )
-                    tep_records.append(
-                        {
-                            "model": result["model"],
-                            "view": view.relative_root.as_posix(),
-                            "selected_history_steps": int(
-                                selection["selected_profile"]["history_steps"]
+            if tep_dev is not None:
+                for view in tep_views(shared, config):
+                    matching = [
+                        item
+                        for item in tep_dev["records"]
+                        if item["view"] == view.relative_root.as_posix()
+                    ]
+                    for item in matching:
+                        selection = read_json(Path(item["selection_path"]))
+                        result = mod["materialize_model"](
+                            shared=shared,
+                            view=view,
+                            selection=selection,
+                            split="test",
+                            output=run_root / "tep" / "test",
+                            device=torch.device(
+                                "cuda" if torch.cuda.is_available() else "cpu"
                             ),
-                            "test_result_path": str(
-                                run_root
-                                / "tep"
-                                / "test"
-                                / "FINAL"
-                                / result["model"]
-                                / view.relative_root
-                                / "TEST_RESULT.json"
-                            ),
-                        }
-                    )
+                            final_fit=True,
+                        )
+                        tep_records.append(
+                            {
+                                "model": result["model"],
+                                "view": view.relative_root.as_posix(),
+                                "selected_history_steps": int(
+                                    selection["selected_profile"]["history_steps"]
+                                ),
+                                "test_result_path": str(
+                                    run_root
+                                    / "tep"
+                                    / "test"
+                                    / "FINAL"
+                                    / result["model"]
+                                    / view.relative_root
+                                    / "TEST_RESULT.json"
+                                ),
+                            }
+                        )
     finally:
         if previous_inference is None:
             os.environ.pop("PRISM_FORMAL_INFERENCE_ONLY", None)
@@ -899,7 +973,7 @@ def run_test(run_root: Path) -> dict[str, Any]:
         view = next(v for v in tep_views(shared, config) if v.relative_root.as_posix() == item["view"])
         selection_path = next(
             Path(record["selection_path"])
-            for record in tep_dev["records"]
+            for record in tep_dev["records"]  # type: ignore[index]
             if record["view"] == item["view"] and record["model"] == item["model"]
         )
         selection = read_json(selection_path)
@@ -939,28 +1013,29 @@ def run_test(run_root: Path) -> dict[str, Any]:
             }
         )
     history_comparison: list[dict[str, Any]] = []
-    for record in tep_dev["records"]:
-        for candidate in record.get("candidate_results", []):
-            history_comparison.append(
-                {
-                    "model": record["model"],
-                    "view": record["view"],
-                    "history_steps": int(candidate["history_steps"]),
-                    "history_label": candidate.get("history_label"),
-                    "validation_mse": candidate.get("validation_mse"),
-                    "validation_r2_level_reconstructed": candidate.get("validation_r2_level_reconstructed"),
-                    "validation_r2_delta": candidate.get("validation_r2_delta"),
-                    "validation_persistence_skill": candidate.get("validation_persistence_skill"),
-                    "validation_residual_identity_status": candidate.get("validation_residual_identity_status"),
-                    "validation_residual_identity_max_abs_error": candidate.get("validation_residual_identity_max_abs_error"),
-                    "native_fit_rows": candidate.get("native_fit_rows"),
-                    "common_validation_rows": candidate.get("common_validation_rows"),
-                    "native_fit_support_hash": candidate.get("native_fit_support_hash"),
-                    "common_validation_support_hash": candidate.get("common_validation_support_hash"),
-                    "training_seconds": candidate.get("training_seconds"),
-                    "peak_vram_bytes": candidate.get("peak_vram_bytes"),
-                }
-            )
+    if tep_dev is not None:
+        for record in tep_dev["records"]:
+            for candidate in record.get("candidate_results", []):
+                history_comparison.append(
+                    {
+                        "model": record["model"],
+                        "view": record["view"],
+                        "history_steps": int(candidate["history_steps"]),
+                        "history_label": candidate.get("history_label"),
+                        "validation_mse": candidate.get("validation_mse"),
+                        "validation_r2_level_reconstructed": candidate.get("validation_r2_level_reconstructed"),
+                        "validation_r2_delta": candidate.get("validation_r2_delta"),
+                        "validation_persistence_skill": candidate.get("validation_persistence_skill"),
+                        "validation_residual_identity_status": candidate.get("validation_residual_identity_status"),
+                        "validation_residual_identity_max_abs_error": candidate.get("validation_residual_identity_max_abs_error"),
+                        "native_fit_rows": candidate.get("native_fit_rows"),
+                        "common_validation_rows": candidate.get("common_validation_rows"),
+                        "native_fit_support_hash": candidate.get("native_fit_support_hash"),
+                        "common_validation_support_hash": candidate.get("common_validation_support_hash"),
+                        "training_seconds": candidate.get("training_seconds"),
+                        "peak_vram_bytes": candidate.get("peak_vram_bytes"),
+                    }
+                )
     rankings: dict[str, list[dict[str, Any]]] = {"tep": [], "cz": []}
     rankings["tep"] = sorted(tep_metrics, key=lambda row: -float(row.get("r2_level_reconstructed", float("-inf"))))
     rankings["cz"] = sorted(
@@ -1013,7 +1088,7 @@ def report(run_root: Path) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("stage", choices=("scope", "environment", "pilot", "pilot-accept", "development", "freeze", "checkpoints", "test", "report", "status"))
+    parser.add_argument("stage", choices=("scope", "environment", "pilot", "pilot-accept", "development", "freeze", "checkpoints", "test", "report", "formal-pilot", "formal-pilot-accept", "formal-development", "formal-freeze", "formal-checkpoints", "formal-test", "status"))
     parser.add_argument("--run-root", type=Path, required=True)
     args = parser.parse_args()
     run_root = args.run_root.resolve()
@@ -1032,6 +1107,18 @@ def main() -> None:
     elif args.stage == "checkpoints":
         result = fit_checkpoints(run_root)
     elif args.stage == "test":
+        result = run_test(run_root)
+    elif args.stage == "formal-pilot":
+        result = run_cz_pilot(run_root)
+    elif args.stage == "formal-pilot-accept":
+        result = formal_pilot_accept(run_root)
+    elif args.stage == "formal-development":
+        result = run_cz_development(run_root)
+    elif args.stage == "formal-freeze":
+        result = formal_freeze(run_root)
+    elif args.stage == "formal-checkpoints":
+        result = fit_checkpoints(run_root)
+    elif args.stage == "formal-test":
         result = run_test(run_root)
     elif args.stage == "report":
         result = report(run_root)

@@ -1,0 +1,81 @@
+{
+  "protocol_id": "REPRESENTATIVE_STAGE1_TEP_SRU_CZ_L256_FORMAL_V1",
+  "evidence_class": "POST_HOC_REPRESENTATIVE_HORIZON_FORMAL_RERUN_WITH_FROZEN_SELECTION",
+  "base_commit": "70537060b4d6713db7a557fc37e6771fd07b6a6b",
+  "authority_repository": "Mountainatic/AR_RAPHU",
+  "authority_branch": "prism-v2-1-1-metro-p60-joint-stability-final",
+  "authority_commit": "e47542a319640bc045ca0d31ae9b40763182dde8",
+  "direct_server_source_branch": "prism-v2-1-1-cz-neural3-six-datasets-20260817",
+  "execution_branch": "prism-v2-1-1-representative-tep-sru-cz-l256-20260824",
+  "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+  "active_datasets": ["tep", "sru", "cz_czochralski"],
+  "public_development_datasets": ["tep", "sru"],
+  "primary_tasks": ["TEP_G_REP_H1", "SRU_H2S_REP_H1", "SRU_SO2_REP_H1", "CZ_DIAM_RAW2S_CURRENT_L256"],
+  "public_primary_tasks": ["TEP_G_REP_H1", "SRU_H2S_REP_H1", "SRU_SO2_REP_H1"],
+  "reserved_datasets": {
+    "debutanizer": "NOT_RUN_BY_USER_SCOPE",
+    "pmsm": "NOT_RUN_BY_USER_SCOPE",
+    "metropt": "NOT_RUN_BY_USER_SCOPE"
+  },
+  "stage2_status": "NOT_RUN_BY_USER_SCOPE",
+  "neural3_status": "NOT_RUN_BY_USER_SCOPE",
+  "expected_public_input_views": 3,
+  "expected_public_dynamic_views": 4,
+  "expected_public_k_channel_jobs": 57,
+  "expected_cz_directions": 2,
+  "expected_cz_input_views": 2,
+  "expected_cz_dynamic_views": 2,
+  "c1_config": {
+    "path": "configs/representative_horizon_stage1_tep_sru_c1_tasks.json",
+    "sha256": "f0fa2495a839f0561a081cbe889dc96a15708831bb73425d5b3548affa636918"
+  },
+  "cz_contract": {
+    "path": "src/prism_benchmark/cz_l256_nowcast.py",
+    "sha256": "779b83b30db3bb813f5fb2fe99fdca6fcabd22cb048a653b044d48421d3e998a"
+  },
+  "formal_code_bindings": [
+    {"path": "src/prism_benchmark/portable_checkpoints.py", "sha256": "33709cfc877a3661045443191228e0e2ab9791f7c0801653689d07fafbf4e97a"},
+    {"path": "src/prism_benchmark/representative_baseline_checkpoints.py", "sha256": "e9a0b0b0cf7127bed1d1c1c8049a1bfcf738f7c16aa89fc265aa2f535eed3558"},
+    {"path": "src/prism_benchmark/representative_prism_checkpoints.py", "sha256": "4a5cc95b1a53fd7d7d9a564d00c8fd97650a5887397757d0463faafb41369ee9"},
+    {"path": "src/prism_benchmark/representative_formal.py", "sha256": "889a59c0d25df4bf9aaf12c0ae5461c3d7d182f81285967f4ecbdeee9b05e09d"},
+    {"path": "src/prism_benchmark/cz_k_support.py", "sha256": "f8424b8eae5ff1af1ee6fd811d609b60f2c7d40b5dab60f5bdfe68e313e10a67"},
+    {"path": "src/prism_benchmark/level_reconstruction.py", "sha256": "0091ef5e07d92e97aa9198284cf3585e64101eaf28e8129cc3cf778bb8953705"},
+    {"path": "scripts/run_representative_stage1_formal.py", "sha256": "595b502a09d9e7811b7776f457a1fd176cfc6b2938daf895a39a5cdce1c2b79d"},
+    {"path": "scripts/launch_representative_stage1_formal.py", "sha256": "19cadf2f752b033713872c83a9d30249881cdce1749efbbc38abe07b5da5a5ed"},
+    {"path": "scripts/archive_and_remove_approved_r3_r4.py", "sha256": "be290998608b4816512cd67e2802fb21f2da85664f4eed87ae296abfb987fd3b"}
+  ],
+  "algorithm_config": {
+    "path": "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_PACKAGE/PRISM_V2_1_2_JOINT_OOF_PROTOCOL_CORRECTION_CONFIG.json",
+    "sha256": "a14c05cb51d94c4af3f5aed33f6ec810f93170acfdf2e513292ae49e2566f1f7"
+  },
+  "joint_config": {
+    "path": "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_PACKAGE/PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_CONFIG.json",
+    "sha256": "a7073b0bfd1e64de1e9f2d9f336ff0c246c88165000eb743f6611be39fa8c95f"
+  },
+  "sru_patch": {
+    "path": "PRISM_V2_1_1_SRU_IMPLEMENTATION_CORRECTION/PRISM_V2_1_1_SRU_CONFIG_PATCH.json",
+    "sha256": "9878bb90f8d7862de3de07259ee86ed078d85b67c865e02fd627fe8f743f7a80"
+  },
+  "cpu_model_freeze": {
+    "path": "configs/cpu_model_freeze_v1.json",
+    "sha256": "14cefef2b0b4307ca208d0f0d43b50146de9edf78e93c59d67bf6fdd5d9cf65a"
+  },
+  "development_order": ["TEP_SRU", "CZ_ROD_1_TO_ROD_2", "CZ_ROD_2_TO_ROD_1"],
+  "final_order": ["ALL_DEVELOPMENT_COMPLETE", "GLOBAL_SELECTION_FREEZE", "FINAL_FIT_AND_CHECKPOINT_SEAL", "TEST_INFERENCE_ONLY", "REPORT_AND_ACCEPTANCE"],
+  "development_only": false,
+  "neural_in_scope": false,
+  "global_freeze_required": true,
+  "checkpoint_seal_required_before_test": true,
+  "test_access_before_global_freeze": false,
+  "ood_access_before_global_freeze": false,
+  "minimum_start_free_gib": 5.0,
+  "minimum_runtime_free_gib": 5.0,
+  "resource": {
+    "outer_workers": 1,
+    "k_inner_workers": 1,
+    "stage_inner_workers": 1,
+    "blas_threads": 1,
+    "prediction_chunk_rows": 50000,
+    "memory_safety_fraction": 0.2
+  }
+}
