@@ -322,6 +322,7 @@ def _imports() -> dict[str, Any]:
         fit_prism_checkpoint_for_view,
         predict_prism_checkpoint_for_view,
     )
+    from prism_benchmark.representative_formal import build_common_support_for_views
     from prism_benchmark.v211_a import run_a_view
     from prism_benchmark.v211_c import run_c_view
     from prism_benchmark.v211_config import REPRESENTATIVE_STAGE1_PROTOCOL
@@ -805,12 +806,120 @@ def formal_freeze(run_root: Path) -> dict[str, Any]:
     return result
 
 
+def freeze_cz_common_support(run_root: Path) -> dict[str, Any]:
+    """Derive and seal per-horizon common support after selection freeze."""
+
+    freeze_path = run_root / "freeze" / "SELECTION_FREEZE.json"
+    frozen = read_json(freeze_path)
+    reconciliation = read_json(
+        run_root / "logs" / "CZ_DEVELOPMENT_RECONCILIATION.json"
+    )
+    if frozen.get("status") != "GLOBAL_SELECTION_FROZEN" or frozen.get("sealed") is not True:
+        raise RuntimeError("STOP_SELECTION_FREEZE_NOT_SEALED")
+    if reconciliation.get("status") != "PASS":
+        raise RuntimeError("STOP_CZ_DEVELOPMENT_RECONCILIATION_NOT_PASS")
+    if reconciliation.get("test_accessed") is not False or reconciliation.get("ood_accessed") is not False:
+        raise RuntimeError("STOP_TEST_OR_OOD_ACCESSED_BEFORE_COMMON_SUPPORT_FREEZE")
+    storage_guard(run_root, "formal_common_support_freeze")
+    mod = _imports()
+    records: list[dict[str, Any]] = []
+    for h_steps in load_config()["cz"]["h_steps"]:
+        for direction in load_config()["cz"]["directions"]:
+            shared, input_view, dynamic_view, _ = _cz_paths(
+                run_root, int(h_steps), direction
+            )
+            paths = mod["PublicAllPaths"](
+                PROJECT,
+                shared,
+                run_root / "cz" / f"h{int(h_steps)}" / "directions" / direction,
+            )
+            support = (
+                read_json(paths.leaderboard_support_path)
+                if paths.leaderboard_support_path.exists()
+                else mod["build_common_support_for_views"](
+                    paths, [input_view, dynamic_view]
+                )
+            )
+            observed_views = {
+                (
+                    item.get("target_head"),
+                    item.get("information_set"),
+                    item.get("availability_scenario"),
+                    item.get("proxy_policy"),
+                )
+                for item in support.get("views", [])
+            }
+            expected_views = {
+                (
+                    view.head.head_id,
+                    view.information_set,
+                    view.availability_scenario,
+                    view.proxy_policy,
+                )
+                for view in (input_view, dynamic_view)
+            }
+            if (
+                support.get("status") != "PASS"
+                or observed_views != expected_views
+                or support.get("test_y_read") is not False
+                or support.get("ood_y_read") is not False
+                or support.get("test_accessed") is not False
+                or support.get("ood_accessed") is not False
+            ):
+                raise RuntimeError("STOP_COMMON_SUPPORT_PRIVACY_GATE_FAILED")
+            records.append(
+                {
+                    "h_steps": int(h_steps),
+                    "direction": direction,
+                    "path": paths.leaderboard_support_path.relative_to(run_root).as_posix(),
+                    "sha256": sha256_file(paths.leaderboard_support_path),
+                    "views": support["views"],
+                }
+            )
+            paths.leaderboard_support_path.chmod(0o444)
+    result = {
+        "status": "COMMON_SUPPORT_FROZEN",
+        "sealed": True,
+        "sealed_utc": utc(),
+        "scope": "CPU_PRISM_ONLY",
+        "selection_freeze_sha256": sha256_file(freeze_path),
+        "records": records,
+        "records_sha256": stable_hash(records),
+        "test_y_read": False,
+        "ood_y_read": False,
+        "test_accessed": False,
+        "ood_accessed": False,
+        "deletion_forbidden": True,
+    }
+    destination = run_root / "freeze" / "CZ_COMMON_SUPPORT_FREEZE.json"
+    if destination.exists():
+        raise RuntimeError("REFUSING_TO_OVERWRITE_CZ_COMMON_SUPPORT_FREEZE")
+    write_json(destination, result)
+    destination.chmod(0o444)
+    return result
+
+
+def _checkpoint_storage_guard(run_root: Path, stage: str) -> dict[str, Any]:
+    candidate = stage
+    suffix = 0
+    while (run_root / "logs" / f"STORAGE_{candidate.upper()}.json").exists():
+        suffix += 1
+        candidate = f"{stage}_resume{suffix}"
+    return storage_guard(run_root, candidate)
+
+
 def fit_checkpoints(run_root: Path) -> dict[str, Any]:
     mod = _imports()
     freeze_path = run_root / "freeze" / "SELECTION_FREEZE.json"
+    common_support_path = run_root / "freeze" / "CZ_COMMON_SUPPORT_FREEZE.json"
     frozen = read_json(freeze_path)
+    common_support = read_json(common_support_path)
     if frozen.get("status") not in {"GLOBAL_SELECTION_FROZEN", "SELECTION_FROZEN"} or frozen.get("sealed") is not True:
         raise RuntimeError("STOP_SELECTION_FREEZE_NOT_SEALED")
+    if common_support.get("status") != "COMMON_SUPPORT_FROZEN" or common_support.get("sealed") is not True:
+        raise RuntimeError("STOP_COMMON_SUPPORT_FREEZE_NOT_SEALED")
+    if common_support.get("selection_freeze_sha256") != sha256_file(freeze_path):
+        raise RuntimeError("STOP_COMMON_SUPPORT_SELECTION_FREEZE_HASH_MISMATCH")
     records: list[dict[str, Any]] = []
     with MemoryGuard():
         for h_steps in load_config()["cz"]["h_steps"]:
@@ -819,7 +928,7 @@ def fit_checkpoints(run_root: Path) -> dict[str, Any]:
                 paths = mod["PublicAllPaths"](PROJECT, shared, run_root / "cz" / f"h{int(h_steps)}" / "directions" / direction)
                 checkpoint_root.mkdir(parents=True, exist_ok=True)
                 for view in (input_view, dynamic_view):
-                    storage_guard(run_root, f"checkpoint_h{int(h_steps)}_{direction}_{view.information_set}")
+                    _checkpoint_storage_guard(run_root, f"checkpoint_h{int(h_steps)}_{direction}_{view.information_set}")
                     records.append({"h_steps": int(h_steps), "direction": direction, "view": view.relative_root.as_posix(), "prism": mod["fit_prism_checkpoint_for_view"](paths, view, checkpoint_root)})
                     records.append({"h_steps": int(h_steps), "direction": direction, "view": view.relative_root.as_posix(), "baseline": mod["fit_baseline_checkpoints_for_view"](paths, view, checkpoint_root)})
     inventory = []
@@ -830,6 +939,7 @@ def fit_checkpoints(run_root: Path) -> dict[str, Any]:
         "sealed": True,
         "sealed_utc": utc(),
         "selection_freeze_sha256": sha256_file(freeze_path),
+        "common_support_freeze_sha256": sha256_file(common_support_path),
         "records": records,
         "inventory": inventory,
         "inventory_sha256": stable_hash(inventory),
@@ -1154,7 +1264,7 @@ def report(run_root: Path) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("stage", choices=("scope", "environment", "pilot", "pilot-accept", "development", "freeze", "checkpoints", "test", "report", "formal-pilot", "formal-pilot-accept", "formal-development", "formal-development-reconcile", "formal-freeze", "formal-checkpoints", "formal-test", "status"))
+    parser.add_argument("stage", choices=("scope", "environment", "pilot", "pilot-accept", "development", "freeze", "checkpoints", "test", "report", "formal-pilot", "formal-pilot-accept", "formal-development", "formal-development-reconcile", "formal-freeze", "formal-support-freeze", "formal-checkpoints", "formal-test", "status"))
     parser.add_argument("--run-root", type=Path, required=True)
     args = parser.parse_args()
     run_root = args.run_root.resolve()
@@ -1184,6 +1294,8 @@ def main() -> None:
         result = reconcile_cz_development(run_root)
     elif args.stage == "formal-freeze":
         result = formal_freeze(run_root)
+    elif args.stage == "formal-support-freeze":
+        result = freeze_cz_common_support(run_root)
     elif args.stage == "formal-checkpoints":
         result = fit_checkpoints(run_root)
     elif args.stage == "formal-test":
