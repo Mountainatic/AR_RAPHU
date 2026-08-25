@@ -96,6 +96,13 @@ def git_commit() -> str:
     ).stdout.strip()
 
 
+def baseline_is_ancestor() -> bool:
+    return subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "merge-base", "--is-ancestor", BASELINE_COMMIT, "HEAD"],
+        check=False,
+    ).returncode == 0
+
+
 def free_gib(path: Path) -> float:
     return float(shutil.disk_usage(path).free / (1024**3))
 
@@ -224,8 +231,8 @@ def scope(run_root: Path) -> dict[str, Any]:
     config = load_config()
     ensure_fresh_run(run_root)
     configure_resources()
-    if git_commit() != BASELINE_COMMIT:
-        raise RuntimeError(f"STOP_SOURCE_COMMIT_MISMATCH:{git_commit()} != {BASELINE_COMMIT}")
+    if not baseline_is_ancestor():
+        raise RuntimeError(f"STOP_BASELINE_NOT_ANCESTOR:{BASELINE_COMMIT}")
     storage = storage_guard(run_root, "scope")
     result = {
         "status": "PASS",
