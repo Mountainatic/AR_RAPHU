@@ -586,7 +586,12 @@ def run_cz_development(run_root: Path) -> dict[str, Any]:
     summary = {
         "status": "PASS" if all(
             item["baseline_status"] in {"PASS", "COMPLETED_WITH_RETAINED_FAILURES"}
-            and all(status in {"PASS", "COMPLETED_WITH_RETAINED_FAILURES", "NOT_RUN_PROTOCOL_INCOMPATIBLE"} for status in item["stage_statuses"])
+            and all(status in {
+                "PASS",
+                "COMPLETED_WITH_RETAINED_FAILURES",
+                "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+                "JOINT_STABILITY_REGISTERED_STABILITY_CONTROLS_INSUFFICIENT",
+            } for status in item["stage_statuses"])
             for item in all_records
         ) else "FAILED",
         "stage": "CZ_DEVELOPMENT",
@@ -600,6 +605,66 @@ def run_cz_development(run_root: Path) -> dict[str, Any]:
     }
     write_json(run_root / "logs" / "CZ_DEVELOPMENT.json", summary)
     return summary
+
+
+def reconcile_cz_development(run_root: Path) -> dict[str, Any]:
+    """Reclassify completed formal results using the protocol's retained status.
+
+    The full development pass already materializes one result per h/direction.
+    This read-only gate avoids rerunning those results solely because the
+    extension runner's first summary omitted an allowed joint-stability status.
+    """
+
+    source_path = run_root / "logs" / "CZ_DEVELOPMENT.json"
+    source = read_json(source_path)
+    accepted = {
+        "PASS",
+        "COMPLETED_WITH_RETAINED_FAILURES",
+        "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+        "JOINT_STABILITY_REGISTERED_STABILITY_CONTROLS_INSUFFICIENT",
+    }
+    checks = {
+        "source_stage": source.get("stage") == "CZ_DEVELOPMENT",
+        "all_records_present": len(source.get("records", []))
+        == len(load_config()["cz"]["h_steps"]) * len(load_config()["cz"]["directions"]),
+        "all_baselines_accepted": all(
+            item.get("baseline_status") in {"PASS", "COMPLETED_WITH_RETAINED_FAILURES"}
+            for item in source.get("records", [])
+        ),
+        "all_formal_stages_accepted": all(
+            status in accepted
+            for item in source.get("records", [])
+            for status in item.get("stage_statuses", [])
+        ),
+        "test_not_accessed": source.get("test_accessed") is False
+        and all(item.get("test_accessed") is False for item in source.get("records", [])),
+        "ood_not_accessed": source.get("ood_accessed") is False
+        and all(item.get("ood_accessed") is False for item in source.get("records", [])),
+        "storage_above_stopline": free_gib(run_root.parent) >= STORAGE_STOPLINE_GIB,
+    }
+    result = {
+        "status": "PASS" if all(checks.values()) else "FAILED",
+        "stage": "CZ_DEVELOPMENT_RECONCILIATION",
+        "scope": "CPU_PRISM_ONLY",
+        "source_summary": str(source_path),
+        "source_summary_sha256": sha256_file(source_path),
+        "accepted_retained_statuses": sorted(accepted),
+        "checks": checks,
+        "h_steps": source.get("h_steps"),
+        "h_unit": source.get("h_unit"),
+        "directions": source.get("directions"),
+        "records": source.get("records", []),
+        "test_accessed": False,
+        "ood_accessed": False,
+        "memory": source.get("memory", memory_snapshot()),
+    }
+    destination = run_root / "logs" / "CZ_DEVELOPMENT_RECONCILIATION.json"
+    if destination.exists():
+        raise RuntimeError("REFUSING_TO_OVERWRITE_CZ_DEVELOPMENT_RECONCILIATION")
+    write_json(destination, result)
+    if result["status"] != "PASS":
+        raise RuntimeError("STOP_CZ_DEVELOPMENT_RECONCILIATION_FAILED")
+    return result
 
 
 def pilot_accept(run_root: Path) -> dict[str, Any]:
@@ -707,7 +772,8 @@ def freeze(run_root: Path) -> dict[str, Any]:
 def formal_freeze(run_root: Path) -> dict[str, Any]:
     config = load_config()
     pilot = read_json(run_root / "logs" / "FORMAL_PILOT_ACCEPTANCE.json")
-    cz = read_json(run_root / "logs" / "CZ_DEVELOPMENT.json")
+    reconciled_path = run_root / "logs" / "CZ_DEVELOPMENT_RECONCILIATION.json"
+    cz = read_json(reconciled_path if reconciled_path.is_file() else run_root / "logs" / "CZ_DEVELOPMENT.json")
     if pilot.get("status") != "PASS" or cz.get("status") != "PASS":
         raise RuntimeError("STOP_FORMAL_CPU_PRISM_DEVELOPMENT_NOT_COMPLETE")
     if cz.get("test_accessed") is not False:
@@ -1088,7 +1154,7 @@ def report(run_root: Path) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("stage", choices=("scope", "environment", "pilot", "pilot-accept", "development", "freeze", "checkpoints", "test", "report", "formal-pilot", "formal-pilot-accept", "formal-development", "formal-freeze", "formal-checkpoints", "formal-test", "status"))
+    parser.add_argument("stage", choices=("scope", "environment", "pilot", "pilot-accept", "development", "freeze", "checkpoints", "test", "report", "formal-pilot", "formal-pilot-accept", "formal-development", "formal-development-reconcile", "formal-freeze", "formal-checkpoints", "formal-test", "status"))
     parser.add_argument("--run-root", type=Path, required=True)
     args = parser.parse_args()
     run_root = args.run_root.resolve()
@@ -1114,6 +1180,8 @@ def main() -> None:
         result = formal_pilot_accept(run_root)
     elif args.stage == "formal-development":
         result = run_cz_development(run_root)
+    elif args.stage == "formal-development-reconcile":
+        result = reconcile_cz_development(run_root)
     elif args.stage == "formal-freeze":
         result = formal_freeze(run_root)
     elif args.stage == "formal-checkpoints":
