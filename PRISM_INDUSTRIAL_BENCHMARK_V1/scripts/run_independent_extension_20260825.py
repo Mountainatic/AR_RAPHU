@@ -920,6 +920,21 @@ def fit_checkpoints(run_root: Path) -> dict[str, Any]:
         raise RuntimeError("STOP_COMMON_SUPPORT_FREEZE_NOT_SEALED")
     if common_support.get("selection_freeze_sha256") != sha256_file(freeze_path):
         raise RuntimeError("STOP_COMMON_SUPPORT_SELECTION_FREEZE_HASH_MISMATCH")
+    expected_supports = {
+        (int(h_steps), direction)
+        for h_steps in load_config()["cz"]["h_steps"]
+        for direction in load_config()["cz"]["directions"]
+    }
+    observed_supports = {
+        (int(item["h_steps"]), str(item["direction"]))
+        for item in common_support.get("records", [])
+    }
+    if observed_supports != expected_supports:
+        raise RuntimeError("STOP_COMMON_SUPPORT_MATRIX_MISMATCH")
+    for item in common_support["records"]:
+        path = run_root / str(item["path"])
+        if not path.is_file() or sha256_file(path) != item["sha256"]:
+            raise RuntimeError(f"STOP_COMMON_SUPPORT_DRIFT:{path}")
     records: list[dict[str, Any]] = []
     with MemoryGuard():
         for h_steps in load_config()["cz"]["h_steps"]:
