@@ -31,7 +31,7 @@
   },
   "cz_contract": {
     "path": "src/prism_benchmark/cz_l256_nowcast.py",
-    "sha256": "779b83b30db3bb813f5fb2fe99fdca6fcabd22cb048a653b044d48421d3e998a"
+    "sha256": "d4c0dc3d5346ef4c86bc56137af3c5203d1e99bee05f595a25216f185f6b84c4"
   },
   "formal_code_bindings": [
     {"path": "src/prism_benchmark/portable_checkpoints.py", "sha256": "33709cfc877a3661045443191228e0e2ab9791f7c0801653689d07fafbf4e97a"},
