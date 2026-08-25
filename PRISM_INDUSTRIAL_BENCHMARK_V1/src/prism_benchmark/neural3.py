@@ -8,7 +8,7 @@ import os
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping, Sequence
 
 import numpy as np
 import pandas as pd
@@ -22,6 +22,7 @@ from .cpu_data import (
     deterministic_subsample,
     input_columns as registered_input_columns,
 )
+from .level_reconstruction import metric_bundle_delta_and_level
 from .v211_support import (
     SUPPORT_CONTRACT,
     load_native_samples,
@@ -55,11 +56,14 @@ class Candidate:
     history_steps: int
     capacity: str
     learning_rate: float
+    history_label: str | None = None
 
     @property
     def candidate_id(self) -> str:
+        label = self.history_label or f"{self.lookback_hours}h"
+        label = label if label.startswith("L") else f"L{label}"
         return (
-            f"{self.model}__L{self.lookback_hours}h__"
+            f"{self.model}__{label}__"
             f"{self.capacity}__lr{self.learning_rate:g}"
         )
 
@@ -230,6 +234,52 @@ def candidate_grid(model_name: str, cadence_seconds: float) -> list[Candidate]:
     if len(result) > 12:
         raise AssertionError("Neural candidate grid exceeded 12 candidates")
     return result
+
+
+def _history_candidate_grid(
+    model_name: str,
+    history_steps: Sequence[int],
+    history_labels: Mapping[int, str] | None = None,
+) -> list[Candidate]:
+    """Build a deterministic candidate grid for explicitly registered histories.
+
+    ``Candidate.lookback_hours`` is a legacy field used by the standard grid.
+    Explicit-history candidates use zero there and carry their unambiguous
+    display value in ``history_label`` instead.
+    """
+
+    values: list[int] = []
+    for raw in history_steps:
+        value = int(raw)
+        if value != raw or value < 1:
+            raise ValueError("history_steps must contain positive integers")
+        values.append(value)
+    values = sorted(set(values))
+    if not values:
+        raise ValueError("history_steps must not be empty")
+    labels = history_labels or {}
+    candidates: list[Candidate] = []
+    observed_labels: set[str] = set()
+    for value in values:
+        label = str(labels.get(value, f"{value}steps"))
+        if not label or label in observed_labels:
+            raise ValueError("history_labels must be nonempty and unique")
+        observed_labels.add(label)
+        for capacity in CAPACITIES:
+            for learning_rate in LEARNING_RATES:
+                candidates.append(
+                    Candidate(
+                        model_name,
+                        0,
+                        value,
+                        capacity,
+                        learning_rate,
+                        history_label=label,
+                    )
+                )
+    if len(candidates) > 12:
+        raise AssertionError("explicit history candidate grid exceeded 12 candidates")
+    return candidates
 
 
 def native_support(
@@ -548,7 +598,14 @@ def _fit_one(
     dynamic: bool,
     seed: int,
     device: torch.device,
+    max_epochs: int | None = None,
+    patience: int | None = None,
+    anchor_steps: int = 1,
 ) -> dict[str, Any]:
+    epoch_limit = MAX_EPOCHS if max_epochs is None else int(max_epochs)
+    patience_limit = PATIENCE if patience is None else int(patience)
+    if epoch_limit < 1 or patience_limit < 1:
+        raise ValueError("max_epochs and patience must be positive")
     set_seed(seed)
     model = build_model(
         candidate.model, len(columns) + (1 if dynamic else 0), candidate.capacity
@@ -567,7 +624,7 @@ def _fit_one(
     if device.type == "cuda":
         torch.cuda.reset_peak_memory_stats(device)
     permutation_rng = np.random.default_rng(seed)
-    for epoch in range(1, MAX_EPOCHS + 1):
+    for epoch in range(1, epoch_limit + 1):
         model.train()
         order = permutation_rng.permutation(len(fit_samples))
         optimizer.zero_grad(set_to_none=True)
@@ -616,10 +673,42 @@ def _fit_one(
             stale = 0
         else:
             stale += 1
-            if stale >= PATIENCE:
+            if stale >= patience_limit:
                 break
     if best_state is not None:
         model.load_state_dict(best_state)
+    validation_prediction = _predict(
+        model,
+        accessor,
+        validation_samples,
+        columns,
+        candidate.history_steps,
+        scaler,
+        dynamic=dynamic,
+        device=device,
+    )
+    current_level = accessor.block_means(
+        validation_samples,
+        target,
+        [(0, max(1, int(anchor_steps)))],
+    ).reshape(-1)
+    validation_metrics = metric_bundle_delta_and_level(
+        validation_target,
+        validation_prediction,
+        current_level,
+    )
+    validation_residual_identity_max_abs_error = float(
+        np.max(
+            np.abs(
+                (validation_target - validation_prediction)
+                - (
+                    (current_level + validation_target)
+                    - (current_level + validation_prediction)
+                )
+            ),
+            initial=0.0,
+        )
+    )
     peak_vram = (
         int(torch.cuda.max_memory_allocated(device))
         if device.type == "cuda"
@@ -631,16 +720,48 @@ def _fit_one(
         "model": candidate.model,
         "lookback_hours": candidate.lookback_hours,
         "history_steps": candidate.history_steps,
+        "history_label": candidate.history_label,
         "capacity": candidate.capacity,
         "learning_rate": candidate.learning_rate,
         "parameter_count": parameter_count(model),
         "best_epoch": best_epoch,
+        "epochs_run": epoch,
+        "max_epochs": epoch_limit,
+        "patience": patience_limit,
         "validation_mse": best_val,
         "validation_rmse": math.sqrt(best_val),
         "training_seconds": time.time() - started,
         "peak_vram_bytes": peak_vram,
         "seed": seed,
+        "validation_anchor_steps": max(1, int(anchor_steps)),
+        "validation_residual_identity_status": "PASS",
+        "validation_residual_identity_max_abs_error": validation_residual_identity_max_abs_error,
+        "validation_mse_identity_max_abs_error": abs(
+            float(validation_metrics["mse"] - validation_metrics["mse_delta"])
+        ),
+        "validation_rmse_identity_max_abs_error": abs(
+            float(validation_metrics["rmse"] - validation_metrics["rmse_delta"])
+        ),
+        "validation_mae_identity_max_abs_error": abs(
+            float(validation_metrics["mae"] - validation_metrics["mae_delta"])
+        ),
     }
+    for metric_name in (
+        "r2_level_reconstructed",
+        "r2_delta",
+        "r2_level_persistence",
+        "mse",
+        "rmse",
+        "mae",
+        "mse_delta",
+        "rmse_delta",
+        "mae_delta",
+        "std_level_target",
+        "std_delta_target",
+        "variance_ratio",
+    ):
+        result[f"validation_{metric_name}"] = float(validation_metrics[metric_name])
+    result["validation_persistence_skill"] = validation_metrics["persistence_skill"]
     del model, optimizer, best_state
     gc.collect()
     if device.type == "cuda":
@@ -717,6 +838,7 @@ def _fit_fixed_epochs(
         "model": candidate.model,
         "lookback_hours": candidate.lookback_hours,
         "history_steps": candidate.history_steps,
+        "history_label": candidate.history_label,
         "capacity": candidate.capacity,
         "learning_rate": candidate.learning_rate,
         "parameter_count": parameter_count(model),
@@ -740,9 +862,26 @@ def select_candidate(
     model_name: str,
     output: Path,
     device: torch.device,
+    history_steps: Sequence[int] | None = None,
+    history_labels: Mapping[int, str] | None = None,
+    common_fit_support: bool = False,
+    max_epochs: int | None = None,
+    patience: int | None = None,
+    fit_row_cap: int | None = None,
+    validation_row_cap: int | None = None,
 ) -> dict[str, Any]:
     if model_name not in MODEL_FAMILIES:
         raise ValueError(model_name)
+    actual_fit_row_cap = (
+        NEURAL_FIT_ROW_CAP if fit_row_cap is None else int(fit_row_cap)
+    )
+    actual_validation_row_cap = (
+        NEURAL_VALIDATION_ROW_CAP
+        if validation_row_cap is None
+        else int(validation_row_cap)
+    )
+    if actual_fit_row_cap < 1 or actual_validation_row_cap < 1:
+        raise ValueError("fit_row_cap and validation_row_cap must be positive")
     train = load_native_samples(shared, view, "train")
     validation = load_native_samples(shared, view, "validation")
     require_native_support_contract(train)
@@ -758,7 +897,14 @@ def select_candidate(
         [*input_columns, view.head.target],
     )
     _set_target_column(accessor, view.head.target)
-    candidates = candidate_grid(model_name, view.head.cadence_seconds)
+    if history_steps is None:
+        if history_labels is not None:
+            raise ValueError("history_labels requires explicit history_steps")
+        candidates = candidate_grid(model_name, view.head.cadence_seconds)
+    else:
+        candidates = _history_candidate_grid(
+            model_name, history_steps, history_labels
+        )
     native_candidates, unavailable_candidates = _partition_candidate_support(
         candidates, train, validation, dynamic=dynamic
     )
@@ -772,9 +918,10 @@ def select_candidate(
     )
     common_validation_rows_before_cap = len(common_validation)
     common_validation = _cap_after_native_support(
-        common_validation, NEURAL_VALIDATION_ROW_CAP
+        common_validation, actual_validation_row_cap
     )
-    scaler_fit = native_support(train, max_history, dynamic=dynamic)
+    common_fit = native_support(train, max_history, dynamic=dynamic)
+    scaler_fit = common_fit
     if common_validation.empty or scaler_fit.empty:
         raise AssertionError("available neural candidates lost common support")
     scaler = fit_scaler(
@@ -786,8 +933,9 @@ def select_candidate(
     )
     candidate_results = []
     for candidate, fit in native_candidates:
-        native_fit_rows_before_cap = len(fit)
-        fit = _cap_after_native_support(fit, NEURAL_FIT_ROW_CAP)
+        candidate_fit = common_fit if common_fit_support else fit
+        native_fit_rows_before_cap = len(candidate_fit)
+        fit = _cap_after_native_support(candidate_fit, actual_fit_row_cap)
         result = _fit_one(
             candidate,
             accessor,
@@ -799,16 +947,20 @@ def select_candidate(
             dynamic=dynamic,
             seed=SCREENING_SEED,
             device=device,
+            max_epochs=max_epochs,
+            patience=patience,
+            anchor_steps=int(view.head.w0_steps),
         )
         result.update(
             {
                 "native_fit_rows": int(len(fit)),
                 "native_fit_rows_before_cap": int(native_fit_rows_before_cap),
-                "native_fit_row_cap": NEURAL_FIT_ROW_CAP,
+                "native_fit_row_cap": actual_fit_row_cap,
                 "native_fit_support_hash": support_hash(fit),
+                "common_fit_support_requested": bool(common_fit_support),
                 "common_validation_rows": int(len(common_validation)),
                 "common_validation_rows_before_cap": int(common_validation_rows_before_cap),
-                "common_validation_row_cap": NEURAL_VALIDATION_ROW_CAP,
+                "common_validation_row_cap": actual_validation_row_cap,
                 "common_validation_support_hash": support_hash(common_validation),
                 "row_cap_applied_after_native_mask": True,
                 "test_metrics_used_for_selection": False,
@@ -820,7 +972,12 @@ def select_candidate(
         key=lambda value: (
             float(value["validation_mse"]),
             int(value["parameter_count"]),
-            int(value["lookback_hours"]),
+            int(value["history_steps"])
+            if history_steps is not None
+            else int(value["lookback_hours"]),
+            int(value["lookback_hours"])
+            if history_steps is not None
+            else int(value["history_steps"]),
             0 if value["capacity"] == "SMALL" else 1,
             float(value["learning_rate"]),
         )
@@ -836,7 +993,12 @@ def select_candidate(
         eligible,
         key=lambda value: (
             int(value["parameter_count"]),
-            int(value["lookback_hours"]),
+            int(value["history_steps"])
+            if history_steps is not None
+            else int(value["lookback_hours"]),
+            int(value["lookback_hours"])
+            if history_steps is not None
+            else int(value["history_steps"]),
             0 if value["capacity"] == "SMALL" else 1,
             float(value["learning_rate"]),
         ),
@@ -850,8 +1012,23 @@ def select_candidate(
         "task_id": view.head.task_id,
         "information_set": view.information_set,
         "screening_seed": SCREENING_SEED,
+        "max_epochs": MAX_EPOCHS if max_epochs is None else int(max_epochs),
+        "patience": PATIENCE if patience is None else int(patience),
+        "fit_row_cap": actual_fit_row_cap,
+        "validation_row_cap": actual_validation_row_cap,
         "candidate_count": len(candidate_results),
         "candidate_grid_count": len(candidates),
+        "explicit_history_grid": history_steps is not None,
+        "history_steps_grid": sorted(
+            {int(candidate.history_steps) for candidate in candidates}
+        ),
+        "history_labels": sorted(
+            {
+                str(candidate.history_label)
+                for candidate in candidates
+                if candidate.history_label is not None
+            }
+        ),
         "available_candidate_ids": [
             candidate.candidate_id for candidate, _fit in native_candidates
         ],
@@ -861,15 +1038,22 @@ def select_candidate(
                 for candidate, _fit in native_candidates
             }
         ),
+        "available_history_steps": sorted(
+            {int(candidate.history_steps) for candidate, _fit in native_candidates}
+        ),
         "unavailable_candidates": unavailable_candidates,
         "unavailable_lookback_hours": sorted(
             {item["lookback_hours"] for item in unavailable_candidates}
+        ),
+        "unavailable_history_steps": sorted(
+            {int(item["history_steps"]) for item in unavailable_candidates}
         ),
         "selected_candidate": selected,
         "selected_profile": {
             "model": selected["model"],
             "lookback_hours": selected["lookback_hours"],
             "history_steps": selected["history_steps"],
+            "history_label": selected.get("history_label"),
             "capacity": selected["capacity"],
             "learning_rate": selected["learning_rate"],
             "parameter_count": selected["parameter_count"],
@@ -883,8 +1067,21 @@ def select_candidate(
             "common_validation_rows": selected["common_validation_rows"],
             "common_validation_support_hash": selected["common_validation_support_hash"],
             "common_support_history_steps": max_history,
-            "fit_row_cap": NEURAL_FIT_ROW_CAP,
-            "validation_row_cap": NEURAL_VALIDATION_ROW_CAP,
+            "common_fit_support_requested": bool(common_fit_support),
+            "common_fit_rows_before_cap": int(len(common_fit)),
+            "common_fit_support_hash": support_hash(common_fit),
+            "cross_candidate_fit_support_rows_equal": common_fit_support,
+            "cross_candidate_fit_support_hashes_equal": (
+                len(
+                    {
+                        value["native_fit_support_hash"]
+                        for value in candidate_results
+                    }
+                )
+                == 1
+            ),
+            "fit_row_cap": actual_fit_row_cap,
+            "validation_row_cap": actual_validation_row_cap,
             "cross_candidate_validation_rows_equal": len(
                 {value["common_validation_support_hash"] for value in candidate_results}
             )
@@ -906,6 +1103,45 @@ def select_candidate(
         encoding="utf-8",
     )
     return result
+
+
+def select_candidate_histories(
+    *,
+    shared: Path,
+    view: ViewSpec,
+    model_name: str,
+    output: Path,
+    device: torch.device,
+    history_steps: Sequence[int],
+    history_labels: Mapping[int, str] | None = None,
+    common_fit_support: bool = False,
+    max_epochs: int | None = None,
+    patience: int | None = None,
+    fit_row_cap: int | None = None,
+    validation_row_cap: int | None = None,
+) -> dict[str, Any]:
+    """Select neural candidates on an explicit history-point grid.
+
+    The standard selector remains unchanged for callers that omit the new
+    arguments.  This entry point keeps one common, max-history validation
+    support across candidates and can optionally train every candidate on the
+    same max-history fit support.  Test/OOD partitions are never loaded.
+    """
+
+    return select_candidate(
+        shared=shared,
+        view=view,
+        model_name=model_name,
+        output=output,
+        device=device,
+        history_steps=history_steps,
+        history_labels=history_labels,
+        common_fit_support=common_fit_support,
+        max_epochs=max_epochs,
+        patience=patience,
+        fit_row_cap=fit_row_cap,
+        validation_row_cap=validation_row_cap,
+    )
 
 
 def materialize_model(
@@ -935,6 +1171,7 @@ def materialize_model(
         int(profile["history_steps"]),
         profile["capacity"],
         float(profile["learning_rate"]),
+        profile.get("history_label"),
     )
     if selected_candidate["candidate_id"] != candidate.candidate_id:
         raise RuntimeError("selected profile and candidate disagree")

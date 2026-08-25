@@ -1,9 +1,10 @@
 """Frozen raw-2-second CZ L256 delta-nowcast data contract.
 
 This task intentionally coexists with the historical ``CZ_D20`` task.  An
-exclusive origin ``t`` denotes the row being predicted: inputs are the 256
-rows ``[t-256, t)``, the registered target is ``D[t] - D[t-1]``, and level
-reporting reconstructs ``D[t-1] + delta_pred``.
+exclusive origin ``t`` denotes the last available row plus one: inputs are
+the 256 rows ``[t-256, t)``, the registered target for a positive ``h`` is
+``D[t+h-1] - D[t-1]``, and level reporting reconstructs
+``D[t-1] + delta_pred``.  ``h=0`` is retained as the legacy one-step alias.
 
 Development and target-rod materialization are separate entry points.  The
 target partition cannot be built until both the global selection freeze and
@@ -64,6 +65,14 @@ class RawSegment:
     raw_start: int
     raw_stop: int
     frame: pd.DataFrame
+
+
+def _effective_h_steps(h_steps: int) -> int:
+    """Map the legacy zero alias to one and reject non-forward targets."""
+    value = int(h_steps)
+    if value < 0:
+        raise ValueError("h_steps must be non-negative; zero is the legacy one-step alias")
+    return 1 if value == 0 else value
 
 
 def _utc() -> str:
@@ -129,16 +138,23 @@ def _raw_segments(rod_id: str, raw: pd.DataFrame) -> list[RawSegment]:
 
 def _split_source_origins(
     segments: list[RawSegment],
+    *,
+    h_steps: int = H_STEPS,
 ) -> tuple[dict[str, set[int]], dict[str, set[int]]]:
     """Create an 80/20 chronological split with disjoint dependency intervals."""
 
     train: dict[str, set[int]] = {segment.segment_id: set() for segment in segments}
     validation: dict[str, set[int]] = {segment.segment_id: set() for segment in segments}
-    purge = HISTORY_STEPS + 1
+    # Positive h values use target index t+h-1, so the dependency purge must
+    # include the full forward target offset.  Restricting eligible origins
+    # here (rather than dropping them later) keeps train/validation supports
+    # comparable across horizons.
+    effective_h = _effective_h_steps(h_steps)
+    purge = HISTORY_STEPS + effective_h
     eligible = [
-        (segment, list(range(HISTORY_STEPS, len(segment.frame))))
+        (segment, list(range(HISTORY_STEPS, len(segment.frame) - effective_h + 1)))
         for segment in segments
-        if len(segment.frame) > HISTORY_STEPS
+        if len(segment.frame) >= HISTORY_STEPS + effective_h
     ]
     total = sum(len(valid) for _, valid in eligible)
     desired_train = int(math.floor(0.8 * total))
@@ -252,6 +268,8 @@ def _sample_rows(
     direction: str,
     split: str,
     origin_filter: dict[str, set[int]] | None = None,
+    h_steps: int = H_STEPS,
+    task_id: str = TASK_ID,
 ) -> pd.DataFrame:
     records: list[dict[str, Any]] = []
     for segment in segments:
@@ -259,27 +277,31 @@ def _sample_rows(
         for origin in range(HISTORY_STEPS, len(segment.frame)):
             if origin_filter is not None and origin not in origin_filter.get(segment.segment_id, set()):
                 continue
+            effective_h = _effective_h_steps(h_steps)
+            target_index = origin + effective_h - 1
+            if target_index >= len(diameter):
+                continue
             current = float(diameter[origin - 1])
-            future = float(diameter[origin])
-            base_id = _hash_text(f"{TASK_ID}|{direction}|{segment.segment_id}|{origin}")
+            future = float(diameter[target_index])
+            base_id = _hash_text(f"{task_id}|{direction}|{segment.segment_id}|{origin}")
             records.append(
                 {
                     "base_origin_id": base_id,
                     "view_sample_id": _hash_text(f"input_only|{base_id}"),
                     "dataset": "cz_czochralski",
                     "entity_id": segment.segment_id,
-                    "task_id": TASK_ID,
-                    "target_head": TASK_ID,
+                    "task_id": task_id,
+                    "target_head": task_id,
                     "split": split,
                     "origin": origin,
                     "current_start": origin - 1,
                     "current_stop_exclusive": origin,
                     "history_start": origin - HISTORY_STEPS,
                     "history_stop_exclusive": origin,
-                    "target_start": origin,
-                    "target_stop_exclusive": origin + 1,
+                    "target_start": target_index,
+                    "target_stop_exclusive": target_index + 1,
                     "dependency_start": origin - HISTORY_STEPS,
-                    "dependency_stop_exclusive": origin + 1,
+                    "dependency_stop_exclusive": target_index + 1,
                     "latest_available_target_index": origin - 1,
                     "availability_delay_steps": 0,
                     "availability_scenario": "record_time",
@@ -324,15 +346,23 @@ def _empty_samples() -> pd.DataFrame:
     return _sample_rows([], direction="EMPTY", split="test")
 
 
-def _write_partition(root: Path, split: str, base: pd.DataFrame, samples: pd.DataFrame) -> None:
+def _write_partition(
+    root: Path,
+    split: str,
+    base: pd.DataFrame,
+    samples: pd.DataFrame,
+    *,
+    h_steps: int = H_STEPS,
+    task_id: str = TASK_ID,
+) -> None:
     if not base.empty:
         path = root / "base_data" / "cz_czochralski" / f"{split}.parquet"
         path.parent.mkdir(parents=True, exist_ok=True)
         base.to_parquet(path, index=False, compression="zstd")
     for information_set in ("input_only", "dynamic"):
         frame = samples[samples["information_set"] == information_set].copy()
-        sample_path = root / "sample_ids" / TASK_ID / information_set / "record_time" / "primary" / f"{split}.parquet"
-        target_path = root / "targets" / f"{TASK_ID}__H0__W1" / f"{split}.parquet"
+        sample_path = root / "sample_ids" / task_id / information_set / "record_time" / "primary" / f"{split}.parquet"
+        target_path = root / "targets" / f"{task_id}__H{h_steps}__W1" / f"{split}.parquet"
         sample_path.parent.mkdir(parents=True, exist_ok=True)
         target_path.parent.mkdir(parents=True, exist_ok=True)
         frame.to_parquet(sample_path, index=False, compression="zstd")
@@ -341,46 +371,69 @@ def _write_partition(root: Path, split: str, base: pd.DataFrame, samples: pd.Dat
         )
 
 
-def head() -> HeadSpec:
-    return HeadSpec(TASK_ID, TASK_ID, "cz_czochralski", TARGET_COLUMN, RAW_PERIOD_SECONDS, H_STEPS, W_STEPS, W0_STEPS, True)
+def head(h_steps: int = H_STEPS, task_id: str = TASK_ID) -> HeadSpec:
+    return HeadSpec(task_id, task_id, "cz_czochralski", TARGET_COLUMN, RAW_PERIOD_SECONDS, int(h_steps), W_STEPS, W0_STEPS, True)
 
 
-def view(information_set: str) -> ViewSpec:
+def view(
+    information_set: str,
+    *,
+    h_steps: int = H_STEPS,
+    task_id: str = TASK_ID,
+) -> ViewSpec:
     if information_set not in {"input_only", "dynamic"}:
         raise ValueError(information_set)
-    return ViewSpec(head(), information_set, "record_time", "primary")
+    return ViewSpec(head(h_steps=h_steps, task_id=task_id), information_set, "record_time", "primary")
 
 
-def _write_metadata(root: Path, direction: str, source_rod: str, target_rod: str, pca: dict[str, Any]) -> None:
-    _write_json(root / "TASK_REGISTRY.json", {"dataset": "cz_czochralski", "heads": [{"head_id": TASK_ID, "task_id": TASK_ID, "dataset": "cz_czochralski", "target": TARGET_COLUMN, "cadence_seconds": RAW_PERIOD_SECONDS, "h_steps": H_STEPS, "w_steps": W_STEPS, "w0_steps": W0_STEPS, "primary": True, "direction": direction}]})
-    _write_json(root / "dataset_views" / "VIEW_REGISTRY.json", [{"task_id": TASK_ID, "dataset": "cz_czochralski", "head_id": TASK_ID, "information_set": information_set, "availability_scenario": "record_time", "proxy_policy": "primary", "input_columns": list(INPUT_COLUMNS), "target_history_column": TARGET_COLUMN if information_set == "dynamic" else None} for information_set in ("input_only", "dynamic")])
-    _write_json(root / "PROTOCOL.json", {"protocol_id": "REPRESENTATIVE_STAGE1_TEP_SRU_CZ_L256_FORMAL_V1", "support_contract": SUPPORT_CONTRACT, "tasks": [{"task_id": TASK_ID, "proxy_policies": ["primary"]}], "primary_views": ["record_time/primary"], "direction": direction, "source_rod": source_rod, "target_rod": target_rod, "target_rod_used_for_direction_selection": False})
-    _write_json(root / "CZ_TASK_REALIZATION.json", {"task_id": TASK_ID, "cadence_seconds": RAW_PERIOD_SECONDS, "aggregation": "NONE_RAW_ROWS", "origin_semantics": "CURRENT_TARGET_AT_EXCLUSIVE_HISTORY_STOP", "history_interval": "[t-256,t)", "lookback_steps": HISTORY_STEPS, "lookback_seconds": HISTORY_STEPS * RAW_PERIOD_SECONDS, "target_representation": "DELTA_FROM_LAST_OBSERVED_LEVEL", "target_formula": "D[t]-D[t-1]", "level_reconstruction": "D[t-1]+delta_pred", "max_input_index": "t-1", "target_index": "t", "h_steps": 0, "w_steps": 1, "w0_steps": 1, "direction": direction})
+def _write_metadata(
+    root: Path,
+    direction: str,
+    source_rod: str,
+    target_rod: str,
+    pca: dict[str, Any],
+    *,
+    h_steps: int = H_STEPS,
+    task_id: str = TASK_ID,
+) -> None:
+    effective_h = 1 if int(h_steps) == 0 else int(h_steps)
+    _write_json(root / "TASK_REGISTRY.json", {"dataset": "cz_czochralski", "heads": [{"head_id": task_id, "task_id": task_id, "dataset": "cz_czochralski", "target": TARGET_COLUMN, "cadence_seconds": RAW_PERIOD_SECONDS, "h_steps": int(h_steps), "w_steps": W_STEPS, "w0_steps": W0_STEPS, "primary": True, "direction": direction}]})
+    _write_json(root / "dataset_views" / "VIEW_REGISTRY.json", [{"task_id": task_id, "dataset": "cz_czochralski", "head_id": task_id, "information_set": information_set, "availability_scenario": "record_time", "proxy_policy": "primary", "input_columns": list(INPUT_COLUMNS), "target_history_column": TARGET_COLUMN if information_set == "dynamic" else None} for information_set in ("input_only", "dynamic")])
+    _write_json(root / "PROTOCOL.json", {"protocol_id": "REPRESENTATIVE_STAGE1_TEP_SRU_CZ_L256_FORMAL_V1", "support_contract": SUPPORT_CONTRACT, "tasks": [{"task_id": task_id, "proxy_policies": ["primary"]}], "primary_views": ["record_time/primary"], "direction": direction, "source_rod": source_rod, "target_rod": target_rod, "target_rod_used_for_direction_selection": False, "h_is_sampling_points": True})
+    _write_json(root / "CZ_TASK_REALIZATION.json", {"task_id": task_id, "cadence_seconds": RAW_PERIOD_SECONDS, "aggregation": "NONE_RAW_ROWS", "origin_semantics": "EXCLUSIVE_HISTORY_STOP", "history_interval": "[t-256,t)", "lookback_steps": HISTORY_STEPS, "lookback_seconds": HISTORY_STEPS * RAW_PERIOD_SECONDS, "target_representation": "DELTA_FROM_LAST_OBSERVED_LEVEL", "target_formula": "D[t+h-1]-D[t-1]", "level_reconstruction": "D[t-1]+delta_pred", "max_input_index": "t-1", "target_index": "t+h-1", "h_is_sampling_points": True, "h_steps": int(h_steps), "effective_h_steps": effective_h, "w_steps": 1, "w0_steps": 1, "direction": direction})
     _write_json(root / "JOINT_LIFT_PCA_CONTRACT.json", pca)
 
 
-def build_development_direction(raw_path: Path, output_root: Path, direction: str) -> dict[str, Any]:
+def build_development_direction(
+    raw_path: Path,
+    output_root: Path,
+    direction: str,
+    *,
+    h_steps: int = H_STEPS,
+    task_id: str | None = None,
+) -> dict[str, Any]:
     if direction not in DIRECTIONS:
         raise KeyError(direction)
     source_rod, target_rod = DIRECTIONS[direction]
+    task_id = TASK_ID if task_id is None else str(task_id)
     root = output_root / direction
     if root.exists() and any(root.iterdir()):
         raise RuntimeError(f"refusing existing CZ L256 direction root: {root}")
     raw = _read_rod(raw_path, source_rod)
     segments = _raw_segments(source_rod, raw)
-    train_origins, validation_origins = _split_source_origins(segments)
+    train_origins, validation_origins = _split_source_origins(segments, h_steps=h_steps)
     pca = _fit_joint_lift(segments, train_origins)
     segments = _apply_joint_lift(segments, pca)
     root.mkdir(parents=True, exist_ok=True)
-    _write_metadata(root, direction, source_rod, target_rod, pca)
-    train = _sample_rows(segments, direction=direction, split="train", origin_filter=train_origins)
-    validation = _sample_rows(segments, direction=direction, split="validation", origin_filter=validation_origins)
+    _write_metadata(root, direction, source_rod, target_rod, pca, h_steps=h_steps, task_id=task_id)
+    train = _sample_rows(segments, direction=direction, split="train", origin_filter=train_origins, h_steps=h_steps, task_id=task_id)
+    validation = _sample_rows(segments, direction=direction, split="validation", origin_filter=validation_origins, h_steps=h_steps, task_id=task_id)
     empty = train.iloc[0:0].copy()
-    _write_partition(root, "train", _base_frame(segments), train)
-    _write_partition(root, "validation", pd.DataFrame(), validation)
-    _write_partition(root, "test", pd.DataFrame(), empty.assign(split="test"))
-    _write_partition(root, "ood", pd.DataFrame(), empty.assign(split="ood"))
-    audit = {"status": "PASS", "stage": "CZ_SOURCE_DEVELOPMENT_C1", "created_utc": _utc(), "direction": direction, "source_rod": source_rod, "target_rod": target_rod, "raw_file_sha256": _sha256_file(raw_path), "raw_rows_read": int(len(raw)), "target_sheet_read_for_this_direction": False, "train_rows_per_information_set": int(len(train) // 2), "validation_rows_per_information_set": int(len(validation) // 2), "test_rows": 0, "test_accessed": False, "support_contract": SUPPORT_CONTRACT}
+    _write_partition(root, "train", _base_frame(segments), train, h_steps=h_steps, task_id=task_id)
+    _write_partition(root, "validation", pd.DataFrame(), validation, h_steps=h_steps, task_id=task_id)
+    _write_partition(root, "test", pd.DataFrame(), empty.assign(split="test"), h_steps=h_steps, task_id=task_id)
+    _write_partition(root, "ood", pd.DataFrame(), empty.assign(split="ood"), h_steps=h_steps, task_id=task_id)
+    audit = {"status": "PASS", "stage": "CZ_SOURCE_DEVELOPMENT_C1", "created_utc": _utc(), "direction": direction, "task_id": task_id, "h_steps": int(h_steps), "h_is_sampling_points": True, "source_rod": source_rod, "target_rod": target_rod, "raw_file_sha256": _sha256_file(raw_path), "raw_rows_read": int(len(raw)), "target_sheet_read_for_this_direction": False, "train_rows_per_information_set": int(len(train) // 2), "validation_rows_per_information_set": int(len(validation) // 2), "test_rows": 0, "test_accessed": False, "support_contract": SUPPORT_CONTRACT}
     _write_json(root / "C1_NATIVE_SUPPORT_AUDIT.json", audit)
     return audit
 
@@ -399,23 +452,26 @@ def materialize_target_direction(
     *,
     global_freeze_path: Path,
     checkpoint_manifest_path: Path,
+    h_steps: int = H_STEPS,
+    task_id: str | None = None,
 ) -> dict[str, Any]:
     _require_sealed(global_freeze_path, "GLOBAL_SELECTION_FROZEN")
     _require_sealed(checkpoint_manifest_path, "CHECKPOINTS_SEALED")
     source_rod, target_rod = DIRECTIONS[direction]
+    task_id = TASK_ID if task_id is None else str(task_id)
     root = output_root / direction
-    test_sample = root / "sample_ids" / TASK_ID / "input_only" / "record_time" / "primary" / "test.parquet"
+    test_sample = root / "sample_ids" / task_id / "input_only" / "record_time" / "primary" / "test.parquet"
     if test_sample.is_file() and len(pd.read_parquet(test_sample)):
         raise RuntimeError(f"refusing to overwrite materialized CZ target partition: {test_sample}")
     pca = json.loads((root / "JOINT_LIFT_PCA_CONTRACT.json").read_text(encoding="utf-8"))
     raw = _read_rod(raw_path, target_rod)
     segments = _apply_joint_lift(_raw_segments(target_rod, raw), pca)
-    test = _sample_rows(segments, direction=direction, split="test")
-    _write_partition(root, "test", _base_frame(segments), test)
+    test = _sample_rows(segments, direction=direction, split="test", h_steps=h_steps, task_id=task_id)
+    _write_partition(root, "test", _base_frame(segments), test, h_steps=h_steps, task_id=task_id)
     for information_set in ("input_only", "dynamic"):
         subset = test[test["information_set"] == information_set]
         if not np.all(subset["history_stop_exclusive"].to_numpy(dtype=np.int64) <= subset["target_start"].to_numpy(dtype=np.int64)):
             raise AssertionError("STOP_CZ_L256_LOOKAHEAD_LEAK")
-    audit = {"status": "PASS", "stage": "CZ_TARGET_TEST_C1", "created_utc": _utc(), "direction": direction, "source_rod": source_rod, "target_rod": target_rod, "raw_file_sha256": _sha256_file(raw_path), "raw_rows_read": int(len(raw)), "test_rows_per_information_set": int(len(test) // 2), "input_support_hash": support_id_hash(test[test["information_set"] == "input_only"]), "dynamic_support_hash": support_id_hash(test[test["information_set"] == "dynamic"]), "global_freeze_sha256": _sha256_file(global_freeze_path), "checkpoint_manifest_sha256": _sha256_file(checkpoint_manifest_path), "test_accessed": True, "target_rod_first_access_after_freeze": True}
+    audit = {"status": "PASS", "stage": "CZ_TARGET_TEST_C1", "created_utc": _utc(), "direction": direction, "task_id": task_id, "h_steps": int(h_steps), "h_is_sampling_points": True, "source_rod": source_rod, "target_rod": target_rod, "raw_file_sha256": _sha256_file(raw_path), "raw_rows_read": int(len(raw)), "test_rows_per_information_set": int(len(test) // 2), "input_support_hash": support_id_hash(test[test["information_set"] == "input_only"]), "dynamic_support_hash": support_id_hash(test[test["information_set"] == "dynamic"]), "global_freeze_sha256": _sha256_file(global_freeze_path), "checkpoint_manifest_sha256": _sha256_file(checkpoint_manifest_path), "test_accessed": True, "target_rod_first_access_after_freeze": True}
     _write_json(root / "CZ_TARGET_TEST_ACCESS_AUDIT.json", audit)
     return audit
