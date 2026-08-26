@@ -9,6 +9,7 @@ The formal freeze/checkpoint/test process is a separate follow-up launcher.
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import os
@@ -579,6 +580,27 @@ def run_baselines(shared: Path, output: Path, inputs: list[ViewSpec], dynamics: 
     return _summary(output, "BASELINES", results)
 
 
+def _finite_fold_loss_histories(
+    fold_losses: Any,
+    *,
+    history_position: int,
+) -> set[int]:
+    """Return histories backed by an actually evaluated finite four-fold candidate."""
+    if not isinstance(fold_losses, dict):
+        return set()
+    histories: set[int] = set()
+    for raw_candidate, raw_losses in fold_losses.items():
+        try:
+            candidate = ast.literal_eval(str(raw_candidate))
+            losses = np.asarray(raw_losses, dtype=np.float64).reshape(-1)
+            history = int(candidate[history_position])
+        except (IndexError, TypeError, ValueError, SyntaxError):
+            continue
+        if len(losses) >= 4 and bool(np.isfinite(losses).all()):
+            histories.add(history)
+    return histories
+
+
 def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
     pilot_output = run_root / "pilot" / "results"
     inputs, dynamics = _tep_views(shared)
@@ -592,26 +614,43 @@ def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
         run_dpls_job(shared, PROJECT, pilot_output / "BASELINE_DEVELOPMENT", view, CONFIG_PATH),
         run_ar_job(shared, PROJECT, pilot_output / "BASELINE_DEVELOPMENT", dynamics[0], CONFIG_PATH),
     ]
-    histories_seen: set[int] = set()
-    for record in records:
-        for audit in record.get("registered_history_support_audit", []):
-            if audit.get("available") is True:
-                histories_seen.add(int(audit["history_steps"]))
-        for key in record.get("profile_fold_losses", {}):
-            numbers = [int(token) for token in key.replace("(", "").replace(")", "").split(",") if token.strip().isdigit()]
-            if len(numbers) >= 2:
-                histories_seen.add(numbers[1])
-        for key in record.get("selection", {}).get("fold_losses", {}):
-            for expected in EXPECTED_HISTORIES:
-                if str(expected) in str(key):
-                    histories_seen.add(expected)
-    missing = sorted(set(EXPECTED_HISTORIES).difference(histories_seen))
+    coverage_by_job = {
+        f"K:{fast}": _finite_fold_loss_histories(
+            records[0].get("profile_fold_losses"), history_position=1
+        ),
+        f"K:{medium}": _finite_fold_loss_histories(
+            records[1].get("profile_fold_losses"), history_position=1
+        ),
+        "DPLS": _finite_fold_loss_histories(
+            records[2].get("selection", {}).get("fold_losses"),
+            history_position=0,
+        ),
+        "AR": _finite_fold_loss_histories(
+            records[3].get("selection", {}).get("profile_fold_losses"),
+            history_position=1,
+        ),
+    }
+    expected = set(EXPECTED_HISTORIES)
+    missing_by_job = {
+        job: sorted(expected.difference(histories))
+        for job, histories in coverage_by_job.items()
+        if histories != expected
+    }
+    histories_seen = set.intersection(*coverage_by_job.values())
+    missing = sorted(expected.difference(histories_seen))
     result = {
-        "status": "PASS" if not missing and all(str(item.get("status")) in SUCCESS_STATUSES for item in records) else "FAILED",
+        "status": "PASS"
+        if not missing_by_job
+        and all(str(item.get("status")) in SUCCESS_STATUSES for item in records)
+        else "FAILED",
         "stage": "TEP_CPU_HISTORY_EXTENSION_PILOT",
         "jobs": len(records),
         "history_steps_observed": sorted(histories_seen),
+        "history_steps_observed_by_job": {
+            job: sorted(histories) for job, histories in coverage_by_job.items()
+        },
         "missing_registered_histories": missing,
+        "missing_registered_histories_by_job": missing_by_job,
         "common_support_history_steps": COMMON_HISTORY,
         "test_accessed": False,
         "ood_accessed": False,

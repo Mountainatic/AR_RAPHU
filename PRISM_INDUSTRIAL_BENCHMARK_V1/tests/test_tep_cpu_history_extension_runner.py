@@ -126,6 +126,38 @@ def test_explicit_override_binds_every_history_and_preserves_dpls_lag_cap() -> N
     assert {history for _, history in capped} == {2, 4, 8, 128, 256}
 
 
+def test_pilot_gate_requires_actual_finite_four_fold_losses() -> None:
+    module = _runner()
+    expected = {2, 4, 8, 128, 256}
+    k_losses = {
+        str((1, history)): [1.0, 1.1, 1.2, 1.3] for history in expected
+    }
+    dpls_losses = {
+        str((history, 1)): [1.0, 1.1, 1.2, 1.3] for history in expected
+    }
+    assert module._finite_fold_loss_histories(
+        k_losses, history_position=1
+    ) == expected
+    assert module._finite_fold_loss_histories(
+        dpls_losses, history_position=0
+    ) == expected
+
+    metadata_only = {
+        "registered_history_support_audit": [
+            {"history_steps": history, "available": True} for history in expected
+        ]
+    }
+    assert module._finite_fold_loss_histories(
+        metadata_only, history_position=1
+    ) == set()
+    assert module._finite_fold_loss_histories(
+        {"(128, 1)": [1.0] * 4}, history_position=0
+    ) == {128}
+    assert module._finite_fold_loss_histories(
+        {"(1, 256)": [1.0, float("inf"), 1.0, 1.0]}, history_position=1
+    ) == set()
+
+
 def test_launcher_uses_cgroup_75gib_and_kills_the_stage_process_group() -> None:
     text = LAUNCHER_PATH.read_text(encoding="utf-8")
     assert 'Path("/sys/fs/cgroup/memory.current")' in text
