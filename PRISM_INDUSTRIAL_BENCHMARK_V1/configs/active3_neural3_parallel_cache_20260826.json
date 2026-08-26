@@ -1,0 +1,199 @@
+{
+  "schema_version": "1.0",
+  "protocol_id": "PRISM_V211_ACTIVE3_NEURAL3_PARALLEL_CACHE_20260826_R1",
+  "status": "FROZEN_BEFORE_ACTIVE3_NEURAL3_DEVELOPMENT",
+  "authority": {
+    "repository": "Mountainatic/AR_RAPHU",
+    "source_branch": "prism-v2-1-1-metro-p60-joint-stability-final",
+    "source_commit": "e47542a319640bc045ca0d31ae9b40763182dde8",
+    "execution_branch": "prism-v2-1-1-active3-neural3-parallel-cache-20260826"
+  },
+  "namespace": {
+    "server_code": "/root/AR_RAPHU_EXT_20260825/code",
+    "run_root": "/root/autodl-tmp/PRISM_V211_ACTIVE3_NEURAL3_PARALLEL_CACHE_20260826_R1",
+    "existing_formal_baseline_readonly": "/root/autodl-tmp/PRISM_V211_REPRESENTATIVE_TEP_SRU_CZ_L256_FORMAL_20260825_R3",
+    "existing_cz_cpu_extension_readonly": "/root/autodl-tmp/PRISM_V211_EXT_20260825_FORMAL_CPU_R2",
+    "old_runs_must_not_be_modified": true,
+    "old_neural3_cancellation_overridden_only_in_this_namespace": true
+  },
+  "active_scope": {
+    "tep": {
+      "dataset": "tep",
+      "cadence_seconds": 180,
+      "prediction_scale_seconds": 180,
+      "history_steps": [128, 256],
+      "history_labels": {"128": "128pts", "256": "256pts"},
+      "tasks": [
+        {
+          "dataset": "tep",
+          "task_id": "TEP_G_REP_H1",
+          "head_id": "TEP_G_REP_H1__H1__W2",
+          "h_steps": 1,
+          "w_steps": 2,
+          "w0_steps": 2,
+          "view_variants": [
+            {
+              "information_set": "input_only",
+              "availability_scenario": "record_time",
+              "proxy_policy": "proxy_excluded"
+            },
+            {
+              "information_set": "dynamic",
+              "availability_scenario": "record_time",
+              "proxy_policy": "proxy_excluded"
+            },
+            {
+              "information_set": "dynamic",
+              "availability_scenario": "analyzer_maturity_5_steps",
+              "proxy_policy": "proxy_excluded"
+            }
+          ]
+        }
+      ]
+    },
+    "sru": {
+      "dataset": "sru",
+      "cadence_seconds": 60,
+      "prediction_scale_seconds": 60,
+      "history_rule": "FROZEN_REPRESENTATIVE_NEURAL_LOOKBACK_HOURS",
+      "lookback_hours": [2, 4, 8],
+      "history_steps": [120, 240, 480],
+      "history_labels": {"120": "2h", "240": "4h", "480": "8h"},
+      "tasks": [
+        {
+          "dataset": "sru",
+          "task_id": "SRU_H2S_REP_H1",
+          "head_id": "SRU_H2S_REP_H1__H1__W1",
+          "h_steps": 1,
+          "w_steps": 1,
+          "w0_steps": 1,
+          "view_variants": [
+            {
+              "information_set": "input_only",
+              "availability_scenario": "record_time",
+              "proxy_policy": "primary"
+            },
+            {
+              "information_set": "dynamic",
+              "availability_scenario": "record_time",
+              "proxy_policy": "primary"
+            }
+          ]
+        },
+        {
+          "dataset": "sru",
+          "task_id": "SRU_SO2_REP_H1",
+          "head_id": "SRU_SO2_REP_H1__H1__W1",
+          "h_steps": 1,
+          "w_steps": 1,
+          "w0_steps": 1,
+          "view_variants": [
+            {
+              "information_set": "input_only",
+              "availability_scenario": "record_time",
+              "proxy_policy": "primary"
+            },
+            {
+              "information_set": "dynamic",
+              "availability_scenario": "record_time",
+              "proxy_policy": "primary"
+            }
+          ]
+        }
+      ]
+    },
+    "cz": {
+      "dataset": "cz_czochralski",
+      "task_id_template": "CZ_DIAM_RAW2S_CURRENT_L256_H{h}",
+      "head_id_template": "CZ_DIAM_RAW2S_CURRENT_L256_H{h}",
+      "sampling_period_seconds": 2,
+      "aggregation": "NONE_RAW_ROWS",
+      "history_steps": 256,
+      "history_labels": {"256": "256pts"},
+      "history_interval": "[t-256,t)",
+      "horizons_steps": [1, 2, 4, 8, 16],
+      "directions": ["Rod_1_to_Rod_2", "Rod_2_to_Rod_1"],
+      "information_sets": ["input_only", "dynamic"],
+      "target_formula": "D[t+h-1]-D[t-1]",
+      "level_reconstruction": "D[t-1]+delta_pred",
+      "breakpoint_and_unlock_contract": "src/prism_benchmark/cz_l256_nowcast.py",
+      "development_reads_source_rod_only": true,
+      "target_rod_locked_until_global_freeze": true,
+      "raw_data_public_upload_forbidden": true
+    }
+  },
+  "out_of_scope": {
+    "debutanizer": "NOT_RUN_BY_USER_SCOPE",
+    "pmsm": "NOT_RUN_BY_USER_SCOPE",
+    "metro": "NOT_RUN_BY_USER_SCOPE",
+    "stage2": "NOT_RUN_BY_USER_SCOPE"
+  },
+  "neural_protocol": {
+    "models": ["LSTM", "iTransformer", "TimeMixer"],
+    "capacities": ["SMALL", "MEDIUM"],
+    "learning_rates": [0.0003, 0.001],
+    "screening_seed": 20260817,
+    "active_checkpoint_seed": 20260817,
+    "historical_final_seeds_not_run": [20260817, 20260818, 20260819],
+    "optimizer": "AdamW",
+    "weight_decay": 0.0001,
+    "loss": "MSE",
+    "gradient_clip_norm": 1.0,
+    "max_epochs": 100,
+    "early_stopping_patience": 12,
+    "effective_batch_size": 256,
+    "precision": "FP32",
+    "tf32_allowed": false,
+    "development_fit_split": "train",
+    "development_selection_split": "validation",
+    "final_fit_status": "NOT_RUN_RETRAIN_FORBIDDEN_BY_CURRENT_USER_RULE",
+    "selected_checkpoint_policy": "REFERENCE_CACHED_DEVELOPMENT_BEST_WEIGHT",
+    "test_inference_only": true,
+    "test_entry_must_reject": ["fit", "refit", "select"]
+  },
+  "declared_view_counts": {
+    "tep": 3,
+    "sru": 4,
+    "cz": 20,
+    "total": 27
+  },
+  "declared_workload_counts": {
+    "profiles": 81,
+    "selection_candidates": 456,
+    "selected_checkpoint_references": 81,
+    "total_training_units": 456
+  },
+  "resources": {
+    "resource_unit": "decimal_GB",
+    "cgroup_memory_is_authoritative": true,
+    "container_memory_hard_limit_gib": 90,
+    "ram_dispatch_budget_gib": 75,
+    "ram_pause_dispatch_gib": 82,
+    "ram_safe_stop_gib": 85,
+    "vram_dispatch_budget_gib": 27,
+    "data_disk_stopline_gib": 5,
+    "pilot_required_per_model": true,
+    "max_concurrency_before_pilot": 1,
+    "gpu_index": 0,
+    "dataloader_workers": 0,
+    "blas_threads_per_process": 1,
+    "torch_intraop_threads_per_process": 1,
+    "torch_interop_threads_per_process": 1,
+    "dispatch_action_at_ram_pause": "STOP_NEW_DISPATCH",
+    "runtime_action_at_ram_safe_stop": "CHECKPOINT_ALL_AND_SAFE_STOP",
+    "disk_action_below_stopline": "STOP_NEW_DISPATCH"
+  },
+  "cache_and_freeze": {
+    "candidate_manifest": "CANDIDATE_CHECKPOINT_MANIFEST.json",
+    "candidate_level_lock_required": true,
+    "atomic_manifest_replace_required": true,
+    "exact_hash_match_reuse_required": true,
+    "corrupt_file_action": "CORRUPT_QUARANTINED",
+    "unfinished_candidate_action": "RESUME_RECENT_CHECKPOINT",
+    "delete_unselected_candidates": false,
+    "global_selection_freeze": "GLOBAL_SELECTION_FREEZE.json",
+    "selected_checkpoint_manifest": "SELECTED_CHECKPOINT_MANIFEST.json",
+    "selected_checkpoints_readonly_before_test": true,
+    "deletion_forbidden": true
+  }
+}

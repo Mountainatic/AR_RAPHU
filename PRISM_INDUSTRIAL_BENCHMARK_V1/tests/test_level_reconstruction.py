@@ -23,6 +23,22 @@ def test_reconstruction_and_metrics_share_residuals() -> None:
     assert result["rmse"] == pytest.approx(result["rmse_delta"])
     assert result["mae"] == pytest.approx(result["mae_delta"])
     assert result["r2_level_reconstructed"] != result["r2_delta"]
+    assert result["std_level_prediction"] == pytest.approx(
+        np.std(current + delta_pred), abs=1e-15
+    )
+    assert result["std_delta_prediction"] == pytest.approx(
+        np.std(delta_pred), abs=1e-15
+    )
+    assert result["std_level_residual"] == pytest.approx(
+        result["std_delta_residual"], abs=1e-15
+    )
+    assert result["variance_ratio_level_prediction_to_target"] == pytest.approx(
+        np.var(current + delta_pred) / np.var(current + delta_true), abs=1e-15
+    )
+    assert result["variance_ratio_delta_prediction_to_target"] == pytest.approx(
+        np.var(delta_pred) / np.var(delta_true), abs=1e-15
+    )
+    assert result["residual_identity_max_abs_error"] <= 1e-10
 
 
 def test_reconstruction_rejects_mismatched_support_lengths() -> None:

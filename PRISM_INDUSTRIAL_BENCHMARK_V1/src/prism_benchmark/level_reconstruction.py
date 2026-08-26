@@ -123,6 +123,20 @@ def metric_bundle_delta_and_level(
     variance_ratio = (
         float("nan") if variance_delta == 0.0 else variance_level / variance_delta
     )
+    prediction_variance_delta = float(np.var(prediction, dtype=np.float64))
+    prediction_variance_level = float(
+        np.var(future_prediction, dtype=np.float64)
+    )
+    variance_ratio_delta_prediction_to_target = (
+        float("nan")
+        if variance_delta == 0.0
+        else prediction_variance_delta / variance_delta
+    )
+    variance_ratio_level_prediction_to_target = (
+        float("nan")
+        if variance_level == 0.0
+        else prediction_variance_level / variance_level
+    )
     return {
         "r2_level_reconstructed": level_metrics["r2"],
         "r2_delta": delta_metrics["r2"],
@@ -135,8 +149,18 @@ def metric_bundle_delta_and_level(
         "r2_level_persistence": persistence["r2_level_persistence"],
         "persistence_skill": skill,
         "std_level_target": float(np.std(future_truth, dtype=np.float64)),
+        "std_level_prediction": float(
+            np.std(future_prediction, dtype=np.float64)
+        ),
+        "std_level_residual": float(np.std(level_residual, dtype=np.float64)),
         "std_delta_target": float(np.std(truth, dtype=np.float64)),
+        "std_delta_prediction": float(np.std(prediction, dtype=np.float64)),
+        "std_delta_residual": float(np.std(residual, dtype=np.float64)),
         "variance_ratio": variance_ratio,
+        "variance_ratio_level_to_delta_target": variance_ratio,
+        "variance_ratio_level_prediction_to_target": variance_ratio_level_prediction_to_target,
+        "variance_ratio_delta_prediction_to_target": variance_ratio_delta_prediction_to_target,
+        "residual_identity_max_abs_error": max_abs_error,
         "future_level_true": future_truth,
         "future_level_pred": future_prediction,
     }
