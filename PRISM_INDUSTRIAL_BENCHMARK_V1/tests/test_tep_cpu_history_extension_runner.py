@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -19,6 +20,16 @@ def _runner():
     if source not in sys.path:
         sys.path.insert(0, source)
     spec = importlib.util.spec_from_file_location("tep_cpu_history_runner", RUNNER_PATH)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _launcher():
+    spec = importlib.util.spec_from_file_location(
+        "tep_cpu_history_launcher", LAUNCHER_PATH
+    )
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -187,6 +198,224 @@ def test_launcher_uses_cgroup_75gib_and_kills_the_stage_process_group() -> None:
     assert 'environment["PYTHONPATH"]' in text
     assert 'if stage == "scope"' in text
     assert 'mode.add_argument("--pilot-only"' in text
+
+
+def _sealed_pilot_fixture(tmp_path: Path, module):
+    run_root = tmp_path / "run"
+    logs = run_root / "logs"
+    source = tmp_path / "source_shared"
+    logs.mkdir(parents=True)
+    source.mkdir()
+    registry_names = (
+        "DATASET_HASHES.json",
+        "TASK_REGISTRY.json",
+        "SPLIT_REGISTRY.json",
+        "SAMPLE_ID_REGISTRY.json",
+        "PROTOCOL.json",
+        "LOCKBOX.json",
+    )
+    inventory = []
+    for index, name in enumerate(registry_names):
+        path = source / name
+        path.write_text(f"registry-{index}\n", encoding="utf-8")
+        inventory.append(
+            {
+                "name": name,
+                "bytes": path.stat().st_size,
+                "sha256": module._sha256_file(path),
+            }
+        )
+    support = {
+        "status": "PASS",
+        "stage": "L256_DEVELOPMENT_COMMON_SUPPORT",
+        "test_accessed": False,
+        "ood_accessed": False,
+        "records": [],
+    }
+    support_path = logs / "L256_DEVELOPMENT_SUPPORT.json"
+    support_path.write_text(
+        json.dumps(support, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    config_sha256 = module._sha256_file(module.CONFIG)
+    scope = {
+        "status": "PASS",
+        "stage": "TEP_CPU_HISTORY_EXTENSION_SCOPE",
+        "protocol_id": module.EXPECTED_PROTOCOL,
+        "source_commit": "fixture-commit",
+        "config_sha256": config_sha256,
+        "source_shared": str(source.resolve()),
+        "support_manifest_sha256": module._stable_hash(support),
+        "data_manifest_sha256": module._stable_hash(inventory),
+        "protocol_sha256": module._sha256_file(source / "PROTOCOL.json"),
+        "source_registry_inventory": inventory,
+        "test_accessed": False,
+        "ood_accessed": False,
+    }
+    scope_path = logs / "SCOPE.json"
+    scope_path.write_text(
+        json.dumps(scope, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    jobs = ("K:xmv_1", "K:xmeas_1", "DPLS", "AR")
+    artifacts = {}
+    audits = {}
+    for index, job in enumerate(jobs):
+        path = run_root / "pilot" / "results" / f"prediction_{index}.parquet"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(f"prediction-{index}".encode("ascii"))
+        relative = path.relative_to(run_root).as_posix()
+        sha256 = module._sha256_file(path)
+        artifacts[job] = {"path": relative, "sha256": sha256}
+        audits[job] = {
+            "status": "PASS",
+            "passed": True,
+            "history_steps": list(module.EXPECTED_HISTORIES),
+            "finite_exact_four_fold_grid": True,
+            "grid_size_valid": True,
+            "common_scoring_valid": True,
+            "override_config_sha256": config_sha256,
+            "override_protocol_id": module.EXPECTED_PROTOCOL,
+            "prediction_artifact_verified": True,
+            "prediction_path": relative,
+            "prediction_sha256": sha256,
+        }
+    evidence = {
+        "status": "PASS",
+        "stage": module.EXPECTED_PILOT_STAGE,
+        "pilot_evidence_version": 1,
+        "protocol_id": module.EXPECTED_PROTOCOL,
+        "protocol_sha256": scope["protocol_sha256"],
+        "source_commit": "fixture-commit",
+        "config_sha256": config_sha256,
+        "history_override_config_sha256": config_sha256,
+        "scope_manifest_path": "logs/SCOPE.json",
+        "scope_manifest_sha256": module._sha256_file(scope_path),
+        "support_manifest_path": "logs/L256_DEVELOPMENT_SUPPORT.json",
+        "support_manifest_sha256": scope["support_manifest_sha256"],
+        "support_manifest_file_sha256": module._sha256_file(support_path),
+        "data_manifest_sha256": scope["data_manifest_sha256"],
+        "source_registry_inventory": inventory,
+        "jobs": 4,
+        "history_steps_observed": list(module.EXPECTED_HISTORIES),
+        "history_steps_observed_by_job": {
+            job: list(module.EXPECTED_HISTORIES) for job in jobs
+        },
+        "missing_registered_histories": [],
+        "missing_registered_histories_by_job": {},
+        "job_audits": audits,
+        "prediction_artifacts": artifacts,
+        "prediction_artifact_count": 4,
+        "prediction_artifacts_sha256": module._stable_hash(artifacts),
+        "common_support_history_steps": module.EXPECTED_COMMON_HISTORY,
+        "test_accessed": False,
+        "ood_accessed": False,
+    }
+    evidence_path = logs / "PILOT.json"
+    evidence_path.write_text(
+        json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    return run_root, evidence_path, evidence
+
+
+def test_launcher_skip_pilot_requires_evidence_path(monkeypatch) -> None:
+    module = _launcher()
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "launch_tep_cpu_history_extension_20260826.py",
+            "--shared",
+            "unused-shared",
+            "--run-root",
+            "unused-run",
+            "--skip-pilot",
+        ],
+    )
+    with pytest.raises(SystemExit):
+        module.main()
+
+
+def test_launcher_skip_pilot_stops_before_formal_stages_on_invalid_evidence(
+    tmp_path: Path, monkeypatch
+) -> None:
+    module = _launcher()
+    calls: list[str] = []
+    monkeypatch.setattr(
+        module,
+        "_run_stage",
+        lambda stage, *arguments: calls.append(stage),
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "launch_tep_cpu_history_extension_20260826.py",
+            "--shared",
+            str(tmp_path / "shared"),
+            "--run-root",
+            str(tmp_path / "run"),
+            "--skip-pilot",
+            "--pilot-evidence",
+            str(tmp_path / "missing-PILOT.json"),
+        ],
+    )
+    with pytest.raises(RuntimeError, match="EVIDENCE_MISSING"):
+        module.main()
+    assert calls == ["scope"]
+
+
+def test_launcher_pilot_evidence_guard_rechecks_provenance_and_predictions(
+    tmp_path: Path, monkeypatch
+) -> None:
+    module = _launcher()
+    run_root, evidence_path, evidence = _sealed_pilot_fixture(tmp_path, module)
+    monkeypatch.setattr(module, "_git", lambda *arguments: "fixture-commit")
+
+    result = module.verify_pilot_evidence(evidence_path, run_root)
+    assert result["status"] == "PASS"
+    assert result["prediction_artifact_count"] == 4
+
+    first_prediction = run_root / evidence["prediction_artifacts"]["K:xmv_1"]["path"]
+    first_prediction.write_bytes(b"tampered")
+    with pytest.raises(RuntimeError, match="PREDICTION_SHA"):
+        module.verify_pilot_evidence(evidence_path, run_root)
+
+
+def test_launcher_pilot_evidence_guard_rejects_commit_drift(
+    tmp_path: Path, monkeypatch
+) -> None:
+    module = _launcher()
+    run_root, evidence_path, _ = _sealed_pilot_fixture(tmp_path, module)
+    monkeypatch.setattr(module, "_git", lambda *arguments: "new-commit")
+    with pytest.raises(RuntimeError, match="EVIDENCE_COMMIT"):
+        module.verify_pilot_evidence(evidence_path, run_root)
+
+
+def test_launcher_pilot_evidence_guard_rejects_data_manifest_drift(
+    tmp_path: Path, monkeypatch
+) -> None:
+    module = _launcher()
+    run_root, evidence_path, _ = _sealed_pilot_fixture(tmp_path, module)
+    monkeypatch.setattr(module, "_git", lambda *arguments: "fixture-commit")
+    scope = json.loads(
+        (run_root / "logs" / "SCOPE.json").read_text(encoding="utf-8")
+    )
+    (Path(scope["source_shared"]) / "PROTOCOL.json").write_text(
+        "changed\n", encoding="utf-8"
+    )
+    with pytest.raises(RuntimeError, match="DATA_(SIZE|SHA)|PROTOCOL_MANIFEST"):
+        module.verify_pilot_evidence(evidence_path, run_root)
+
+
+def test_launcher_pilot_evidence_guard_rejects_support_file_drift(
+    tmp_path: Path, monkeypatch
+) -> None:
+    module = _launcher()
+    run_root, evidence_path, _ = _sealed_pilot_fixture(tmp_path, module)
+    monkeypatch.setattr(module, "_git", lambda *arguments: "fixture-commit")
+    support_path = run_root / "logs" / "L256_DEVELOPMENT_SUPPORT.json"
+    support_path.write_text("{\"status\": \"PASS\", \"changed\": true}\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="SUPPORT|ACCESS"):
+        module.verify_pilot_evidence(evidence_path, run_root)
 
 
 def test_k_smoothness_scoring_history_is_opt_in(monkeypatch) -> None:

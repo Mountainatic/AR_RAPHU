@@ -369,6 +369,21 @@ def run_scope(source_shared: Path, run_root: Path) -> dict[str, Any]:
             "STOP_TEP_K_CHANNEL_CARDINALITY:"
             f"{len(k_jobs)}!={EXPECTED_K_CHANNEL_JOBS}"
         )
+    source_registry_inventory = [
+        {
+            "name": name,
+            "bytes": (source_shared / name).stat().st_size,
+            "sha256": sha256_file(source_shared / name),
+        }
+        for name in (
+            "DATASET_HASHES.json",
+            "TASK_REGISTRY.json",
+            "SPLIT_REGISTRY.json",
+            "SAMPLE_ID_REGISTRY.json",
+            "PROTOCOL.json",
+            "LOCKBOX.json",
+        )
+    ]
     result = {
         "status": "PASS",
         "stage": "TEP_CPU_HISTORY_EXTENSION_SCOPE",
@@ -393,23 +408,11 @@ def run_scope(source_shared: Path, run_root: Path) -> dict[str, Any]:
         "test_accessed": False,
         "ood_accessed": False,
         "support_manifest_sha256": _stable_hash(support),
+        "data_manifest_sha256": _stable_hash(source_registry_inventory),
+        "protocol_sha256": sha256_file(source_shared / "PROTOCOL.json"),
         "pyproject_sha256": sha256_file(PROJECT.parent / "pyproject.toml"),
         "uv_lock_sha256": sha256_file(PROJECT.parent / "uv.lock"),
-        "source_registry_inventory": [
-            {
-                "name": name,
-                "bytes": (source_shared / name).stat().st_size,
-                "sha256": sha256_file(source_shared / name),
-            }
-            for name in (
-                "DATASET_HASHES.json",
-                "TASK_REGISTRY.json",
-                "SPLIT_REGISTRY.json",
-                "SAMPLE_ID_REGISTRY.json",
-                "PROTOCOL.json",
-                "LOCKBOX.json",
-            )
-        ],
+        "source_registry_inventory": source_registry_inventory,
     }
     write_json(scope_path, result)
     return result
@@ -638,7 +641,45 @@ def _prediction_artifact_verified(record: dict[str, Any], root: Path) -> bool:
     return candidate.is_file() and sha256_file(candidate) == expected_sha256
 
 
+def _prediction_artifact_entry(
+    record: dict[str, Any], root: Path, run_root: Path
+) -> dict[str, str] | None:
+    """Return a run-root-relative prediction reference for the pilot seal.
+
+    Pilot evidence is later checked from the launcher process.  Keep the
+    reference relative to the run root and reject paths that escape it (for
+    example through a symlink), so a valid hash cannot be used to bless an
+    unrelated artifact.
+    """
+
+    relative_path = record.get("prediction_path")
+    expected_sha256 = record.get("prediction_sha256")
+    if not isinstance(relative_path, str) or not isinstance(expected_sha256, str):
+        return None
+    root = root.resolve()
+    run_root = run_root.resolve()
+    candidate = (root / relative_path).resolve()
+    try:
+        relative_to_run_root = candidate.relative_to(run_root)
+    except ValueError:
+        return None
+    if not candidate.is_file() or sha256_file(candidate) != expected_sha256:
+        return None
+    return {
+        "path": relative_to_run_root.as_posix(),
+        "sha256": expected_sha256,
+    }
+
+
 def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
+    scope_path = run_root / "logs" / "SCOPE.json"
+    support_path = run_root / "logs" / "L256_DEVELOPMENT_SUPPORT.json"
+    if not scope_path.is_file() or not support_path.is_file():
+        raise RuntimeError("STOP_TEP_EXTENSION_PILOT_PROVENANCE_MISSING")
+    scope = _read_json(scope_path)
+    support = _read_json(support_path)
+    if scope.get("status") != "PASS" or support.get("status") != "PASS":
+        raise RuntimeError("STOP_TEP_EXTENSION_PILOT_PROVENANCE_NOT_PASS")
     pilot_output = run_root / "pilot" / "results"
     inputs, dynamics = _tep_views(shared)
     view = inputs[0]
@@ -691,6 +732,7 @@ def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
     expected_config_sha256 = sha256_file(CONFIG_PATH)
     coverage_by_job: dict[str, set[int]] = {}
     job_audits: dict[str, dict[str, Any]] = {}
+    prediction_artifacts: dict[str, dict[str, str]] = {}
     for job, specification in jobs.items():
         record = specification["record"]
         fold_losses = specification["fold_losses"]
@@ -710,6 +752,9 @@ def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
             not bool(specification["requires_common_scoring"])
             or record.get("selected_scoring_history_steps") == COMMON_HISTORY
         )
+        artifact = _prediction_artifact_entry(
+            record, specification["prediction_root"], run_root
+        )
         audit = {
             "status": str(record.get("status")),
             "history_steps": sorted(histories),
@@ -725,7 +770,11 @@ def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
             "prediction_artifact_verified": _prediction_artifact_verified(
                 record, specification["prediction_root"]
             ),
+            "prediction_path": None if artifact is None else artifact["path"],
+            "prediction_sha256": None if artifact is None else artifact["sha256"],
         }
+        if artifact is not None:
+            prediction_artifacts[job] = artifact
         audit["passed"] = bool(
             audit["status"] == "PASS"
             and histories == expected
@@ -735,6 +784,7 @@ def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
             and audit["override_config_sha256"] == expected_config_sha256
             and audit["override_protocol_id"] == EXPECTED_PROTOCOL
             and audit["prediction_artifact_verified"]
+            and artifact is not None
         )
         job_audits[job] = audit
     missing_by_job = {
@@ -744,11 +794,37 @@ def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
     }
     histories_seen = set.intersection(*coverage_by_job.values())
     missing = sorted(expected.difference(histories_seen))
+    source_registry_inventory = scope.get("source_registry_inventory")
+    if not isinstance(source_registry_inventory, list) or not source_registry_inventory:
+        raise RuntimeError("STOP_TEP_EXTENSION_DATA_MANIFEST_MISSING")
+    if scope.get("support_manifest_sha256") != _stable_hash(support):
+        raise RuntimeError("STOP_TEP_EXTENSION_PILOT_SUPPORT_MANIFEST_CHANGED")
+    data_manifest_sha256 = scope.get("data_manifest_sha256")
+    if not isinstance(data_manifest_sha256, str):
+        data_manifest_sha256 = _stable_hash(source_registry_inventory)
+    protocol_sha256 = scope.get("protocol_sha256")
+    if not isinstance(protocol_sha256, str):
+        protocol_sha256 = sha256_file(shared / "PROTOCOL.json")
+    if protocol_sha256 != sha256_file(shared / "PROTOCOL.json"):
+        raise RuntimeError("STOP_TEP_EXTENSION_PILOT_PROTOCOL_MANIFEST_CHANGED")
     result = {
         "status": "PASS"
         if not missing_by_job and all(audit["passed"] for audit in job_audits.values())
         else "FAILED",
         "stage": "TEP_CPU_HISTORY_EXTENSION_PILOT",
+        "pilot_evidence_version": 1,
+        "protocol_id": EXPECTED_PROTOCOL,
+        "protocol_sha256": protocol_sha256,
+        "source_commit": scope.get("source_commit"),
+        "config_sha256": expected_config_sha256,
+        "history_override_config_sha256": expected_config_sha256,
+        "scope_manifest_path": str(scope_path.relative_to(run_root).as_posix()),
+        "scope_manifest_sha256": sha256_file(scope_path),
+        "support_manifest_path": str(support_path.relative_to(run_root).as_posix()),
+        "support_manifest_sha256": _stable_hash(support),
+        "support_manifest_file_sha256": sha256_file(support_path),
+        "data_manifest_sha256": data_manifest_sha256,
+        "source_registry_inventory": source_registry_inventory,
         "jobs": len(records),
         "history_steps_observed": sorted(histories_seen),
         "history_steps_observed_by_job": {
@@ -757,6 +833,12 @@ def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
         "missing_registered_histories": missing,
         "missing_registered_histories_by_job": missing_by_job,
         "job_audits": job_audits,
+        "prediction_artifacts": prediction_artifacts,
+        "prediction_sha256": {
+            job: artifact["sha256"] for job, artifact in prediction_artifacts.items()
+        },
+        "prediction_artifact_count": len(prediction_artifacts),
+        "prediction_artifacts_sha256": _stable_hash(prediction_artifacts),
         "common_support_history_steps": COMMON_HISTORY,
         "test_accessed": False,
         "ood_accessed": False,
