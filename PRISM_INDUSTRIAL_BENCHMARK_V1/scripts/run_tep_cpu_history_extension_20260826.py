@@ -596,9 +596,46 @@ def _finite_fold_loss_histories(
             history = int(candidate[history_position])
         except (IndexError, TypeError, ValueError, SyntaxError):
             continue
-        if len(losses) >= 4 and bool(np.isfinite(losses).all()):
+        if len(losses) == 4 and bool(np.isfinite(losses).all()):
             histories.add(history)
     return histories
+
+
+def _finite_four_fold_grid(fold_losses: Any, *, history_position: int) -> bool:
+    if not isinstance(fold_losses, dict) or not fold_losses:
+        return False
+    for raw_candidate, raw_losses in fold_losses.items():
+        try:
+            candidate = ast.literal_eval(str(raw_candidate))
+            int(candidate[history_position])
+            losses = np.asarray(raw_losses, dtype=np.float64).reshape(-1)
+        except (IndexError, TypeError, ValueError, SyntaxError):
+            return False
+        if len(losses) != 4 or not bool(np.isfinite(losses).all()):
+            return False
+    return True
+
+
+def _history_override_audit(record: dict[str, Any]) -> dict[str, Any]:
+    direct = record.get("history_override")
+    if isinstance(direct, dict):
+        return direct
+    nested = record.get("selection", {}).get("history_override")
+    return nested if isinstance(nested, dict) else {}
+
+
+def _prediction_artifact_verified(record: dict[str, Any], root: Path) -> bool:
+    relative_path = record.get("prediction_path")
+    expected_sha256 = record.get("prediction_sha256")
+    if not isinstance(relative_path, str) or not isinstance(expected_sha256, str):
+        return False
+    root = root.resolve()
+    candidate = (root / relative_path).resolve()
+    try:
+        candidate.relative_to(root)
+    except ValueError:
+        return False
+    return candidate.is_file() and sha256_file(candidate) == expected_sha256
 
 
 def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
@@ -614,23 +651,92 @@ def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
         run_dpls_job(shared, PROJECT, pilot_output / "BASELINE_DEVELOPMENT", view, CONFIG_PATH),
         run_ar_job(shared, PROJECT, pilot_output / "BASELINE_DEVELOPMENT", dynamics[0], CONFIG_PATH),
     ]
-    coverage_by_job = {
-        f"K:{fast}": _finite_fold_loss_histories(
-            records[0].get("profile_fold_losses"), history_position=1
-        ),
-        f"K:{medium}": _finite_fold_loss_histories(
-            records[1].get("profile_fold_losses"), history_position=1
-        ),
-        "DPLS": _finite_fold_loss_histories(
-            records[2].get("selection", {}).get("fold_losses"),
-            history_position=0,
-        ),
-        "AR": _finite_fold_loss_histories(
-            records[3].get("selection", {}).get("profile_fold_losses"),
-            history_position=1,
-        ),
+    jobs = {
+        f"K:{fast}": {
+            "record": records[0],
+            "fold_losses": records[0].get("profile_fold_losses"),
+            "history_position": 1,
+            "prediction_root": pilot_output,
+            "expected_grid_entries": None,
+            "requires_common_scoring": True,
+        },
+        f"K:{medium}": {
+            "record": records[1],
+            "fold_losses": records[1].get("profile_fold_losses"),
+            "history_position": 1,
+            "prediction_root": pilot_output,
+            "expected_grid_entries": None,
+            "requires_common_scoring": True,
+        },
+        "DPLS": {
+            "record": records[2],
+            "fold_losses": records[2].get("selection", {}).get("fold_losses"),
+            "history_position": 0,
+            "prediction_root": pilot_output / "BASELINE_DEVELOPMENT",
+            "expected_grid_entries": 40,
+            "requires_common_scoring": False,
+        },
+        "AR": {
+            "record": records[3],
+            "fold_losses": records[3]
+            .get("selection", {})
+            .get("profile_fold_losses"),
+            "history_position": 1,
+            "prediction_root": pilot_output / "BASELINE_DEVELOPMENT",
+            "expected_grid_entries": None,
+            "requires_common_scoring": False,
+        },
     }
     expected = set(EXPECTED_HISTORIES)
+    expected_config_sha256 = sha256_file(CONFIG_PATH)
+    coverage_by_job: dict[str, set[int]] = {}
+    job_audits: dict[str, dict[str, Any]] = {}
+    for job, specification in jobs.items():
+        record = specification["record"]
+        fold_losses = specification["fold_losses"]
+        history_position = int(specification["history_position"])
+        histories = _finite_fold_loss_histories(
+            fold_losses, history_position=history_position
+        )
+        coverage_by_job[job] = histories
+        override = _history_override_audit(record)
+        grid_entries = len(fold_losses) if isinstance(fold_losses, dict) else 0
+        expected_grid_entries = specification["expected_grid_entries"]
+        grid_size_valid = (
+            expected_grid_entries is None
+            or grid_entries == int(expected_grid_entries)
+        )
+        common_scoring_valid = (
+            not bool(specification["requires_common_scoring"])
+            or record.get("selected_scoring_history_steps") == COMMON_HISTORY
+        )
+        audit = {
+            "status": str(record.get("status")),
+            "history_steps": sorted(histories),
+            "fold_loss_grid_entries": grid_entries,
+            "finite_exact_four_fold_grid": _finite_four_fold_grid(
+                fold_losses, history_position=history_position
+            ),
+            "expected_grid_entries": expected_grid_entries,
+            "grid_size_valid": grid_size_valid,
+            "common_scoring_valid": common_scoring_valid,
+            "override_config_sha256": override.get("config_sha256"),
+            "override_protocol_id": override.get("protocol_id"),
+            "prediction_artifact_verified": _prediction_artifact_verified(
+                record, specification["prediction_root"]
+            ),
+        }
+        audit["passed"] = bool(
+            audit["status"] == "PASS"
+            and histories == expected
+            and audit["finite_exact_four_fold_grid"]
+            and audit["grid_size_valid"]
+            and audit["common_scoring_valid"]
+            and audit["override_config_sha256"] == expected_config_sha256
+            and audit["override_protocol_id"] == EXPECTED_PROTOCOL
+            and audit["prediction_artifact_verified"]
+        )
+        job_audits[job] = audit
     missing_by_job = {
         job: sorted(expected.difference(histories))
         for job, histories in coverage_by_job.items()
@@ -640,8 +746,7 @@ def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
     missing = sorted(expected.difference(histories_seen))
     result = {
         "status": "PASS"
-        if not missing_by_job
-        and all(str(item.get("status")) in SUCCESS_STATUSES for item in records)
+        if not missing_by_job and all(audit["passed"] for audit in job_audits.values())
         else "FAILED",
         "stage": "TEP_CPU_HISTORY_EXTENSION_PILOT",
         "jobs": len(records),
@@ -651,6 +756,7 @@ def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
         },
         "missing_registered_histories": missing,
         "missing_registered_histories_by_job": missing_by_job,
+        "job_audits": job_audits,
         "common_support_history_steps": COMMON_HISTORY,
         "test_accessed": False,
         "ood_accessed": False,

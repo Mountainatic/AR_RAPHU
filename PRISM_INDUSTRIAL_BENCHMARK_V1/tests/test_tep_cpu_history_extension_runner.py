@@ -141,6 +141,9 @@ def test_pilot_gate_requires_actual_finite_four_fold_losses() -> None:
     assert module._finite_fold_loss_histories(
         dpls_losses, history_position=0
     ) == expected
+    assert module._finite_four_fold_grid(
+        k_losses, history_position=1
+    ) is True
 
     metadata_only = {
         "registered_history_support_audit": [
@@ -156,6 +159,22 @@ def test_pilot_gate_requires_actual_finite_four_fold_losses() -> None:
     assert module._finite_fold_loss_histories(
         {"(1, 256)": [1.0, float("inf"), 1.0, 1.0]}, history_position=1
     ) == set()
+    assert module._finite_four_fold_grid(
+        {"(1, 256)": [1.0] * 5}, history_position=1
+    ) is False
+
+
+def test_pilot_gate_verifies_prediction_artifact_hash(tmp_path: Path) -> None:
+    module = _runner()
+    prediction = tmp_path / "validation.parquet"
+    prediction.write_bytes(b"frozen-pilot-prediction")
+    record = {
+        "prediction_path": prediction.name,
+        "prediction_sha256": module.sha256_file(prediction),
+    }
+    assert module._prediction_artifact_verified(record, tmp_path) is True
+    record["prediction_sha256"] = "0" * 64
+    assert module._prediction_artifact_verified(record, tmp_path) is False
 
 
 def test_launcher_uses_cgroup_75gib_and_kills_the_stage_process_group() -> None:
