@@ -132,6 +132,8 @@ def test_launcher_uses_cgroup_75gib_and_kills_the_stage_process_group() -> None:
     assert "if cgroup_gib >= recommended:" in text
     assert "os.killpg(process.pid, signal.SIGTERM)" in text
     assert "start_new_session=True" in text
+    assert 'source_path = str(PROJECT / "src")' in text
+    assert 'environment["PYTHONPATH"]' in text
     assert 'if stage == "scope"' in text
     assert 'mode.add_argument("--pilot-only"' in text
 

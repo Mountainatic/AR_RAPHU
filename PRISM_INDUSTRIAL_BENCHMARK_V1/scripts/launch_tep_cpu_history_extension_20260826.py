@@ -103,6 +103,13 @@ def _run_stage(stage: str, shared: Path, run_root: Path, config: dict) -> None:
         str(run_root),
     ]
     environment = os.environ.copy()
+    source_path = str(PROJECT / "src")
+    inherited_pythonpath = environment.get("PYTHONPATH")
+    environment["PYTHONPATH"] = (
+        source_path
+        if not inherited_pythonpath
+        else os.pathsep.join((source_path, inherited_pythonpath))
+    )
     for name in (
         "OMP_NUM_THREADS",
         "OPENBLAS_NUM_THREADS",
