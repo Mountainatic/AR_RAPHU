@@ -11,6 +11,7 @@ from typing import Any, Callable, Mapping, Sequence
 import numpy as np
 import pandas as pd
 
+from .c4_prism import channel_class
 from .cpu_data import (
     BaseAccessor,
     ViewSpec,
@@ -35,6 +36,7 @@ from .v2_urysohn import fit_contract, predict_contract
 from .v21_selection import guarded_local_one_se_select
 from .v21_views import sru_input_views
 from .v211_config import load_v211_configs
+from .v211_history_override import load_tep_history_override
 from .v211_selection import profile_one_se_regret_guard
 from .v211_support import (
     SUPPORT_CONTRACT,
@@ -249,6 +251,7 @@ def _smoothness_selection(
     m_x: int,
     v2: dict[str, Any],
     minimum_folds: int,
+    scoring_history_steps: int | None = None,
     parallel_workers: int = 1,
 ) -> tuple[float, float, dict[str, Any]]:
     lambda_0 = 0.0
@@ -277,7 +280,9 @@ def _smoothness_selection(
                     m_x,
                     (lambda_0, candidate_tau, candidate_x),
                     v2,
-                    int(profile[1]),
+                    int(profile[1])
+                    if scoring_history_steps is None
+                    else int(scoring_history_steps),
                 )
             )
         scan = dict(
@@ -310,6 +315,7 @@ def run_k_channel(
     view: ViewSpec,
     channel: str,
     protocol: str = "sru",
+    history_override_config: Path | str | None = None,
 ) -> dict[str, Any]:
     started = time.time()
     destination = (
@@ -318,6 +324,23 @@ def run_k_channel(
     destination.mkdir(parents=True, exist_ok=True)
     try:
         v211, v21, v2 = load_v211_configs(project, protocol=protocol)
+        history_override = load_tep_history_override(history_override_config)
+        if history_override is not None:
+            history_override.require_view(view)
+            if str(view.information_set) != "input_only":
+                raise RuntimeError("TEP K history override requires input_only")
+            normalized_channel = str(channel).lower()
+            expected_class = (
+                "FAST" if normalized_channel.startswith("xmv") else "MEDIUM"
+            )
+            if not normalized_channel.startswith(("xmv", "xmeas")):
+                raise RuntimeError(f"unexpected TEP K channel: {channel}")
+            actual_class = channel_class(view.head.dataset, channel)
+            if actual_class != expected_class:
+                raise RuntimeError(
+                    f"TEP K channel class drifted: {channel}="
+                    f"{actual_class}, expected {expected_class}"
+                )
         minimum_folds = int(v21["selection"]["minimum_usable_folds"])
         train = load_native_samples(
             shared, view, "train", columns=CHANNEL_SAMPLE_COLUMNS
@@ -329,8 +352,61 @@ def run_k_channel(
         accessor.warm_prefixes([channel])
         inner_workers = _k_inner_workers()
         folds = inner_folds(train, int(v21["selection"]["inner_folds"]))
-        profiles = channel_profiles(view, channel, v2)
-        profile_comparison_history = max(int(profile[1]) for profile in profiles)
+        profiles = channel_profiles(
+            view,
+            channel,
+            v2,
+            positive_h_history_multipliers=None
+            if history_override is None
+            else history_override.positive_h_history_multipliers,
+        )
+        profile_comparison_history = (
+            max(int(profile[1]) for profile in profiles)
+            if history_override is None
+            else history_override.common_support_history_steps
+        )
+        history_support_audit = []
+        if history_override is not None:
+            for history in history_override.history_steps:
+                records = registered_fold_native_masks(
+                    train,
+                    folds,
+                    fit_history_steps=int(history),
+                    scoring_history_steps=int(profile_comparison_history),
+                    fit_cap=int(v2["row_caps"]["single_channel_k_fit"]),
+                    evaluation_cap=int(
+                        v2["row_caps"]["validation_selection_per_fold"]
+                    ),
+                )
+                available = bool(records) and all(
+                    len(record["fit"]) > 0 and len(record["evaluation"]) > 0
+                    for record in records
+                )
+                history_support_audit.append(
+                    {
+                        "history_steps": int(history),
+                        "available": available,
+                        "fit_rows_by_fold": [
+                            len(record["fit"]) for record in records
+                        ],
+                        "scoring_rows_by_fold": [
+                            len(record["evaluation"]) for record in records
+                        ],
+                    }
+                )
+            unavailable = {
+                int(item["history_steps"])
+                for item in history_support_audit
+                if not bool(item["available"])
+            }
+            forbidden_unavailable = unavailable.intersection(
+                history_override.fail_if_history_unavailable
+            )
+            if forbidden_unavailable:
+                raise RuntimeError(
+                    "required TEP K histories are unavailable: "
+                    f"{sorted(forbidden_unavailable)}"
+                )
         pilot = v2["K_module"]["penalties"]["pilot"]
         pilot_lambdas = (
             float(pilot["lambda_0"]),
@@ -372,8 +448,10 @@ def run_k_channel(
             minimum_usable_folds=minimum_folds,
         )
         retained_profiles = [tuple(value) for value in profile_selection.retained_profiles]
-        local_comparison_history = max(
-            int(profile[1]) for profile in retained_profiles
+        local_comparison_history = (
+            max(int(profile[1]) for profile in retained_profiles)
+            if history_override is None
+            else history_override.common_support_history_steps
         )
         local_scoring_records = registered_fold_native_masks(
             train,
@@ -533,16 +611,22 @@ def run_k_channel(
                     m_x=selected_m_x,
                     v2=v2,
                     minimum_folds=minimum_folds,
+                    scoring_history_steps=local_comparison_history,
                     parallel_workers=inner_workers,
                 )
 
         selected_history = int(selected_profile[1])
-        selected_support_history = (
+        selected_fit_history = (
             local_comparison_history
             if selected_family == EXACT_ZERO
             else selected_history
         )
-        final_train_native = apply_native_support(train, selected_support_history)
+        selected_support_history = (
+            selected_fit_history
+            if history_override is None
+            else history_override.common_support_history_steps
+        )
+        final_train_native = apply_native_support(train, selected_fit_history)
         final_train = _cap(
             final_train_native, int(v2["row_caps"]["single_channel_k_fit"])
         )
@@ -552,7 +636,7 @@ def run_k_channel(
         selected_fold_records = registered_fold_native_masks(
             train,
             folds,
-            fit_history_steps=selected_support_history,
+            fit_history_steps=selected_fit_history,
             scoring_history_steps=selected_support_history,
             fit_cap=int(v2["row_caps"]["single_channel_k_fit"]),
             evaluation_cap=int(v2["row_caps"]["validation_selection_per_fold"]),
@@ -723,7 +807,12 @@ def run_k_channel(
             "selected_profile": list(selected_profile),
             "support_contract": SUPPORT_CONTRACT,
             "selected_profile_history_steps": selected_history,
+            "selected_fit_history_steps": selected_fit_history,
             "selected_scoring_history_steps": selected_support_history,
+            "history_override": None
+            if history_override is None
+            else history_override.audit(),
+            "registered_history_support_audit": history_support_audit,
             "retained_profiles": [list(value) for value in retained_profiles],
             "selected_intervals": [list(value) for value in intervals],
             "selected_family": selected_family,

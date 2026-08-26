@@ -6,7 +6,7 @@ import time
 import traceback
 from collections import defaultdict
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import numpy as np
 import pandas as pd
@@ -46,12 +46,34 @@ CHANNEL_SAMPLE_COLUMNS = [
 ]
 
 
-def channel_profiles(view: ViewSpec, channel: str, config: dict[str, Any]) -> list[tuple[int, int]]:
+def channel_profiles(
+    view: ViewSpec,
+    channel: str,
+    config: dict[str, Any],
+    positive_h_history_multipliers: Sequence[int] | None = None,
+) -> list[tuple[int, int]]:
     category = channel_class(view.head.dataset, channel)
     deltas = [int(value) for value in config["time_profile_grid"]["class_delta_ratio_steps"][category]]
     if view.head.h_steps > 0:
-        histories = [int(value) * view.head.h_steps for value in config["time_profile_grid"]["positive_h_history_multipliers"]]
+        if positive_h_history_multipliers is None:
+            multipliers = tuple(
+                int(value)
+                for value in config["time_profile_grid"][
+                    "positive_h_history_multipliers"
+                ]
+            )
+        else:
+            from .v211_history_override import (
+                validate_positive_h_history_multipliers,
+            )
+
+            multipliers = validate_positive_h_history_multipliers(
+                positive_h_history_multipliers
+            )
+        histories = [int(value) * view.head.h_steps for value in multipliers]
     else:
+        if positive_h_history_multipliers is not None:
+            raise ValueError("positive-h history override cannot be used for h=0")
         histories = sorted({delta * int(value) for delta in deltas for value in config["time_profile_grid"]["zero_h_history_in_delta_multipliers"]})
     return sorted({(delta, history) for delta in deltas for history in histories if delta <= history}, key=lambda value: (value[1], -value[0]))
 

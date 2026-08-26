@@ -439,14 +439,49 @@ def inner_folds(samples: pd.DataFrame, count: int = 4, extra_buffer_steps: int =
     return folds
 
 
-def realized_state_profiles(head: HeadSpec) -> list[tuple[int, int]]:
+def realized_state_profiles(
+    head: HeadSpec,
+    positive_h_history_multipliers: Sequence[int] | None = None,
+    delta_steps_override: Sequence[int] | None = None,
+) -> list[tuple[int, int]]:
     window = head.w_steps
-    deltas = sorted({max(1, int(math.floor(window * ratio + 0.5))) for ratio in (0.25, 0.5, 1.0, 2.0)})
+    if delta_steps_override is None:
+        deltas = sorted(
+            {
+                max(1, int(math.floor(window * ratio + 0.5)))
+                for ratio in (0.25, 0.5, 1.0, 2.0)
+            }
+        )
+    else:
+        from .v211_history_override import (
+            validate_positive_h_history_multipliers,
+        )
+
+        deltas = list(
+            validate_positive_h_history_multipliers(delta_steps_override)
+        )
     result = []
     for delta in deltas:
         if head.h_steps > 0:
-            histories = [max(delta, multiplier * head.h_steps) for multiplier in (2, 4, 8)]
+            if positive_h_history_multipliers is None:
+                multipliers = (2, 4, 8)
+            else:
+                from .v211_history_override import (
+                    validate_positive_h_history_multipliers,
+                )
+
+                multipliers = validate_positive_h_history_multipliers(
+                    positive_h_history_multipliers
+                )
+            histories = [
+                max(delta, multiplier * head.h_steps)
+                for multiplier in multipliers
+            ]
         else:
+            if positive_h_history_multipliers is not None:
+                raise ValueError(
+                    "positive-h history override cannot be used for h=0"
+                )
             histories = [multiplier * delta for multiplier in (4, 16, 64)]
         result.extend((delta, history) for history in histories)
     # Rounding and the ``max(delta, multiplier * h)`` maturity floor can map

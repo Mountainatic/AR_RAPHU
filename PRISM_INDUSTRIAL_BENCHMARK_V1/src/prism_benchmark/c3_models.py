@@ -7,7 +7,7 @@ import time
 import traceback
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 import numpy as np
 import pandas as pd
@@ -349,12 +349,60 @@ def _nonlinear_features(
     return np.concatenate(pieces_train, axis=1), np.concatenate(pieces_eval, axis=1)
 
 
-def _hammerstein_profiles(view: ViewSpec) -> list[tuple[int, int]]:
-    profiles = sorted(realized_state_profiles(view.head), key=lambda value: (value[1], -value[0]))
-    if len(profiles) <= 6:
+def _hammerstein_profiles(
+    view: ViewSpec,
+    positive_h_history_multipliers: Sequence[int] | None = None,
+    delta_steps_override: Sequence[int] | None = None,
+    profile_cap: int = 6,
+    require_every_registered_history: bool = False,
+) -> list[tuple[int, int]]:
+    profiles = sorted(
+        realized_state_profiles(
+            view.head,
+            positive_h_history_multipliers=positive_h_history_multipliers,
+            delta_steps_override=delta_steps_override,
+        ),
+        key=lambda value: (value[1], -value[0]),
+    )
+    cap = int(profile_cap)
+    if cap <= 0:
+        raise ValueError("Hammerstein profile cap must be positive")
+    if len(profiles) <= cap:
         return profiles
-    indices = np.rint(np.linspace(0, len(profiles) - 1, 6)).astype(int)
-    return [profiles[index] for index in indices]
+    if not require_every_registered_history:
+        indices = np.rint(np.linspace(0, len(profiles) - 1, cap)).astype(int)
+        return [profiles[index] for index in indices]
+
+    # Preserve the published six-profile candidate set exactly, then append
+    # one deterministic (largest-delta) representative for each newly
+    # registered history.  This makes the extension additive rather than
+    # silently replacing short-history candidates.
+    legacy = _hammerstein_profiles(view)
+    legacy_histories = {int(profile[1]) for profile in legacy}
+    histories = list(dict.fromkeys(int(profile[1]) for profile in profiles))
+    new_histories = [
+        history for history in histories if history not in legacy_histories
+    ]
+    selected = list(legacy)
+    selected.extend(
+        next(profile for profile in profiles if int(profile[1]) == history)
+        for history in new_histories
+    )
+    if len(selected) > cap:
+        raise ValueError(
+            "Hammerstein profile cap cannot preserve legacy profiles and "
+            "cover every registered history"
+        )
+    remaining = [profile for profile in profiles if profile not in selected]
+    slots = cap - len(selected)
+    if slots and remaining:
+        indices = np.rint(
+            np.linspace(0, len(remaining) - 1, min(slots, len(remaining)))
+        ).astype(int)
+        selected.extend(remaining[index] for index in dict.fromkeys(indices))
+    return sorted(
+        dict.fromkeys(selected), key=lambda value: (value[1], -value[0])
+    )
 
 
 def _run_hammerstein(

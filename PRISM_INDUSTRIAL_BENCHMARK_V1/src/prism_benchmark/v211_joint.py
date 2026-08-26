@@ -29,6 +29,7 @@ from .v21_selection import guarded_local_one_se_select
 from .v211_a import fit_mature_residual_ar
 from .v211_c import _gate_config, _smallest_stable_alpha
 from .v211_config import load_v211_configs
+from .v211_history_override import load_tep_history_override
 from .v211_k import load_active_channels
 from .v211_selection import (
     attach_nonselecting_validation_confirmation,
@@ -122,8 +123,59 @@ def registered_joint_inner_fold_frames(
     fit_cap: int,
     evaluation_cap: int,
     active: list[dict[str, Any]] | None = None,
+    mandatory_input_history_steps: int = 0,
+    mandatory_target_profile: tuple[int, int] | None = None,
 ) -> list[dict[str, Any]]:
     """Materialize registered original ``T_i -> V_i`` Joint fold supports."""
+
+    input_history = int(mandatory_input_history_steps)
+    if input_history < 0:
+        raise ValueError("mandatory Joint input history must be nonnegative")
+    if mandatory_target_profile is None:
+        target_delta = target_history = 0
+    else:
+        target_delta, target_history = (
+            int(value) for value in mandatory_target_profile
+        )
+        if target_delta <= 0 or target_history <= 0:
+            raise ValueError("mandatory Joint target profile must be positive")
+
+    def mandatory_support(
+        frame: pd.DataFrame,
+        additional_floor: np.ndarray | None = None,
+    ) -> pd.DataFrame:
+        if input_history == 0 and target_history == 0:
+            return frame
+        floor = frame["causal_history_floor"].to_numpy(dtype=np.int64)
+        if additional_floor is not None:
+            additional = np.asarray(additional_floor, dtype=np.int64)
+            if additional.shape != floor.shape:
+                positions = frame.index.to_numpy(dtype=np.int64)
+                if (
+                    additional.ndim != 1
+                    or len(positions) != len(frame)
+                    or (len(positions) and int(positions.max()) >= len(additional))
+                ):
+                    raise ValueError("mandatory Joint causal floor shape mismatch")
+                additional = additional[positions]
+            floor = np.maximum(floor, additional)
+        mask = np.ones(len(frame), dtype=bool)
+        if input_history:
+            mask &= (
+                frame["origin"].to_numpy(dtype=np.int64) - input_history
+                >= floor
+            )
+        if target_history:
+            oldest_offset = (max(1, target_history // target_delta) - 1) * target_delta
+            mask &= (
+                frame["latest_available_target_index"].to_numpy(
+                    dtype=np.int64
+                )
+                - oldest_offset
+                >= floor
+            )
+        return frame.loc[mask].copy()
+
     result = []
     for fold_index, (fit_index, evaluation_index) in enumerate(
         inner_folds(development_train, int(fold_count))
@@ -132,6 +184,9 @@ def registered_joint_inner_fold_frames(
         evaluation_raw = development_train.iloc[evaluation_index].reset_index(
             drop=True
         )
+        evaluation_floor = fold_evaluation_causal_floor(
+            fit_raw, evaluation_raw
+        )
         fit_supported = (
             apply_assembly_support(fit_raw, active) if active is not None else fit_raw
         )
@@ -139,11 +194,20 @@ def registered_joint_inner_fold_frames(
             apply_assembly_support(
                 evaluation_raw,
                 active,
-                fold_evaluation_causal_floor(fit_raw, evaluation_raw),
+                evaluation_floor,
             )
             if active is not None
             else evaluation_raw
         )
+        fit_supported = mandatory_support(fit_supported)
+        evaluation_supported = mandatory_support(
+            evaluation_supported,
+            evaluation_floor,
+        )
+        if fit_supported.empty or evaluation_supported.empty:
+            raise JointFoldProtocolMismatch(
+                "mandatory Joint history support produced an empty fold"
+            )
         result.append(
             {
                 "fold_index": fold_index,
@@ -703,6 +767,7 @@ def run_joint_view(
     output: Path,
     view: Any,
     protocol: str = "sru",
+    history_override_config: Path | str | None = None,
 ) -> dict[str, Any]:
     started = time.time()
     destination = (
@@ -716,6 +781,9 @@ def run_joint_view(
     destination.mkdir(parents=True, exist_ok=True)
     try:
         v211, v21, v2 = load_v211_configs(project, protocol=protocol)
+        history_override = load_tep_history_override(history_override_config)
+        if history_override is not None:
+            history_override.require_view(view)
         inner_workers = _j_inner_workers()
         c_result = json.loads(
             (
@@ -780,10 +848,17 @@ def run_joint_view(
             raise RuntimeError(
                 "Joint W basis construction was not frozen from the registered W pool"
             )
+        default_profiles = realized_state_profiles(
+            view.head,
+            positive_h_history_multipliers=None
+            if history_override is None
+            else history_override.positive_h_history_multipliers,
+            delta_steps_override=None
+            if history_override is None
+            else history_override.state_delta_steps,
+        )
         a_profile = tuple(
-            a_result["a_contract"].get(
-                "profile", realized_state_profiles(view.head)[0]
-            )
+            a_result["a_contract"].get("profile", default_profiles[0])
         )
         alpha_grid = sorted(
             float(value) for value in v2["J_module"]["ridge_alpha_grid"]
@@ -820,6 +895,12 @@ def run_joint_view(
             fit_cap=fit_cap,
             evaluation_cap=evaluation_cap,
             active=active,
+            mandatory_input_history_steps=0
+            if history_override is None
+            else history_override.common_support_history_steps,
+            mandatory_target_profile=None
+            if history_override is None
+            else (1, history_override.common_support_history_steps),
         )
         registered_input_folds = registered_joint_inner_fold_frames(
             registered_input_train,
@@ -827,6 +908,12 @@ def run_joint_view(
             fit_cap=fit_cap,
             evaluation_cap=evaluation_cap,
             active=active,
+            mandatory_input_history_steps=0
+            if history_override is None
+            else history_override.common_support_history_steps,
+            mandatory_target_profile=None
+            if history_override is None
+            else (1, history_override.common_support_history_steps),
         )
         if len(joint_folds) != fold_count or len(registered_input_folds) != fold_count:
             raise JointFoldProtocolMismatch(
@@ -1284,6 +1371,16 @@ def run_joint_view(
             "ridge_semantics": "NUMERICAL_STABILITY_ONLY",
             "minimal_stabilizing_ridge_audits": ridge_audits,
             "ar_profile": list(a_profile),
+            "history_override": None
+            if history_override is None
+            else history_override.audit(),
+            "mandatory_common_support_requirement": None
+            if history_override is None
+            else {
+                "input_history_steps": history_override.common_support_history_steps,
+                "target_delta_steps": 1,
+                "target_history_steps": history_override.common_support_history_steps,
+            },
             "selected_candidate": selected_route,
             "selection": selection.to_json(),
             "candidate_fold_losses": {

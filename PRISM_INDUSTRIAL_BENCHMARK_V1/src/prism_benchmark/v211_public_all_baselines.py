@@ -47,6 +47,7 @@ from .v211_support import (
     require_native_support_contract,
     support_id_hash,
 )
+from .v211_history_override import load_tep_history_override
 
 
 STATIC_INPUT_MODELS = ("RIDGE", "PLS", "RBF_SVR", "XGBOOST")
@@ -572,18 +573,29 @@ def run_dpls_job(
     project: Path,
     output: Path,
     view: ViewSpec,
+    history_override_config: Path | str | None = None,
 ) -> dict[str, Any]:
     started = time.time()
     model_name = "DPLS"
     try:
         freeze = _freeze(project)
         config = freeze["c2"]["dpls"]
+        history_override = load_tep_history_override(history_override_config)
+        if history_override is not None:
+            history_override.require_view(view)
+            if str(view.information_set) != "input_only":
+                raise RuntimeError("TEP DPLS history override requires input_only")
         train = load_native_samples(shared, view, "train")
         validation = load_native_samples(shared, view, "validation")
         columns = input_columns(shared, view.head.task_id, view.proxy_policy)
+        multipliers = (
+            config["lag_coverage_for_positive_h"]
+            if history_override is None
+            else history_override.positive_h_history_multipliers
+        )
         histories = [
             max(1, int(multiplier) * view.head.h_steps)
-            for multiplier in config["lag_coverage_for_positive_h"]
+            for multiplier in multipliers
         ]
         histories = sorted(set(histories))
         requirements = {
@@ -599,6 +611,18 @@ def run_dpls_job(
                 freeze["selection"]["selection_validation_row_cap_default"]
             ),
         )
+        if history_override is not None:
+            unavailable = {
+                int(item["input_history_steps"])
+                for item in support_audit["unavailable_requirements"]
+            }
+            forbidden = unavailable.intersection(
+                history_override.fail_if_history_unavailable
+            )
+            if forbidden:
+                raise RuntimeError(
+                    f"required TEP DPLS histories are unavailable: {sorted(forbidden)}"
+                )
         histories = [
             history
             for history in histories
@@ -614,6 +638,16 @@ def run_dpls_job(
             for history in histories
             for components in config["components"]
         ]
+        if (
+            history_override is not None
+            and len(candidates)
+            != history_override.dpls_maximum_joint_configurations
+        ):
+            raise RuntimeError(
+                "TEP DPLS joint grid must contain exactly "
+                f"{history_override.dpls_maximum_joint_configurations} "
+                f"configurations, got {len(candidates)}"
+            )
         losses = {candidate: [] for candidate in candidates}
         accessor = BaseAccessor(shared, view.head.dataset, "train", columns)
         for fold_index in range(len(next(iter(fold_supports.values())))):
@@ -625,13 +659,21 @@ def run_dpls_job(
                     fit,
                     columns,
                     history,
-                    int(config["maximum_lags_per_channel"]),
+                    int(
+                        config["maximum_lags_per_channel"]
+                        if history_override is None
+                        else history_override.dpls_maximum_lags_per_channel
+                    ),
                 )
                 x_evaluation = accessor.input_lags(
                     evaluation,
                     columns,
                     history,
-                    int(config["maximum_lags_per_channel"]),
+                    int(
+                        config["maximum_lags_per_channel"]
+                        if history_override is None
+                        else history_override.dpls_maximum_lags_per_channel
+                    ),
                 )
                 y_fit = fit["y_true"].to_numpy(dtype=np.float64)
                 for components in [
@@ -665,7 +707,11 @@ def run_dpls_job(
             fit,
             columns,
             int(history),
-            int(config["maximum_lags_per_channel"]),
+            int(
+                config["maximum_lags_per_channel"]
+                if history_override is None
+                else history_override.dpls_maximum_lags_per_channel
+            ),
         )
         estimator = _fit_pls_selected(
             x_fit,
@@ -681,7 +727,11 @@ def run_dpls_job(
                 chunk,
                 columns,
                 int(history),
-                int(config["maximum_lags_per_channel"]),
+                int(
+                    config["maximum_lags_per_channel"]
+                    if history_override is None
+                    else history_override.dpls_maximum_lags_per_channel
+                ),
             ),
             lambda matrix: estimator.predict(matrix).reshape(-1),
         )
@@ -689,6 +739,9 @@ def run_dpls_job(
         selection = {
             "selected_history": int(history),
             "selected_components": int(components),
+            "history_override": None
+            if history_override is None
+            else history_override.audit(),
             "fold_losses": {str(key): value for key, value in losses.items()},
             "one_se": selected.__dict__,
             "native_support_audit": {
@@ -752,15 +805,32 @@ def run_ar_job(
     project: Path,
     output: Path,
     view: ViewSpec,
+    history_override_config: Path | str | None = None,
 ) -> dict[str, Any]:
     started = time.time()
     model_name = "AR"
     try:
         freeze = _freeze(project)
         config = freeze["c3"]["state_profile"]
+        history_override = load_tep_history_override(history_override_config)
+        if history_override is not None:
+            history_override.require_view(view)
+            if str(view.information_set) != "dynamic":
+                raise RuntimeError("TEP AR history override requires dynamic")
         train = load_native_samples(shared, view, "train")
         validation = load_native_samples(shared, view, "validation")
-        profiles = [tuple(profile) for profile in realized_state_profiles(view.head)]
+        profiles = [
+            tuple(profile)
+            for profile in realized_state_profiles(
+                view.head,
+                positive_h_history_multipliers=None
+                if history_override is None
+                else history_override.positive_h_history_multipliers,
+                delta_steps_override=None
+                if history_override is None
+                else history_override.state_delta_steps,
+            )
+        ]
         requirements = {profile: _profile_requirement(profile) for profile in profiles}
         fold_supports, support_audit = candidate_fold_supports(
             train,
@@ -771,6 +841,19 @@ def run_ar_job(
                 freeze["selection"]["selection_validation_row_cap_default"]
             ),
         )
+        if history_override is not None:
+            unavailable = {
+                int(item["target_history_steps"])
+                for item in support_audit["unavailable_requirements"]
+                if int(item.get("target_history_steps", 0)) > 0
+            }
+            forbidden = unavailable.intersection(
+                history_override.fail_if_history_unavailable
+            )
+            if forbidden:
+                raise RuntimeError(
+                    f"required TEP AR histories are unavailable: {sorted(forbidden)}"
+                )
         profiles = [
             profile
             for profile in profiles
@@ -863,6 +946,9 @@ def run_ar_job(
             "penalty_fold_losses": penalty_losses,
             "selected_profile": list(profile),
             "selected_alpha": alpha,
+            "history_override": None
+            if history_override is None
+            else history_override.audit(),
             "numerical_certificate": certificate,
             "native_support_audit": {
                 **support_audit,
@@ -1274,6 +1360,7 @@ def run_hammerstein_job(
     output: Path,
     view: ViewSpec,
     model_name: str,
+    history_override_config: Path | str | None = None,
 ) -> dict[str, Any]:
     from sklearn.isotonic import IsotonicRegression
 
@@ -1283,10 +1370,38 @@ def run_hammerstein_job(
         freeze = _freeze(project)
         section = "hammerstein_wiener" if wiener else "parallel_hammerstein"
         config = freeze["c3"][section]
+        history_override = load_tep_history_override(history_override_config)
+        if history_override is not None:
+            history_override.require_view(view)
+            if str(view.information_set) != "input_only":
+                raise RuntimeError(
+                    "TEP Hammerstein history override requires input_only"
+                )
         train = load_native_samples(shared, view, "train")
         validation = load_native_samples(shared, view, "validation")
         columns = input_columns(shared, view.head.task_id, view.proxy_policy)
-        profiles = [tuple(profile) for profile in _hammerstein_profiles(view)]
+        profiles = [
+            tuple(profile)
+            for profile in _hammerstein_profiles(
+                view,
+                positive_h_history_multipliers=None
+                if history_override is None
+                else history_override.positive_h_history_multipliers,
+                delta_steps_override=None
+                if history_override is None
+                else history_override.state_delta_steps,
+                profile_cap=6
+                if history_override is None
+                else history_override.hammerstein_profile_cap,
+                require_every_registered_history=history_override is not None,
+            )
+        ]
+        if history_override is not None and {
+            int(profile[1]) for profile in profiles
+        } != set(history_override.history_steps):
+            raise RuntimeError(
+                "TEP Hammerstein deterministic profile cap did not cover every history"
+            )
         requirements = {
             profile: SupportRequirement(input_history_steps=int(profile[1]))
             for profile in profiles
@@ -1300,6 +1415,20 @@ def run_hammerstein_job(
                 freeze["selection"]["selection_validation_row_cap_default"]
             ),
         )
+        if history_override is not None:
+            unavailable = {
+                int(item["input_history_steps"])
+                for item in support_audit["unavailable_requirements"]
+                if int(item.get("input_history_steps", 0)) > 0
+            }
+            forbidden = unavailable.intersection(
+                history_override.fail_if_history_unavailable
+            )
+            if forbidden:
+                raise RuntimeError(
+                    "required TEP Hammerstein histories are unavailable: "
+                    f"{sorted(forbidden)}"
+                )
         profiles = [
             profile
             for profile in profiles
@@ -1323,6 +1452,11 @@ def run_hammerstein_job(
                 for profile in profiles
                 for nonlinearity in config["nonlinearities"]
             ]
+        if history_override is not None and len(candidates) != 32:
+            raise RuntimeError(
+                "TEP Hammerstein extension must contain exactly 32 "
+                f"joint configurations, got {len(candidates)}"
+            )
         losses = {candidate: [] for candidate in candidates}
         accessor = BaseAccessor(shared, view.head.dataset, "train", columns)
         for profile in profiles:
@@ -1427,6 +1561,10 @@ def run_hammerstein_job(
             "selected_profile": list(profile),
             "selected_input_nonlinearity": nonlinearity,
             "selected_output_map": output_map,
+            "history_override": None
+            if history_override is None
+            else history_override.audit(),
+            "registered_profiles": [list(value) for value in profiles],
             "fold_losses": {str(key): value for key, value in losses.items()},
             "one_se": selected.__dict__,
             "numerical_certificate": certificate,

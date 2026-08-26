@@ -24,6 +24,7 @@ from .v2_selection import one_se_select, practical_activation
 from .v21_selection import guarded_local_one_se_select
 from .v211_c import _gate_config
 from .v211_config import load_v211_configs
+from .v211_history_override import load_tep_history_override
 from .v211_joint import (
     J_K,
     J_KA,
@@ -760,6 +761,7 @@ def run_joint_stability_view(
     legacy_results_root: Path | None,
     view: Any,
     protocol: str = "metro_p60",
+    history_override_config: Path | str | None = None,
 ) -> dict[str, Any]:
     started = time.time()
     destination = (
@@ -774,6 +776,13 @@ def run_joint_stability_view(
     try:
         config = load_joint_stability_config(project)
         v211, v21, v2 = load_v211_configs(project, protocol=protocol)
+        history_override = load_tep_history_override(history_override_config)
+        if history_override is not None:
+            history_override.require_view(view)
+            if str(view.information_set) != "dynamic":
+                raise RuntimeError(
+                    "TEP Joint history override requires dynamic"
+                )
         c_path = (
             output
             / "DEVELOPMENT/C"
@@ -829,11 +838,12 @@ def run_joint_stability_view(
             columns=["base_origin_id", "view_sample_id", "oof_fold"],
         )
         w_contract = w_result["joint_w_basis_contract"]
-        a_profile = tuple(
-            a_result["a_contract"].get(
-                "profile", realized_state_profiles(view.head)[0]
-            )
+        default_profiles = realized_state_profiles(
+            view.head,
+            positive_h_history_multipliers=None if history_override is None else history_override.positive_h_history_multipliers,
+            delta_steps_override=None if history_override is None else history_override.state_delta_steps,
         )
+        a_profile = tuple(a_result["a_contract"].get("profile", default_profiles[0]))
         development_train = load_native_samples(shared, view, "train")
         registered_input_train = load_native_samples(
             shared, _input_only_view(view), "train"
@@ -847,6 +857,8 @@ def run_joint_stability_view(
             fit_cap=fit_cap,
             evaluation_cap=evaluation_cap,
             active=active,
+            mandatory_input_history_steps=0 if history_override is None else history_override.common_support_history_steps,
+            mandatory_target_profile=None if history_override is None else (1, history_override.common_support_history_steps),
         )
         registered_input_folds = registered_joint_inner_fold_frames(
             registered_input_train,
@@ -854,6 +866,8 @@ def run_joint_stability_view(
             fit_cap=fit_cap,
             evaluation_cap=evaluation_cap,
             active=active,
+            mandatory_input_history_steps=0 if history_override is None else history_override.common_support_history_steps,
+            mandatory_target_profile=None if history_override is None else (1, history_override.common_support_history_steps),
         )
         inner_target_accessor = BaseAccessor(
             shared, view.head.dataset, "train", [view.head.target]
@@ -1500,6 +1514,12 @@ def run_joint_stability_view(
             "predictive_eta_selections": eta_selections,
             "minimal_stabilizing_numerical_alpha_audits": numerical_audits,
             "ar_profile": list(a_profile),
+            "history_override": None if history_override is None else history_override.audit(),
+            "mandatory_common_support_requirement": None if history_override is None else {
+                "input_history_steps": history_override.common_support_history_steps,
+                "target_delta_steps": 1,
+                "target_history_steps": history_override.common_support_history_steps,
+            },
             "legacy_v212_joint_anchor": legacy_anchor,
             "legacy_anchor_available": legacy_anchor_available,
             "legacy_anchor_reproduced": legacy_reproduced,

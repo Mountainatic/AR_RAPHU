@@ -23,6 +23,7 @@ from .v21_a import (
 )
 from .v21_selection import guarded_local_one_se_select
 from .v211_config import load_v211_configs
+from .v211_history_override import load_tep_history_override
 from .v211_support import load_native_samples, support_id_hash
 A_INNER_WORKERS_ENV = "PRISM_V211_A_INNER_WORKERS"
 _A_CANDIDATE_CONTEXT: tuple[
@@ -245,6 +246,7 @@ def run_a_view(
     output: Path,
     view: Any,
     protocol: str = "sru",
+    history_override_config: Path | str | None = None,
 ) -> dict[str, Any]:
     global _A_CANDIDATE_CONTEXT
     started = time.time()
@@ -259,6 +261,11 @@ def run_a_view(
     destination.mkdir(parents=True, exist_ok=True)
     try:
         v211, v21, v2 = load_v211_configs(project, protocol=protocol)
+        history_override = load_tep_history_override(history_override_config)
+        if history_override is not None:
+            history_override.require_view(view)
+            if str(view.information_set) != "dynamic":
+                raise RuntimeError("TEP A history override requires dynamic")
         inner_workers = _a_inner_workers()
         w_root = output / "DEVELOPMENT" / "W" / view.head.head_id / view.proxy_policy
         w_result = json.loads((w_root / "RESULT.json").read_text(encoding="utf-8"))
@@ -281,7 +288,25 @@ def run_a_view(
         validation_frame["residual"] = (
             validation_frame["y_true"] - validation_frame["physical_w"]
         )
-        profiles = realized_state_profiles(view.head)
+        profiles = realized_state_profiles(
+            view.head,
+            positive_h_history_multipliers=None
+            if history_override is None
+            else history_override.positive_h_history_multipliers,
+            delta_steps_override=None
+            if history_override is None
+            else history_override.state_delta_steps,
+        )
+        if history_override is not None:
+            realized_histories = {int(profile[1]) for profile in profiles}
+            missing = set(history_override.fail_if_history_unavailable).difference(
+                realized_histories
+            )
+            if missing:
+                raise RuntimeError(
+                    "required TEP A histories were not registered: "
+                    f"{sorted(missing)}"
+                )
         alphas = [float(value) for value in v2["A_module"]["ridge_alpha_grid"]]
         mus = [float(value) for value in v21["A"]["soft_overlap_mu"]]
         candidates: list[Any] = [EXACT_ZERO]
@@ -361,6 +386,27 @@ def run_a_view(
                 ):
                     losses[(MATURE_RESIDUAL_AR, profile, alpha, mu)].append(
                         candidate_loss
+                    )
+
+        profile_coverage = {
+            key: {
+                "minimum": float(min(values)) if values else 0.0,
+                "maximum": float(max(values)) if values else 0.0,
+                "observations": len(values),
+            }
+            for key, values in coverage.items()
+        }
+        if history_override is not None:
+            for history in history_override.fail_if_history_unavailable:
+                matching = [
+                    profile_coverage[str(profile)]["maximum"]
+                    for profile in profiles
+                    if int(profile[1]) == int(history)
+                ]
+                if not matching or max(matching) <= 0.0:
+                    raise RuntimeError(
+                        "required TEP A mature residual history has zero "
+                        f"observed coverage: {history}"
                     )
 
         def complexity(candidate: Any) -> tuple[Any, ...]:
@@ -629,6 +675,11 @@ def run_a_view(
             "availability_scenario": view.availability_scenario,
             "proxy_policy": view.proxy_policy,
             "selected_candidate": str(selected),
+            "history_override": None
+            if history_override is None
+            else history_override.audit(),
+            "registered_state_profiles": [list(profile) for profile in profiles],
+            "registered_profile_observed_coverage": profile_coverage,
             "a_contract": contract,
             "selection": selection.to_json(),
             "candidate_fold_losses": {
