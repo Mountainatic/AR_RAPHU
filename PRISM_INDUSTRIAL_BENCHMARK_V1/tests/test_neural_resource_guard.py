@@ -221,6 +221,12 @@ def test_non_authoritative_memory_and_invalid_gpu_values_stop_dispatch() -> None
     assert invalid_gpu[0:2] == (None, None)
     assert invalid_gpu[2] == "GPU_MEMORY_VALUES_INVALID:0"
 
+    fractional_gpu = query_gpu_memory(
+        command_runner=lambda _command: "0, 1.5, 32607\n",
+    )
+    assert fractional_gpu[0:2] == (None, None)
+    assert fractional_gpu[2] == "GPU_MEMORY_VALUES_INVALID:0"
+
 
 def test_invalid_disk_telemetry_fails_closed(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch

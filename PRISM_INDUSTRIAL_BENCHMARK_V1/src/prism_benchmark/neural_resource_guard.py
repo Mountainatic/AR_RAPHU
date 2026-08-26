@@ -273,6 +273,8 @@ def query_gpu_memory(
             if (
                 not math.isfinite(used_mib)
                 or not math.isfinite(total_mib)
+                or not used_mib.is_integer()
+                or not total_mib.is_integer()
                 or used_mib < 0
                 or total_mib <= 0
                 or used_mib > total_mib
