@@ -611,7 +611,11 @@ def run_k_channel(
                     m_x=selected_m_x,
                     v2=v2,
                     minimum_folds=minimum_folds,
-                    scoring_history_steps=local_comparison_history,
+                    scoring_history_steps=(
+                        None
+                        if history_override is None
+                        else local_comparison_history
+                    ),
                     parallel_workers=inner_workers,
                 )
 

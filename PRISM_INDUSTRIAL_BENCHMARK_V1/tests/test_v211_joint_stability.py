@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import inspect
 import os
 import subprocess
@@ -346,19 +347,70 @@ def test_original_four_fold_provenance_code_is_retained() -> None:
     assert "w_physical_oof_used_as_training_pool" in source
 
 
+def _source_at_commit(project: Path, commit: str, relative_path: str) -> str:
+    repository = Path(
+        subprocess.run(
+            ["git", "-C", str(project), "rev-parse", "--show-toplevel"],
+            check=True,
+            text=True,
+            capture_output=True,
+        ).stdout.strip()
+    ).resolve()
+    repository_path = (project / relative_path).resolve().relative_to(repository)
+    return subprocess.run(
+        ["git", "-C", str(repository), "show", f"{commit}:{repository_path.as_posix()}"],
+        check=True,
+        text=True,
+        capture_output=True,
+    ).stdout
+
+
+def _normalized_function(source: str, name: str) -> str:
+    matches = [
+        node
+        for node in ast.parse(source).body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name == name
+    ]
+    assert len(matches) == 1
+    return ast.dump(matches[0], include_attributes=False)
+
+
 def test_pf_core_estimators_are_unchanged_from_native_support_source_commit() -> None:
     project = Path(__file__).resolve().parents[1]
-    paths = [
-        "src/prism_benchmark/v211_k.py",
+    commit = "e47542a319640bc045ca0d31ae9b40763182dde8"
+    unchanged_paths = [
         "src/prism_benchmark/v211_c.py",
+        "src/prism_benchmark/v2_urysohn.py",
     ]
     diff = subprocess.run(
-        ["git", "-C", str(project), "diff", "e47542a319640bc045ca0d31ae9b40763182dde8", "--", *paths],
+        ["git", "-C", str(project), "diff", commit, "--", *unchanged_paths],
         check=True,
         text=True,
         capture_output=True,
     ).stdout
     assert diff == ""
+
+    k_path = "src/prism_benchmark/v211_k.py"
+    current_k = (project / k_path).read_text(encoding="utf-8")
+    original_k = _source_at_commit(project, commit, k_path)
+    for function in (
+        "oof_replay_audit",
+        "select_smallest_stable_full_and_folds",
+        "_profile_complexity",
+        "_structural_complexity",
+        "evaluate_candidate",
+    ):
+        assert _normalized_function(current_k, function) == _normalized_function(
+            original_k, function
+        )
+
+    v2_k_path = "src/prism_benchmark/v2_k.py"
+    current_v2_k = (project / v2_k_path).read_text(encoding="utf-8")
+    original_v2_k = _source_at_commit(project, commit, v2_k_path)
+    assert _normalized_function(current_v2_k, "profile_values") == _normalized_function(
+        original_v2_k, "profile_values"
+    )
 
 
 def test_m5_never_accesses_test_or_ood_and_m7_is_contract_driven() -> None:

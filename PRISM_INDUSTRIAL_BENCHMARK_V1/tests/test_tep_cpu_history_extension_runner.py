@@ -134,3 +134,44 @@ def test_launcher_uses_cgroup_75gib_and_kills_the_stage_process_group() -> None:
     assert "start_new_session=True" in text
     assert 'if stage == "scope"' in text
     assert 'mode.add_argument("--pilot-only"' in text
+
+
+def test_k_smoothness_scoring_history_is_opt_in(monkeypatch) -> None:
+    _runner()
+    from prism_benchmark import v211_k
+
+    observed: list[int] = []
+
+    def fake_parallel_map(function, jobs, workers):
+        del function, workers
+        observed.extend(int(job[-1]) for job in jobs)
+        return [[1.0, 1.0] for _ in jobs]
+
+    monkeypatch.setattr(v211_k, "_ordered_parallel_map", fake_parallel_map)
+    arguments = {
+        "accessor": object(),
+        "train": object(),
+        "folds": [],
+        "channel": "xmeas_1",
+        "profile": (1, 8),
+        "m_tau": 1,
+        "family": "LINEAR_DISTRIBUTED_LAG",
+        "m_x": 1,
+        "v2": {
+            "K_module": {
+                "penalties": {
+                    "pilot": {"lambda_tau": 1.0, "lambda_x": 1.0},
+                    "lambda_tau": [1.0],
+                    "lambda_x": [1.0],
+                }
+            }
+        },
+        "minimum_folds": 1,
+    }
+
+    v211_k._smoothness_selection(**arguments)
+    assert observed == [8]
+
+    observed.clear()
+    v211_k._smoothness_selection(**arguments, scoring_history_steps=256)
+    assert observed == [256]
