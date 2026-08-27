@@ -67,7 +67,7 @@ DEFAULT_RUN_ROOT = Path(
 EXPECTED_PROTOCOL = "TEP_CPU_HISTORY_EXTENSION_L256_V1"
 EXPECTED_TASK = "TEP_G_REP_H1"
 EXPECTED_HEAD = "TEP_G_REP_H1__H1__W2"
-EXPECTED_HISTORIES = (2, 4, 8, 128, 256)
+EXPECTED_HISTORIES = (128, 256)
 COMMON_HISTORY = 256
 EXPECTED_K_CHANNEL_JOBS = 47
 SUCCESS_STATUSES = {
@@ -714,7 +714,7 @@ def run_pilot(shared: Path, run_root: Path) -> dict[str, Any]:
             "fold_losses": records[2].get("selection", {}).get("fold_losses"),
             "history_position": 0,
             "prediction_root": pilot_output / "BASELINE_DEVELOPMENT",
-            "expected_grid_entries": 40,
+            "expected_grid_entries": 16,
             "requires_common_scoring": False,
         },
         "AR": {

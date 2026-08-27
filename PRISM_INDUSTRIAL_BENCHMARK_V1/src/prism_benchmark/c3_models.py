@@ -373,25 +373,19 @@ def _hammerstein_profiles(
         indices = np.rint(np.linspace(0, len(profiles) - 1, cap)).astype(int)
         return [profiles[index] for index in indices]
 
-    # Preserve the published six-profile candidate set exactly, then append
-    # one deterministic (largest-delta) representative for each newly
-    # registered history.  This makes the extension additive rather than
-    # silently replacing short-history candidates.
-    legacy = _hammerstein_profiles(view)
-    legacy_histories = {int(profile[1]) for profile in legacy}
+    # Select one deterministic (largest-delta) profile for every registered
+    # history, then fill remaining slots from the same registered grid.  The
+    # extension contract is a strict history override: the legacy default
+    # profiles must never be reintroduced implicitly.
     histories = list(dict.fromkeys(int(profile[1]) for profile in profiles))
-    new_histories = [
-        history for history in histories if history not in legacy_histories
-    ]
-    selected = list(legacy)
+    selected: list[tuple[int, int]] = []
     selected.extend(
         next(profile for profile in profiles if int(profile[1]) == history)
-        for history in new_histories
+        for history in histories
     )
     if len(selected) > cap:
         raise ValueError(
-            "Hammerstein profile cap cannot preserve legacy profiles and "
-            "cover every registered history"
+            "Hammerstein profile cap cannot cover every registered history"
         )
     remaining = [profile for profile in profiles if profile not in selected]
     slots = cap - len(selected)

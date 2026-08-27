@@ -1,7 +1,7 @@
 {
   "protocol_id": "TEP_CPU_HISTORY_EXTENSION_L256_V1",
   "status": "FROZEN_BY_USER_BEFORE_FORMAL_DEVELOPMENT",
-  "experiment_id": "TEP_G_REP_H1_CPU_HISTORY_2_4_8_128_256",
+  "experiment_id": "TEP_G_REP_H1_CPU_HISTORY_128_256",
   "baseline_commit": "89471c12001a9bc514e02fa2df82e77d3802170d",
   "implementation_start_commit": "f83283e81a1dbbfbde0d657d07bc196340a49d90",
   "authority_repository": "Mountainatic/AR_RAPHU",
@@ -10,7 +10,7 @@
   "active_tasks": ["TEP_G_REP_H1"],
   "active_heads": ["TEP_G_REP_H1__H1__W2"],
   "information_sets": ["input_only", "dynamic"],
-  "history_aware_steps": [2, 4, 8, 128, 256],
+  "history_aware_steps": [128, 256],
   "common_support_history_steps": 256,
   "common_support_contract": "L256_INPUT_AND_AVAILABLE_TARGET_HISTORY_BY_VIEW_V1",
   "window_independent_methods": [
@@ -40,11 +40,11 @@
   ],
   "history_method_overrides": {
     "dpls_maximum_lags_per_channel": 16,
-    "dpls_maximum_joint_configurations": 40,
-    "hammerstein_profile_cap": 8,
-    "hammerstein_profile_strategy": "LEGACY_SIX_UNION_ONE_REPRESENTATIVE_PER_NEW_HISTORY",
+    "dpls_maximum_joint_configurations": 16,
+    "hammerstein_profile_cap": 6,
+    "hammerstein_profile_strategy": "REGISTERED_HISTORIES_ONLY_WITH_STATE_DELTAS",
     "hammerstein_profile_cap_must_cover_every_registered_history": true,
-    "hammerstein_maximum_configurations_per_method": 32,
+    "hammerstein_maximum_configurations_per_method": 24,
     "state_delta_steps": [1, 2, 4],
     "k_channel_class": {
       "xmv": "FAST",

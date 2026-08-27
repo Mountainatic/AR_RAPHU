@@ -1452,9 +1452,19 @@ def run_hammerstein_job(
                 for profile in profiles
                 for nonlinearity in config["nonlinearities"]
             ]
-        if history_override is not None and len(candidates) != 32:
+        if (
+            history_override is not None
+            and len(candidates)
+            != history_override.hammerstein_profile_cap
+            * (
+                len(config["input_nonlinearities"])
+                * len(config["output_map"])
+                if wiener
+                else len(config["nonlinearities"])
+            )
+        ):
             raise RuntimeError(
-                "TEP Hammerstein extension must contain exactly 32 "
+                "TEP Hammerstein extension candidate grid size drifted: "
                 f"joint configurations, got {len(candidates)}"
             )
         losses = {candidate: [] for candidate in candidates}

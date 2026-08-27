@@ -12,7 +12,7 @@ TEP_CPU_HISTORY_EXTENSION_STATUS = "FROZEN_BY_USER_BEFORE_FORMAL_DEVELOPMENT"
 TEP_DATASET = "tep"
 TEP_TASK = "TEP_G_REP_H1"
 TEP_HEAD = "TEP_G_REP_H1__H1__W2"
-FROZEN_HISTORY_STEPS = (2, 4, 8, 128, 256)
+FROZEN_HISTORY_STEPS = (128, 256)
 FROZEN_COMMON_SUPPORT_HISTORY_STEPS = 256
 
 
@@ -147,9 +147,9 @@ def load_tep_history_override(
     if (
         isinstance(dpls_maximum_joint_configurations, bool)
         or not isinstance(dpls_maximum_joint_configurations, int)
-        or dpls_maximum_joint_configurations != 40
+        or dpls_maximum_joint_configurations != 16
     ):
-        raise RuntimeError("DPLS maximum joint configurations must equal 40")
+        raise RuntimeError("DPLS maximum joint configurations must equal 16")
     if (
         isinstance(profile_cap, bool)
         or not isinstance(profile_cap, int)
@@ -159,11 +159,11 @@ def load_tep_history_override(
     if methods.get("hammerstein_profile_cap_must_cover_every_registered_history") is not True:
         raise RuntimeError("Hammerstein history coverage guard must be enabled")
     if methods.get("hammerstein_profile_strategy") != (
-        "LEGACY_SIX_UNION_ONE_REPRESENTATIVE_PER_NEW_HISTORY"
+        "REGISTERED_HISTORIES_ONLY_WITH_STATE_DELTAS"
     ):
         raise RuntimeError("Hammerstein profile extension strategy changed")
-    if methods.get("hammerstein_maximum_configurations_per_method") != 32:
-        raise RuntimeError("Hammerstein maximum configuration count must equal 32")
+    if methods.get("hammerstein_maximum_configurations_per_method") != 24:
+        raise RuntimeError("Hammerstein maximum configuration count must equal 24")
     state_deltas = _strict_positive_ints(
         methods.get("state_delta_steps"), "state_delta_steps"
     )

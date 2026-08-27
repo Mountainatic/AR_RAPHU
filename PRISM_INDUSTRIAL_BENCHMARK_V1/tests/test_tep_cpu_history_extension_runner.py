@@ -54,7 +54,7 @@ def test_frozen_scope_is_tep_only_and_single_worker() -> None:
     assert value["protocol_id"] == "TEP_CPU_HISTORY_EXTENSION_L256_V1"
     assert value["active_datasets"] == ["tep"]
     assert value["active_tasks"] == ["TEP_G_REP_H1"]
-    assert value["history_aware_steps"] == [2, 4, 8, 128, 256]
+    assert value["history_aware_steps"] == [128, 256]
     assert value["common_support_history_steps"] == 256
     assert value["resources"]["workers"] == 1
     assert value["resources"]["hard_memory_limit_gib"] == 90
@@ -89,8 +89,8 @@ def test_incompatible_registry_is_explicit() -> None:
         "N4SID",
     ]
     assert value["history_method_overrides"]["dpls_maximum_lags_per_channel"] == 16
-    assert value["history_method_overrides"]["dpls_maximum_joint_configurations"] == 40
-    assert value["history_method_overrides"]["hammerstein_profile_cap"] == 8
+    assert value["history_method_overrides"]["dpls_maximum_joint_configurations"] == 16
+    assert value["history_method_overrides"]["hammerstein_profile_cap"] == 6
     assert value["history_method_overrides"]["state_delta_steps"] == [1, 2, 4]
 
 
@@ -105,7 +105,7 @@ def test_explicit_override_binds_every_history_and_preserves_dpls_lag_cap() -> N
     override = load_tep_history_override(CONFIG_PATH.resolve())
     assert override is not None
     assert override.dpls_maximum_lags_per_channel == 16
-    assert override.dpls_maximum_joint_configurations == 40
+    assert override.dpls_maximum_joint_configurations == 16
     head = HeadSpec(
         head_id="TEP_G_REP_H1__H1__W2",
         task_id="TEP_G_REP_H1",
@@ -123,7 +123,7 @@ def test_explicit_override_binds_every_history_and_preserves_dpls_lag_cap() -> N
         override.positive_h_history_multipliers,
         override.state_delta_steps,
     )
-    assert {history for _, history in profiles} == {2, 4, 8, 128, 256}
+    assert {history for _, history in profiles} == {128, 256}
     legacy = _hammerstein_profiles(view)
     capped = _hammerstein_profiles(
         view,
@@ -132,14 +132,14 @@ def test_explicit_override_binds_every_history_and_preserves_dpls_lag_cap() -> N
         override.hammerstein_profile_cap,
         True,
     )
-    assert len(capped) == 8
-    assert set(legacy).issubset(capped)
-    assert {history for _, history in capped} == {2, 4, 8, 128, 256}
+    assert len(capped) == 6
+    assert not {history for _, history in capped}.intersection({2, 4, 8})
+    assert {history for _, history in capped} == {128, 256}
 
 
 def test_pilot_gate_requires_actual_finite_four_fold_losses() -> None:
     module = _runner()
-    expected = {2, 4, 8, 128, 256}
+    expected = {128, 256}
     k_losses = {
         str((1, history)): [1.0, 1.1, 1.2, 1.3] for history in expected
     }
