@@ -10,6 +10,7 @@ process after both seals exist.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import os
 import re
@@ -19,6 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
+import numpy as np
 import pandas as pd
 
 from prism_benchmark.cpu_data import SAMPLE_RUNTIME_COLUMNS, ViewSpec, sha256_file
@@ -187,6 +189,78 @@ def _selected_history(value: Mapping[str, Any]) -> int | None:
     return None
 
 
+def _candidate_history(raw: Any) -> int | None:
+    try:
+        value = ast.literal_eval(str(raw))
+    except (SyntaxError, ValueError):
+        return None
+
+    def integers(item: Any) -> list[int]:
+        if isinstance(item, bool):
+            return []
+        if isinstance(item, int):
+            return [item]
+        if isinstance(item, (list, tuple)):
+            result: list[int] = []
+            for child in item:
+                result.extend(integers(child))
+            return result
+        return []
+
+    observed = [item for item in integers(value) if item in HISTORIES]
+    return observed[0] if len(set(observed)) == 1 else None
+
+
+def _history_cv_summary(value: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Extract the largest four-fold candidate grid covering both histories."""
+
+    candidates: list[dict[str, Any]] = []
+
+    def visit(item: Any, path: str) -> None:
+        if isinstance(item, Mapping):
+            grouped: dict[int, list[float]] = {history: [] for history in HISTORIES}
+            finite_entries = 0
+            for key, raw_losses in item.items():
+                history = _candidate_history(key)
+                try:
+                    losses = np.asarray(raw_losses, dtype=np.float64).reshape(-1)
+                except (TypeError, ValueError):
+                    continue
+                if history is None or len(losses) != 4 or not np.isfinite(losses).all():
+                    continue
+                grouped[history].append(float(np.mean(losses, dtype=np.float64)))
+                finite_entries += 1
+            if all(grouped[history] for history in HISTORIES):
+                best = {history: min(grouped[history]) for history in HISTORIES}
+                candidates.append(
+                    {
+                        "path": path,
+                        "finite_grid_entries": finite_entries,
+                        "best_mean_fold_mse_by_history": {
+                            str(history): best[history] for history in HISTORIES
+                        },
+                    }
+                )
+            for key, child in item.items():
+                visit(child, f"{path}.{key}" if path else str(key))
+        elif isinstance(item, list):
+            for index, child in enumerate(item):
+                visit(child, f"{path}[{index}]")
+
+    visit(value, "")
+    if not candidates:
+        return None
+    result = max(candidates, key=lambda item: int(item["finite_grid_entries"]))
+    loss_128 = float(result["best_mean_fold_mse_by_history"]["128"])
+    loss_256 = float(result["best_mean_fold_mse_by_history"]["256"])
+    result["mse_change_256_minus_128"] = loss_256 - loss_128
+    result["relative_mse_change_256_vs_128"] = (
+        None if loss_128 == 0.0 else (loss_256 - loss_128) / loss_128
+    )
+    result["lower_loss_history_steps"] = 128 if loss_128 <= loss_256 else 256
+    return result
+
+
 def _development_inventory(run_root: Path) -> list[dict[str, Any]]:
     roots = (
         run_root / "results" / "DEVELOPMENT",
@@ -217,6 +291,9 @@ def _development_inventory(run_root: Path) -> list[dict[str, Any]]:
                     "availability_scenario": value.get("availability_scenario"),
                     "proxy_policy": value.get("proxy_policy"),
                     "selected_history_steps": history,
+                    "candidate_cv_comparison": (
+                        _history_cv_summary(value) if history is not None else None
+                    ),
                     "elapsed_seconds": value.get("elapsed_seconds"),
                     "validation_r2_delta": value.get("r2"),
                     "validation_rows": value.get("rows"),
@@ -286,7 +363,12 @@ def _requirement(view: ViewSpec) -> SupportRequirement:
     )
 
 
-def _metadata_support(source_shared: Path, view: ViewSpec, split: str) -> pd.DataFrame:
+def _metadata_support(
+    source_shared: Path,
+    view: ViewSpec,
+    split: str,
+    requirement: SupportRequirement | None = None,
+) -> pd.DataFrame:
     columns = [
         name
         for name in SAMPLE_RUNTIME_COLUMNS
@@ -295,7 +377,19 @@ def _metadata_support(source_shared: Path, view: ViewSpec, split: str) -> pd.Dat
     columns.extend(SUPPORT_COLUMNS)
     path = source_shared / "sample_ids" / view.relative_root / f"{split}.parquet"
     frame = pd.read_parquet(path, columns=list(dict.fromkeys(columns)))
-    return apply_common_requirements(frame, [_requirement(view)]).reset_index(drop=True)
+    return apply_common_requirements(
+        frame, [requirement or _requirement(view)]
+    ).reset_index(drop=True)
+
+
+def _history_requirement(view: ViewSpec, history: int) -> SupportRequirement:
+    if view.information_set == "input_only":
+        return SupportRequirement(input_history_steps=history)
+    return SupportRequirement(
+        input_history_steps=history,
+        target_delta_steps=1,
+        target_history_steps=history,
+    )
 
 
 def freeze_common_support(source_shared: Path, run_root: Path) -> dict[str, Any]:
@@ -312,6 +406,19 @@ def freeze_common_support(source_shared: Path, run_root: Path) -> dict[str, Any]
         splits: dict[str, Any] = {}
         for split in ("train", "validation", "test"):
             common = _metadata_support(source_shared, view, split)
+            candidate_rows = {
+                str(history): int(
+                    len(
+                        _metadata_support(
+                            source_shared,
+                            view,
+                            split,
+                            _history_requirement(view, history),
+                        )
+                    )
+                )
+                for history in HISTORIES
+            }
             splits[split] = {
                 "rows": int(len(common)),
                 "support_hash": support_id_hash(common),
@@ -324,6 +431,11 @@ def freeze_common_support(source_shared: Path, run_root: Path) -> dict[str, Any]
                         columns=["origin"],
                     ).shape[0]
                 ),
+                "candidate_native_rows": candidate_rows,
+                "candidate_rows_discarded_for_common_l256_support": {
+                    str(history): candidate_rows[str(history)] - int(len(common))
+                    for history in HISTORIES
+                },
             }
         views.append(
             {
