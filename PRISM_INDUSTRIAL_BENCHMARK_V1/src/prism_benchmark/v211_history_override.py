@@ -44,6 +44,7 @@ def _strict_positive_ints(value: Any, field: str) -> tuple[int, ...]:
 class TEPHistoryOverride:
     config_path: Path
     config_sha256: str
+    protocol_id: str
     history_steps: tuple[int, ...]
     common_support_history_steps: int
     dpls_maximum_lags_per_channel: int
@@ -73,7 +74,7 @@ class TEPHistoryOverride:
 
     def audit(self) -> dict[str, Any]:
         return {
-            "protocol_id": TEP_CPU_HISTORY_EXTENSION_PROTOCOL_ID,
+            "protocol_id": self.protocol_id,
             "config_path": str(self.config_path),
             "config_sha256": self.config_sha256,
             "history_steps": list(self.history_steps),
@@ -198,6 +199,7 @@ def load_tep_history_override(
     return TEPHistoryOverride(
         config_path=path.resolve(),
         config_sha256=_sha256_file(path),
+        protocol_id=str(protocol_id),
         history_steps=histories,
         common_support_history_steps=int(common_support),
         dpls_maximum_lags_per_channel=int(dpls_maximum_lags),

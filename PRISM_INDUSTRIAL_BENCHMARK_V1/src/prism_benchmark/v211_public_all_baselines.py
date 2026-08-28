@@ -593,10 +593,15 @@ def run_dpls_job(
             if history_override is None
             else history_override.positive_h_history_multipliers
         )
-        histories = [
-            max(1, int(multiplier) * view.head.h_steps)
-            for multiplier in multipliers
-        ]
+        if history_override is not None and view.head.h_steps == 0:
+            # The nowcast contract registers literal strict-past histories.
+            # Multiplying by H0 would otherwise collapse every candidate to 1.
+            histories = [int(value) for value in multipliers]
+        else:
+            histories = [
+                max(1, int(multiplier) * view.head.h_steps)
+                for multiplier in multipliers
+            ]
         histories = sorted(set(histories))
         requirements = {
             history: SupportRequirement(input_history_steps=history)
