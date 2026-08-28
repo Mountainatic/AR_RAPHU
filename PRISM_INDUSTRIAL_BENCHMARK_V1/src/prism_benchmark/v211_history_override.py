@@ -12,6 +12,9 @@ TEP_CPU_HISTORY_EXTENSION_STATUS = "FROZEN_BY_USER_BEFORE_FORMAL_DEVELOPMENT"
 TEP_DATASET = "tep"
 TEP_TASK = "TEP_G_REP_H1"
 TEP_HEAD = "TEP_G_REP_H1__H1__W2"
+TEP_NOWCAST_PROTOCOL_ID = "TEP_CPU_NOWCAST_HISTORY_L256_V1"
+TEP_NOWCAST_TASK = "TEP_G_NOWCAST_H0"
+TEP_NOWCAST_HEAD = "TEP_G_NOWCAST_H0__H0__W1"
 FROZEN_HISTORY_STEPS = (128, 256)
 FROZEN_COMMON_SUPPORT_HISTORY_STEPS = 256
 
@@ -48,10 +51,14 @@ class TEPHistoryOverride:
     hammerstein_profile_cap: int
     state_delta_steps: tuple[int, ...]
     fail_if_history_unavailable: tuple[int, ...]
+    task_id: str
+    head_id: str
+    h_steps: int
+    w_steps: int
 
     @property
     def positive_h_history_multipliers(self) -> tuple[int, ...]:
-        """The registered TEP head has h=1, so steps equal multipliers."""
+        """H1 uses these as multipliers; H0 consumes them as exact histories."""
 
         return self.history_steps
 
@@ -59,10 +66,10 @@ class TEPHistoryOverride:
         head = view.head
         if str(head.dataset) != TEP_DATASET:
             raise RuntimeError("TEP history override cannot be applied outside TEP")
-        if str(head.task_id) != TEP_TASK or str(head.head_id) != TEP_HEAD:
+        if str(head.task_id) != self.task_id or str(head.head_id) != self.head_id:
             raise RuntimeError("TEP history override cannot be applied to an unregistered task/head")
-        if int(head.h_steps) != 1 or int(head.w_steps) != 2:
-            raise RuntimeError("TEP history override requires the registered H1/W2 head")
+        if int(head.h_steps) != self.h_steps or int(head.w_steps) != self.w_steps:
+            raise RuntimeError("TEP history override head realization mismatch")
 
     def audit(self) -> dict[str, Any]:
         return {
@@ -84,6 +91,10 @@ class TEPHistoryOverride:
             "fail_if_history_unavailable": list(
                 self.fail_if_history_unavailable
             ),
+            "task_id": self.task_id,
+            "head_id": self.head_id,
+            "h_steps": self.h_steps,
+            "w_steps": self.w_steps,
         }
 
 
@@ -107,15 +118,21 @@ def load_tep_history_override(
     payload = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(payload, Mapping):
         raise RuntimeError("TEP history override config must be a JSON object")
-    if payload.get("protocol_id") != TEP_CPU_HISTORY_EXTENSION_PROTOCOL_ID:
+    protocol_id = payload.get("protocol_id")
+    bindings = {
+        TEP_CPU_HISTORY_EXTENSION_PROTOCOL_ID: (TEP_TASK, TEP_HEAD, 1, 2),
+        TEP_NOWCAST_PROTOCOL_ID: (TEP_NOWCAST_TASK, TEP_NOWCAST_HEAD, 0, 1),
+    }
+    if protocol_id not in bindings:
         raise RuntimeError("TEP history override protocol_id mismatch")
+    task_id, head_id, h_steps, w_steps = bindings[str(protocol_id)]
     if payload.get("status") != TEP_CPU_HISTORY_EXTENSION_STATUS:
         raise RuntimeError("TEP history override is not frozen")
     if payload.get("active_datasets") != [TEP_DATASET]:
         raise RuntimeError("TEP history override must be restricted to TEP")
-    if payload.get("active_tasks") != [TEP_TASK]:
+    if payload.get("active_tasks") != [task_id]:
         raise RuntimeError("TEP history override task binding mismatch")
-    if payload.get("active_heads") != [TEP_HEAD]:
+    if payload.get("active_heads") != [head_id]:
         raise RuntimeError("TEP history override head binding mismatch")
     histories = _strict_positive_ints(
         payload.get("history_aware_steps"), "history_aware_steps"
@@ -190,6 +207,10 @@ def load_tep_history_override(
         hammerstein_profile_cap=int(profile_cap),
         state_delta_steps=state_deltas,
         fail_if_history_unavailable=unavailable,
+        task_id=task_id,
+        head_id=head_id,
+        h_steps=h_steps,
+        w_steps=w_steps,
     )
 
 

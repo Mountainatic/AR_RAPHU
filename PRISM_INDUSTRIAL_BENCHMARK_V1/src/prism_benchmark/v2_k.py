@@ -72,9 +72,16 @@ def channel_profiles(
             )
         histories = [int(value) * view.head.h_steps for value in multipliers]
     else:
-        if positive_h_history_multipliers is not None:
-            raise ValueError("positive-h history override cannot be used for h=0")
-        histories = sorted({delta * int(value) for delta in deltas for value in config["time_profile_grid"]["zero_h_history_in_delta_multipliers"]})
+        if positive_h_history_multipliers is None:
+            histories = sorted({delta * int(value) for delta in deltas for value in config["time_profile_grid"]["zero_h_history_in_delta_multipliers"]})
+        else:
+            from .v211_history_override import validate_positive_h_history_multipliers
+
+            histories = list(
+                validate_positive_h_history_multipliers(
+                    positive_h_history_multipliers
+                )
+            )
     return sorted({(delta, history) for delta in deltas for history in histories if delta <= history}, key=lambda value: (value[1], -value[0]))
 
 

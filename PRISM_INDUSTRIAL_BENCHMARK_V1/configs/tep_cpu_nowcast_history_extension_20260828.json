@@ -1,0 +1,108 @@
+{
+  "protocol_id": "TEP_CPU_NOWCAST_HISTORY_L256_V1",
+  "status": "FROZEN_BY_USER_BEFORE_FORMAL_DEVELOPMENT",
+  "experiment_id": "TEP_G_NOWCAST_H0_CPU_HISTORY_128_256",
+  "baseline_commit": "89471c12001a9bc514e02fa2df82e77d3802170d",
+  "implementation_start_commit": "f83283e81a1dbbfbde0d657d07bc196340a49d90",
+  "authority_repository": "Mountainatic/AR_RAPHU",
+  "authority_branch": "prism-v2-1-1-metro-p60-joint-stability-final",
+  "active_datasets": ["tep"],
+  "active_tasks": ["TEP_G_NOWCAST_H0"],
+  "active_heads": ["TEP_G_NOWCAST_H0__H0__W1"],
+  "task_realization": {
+    "cadence_seconds": 180,
+    "h_steps": 0,
+    "w_steps": 1,
+    "w0_steps": 1,
+    "history_interval": "[t-L,t)",
+    "anchor": "D[t-1]",
+    "target_delta": "D[t]-D[t-1]",
+    "level_reconstruction": "D[t-1]+delta_pred",
+    "strict_past_only": true
+  },
+  "information_sets": ["input_only", "dynamic"],
+  "history_aware_steps": [128, 256],
+  "common_support_history_steps": 256,
+  "common_support_contract": "L256_INPUT_AND_AVAILABLE_TARGET_HISTORY_BY_VIEW_V1",
+  "window_independent_methods": [
+    "MEAN",
+    "PERSISTENCE",
+    "RIDGE",
+    "PLS",
+    "RBF_SVR",
+    "XGBOOST"
+  ],
+  "registered_protocol_incompatible": [
+    "SEASONAL_PERSISTENCE",
+    "N4SID"
+  ],
+  "history_aware_methods": [
+    "DPLS",
+    "PARALLEL_HAMMERSTEIN",
+    "HAMMERSTEIN_WIENER",
+    "AR",
+    "ARX",
+    "LINEAR_NARX",
+    "PRISM_K",
+    "PRISM_C",
+    "PRISM_W",
+    "PRISM_A",
+    "PRISM_JOINT"
+  ],
+  "history_method_overrides": {
+    "dpls_maximum_lags_per_channel": 16,
+    "dpls_maximum_joint_configurations": 16,
+    "hammerstein_profile_cap": 6,
+    "hammerstein_profile_strategy": "REGISTERED_HISTORIES_ONLY_WITH_STATE_DELTAS",
+    "hammerstein_profile_cap_must_cover_every_registered_history": true,
+    "hammerstein_maximum_configurations_per_method": 24,
+    "state_delta_steps": [1, 2, 4],
+    "k_channel_class": {
+      "xmv": "FAST",
+      "xmeas": "MEDIUM"
+    },
+    "fail_if_history_unavailable": [128, 256]
+  },
+  "disabled": {
+    "sru": "NOT_RUN_BY_USER_SCOPE",
+    "cz_czochralski": "NOT_RUN_BY_USER_SCOPE",
+    "neural3": "NOT_RUN_BY_USER_SCOPE",
+    "debutanizer": "NOT_RUN_BY_USER_SCOPE",
+    "pmsm": "NOT_RUN_BY_USER_SCOPE",
+    "metropt": "NOT_RUN_BY_USER_SCOPE",
+    "stage2": "NOT_RUN_BY_USER_SCOPE"
+  },
+  "c1": {
+    "mode": "REUSE_EXISTING_READONLY_REPRESENTATIVE_C1",
+    "rebuild": false,
+    "test_access_before_freeze": false,
+    "ood_access": false
+  },
+  "execution_order": [
+    "SCOPE",
+    "K",
+    "C",
+    "W",
+    "A",
+    "JOINT",
+    "BASELINES",
+    "GLOBAL_SELECTION_FREEZE",
+    "FINAL_CHECKPOINT_FIT_AND_SEAL",
+    "INFERENCE_ONLY_TEST",
+    "REPORT"
+  ],
+  "resources": {
+    "workers": 1,
+    "blas_threads": 1,
+    "recommended_memory_limit_gib": 75,
+    "hard_memory_limit_gib": 90,
+    "minimum_runtime_free_gib": 5,
+    "per_worker_memory_gib": 70
+  },
+  "checkpoint": {
+    "portable_only": true,
+    "deletion_forbidden": true,
+    "test_requires_selection_freeze": true,
+    "test_requires_checkpoint_manifest": true
+  }
+}

@@ -478,11 +478,18 @@ def realized_state_profiles(
                 for multiplier in multipliers
             ]
         else:
-            if positive_h_history_multipliers is not None:
-                raise ValueError(
-                    "positive-h history override cannot be used for h=0"
+            if positive_h_history_multipliers is None:
+                histories = [multiplier * delta for multiplier in (4, 16, 64)]
+            else:
+                from .v211_history_override import (
+                    validate_positive_h_history_multipliers,
                 )
-            histories = [multiplier * delta for multiplier in (4, 16, 64)]
+
+                histories = list(
+                    validate_positive_h_history_multipliers(
+                        positive_h_history_multipliers
+                    )
+                )
         result.extend((delta, history) for history in histories)
     # Rounding and the ``max(delta, multiplier * h)`` maturity floor can map
     # different registered grid points to the same realized profile.  A
