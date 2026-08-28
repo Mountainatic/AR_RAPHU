@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 from pathlib import Path
 from typing import Any, Mapping
@@ -486,9 +487,17 @@ def _write_model(
 ) -> dict[str, Any]:
     frame = _prediction_frame(samples, view, model, prediction, parameter_count)
     frame["split"] = split
-    destination = _prediction_root(paths, split) / view.relative_root / f"{model}.parquet"
+    compact = os.environ.get("PRISM_COMPACT_PREDICTION_ONLY") == "1"
+    suffix = f"{model}.y_pred.fp64.npy" if compact else f"{model}.parquet"
+    destination = _prediction_root(paths, split) / view.relative_root / suffix
     destination.parent.mkdir(parents=True, exist_ok=True)
-    frame.to_parquet(destination, index=False, compression="zstd")
+    if compact:
+        temporary = destination.with_suffix(destination.suffix + ".tmp")
+        with temporary.open("wb") as handle:
+            np.save(handle, frame["y_pred"].to_numpy(dtype=np.float64))
+        os.replace(temporary, destination)
+    else:
+        frame.to_parquet(destination, index=False, compression="zstd")
     metrics = metric_bundle_delta_and_level(
         frame["y_true"].to_numpy(dtype=np.float64),
         frame["y_pred"].to_numpy(dtype=np.float64),
@@ -513,6 +522,9 @@ def _write_model(
         "checkpoint_dir": str(checkpoint),
         "prediction_path": str(destination.relative_to(paths.run_root)),
         "prediction_sha256": sha256_file(destination),
+        "prediction_storage": (
+            "NPY_FP64_Y_PRED_ONLY" if compact else "PARQUET_ROW_LEVEL"
+        ),
         "test_accessed": split == "test",
         "ood_accessed": split == "ood",
         "fit_called_in_inference": False,

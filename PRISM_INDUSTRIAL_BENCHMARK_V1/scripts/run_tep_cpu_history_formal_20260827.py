@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import argparse
 import ast
+import gc
+import importlib.util
 import json
 import os
 import re
@@ -58,6 +60,7 @@ COMMON_HISTORY = 256
 SELECTION_FREEZE_NAME = "TEP_SELECTION_FREEZE.json"
 SUPPORT_FREEZE_NAME = "TEP_COMMON_SUPPORT_FREEZE.json"
 CHECKPOINT_MANIFEST_NAME = "CHECKPOINT_MANIFEST.json"
+LOW_MEMORY_FREEZE_NAME = "TEP_LOW_MEMORY_INFERENCE_FREEZE.json"
 FORMAL_TEST_NAME = "TEP_FORMAL_TEST_REPORT.json"
 REPORT_NAME = "TEP_CPU_PRISM_HISTORY_EXTENSION_REPORT.json"
 LEGAL_DEVELOPMENT_STATUSES = {
@@ -353,6 +356,46 @@ def _require_sealed(path: Path, status: str) -> dict[str, Any]:
     return value
 
 
+def _freeze_low_memory_inference(run_root: Path) -> dict[str, Any]:
+    selection_path = run_root / "freeze" / SELECTION_FREEZE_NAME
+    support_path = run_root / "freeze" / SUPPORT_FREEZE_NAME
+    _require_sealed(selection_path, "SELECTION_FROZEN")
+    _require_sealed(support_path, "COMMON_SUPPORT_FROZEN")
+    destination = run_root / "freeze" / LOW_MEMORY_FREEZE_NAME
+    if destination.exists():
+        return _require_sealed(destination, "LOW_MEMORY_INFERENCE_FROZEN")
+    if (run_root / "final" / FORMAL_TEST_NAME).exists():
+        raise RuntimeError("STOP_TEP_LOW_MEMORY_FREEZE_AFTER_FORMAL_TEST")
+    result = {
+        "status": "LOW_MEMORY_INFERENCE_FROZEN",
+        "sealed": True,
+        "sealed_utc": _utc(),
+        "deletion_forbidden": True,
+        "protocol_id": PROTOCOL_ID,
+        "implementation_commit": _git("rev-parse", "HEAD"),
+        "selection_freeze_sha256": sha256_file(selection_path),
+        "support_freeze_sha256": sha256_file(support_path),
+        "prediction_storage": "NPY_FP64_Y_PRED_ONLY",
+        "baseline_inference_chunk_rows": 50000,
+        "scientific_contract_changes": [],
+        "storage_only_changes": [
+            "omit row-level identity and y_true columns from prediction artifacts",
+            "store ordered float64 y_pred arrays",
+            "run registered baseline inference in bounded row chunks",
+        ],
+        "model_selection_unchanged": True,
+        "checkpoint_fit_unchanged": True,
+        "scoring_support_unchanged": True,
+        "metric_calculation_unchanged": True,
+        "test_accessed": False,
+        "test_targets_read": False,
+        "ood_accessed": False,
+    }
+    write_json(destination, result)
+    destination.chmod(0o444)
+    return result
+
+
 def _requirement(view: ViewSpec) -> SupportRequirement:
     if view.information_set == "input_only":
         return SupportRequirement(input_history_steps=COMMON_HISTORY)
@@ -496,6 +539,7 @@ def fit_checkpoints(run_root: Path) -> dict[str, Any]:
     support_path = run_root / "freeze" / SUPPORT_FREEZE_NAME
     _require_sealed(selection_path, "SELECTION_FROZEN")
     _require_sealed(support_path, "COMMON_SUPPORT_FROZEN")
+    low_memory_freeze = _freeze_low_memory_inference(run_root)
     checkpoint_root = run_root / "checkpoints" / "tep"
     if checkpoint_root.exists():
         raise RuntimeError(f"REFUSING_EXISTING_CHECKPOINT_ROOT:{checkpoint_root}")
@@ -535,6 +579,10 @@ def fit_checkpoints(run_root: Path) -> dict[str, Any]:
         "protocol_id": PROTOCOL_ID,
         "selection_freeze_sha256": sha256_file(selection_path),
         "support_freeze_sha256": sha256_file(support_path),
+        "low_memory_inference_freeze_sha256": sha256_file(
+            run_root / "freeze" / LOW_MEMORY_FREEZE_NAME
+        ),
+        "low_memory_inference_contract": low_memory_freeze["prediction_storage"],
         "entries": entries,
         "entry_count": len(entries),
         "fit_records": records,
@@ -561,27 +609,10 @@ def _require_checkpoints(run_root: Path) -> dict[str, Any]:
     return value
 
 
-def _build_test_shared(source_shared: Path, run_root: Path) -> tuple[Path, dict[str, Any]]:
-    destination = run_root / "shared_l256_formal"
-    if destination.exists():
-        raise RuntimeError(f"REFUSING_EXISTING_FORMAL_SHARED:{destination}")
-    development = run_root / "shared_l256_development"
-    destination.mkdir(parents=True)
-    for child in sorted(development.iterdir()):
-        if child.name in {"sample_ids", "base_data"}:
-            continue
-        os.symlink(str(child.resolve()), str(destination / child.name), target_is_directory=child.is_dir())
-    base = destination / "base_data" / "tep"
-    base.mkdir(parents=True)
-    for split in ("train", "validation", "test"):
-        source = source_shared / "base_data" / "tep" / f"{split}.parquet"
-        os.symlink(str(source.resolve()), str(base / source.name))
+def _verify_test_support_unlock(
+    source_shared: Path, run_root: Path
+) -> tuple[Path, dict[str, Any]]:
     source_inputs, source_dynamics = _tep_views(source_shared)
-    dev_inputs, dev_dynamics = _tep_views(development)
-    dev_by_key = {
-        (view.information_set, view.availability_scenario, view.proxy_policy): view
-        for view in [*dev_inputs, *dev_dynamics]
-    }
     records: list[dict[str, Any]] = []
     support_freeze = _require_sealed(
         run_root / "freeze" / SUPPORT_FREEZE_NAME, "COMMON_SUPPORT_FROZEN"
@@ -592,28 +623,18 @@ def _build_test_shared(source_shared: Path, run_root: Path) -> tuple[Path, dict[
     }
     for view in [*source_inputs, *source_dynamics]:
         key = (view.information_set, view.availability_scenario, view.proxy_policy)
-        target = destination / "sample_ids" / view.relative_root
-        target.mkdir(parents=True, exist_ok=True)
-        dev_view = dev_by_key[key]
-        for split in ("train", "validation"):
-            source = development / "sample_ids" / dev_view.relative_root / f"{split}.parquet"
-            os.symlink(str(source.resolve()), str(target / source.name))
         source_test = source_shared / "sample_ids" / view.relative_root / "test.parquet"
-        test = pd.read_parquet(source_test)
-        common = apply_common_requirements(test, [_requirement(view)]).reset_index(drop=True)
+        common = _metadata_support(source_shared, view, "test")
         expected = frozen[key]["splits"]["test"]
         if len(common) != int(expected["rows"]) or support_id_hash(common) != expected["support_hash"]:
             raise RuntimeError(f"STOP_TEP_FORMAL_TEST_SUPPORT_DRIFT:{view.relative_root}")
-        output = target / "test.parquet"
-        common.to_parquet(output, index=False, compression="zstd")
         records.append(
             {
                 "view": view.relative_root.as_posix(),
                 "rows": int(len(common)),
                 "support_hash": support_id_hash(common),
                 "source_sha256": sha256_file(source_test),
-                "path": output.relative_to(run_root).as_posix(),
-                "sha256": sha256_file(output),
+                "test_target_read": False,
             }
         )
     audit = {
@@ -624,10 +645,24 @@ def _build_test_shared(source_shared: Path, run_root: Path) -> tuple[Path, dict[
         "selection_freeze_sha256": sha256_file(run_root / "freeze" / SELECTION_FREEZE_NAME),
         "checkpoint_manifest_sha256": sha256_file(run_root / "freeze" / CHECKPOINT_MANIFEST_NAME),
         "records": records,
+        "test_target_read_during_unlock_audit": False,
+        "test_target_read_by_following_inference": True,
         "ood_accessed": False,
     }
     write_json(run_root / "logs" / "TEP_TEST_UNLOCK_AUDIT.json", audit)
-    return destination, audit
+    return source_shared, audit
+
+
+def _low_memory_module() -> Any:
+    path = PROJECT / "scripts" / "resume_representative_formal_test_low_memory.py"
+    specification = importlib.util.spec_from_file_location(
+        "tep_registered_low_memory_inference", path
+    )
+    if specification is None or specification.loader is None:
+        raise RuntimeError("STOP_TEP_LOW_MEMORY_MODULE_LOAD")
+    module = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(module)
+    return module
 
 
 def _support_acceptance(records: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
@@ -666,20 +701,25 @@ def run_test(source_shared: Path, run_root: Path) -> dict[str, Any]:
         raise RuntimeError("STOP_TEP_FORMAL_TEST_REQUIRES_INFERENCE_ONLY_PROCESS")
     _require_sealed(run_root / "freeze" / SELECTION_FREEZE_NAME, "SELECTION_FROZEN")
     _require_sealed(run_root / "freeze" / SUPPORT_FREEZE_NAME, "COMMON_SUPPORT_FROZEN")
+    _require_sealed(
+        run_root / "freeze" / LOW_MEMORY_FREEZE_NAME,
+        "LOW_MEMORY_INFERENCE_FROZEN",
+    )
     checkpoint_manifest = _require_checkpoints(run_root)
     destination = run_root / "final" / FORMAL_TEST_NAME
     if destination.exists():
         raise RuntimeError("REFUSING_TO_OVERWRITE_TEP_FORMAL_TEST")
     _storage_guard(run_root, "test_unlock")
-    formal_shared, unlock = _build_test_shared(source_shared, run_root)
+    formal_shared, unlock = _verify_test_support_unlock(source_shared, run_root)
     activate_inference_fit_guard()
-    from prism_benchmark.representative_baseline_checkpoints import (
-        predict_baseline_checkpoints_for_view,
-    )
+    import prism_benchmark.representative_baseline_checkpoints as baseline_module
     from prism_benchmark.representative_prism_checkpoints import (
         predict_prism_checkpoint_for_view,
     )
 
+    low_memory = _low_memory_module()
+    os.environ["PRISM_COMPACT_PREDICTION_ONLY"] = "1"
+    os.environ.setdefault("PRISM_LOW_MEMORY_TEST_CHUNK_ROWS", "50000")
     paths = PublicAllPaths(PROJECT, formal_shared, run_root)
     inputs, dynamics = _tep_views(formal_shared)
     checkpoint_root = run_root / "checkpoints" / "tep"
@@ -687,7 +727,21 @@ def run_test(source_shared: Path, run_root: Path) -> dict[str, Any]:
     for view in [*inputs, *dynamics]:
         _storage_guard(run_root, "test_view")
         records.extend(predict_prism_checkpoint_for_view(paths, view, checkpoint_root, split="test"))
-        records.extend(predict_baseline_checkpoints_for_view(paths, view, checkpoint_root, split="test"))
+        gc.collect()
+        for _, model, output_model in baseline_module.baseline_candidates(view):
+            _storage_guard(run_root, "test_model")
+            records.append(
+                low_memory._predict_one_baseline_chunked(
+                    formal_root=run_root,
+                    paths=paths,
+                    view=view,
+                    checkpoint_root=checkpoint_root,
+                    model=str(model),
+                    output_model=str(output_model),
+                    split="test",
+                )
+            )
+            gc.collect()
     _verify_checkpoint_inventory(checkpoint_root, checkpoint_manifest["entries"])
     passed = [item for item in records if item.get("status") == "PASS"]
     if not passed or any(item.get("fit_called_in_inference") is not False for item in passed):
@@ -744,11 +798,22 @@ def _resource_summary(run_root: Path) -> dict[str, Any]:
                     "minimum_free_gib": min(float(item.group("free")) for item in values),
                 }
             )
+    cgroup_peak_bytes = None
+    cgroup_peak_path = Path("/sys/fs/cgroup/memory.peak")
+    if cgroup_peak_path.is_file():
+        raw_peak = cgroup_peak_path.read_text(encoding="utf-8").strip()
+        if raw_peak.isdigit():
+            cgroup_peak_bytes = int(raw_peak)
+    disk_free_gib = shutil.disk_usage(run_root).free / (1024**3)
     return {
         "stages": rows,
         "peak_cgroup_gib": max((item["peak_cgroup_gib"] for item in rows), default=None),
         "peak_process_tree_rss_gib": max((item["peak_process_tree_rss_gib"] for item in rows), default=None),
         "minimum_free_gib": min((item["minimum_free_gib"] for item in rows), default=None),
+        "cgroup_lifetime_peak_gib": (
+            None if cgroup_peak_bytes is None else cgroup_peak_bytes / (1024**3)
+        ),
+        "disk_free_gib_at_report": disk_free_gib,
         "hard_memory_limit_gib": 90,
         "recommended_memory_limit_gib": 75,
         "storage_stopline_gib": 5,
@@ -764,6 +829,10 @@ def build_report(source_shared: Path, run_root: Path) -> dict[str, Any]:
         run_root / "freeze" / SUPPORT_FREEZE_NAME, "COMMON_SUPPORT_FROZEN"
     )
     checkpoints = _require_checkpoints(run_root)
+    low_memory = _require_sealed(
+        run_root / "freeze" / LOW_MEMORY_FREEZE_NAME,
+        "LOW_MEMORY_INFERENCE_FROZEN",
+    )
     formal = _read_json(run_root / "final" / FORMAL_TEST_NAME)
     if formal.get("status") != "PASS":
         raise RuntimeError("STOP_TEP_FORMAL_TEST_NOT_PASS")
@@ -818,6 +887,14 @@ def build_report(source_shared: Path, run_root: Path) -> dict[str, Any]:
         "common_support_freeze_sha256": sha256_file(run_root / "freeze" / SUPPORT_FREEZE_NAME),
         "support_records_hash": support["support_records_hash"],
         "checkpoint_manifest_sha256": sha256_file(run_root / "freeze" / CHECKPOINT_MANIFEST_NAME),
+        "low_memory_inference_freeze_sha256": sha256_file(
+            run_root / "freeze" / LOW_MEMORY_FREEZE_NAME
+        ),
+        "low_memory_inference_contract": {
+            "prediction_storage": low_memory["prediction_storage"],
+            "baseline_inference_chunk_rows": low_memory["baseline_inference_chunk_rows"],
+            "scientific_contract_changes": low_memory["scientific_contract_changes"],
+        },
         "checkpoint_entry_count": checkpoints["entry_count"],
         "experiment_matrix": {
             "dataset": "TEP",
@@ -849,7 +926,7 @@ def build_report(source_shared: Path, run_root: Path) -> dict[str, Any]:
             "python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_tep_cpu_history_formal_20260827.py freeze --shared <formal-shared> --run-root <run-root>",
             "python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_tep_cpu_history_formal_20260827.py support-freeze --shared <formal-shared> --run-root <run-root>",
             "python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_tep_cpu_history_formal_20260827.py checkpoints --shared <formal-shared> --run-root <run-root>",
-            "PRISM_FORMAL_INFERENCE_ONLY=1 python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_tep_cpu_history_formal_20260827.py test --shared <formal-shared> --run-root <run-root>",
+            "PRISM_FORMAL_INFERENCE_ONLY=1 PRISM_COMPACT_PREDICTION_ONLY=1 PRISM_LOW_MEMORY_TEST_CHUNK_ROWS=50000 python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_tep_cpu_history_formal_20260827.py test --shared <formal-shared> --run-root <run-root>",
             "python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_tep_cpu_history_formal_20260827.py report --shared <formal-shared> --run-root <run-root>",
         ],
     }
@@ -874,6 +951,7 @@ def status(run_root: Path) -> dict[str, Any]:
     paths = {
         "selection": run_root / "freeze" / SELECTION_FREEZE_NAME,
         "support": run_root / "freeze" / SUPPORT_FREEZE_NAME,
+        "low_memory": run_root / "freeze" / LOW_MEMORY_FREEZE_NAME,
         "checkpoints": run_root / "freeze" / CHECKPOINT_MANIFEST_NAME,
         "test": run_root / "final" / FORMAL_TEST_NAME,
         "report": run_root / "final" / REPORT_NAME,
