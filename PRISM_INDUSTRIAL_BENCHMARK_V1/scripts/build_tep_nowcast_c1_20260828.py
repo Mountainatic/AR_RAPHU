@@ -101,8 +101,20 @@ def _registries(source: Path, destination: Path) -> None:
             ],
         },
     )
-    if (source / "SPLIT_REGISTRY.json").is_file():
-        _link_new(source / "SPLIT_REGISTRY.json", destination / "SPLIT_REGISTRY.json")
+    # These are immutable C1 contract/identity metadata.  Linking them does not
+    # open any lockbox parquet; the development builder still materializes only
+    # train and validation rows below.  The extension runner inventories all
+    # six canonical registry names before it will start its pilot.
+    for name in (
+        "DATASET_HASHES.json",
+        "SPLIT_REGISTRY.json",
+        "SAMPLE_ID_REGISTRY.json",
+        "LOCKBOX.json",
+    ):
+        source_path = source / name
+        if not source_path.is_file():
+            raise RuntimeError(f"STOP_NOWCAST_SOURCE_REGISTRY_MISSING:{name}")
+        _link_new(source_path, destination / name)
 
 
 def _sample_frame(base: pd.DataFrame, split: str, information: str, availability: str, delay: int) -> pd.DataFrame:
