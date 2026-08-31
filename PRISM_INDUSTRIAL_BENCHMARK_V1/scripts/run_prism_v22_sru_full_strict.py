@@ -3,22 +3,29 @@ from __future__ import annotations
 """Strict numerical-refit wrapper for the SRU v2.2 full KWA benchmark.
 
 This wrapper intentionally leaves the full runner unchanged and replaces only
-its K channel-selection hook. An active K structural candidate is eligible for
-guarded one-SE selection only when that same structure is numerically valid on:
+its K channel-selection hook plus the persistence-only assembly fallback.
+
+An active K structural candidate is eligible for guarded one-SE selection only
+when that same structure is numerically valid on:
 
 1. every registered K/C inner expanding fold;
 2. every registered Gamma_CT OOF expanding fold used later to construct W
    residuals; and
 3. the full development refit.
 
-No numerical threshold is relaxed and no candidate is changed after selection.
-This makes the matched adapter inherit the v2.1.1 principle that a selected K
-structure must certify everywhere it will be materialized downstream.
+If every D/M/S branch is rejected, Gamma_CT is still well-defined by the frozen
+v2.2 persistence anchor.  The wrapper therefore emits one internal zero-delta
+sentinel branch.  The existing simplex ridge penalizes that synthetic dynamic
+weight but not the persistence weight, so the solution contracts to the
+persistence-only corner without changing any numerical threshold.
 """
 
 import numpy as np
 
 import run_prism_v22_sru_full as base
+
+
+PERSISTENCE_ONLY_SENTINEL = "__PERSISTENCE_ONLY_ZERO_DELTA__"
 
 
 def _numeric_fold_audit(
@@ -106,7 +113,7 @@ def strict_select_k_channel(
                 )
             losses[candidate].append(loss)
 
-    # W is trained from Gamma_CT OOF residuals.  These folds may have different
+    # W is trained from Gamma_CT OOF residuals. These folds have different
     # boundaries from the K/C selection folds, so certify them explicitly too.
     gamma_oof_numeric = _numeric_fold_audit(
         representation,
@@ -158,8 +165,8 @@ def strict_select_k_channel(
         if stable:
             stable_candidates.append(candidate)
         else:
-            # Unstable structures are removed before one-SE/activation.  This
-            # is a numerical admission rule only; no evaluation target is read.
+            # Unstable structures are removed before one-SE/activation. This is
+            # a numerical admission rule only; no evaluation target is read.
             losses[candidate] = [float("nan")] * len(selection_folds)
 
     neutral = (base.K_ZERO, 1)
@@ -199,7 +206,53 @@ def strict_select_k_channel(
     }
 
 
+def strict_branch_predictions(
+    representations: dict[str, np.ndarray],
+    target_delta: np.ndarray,
+    fit_index: np.ndarray,
+    evaluation_index: np.ndarray,
+    structures: dict[str, dict],
+    config: dict,
+):
+    predictions: dict[str, np.ndarray] = {}
+    contracts: dict[str, dict] = {}
+    for branch in base.BRANCHES:
+        structure = structures[branch]
+        if not structure["eligible"]:
+            continue
+        prediction, contract = base._predict_branch_fixed(
+            representations[branch],
+            target_delta,
+            fit_index,
+            evaluation_index,
+            structure,
+            config,
+        )
+        predictions[branch] = prediction
+        contracts[branch] = contract
+
+    if predictions:
+        return predictions, contracts
+
+    # Frozen v2.2 Gamma_CT includes an explicit persistence / zero-delta anchor.
+    # All physical temporal branches may therefore be rejected without making
+    # the assembly undefined. The sentinel carries only row count into the
+    # existing simplex implementation; its dynamic coefficient is ridge-
+    # penalized and should collapse to zero while persistence absorbs unit mass.
+    predictions[PERSISTENCE_ONLY_SENTINEL] = np.zeros(
+        len(evaluation_index), dtype=np.float64
+    )
+    contracts[PERSISTENCE_ONLY_SENTINEL] = {
+        "status": "PERSISTENCE_ONLY_FALLBACK",
+        "synthetic_zero_delta_sentinel": True,
+        "eligible_dynamic_branches": [],
+        "uses_target_for_fallback_decision": False,
+    }
+    return predictions, contracts
+
+
 base._select_k_channel = strict_select_k_channel
+base._branch_predictions = strict_branch_predictions
 
 
 if __name__ == "__main__":
