@@ -1,0 +1,146 @@
+{
+  "protocol_id": "PRISM_V2_2_BETA_SRU_RTA_TCN_FULL_KWA_MATCHED_V2_C_RESTORED",
+  "status": "IMPLEMENTATION_CORRECTION_FROZEN_BEFORE_FORMAL_RERUN",
+  "dataset": "SRU Line 4",
+  "source": "CHM00/RTA-TCN-and-JITL-RTA-TCN/SRU/SRU_data.txt",
+  "parser": "header_none_corrected",
+  "target": "H2S",
+  "target_column": 5,
+  "input_columns": [0, 1, 2, 3, 4],
+  "task": "current_time_soft_sensor",
+  "information_set": "dynamic_record_time",
+  "historical_target_rule": "only_already_observed_y_t_minus_1_or_older",
+  "future_inputs": false,
+  "cadence_seconds": 60.0,
+  "sequence_length": 25,
+  "author_train_target_count": 7039,
+  "author_train_size": 7063,
+  "target_transform": "delta_y_t_equals_y_t_minus_y_t_minus_1",
+  "absolute_reconstruction": "y_hat_t_equals_y_t_minus_1_plus_delta_hat_t",
+  "implementation_correction": {
+    "supersedes_protocol_for_formal_reporting": "PRISM_V2_2_BETA_SRU_RTA_TCN_FULL_KWA_MATCHED_V1",
+    "reason": "V1 adapter used structural one-SE simplicity on C ridge, then rejected the whole D/M/S branch after ridge shrinkage erased an already-active K path. Frozen v2.1.1 C semantics instead treat ridge as numerical stabilization and preserve active K via OOF input-path gating with BEST_ACTIVE_K fallback.",
+    "score_tuning_patch": false,
+    "test_target_used_to_define_correction": false,
+    "inherited_contract_source": "PRISM_V2_1_1_SRU_IMPLEMENTATION_CORRECTION_V1",
+    "legacy_v1_result_retained_for_audit": true
+  },
+  "selection": {
+    "development_fraction_of_author_train": 0.85,
+    "inner_expanding_folds": 4,
+    "gamma_oof_expanding_folds": 5,
+    "minimum_usable_folds": 3,
+    "minimum_relative_improvement": 0.01,
+    "minimum_positive_fold_fraction": 0.75,
+    "one_se_ddof": 1
+  },
+  "temporal_representation": {
+    "D_lags_steps": [0, 1, 2, 4, 8, 16, 24],
+    "CT_tau_steps": [1, 2, 4, 8, 16, 24],
+    "CT_tau_seconds": [60, 120, 240, 480, 960, 1440],
+    "CT_discretization": "exact_ZOH",
+    "M": "adjacent_scale_increments",
+    "S": "absolute_stable_CT_states",
+    "S_condition_number_hard_fail": 100000000.0,
+    "CT_state_reset": "single_SRU_entity_start_only"
+  },
+  "K": {
+    "candidate_families": [
+      "EXACT_ZERO",
+      "LINEAR_DISTRIBUTED_LAG",
+      "RANK_1",
+      "RANK_2",
+      "RANK_3",
+      "FULL_FINITE_URYSOHN"
+    ],
+    "candidate_m_x": [4, 6, 8],
+    "linear_m_x": 1,
+    "penalties": {
+      "lambda_0": 0.0001,
+      "lambda_tau": 0.001,
+      "lambda_x": 0.001
+    },
+    "als_seeds": [20260804, 20260805, 20260806],
+    "als_max_iterations": 100,
+    "als_tolerance": 1e-8,
+    "als_max_increases": 5,
+    "als_divergence_factor": 1000000.0,
+    "exact_zero_neutral": true
+  },
+  "C": {
+    "candidate_scope": ["ADDITIVE_COMPRESSED", "BEST_ACTIVE_K_CHANNEL_FALLBACK"],
+    "ridge_semantics": "NUMERICAL_STABILIZATION_ONLY",
+    "ridge_selection": "SMALLEST_STABLE_RIDGE",
+    "ridge_alpha_grid": [
+      1e-8,
+      2.848035868435799e-7,
+      8.111308307896873e-6,
+      0.0002310129700083158,
+      0.006579332246575682,
+      0.18738174228603832,
+      5.336699231206313,
+      151.99110829529332,
+      4328.7612810830615,
+      123284.67394420659,
+      3511191.7342151273,
+      100000000.0
+    ],
+    "input_path_gate_split": "inner_expanding_oof_only",
+    "input_path_min_variance_ratio": 1e-8,
+    "input_path_min_fraction_of_best_active_k_variance_ratio": 0.10,
+    "input_path_max_mse_ratio_vs_best_active_k": 1.02,
+    "input_path_min_nonintercept_coefficient_abs": 1e-10,
+    "fallback_on_gate_failure": "BEST_ACTIVE_K_CHANNEL",
+    "silent_active_k_erasure_forbidden": true
+  },
+  "Gamma_CT": {
+    "ridge": 0.001,
+    "constraint": "nonnegative_simplex",
+    "anchor": "persistence_zero_delta",
+    "weights_fit_on": "held_out_author_train_calibration_only",
+    "final_holdout_target_access": false
+  },
+  "W": {
+    "candidates": [
+      "IDENTITY_CORRECTION",
+      "MONOTONE_I_SPLINE_CORRECTION",
+      "NATURAL_CUBIC_CORRECTION"
+    ],
+    "monotone_knots": [4, 6],
+    "natural_cubic_knots": [4, 6, 8],
+    "smoothness": [0.0, 0.0001, 0.001, 0.01, 0.1, 1.0],
+    "soft_overlap_mu": [0.0, 0.03, 0.3, 3.0, 30.0],
+    "identity_neutral": true,
+    "minimum_distinct_latent_values": 20,
+    "minimum_rank": 2
+  },
+  "A": {
+    "candidates": ["EXACT_ZERO", "MATURE_RESIDUAL_AR"],
+    "profiles_delta_history_steps": [[1, 4], [1, 16], [1, 64], [2, 8], [2, 32], [2, 128]],
+    "ridge_alpha_grid": [
+      1e-8,
+      2.848035868435799e-7,
+      8.111308307896873e-6,
+      0.0002310129700083158,
+      0.006579332246575682,
+      0.18738174228603832,
+      5.336699231206313,
+      151.99110829529332,
+      4328.7612810830615,
+      123284.67394420659,
+      3511191.7342151273,
+      100000000.0
+    ],
+    "soft_overlap_mu": [0.0, 0.03, 0.3, 3.0, 30.0],
+    "maturity_rule": "s_plus_h_plus_W_plus_D_le_t",
+    "h_steps": 0,
+    "w_steps": 1,
+    "availability_delay_steps": 0,
+    "latest_available_target_index": "origin_minus_1",
+    "maximum_lags": 64,
+    "exact_zero_neutral": true
+  },
+  "reported_nested_routes": ["K_GAMMA", "K_GAMMA_W", "K_GAMMA_W_A"],
+  "primary_model": "PRISM_V2_2_BETA_FULL_KWA_DYNAMIC_C_RESTORED",
+  "fairness_note": "Original RTA-TCN author task forbids historical target y. Full KWA uses only already-observed historical target/residual state and is therefore a richer dynamic information set; exact-author RTA-TCN remains an input-only reference, not a strictly information-matched KWA comparator."
+}
