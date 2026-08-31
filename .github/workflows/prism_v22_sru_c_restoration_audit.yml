@@ -1,0 +1,148 @@
+name: PRISM v2.2 SRU C-restoration audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - prism-v2-2-beta-debutanizer-benchmark-20260824
+    paths:
+      - '.github/workflows/prism_v22_sru_c_restoration_audit.yml'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_strict.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_restored_c.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_sru_rta_tcn_full.json'
+
+permissions:
+  contents: write
+
+jobs:
+  c-restoration-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PYTHONHASHSEED: '1024'
+      OUTDIR: sru_restored_c_out
+
+    steps:
+      - name: Checkout PRISM branch
+        uses: actions/checkout@v4
+        with:
+          path: prism_repo
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas scipy scikit-learn matplotlib pyarrow pyreadr
+
+      - name: Fetch official SRU data
+        run: |
+          mkdir -p "$OUTDIR"
+          curl -fsSL \
+            https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/SRU/SRU_data.txt \
+            -o SRU_data.txt
+          sha256sum SRU_data.txt | tee "$OUTDIR/upstream_sha256.txt"
+          python - <<'PY'
+          import pandas as pd
+          data = pd.read_csv('SRU_data.txt', sep=r'\s+', header=None)
+          assert data.shape == (10081, 7), data.shape
+          PY
+
+      - name: Compile restored runner
+        run: |
+          python -m py_compile prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full.py
+          python -m py_compile prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_strict.py
+          python -m py_compile prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_restored_c.py
+
+      - name: Run restored full PRISM KWA
+        run: |
+          set -o pipefail
+          python prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_restored_c.py \
+            --data SRU_data.txt \
+            --config prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_sru_rta_tcn_full.json \
+            --output "$OUTDIR/prism_v22_full_kwa_c_restored.json" \
+            2>&1 | tee "$OUTDIR/prism_v22_full_kwa_c_restored.log"
+
+      - name: Build restoration audit summary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          out = Path('sru_restored_c_out')
+          result_path = out / 'prism_v22_full_kwa_c_restored.json'
+          if not result_path.exists():
+              (out / 'C_RESTORATION_AUDIT.md').write_text(
+                  '# SRU v2.2 C-restoration audit\n\nRESULT_NOT_AVAILABLE; inspect log.\n'
+              )
+              raise SystemExit(0)
+          r = json.loads(result_path.read_text())
+          lines = [
+              '# SRU v2.2 C-restoration audit',
+              '',
+              'This run restores the already-frozen v2.1.1 SRU C input-path contract while retaining the v2.2 D/M/S, Gamma_CT, W and A candidate universes.',
+              '',
+              '## Nested routes',
+              '',
+          ]
+          for route in ('K_GAMMA','K_GAMMA_W','K_GAMMA_W_A','PERSISTENCE'):
+              m = r['nested_routes'][route]
+              lines.append(f"- {route}: RMSE={m['rmse']:.9f}, MAE={m['mae']:.9f}, R2={m['r2']:.9f}")
+          lines += [
+              '',
+              f"- Gamma weights: `{r['gamma_ct']['weights']}`",
+              f"- W selected: `{r['W']['selected']}`; active={r['W']['active']}",
+              f"- A selected: `{r['A']['selected']}`; active={r['A']['active']}",
+              '',
+              '## Branch C audit',
+              '',
+          ]
+          for branch in ('D','M','S'):
+              b = r['branch_structures'][branch]
+              c = b.get('C', {})
+              lines.append(
+                  f"- {branch}: eligible={b.get('eligible')}; active K={b.get('active_channels', [])}; "
+                  f"reason={b.get('reason')}; C family={c.get('family')}; alpha={c.get('selected_alpha')}; "
+                  f"fallback={c.get('fallback_to_best_active_k')}; gate={c.get('input_path_preservation', {}).get('status')}"
+              )
+          lines += [
+              '',
+              '## Interpretation rule',
+              '',
+              'Only after C preserves an active K path is W activation/non-activation scientifically interpretable. This audit does not change W/A thresholds based on test results.',
+          ]
+          (out / 'C_RESTORATION_AUDIT.md').write_text('\n'.join(lines) + '\n')
+          PY
+
+      - name: Upload audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-v22-sru-c-restoration-audit
+          path: sru_restored_c_out/
+          if-no-files-found: warn
+
+      - name: Commit audit result
+        if: always()
+        run: |
+          if [ ! -f "$OUTDIR/C_RESTORATION_AUDIT.md" ]; then exit 0; fi
+          DEST="prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_sru_rta_tcn_20260830/full_kwa_c_restored"
+          mkdir -p "$DEST"
+          cp "$OUTDIR/C_RESTORATION_AUDIT.md" "$DEST/"
+          cp "$OUTDIR/upstream_sha256.txt" "$DEST/"
+          if [ -f "$OUTDIR/prism_v22_full_kwa_c_restored.json" ]; then
+            cp "$OUTDIR/prism_v22_full_kwa_c_restored.json" "$DEST/"
+          fi
+          cd prism_repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_sru_rta_tcn_20260830/full_kwa_c_restored
+          if ! git diff --cached --quiet; then
+            git commit -m "results: add SRU v2.2 C-restoration audit"
+            git push origin HEAD:prism-v2-2-beta-debutanizer-benchmark-20260824
+          fi
