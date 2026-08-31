@@ -1,0 +1,157 @@
+name: PRISM v2.2 SRU full KWA corrected C contract
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - prism-v2-2-beta-debutanizer-benchmark-20260824
+    paths:
+      - '.github/workflows/prism_v22_sru_full_corrected_c.yml'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_corrected_c.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_c_v211_contract_diagnostic.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/configs/PRISM_V2_2_SRU_C_CONTRACT_CORRECTION_20260831.json'
+
+permissions:
+  contents: write
+
+jobs:
+  full-kwa-corrected-c:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PYTHONHASHSEED: '1024'
+      OUTDIR: sru_full_corrected_c
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies and verify imports
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas scipy scikit-learn matplotlib torchinfo pyarrow pyreadr pytest
+          python - <<'PY'
+          import numpy, pandas, scipy, sklearn, pyarrow, pyreadr
+          print('corrected-C dependencies import OK')
+          PY
+
+      - name: Fetch official SRU data
+        run: |
+          mkdir -p "$OUTDIR"
+          curl -fsSL \
+            https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/SRU/SRU_data.txt \
+            -o SRU_data.txt
+          sha256sum SRU_data.txt | tee "$OUTDIR/upstream_sha256.txt"
+
+      - name: Verify correction manifest and compile
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('PRISM_INDUSTRIAL_BENCHMARK_V1/configs/PRISM_V2_2_SRU_C_CONTRACT_CORRECTION_20260831.json')
+          c = json.loads(p.read_text())
+          assert c['correction_id'] == 'PRISM_V2_2_SRU_C_CONTRACT_CORRECTION_20260831_V1'
+          assert c['correction_basis']['new_thresholds_introduced'] is False
+          assert c['publication_hygiene']['corrected_sru_test_result_is_clean_confirmatory'] is False
+          print(c['correction_id'])
+          PY
+          python -m py_compile PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_corrected_c.py
+
+      - name: Run corrected full KWA
+        run: |
+          set -o pipefail
+          python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_corrected_c.py \
+            --data SRU_data.txt \
+            --config PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_sru_rta_tcn_full.json \
+            --output "$OUTDIR/RESULT.json" \
+            2>&1 | tee "$OUTDIR/run.log"
+
+      - name: Build corrected result report
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          out = Path('sru_full_corrected_c')
+          p = out / 'RESULT.json'
+          if not p.exists():
+              (out / 'RESULT.md').write_text('# SRU full KWA corrected C\n\nRESULT.json was not produced. Inspect run.log.\n')
+              raise SystemExit(0)
+          r = json.loads(p.read_text())
+          lines = [
+              '# PRISM v2.2 SRU full KWA — corrected inherited C contract',
+              '',
+              '> Status: **POST_LOCKBOX_IMPLEMENTATION_CORRECTION_DESCRIPTIVE**. This is not a clean new confirmatory lockbox result.',
+              '',
+              '## Correction',
+              '',
+              '- C ridge restored to numerical-stability-only semantics.',
+              '- Smallest stable registered ridge is used.',
+              '- Frozen v2.1.1 OOF input-path-preservation gate is restored.',
+              '- Collapsed compressed C falls back to BEST_ACTIVE_K instead of killing the entire temporal branch.',
+              '- No new thresholds were introduced.',
+              '',
+              '## Branches',
+              '',
+          ]
+          for b in ('D','M','S'):
+              a = r['branch_structures'][b]
+              c = a.get('C', {})
+              lines.append(
+                  f"- {b}: eligible={a['eligible']}; reason={a.get('reason','PASS')}; active={a.get('active_channels',[])}; C_family={c.get('family')}; alpha={c.get('selected_alpha')}; fallback={c.get('fallback_used')}"
+              )
+          lines += ['', '## Assembly', '']
+          lines += [f"- Gamma weights: `{r['gamma_ct']['weights']}`"]
+          lines += [f"- W selected: `{r['W']['selected']}`; active={r['W']['active']}"]
+          lines += [f"- A selected: `{r['A']['selected']}`; active={r['A']['active']}"]
+          lines += ['', '## Nested test routes', '']
+          for route, m in r['nested_routes'].items():
+              lines.append(f"- {route}: RMSE={m['rmse']:.9f}; MAE={m['mae']:.9f}; R2={m['r2']:.9f}")
+          lines += [
+              '',
+              f"- test_target_used_for_selection={r['test_target_used_for_selection']}",
+              f"- correction_id={r['implementation_correction']['correction_id']}",
+              f"- confirmatory_use={r['implementation_correction']['confirmatory_use']}",
+          ]
+          (out / 'RESULT.md').write_text('\n'.join(lines) + '\n')
+          print('\n'.join(lines))
+          PY
+
+      - name: Upload corrected evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-v22-sru-full-kwa-corrected-c
+          path: |
+            sru_full_corrected_c/
+            PRISM_INDUSTRIAL_BENCHMARK_V1/configs/PRISM_V2_2_SRU_C_CONTRACT_CORRECTION_20260831.json
+          if-no-files-found: warn
+
+      - name: Commit corrected result without overwriting original evidence
+        if: always()
+        run: |
+          if [ ! -f "$OUTDIR/RESULT.md" ]; then
+            exit 0
+          fi
+          DEST="PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_sru_rta_tcn_20260830/full_kwa_corrected_c"
+          mkdir -p "$DEST"
+          cp "$OUTDIR/RESULT.md" "$DEST/"
+          if [ -f "$OUTDIR/RESULT.json" ]; then cp "$OUTDIR/RESULT.json" "$DEST/"; fi
+          cp "$OUTDIR/upstream_sha256.txt" "$DEST/" || true
+          cp PRISM_INDUSTRIAL_BENCHMARK_V1/configs/PRISM_V2_2_SRU_C_CONTRACT_CORRECTION_20260831.json "$DEST/"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$DEST"
+          if git diff --cached --quiet; then
+            echo 'No corrected result changes'
+          else
+            git commit -m 'results: add SRU full KWA corrected-C evidence'
+            git push origin HEAD:prism-v2-2-beta-debutanizer-benchmark-20260824
+          fi
