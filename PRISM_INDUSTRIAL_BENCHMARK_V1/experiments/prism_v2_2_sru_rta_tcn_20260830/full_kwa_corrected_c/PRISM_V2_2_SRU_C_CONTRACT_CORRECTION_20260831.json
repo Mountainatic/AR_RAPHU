@@ -1,0 +1,56 @@
+{
+  "correction_id": "PRISM_V2_2_SRU_C_CONTRACT_CORRECTION_20260831_V1",
+  "status": "POST_LOCKBOX_IMPLEMENTATION_CORRECTION_DESCRIPTIVE",
+  "dataset": "SRU Line 4",
+  "target": "H2S",
+  "affected_runner": "scripts/run_prism_v22_sru_full.py",
+  "corrected_runner": "scripts/run_prism_v22_sru_full_corrected_c.py",
+  "problem": {
+    "summary": "The beta SRU adapter incorrectly applied predictive one-SE selection across C ridge alpha and rejected the entire D/M/S branch when the selected over-regularized C refit collapsed the input path.",
+    "observed_failure_chain": [
+      "active K channels selected",
+      "C one-SE selected alpha=1e8",
+      "C prediction variance collapsed below path gate",
+      "all D/M/S branches rejected",
+      "Gamma_CT contracted to persistence-only zero-delta anchor",
+      "W nonlinear candidates received a numerically degenerate latent and were not applicable",
+      "A became the only active residual-dynamics stage"
+    ]
+  },
+  "correction_basis": {
+    "pre_existing_v2_1_1_semantics": {
+      "ridge_semantics": "NUMERICAL_STABILITY_ONLY",
+      "ridge_selection": "SMALLEST_STABLE_REGISTERED_ALPHA",
+      "input_path_preservation": {
+        "minimum_variance_ratio_to_target": 1e-8,
+        "minimum_fraction_of_best_active_k_variance_ratio": 0.10,
+        "maximum_mse_ratio_vs_best_active_k": 1.02,
+        "minimum_nonintercept_coefficient_abs": 1e-10
+      },
+      "fallback": "BEST_ACTIVE_K_CHANNEL"
+    },
+    "source_branch": "prism-v2-1-1-sru-implementation-correction",
+    "source_config": "PRISM_V2_1_1_SRU_IMPLEMENTATION_CORRECTION/PRISM_V2_1_1_SRU_CONFIG_PATCH.json",
+    "new_thresholds_introduced": false,
+    "test_metrics_used_to_set_thresholds": false
+  },
+  "diagnostics": {
+    "best_mean_alpha_counterfactual": {
+      "role": "causal diagnosis only",
+      "adopted_as_formal_correction": false,
+      "finding": "Restoring non-degenerate C immediately reactivated W."
+    },
+    "v2_1_1_compatible_c_counterfactual": {
+      "role": "implementation-alignment diagnosis",
+      "adopted_as_correction_basis": true,
+      "finding": "D/M fell back to BEST_ACTIVE_K, S retained compressed C, W selected a nonlinear natural-cubic correction, and A remained active."
+    }
+  },
+  "publication_hygiene": {
+    "sru_test_lockbox_was_already_accessed_before_correction": true,
+    "corrected_sru_test_result_is_clean_confirmatory": false,
+    "corrected_sru_test_result_role": "descriptive implementation-correction evidence",
+    "independent_confirmation_required": true,
+    "recommended_confirmation": "Apply the same frozen correction unchanged to an untouched task/dataset or a newly designated untouched holdout."
+  }
+}
