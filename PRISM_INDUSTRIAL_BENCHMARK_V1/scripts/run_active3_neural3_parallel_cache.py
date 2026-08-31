@@ -74,20 +74,25 @@ from prism_benchmark.neural_resource_guard import (
     decide_resource_action,
     load_workload_config,
 )
+from prism_benchmark.tep_nowcast_c1 import (
+    build_development as build_tep_nowcast_development_c1,
+    build_test as build_tep_nowcast_test_c1,
+    protocol_summary as tep_nowcast_protocol_summary,
+)
 from prism_benchmark.v211_support import SUPPORT_CONTRACT
 
 
 DEFAULT_RUN_ROOT = Path(
-    "/root/autodl-tmp/PRISM_V211_ACTIVE3_NEURAL3_PARALLEL_CACHE_20260826_R1"
+    "/root/autodl-tmp/PRISM_V211_ACTIVE3_NEURAL3_TEP_NOWCAST_H0_20260831_R1"
 )
-PUBLIC_SHARED = Path(
+PUBLIC_FORECAST_SHARED = Path(
     "/root/autodl-tmp/PRISM_V211_REPRESENTATIVE_TEP_SRU_CZ_L256_FORMAL_20260825_R3/public/shared"
 )
 RAW_CZ_ROOT = Path(
     "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources/cz_czochralski"
 )
 CONFIG_PATH = _PROJECT / "configs" / "active3_neural3_parallel_cache_20260826.json"
-EXPECTED_BRANCH = "prism-v2-1-1-active3-neural3-parallel-cache-20260826"
+EXPECTED_BRANCH = "prism-v2-1-1-active3-neural3-tep-nowcast-h0-20260831"
 SCREENING_SEED = 20260817
 # A resource stopline gives workers a bounded checkpoint window before the
 # supervisor terminates their whole process groups.  Keep this short enough
@@ -303,7 +308,11 @@ def prepare_data_bindings(
 
 def task_view(run_root: Path, task: Mapping[str, Any]) -> tuple[Path, ViewSpec]:
     if task["scope"] in {"tep", "sru"}:
-        shared = PUBLIC_SHARED
+        shared = (
+            run_root / "tep_nowcast" / "shared"
+            if task["scope"] == "tep"
+            else PUBLIC_FORECAST_SHARED
+        )
         heads = [head for head in load_heads(shared) if head.task_id == task["task_id"]]
         if len(heads) != 1:
             raise RuntimeError(f"STOP_PUBLIC_HEAD_NOT_UNIQUE:{task['task_id']}")
@@ -427,10 +436,21 @@ def initialize_run(run_root: Path, *, resume: bool) -> dict[str, Any]:
     require_gpu()
     if run_root.exists() and any(run_root.iterdir()) and not resume:
         raise RuntimeError(f"STOP_REFUSING_NONEMPTY_RUN_ROOT_WITHOUT_RESUME:{run_root}")
-    for name in ("logs", "freeze", "final", "reports", "cz", "test_results"):
+    for name in (
+        "logs",
+        "freeze",
+        "final",
+        "reports",
+        "cz",
+        "test_results",
+    ):
         (run_root / name).mkdir(parents=True, exist_ok=True)
     cache_for(run_root)
     config, matrix = load_scope()
+    tep_nowcast_audit = build_tep_nowcast_development_c1(
+        PUBLIC_FORECAST_SHARED,
+        run_root / "tep_nowcast" / "shared",
+    )
     thresholds = configured_resource_thresholds(config)
     dependency_files = [
         file_record(_REPOSITORY / "pyproject.toml", relative_to=_REPOSITORY),
@@ -459,7 +479,10 @@ def initialize_run(run_root: Path, *, resume: bool) -> dict[str, Any]:
         "config": file_record(CONFIG_PATH, relative_to=_PROJECT),
         "protocol_hash": stable_hash(config),
         "workload_counts": matrix.counts(),
-        "public_shared_readonly": str(PUBLIC_SHARED),
+        "public_forecast_shared_readonly": str(PUBLIC_FORECAST_SHARED),
+        "tep_nowcast_shared": str(run_root / "tep_nowcast" / "shared"),
+        "tep_nowcast_development_audit": tep_nowcast_audit,
+        "tep_nowcast_protocol": dict(tep_nowcast_protocol_summary()),
         "raw_cz_root_private": str(RAW_CZ_ROOT),
         "test_accessed": False,
         "password_persisted": False,
@@ -835,7 +858,7 @@ def _pilot_tasks(matrix: Any) -> list[dict[str, Any]]:
             dict(task)
             for task in matrix.selection_candidates
             if task["scope"] == "tep"
-            and task["task_id"] == "TEP_G_REP_H1"
+            and task["task_id"] == "TEP_G_NOWCAST_H0"
             and task["information_set"] == "input_only"
             and task["availability_scenario"] == "record_time"
             and task["model"] == model
@@ -1813,6 +1836,19 @@ def materialize_cz_targets(run_root: Path) -> dict[str, Any]:
     return result
 
 
+def materialize_tep_nowcast_test(run_root: Path) -> dict[str, Any]:
+    """Open only the H0/W1 TEP test partition after both GPU freezes."""
+
+    result = build_tep_nowcast_test_c1(
+        PUBLIC_FORECAST_SHARED,
+        run_root / "tep_nowcast" / "shared",
+        run_root / "freeze" / "GLOBAL_SELECTION_FREEZE.json",
+        run_root / "freeze" / "SELECTED_CHECKPOINT_MANIFEST.json",
+    )
+    atomic_write_json(run_root / "logs" / "TEP_NOWCAST_TEST_UNLOCK.json", result)
+    return result
+
+
 def _safe_component(value: Any) -> str:
     return "".join(character if str(character).isalnum() or character in "-_." else "_" for character in str(value))
 
@@ -2207,6 +2243,8 @@ def run_tests(
         if (not dataset or profile["scope"] == dataset or profile["dataset"] == dataset)
         and (not model or profile["model"] == model)
     ]
+    if any(profile["scope"] == "tep" for profile in profiles):
+        materialize_tep_nowcast_test(run_root)
     # Public-only test runs must not open the private CZ workbook or materialize
     # any target-rod values.  Unlock CZ targets only when this invocation
     # actually includes a CZ profile.
@@ -2417,6 +2455,7 @@ def build_report(run_root: Path) -> dict[str, Any]:
         key = tuple(result.get(name) for name in grouping)
         groups.setdefault(key, []).append(result)
     leaderboards = []
+    tep_reference_results = config["active_scope"]["tep"]["reference_results"]
     for key, values in sorted(groups.items(), key=lambda item: str(item[0])):
         ranked = sorted(
             values,
@@ -2426,7 +2465,15 @@ def build_report(run_root: Path) -> dict[str, Any]:
         leaderboards.append(
             {
                 **dict(zip(grouping, key, strict=True)),
+                "task_type": (
+                    "STRICT_PAST_CURRENT_STATE_NOWCAST"
+                    if key[0] == "tep"
+                    else "FUTURE_FORECAST"
+                ),
                 "primary_metric": "R2_LEVEL_RECONSTRUCTED",
+                "tep_reference_results": (
+                    tep_reference_results if key[0] == "tep" else None
+                ),
                 "ranking": [
                     {
                         "rank": index,
@@ -2460,6 +2507,16 @@ def build_report(run_root: Path) -> dict[str, Any]:
         "leaderboards": leaderboards,
         "primary_metric": "R2_LEVEL_RECONSTRUCTED",
         "secondary_metric": "R2_DELTA",
+        "ranking_homogeneity": "HETEROGENEOUS_TEP_NOWCAST_AND_FUTURE_FORECASTS",
+        "ranking_interpretation": (
+            "TEP estimates the current H0 state from strictly past data; all "
+            "other active heads remain future forecasts. This is not a "
+            "homogeneous seven-forecast-head leaderboard."
+        ),
+        "tep_reference_results": tep_reference_results,
+        "tep_compatibility_appendix": config["active_scope"]["tep"][
+            "compatibility_appendix"
+        ],
         "out_of_scope": config["out_of_scope"],
         "candidate_count": 456,
         "selected_checkpoint_reference_count": 81,
@@ -2475,6 +2532,10 @@ def build_report(run_root: Path) -> dict[str, Any]:
         "Status: PASS",
         "",
         "Primary metric: R2_LEVEL_RECONSTRUCTED",
+        "",
+        "TEP is a strict-past H0 current-state nowcast; the other active heads "
+        "are future forecasts. These results are not a homogeneous "
+        "seven-forecast-head leaderboard.",
         "",
         f"Candidates: 456; selected cached checkpoints: 81; test results: {len(results)}.",
         "",
@@ -2821,6 +2882,7 @@ def run_selftest(run_root: Path) -> dict[str, Any]:
         "tests/test_neural3_cached.py",
         "tests/test_level_reconstruction.py",
         "tests/test_cz_l256_nowcast.py",
+        "tests/test_tep_nowcast_c1.py",
     ]
     environment = dict(os.environ)
     environment["PYTHONPATH"] = str(_PROJECT / "src")

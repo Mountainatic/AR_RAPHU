@@ -1,17 +1,19 @@
 {
   "schema_version": "1.0",
-  "protocol_id": "PRISM_V211_ACTIVE3_NEURAL3_PARALLEL_CACHE_20260826_R1",
-  "status": "FROZEN_BEFORE_ACTIVE3_NEURAL3_DEVELOPMENT",
+  "protocol_id": "PRISM_V211_ACTIVE3_NEURAL3_TEP_NOWCAST_H0_20260831_R1",
+  "status": "FROZEN_AFTER_TEP_H0_NOWCAST_REPLACEMENT_BEFORE_GPU_DEVELOPMENT",
+  "protocol_amendment": "docs/ACTIVE3_NEURAL3_TEP_H0_NOWCAST_AMENDMENT_20260831.md",
   "authority": {
     "repository": "Mountainatic/AR_RAPHU",
     "source_branch": "prism-v2-1-1-metro-p60-joint-stability-final",
     "source_commit": "e47542a319640bc045ca0d31ae9b40763182dde8",
-    "execution_branch": "prism-v2-1-1-active3-neural3-parallel-cache-20260826"
+    "execution_branch": "prism-v2-1-1-active3-neural3-tep-nowcast-h0-20260831"
   },
   "namespace": {
-    "server_code": "/root/AR_RAPHU_EXT_20260825/code",
-    "run_root": "/root/autodl-tmp/PRISM_V211_ACTIVE3_NEURAL3_PARALLEL_CACHE_20260826_R1",
+    "server_code": "/root/autodl-tmp/PRISM_V211_ACTIVE3_NEURAL3_DEPLOY_20260827/code",
+    "run_root": "/root/autodl-tmp/PRISM_V211_ACTIVE3_NEURAL3_TEP_NOWCAST_H0_20260831_R1",
     "existing_formal_baseline_readonly": "/root/autodl-tmp/PRISM_V211_REPRESENTATIVE_TEP_SRU_CZ_L256_FORMAL_20260825_R3",
+    "tep_nowcast_formal_evidence_readonly": "/root/PRISM_V211_TEP_NOWCAST_H0_W1_HISTORY_128_256_20260828_AGGREGATE_ONLY",
     "existing_cz_cpu_extension_readonly": "/root/autodl-tmp/PRISM_V211_EXT_20260825_FORMAL_CPU_R2",
     "old_runs_must_not_be_modified": true,
     "old_neural3_cancellation_overridden_only_in_this_namespace": true
@@ -26,11 +28,18 @@
       "tasks": [
         {
           "dataset": "tep",
-          "task_id": "TEP_G_REP_H1",
-          "head_id": "TEP_G_REP_H1__H1__W2",
-          "h_steps": 1,
-          "w_steps": 2,
-          "w0_steps": 2,
+          "task_id": "TEP_G_NOWCAST_H0",
+          "head_id": "TEP_G_NOWCAST_H0__H0__W1",
+          "task_type": "STRICT_PAST_CURRENT_STATE_NOWCAST",
+          "h_steps": 0,
+          "w_steps": 1,
+          "w0_steps": 1,
+          "history_interval": "[t-L,t)",
+          "current_t_excluded": true,
+          "anchor": "D[t-1]",
+          "target_delta": "D[t]-D[t-1]",
+          "level_reconstruction": "D[t-1]+delta_pred",
+          "common_support_history_steps": 256,
           "view_variants": [
             {
               "information_set": "input_only",
@@ -49,7 +58,44 @@
             }
           ]
         }
-      ]
+      ],
+      "reference_results": {
+        "prism": {
+          "input_only_record_time": {
+            "r2_level": 0.713246,
+            "r2_delta": 0.0,
+            "persistence_skill_approx": -0.000001
+          },
+          "dynamic_analyzer_maturity_5_steps": {
+            "r2_level": 0.713496,
+            "r2_delta": 0.0,
+            "persistence_skill_approx": -0.0000005
+          },
+          "dynamic_record_time": {
+            "r2_level": 0.781337,
+            "r2_delta": 0.237455,
+            "persistence_skill": 0.237455
+          }
+        },
+        "best_existing_cpu_arx_dynamic_record_time": {
+          "r2_level": 0.836777,
+          "r2_delta": 0.430792,
+          "persistence_skill": 0.430792
+        },
+        "gpu_grading_targets": {
+          "r2_level_exceeds_prism": 0.781337,
+          "r2_level_exceeds_all_existing_cpu": 0.836777,
+          "persistence_skill_exceeds_prism": 0.237455,
+          "persistence_skill_exceeds_best_existing_arx": 0.430792
+        }
+      },
+      "compatibility_appendix": {
+        "task_id": "TEP_G_REP_H1",
+        "head_id": "TEP_G_REP_H1__H1__W2",
+        "horizon_minutes": 3,
+        "best_prism_dynamic_r2_level": 0.523519,
+        "active_gpu_head": false
+      }
     },
     "sru": {
       "dataset": "sru",
@@ -126,7 +172,8 @@
     "debutanizer": "NOT_RUN_BY_USER_SCOPE",
     "pmsm": "NOT_RUN_BY_USER_SCOPE",
     "metro": "NOT_RUN_BY_USER_SCOPE",
-    "stage2": "NOT_RUN_BY_USER_SCOPE"
+    "stage2": "NOT_RUN_BY_USER_SCOPE",
+    "tep_h1_compatibility_appendix": "RETAINED_FOR_CONTINUITY_NOT_AN_ACTIVE_GPU_HEAD"
   },
   "neural_protocol": {
     "models": ["LSTM", "iTransformer", "TimeMixer"],
@@ -166,11 +213,11 @@
   "resources": {
     "resource_unit": "decimal_GB",
     "cgroup_memory_is_authoritative": true,
-    "container_memory_hard_limit_gib": 90,
-    "ram_dispatch_budget_gib": 75,
-    "ram_pause_dispatch_gib": 82,
-    "ram_safe_stop_gib": 85,
-    "vram_dispatch_budget_gib": 27,
+    "container_memory_hard_limit_gib": 77.3,
+    "ram_dispatch_budget_gib": 62,
+    "ram_pause_dispatch_gib": 68,
+    "ram_safe_stop_gib": 72,
+    "vram_dispatch_budget_gib": 44,
     "data_disk_stopline_gib": 5,
     "pilot_required_per_model": true,
     "max_concurrency_before_pilot": 1,

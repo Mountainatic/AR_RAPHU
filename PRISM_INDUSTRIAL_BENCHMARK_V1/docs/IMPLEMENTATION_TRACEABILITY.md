@@ -20,3 +20,6 @@ Status values are `NOT_STARTED`, `IMPLEMENTED`, `TESTED`, `RUN`, `PASS`,
 | True K-Joint AR | Theory J1--J4; CPU 5.4, C5 | `c5_models.py` | Urysohn subspace/nested-zero/head isolation | predictions and selection contract | TESTED |
 | Paired block bootstrap and Holm | Master 11; CPU C6 | `c6_final.py` | paired IDs/block semantics | `BOOTSTRAP_PAIRED.csv`, `CPU_FINAL_REPORT.md` | TESTED |
 | Raw-data exclusion and round-trip bundle | Master 13; CPU 11--12 | `build_cpu_bundle.py` | manifest/hash/privacy round trip | return bundle | TESTED |
+| TEP strict-past H0/W1 GPU replacement | `ACTIVE3_NEURAL3_TEP_H0_NOWCAST_AMENDMENT_20260831.md` | `tep_nowcast_c1.py`, `run_active3_neural3_parallel_cache.py` | `test_tep_nowcast_c1.py` | `TEP_NOWCAST_C1_DEVELOPMENT_AUDIT.json`, `TEP_NOWCAST_C1_TEST_UNLOCK_AUDIT.json` | TESTED |
+| TEP L128/L256 comparison on L256 common target support | Same amendment, Active TEP protocol | `tep_nowcast_c1.py`, `neural3_cached.py` | `test_development_is_strict_past_and_uses_l256_common_support` | candidate support records and final test support hashes | TESTED |
+| Heterogeneous nowcast/forecast reporting boundary | Same amendment, ranking boundary | `run_active3_neural3_parallel_cache.py::build_report` | `test_active3_report_integrity.py` | `ACTIVE3_NEURAL3_FINAL_REPORT.json`, `R2_RANKINGS.json` | TESTED |

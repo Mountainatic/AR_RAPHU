@@ -107,6 +107,15 @@ def test_build_report_accepts_complete_profile_bound_results(complete_report_fix
     assert report["status"] == "PASS"
     assert report["result_count"] == len(matrix.profiles) == 81
     assert report["leaderboard_count"] > 0
+    assert report["ranking_homogeneity"] == (
+        "HETEROGENEOUS_TEP_NOWCAST_AND_FUTURE_FORECASTS"
+    )
+    assert report["tep_reference_results"]["gpu_grading_targets"][
+        "r2_level_exceeds_prism"
+    ] == 0.781337
+    tep_boards = [item for item in report["leaderboards"] if item["dataset"] == "tep"]
+    assert tep_boards
+    assert all(item["task_type"] == "STRICT_PAST_CURRENT_STATE_NOWCAST" for item in tep_boards)
 
 
 def test_build_report_rejects_duplicate_profile_even_when_count_is_81(
@@ -532,7 +541,7 @@ def test_pilot_resource_gate_stops_before_worker_when_snapshot_denies_dispatch(
 
 
 @pytest.mark.parametrize("scope", ["tep", "cz"])
-def test_run_tests_materializes_cz_only_for_cz_profiles(
+def test_run_tests_materializes_only_the_included_locked_test_data(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, scope: str
 ) -> None:
     config, full_matrix = RUNNER.load_scope()
@@ -541,9 +550,15 @@ def test_run_tests_materializes_cz_only_for_cz_profiles(
     monkeypatch.setattr(RUNNER, "load_scope", lambda: (config, matrix))
     monkeypatch.setattr(RUNNER, "update_status", lambda *args, **kwargs: {})
     monkeypatch.setattr(RUNNER, "_validate_test_result", lambda *args, **kwargs: None)
-    materialized: list[Path] = []
+    cz_materialized: list[Path] = []
+    tep_materialized: list[Path] = []
     monkeypatch.setattr(
-        RUNNER, "materialize_cz_targets", lambda root: materialized.append(root)
+        RUNNER, "materialize_cz_targets", lambda root: cz_materialized.append(root)
+    )
+    monkeypatch.setattr(
+        RUNNER,
+        "materialize_tep_nowcast_test",
+        lambda root: tep_materialized.append(root),
     )
     result_path = RUNNER.test_output(tmp_path, profile) / "TEST_RESULT.json"
     result_path.parent.mkdir(parents=True, exist_ok=True)
@@ -551,7 +566,8 @@ def test_run_tests_materializes_cz_only_for_cz_profiles(
 
     result = RUNNER.run_tests(tmp_path, dataset=scope, model=None)
     assert result["status"] == "PASS"
-    assert bool(materialized) is (scope == "cz")
+    assert bool(cz_materialized) is (scope == "cz")
+    assert bool(tep_materialized) is (scope == "tep")
 
 
 def test_verify_immutability_rejects_tampered_pretest_inventory(
