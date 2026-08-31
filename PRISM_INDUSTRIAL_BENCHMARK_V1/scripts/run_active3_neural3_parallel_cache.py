@@ -2651,19 +2651,24 @@ def _privacy_path_flags(relative_path: str, *, repository: bool) -> tuple[bool, 
         # A run may legitimately contain derived CZ prediction parquet files.
         # Only Excel files or explicitly raw/source/private data paths are
         # treated as forbidden source material in the private run namespace.
+        path_tokens = set(re.split(r"[^a-z0-9]+", lower))
         is_cz_data = suffix in {".xlsx", ".xls"} or (
             suffix in _PRIVACY_DATA_SUFFIXES
-            and any(token in lower for token in cz_tokens)
-            and any(token in lower for token in ("raw", "source", "private"))
+            and bool(path_tokens.intersection({"cz", "czochralski"}))
+            and bool(path_tokens.intersection({"raw", "source", "private"}))
         )
     is_credential = (
         suffix in _PRIVACY_CREDENTIAL_SUFFIXES
         or path.name.lower() in _PRIVACY_CREDENTIAL_NAMES
     )
+    is_public_protocol_document = suffix == ".md" and "docs" in parts
     is_run_artifact = repository and bool(
         parts.intersection(_PRIVACY_RUN_ARTIFACT_COMPONENTS)
         or path.name.startswith("GPU_RESOURCE_")
-        or path.name.startswith("ACTIVE3_NEURAL3_")
+        or (
+            path.name.startswith("ACTIVE3_NEURAL3_")
+            and not is_public_protocol_document
+        )
     )
     return is_cz_data, is_credential, is_run_artifact
 

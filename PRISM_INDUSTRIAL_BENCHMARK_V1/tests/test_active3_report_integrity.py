@@ -624,7 +624,29 @@ def test_privacy_audit_scans_untracked_paths_and_redacts_content_matches(
     }
     assert "abcdefghijklmn" not in audit_text
     assert RUNNER._privacy_path_flags("test_results/cz/test.parquet", repository=False)[0] is False
+    assert (
+        RUNNER._privacy_path_flags(
+            "cz/h4/shared/Rod_1_to_Rod_2/targets/"
+            "CZ_DIAM_RAW2S_CURRENT_L256_H4__H4__W1/test.parquet",
+            repository=False,
+        )[0]
+        is False
+    )
     assert RUNNER._privacy_path_flags("raw/source_cz.parquet", repository=False)[0] is True
+    assert (
+        RUNNER._privacy_path_flags(
+            "PRISM_INDUSTRIAL_BENCHMARK_V1/docs/"
+            "ACTIVE3_NEURAL3_TEP_H0_NOWCAST_AMENDMENT_20260831.md",
+            repository=True,
+        )[2]
+        is False
+    )
+    assert (
+        RUNNER._privacy_path_flags(
+            "final/ACTIVE3_NEURAL3_FINAL_REPORT.md", repository=True
+        )[2]
+        is True
+    )
 
 
 def test_privacy_audit_rejects_run_root_inside_repository(
