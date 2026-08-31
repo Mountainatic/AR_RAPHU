@@ -69,18 +69,11 @@ jobs:
           from pathlib import Path
           p = Path("RTA-TCN-SRU.corrected.py")
           s = p.read_text(encoding="utf-8")
-          old_variants = [
-              "pd.read_csv('SRU_data.txt', sep='\\\\s+')",
-              'pd.read_csv("SRU_data.txt", sep="\\\\s+")',
-              "pd.read_csv('SRU_data.txt', sep=r'\\\\s+')",
-              'pd.read_csv("SRU_data.txt", sep=r"\\\\s+")',
-          ]
-          for old in old_variants:
-              if old in s:
-                  s = s.replace(old, old[:-1] + ", header=None)", 1)
-                  break
-          else:
+          old = r"pd.read_csv('SRU_data.txt', sep='\s+')"
+          new = r"pd.read_csv('SRU_data.txt', sep='\s+', header=None)"
+          if old not in s:
               raise SystemExit("author pd.read_csv line not found")
+          s = s.replace(old, new, 1)
           p.write_text(s, encoding="utf-8")
           PY
           grep -n "read_csv" RTA-TCN-SRU.corrected.py
