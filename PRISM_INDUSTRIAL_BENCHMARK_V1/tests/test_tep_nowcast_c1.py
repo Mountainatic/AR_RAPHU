@@ -87,6 +87,13 @@ def test_development_is_strict_past_and_uses_l256_common_support(tmp_path: Path)
     assert audit["test_accessed"] is False
     assert audit["common_support_history_steps"] == COMMON_SUPPORT_HISTORY_STEPS
     assert not (destination / "base_data" / "tep" / "test.parquet").exists()
+    registry = json.loads((destination / "SAMPLE_ID_REGISTRY.json").read_text())
+    assert registry["materialized_splits"] == ["train", "validation"]
+    registered_paths = [entry["path"] for entry in registry["files"]]
+    assert not any("TEP_G_REP_H1" in path for path in registered_paths)
+    assert not any(path.endswith("/test.parquet") for path in registered_paths)
+    lockbox = json.loads((destination / "LOCKBOX.json").read_text())
+    assert lockbox["locked_files"] == []
 
     for information, availability, delay in (
         ("input_only", "record_time", 0),
@@ -123,6 +130,11 @@ def test_test_materialization_requires_both_freezes(tmp_path: Path) -> None:
     _write_json(selected, {"status": "SELECTED_CHECKPOINTS_SEALED", "sealed": True})
     audit = build_test(source, destination, global_freeze, selected)
     assert audit["test_accessed"] is True
+    registry = json.loads((destination / "SAMPLE_ID_REGISTRY.json").read_text())
+    assert registry["materialized_splits"] == ["test", "train", "validation"]
+    lockbox = json.loads((destination / "LOCKBOX.json").read_text())
+    assert len(lockbox["locked_files"]) == 4
+    assert all("TEP_G_NOWCAST_H0" in path or path == "base_data/tep/test.parquet" for path in lockbox["locked_files"])
     test = _samples(destination, "dynamic", "record_time", "test")
     assert test["origin"].min() == COMMON_SUPPORT_HISTORY_STEPS
     assert (test["latest_available_target_index"] == test["origin"] - 1).all()
@@ -137,4 +149,3 @@ def test_registered_head_is_h0_w1(tmp_path: Path) -> None:
     assert head["task_id"] == TASK
     assert head["head_id"] == HEAD
     assert (head["h_steps"], head["w_steps"], head["w0_steps"]) == (0, 1, 1)
-

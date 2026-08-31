@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from datetime import datetime, timezone
@@ -10,6 +11,7 @@ from typing import Any, Mapping
 
 import numpy as np
 import pandas as pd
+import pyarrow.parquet as pq
 
 
 TASK = "TEP_G_NOWCAST_H0"
@@ -53,6 +55,79 @@ def _hardlink_new(source: Path, destination: Path) -> None:
         raise RuntimeError(f"STOP_NOWCAST_SOURCE_FILE_UNSAFE:{source}")
     destination.parent.mkdir(parents=True, exist_ok=True)
     os.link(source.resolve(), destination)
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _replace_json(path: Path, value: Any) -> None:
+    """Atomically refresh mutable stage metadata without touching data artifacts."""
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.tmp")
+    temporary.write_text(
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
+
+
+def _refresh_lockbox(destination: Path) -> None:
+    locked = sorted(
+        path.relative_to(destination).as_posix()
+        for path in destination.rglob("*.parquet")
+        if path.name in {"test.parquet", "ood.parquet"}
+    )
+    _replace_json(
+        destination / "LOCKBOX.json",
+        {
+            "contract": "PRISM_C1_TEST_LOCKBOX_V1",
+            "protocol_frozen": False,
+            "access_rule": "GLOBAL_SELECTION_AND_SELECTED_CHECKPOINTS_FROZEN",
+            "metric_access_before_freeze": False,
+            "locked_files": locked,
+        },
+    )
+
+
+def _refresh_sample_registry(destination: Path) -> None:
+    files = []
+    for path in sorted(destination.rglob("*")):
+        if not path.is_file() or path.name == "SAMPLE_ID_REGISTRY.json":
+            continue
+        entry: dict[str, Any] = {
+            "path": path.relative_to(destination).as_posix(),
+            "bytes": path.stat().st_size,
+            "sha256": _sha256_file(path),
+        }
+        if path.suffix == ".parquet":
+            entry["rows"] = pq.ParquetFile(path).metadata.num_rows
+            entry["dtype"] = "schema_in_parquet"
+        files.append(entry)
+    _replace_json(
+        destination / "SAMPLE_ID_REGISTRY.json",
+        {
+            "contract": "IMMUTABLE_SAMPLE_IDS_V1",
+            "sample_support_contract": SUPPORT_CONTRACT,
+            "anchor_universe": "TEP_H0_L256_COMMON_TARGET_ROWS",
+            "materialized_splits": sorted(
+                {
+                    Path(item["path"]).stem
+                    for item in files
+                    if item["path"].startswith(f"sample_ids/{HEAD}/")
+                    and item["path"].endswith(".parquet")
+                }
+            ),
+            "protocol_sha256": _sha256_file(destination / "PROTOCOL.json"),
+            "files": files,
+        },
+    )
 
 
 def _registries(source: Path, destination: Path) -> None:
@@ -107,13 +182,9 @@ def _registries(source: Path, destination: Path) -> None:
             ],
         },
     )
-    for name in (
-        "DATASET_HASHES.json",
-        "SPLIT_REGISTRY.json",
-        "SAMPLE_ID_REGISTRY.json",
-        "LOCKBOX.json",
-    ):
+    for name in ("DATASET_HASHES.json", "SPLIT_REGISTRY.json"):
         _hardlink_new(source / name, destination / name)
+    _refresh_lockbox(destination)
 
 
 def _sample_frame(
@@ -259,6 +330,7 @@ def build_development(source: Path, destination: Path) -> dict[str, Any]:
         ],
     }
     _write_new(audit_path, result)
+    _refresh_sample_registry(destination)
     return result
 
 
@@ -293,6 +365,8 @@ def build_test(
         "split": _materialize_split(source, destination, "test"),
     }
     _write_new(audit_path, result)
+    _refresh_lockbox(destination)
+    _refresh_sample_registry(destination)
     return result
 
 
