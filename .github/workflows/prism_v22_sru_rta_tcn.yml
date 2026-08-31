@@ -1,4 +1,4 @@
-name: PRISM v2.2 SRU matched RTA-TCN benchmark
+name: PRISM v2.2 full KWA vs RTA-TCN SRU
 
 on:
   workflow_dispatch:
@@ -12,15 +12,21 @@ permissions:
   contents: write
 
 jobs:
-  sru-matched-benchmark:
+  sru-full-kwa-benchmark:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 180
     env:
       MPLBACKEND: Agg
       PYTHONHASHSEED: '1024'
       OUTDIR: sru_out
 
     steps:
+      - name: Checkout PRISM branch
+        uses: actions/checkout@v4
+        with:
+          path: prism_repo
+          fetch-depth: 1
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -29,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install numpy pandas scipy scikit-learn matplotlib torchinfo
+          pip install numpy pandas scipy scikit-learn matplotlib torchinfo pyarrow pyreadr pytest
           pip install torch --index-url https://download.pytorch.org/whl/cpu
 
       - name: Fetch official author code and SRU data
@@ -41,18 +47,39 @@ jobs:
           curl -fsSL \
             https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/SRU/SRU_data.txt \
             -o SRU_data.txt
-
           sha256sum RTA-TCN-SRU.author.py SRU_data.txt | tee "$OUTDIR/upstream_sha256.txt"
-
           python - <<'PY'
           import pandas as pd
-          a = pd.read_csv("SRU_data.txt", sep=r"\s+").values
-          b = pd.read_csv("SRU_data.txt", sep=r"\s+", header=None).values
-          print("exact_author_shape =", a.shape)
-          print("corrected_shape    =", b.shape)
-          assert b.shape == (10081, 7), b.shape
-          assert a.shape == (10080, 7), a.shape
+          exact = pd.read_csv("SRU_data.txt", sep=r"\s+").values
+          corrected = pd.read_csv("SRU_data.txt", sep=r"\s+", header=None).values
+          print("exact_author_shape =", exact.shape)
+          print("corrected_shape    =", corrected.shape)
+          assert exact.shape == (10080, 7), exact.shape
+          assert corrected.shape == (10081, 7), corrected.shape
           PY
+
+      - name: Compile full PRISM v2.2 SRU runner
+        run: |
+          python -m py_compile prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_sru_rta_tcn_full.json")
+          cfg = json.loads(p.read_text())
+          assert cfg["protocol_id"] == "PRISM_V2_2_BETA_SRU_RTA_TCN_FULL_KWA_MATCHED_V1"
+          assert cfg["reported_nested_routes"] == ["K_GAMMA", "K_GAMMA_W", "K_GAMMA_W_A"]
+          print(cfg["protocol_id"])
+          PY
+
+      - name: Run full PRISM v2.2 K plus W plus A
+        id: prism_full
+        run: |
+          set -o pipefail
+          python prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full.py \
+            --data SRU_data.txt \
+            --config prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_sru_rta_tcn_full.json \
+            --output "$OUTDIR/prism_v22_full_kwa.json" \
+            2>&1 | tee "$OUTDIR/prism_v22_full_kwa.log"
 
       - name: Run exact-author RTA-TCN
         id: rta_exact
@@ -73,8 +100,7 @@ jobs:
           new = r"pd.read_csv('SRU_data.txt', sep='\s+', header=None)"
           if old not in s:
               raise SystemExit("author pd.read_csv line not found")
-          s = s.replace(old, new, 1)
-          p.write_text(s, encoding="utf-8")
+          p.write_text(s.replace(old, new, 1), encoding="utf-8")
           PY
           grep -n "read_csv" RTA-TCN-SRU.corrected.py
 
@@ -85,174 +111,137 @@ jobs:
           set -o pipefail
           python RTA-TCN-SRU.corrected.py 2>&1 | tee "$OUTDIR/rta_corrected.log"
 
-      - name: Run matched PRISM v2.2 beta
-        run: |
-          cat > run_prism_sru.py <<'PY'
-          import json, math
-          import numpy as np
-          import pandas as pd
-          from sklearn.linear_model import Ridge
-          from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-          from sklearn.preprocessing import StandardScaler
-          from scipy.optimize import minimize
-
-          SEQ = 25
-          TRAIN_TARGETS = 7039
-          TRAIN_SIZE = TRAIN_TARGETS + SEQ - 1
-          LAGS = [0, 1, 2, 4, 8, 16, 24]
-          TAUS = [1., 2., 4., 8., 16., 24.]
-          LAMBDAS = [1e-4, 1e-3, 1e-2, 1e-1, 1.]
-          ASSEMBLY_RIDGE = 1e-3
-
-          class StdRidge:
-              def __init__(self, lam): self.lam = lam
-              def fit(self, X, y):
-                  self.scaler = StandardScaler().fit(X)
-                  Z = self.scaler.transform(X)
-                  self.model = Ridge(alpha=self.lam * len(X), fit_intercept=True).fit(Z, y)
-                  return self
-              def predict(self, X): return self.model.predict(self.scaler.transform(X))
-
-          def metrics(y, p):
-              return {"rmse": float(mean_squared_error(y, p) ** 0.5), "mae": float(mean_absolute_error(y, p)), "r2": float(r2_score(y, p))}
-
-          def audit(X):
-              Z = StandardScaler().fit_transform(X)
-              sv = np.linalg.svd(Z, compute_uv=False)
-              return {"features": int(X.shape[1]), "rank": int(np.linalg.matrix_rank(Z)), "condition": float(sv[0] / sv[-1]) if sv[-1] > 0 else float("inf")}
-
-          def ct_features(win):
-              states = []
-              for tau in TAUS:
-                  a = math.exp(-1.0 / tau)
-                  z = win[0].copy()
-                  for row in win[1:]: z = a * z + (1 - a) * row
-                  states.append(z)
-              states = np.asarray(states)
-              m = [win[-1] - states[0]]
-              for i in range(len(states) - 1): m.append(states[i] - states[i + 1])
-              return np.concatenate(m), states.reshape(-1)
-
-          def make_rows(data, target_col):
-              x = data[:, :5]; y = data[:, target_col]
-              train_ep = np.arange(SEQ - 1, TRAIN_SIZE)
-              test_ep = np.arange(TRAIN_SIZE, len(data))
-              def build(ep):
-                  D, M, S, F, Y = [], [], [], [], []
-                  for t in ep:
-                      win = x[t - SEQ + 1:t + 1]
-                      D.append(np.concatenate([win[-1 - l] for l in LAGS]))
-                      m, s = ct_features(win)
-                      M.append(m); S.append(s); F.append(win.reshape(-1)); Y.append(y[t])
-                  return {"D": np.asarray(D), "M": np.asarray(M), "S": np.asarray(S), "F": np.asarray(F), "Y": np.asarray(Y)}
-              return build(train_ep), build(test_ep)
-
-          def run_one(data, target_col):
-              tr, te = make_rows(data, target_col)
-              n = len(tr["Y"]); n70 = int(np.floor(0.70 * n)); n85 = int(np.floor(0.85 * n))
-              chosen, val_pred, final_pred = {}, {}, {}
-              for b in ["D", "M", "S"]:
-                  scores = []
-                  for lam in LAMBDAS:
-                      m = StdRidge(lam).fit(tr[b][:n70], tr["Y"][:n70])
-                      pred = m.predict(tr[b][n70:n85])
-                      scores.append((mean_squared_error(tr["Y"][n70:n85], pred), lam))
-                  lam = min(scores)[1]; chosen[b] = float(lam)
-                  m85 = StdRidge(lam).fit(tr[b][:n85], tr["Y"][:n85]); val_pred[b] = m85.predict(tr[b][n85:])
-                  mall = StdRidge(lam).fit(tr[b], tr["Y"]); final_pred[b] = mall.predict(te[b])
-              Q = np.column_stack([val_pred[b] for b in ["D", "M", "S"]]); yy = tr["Y"][n85:]
-              def obj(w):
-                  e = Q @ w - yy
-                  return float(np.mean(e * e) + ASSEMBLY_RIDGE * np.sum(w * w))
-              res = minimize(obj, np.ones(3) / 3, method="SLSQP", bounds=[(0, 1)] * 3, constraints={"type": "eq", "fun": lambda w: np.sum(w) - 1}, options={"maxiter": 500, "ftol": 1e-14})
-              w = np.maximum(res.x, 0); w /= w.sum()
-              gamma = np.column_stack([final_pred[b] for b in ["D", "M", "S"]]) @ w
-              full_scores = []
-              for lam in LAMBDAS:
-                  m = StdRidge(lam).fit(tr["F"][:n70], tr["Y"][:n70]); pred = m.predict(tr["F"][n70:n85])
-                  full_scores.append((mean_squared_error(tr["Y"][n70:n85], pred), lam))
-              full_lam = min(full_scores)[1]
-              full_pred = StdRidge(full_lam).fit(tr["F"], tr["Y"]).predict(te["F"])
-              return {"n_train": int(len(tr["Y"])), "n_test": int(len(te["Y"])), "selected_lambdas": chosen, "gamma_weights": {"D": float(w[0]), "M": float(w[1]), "S": float(w[2])}, "D": metrics(te["Y"], final_pred["D"]), "M": metrics(te["Y"], final_pred["M"]), "S": metrics(te["Y"], final_pred["S"]), "Gamma_DMS": metrics(te["Y"], gamma), "Full25LagRidge": metrics(te["Y"], full_pred), "full_lag_lambda": float(full_lam), "audits": {b: audit(tr[b]) for b in ["D", "M", "S"]}}
-
-          out = {}
-          for name, kwargs in [("exact_author", {}), ("corrected", {"header": None})]:
-              data = pd.read_csv("SRU_data.txt", sep=r"\s+", **kwargs).values.astype(float)
-              out[name] = {"shape": list(data.shape), "H2S": run_one(data, 5), "SO2": run_one(data, 6)}
-          print(json.dumps(out, indent=2))
-          with open("sru_out/prism_sru.json", "w") as f: json.dump(out, f, indent=2)
-          PY
-          python run_prism_sru.py | tee "$OUTDIR/prism_sru.log"
-
-      - name: Parse RTA-TCN metrics and build evidence record
+      - name: Build publication evidence record
         if: always()
         run: |
           python - <<'PY'
           import json, re
           from pathlib import Path
+
           outdir = Path("sru_out")
           def parse_rta(path):
               text = Path(path).read_text(errors="replace") if Path(path).exists() else ""
               rmses = [float(x) for x in re.findall(r"RMSE:\s*([0-9.eE+-]+)", text)]
               r2s = [float(x) for x in re.findall(r"相关系数：\s*([0-9.eE+-]+)", text)]
               mses = [float(x) for x in re.findall(r"MSE：\s*([0-9.eE+-]+)", text)]
-              return {"train_mse": mses[-2] if len(mses) >= 2 else None, "test_mse": mses[-1] if len(mses) >= 1 else None, "train_rmse": rmses[-2] if len(rmses) >= 2 else None, "test_rmse": rmses[-1] if len(rmses) >= 1 else None, "train_r2": r2s[-2] if len(r2s) >= 2 else None, "test_r2": r2s[-1] if len(r2s) >= 1 else None}
-          prism = json.loads((outdir / "prism_sru.json").read_text())
-          combined = {"rta_tcn": {"exact_author": parse_rta(outdir / "rta_exact.log"), "corrected": parse_rta(outdir / "rta_corrected.log")}, "prism_v2_2_beta": prism}
-          (outdir / "SRU_MATCHED_RESULT.json").write_text(json.dumps(combined, indent=2))
-          def fmt(x): return "NOT_AVAILABLE" if x is None else f"{x:.9f}"
-          lines = ["# PRISM v2.2(beta) vs RTA-TCN — SRU matched benchmark", "", "## Frozen information contract", "", "- Upstream source: `CHM00/RTA-TCN-and-JITL-RTA-TCN`.", "- Data: official `SRU/SRU_data.txt`.", "- Author task: H2S current-time soft sensing.", "- Inputs: 5 process variables.", "- Sequence length: 25.", "- Historical target y: forbidden.", "- Future inputs: forbidden.", "- Author train target count: 7039.", "- RTA-TCN: author architecture/training code, 240 epochs, batch 64, lr 0.001, seed 1024.", "- PRISM branch profile: D lags [0,1,2,4,8,16,24], CT taus [1,2,4,8,16,24].", "", "## RTA-TCN official-code rerun", ""]
-          for parser in ["exact_author", "corrected"]:
-              r = combined["rta_tcn"][parser]
-              lines += [f"### {parser}", f"- Train RMSE: {fmt(r['train_rmse'])}", f"- Train R2: {fmt(r['train_r2'])}", f"- Test RMSE: **{fmt(r['test_rmse'])}**", f"- Test R2: **{fmt(r['test_r2'])}**", ""]
-          lines += ["## PRISM v2.2(beta)", ""]
-          for parser in ["exact_author", "corrected"]:
-              p = prism[parser]["H2S"]
-              lines += [f"### {parser}", f"- D: RMSE {p['D']['rmse']:.9f}, R2 {p['D']['r2']:.9f}", f"- M: RMSE {p['M']['rmse']:.9f}, R2 {p['M']['r2']:.9f}", f"- S: RMSE {p['S']['rmse']:.9f}, R2 {p['S']['r2']:.9f}", f"- Gamma D/M/S: RMSE {p['Gamma_DMS']['rmse']:.9f}, R2 {p['Gamma_DMS']['r2']:.9f}", f"- Full-25-lag Ridge: RMSE {p['Full25LagRidge']['rmse']:.9f}, R2 {p['Full25LagRidge']['r2']:.9f}", f"- Gamma weights: {p['gamma_weights']}", f"- Numerical audits: {p['audits']}", ""]
-          lines += ["## Secondary PRISM-only SO2 audit", "", "SO2 is evaluated with the identical frozen PRISM protocol as a secondary target; it is not presented as an official RTA-TCN matched task unless the author script is separately verified for SO2.", ""]
-          for parser in ["exact_author", "corrected"]:
-              p = prism[parser]["SO2"]
-              lines += [f"- {parser}: Gamma RMSE {p['Gamma_DMS']['rmse']:.9f}, R2 {p['Gamma_DMS']['r2']:.9f}; best branch R2 {max(p['D']['r2'],p['M']['r2'],p['S']['r2']):.9f}."]
-          lines += ["", "## Upstream SHA256", "", "```text", (outdir / "upstream_sha256.txt").read_text().strip(), "```", "", "## Scientific note", "", "Exact-author and corrected-parser results are reported separately. No test-set result is used for model or hyperparameter selection."]
-          md = "\n".join(lines) + "\n"
-          (outdir / "SRU_MATCHED_RESULT.md").write_text(md)
-          print(md)
+              return {
+                  "train_mse": mses[-2] if len(mses) >= 2 else None,
+                  "test_mse": mses[-1] if mses else None,
+                  "train_rmse": rmses[-2] if len(rmses) >= 2 else None,
+                  "test_rmse": rmses[-1] if rmses else None,
+                  "train_r2": r2s[-2] if len(r2s) >= 2 else None,
+                  "test_r2": r2s[-1] if r2s else None,
+              }
+
+          full_path = outdir / "prism_v22_full_kwa.json"
+          full = json.loads(full_path.read_text()) if full_path.exists() else None
+          combined = {
+              "rta_tcn_input_only": {
+                  "exact_author": parse_rta(outdir / "rta_exact.log"),
+                  "corrected_parser": parse_rta(outdir / "rta_corrected.log"),
+              },
+              "prism_v2_2_beta_full_dynamic": full,
+          }
+          (outdir / "SRU_FULL_KWA_MATCHED_RESULT.json").write_text(json.dumps(combined, indent=2, allow_nan=True) + "\n")
+
+          def fmt(value):
+              return "NOT_AVAILABLE" if value is None else f"{value:.9f}"
+
+          lines = [
+              "# PRISM v2.2(beta) full KWA vs RTA-TCN — SRU",
+              "",
+              "## Scope",
+              "",
+              "- RTA-TCN is rerun from the official author code on the official SRU file.",
+              "- The exact-author parser and corrected `header=None` parser are reported separately.",
+              "- The new PRISM result is the full beta chain: `D/M/S -> K/C -> Gamma_CT -> DeltaW -> A`.",
+              "- The previous D/M/S + Ridge experiment is a temporal-representation ablation and is not labeled as full PRISM here.",
+              "- SRU cadence is 60 s; CT tau is frozen in physical time as [60,120,240,480,960,1440] s.",
+              "",
+              "## Information-set warning",
+              "",
+              "- Official RTA-TCN reference: input-only; historical target y is forbidden.",
+              "- Full PRISM KWA: dynamic record-time information; only y[t-1] or older and mature residuals are legal.",
+              "- Therefore RTA-TCN vs full KWA is not claimed to be strictly information-matched. It is a model/task reference plus a full-architecture result.",
+              "",
+              "## RTA-TCN official-code rerun",
+              "",
+          ]
+          for parser in ("exact_author", "corrected_parser"):
+              result = combined["rta_tcn_input_only"][parser]
+              lines += [
+                  f"### {parser}",
+                  f"- Test RMSE: **{fmt(result['test_rmse'])}**",
+                  f"- Test R2 / author-labeled score: **{fmt(result['test_r2'])}**",
+                  "",
+              ]
+
+          if full is None:
+              lines += ["## Full PRISM v2.2(beta)", "", "FULL_RESULT_NOT_AVAILABLE — inspect `prism_v22_full_kwa.log`.", ""]
+          else:
+              lines += ["## Full PRISM v2.2(beta)", ""]
+              for route in ("K_GAMMA", "K_GAMMA_W", "K_GAMMA_W_A", "PERSISTENCE"):
+                  metric = full["nested_routes"][route]
+                  lines += [f"- **{route}**: RMSE {metric['rmse']:.9f}, MAE {metric['mae']:.9f}, R2 {metric['r2']:.9f}"]
+              lines += [
+                  "",
+                  f"- Gamma weights: `{full['gamma_ct']['weights']}`",
+                  f"- W selected: `{full['W']['selected']}`; active={full['W']['active']}",
+                  f"- A selected: `{full['A']['selected']}`; active={full['A']['active']}",
+                  f"- Test target used for selection: `{full['test_target_used_for_selection']}`",
+                  f"- Runtime: {full['elapsed_seconds']:.3f} s",
+                  "",
+                  "### Branch admission",
+                  "",
+              ]
+              for branch in ("D", "M", "S"):
+                  audit = full["branch_structures"][branch]
+                  lines += [f"- {branch}: eligible={audit['eligible']}; active K channels={audit.get('active_channels', [])}; reason={audit.get('reason', 'PASS')}"]
+          lines += [
+              "",
+              "## Upstream SHA256",
+              "",
+              "```text",
+              (outdir / "upstream_sha256.txt").read_text().strip() if (outdir / "upstream_sha256.txt").exists() else "NOT_AVAILABLE",
+              "```",
+              "",
+              "## Scientific note",
+              "",
+              "K/W/A selection is frozen from author-train development/calibration data. The final RTA author test targets are not used for PRISM route, candidate, penalty, Gamma, W, or A selection.",
+          ]
+          (outdir / "SRU_FULL_KWA_MATCHED_RESULT.md").write_text("\n".join(lines) + "\n")
           PY
 
-      - name: Upload raw evidence artifact
+      - name: Upload full evidence artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: prism-v22-sru-rta-tcn-evidence
+          name: prism-v22-sru-full-kwa-rta-tcn
           path: |
             sru_out/
-            RTA-TCN-SRU.author.py
-            RTA-TCN-SRU.corrected.py
-            run_prism_sru.py
-          retention-days: 90
+            prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_sru_rta_tcn_full.json
+          if-no-files-found: warn
 
-      - name: Checkout isolated PRISM benchmark branch
-        if: always()
-        uses: actions/checkout@v4
-        with:
-          ref: prism-v2-2-beta-debutanizer-benchmark-20260824
-          path: repo
-
-      - name: Commit result back to benchmark branch
+      - name: Commit full result to benchmark branch
         if: always()
         run: |
-          DEST=repo/PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_sru_rta_tcn_20260830
+          if [ ! -f "$OUTDIR/SRU_FULL_KWA_MATCHED_RESULT.json" ]; then
+            echo "No evidence record to commit"
+            exit 0
+          fi
+          DEST="prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_sru_rta_tcn_20260830/full_kwa"
           mkdir -p "$DEST"
-          cp "$OUTDIR/SRU_MATCHED_RESULT.md" "$DEST/" || true
-          cp "$OUTDIR/SRU_MATCHED_RESULT.json" "$DEST/" || true
-          cp "$OUTDIR/upstream_sha256.txt" "$DEST/" || true
-          cp "$OUTDIR/rta_exact.log" "$DEST/" || true
-          cp "$OUTDIR/rta_corrected.log" "$DEST/" || true
-          cp "$OUTDIR/prism_sru.log" "$DEST/" || true
-          cd repo
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_sru_rta_tcn_20260830/
-          git diff --cached --quiet && exit 0
-          git commit -m 'benchmark: add matched PRISM v2.2 vs RTA-TCN SRU evidence'
-          git push origin HEAD:prism-v2-2-beta-debutanizer-benchmark-20260824
+          cp "$OUTDIR/SRU_FULL_KWA_MATCHED_RESULT.json" "$DEST/"
+          cp "$OUTDIR/SRU_FULL_KWA_MATCHED_RESULT.md" "$DEST/"
+          cp "$OUTDIR/upstream_sha256.txt" "$DEST/"
+          if [ -f "$OUTDIR/prism_v22_full_kwa.json" ]; then cp "$OUTDIR/prism_v22_full_kwa.json" "$DEST/"; fi
+          cd prism_repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_sru_rta_tcn_20260830/full_kwa
+          if git diff --cached --quiet; then
+            echo "No result changes"
+          else
+            git commit -m "results: add full v2.2 KWA SRU benchmark"
+            git push origin HEAD:prism-v2-2-beta-debutanizer-benchmark-20260824
+          fi
