@@ -17,17 +17,31 @@
 ## RTA-TCN official-code rerun
 
 ### exact_author
-- Test RMSE: **NOT_AVAILABLE**
-- Test R2 / author-labeled score: **NOT_AVAILABLE**
+- Test RMSE: **0.025544488**
+- Test R2 / author-labeled score: **0.804771079**
 
 ### corrected_parser
-- Test RMSE: **NOT_AVAILABLE**
-- Test R2 / author-labeled score: **NOT_AVAILABLE**
+- Test RMSE: **0.030893714**
+- Test R2 / author-labeled score: **0.714350461**
 
 ## Full PRISM v2.2(beta)
 
-FULL_RESULT_NOT_AVAILABLE — inspect `prism_v22_full_kwa.log`.
+- **K_GAMMA**: RMSE 0.018864074, MAE 0.006103631, R2 0.893496409
+- **K_GAMMA_W**: RMSE 0.018864074, MAE 0.006103631, R2 0.893496409
+- **K_GAMMA_W_A**: RMSE 0.013539937, MAE 0.004564453, R2 0.945131061
+- **PERSISTENCE**: RMSE 0.018864074, MAE 0.006103631, R2 0.893496409
 
+- Gamma weights: `{'__PERSISTENCE_ONLY_ZERO_DELTA__': 4.547473508864641e-13, 'PERSISTENCE': 0.9999999999995453}`
+- W selected: `IDENTITY_CORRECTION`; active=False
+- A selected: `('MATURE_RESIDUAL_AR', (1, 4), 151.99110829529332, 30.0)`; active=True
+- Test target used for selection: `False`
+- Runtime: 163.830 s
+
+### Branch admission
+
+- D: eligible=False; active K channels=[0, 2]; reason=C_INPUT_PATH_NOT_PRESERVED
+- M: eligible=False; active K channels=[0, 2]; reason=C_INPUT_PATH_NOT_PRESERVED
+- S: eligible=False; active K channels=[2]; reason=C_INPUT_PATH_NOT_PRESERVED
 
 ## Upstream SHA256
 
