@@ -3,16 +3,56 @@ from __future__ import annotations
 """Strict numerical-refit wrapper for the SRU v2.2 full KWA benchmark.
 
 This wrapper intentionally leaves the full runner unchanged and replaces only
-its K channel-selection hook.  An active K candidate is eligible for guarded
-one-SE selection only when the exact same structural candidate is numerically
-valid on the full development refit and on every registered inner expanding
-fold.  This mirrors the v2.1.1 rule that materialized K structures may not be
-selected from a merely partial set of numerically valid folds.
+its K channel-selection hook. An active K structural candidate is eligible for
+guarded one-SE selection only when that same structure is numerically valid on:
+
+1. every registered K/C inner expanding fold;
+2. every registered Gamma_CT OOF expanding fold used later to construct W
+   residuals; and
+3. the full development refit.
+
+No numerical threshold is relaxed and no candidate is changed after selection.
+This makes the matched adapter inherit the v2.1.1 principle that a selected K
+structure must certify everywhere it will be materialized downstream.
 """
 
 import numpy as np
 
 import run_prism_v22_sru_full as base
+
+
+def _numeric_fold_audit(
+    representation: np.ndarray,
+    target_delta: np.ndarray,
+    channel: int,
+    candidates: list[tuple[str, int]],
+    folds: list[tuple[np.ndarray, np.ndarray]],
+    config: dict,
+) -> dict[str, list[dict]]:
+    audit = {str(candidate): [] for candidate in candidates}
+    for fold_number, (fit_index, _) in enumerate(folds):
+        fit_values = representation[fit_index, channel, :]
+        y_fit = target_delta[fit_index]
+        for candidate in candidates:
+            try:
+                contract = base._fit_k(fit_values, y_fit, candidate, config)
+                valid = bool(base.numerical_contract_passes(contract))
+                audit[str(candidate)].append(
+                    {
+                        "fold": int(fold_number),
+                        "pass": valid,
+                        "certificate": contract.get("certificate", {}),
+                    }
+                )
+            except Exception as error:
+                audit[str(candidate)].append(
+                    {
+                        "fold": int(fold_number),
+                        "pass": False,
+                        "error": f"{type(error).__name__}: {error}",
+                    }
+                )
+    return audit
 
 
 def strict_select_k_channel(
@@ -23,13 +63,18 @@ def strict_select_k_channel(
     config: dict,
 ):
     candidates = base._k_candidates(config)
-    folds = base._expanding_folds(
+    selection_folds = base._expanding_folds(
         development, int(config["selection"]["inner_expanding_folds"])
     )
-    losses = {candidate: [] for candidate in candidates}
-    numeric = {str(candidate): [] for candidate in candidates}
+    gamma_oof_folds = base._expanding_folds(
+        development, int(config["selection"]["gamma_oof_expanding_folds"])
+    )
 
-    for fit_index, evaluation_index in folds:
+    losses = {candidate: [] for candidate in candidates}
+    selection_numeric = {str(candidate): [] for candidate in candidates}
+
+    # Predictive scoring remains exactly on the registered K/C selection folds.
+    for fold_number, (fit_index, evaluation_index) in enumerate(selection_folds):
         fit_values = representation[fit_index, channel, :]
         evaluation_values = representation[evaluation_index, channel, :]
         y_fit = target_delta[fit_index]
@@ -37,27 +82,40 @@ def strict_select_k_channel(
         for candidate in candidates:
             try:
                 contract = base._fit_k(fit_values, y_fit, candidate, config)
-                valid = base.numerical_contract_passes(contract)
+                valid = bool(base.numerical_contract_passes(contract))
                 if valid:
                     prediction = base.predict_contract(evaluation_values, contract)
                     loss = float(np.mean(np.square(y_evaluation - prediction)))
                 else:
                     loss = float("nan")
-                numeric[str(candidate)].append(
+                selection_numeric[str(candidate)].append(
                     {
-                        "pass": bool(valid),
+                        "fold": int(fold_number),
+                        "pass": valid,
                         "certificate": contract.get("certificate", {}),
                     }
                 )
             except Exception as error:
                 loss = float("nan")
-                numeric[str(candidate)].append(
+                selection_numeric[str(candidate)].append(
                     {
+                        "fold": int(fold_number),
                         "pass": False,
                         "error": f"{type(error).__name__}: {error}",
                     }
                 )
             losses[candidate].append(loss)
+
+    # W is trained from Gamma_CT OOF residuals.  These folds may have different
+    # boundaries from the K/C selection folds, so certify them explicitly too.
+    gamma_oof_numeric = _numeric_fold_audit(
+        representation,
+        target_delta,
+        channel,
+        candidates,
+        gamma_oof_folds,
+        config,
+    )
 
     full_refit = {}
     stable_candidates = []
@@ -81,19 +139,28 @@ def strict_select_k_channel(
                 "error": f"{type(error).__name__}: {error}",
             }
 
-        all_fold_valid = bool(numeric[str(candidate)]) and all(
-            bool(item.get("pass", False)) for item in numeric[str(candidate)]
+        selection_all_valid = bool(selection_numeric[str(candidate)]) and all(
+            bool(item.get("pass", False))
+            for item in selection_numeric[str(candidate)]
         )
-        stable = bool(full_valid and all_fold_valid)
-        full_refit[str(candidate)]["all_inner_folds_pass"] = all_fold_valid
-        full_refit[str(candidate)]["eligible_for_selection"] = stable
+        gamma_all_valid = bool(gamma_oof_numeric[str(candidate)]) and all(
+            bool(item.get("pass", False))
+            for item in gamma_oof_numeric[str(candidate)]
+        )
+        stable = bool(full_valid and selection_all_valid and gamma_all_valid)
+        full_refit[str(candidate)].update(
+            {
+                "all_selection_folds_pass": selection_all_valid,
+                "all_gamma_oof_folds_pass": gamma_all_valid,
+                "eligible_for_selection": stable,
+            }
+        )
         if stable:
             stable_candidates.append(candidate)
         else:
-            # A numerically unstable structure must not enter one-SE or
-            # practical-activation selection.  The exact-zero neutral remains
-            # available and is expected to certify on every fold.
-            losses[candidate] = [float("nan")] * len(folds)
+            # Unstable structures are removed before one-SE/activation.  This
+            # is a numerical admission rule only; no evaluation target is read.
+            losses[candidate] = [float("nan")] * len(selection_folds)
 
     neutral = (base.K_ZERO, 1)
     if neutral not in stable_candidates:
@@ -122,9 +189,12 @@ def strict_select_k_channel(
     return selected, {
         "selected": str(selected),
         "selection": selection.to_json(),
-        "candidate_numeric_audit": numeric,
+        "candidate_numeric_audit": selection_numeric,
+        "gamma_oof_numeric_audit": gamma_oof_numeric,
         "full_refit_numeric_audit": full_refit,
-        "strict_stability_rule": "FULL_REFIT_AND_ALL_INNER_FOLDS",
+        "strict_stability_rule": (
+            "FULL_DEVELOPMENT_REFIT_AND_ALL_SELECTION_AND_GAMMA_OOF_FOLDS"
+        ),
         "stable_candidates": [str(candidate) for candidate in stable_candidates],
     }
 
