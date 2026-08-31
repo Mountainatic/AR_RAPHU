@@ -1,0 +1,266 @@
+name: PRISM v2.2 restored-C full KWA vs RTA-TCN SRU
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - prism-v2-2-beta-debutanizer-benchmark-20260824
+    paths:
+      - '.github/workflows/prism_v22_sru_rta_tcn_c_restored_formal.yml'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_strict.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_restored_c.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_sru_rta_tcn_full_c_restored.json'
+
+permissions:
+  contents: write
+
+jobs:
+  sru-restored-c-formal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      MPLBACKEND: Agg
+      PYTHONHASHSEED: '1024'
+      OUTDIR: sru_restored_formal
+
+    steps:
+      - name: Checkout PRISM branch
+        uses: actions/checkout@v4
+        with:
+          path: prism_repo
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas scipy scikit-learn matplotlib torchinfo pyarrow pyreadr pytest
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Fetch official author code and SRU data
+        run: |
+          mkdir -p "$OUTDIR"
+          curl -fsSL \
+            https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/SRU/RTA-TCN-SRU.py \
+            -o RTA-TCN-SRU.author.py
+          curl -fsSL \
+            https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/SRU/SRU_data.txt \
+            -o SRU_data.txt
+          sha256sum RTA-TCN-SRU.author.py SRU_data.txt | tee "$OUTDIR/upstream_sha256.txt"
+          python - <<'PY'
+          import pandas as pd
+          exact = pd.read_csv('SRU_data.txt', sep=r'\s+').values
+          corrected = pd.read_csv('SRU_data.txt', sep=r'\s+', header=None).values
+          assert exact.shape == (10080, 7), exact.shape
+          assert corrected.shape == (10081, 7), corrected.shape
+          PY
+
+      - name: Validate restored-C frozen contract
+        run: |
+          python -m py_compile prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full.py
+          python -m py_compile prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_strict.py
+          python -m py_compile prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_restored_c.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_sru_rta_tcn_full_c_restored.json')
+          cfg = json.loads(p.read_text())
+          assert cfg['protocol_id'] == 'PRISM_V2_2_BETA_SRU_RTA_TCN_FULL_KWA_MATCHED_V2_C_RESTORED'
+          c = cfg['C']
+          assert c['ridge_semantics'] == 'NUMERICAL_STABILIZATION_ONLY'
+          assert c['ridge_selection'] == 'SMALLEST_STABLE_RIDGE'
+          assert c['input_path_min_fraction_of_best_active_k_variance_ratio'] == 0.10
+          assert c['input_path_max_mse_ratio_vs_best_active_k'] == 1.02
+          assert c['fallback_on_gate_failure'] == 'BEST_ACTIVE_K_CHANNEL'
+          assert c['silent_active_k_erasure_forbidden'] is True
+          assert cfg['implementation_correction']['score_tuning_patch'] is False
+          assert cfg['implementation_correction']['test_target_used_to_define_correction'] is False
+          print(cfg['protocol_id'])
+          PY
+
+      - name: Run restored-C full PRISM v2.2 K plus W plus A
+        id: prism_full
+        run: |
+          set -o pipefail
+          python prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_full_restored_c.py \
+            --data SRU_data.txt \
+            --config prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_sru_rta_tcn_full_c_restored.json \
+            --output "$OUTDIR/prism_v22_full_kwa_c_restored.json" \
+            2>&1 | tee "$OUTDIR/prism_v22_full_kwa_c_restored.log"
+
+      - name: Run exact-author RTA-TCN
+        id: rta_exact
+        continue-on-error: true
+        run: |
+          cp RTA-TCN-SRU.author.py RTA-TCN-SRU.exact.py
+          set -o pipefail
+          python RTA-TCN-SRU.exact.py 2>&1 | tee "$OUTDIR/rta_exact.log"
+
+      - name: Build corrected-parser RTA-TCN
+        run: |
+          cp RTA-TCN-SRU.author.py RTA-TCN-SRU.corrected.py
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('RTA-TCN-SRU.corrected.py')
+          s = p.read_text(encoding='utf-8')
+          old = r"pd.read_csv('SRU_data.txt', sep='\s+')"
+          new = r"pd.read_csv('SRU_data.txt', sep='\s+', header=None)"
+          if old not in s:
+              raise SystemExit('author pd.read_csv line not found')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+          grep -n "read_csv" RTA-TCN-SRU.corrected.py
+
+      - name: Run corrected-parser RTA-TCN
+        id: rta_corrected
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python RTA-TCN-SRU.corrected.py 2>&1 | tee "$OUTDIR/rta_corrected.log"
+
+      - name: Build formal evidence record
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, re
+          from pathlib import Path
+          out = Path('sru_restored_formal')
+
+          def parse_rta(path):
+              text = Path(path).read_text(errors='replace') if Path(path).exists() else ''
+              rmses = [float(x) for x in re.findall(r'RMSE:\s*([0-9.eE+-]+)', text)]
+              r2s = [float(x) for x in re.findall(r'相关系数：\s*([0-9.eE+-]+)', text)]
+              mses = [float(x) for x in re.findall(r'MSE：\s*([0-9.eE+-]+)', text)]
+              return {
+                  'train_mse': mses[-2] if len(mses) >= 2 else None,
+                  'test_mse': mses[-1] if mses else None,
+                  'train_rmse': rmses[-2] if len(rmses) >= 2 else None,
+                  'test_rmse': rmses[-1] if rmses else None,
+                  'train_r2': r2s[-2] if len(r2s) >= 2 else None,
+                  'test_r2': r2s[-1] if r2s else None,
+              }
+
+          full_path = out / 'prism_v22_full_kwa_c_restored.json'
+          full = json.loads(full_path.read_text()) if full_path.exists() else None
+          combined = {
+              'protocol_id': 'PRISM_V2_2_BETA_SRU_RTA_TCN_FULL_KWA_MATCHED_V2_C_RESTORED',
+              'implementation_correction': 'RESTORE_FROZEN_V211_C_INPUT_PATH_SEMANTICS',
+              'rta_tcn_input_only': {
+                  'exact_author': parse_rta(out / 'rta_exact.log'),
+                  'corrected_parser': parse_rta(out / 'rta_corrected.log'),
+              },
+              'prism_v2_2_beta_full_dynamic_c_restored': full,
+          }
+          (out / 'SRU_FULL_KWA_C_RESTORED_MATCHED_RESULT.json').write_text(json.dumps(combined, indent=2, allow_nan=True) + '\n')
+
+          def fmt(value):
+              return 'NOT_AVAILABLE' if value is None else f'{value:.9f}'
+
+          lines = [
+              '# PRISM v2.2(beta) restored-C full KWA vs RTA-TCN — SRU',
+              '',
+              '## Protocol status',
+              '',
+              '- Formal rerun under `PRISM_V2_2_BETA_SRU_RTA_TCN_FULL_KWA_MATCHED_V2_C_RESTORED`.',
+              '- This is an implementation-contract correction, not a score-tuning patch.',
+              '- The superseded V1 result is retained separately as audit evidence of the C-collapse bug.',
+              '- C inherits frozen v2.1.1 SRU semantics: smallest numerically stable ridge, OOF input-path preservation, and BEST_ACTIVE_K fallback if C would erase an already-active K path.',
+              '',
+              '## Information-set warning',
+              '',
+              '- Official RTA-TCN reference is input-only; historical target y is forbidden.',
+              '- Full PRISM KWA uses dynamic record-time information: y[t-1] or older and mature residuals only.',
+              '- Therefore RTA-TCN vs full KWA is not claimed to be a strictly information-matched comparison.',
+              '',
+              '## RTA-TCN official-code rerun',
+              '',
+          ]
+          for parser in ('exact_author', 'corrected_parser'):
+              r = combined['rta_tcn_input_only'][parser]
+              lines += [
+                  f'### {parser}',
+                  f"- Test RMSE: **{fmt(r['test_rmse'])}**",
+                  f"- Test R2: **{fmt(r['test_r2'])}**",
+                  '',
+              ]
+
+          if full is None:
+              lines += ['## Full PRISM v2.2 restored-C', '', 'FULL_RESULT_NOT_AVAILABLE — inspect log.', '']
+          else:
+              lines += ['## Full PRISM v2.2 restored-C', '']
+              for route in ('K_GAMMA','K_GAMMA_W','K_GAMMA_W_A','PERSISTENCE'):
+                  m = full['nested_routes'][route]
+                  lines.append(f"- **{route}**: RMSE {m['rmse']:.9f}, MAE {m['mae']:.9f}, R2 {m['r2']:.9f}")
+              lines += [
+                  '',
+                  f"- Gamma weights: `{full['gamma_ct']['weights']}`",
+                  f"- W selected: `{full['W']['selected']}`; active={full['W']['active']}",
+                  f"- A selected: `{full['A']['selected']}`; active={full['A']['active']}",
+                  f"- Test target used for selection: `{full['test_target_used_for_selection']}`",
+                  '',
+                  '### Branch C audit',
+                  '',
+              ]
+              for b in ('D','M','S'):
+                  a = full['branch_structures'][b]
+                  c = a.get('C', {})
+                  lines.append(
+                      f"- {b}: eligible={a.get('eligible')}; active K={a.get('active_channels', [])}; "
+                      f"reason={a.get('reason')}; C family={c.get('family')}; alpha={c.get('selected_alpha')}; "
+                      f"fallback={c.get('fallback_to_best_active_k')}; gate={c.get('input_path_preservation', {}).get('status')}"
+                  )
+          lines += [
+              '',
+              '## Upstream SHA256',
+              '',
+              '```text',
+              (out / 'upstream_sha256.txt').read_text().strip() if (out / 'upstream_sha256.txt').exists() else 'NOT_AVAILABLE',
+              '```',
+              '',
+              '## Scientific note',
+              '',
+              'No final test target is used for PRISM K/C/Gamma/W/A route or hyperparameter selection. Best-mean C and best-mean A runs remain diagnostic-only and are not substituted for this formal inherited-contract rerun.',
+          ]
+          (out / 'SRU_FULL_KWA_C_RESTORED_MATCHED_RESULT.md').write_text('\n'.join(lines) + '\n')
+          PY
+
+      - name: Upload formal evidence artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-v22-sru-restored-c-full-kwa-rta-tcn
+          path: |
+            sru_restored_formal/
+            prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_sru_rta_tcn_full_c_restored.json
+          if-no-files-found: warn
+
+      - name: Commit formal restored-C result
+        if: always()
+        run: |
+          if [ ! -f "$OUTDIR/SRU_FULL_KWA_C_RESTORED_MATCHED_RESULT.json" ]; then
+            echo 'No formal evidence record to commit'
+            exit 0
+          fi
+          DEST="prism_repo/PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_sru_rta_tcn_20260830/full_kwa_c_restored_formal"
+          mkdir -p "$DEST"
+          cp "$OUTDIR/SRU_FULL_KWA_C_RESTORED_MATCHED_RESULT.json" "$DEST/"
+          cp "$OUTDIR/SRU_FULL_KWA_C_RESTORED_MATCHED_RESULT.md" "$DEST/"
+          cp "$OUTDIR/upstream_sha256.txt" "$DEST/"
+          if [ -f "$OUTDIR/prism_v22_full_kwa_c_restored.json" ]; then
+            cp "$OUTDIR/prism_v22_full_kwa_c_restored.json" "$DEST/"
+          fi
+          cd prism_repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_sru_rta_tcn_20260830/full_kwa_c_restored_formal
+          if git diff --cached --quiet; then
+            echo 'No formal result changes'
+          else
+            git commit -m 'results: add formal restored-C v2.2 SRU benchmark'
+            git push origin HEAD:prism-v2-2-beta-debutanizer-benchmark-20260824
+          fi
