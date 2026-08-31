@@ -1,0 +1,109 @@
+name: PRISM v2.2 SRU best-mean A diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - prism-v2-2-beta-debutanizer-benchmark-20260824
+    paths:
+      - '.github/workflows/prism_v22_sru_a_best_mean_diagnostic.yml'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_c_best_w_a_best_diagnostic.py'
+
+permissions:
+  contents: write
+
+jobs:
+  a-best-mean-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PYTHONHASHSEED: '1024'
+      OUTDIR: sru_a_best_mean_diag
+
+    steps:
+      - name: Checkout diagnostic branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas scipy scikit-learn pyarrow pyreadr
+
+      - name: Fetch official SRU data
+        run: |
+          mkdir -p "$OUTDIR"
+          curl -fsSL \
+            https://raw.githubusercontent.com/CHM00/RTA-TCN-and-JITL-RTA-TCN/main/SRU/SRU_data.txt \
+            -o SRU_data.txt
+          sha256sum SRU_data.txt | tee "$OUTDIR/upstream_sha256.txt"
+
+      - name: Run best-mean A counterfactual
+        run: |
+          set -o pipefail
+          python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_sru_c_best_w_a_best_diagnostic.py \
+            --data SRU_data.txt \
+            --config PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_sru_rta_tcn_full.json \
+            --output "$OUTDIR/RESULT.json" \
+            2>&1 | tee "$OUTDIR/run.log"
+
+      - name: Build compact report
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          out = Path('sru_a_best_mean_diag')
+          p = out / 'RESULT.json'
+          if not p.exists():
+              (out / 'RESULT.md').write_text('# SRU best-mean A diagnostic\n\nRESULT.json was not produced. Inspect run.log.\n')
+              raise SystemExit(0)
+          r = json.loads(p.read_text())
+          lines = [
+              '# SRU v2.2 best-mean A diagnostic', '',
+              'Strict K and best-mean C are retained; W uses the current guarded selector; A chooses its minimum-mean OOF candidate only if that candidate passes the existing activation guard.', '',
+              f"- Gamma weights: `{r['gamma_ct']['weights']}`",
+              f"- W selected: `{r['W']['selected']}`; active={r['W']['active']}",
+              f"- A selected: `{r['A']['selected']}`; active={r['A']['active']}", '',
+          ]
+          sel = r['A']['audit']['selection']
+          lines += [f"- A best candidate: `{sel['best_candidate']}`; best OOF mean MSE={sel['best_mean']}", '']
+          for route, m in r['nested_routes'].items():
+              lines.append(f"- {route}: RMSE={m['rmse']:.9f}; MAE={m['mae']:.9f}; R2={m['r2']:.9f}")
+          lines += ['', f"- test_target_used_for_selection={r['test_target_used_for_selection']}"]
+          (out / 'RESULT.md').write_text('\n'.join(lines) + '\n')
+          print('\n'.join(lines))
+          PY
+
+      - name: Upload diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-v22-sru-a-best-mean-diagnostic
+          path: sru_a_best_mean_diag/
+          if-no-files-found: warn
+
+      - name: Commit compact diagnostic result
+        if: always()
+        run: |
+          if [ ! -f "$OUTDIR/RESULT.md" ]; then exit 0; fi
+          DEST="PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_sru_rta_tcn_20260830/diagnostics/a_best_mean"
+          mkdir -p "$DEST"
+          cp "$OUTDIR/RESULT.md" "$DEST/"
+          if [ -f "$OUTDIR/RESULT.json" ]; then cp "$OUTDIR/RESULT.json" "$DEST/"; fi
+          cp "$OUTDIR/upstream_sha256.txt" "$DEST/" || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$DEST"
+          if git diff --cached --quiet; then
+            echo 'No diagnostic result changes'
+          else
+            git commit -m 'diagnostic: add SRU best-mean A result'
+            git push origin HEAD:prism-v2-2-beta-debutanizer-benchmark-20260824
+          fi
