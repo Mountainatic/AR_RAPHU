@@ -1,0 +1,21 @@
+{
+  "rta_tcn_input_only": {
+    "exact_author": {
+      "train_mse": null,
+      "test_mse": null,
+      "train_rmse": null,
+      "test_rmse": null,
+      "train_r2": null,
+      "test_r2": null
+    },
+    "corrected_parser": {
+      "train_mse": null,
+      "test_mse": null,
+      "train_rmse": null,
+      "test_rmse": null,
+      "train_r2": null,
+      "test_r2": null
+    }
+  },
+  "prism_v2_2_beta_full_dynamic": null
+}
