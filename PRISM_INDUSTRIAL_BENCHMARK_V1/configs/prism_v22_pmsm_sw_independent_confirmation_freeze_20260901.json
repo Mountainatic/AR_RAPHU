@@ -1,0 +1,146 @@
+{
+  "protocol_id": "PRISM_V2_2_PMSM_SW_INDEPENDENT_CONFIRMATION_20260901_V1",
+  "status": "PRE_RESULT_TASK_AND_CONTRACT_FROZEN",
+  "freeze_date": "2026-09-01",
+  "base_commit": "8ef6517bde469dc7a25007c810e0eea68f46f3d3",
+  "confirmation_class": "INDEPENDENT_TARGET_TASK_ON_PREVIOUSLY_USED_DATASET",
+  "claim_boundary": {
+    "untouched_dataset_claim": false,
+    "untouched_registered_target_task_claim": true,
+    "reason": "The PMSM dataset and split were previously used for PMSM_PM5, but stator_winding is not a registered target in c1_tasks.json or CPU_FINAL_METRICS.csv at the freeze commit. It was previously defined only as a secondary sensor for PMSM_PM5.",
+    "purpose": "Independent confirmation that the frozen corrected C contract does not silently erase an active exogenous K path and that the nested K/Gamma, +W, +A decomposition is reproducible on a different target task."
+  },
+  "dataset": {
+    "name": "PMSM electric motor temperature",
+    "source_file": "pmsm_original/measures_v2.csv",
+    "raw_sha256": "78f3d150f0f2ad9c5dc7ff24dd12c00d386ad530f48c1589ad24fcd88867d3ad",
+    "cadence_seconds": 0.5,
+    "entity_key": "profile_id",
+    "split_protocol": "PRISM_PMSM_SPLIT_V1",
+    "split_registry_sha256": "a571e744884e58817ade9512f97cf3e89e9e18b493d9d9a49182aac21a1a9842",
+    "split_rule": "reuse existing complete-profile train/validation/test allocation unchanged",
+    "test_profile_ids": [51, 75, 60, 54, 8, 21, 2, 73, 68, 36, 20, 4]
+  },
+  "task": {
+    "task_id": "PMSM_SW",
+    "target": "stator_winding",
+    "target_semantics": "same registered future-window change construction as PMSM_PM5",
+    "horizons_seconds": [30, 300, 1200],
+    "primary_horizon_seconds": 300,
+    "window_seconds": 30,
+    "primary_endpoint": "5 min ahead, 30 s target window",
+    "secondary_endpoints": ["30 s ahead, 30 s target window", "20 min ahead, 30 s target window"],
+    "availability_delay_steps": 0,
+    "information_set": "dynamic_record_time",
+    "historical_target_rule": "only already observed stator_winding values at t-1 or older, subject to maturity",
+    "future_inputs": false
+  },
+  "input_contract": {
+    "primary_inputs": ["ambient", "coolant", "u_d", "u_q", "i_d", "i_q", "motor_speed", "torque"],
+    "forbidden_primary_proxy_inputs": ["pm", "stator_tooth", "stator_yoke", "stator_winding"],
+    "temperature_proxy_secondary_view_before_primary_lockbox": false,
+    "reason": "Prevent same-family temperature proxies from making the confirmation trivially easy and preserve the existing PMSM_PM5 primary process-input semantics."
+  },
+  "selection_and_lockbox": {
+    "loss": "mse",
+    "inner_fold_rule": "existing grouped complete-entity inner_folds semantics",
+    "inner_folds": 4,
+    "train_and_validation_only_for_all_selection": true,
+    "test_target_used_for_selection": false,
+    "test_metric_access_before_final_freeze": false,
+    "report_all_registered_horizons": true,
+    "primary_endpoint_fixed_before_results": true,
+    "no_result_dependent_horizon_selection": true
+  },
+  "K_E_contract": {
+    "inherit_source": "configs/cpu_model_freeze_v1.json@8ef6517bde469dc7a25007c810e0eea68f46f3d3",
+    "inherit_sections": ["selection", "c4"],
+    "profile_generator": "src/prism_benchmark/c4_prism.py::channel_profiles at base_commit",
+    "channel_classification": {
+      "ambient": "SLOW",
+      "coolant": "SLOW",
+      "u_d": "FAST",
+      "u_q": "FAST",
+      "i_d": "FAST",
+      "i_q": "FAST",
+      "motor_speed": "FAST",
+      "torque": "FAST"
+    },
+    "new_K_thresholds": false,
+    "new_K_candidate_families": false
+  },
+  "temporal_representation": {
+    "D": "inherit discrete multiresolution K profile generation from frozen c4 contract",
+    "CT_basis_inherit_source": "configs/prism_v2_2_beta_ct_freeze.json@8ef6517bde469dc7a25007c810e0eea68f46f3d3",
+    "CT_tau_seconds": [10, 30, 60, 120, 300, 600, 1200, 2400, 4800, 7200],
+    "CT_discretization": "exact_zero_order_hold",
+    "M": "adjacent_scale_increments",
+    "S": "absolute_stable_CT_states",
+    "S_condition_number_hard_fail": 100000000.0,
+    "CT_state_reset": "each_profile_id_start",
+    "learned_time_constants": false
+  },
+  "C_contract": {
+    "correction_id": "PRISM_V2_2_SRU_C_CONTRACT_CORRECTION_20260831_V1",
+    "inherit_source": "configs/prism_v22_sru_rta_tcn_full_c_restored.json@8ef6517bde469dc7a25007c810e0eea68f46f3d3",
+    "candidate_scope": ["ADDITIVE_COMPRESSED", "BEST_ACTIVE_K_CHANNEL_FALLBACK"],
+    "ridge_semantics": "NUMERICAL_STABILIZATION_ONLY",
+    "ridge_selection": "SMALLEST_STABLE_RIDGE",
+    "ridge_alpha_grid": [1e-8, 2.848035868435799e-7, 8.111308307896873e-6, 0.0002310129700083158, 0.006579332246575682, 0.18738174228603832, 5.336699231206313, 151.99110829529332, 4328.7612810830615, 123284.67394420659, 3511191.7342151273, 100000000.0],
+    "input_path_gate_split": "inner_oof_only",
+    "input_path_min_variance_ratio": 1e-8,
+    "input_path_min_fraction_of_best_active_k_variance_ratio": 0.10,
+    "input_path_max_mse_ratio_vs_best_active_k": 1.02,
+    "input_path_min_nonintercept_coefficient_abs": 1e-10,
+    "fallback_on_gate_failure": "BEST_ACTIVE_K_CHANNEL",
+    "silent_active_k_erasure_forbidden": true,
+    "new_C_thresholds": false
+  },
+  "Gamma_CT_contract": {
+    "ridge": 0.001,
+    "constraint": "nonnegative_simplex",
+    "anchor": "persistence_zero_registered_change",
+    "final_test_target_access_for_weights": false
+  },
+  "W_contract": {
+    "inherit_source": "configs/prism_v22_sru_rta_tcn_full_c_restored.json@8ef6517bde469dc7a25007c810e0eea68f46f3d3",
+    "candidates": ["IDENTITY_CORRECTION", "MONOTONE_I_SPLINE_CORRECTION", "NATURAL_CUBIC_CORRECTION"],
+    "monotone_knots": [4, 6],
+    "natural_cubic_knots": [4, 6, 8],
+    "smoothness": [0.0, 0.0001, 0.001, 0.01, 0.1, 1.0],
+    "soft_overlap_mu": [0.0, 0.03, 0.3, 3.0, 30.0],
+    "identity_neutral": true,
+    "minimum_distinct_latent_values": 20,
+    "minimum_rank": 2,
+    "new_W_thresholds": false
+  },
+  "A_contract": {
+    "candidate_families": ["EXACT_ZERO", "MATURE_RESIDUAL_AR"],
+    "state_profile_generator": "src/prism_benchmark/cpu_data.py::realized_state_profiles at base_commit",
+    "for_primary_head_h600_w60_realized_profiles": [[15,1200],[15,2400],[15,4800],[30,1200],[30,2400],[30,4800],[60,1200],[60,2400],[60,4800],[120,1200],[120,2400],[120,4800]],
+    "ridge_alpha_grid": [1e-8, 2.848035868435799e-7, 8.111308307896873e-6, 0.0002310129700083158, 0.006579332246575682, 0.18738174228603832, 5.336699231206313, 151.99110829529332, 4328.7612810830615, 123284.67394420659, 3511191.7342151273, 100000000.0],
+    "maturity_rule": "s_plus_h_plus_W_le_t",
+    "exact_zero_neutral": true,
+    "new_A_thresholds": false
+  },
+  "reporting": {
+    "required_nested_routes": ["PERSISTENCE", "K_GAMMA", "K_GAMMA_W", "K_GAMMA_W_A"],
+    "required_metrics": ["MSE", "RMSE", "MAE", "R2"],
+    "required_structure_audit": ["active_K_channels", "C_family", "C_fallback", "Gamma_weights", "W_selected", "W_active", "A_selected", "A_active", "test_target_used_for_selection"],
+    "required_mse_reduction_decomposition": true,
+    "negative_or_null_confirmation_outcomes_must_be_reported": true,
+    "no_post_result_threshold_or_candidate_changes": true
+  },
+  "confirmatory_questions": [
+    "When at least one K channel is active on train-only selection evidence, does corrected C preserve a non-degenerate input path or use the frozen BEST_ACTIVE_K fallback instead of deleting the temporal branch?",
+    "Does W remain applicable when its frozen support requirements are met, without being forced active?",
+    "What fraction of persistence-to-KWA MSE reduction is attributable to K/Gamma, W, and A on the fixed primary endpoint?",
+    "Do the same structural conclusions remain qualitatively consistent on the two pre-registered secondary horizons?"
+  ],
+  "implementation_gate": {
+    "runner_not_yet_executed_at_freeze": true,
+    "test_lockbox_access_forbidden_until_runner_audit_passes": true,
+    "allowed_pre_lockbox_changes": "semantics-preserving implementation fixes only; no threshold, candidate-universe, target, input, split, horizon, or primary-endpoint changes",
+    "any_pre_lockbox_implementation_fix_must_be_committed_and_audited_before_test_access": true
+  }
+}
