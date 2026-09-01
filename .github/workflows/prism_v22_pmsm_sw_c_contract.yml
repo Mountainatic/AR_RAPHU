@@ -8,7 +8,10 @@ on:
     paths:
       - '.github/workflows/prism_v22_pmsm_sw_c_contract.yml'
       - 'PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/pmsm_sw_c_contract.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/pmsm_sw_c_audit.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_pmsm_sw_c_audit.py'
       - 'PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_pmsm_sw_c_contract.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_pmsm_sw_c_audit_contract.py'
       - 'PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_implementation_semantics_freeze_20260901.json'
       - 'PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/v211_support.py'
       - 'PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/v211_selection.py'
@@ -34,12 +37,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install numpy pandas pyarrow pyreadr scipy pytest
 
-      - name: Compile corrected-C contract helper
+      - name: Compile corrected-C implementation
         run: |
-          python -m py_compile PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/pmsm_sw_c_contract.py
+          python -m py_compile \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/pmsm_sw_c_contract.py \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/pmsm_sw_c_audit.py \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_pmsm_sw_c_audit.py
 
       - name: Run corrected-C contract tests
         run: |
           pytest -q \
             PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_native_support.py \
-            PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_pmsm_sw_c_contract.py
+            PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_pmsm_sw_c_contract.py \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_pmsm_sw_c_audit_contract.py
