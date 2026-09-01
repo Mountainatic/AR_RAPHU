@@ -1,0 +1,176 @@
+name: PRISM v2.2 PMSM SW D-only FAST-SLOW implementation smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - prism-v2-2-independent-confirmation-pmsm-20260901
+    paths:
+      - '.github/workflows/prism_v22_pmsm_sw_d_smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  d-fast-slow-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      WORKDIR: pmsm_sw_d_smoke_work
+      KAGGLEHUB_CACHE: ${{ github.workspace }}/.kagglehub
+
+    steps:
+      - name: Checkout confirmation branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install frozen-run dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas pyarrow pyreadr scipy pytest kagglehub
+
+      - name: Reconfirm D preregistration contract before first target fit
+        run: |
+          pytest -q \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_native_support.py \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_pmsm_sw_d_audit_contract.py
+
+      - name: Download exact public PMSM source
+        run: |
+          mkdir -p "$WORKDIR"
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          import kagglehub
+
+          freeze = json.loads(Path('PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_independent_confirmation_freeze_20260901.json').read_text())
+          root = Path(kagglehub.dataset_download('wkirgsn/electric-motor-temperature'))
+          matches = list(root.rglob('measures_v2.csv'))
+          if len(matches) != 1:
+              raise SystemExit(f'expected one measures_v2.csv, found {matches}')
+          path = matches[0]
+          h = hashlib.sha256()
+          with path.open('rb') as handle:
+              for block in iter(lambda: handle.read(1024 * 1024), b''):
+                  h.update(block)
+          actual = h.hexdigest()
+          if actual != freeze['dataset']['raw_sha256']:
+              raise SystemExit(f'raw SHA mismatch: {actual}')
+          Path('pmsm_sw_d_smoke_work/full_data_path.txt').write_text(str(path.resolve()) + '\n')
+          print({'source_sha256': actual, 'bytes': path.stat().st_size})
+          PY
+
+      - name: Physically strip registered test profiles before target parsing
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          src = Path(Path('pmsm_sw_d_smoke_work/full_data_path.txt').read_text().strip())
+          dst = Path('pmsm_sw_d_smoke_work/measures_v2_trainval.csv')
+          split = json.loads(Path('PRISM_INDUSTRIAL_BENCHMARK_V1/dataset_registry/pmsm/SPLIT_REGISTRY.json').read_text())
+          allowed = set(map(int, split['train_profile_ids'])) | set(map(int, split['validation_profile_ids']))
+          forbidden = set(map(int, split['test_profile_ids']))
+          kept = skipped = 0
+          with src.open('r', encoding='utf-8', newline='') as source, dst.open('w', encoding='utf-8', newline='') as target:
+              header = source.readline()
+              columns = header.rstrip('\r\n').split(',')
+              if not columns or columns[-1] != 'profile_id':
+                  raise SystemExit(f'profile_id must be final column for byte-line filter: {columns}')
+              target.write(header)
+              for line in source:
+                  profile = int(line.rstrip('\r\n').rsplit(',', 1)[1])
+                  if profile in forbidden:
+                      skipped += 1
+                      continue
+                  if profile not in allowed:
+                      raise SystemExit(f'unregistered profile {profile}')
+                  target.write(line)
+                  kept += 1
+          if kept != 1090177 or skipped != 240639:
+              raise SystemExit(f'unexpected physical filter counts: kept={kept} skipped={skipped}')
+          Path('pmsm_sw_d_smoke_work/FILTER_AUDIT.json').write_text(json.dumps({
+              'status': 'PASS',
+              'full_source_rows': kept + skipped,
+              'development_rows_written': kept,
+              'registered_test_rows_physically_removed': skipped,
+              'test_target_values_numerically_parsed_during_filter': False,
+          }, indent=2) + '\n')
+          PY
+
+      - name: Build immutable train-validation shared data
+        run: |
+          python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/build_prism_v22_pmsm_sw_trainval.py \
+            --data "$WORKDIR/measures_v2_trainval.csv" \
+            --task-config PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_task_20260901.json \
+            --freeze PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_independent_confirmation_freeze_20260901.json \
+            --split-registry PRISM_INDUSTRIAL_BENCHMARK_V1/dataset_registry/pmsm/SPLIT_REGISTRY.json \
+            --output "$WORKDIR/shared"
+
+      - name: Assert lockbox immediately before D fit
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('pmsm_sw_d_smoke_work/shared')
+          lockbox = json.loads((root / 'LOCKBOX.json').read_text())
+          manifest = json.loads((root / 'BUILD_MANIFEST.json').read_text())
+          assert lockbox['test_profiles_physically_absent'] is True
+          assert lockbox['test_target_rows_materialized'] is False
+          assert manifest['test_profile_count_present'] == 0
+          assert manifest['test_target_rows_materialized'] == 0
+          assert manifest['test_metrics_computed'] is False
+          assert not (root / 'base_data/pmsm/test.parquet').exists()
+          assert not list((root / 'sample_ids').rglob('test.parquet'))
+          print('PASS: pre-fit test lockbox intact')
+          PY
+
+      - name: Run frozen D-only representative SLOW and FAST channels
+        run: |
+          python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_pmsm_sw_d_audit.py \
+            --shared "$WORKDIR/shared" \
+            --output "$WORKDIR/d_audit" \
+            --channels ambient motor_speed
+
+      - name: Audit smoke evidence boundaries
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('pmsm_sw_d_smoke_work/d_audit')
+          summary_path = root / 'D_ONLY_SUMMARY.json'
+          if not summary_path.exists():
+              raise SystemExit('D_ONLY_SUMMARY.json missing')
+          summary = json.loads(summary_path.read_text())
+          if summary.get('channels') != ['ambient', 'motor_speed']:
+              raise SystemExit(summary)
+          if summary.get('all_registered_channels_run') is not False:
+              raise SystemExit('smoke must not claim all-channel audit')
+          if summary.get('validation_used_for_selection') is not False:
+              raise SystemExit('validation selection leakage flag')
+          if summary.get('test_accessed') is not False:
+              raise SystemExit('test access flag')
+          for item in summary.get('results', []):
+              if item.get('channel') not in {'ambient', 'motor_speed'}:
+                  raise SystemExit(item)
+          print(json.dumps(summary, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload small implementation-audit evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-v22-pmsm-sw-d-fast-slow-smoke
+          path: |
+            pmsm_sw_d_smoke_work/FILTER_AUDIT.json
+            pmsm_sw_d_smoke_work/shared/BUILD_MANIFEST.json
+            pmsm_sw_d_smoke_work/shared/LOCKBOX.json
+            pmsm_sw_d_smoke_work/d_audit/D_ONLY_SUMMARY.json
+            pmsm_sw_d_smoke_work/d_audit/D_ONLY/PMSM_SW__H600__W60/proxy_excluded/ambient/RESULT.json
+            pmsm_sw_d_smoke_work/d_audit/D_ONLY/PMSM_SW__H600__W60/proxy_excluded/motor_speed/RESULT.json
+          if-no-files-found: warn
