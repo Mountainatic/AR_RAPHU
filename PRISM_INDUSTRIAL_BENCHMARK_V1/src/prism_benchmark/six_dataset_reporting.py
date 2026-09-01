@@ -277,6 +277,14 @@ def _support_records(
     return result
 
 
+def frozen_support_records(
+    run_root: Path,
+) -> dict[tuple[str, str, str, str, str, str], Mapping[str, Any]]:
+    """Return the immutable extension support registry for reporting tools."""
+
+    return _support_records(run_root)
+
+
 def _shared_for(
     run_root: Path,
     public_root: Path,
@@ -352,6 +360,19 @@ def _allowed_support(
             f"{expected_hash} != {observed_hash}"
         )
     return allowed, observed_hash, len(common)
+
+
+def allowed_support_for_prediction(
+    run_root: Path,
+    public_root: Path,
+    spec: PredictionSpec,
+    records: Mapping[
+        tuple[str, str, str, str, str, str], Mapping[str, Any]
+    ],
+) -> tuple[set[str], str, int]:
+    """Resolve and verify a prediction's frozen leaderboard support."""
+
+    return _allowed_support(run_root, public_root, spec, records)
 
 
 def _prediction_columns(path: Path) -> list[str]:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Collection
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +15,12 @@ from prism_benchmark.level_reconstruction import (
     metric_bundle_delta_and_level,
     support_hash,
 )
-from prism_benchmark.six_dataset_reporting import PredictionSpec, prediction_specs
+from prism_benchmark.six_dataset_reporting import (
+    PredictionSpec,
+    allowed_support_for_prediction,
+    frozen_support_records,
+    prediction_specs,
+)
 from prism_benchmark.stage0 import write_json
 
 
@@ -95,14 +101,66 @@ def _current_levels(
     )
 
 
+def _selected(
+    spec: PredictionSpec,
+    *,
+    scopes: Collection[str] | None,
+    splits: Collection[str] | None,
+    models: Collection[str] | None,
+    target_heads: Collection[str] | None,
+) -> bool:
+    return all(
+        (
+            scopes is None or spec.scope in scopes,
+            splits is None or spec.split in splits,
+            models is None or spec.model in models,
+            target_heads is None or spec.target_head in target_heads,
+        )
+    )
+
+
 def collect_level_r2(
     run_root: Path,
     public_root: Path,
+    *,
+    common_support_only: bool = False,
+    scopes: Collection[str] | None = None,
+    splits: Collection[str] | None = None,
+    models: Collection[str] | None = None,
+    target_heads: Collection[str] | None = None,
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    specs = prediction_specs(run_root, public_root=public_root)
+    specs = [
+        spec
+        for spec in prediction_specs(run_root, public_root=public_root)
+        if _selected(
+            spec,
+            scopes=scopes,
+            splits=splits,
+            models=models,
+            target_heads=target_heads,
+        )
+    ]
+    support_records = frozen_support_records(run_root) if common_support_only else {}
     for spec in specs:
         prediction = _prediction(spec)
+        frozen_hash = ""
+        frozen_rows = 0
+        if common_support_only:
+            allowed, frozen_hash, frozen_rows = allowed_support_for_prediction(
+                run_root,
+                public_root,
+                spec,
+                support_records,
+            )
+            prediction = prediction.loc[
+                prediction["sample_id"].astype(str).isin(allowed)
+            ].copy()
+            if len(prediction) != frozen_rows:
+                raise RuntimeError(
+                    "prediction does not completely cover frozen common support: "
+                    f"{spec.path}: {len(prediction)} != {frozen_rows}"
+                )
         if prediction.empty:
             continue
         shared = _shared_root(run_root, public_root, spec)
@@ -118,6 +176,7 @@ def collect_level_r2(
             current,
         )
         sample_ids = joined["sample_id"].astype(str).tolist()
+        observed_support_hash = frozen_hash or support_hash(sample_ids)
         rows.append(
             {
                 "scope": spec.scope,
@@ -130,7 +189,9 @@ def collect_level_r2(
                 "split": spec.split,
                 "model": spec.model,
                 "rows": int(len(joined)),
-                "sample_support_hash": support_hash(sample_ids),
+                "sample_support_hash": observed_support_hash,
+                "frozen_common_support": common_support_only,
+                "frozen_common_support_rows": frozen_rows or int(len(joined)),
                 "prediction_path": str(spec.path),
                 "prediction_sha256": sha256_file(spec.path),
                 "model_retrained": False,
@@ -161,6 +222,7 @@ def collect_level_r2(
     audit = {
         "status": "PASS",
         "reporting_only": True,
+        "frozen_common_support": common_support_only,
         "model_retrained": False,
         "model_reselected": False,
         "test_rerun": False,
@@ -172,15 +234,50 @@ def collect_level_r2(
     return frame.reset_index(drop=True), audit
 
 
-def write_level_r2_outputs(run_root: Path, public_root: Path) -> dict[str, Any]:
-    final = run_root / "final"
+def write_level_r2_outputs(
+    run_root: Path,
+    public_root: Path,
+    *,
+    output_root: Path | None = None,
+    common_support_only: bool = False,
+    scopes: Collection[str] | None = None,
+    splits: Collection[str] | None = None,
+    models: Collection[str] | None = None,
+    target_heads: Collection[str] | None = None,
+) -> dict[str, Any]:
+    final = run_root / "final" if output_root is None else output_root
     final.mkdir(parents=True, exist_ok=True)
-    frame, audit = collect_level_r2(run_root, public_root)
+    frame, audit = collect_level_r2(
+        run_root,
+        public_root,
+        common_support_only=common_support_only,
+        scopes=scopes,
+        splits=splits,
+        models=models,
+        target_heads=target_heads,
+    )
     path = final / "SIX_DATASET_LEVEL_R2_METRICS.csv"
     frame.to_csv(path, index=False)
     frame.to_csv(final / "PUBLIC_ALL_LEVEL_R2_METRICS.csv", index=False)
+    grouping = [
+        "scope",
+        "direction",
+        "dataset",
+        "target_head",
+        "information_set",
+        "availability_scenario",
+        "proxy_policy",
+        "split",
+    ]
+    best = frame.loc[
+        frame.groupby(grouping, dropna=False)["r2_level_reconstructed"].idxmax()
+    ].sort_values(grouping)
+    best_path = final / "SIX_DATASET_LEVEL_R2_BEST_BY_VIEW.csv"
+    best.to_csv(best_path, index=False)
     audit["metrics_path"] = str(path)
     audit["metrics_sha256"] = sha256_file(path)
+    audit["best_by_view_path"] = str(best_path)
+    audit["best_by_view_sha256"] = sha256_file(best_path)
     write_json(final / "LEVEL_R2_RECONSTRUCTION_AUDIT.json", audit)
     return audit
 
@@ -191,5 +288,24 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--run-root", type=Path, required=True)
     parser.add_argument("--public-root", type=Path, required=True)
+    parser.add_argument("--output-root", type=Path)
+    parser.add_argument("--common-support-only", action="store_true")
+    parser.add_argument("--scope", action="append", dest="scopes")
+    parser.add_argument("--split", action="append", dest="splits")
+    parser.add_argument("--model", action="append", dest="models")
+    parser.add_argument("--target-head", action="append", dest="target_heads")
     args = parser.parse_args()
-    print(json.dumps(write_level_r2_outputs(args.run_root, args.public_root)))
+    print(
+        json.dumps(
+            write_level_r2_outputs(
+                args.run_root,
+                args.public_root,
+                output_root=args.output_root,
+                common_support_only=args.common_support_only,
+                scopes=args.scopes,
+                splits=args.splits,
+                models=args.models,
+                target_heads=args.target_heads,
+            )
+        )
+    )
