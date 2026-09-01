@@ -1,0 +1,199 @@
+{
+  "freeze_id": "PRISM_V2_2_PMSM_SW_IMPLEMENTATION_SEMANTICS_FREEZE_20260901_V1",
+  "status": "PRE_MODEL_FIT_IMPLEMENTATION_SEMANTICS_FROZEN",
+  "confirmation_protocol_id": "PRISM_V2_2_PMSM_SW_INDEPENDENT_CONFIRMATION_20260901_V1",
+  "model_target_results_seen_before_this_freeze": false,
+  "test_target_access_before_this_freeze": false,
+  "scope": "Define the non-result-dependent mapping from the already-frozen v2.1.1 C4 K route and the already-frozen v2.2 CT adapter to the new PMSM_SW task. No target, input, split, horizon, candidate-family, threshold, penalty, or test-access rule is changed.",
+  "selection_partition": {
+    "structural_selection": "registered train profiles only",
+    "validation_role": "development holdout evaluation only; never used to choose K/C/Gamma/W/A candidates or thresholds",
+    "test_role": "physically absent until a later final confirmatory unlock",
+    "train_profile_order": "canonical entity order used by grouped_folds: numeric strings sorted by (len,string)",
+    "inner_fold_count": 4,
+    "fold_realization": "five complete-profile chunks; fold j fits chunks 0..j and evaluates chunk j+1",
+    "loss": "mse",
+    "minimum_usable_folds": 3,
+    "minimum_relative_improvement": 0.01,
+    "minimum_positive_fold_fraction": 0.75,
+    "row_caps": {
+      "D_C4_fit_row_cap": 100000,
+      "D_C4_selection_validation_row_cap": 30000,
+      "subsample_rule": "smallest_sha256_of_base_origin_id_within_training_fold",
+      "M_S_fit_row_cap": 100000,
+      "M_S_selection_validation_row_cap": 30000,
+      "prediction_row_policy": "all_legal_rows"
+    }
+  },
+  "sample_support": {
+    "contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+    "rule": "Every candidate is evaluated only where origin-history_steps >= causal_history_floor and the registered target window remains inside the same profile.",
+    "profile_boundary_backfill": false,
+    "unsupported_candidate_fold_value": "NaN/unavailable, never zero-imputed",
+    "candidate_universe_may_not_be_reduced_due_to_support": true,
+    "pre_fit_support_audit": "PRISM_V2_2_PMSM_SW_NATIVE_SUPPORT_AUDIT_20260901_V1"
+  },
+  "D_branch": {
+    "semantic_role": "parent-stable discrete/history response route",
+    "inherit_source": "configs/cpu_model_freeze_v1.json::c4",
+    "channel_classes": {
+      "ambient": "SLOW",
+      "coolant": "SLOW",
+      "u_d": "FAST",
+      "u_q": "FAST",
+      "i_d": "FAST",
+      "i_q": "FAST",
+      "motor_speed": "FAST",
+      "torque": "FAST"
+    },
+    "delta_ratio_by_class": {
+      "FAST": [1, 2, 4, 8],
+      "SLOW": [4, 8, 16, 32, 64]
+    },
+    "history_for_positive_h": [2, 4, 8],
+    "lag_basis": {
+      "family": "causal_piecewise_constant_block_average",
+      "near_to_far_growth": "geometric_ratio_2",
+      "candidate_m_tau": [4, 8, 12]
+    },
+    "amplitude_basis": {
+      "family": "centered_natural_cubic_b_spline",
+      "knot_rule": "outer_train_empirical_quantiles_with_duplicate_removal",
+      "candidate_m_x": [4, 6, 8],
+      "linear_column_exact": true
+    },
+    "rank_candidates": [0, 1, 2, 3, 4],
+    "complexity_ladder": ["exact_zero", "linear", "rank_1", "rank_2", "rank_3", "rank_4", "full"],
+    "selection_order": "linear_profile_then_full_resolution_then_rank_ladder_then_sequential_penalties",
+    "penalties": {
+      "lambda_0": [0.0, 1e-6, 1e-4, 1e-2, 1.0],
+      "lambda_tau": [0.0, 1e-4, 1e-3, 1e-2],
+      "lambda_x": [0.0, 1e-4, 1e-3, 1e-2],
+      "pilot": [1e-4, 1e-3, 1e-3],
+      "selection": "sequential_validation_only_lambda0_then_lambda_tau_then_lambda_x_on_train_inner_folds"
+    },
+    "channel_candidate_gate": {
+      "validation_improvement_vs_zero_min": 0.01,
+      "exact_zero_is_formal_candidate": true,
+      "maximum_profiles_retained_per_channel": 2
+    },
+    "solver": {
+      "dtype": "float64",
+      "direct_order": ["cholesky", "pivoted_qr", "svd_rescue"],
+      "als_initializations": 3,
+      "als_max_iterations": 100,
+      "als_relative_tolerance": 1e-8,
+      "fixed_support_refit": true
+    }
+  },
+  "CT_state_contract": {
+    "inherit_source": "configs/prism_v2_2_beta_ct_freeze.json",
+    "taus_seconds": [10, 30, 60, 120, 300, 600, 1200, 2400, 4800, 7200],
+    "cadence_seconds": 0.5,
+    "discretization": "exact_zero_order_hold",
+    "state_reset": "each_profile_id_start",
+    "initial_state": "first_observed_input_value_of_profile",
+    "learned_time_constants": false,
+    "M_definition": "M0 = x - S(tau0); Mk = S(tau[k-1]) - S(tau[k]) for k=1..9",
+    "S_definition": "absolute stable CT states S(tau0..tau9)",
+    "M_dimension_per_channel": 10,
+    "S_dimension_per_channel": 10,
+    "S_condition_number_hard_fail": 100000000.0,
+    "S_conditioning_fit_partition": "train only"
+  },
+  "M_S_K_contract": {
+    "semantic_role": "Reuse the already-run v2.2 SRU CT-adapter K family on the fixed CT scale coordinate; no PMSM-specific K family is introduced.",
+    "inherit_source": "configs/prism_v22_sru_rta_tcn_full_c_restored.json::K",
+    "temporal_coordinate": "fixed 10-dimensional CT scale vector instead of a newly selected lag basis",
+    "candidate_families": ["EXACT_ZERO", "LINEAR_DISTRIBUTED_LAG", "RANK_1", "RANK_2", "RANK_3", "FULL_FINITE_URYSOHN"],
+    "candidate_m_x": [4, 6, 8],
+    "linear_m_x": 1,
+    "penalties": {
+      "lambda_0": 0.0001,
+      "lambda_tau": 0.001,
+      "lambda_x": 0.001
+    },
+    "als_seeds": [20260804, 20260805, 20260806],
+    "als_max_iterations": 100,
+    "als_tolerance": 1e-8,
+    "als_max_increases": 5,
+    "als_divergence_factor": 1000000.0,
+    "exact_zero_neutral": true,
+    "candidate_selection": "guarded local one-SE on four grouped train folds",
+    "no_m_tau_search": true,
+    "reason_no_m_tau_search": "CT scale locations are physically frozen by tau_seconds and are not a tunable lag discretization."
+  },
+  "C_contract": {
+    "inherit_source": "PRISM_V2_2_SRU_C_CONTRACT_CORRECTION_20260831_V1",
+    "candidate_scope": ["ADDITIVE_COMPRESSED", "BEST_ACTIVE_K_CHANNEL_FALLBACK"],
+    "ridge_semantics": "NUMERICAL_STABILIZATION_ONLY",
+    "ridge_selection": "SMALLEST_STABLE_RIDGE",
+    "ridge_alpha_grid": [1e-8, 2.848035868435799e-7, 8.111308307896873e-6, 0.0002310129700083158, 0.006579332246575682, 0.18738174228603832, 5.336699231206313, 151.99110829529332, 4328.7612810830615, 123284.67394420659, 3511191.7342151273, 100000000.0],
+    "input_path_gate": {
+      "split": "train_inner_oof_only",
+      "minimum_variance_ratio_to_target": 1e-8,
+      "minimum_fraction_of_best_active_k_variance_ratio": 0.10,
+      "maximum_mse_ratio_vs_best_active_k": 1.02,
+      "minimum_nonintercept_coefficient_abs": 1e-10
+    },
+    "fallback_on_gate_failure": "BEST_ACTIVE_K_CHANNEL",
+    "silent_active_k_erasure_forbidden": true
+  },
+  "Gamma_CT_contract": {
+    "ridge": 0.001,
+    "constraint": "nonnegative_simplex",
+    "anchor": "registered_change_persistence_zero",
+    "fit_rows": "pooled train-only OOF D/M/S branch predictions",
+    "fit_target": "registered future-window change y_true",
+    "validation_target_access_for_weights": false,
+    "test_target_access_for_weights": false
+  },
+  "W_contract": {
+    "inherit_source": "configs/prism_v22_sru_rta_tcn_full_c_restored.json::W",
+    "fit_and_select_rows": "train-only Gamma OOF rows",
+    "folds": "complete-profile OOF fold ids; evaluate folds 1..3 using earlier OOF folds as fit rows",
+    "candidates": ["IDENTITY_CORRECTION", "MONOTONE_I_SPLINE_CORRECTION", "NATURAL_CUBIC_CORRECTION"],
+    "monotone_knots": [4, 6],
+    "natural_cubic_knots": [4, 6, 8],
+    "smoothness": [0.0, 0.0001, 0.001, 0.01, 0.1, 1.0],
+    "soft_overlap_mu": [0.0, 0.03, 0.3, 3.0, 30.0],
+    "identity_neutral": true,
+    "monotone_gate": {
+      "minimum_absolute_median_fold_spearman": 0.05,
+      "minimum_same_sign_fold_fraction": 0.75
+    },
+    "minimum_distinct_latent_values": 20,
+    "minimum_rank": 2,
+    "validation_target_access_for_selection": false
+  },
+  "A_contract": {
+    "candidates": ["EXACT_ZERO", "MATURE_RESIDUAL_AR"],
+    "state_profiles": "per-head profiles generated by cpu_data.realized_state_profiles from the frozen c3 rule",
+    "primary_h600_w60_profiles": [[15,1200],[15,2400],[15,4800],[30,1200],[30,2400],[30,4800],[60,1200],[60,2400],[60,4800],[120,1200],[120,2400],[120,4800]],
+    "ridge_alpha_grid": [1e-8, 2.848035868435799e-7, 8.111308307896873e-6, 0.0002310129700083158, 0.006579332246575682, 0.18738174228603832, 5.336699231206313, 151.99110829529332, 4328.7612810830615, 123284.67394420659, 3511191.7342151273, 100000000.0],
+    "soft_overlap_mu": [0.0, 0.03, 0.3, 3.0, 30.0],
+    "maximum_lags": 64,
+    "maturity_rule": "residual_origin_s is available at current origin_t only if s + h_steps + w_steps <= t",
+    "entity_boundary_crossing": false,
+    "selection_rows": "train-only W-corrected OOF residuals",
+    "selection_folds": "complete-profile OOF folds 1..3",
+    "exact_zero_neutral": true,
+    "validation_online_history_rule": "Validation target values may enter only as matured historical residuals for later validation origins under the same record-time maturity rule; they are never used for candidate or hyperparameter selection.",
+    "validation_target_used_for_model_selection": false
+  },
+  "final_train_validation_audit": {
+    "selection": "all K/C/Gamma/W/A choices made using train profiles only",
+    "refit": "selected K/C structures may refit on all train rows with their native support; Gamma/W/A remain fitted from train OOF evidence according to their contracts",
+    "evaluation": "report validation PERSISTENCE, K_GAMMA, K_GAMMA_W, K_GAMMA_W_A metrics and structural audit",
+    "metric_space": "registered future-window change",
+    "persistence_prediction_in_metric_space": 0.0,
+    "required_validation_metrics": ["MSE", "RMSE", "MAE", "R2"],
+    "required_all_horizons_before_test_unlock": true,
+    "test_profiles_physically_absent": true
+  },
+  "change_control": {
+    "allowed_before_validation_run": "semantics-preserving code fixes only",
+    "forbidden": ["target change", "input change", "split change", "horizon change", "candidate universe change", "threshold change", "penalty change", "validation-driven selection rule change", "test access"],
+    "any_code_fix_must_be_committed_before rerun": true
+  }
+}
