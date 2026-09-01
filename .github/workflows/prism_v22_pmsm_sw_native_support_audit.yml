@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
@@ -41,6 +41,7 @@ jobs:
           path: support_out/NATIVE_SUPPORT_AUDIT.json
       - name: Commit audit evidence
         run: |
+          BRANCH=prism-v2-2-independent-confirmation-pmsm-20260901
           DEST=PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_pmsm_sw_confirmation_20260901/pre_lockbox
           mkdir -p "$DEST"
           cp support_out/NATIVE_SUPPORT_AUDIT.json "$DEST/NATIVE_SUPPORT_AUDIT.json"
@@ -49,5 +50,6 @@ jobs:
           git add "$DEST/NATIVE_SUPPORT_AUDIT.json"
           if ! git diff --cached --quiet; then
             git commit -m 'audit: record PMSM SW native-support evidence'
-            git push origin HEAD:prism-v2-2-independent-confirmation-pmsm-20260901
+            git pull --rebase origin "$BRANCH"
+            git push origin HEAD:"$BRANCH"
           fi
