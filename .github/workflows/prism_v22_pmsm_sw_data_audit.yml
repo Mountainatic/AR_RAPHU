@@ -1,0 +1,84 @@
+name: PRISM v2.2 PMSM SW pre-lockbox data audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - prism-v2-2-independent-confirmation-pmsm-20260901
+    paths:
+      - '.github/workflows/prism_v22_pmsm_sw_data_audit.yml'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/audit_prism_v22_pmsm_sw_confirmation_data.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_independent_confirmation_freeze_20260901.json'
+
+permissions:
+  contents: write
+
+jobs:
+  zero-target-value-data-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OUTDIR: pmsm_sw_data_audit
+      KAGGLEHUB_CACHE: ${{ github.workspace }}/.kagglehub
+
+    steps:
+      - name: Checkout confirmation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas kagglehub
+
+      - name: Download public PMSM dataset
+        run: |
+          mkdir -p "$OUTDIR"
+          python - <<'PY'
+          import kagglehub
+          from pathlib import Path
+
+          root = Path(kagglehub.dataset_download("wkirgsn/electric-motor-temperature"))
+          matches = list(root.rglob("measures_v2.csv"))
+          if len(matches) != 1:
+              raise SystemExit(f"expected one measures_v2.csv under {root}, found {matches}")
+          Path("pmsm_sw_data_audit/data_path.txt").write_text(str(matches[0].resolve()) + "\n")
+          print(matches[0])
+          PY
+
+      - name: Run zero-target-value schema split and hash audit
+        run: |
+          DATA_PATH="$(cat "$OUTDIR/data_path.txt")"
+          python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/audit_prism_v22_pmsm_sw_confirmation_data.py \
+            --data "$DATA_PATH" \
+            --freeze PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_independent_confirmation_freeze_20260901.json \
+            --split-registry PRISM_INDUSTRIAL_BENCHMARK_V1/dataset_registry/pmsm/SPLIT_REGISTRY.json \
+            --c1-tasks PRISM_INDUSTRIAL_BENCHMARK_V1/configs/c1_tasks.json \
+            --output "$OUTDIR/AUDIT.json"
+
+      - name: Upload pre-lockbox audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-v22-pmsm-sw-pre-lockbox-data-audit
+          path: pmsm_sw_data_audit/AUDIT.json
+          if-no-files-found: error
+
+      - name: Commit audit evidence
+        run: |
+          mkdir -p PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_pmsm_sw_confirmation_20260901/pre_lockbox
+          cp "$OUTDIR/AUDIT.json" PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_pmsm_sw_confirmation_20260901/pre_lockbox/DATA_AUDIT.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_pmsm_sw_confirmation_20260901/pre_lockbox/DATA_AUDIT.json
+          if git diff --cached --quiet; then
+            echo "No audit changes"
+          else
+            git commit -m "audit: record PMSM SW pre-lockbox data evidence"
+            git push origin HEAD:prism-v2-2-independent-confirmation-pmsm-20260901
+          fi
