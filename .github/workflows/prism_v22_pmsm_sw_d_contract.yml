@@ -1,0 +1,52 @@
+name: PRISM v2.2 PMSM SW D-only contract audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - prism-v2-2-independent-confirmation-pmsm-20260901
+    paths:
+      - '.github/workflows/prism_v22_pmsm_sw_d_contract.yml'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/pmsm_sw_d_audit.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_pmsm_sw_d_audit.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_pmsm_sw_d_audit_contract.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/configs/cpu_model_freeze_v1.json'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_implementation_semantics_freeze_20260901.json'
+
+permissions:
+  contents: read
+
+jobs:
+  d-contract-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout confirmation branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install audit dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas pyarrow pytest
+
+      - name: Compile D-only adapter
+        run: |
+          python -m py_compile \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/src/prism_benchmark/pmsm_sw_d_audit.py \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_pmsm_sw_d_audit.py
+
+      - name: Run preregistration contract tests only
+        run: |
+          pytest -q \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_native_support.py \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_pmsm_sw_d_audit_contract.py
+
+      - name: Assert this workflow cannot fit PMSM target
+        run: |
+          test ! -d pmsm_sw_trainval_work
+          echo 'PASS: no public PMSM download, target fit, validation metric, or test access occurred.'
