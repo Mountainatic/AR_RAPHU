@@ -1,0 +1,178 @@
+name: PRISM v2.2 PMSM SW train-validation shared-data audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - prism-v2-2-independent-confirmation-pmsm-20260901
+    paths:
+      - '.github/workflows/prism_v22_pmsm_sw_trainval_builder.yml'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/build_prism_v22_pmsm_sw_trainval.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_task_20260901.json'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_independent_confirmation_freeze_20260901.json'
+
+permissions:
+  contents: write
+
+jobs:
+  trainval-shared-data-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      WORKDIR: pmsm_sw_trainval_work
+      KAGGLEHUB_CACHE: ${{ github.workspace }}/.kagglehub
+
+    steps:
+      - name: Checkout confirmation branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install builder dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas pyarrow kagglehub
+
+      - name: Download exact public PMSM source
+        run: |
+          mkdir -p "$WORKDIR"
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          import kagglehub
+
+          freeze = json.loads(Path('PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_independent_confirmation_freeze_20260901.json').read_text())
+          root = Path(kagglehub.dataset_download('wkirgsn/electric-motor-temperature'))
+          matches = list(root.rglob('measures_v2.csv'))
+          if len(matches) != 1:
+              raise SystemExit(f'expected one measures_v2.csv, found {matches}')
+          path = matches[0]
+          h = hashlib.sha256()
+          with path.open('rb') as handle:
+              for block in iter(lambda: handle.read(1024 * 1024), b''):
+                  h.update(block)
+          if h.hexdigest() != freeze['dataset']['raw_sha256']:
+              raise SystemExit(f'raw SHA mismatch: {h.hexdigest()}')
+          Path('pmsm_sw_trainval_work/full_data_path.txt').write_text(str(path.resolve()) + '\n')
+          PY
+
+      - name: Physically strip registered test profiles before target parsing
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          src = Path(Path('pmsm_sw_trainval_work/full_data_path.txt').read_text().strip())
+          dst = Path('pmsm_sw_trainval_work/measures_v2_trainval.csv')
+          split = json.loads(Path('PRISM_INDUSTRIAL_BENCHMARK_V1/dataset_registry/pmsm/SPLIT_REGISTRY.json').read_text())
+          allowed = set(map(int, split['train_profile_ids'])) | set(map(int, split['validation_profile_ids']))
+          forbidden = set(map(int, split['test_profile_ids']))
+          kept = skipped = 0
+          with src.open('r', encoding='utf-8', newline='') as source, dst.open('w', encoding='utf-8', newline='') as target:
+              header = source.readline()
+              columns = header.rstrip('\r\n').split(',')
+              if not columns or columns[-1] != 'profile_id':
+                  raise SystemExit(f'profile_id must be final column for byte-line filter: {columns}')
+              target.write(header)
+              for line in source:
+                  # Deliberately inspect only the final profile_id token.  No target
+                  # column is converted to numeric form for registered test rows.
+                  profile = int(line.rstrip('\r\n').rsplit(',', 1)[1])
+                  if profile in forbidden:
+                      skipped += 1
+                      continue
+                  if profile not in allowed:
+                      raise SystemExit(f'unregistered profile {profile}')
+                  target.write(line)
+                  kept += 1
+          if kept != 1090177 or skipped != 240639:
+              raise SystemExit(f'unexpected physical filter counts: kept={kept} skipped={skipped}')
+          Path('pmsm_sw_trainval_work/FILTER_AUDIT.json').write_text(json.dumps({
+              'status': 'PASS',
+              'full_source_rows': kept + skipped,
+              'development_rows_written': kept,
+              'registered_test_rows_physically_removed': skipped,
+              'test_target_values_numerically_parsed_during_filter': False,
+          }, indent=2) + '\n')
+          PY
+
+      - name: Build C1-compatible development-only shared data
+        run: |
+          python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/build_prism_v22_pmsm_sw_trainval.py \
+            --data "$WORKDIR/measures_v2_trainval.csv" \
+            --task-config PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_task_20260901.json \
+            --freeze PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_independent_confirmation_freeze_20260901.json \
+            --split-registry PRISM_INDUSTRIAL_BENCHMARK_V1/dataset_registry/pmsm/SPLIT_REGISTRY.json \
+            --output "$WORKDIR/shared"
+
+      - name: Audit sample semantics without model fitting
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import pandas as pd
+
+          root = Path('pmsm_sw_trainval_work/shared')
+          manifest = json.loads((root / 'BUILD_MANIFEST.json').read_text())
+          if manifest['test_profile_count_present'] != 0 or manifest['test_target_rows_materialized'] != 0:
+              raise SystemExit(manifest)
+          expected_heads = {
+              'PMSM_SW__H60__W60': (60, 60),
+              'PMSM_SW__H600__W60': (600, 60),
+              'PMSM_SW__H2400__W60': (2400, 60),
+          }
+          task = json.loads((root / 'TASK_REGISTRY.json').read_text())
+          realized = {item['head_id']: (item['h_steps'], item['w_steps']) for item in task['heads']}
+          if realized != expected_heads:
+              raise SystemExit(realized)
+          for head in expected_heads:
+              for split in ('train', 'validation'):
+                  path = root / 'sample_ids' / head / 'dynamic' / 'record_time' / 'proxy_excluded' / f'{split}.parquet'
+                  df = pd.read_parquet(path, columns=['entity_id','origin','current_start','current_stop_exclusive','target_start','target_stop_exclusive','latest_available_target_index','causal_history_floor'])
+                  if not ((df.current_stop_exclusive == df.origin).all() and (df.latest_available_target_index == df.origin - 1).all()):
+                      raise SystemExit(f'causal target-history mismatch: {head}/{split}')
+                  if not (df.current_start < df.current_stop_exclusive).all():
+                      raise SystemExit(f'empty current window: {head}/{split}')
+                  if not (df.target_start >= df.current_stop_exclusive).all():
+                      raise SystemExit(f'future window overlaps current window: {head}/{split}')
+                  if set(df.entity_id.astype(int)) & set(json.loads(Path('PRISM_INDUSTRIAL_BENCHMARK_V1/dataset_registry/pmsm/SPLIT_REGISTRY.json').read_text())['test_profile_ids']):
+                      raise SystemExit(f'test entity leaked: {head}/{split}')
+          print(json.dumps(manifest, indent=2))
+          PY
+
+      - name: Upload small audit records only
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-v22-pmsm-sw-trainval-shared-data-audit
+          path: |
+            pmsm_sw_trainval_work/FILTER_AUDIT.json
+            pmsm_sw_trainval_work/shared/BUILD_MANIFEST.json
+            pmsm_sw_trainval_work/shared/SAMPLE_ID_REGISTRY.json
+            pmsm_sw_trainval_work/shared/LOCKBOX.json
+            pmsm_sw_trainval_work/shared/TASK_REGISTRY.json
+            pmsm_sw_trainval_work/shared/VALIDATION_REPORT.md
+          if-no-files-found: error
+
+      - name: Commit pre-lockbox builder evidence
+        run: |
+          DEST=PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_pmsm_sw_confirmation_20260901/pre_lockbox
+          mkdir -p "$DEST"
+          cp "$WORKDIR/FILTER_AUDIT.json" "$DEST/TRAINVAL_FILTER_AUDIT.json"
+          cp "$WORKDIR/shared/BUILD_MANIFEST.json" "$DEST/TRAINVAL_BUILD_MANIFEST.json"
+          cp "$WORKDIR/shared/LOCKBOX.json" "$DEST/TRAINVAL_LOCKBOX.json"
+          cp "$WORKDIR/shared/TASK_REGISTRY.json" "$DEST/TRAINVAL_TASK_REGISTRY.json"
+          cp "$WORKDIR/shared/VALIDATION_REPORT.md" "$DEST/TRAINVAL_VALIDATION_REPORT.md"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$DEST"
+          if git diff --cached --quiet; then
+            echo 'No audit changes'
+          else
+            git commit -m 'audit: record PMSM SW train-validation shared-data evidence'
+            git push origin HEAD:prism-v2-2-independent-confirmation-pmsm-20260901
+          fi
