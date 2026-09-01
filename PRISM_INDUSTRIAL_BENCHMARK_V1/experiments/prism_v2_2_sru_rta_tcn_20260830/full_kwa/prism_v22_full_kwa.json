@@ -118405,7 +118405,7 @@
   "fairness_note": "Original RTA-TCN author task forbids historical target y. Full KWA uses only already-observed historical target/residual state and is therefore a richer dynamic information set; exact-author RTA-TCN remains an input-only reference, not a strictly information-matched KWA comparator.",
   "config_sha256": "a9705cf32e626d03a7683ccf376bc9a0a512a4161302d3ede3e882d51bf9d3ee",
   "data_sha256": "82faa3242e58e74b15020bc499ff913bbd3576869586e6f6d911b79d4664a826",
-  "elapsed_seconds": 163.83034420013428,
+  "elapsed_seconds": 155.1299271583557,
   "contracts": {
     "tail_branch_contracts": {
       "__PERSISTENCE_ONLY_ZERO_DELTA__": {
