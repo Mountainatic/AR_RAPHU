@@ -1,0 +1,53 @@
+name: PRISM v2.2 PMSM SW native-support audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - prism-v2-2-independent-confirmation-pmsm-20260901
+    paths:
+      - '.github/workflows/prism_v22_pmsm_sw_native_support_audit.yml'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/audit_prism_v22_pmsm_sw_native_support.py'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_task_20260901.json'
+      - 'PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_independent_confirmation_freeze_20260901.json'
+
+permissions:
+  contents: write
+
+jobs:
+  native-support-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: pip install numpy
+      - name: Audit frozen candidate-native support
+        run: |
+          mkdir -p support_out
+          python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/audit_prism_v22_pmsm_sw_native_support.py \
+            --task-config PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_task_20260901.json \
+            --split-registry PRISM_INDUSTRIAL_BENCHMARK_V1/dataset_registry/pmsm/SPLIT_REGISTRY.json \
+            --cpu-freeze PRISM_INDUSTRIAL_BENCHMARK_V1/configs/cpu_model_freeze_v1.json \
+            --confirmation-freeze PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_independent_confirmation_freeze_20260901.json \
+            --output support_out/NATIVE_SUPPORT_AUDIT.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prism-v22-pmsm-sw-native-support-audit
+          path: support_out/NATIVE_SUPPORT_AUDIT.json
+      - name: Commit audit evidence
+        run: |
+          DEST=PRISM_INDUSTRIAL_BENCHMARK_V1/experiments/prism_v2_2_pmsm_sw_confirmation_20260901/pre_lockbox
+          mkdir -p "$DEST"
+          cp support_out/NATIVE_SUPPORT_AUDIT.json "$DEST/NATIVE_SUPPORT_AUDIT.json"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$DEST/NATIVE_SUPPORT_AUDIT.json"
+          if ! git diff --cached --quiet; then
+            git commit -m 'audit: record PMSM SW native-support evidence'
+            git push origin HEAD:prism-v2-2-independent-confirmation-pmsm-20260901
+          fi
