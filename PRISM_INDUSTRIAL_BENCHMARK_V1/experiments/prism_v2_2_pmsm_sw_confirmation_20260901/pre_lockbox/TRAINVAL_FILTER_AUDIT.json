@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "full_source_rows": 1330816,
+  "development_rows_written": 1090177,
+  "registered_test_rows_physically_removed": 240639,
+  "test_target_values_numerically_parsed_during_filter": false
+}

@@ -1,0 +1,1 @@
+{"contract":"PRISM_V2_2_PMSM_SW_PRELOCKBOX_NO_TEST_PRESENT_V1","protocol_frozen":true,"registered_test_profiles":[2,4,8,20,21,36,51,54,60,68,73,75],"test_metrics_available":false,"test_profiles_physically_absent":true,"test_target_rows_materialized":false,"unlock_rule":"separate final confirmatory workflow after train-validation implementation audit freeze"}
