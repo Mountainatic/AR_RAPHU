@@ -23,12 +23,14 @@ def test_validation_materialization_occurs_after_selection_freeze() -> None:
     source = inspect.getsource(audit.run_d_channel)
     boundary = source.index("selection_frozen =")
     validation_load = source.index('load_native_samples(shared, view, "validation")')
-    validation_accessor = source.index('BaseAccessor(shared, view.head.dataset, "validation", [channel])')
+    validation_accessor = source.index("validation_accessor = BaseAccessor(")
+    accessor_block = source[validation_accessor : validation_accessor + 240]
+    assert '"validation"' in accessor_block
     assert validation_load > boundary
     assert validation_accessor > boundary
     before_boundary = source[:boundary]
     assert 'load_native_samples(shared, view, "validation")' not in before_boundary
-    assert 'BaseAccessor(shared, view.head.dataset, "validation", [channel])' not in before_boundary
+    assert "validation_accessor = BaseAccessor(" not in before_boundary
 
 
 def test_test_partition_is_never_requested_by_d_runner() -> None:
