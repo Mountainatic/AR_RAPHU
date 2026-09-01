@@ -1,0 +1,48 @@
+{
+  "audit_id": "PRISM_V2_2_PMSM_SW_ZERO_TARGET_VALUE_DATA_AUDIT_20260901_V1",
+  "columns": [
+    "u_q",
+    "coolant",
+    "stator_winding",
+    "u_d",
+    "stator_tooth",
+    "motor_speed",
+    "i_d",
+    "i_q",
+    "pm",
+    "stator_yoke",
+    "ambient",
+    "torque",
+    "profile_id"
+  ],
+  "new_target": "stator_winding",
+  "new_target_values_read_by_this_audit": false,
+  "profile_count": 69,
+  "profile_counts_by_split": {
+    "test": 12,
+    "train": 42,
+    "validation": 15
+  },
+  "protocol_id": "PRISM_V2_2_PMSM_SW_INDEPENDENT_CONFIRMATION_20260901_V1",
+  "raw_bytes": 300061411,
+  "raw_sha256": "78f3d150f0f2ad9c5dc7ff24dd12c00d386ad530f48c1589ad24fcd88867d3ad",
+  "registered_targets_before_confirmation": [
+    "Oil_temperature",
+    "Reservoirs",
+    "pm",
+    "xmeas_40",
+    "y",
+    "y1",
+    "y2"
+  ],
+  "row_count": 1330816,
+  "row_counts_by_split": {
+    "test": 240639,
+    "train": 837927,
+    "validation": 252250
+  },
+  "sampling_hz": 2,
+  "status": "PASS",
+  "test_target_metrics_computed": false,
+  "test_target_used_for_selection": false
+}
