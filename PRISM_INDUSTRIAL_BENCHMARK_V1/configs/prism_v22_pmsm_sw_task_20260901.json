@@ -1,0 +1,22 @@
+{
+  "contract_status": "C1_SEMANTICS_APPROVED",
+  "target_index_contract": "HALF_OPEN_V1",
+  "time_realization_contract": "ROUND_HALF_UP_V1",
+  "purge_contract": "DEPENDENCY_INTERVAL_V1",
+  "sample_support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+  "extra_dependency_interval_seconds": 600,
+  "confirmation_protocol_id": "PRISM_V2_2_PMSM_SW_INDEPENDENT_CONFIRMATION_20260901_V1",
+  "tasks": [
+    {
+      "task_id": "PMSM_SW",
+      "dataset": "pmsm",
+      "target": "stator_winding",
+      "cadence_seconds": 0.5,
+      "horizons_seconds": [30, 300, 1200],
+      "primary_horizon_seconds": 300,
+      "window_seconds": 30,
+      "availability_delays_steps": [0],
+      "proxy_policies": ["proxy_excluded"]
+    }
+  ]
+}
