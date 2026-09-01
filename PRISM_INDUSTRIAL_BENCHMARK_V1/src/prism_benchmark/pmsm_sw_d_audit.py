@@ -79,8 +79,7 @@ def _pilot_tuple(config: dict[str, Any]) -> tuple[float, float, float]:
 def assert_freeze_consistency(project: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     """Fail before target fitting if the preregistered D mapping drifts from C4."""
     implementation = _json(project / IMPLEMENTATION_FREEZE)
-    cpu = _json(project / CPU_FREEZE)
-    c4 = cpu["c4"]
+    c4 = _json(project / CPU_FREEZE)["c4"]
     d = implementation["D_branch"]
     selection = implementation["selection_partition"]
 
@@ -94,8 +93,11 @@ def assert_freeze_consistency(project: Path) -> tuple[dict[str, Any], dict[str, 
         raise RuntimeError("D inheritance source drift")
     if d["complexity_ladder"] != c4["complexity_ladder"] or d["complexity_ladder"] != D_LADDER:
         raise RuntimeError("D complexity ladder drift")
-    if d["delta_ratio_by_class"] != c4["delta_ratio_by_class"]:
-        raise RuntimeError("D delta grid drift")
+    if set(d["delta_ratio_by_class"]) != {"FAST", "SLOW"}:
+        raise RuntimeError("PMSM D must register exactly FAST and SLOW classes")
+    for category, values in d["delta_ratio_by_class"].items():
+        if values != c4["delta_ratio_by_class"][category]:
+            raise RuntimeError(f"D {category} delta grid drift")
     if d["history_for_positive_h"] != c4["history_for_positive_h"]:
         raise RuntimeError("D positive-h history grid drift")
     if d["lag_basis"]["candidate_m_tau"] != c4["lag_basis"]["candidate_m_tau"]:
@@ -127,7 +129,9 @@ def assert_freeze_consistency(project: Path) -> tuple[dict[str, Any], dict[str, 
         raise RuntimeError("D selection validation cap drift")
     if implementation["sample_support"]["contract"] != SUPPORT_CONTRACT:
         raise RuntimeError("D support contract drift")
-    if d["channel_classes"] != {channel: channel_class("pmsm", channel) for channel in EXPECTED_INPUTS}:
+    if d["channel_classes"] != {
+        channel: channel_class("pmsm", channel) for channel in EXPECTED_INPUTS
+    }:
         raise RuntimeError("D channel class mapping drift")
     return implementation, c4
 
@@ -147,27 +151,38 @@ def assert_prelockbox(shared: Path, project: Path) -> dict[str, Any]:
     relevant = [
         item
         for item in views
-        if item.get("task_id") == "PMSM_SW" and item.get("proxy_policy") == "proxy_excluded"
+        if item.get("task_id") == "PMSM_SW"
+        and item.get("proxy_policy") == "proxy_excluded"
     ]
     if len(relevant) != 1 or relevant[0].get("input_columns") != EXPECTED_INPUTS:
         raise RuntimeError("PMSM SW primary input contract drift")
 
-    split = _json(project / SPLIT_REGISTRY)
-    test_profiles = {str(int(value)) for value in split["test_profile_ids"]}
+    test_profiles = {
+        str(int(value))
+        for value in _json(project / SPLIT_REGISTRY)["test_profile_ids"]
+    }
     for base_split in ("train", "validation"):
         path = shared / "base_data/pmsm" / f"{base_split}.parquet"
         if not path.is_file():
             raise FileNotFoundError(path)
-        entities = set(pd.read_parquet(path, columns=["entity_id"])["entity_id"].astype(str).unique())
+        entities = set(
+            pd.read_parquet(path, columns=["entity_id"])["entity_id"]
+            .astype(str)
+            .unique()
+        )
         leaked = entities & test_profiles
         if leaked:
-            raise RuntimeError(f"test profiles leaked into {base_split}: {sorted(leaked)}")
+            raise RuntimeError(
+                f"test profiles leaked into {base_split}: {sorted(leaked)}"
+            )
     return lockbox
 
 
 def primary_view(shared: Path) -> ViewSpec:
-    views = main_views(shared, "dynamic")
-    matches = [view for view in views if view.head.head_id == PRIMARY_HEAD_ID]
+    matches = [
+        view for view in main_views(shared, "dynamic")
+        if view.head.head_id == PRIMARY_HEAD_ID
+    ]
     if len(matches) != 1:
         raise RuntimeError(f"expected exactly one primary PMSM SW view, got {matches}")
     view = matches[0]
@@ -175,7 +190,11 @@ def primary_view(shared: Path) -> ViewSpec:
         raise RuntimeError("primary PMSM SW view identity drift")
     if view.proxy_policy != "proxy_excluded" or view.availability_scenario != "record_time":
         raise RuntimeError("primary PMSM SW view contract drift")
-    if view.head.h_steps != 600 or view.head.w_steps != 60 or view.head.cadence_seconds != 0.5:
+    if (
+        view.head.h_steps != 600
+        or view.head.w_steps != 60
+        or view.head.cadence_seconds != 0.5
+    ):
         raise RuntimeError("primary PMSM SW time contract drift")
     return view
 
@@ -185,7 +204,10 @@ def _complexity_profile(profile: tuple[int, int]) -> tuple[int, int]:
 
 
 def _loss_json(losses: dict[Any, list[float]]) -> dict[str, list[float]]:
-    return {str(key): [float(value) for value in values] for key, values in losses.items()}
+    return {
+        str(key): [float(value) for value in values]
+        for key, values in losses.items()
+    }
 
 
 def _candidate_losses(
@@ -218,7 +240,9 @@ def _candidate_losses(
             if kind == "exact_zero":
                 prediction = np.zeros(len(evaluation), dtype=np.float64)
             else:
-                fit_values, _ = profile_values(accessor, fit, channel, profile, int(m_tau))
+                fit_values, _ = profile_values(
+                    accessor, fit, channel, profile, int(m_tau)
+                )
                 evaluation_values, _ = profile_values(
                     accessor, evaluation, channel, profile, int(m_tau)
                 )
@@ -232,7 +256,10 @@ def _candidate_losses(
                     c4["solver"],
                 )
             losses.append(
-                mse(evaluation["y_true"].to_numpy(dtype=np.float64), prediction)
+                mse(
+                    evaluation["y_true"].to_numpy(dtype=np.float64),
+                    prediction,
+                )
             )
         except Exception:
             losses.append(float("inf"))
@@ -272,25 +299,38 @@ def run_d_channel(
     view: ViewSpec,
     channel: str,
 ) -> dict[str, Any]:
-    """Run preregistered D-only selection using train only; evaluate validation once frozen."""
+    """Train-select on registered train profiles, then evaluate validation once."""
     started = time.time()
-    destination = output / "D_ONLY" / view.head.head_id / view.proxy_policy / channel
+    destination = (
+        output / "D_ONLY" / view.head.head_id / view.proxy_policy / channel
+    )
     destination.mkdir(parents=True, exist_ok=True)
     try:
         implementation, c4 = assert_freeze_consistency(project)
         assert_prelockbox(shared, project)
-        registered_inputs = input_columns(shared, view.head.task_id, view.proxy_policy)
+        registered_inputs = input_columns(
+            shared, view.head.task_id, view.proxy_policy
+        )
         if registered_inputs != EXPECTED_INPUTS or channel not in registered_inputs:
-            raise RuntimeError("requested D channel is outside preregistered input contract")
+            raise RuntimeError(
+                "requested D channel is outside preregistered input contract"
+            )
 
-        # Selection boundary: only train samples and a train-only accessor exist here.
+        # Selection boundary: only train targets and a train-only accessor exist here.
         train = load_native_samples(shared, view, "train")
-        train_accessor = BaseAccessor(shared, view.head.dataset, "train", [channel])
-        folds = inner_folds(train, int(implementation["selection_partition"]["inner_fold_count"]))
+        train_accessor = BaseAccessor(
+            shared, view.head.dataset, "train", [channel]
+        )
+        folds = inner_folds(
+            train,
+            int(implementation["selection_partition"]["inner_fold_count"]),
+        )
         profiles = channel_profiles(view, channel, c4)
         if not profiles:
             raise RuntimeError("empty preregistered D profile universe")
-        profile_comparison_history = max(int(profile[1]) for profile in profiles)
+        profile_comparison_history = max(
+            int(profile[1]) for profile in profiles
+        )
         pilot_lambdas = _pilot_tuple(c4)
         pilot_m_tau = 8
 
@@ -310,18 +350,20 @@ def run_d_channel(
             )
             for profile in profiles
         }
+        minimum_folds = int(
+            implementation["selection_partition"]["minimum_usable_folds"]
+        )
         profile_selection = one_se_select(
             profile_losses,
             _complexity_profile,
-            minimum_usable_folds=int(implementation["selection_partition"]["minimum_usable_folds"]),
+            minimum_usable_folds=minimum_folds,
         )
         selected_profile = tuple(profile_selection.selected)
-        retained_profiles = sorted(profile_selection.acceptable, key=_complexity_profile)[
-            : int(c4["channel_candidate_gate"]["maximum_profiles_retained_per_channel"])
-        ]
+        retained_profiles = sorted(
+            profile_selection.acceptable, key=_complexity_profile
+        )[: int(c4["channel_candidate_gate"]["maximum_profiles_retained_per_channel"])]
         local_history = int(selected_profile[1])
 
-        # Re-score selected linear and exact-zero on identical selected-profile support.
         linear_activation_losses = _candidate_losses(
             accessor=train_accessor,
             train=train,
@@ -336,13 +378,16 @@ def run_d_channel(
             scoring_history_steps=local_history,
         )
         zero_losses, local_scoring_hashes, local_scoring_rows = _zero_losses(
-            train, folds, scoring_history_steps=local_history, c4=c4
+            train,
+            folds,
+            scoring_history_steps=local_history,
+            c4=c4,
         )
         activation_one_se = one_se_select(
             {"exact_zero": zero_losses, "linear": linear_activation_losses},
             lambda value: (0,) if value == "exact_zero" else (1,),
             neutral="exact_zero",
-            minimum_usable_folds=int(implementation["selection_partition"]["minimum_usable_folds"]),
+            minimum_usable_folds=minimum_folds,
         )
         activation = practical_activation(
             zero_losses,
@@ -369,15 +414,16 @@ def run_d_channel(
             resolution_losses: dict[Any, list[float]] = {}
             for m_tau in c4["lag_basis"]["candidate_m_tau"]:
                 for m_x in c4["amplitude_basis"]["candidate_m_x"]:
-                    resolution_losses[(int(m_tau), int(m_x))] = _candidate_losses(
+                    key = (int(m_tau), int(m_x))
+                    resolution_losses[key] = _candidate_losses(
                         accessor=train_accessor,
                         train=train,
                         folds=folds,
                         channel=channel,
                         profile=selected_profile,
-                        m_tau=int(m_tau),
+                        m_tau=key[0],
                         kind="full",
-                        m_x=int(m_x),
+                        m_x=key[1],
                         lambdas=pilot_lambdas,
                         c4=c4,
                         scoring_history_steps=local_history,
@@ -385,9 +431,11 @@ def run_d_channel(
             resolution_selection = one_se_select(
                 resolution_losses,
                 lambda value: (int(value[0]), int(value[1])),
-                minimum_usable_folds=int(implementation["selection_partition"]["minimum_usable_folds"]),
+                minimum_usable_folds=minimum_folds,
             )
-            selected_m_tau, selected_m_x = map(int, resolution_selection.selected)
+            selected_m_tau, selected_m_x = map(
+                int, resolution_selection.selected
+            )
 
             for kind in D_LADDER[1:]:
                 ladder_losses[kind] = _candidate_losses(
@@ -408,7 +456,7 @@ def run_d_channel(
                 ladder_losses,
                 lambda value: (order[str(value)],),
                 neutral="exact_zero",
-                minimum_usable_folds=int(implementation["selection_partition"]["minimum_usable_folds"]),
+                minimum_usable_folds=minimum_folds,
             )
             selected_kind = str(ladder_selection.selected)
             if selected_kind == "exact_zero":
@@ -439,7 +487,9 @@ def run_d_channel(
                     selected_lambdas = pilot_lambdas
                 else:
                     lambdas = list(pilot_lambdas)
-                    for position, name in enumerate(("lambda_0", "lambda_tau", "lambda_x")):
+                    for position, name in enumerate(
+                        ("lambda_0", "lambda_tau", "lambda_x")
+                    ):
                         scan: dict[float, list[float]] = {}
                         for value in c4["penalties"][name]:
                             candidate_lambdas = list(lambdas)
@@ -460,9 +510,7 @@ def run_d_channel(
                         choice = one_se_select(
                             scan,
                             lambda value: (-float(value),),
-                            minimum_usable_folds=int(
-                                implementation["selection_partition"]["minimum_usable_folds"]
-                            ),
+                            minimum_usable_folds=minimum_folds,
                         )
                         lambdas[position] = float(choice.selected)
                         penalty_audit[name] = {
@@ -471,7 +519,7 @@ def run_d_channel(
                         }
                     selected_lambdas = tuple(lambdas)
 
-        # This dictionary is complete before validation targets/accessor are loaded.
+        # This object must be complete before validation targets are loaded.
         selection_frozen = {
             "selection_partition": "train_only",
             "validation_used_for_selection": False,
@@ -485,25 +533,39 @@ def run_d_channel(
             "profile_selection": profile_selection.to_json(),
             "activation_one_se": activation_one_se.to_json(),
             "linear_activation": activation,
-            "resolution_selection": None
-            if resolution_selection is None
-            else resolution_selection.to_json(),
-            "ladder_selection": None if ladder_selection is None else ladder_selection.to_json(),
+            "resolution_selection": (
+                None
+                if resolution_selection is None
+                else resolution_selection.to_json()
+            ),
+            "ladder_selection": (
+                None if ladder_selection is None else ladder_selection.to_json()
+            ),
             "final_activation": final_activation,
             "penalty_audit": penalty_audit,
         }
 
-        # Development holdout boundary: validation is materialized only after selection_frozen.
+        # Holdout boundary: validation is materialized only after selection_frozen.
         validation = load_native_samples(shared, view, "validation")
-        validation_accessor = BaseAccessor(shared, view.head.dataset, "validation", [channel])
+        validation_accessor = BaseAccessor(
+            shared, view.head.dataset, "validation", [channel]
+        )
         selected_history = int(selected_profile[1])
         final_train_native = apply_native_support(train, selected_history)
         final_train = final_train_native.iloc[
-            deterministic_subsample(final_train_native, int(c4["fit_row_cap"]))
+            deterministic_subsample(
+                final_train_native, int(c4["fit_row_cap"])
+            )
         ].reset_index(drop=True)
-        selected_validation = apply_native_support(validation, selected_history).reset_index(drop=True)
+        selected_validation = apply_native_support(
+            validation, selected_history
+        ).reset_index(drop=True)
         train_values, intervals = profile_values(
-            train_accessor, final_train, channel, selected_profile, int(selected_m_tau)
+            train_accessor,
+            final_train,
+            channel,
+            selected_profile,
+            int(selected_m_tau),
         )
         validation_values, _ = profile_values(
             validation_accessor,
@@ -531,7 +593,9 @@ def run_d_channel(
         frame["model"] = f"PRISM_V2_2_PMSM_SW_D_{channel}"
         frame["dtype"] = "float64"
         prediction_path = destination / "validation.parquet"
-        frame.to_parquet(prediction_path, index=False, compression="zstd")
+        frame.to_parquet(
+            prediction_path, index=False, compression="zstd"
+        )
 
         result = {
             "status": "PASS",
@@ -544,7 +608,9 @@ def run_d_channel(
             "channel": channel,
             "channel_class": channel_class("pmsm", channel),
             "support_contract": SUPPORT_CONTRACT,
-            "profile_comparison_history_steps": int(profile_comparison_history),
+            "profile_comparison_history_steps": int(
+                profile_comparison_history
+            ),
             "local_scoring_history_steps": int(local_history),
             "local_scoring_rows_by_fold": local_scoring_rows,
             "exact_zero_scoring_support_hash": local_scoring_hashes,
@@ -558,13 +624,22 @@ def run_d_channel(
             "numerical_status": numerical_status,
             "relative_kkt": float(relative_kkt),
             "condition_number": float(condition_number),
-            "active": bool(selected_kind != "exact_zero" and numerical_status == "PASS"),
+            "active": bool(
+                selected_kind != "exact_zero"
+                and numerical_status == "PASS"
+            ),
             "profile_fold_losses": _loss_json(profile_losses),
-            "linear_activation_fold_losses": [float(value) for value in linear_activation_losses],
+            "linear_activation_fold_losses": [
+                float(value) for value in linear_activation_losses
+            ],
             "ladder_fold_losses": _loss_json(ladder_losses),
-            "selected_native_train_rows_before_cap": int(len(final_train_native)),
+            "selected_native_train_rows_before_cap": int(
+                len(final_train_native)
+            ),
             "selected_fit_rows_after_cap": int(len(final_train)),
-            "selected_native_validation_rows": int(len(selected_validation)),
+            "selected_native_validation_rows": int(
+                len(selected_validation)
+            ),
             "selected_native_support_audit": {
                 "train": support_audit(final_train_native),
                 "validation": support_audit(selected_validation),
@@ -574,7 +649,9 @@ def run_d_channel(
             "validation_used_for_selection": False,
             "test_accessed": False,
             "elapsed_seconds": float(time.time() - started),
-            **regression_metrics(frame["y_true"].to_numpy(dtype=np.float64), prediction),
+            **regression_metrics(
+                frame["y_true"].to_numpy(dtype=np.float64), prediction
+            ),
         }
     except Exception as error:
         result = {
@@ -604,13 +681,25 @@ def run_primary_d_audit(
     assert_freeze_consistency(project)
     assert_prelockbox(shared, project)
     view = primary_view(shared)
-    registered = input_columns(shared, view.head.task_id, view.proxy_policy)
+    registered = input_columns(
+        shared, view.head.task_id, view.proxy_policy
+    )
     requested = list(registered if channels is None else channels)
-    if len(requested) != len(set(requested)) or any(channel not in registered for channel in requested):
+    if (
+        len(requested) != len(set(requested))
+        or any(channel not in registered for channel in requested)
+    ):
         raise RuntimeError(f"invalid requested channels: {requested}")
-    results = [run_d_channel(shared, project, output, view, channel) for channel in requested]
+    results = [
+        run_d_channel(shared, project, output, view, channel)
+        for channel in requested
+    ]
     summary = {
-        "status": "PASS" if all(item.get("status") == "PASS" for item in results) else "FAILED",
+        "status": (
+            "PASS"
+            if all(item.get("status") == "PASS" for item in results)
+            else "FAILED"
+        ),
         "stage": "PMSM_SW_D_ONLY_IMPLEMENTATION_AUDIT",
         "evidence_role": "DEVELOPMENT_IMPLEMENTATION_AUDIT_NOT_FINAL_CONFIRMATION",
         "target_head": PRIMARY_HEAD_ID,
@@ -623,8 +712,12 @@ def run_primary_d_audit(
                 "channel": item.get("channel"),
                 "status": item.get("status"),
                 "active": item.get("active"),
-                "selected_kind": item.get("selection", {}).get("selected_kind"),
-                "selected_profile": item.get("selection", {}).get("selected_profile"),
+                "selected_kind": item.get("selection", {}).get(
+                    "selected_kind"
+                ),
+                "selected_profile": item.get("selection", {}).get(
+                    "selected_profile"
+                ),
                 "mse": item.get("mse"),
                 "rmse": item.get("rmse"),
                 "mae": item.get("mae"),
