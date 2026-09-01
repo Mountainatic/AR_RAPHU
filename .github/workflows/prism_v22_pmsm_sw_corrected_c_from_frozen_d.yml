@@ -1,0 +1,188 @@
+name: PRISM v2.2 PMSM SW corrected-C from frozen D evidence
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - prism-v2-2-independent-confirmation-pmsm-20260901
+    paths:
+      - '.github/workflows/prism_v22_pmsm_sw_corrected_c_from_frozen_d.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  c-from-frozen-d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      WORKDIR: pmsm_sw_c_frozen_d_work
+      KAGGLEHUB_CACHE: ${{ github.workspace }}/.kagglehub
+
+    steps:
+      - name: Checkout confirmation branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install frozen-run dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy pandas pyarrow pyreadr scipy pytest kagglehub
+
+      - name: Reconfirm corrected-C implementation contract
+        run: |
+          pytest -q \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_v211_native_support.py \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_pmsm_sw_c_contract.py \
+            PRISM_INDUSTRIAL_BENCHMARK_V1/tests/test_pmsm_sw_c_audit_contract.py
+
+      - name: Download immutable successful full-D evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: prism-v22-pmsm-sw-d-full-audit
+          path: ${{ env.WORKDIR }}/frozen_d
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: Mountainatic/AR_RAPHU
+          run-id: 33486986581
+
+      - name: Verify frozen D evidence before any C fit
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('pmsm_sw_c_frozen_d_work/frozen_d')
+          summary = json.loads((root / 'd_audit/D_ONLY_SUMMARY.json').read_text())
+          lockbox = json.loads((root / 'shared/LOCKBOX.json').read_text())
+          manifest = json.loads((root / 'shared/BUILD_MANIFEST.json').read_text())
+          assert summary['status'] == 'PASS'
+          assert summary['validation_used_for_selection'] is False
+          assert summary['test_accessed'] is False
+          assert summary['all_registered_channels_run'] is True
+          assert lockbox['test_profiles_physically_absent'] is True
+          assert lockbox['test_target_rows_materialized'] is False
+          assert manifest['test_profile_count_present'] == 0
+          assert manifest['test_target_rows_materialized'] == 0
+          selected = {item['channel']: item['selected_kind'] for item in summary['results']}
+          assert selected == {
+              'ambient': 'exact_zero', 'coolant': 'linear', 'u_d': 'exact_zero',
+              'u_q': 'exact_zero', 'i_d': 'exact_zero', 'i_q': 'exact_zero',
+              'motor_speed': 'exact_zero', 'torque': 'exact_zero',
+          }
+          print({'frozen_d_status': 'PASS', 'selected_kinds': selected})
+          PY
+
+      - name: Download exact public PMSM source
+        run: |
+          mkdir -p "$WORKDIR"
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          import kagglehub
+          freeze = json.loads(Path('PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_independent_confirmation_freeze_20260901.json').read_text())
+          root = Path(kagglehub.dataset_download('wkirgsn/electric-motor-temperature'))
+          matches = list(root.rglob('measures_v2.csv'))
+          if len(matches) != 1:
+              raise SystemExit(matches)
+          path = matches[0]
+          h = hashlib.sha256()
+          with path.open('rb') as handle:
+              for block in iter(lambda: handle.read(1024 * 1024), b''):
+                  h.update(block)
+          if h.hexdigest() != freeze['dataset']['raw_sha256']:
+              raise SystemExit('raw SHA mismatch')
+          Path('pmsm_sw_c_frozen_d_work/full_data_path.txt').write_text(str(path.resolve()) + '\n')
+          PY
+
+      - name: Physically strip test profiles and rebuild shared data
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          src = Path(Path('pmsm_sw_c_frozen_d_work/full_data_path.txt').read_text().strip())
+          dst = Path('pmsm_sw_c_frozen_d_work/measures_v2_trainval.csv')
+          split = json.loads(Path('PRISM_INDUSTRIAL_BENCHMARK_V1/dataset_registry/pmsm/SPLIT_REGISTRY.json').read_text())
+          allowed = set(map(int, split['train_profile_ids'])) | set(map(int, split['validation_profile_ids']))
+          forbidden = set(map(int, split['test_profile_ids']))
+          kept = skipped = 0
+          with src.open('r', encoding='utf-8', newline='') as source, dst.open('w', encoding='utf-8', newline='') as target:
+              header = source.readline()
+              assert header.rstrip('\r\n').split(',')[-1] == 'profile_id'
+              target.write(header)
+              for line in source:
+                  profile = int(line.rstrip('\r\n').rsplit(',', 1)[1])
+                  if profile in forbidden:
+                      skipped += 1
+                  elif profile in allowed:
+                      target.write(line); kept += 1
+                  else:
+                      raise SystemExit(f'unregistered profile {profile}')
+          assert (kept, skipped) == (1090177, 240639)
+          PY
+          python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/build_prism_v22_pmsm_sw_trainval.py \
+            --data "$WORKDIR/measures_v2_trainval.csv" \
+            --task-config PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_task_20260901.json \
+            --freeze PRISM_INDUSTRIAL_BENCHMARK_V1/configs/prism_v22_pmsm_sw_independent_confirmation_freeze_20260901.json \
+            --split-registry PRISM_INDUSTRIAL_BENCHMARK_V1/dataset_registry/pmsm/SPLIT_REGISTRY.json \
+            --output "$WORKDIR/shared"
+
+      - name: Match rebuilt shared registry to frozen D run
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          new = json.loads(Path('pmsm_sw_c_frozen_d_work/shared/BUILD_MANIFEST.json').read_text())
+          old = json.loads(Path('pmsm_sw_c_frozen_d_work/frozen_d/shared/BUILD_MANIFEST.json').read_text())
+          for key in ('raw_source_sha256', 'sample_registry_sha256', 'sample_support_contract', 'sample_counts', 'profile_counts'):
+              if new[key] != old[key]:
+                  raise SystemExit(f'shared-data mismatch at {key}: {new[key]} != {old[key]}')
+          lockbox = json.loads(Path('pmsm_sw_c_frozen_d_work/shared/LOCKBOX.json').read_text())
+          assert lockbox['test_profiles_physically_absent'] is True
+          assert lockbox['test_target_rows_materialized'] is False
+          print('PASS: rebuilt shared data matches frozen D evidence registry')
+          PY
+
+      - name: Run corrected-C from immutable D selections
+        run: |
+          python PRISM_INDUSTRIAL_BENCHMARK_V1/scripts/run_prism_v22_pmsm_sw_c_audit.py \
+            --shared "$WORKDIR/shared" \
+            --d-output "$WORKDIR/frozen_d/d_audit" \
+            --output "$WORKDIR/c_audit"
+
+      - name: Audit corrected-C result
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('pmsm_sw_c_frozen_d_work/c_audit/C_ONLY/PMSM_SW__H600__W60/proxy_excluded/RESULT.json')
+          if not path.exists():
+              raise SystemExit('corrected-C result missing')
+          result = json.loads(path.read_text())
+          assert result['status'] == 'PASS'
+          assert result['test_accessed'] is False
+          assert result['validation_used_for_selection'] is False
+          assert result['structure_frozen_before_validation_materialization'] is True
+          print(json.dumps({
+              'structure': result['structure'],
+              'validation_metrics': result['validation_metrics'],
+              'persistence_validation_metrics': result['persistence_validation_metrics'],
+              'validation_rows': result['validation_rows'],
+              'validation_support_hash': result['validation_prediction_support_hash'],
+          }, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload frozen-D corrected-C evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-v22-pmsm-sw-c-from-frozen-d
+          path: |
+            pmsm_sw_c_frozen_d_work/shared/BUILD_MANIFEST.json
+            pmsm_sw_c_frozen_d_work/shared/LOCKBOX.json
+            pmsm_sw_c_frozen_d_work/c_audit/C_ONLY/PMSM_SW__H600__W60/proxy_excluded/RESULT.json
+          if-no-files-found: warn
