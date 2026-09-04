@@ -388,6 +388,15 @@ def development_residual_block_length(
     }
 
 
+def _bootstrap_view_key(record: dict[str, Any]) -> tuple[str, str, str, str]:
+    return (
+        str(record["target_head"]),
+        str(record["information_set"]),
+        str(record["availability_scenario"]),
+        str(record["proxy_policy"]),
+    )
+
+
 def freeze_bootstrap_block_lengths(
     paths: PublicAllPaths, views: Iterable[ViewSpec]
 ) -> dict[str, Any]:
@@ -423,6 +432,18 @@ def freeze_bootstrap_block_lengths(
                 **development_residual_block_length(frame),
             }
         )
+    registry_path = paths.freeze / BOOTSTRAP_BLOCK_REGISTRY
+    if registry_path.is_file():
+        previous = json.loads(registry_path.read_text(encoding="utf-8"))
+        if previous.get("status") != "PASS" or previous.get("protocol_id") != PROTOCOL_ID:
+            raise RuntimeError("existing bootstrap block registry is incompatible")
+        replaced = {_bootstrap_view_key(record) for record in records}
+        records = [
+            record
+            for record in previous.get("records", [])
+            if _bootstrap_view_key(record) not in replaced
+        ] + records
+        records.sort(key=_bootstrap_view_key)
     result = {
         "status": "PASS",
         "protocol_id": PROTOCOL_ID,
@@ -433,7 +454,7 @@ def freeze_bootstrap_block_lengths(
         "test_accessed": False,
         "ood_accessed": False,
     }
-    write_json(paths.freeze / BOOTSTRAP_BLOCK_REGISTRY, result)
+    write_json(registry_path, result)
     return result
 
 

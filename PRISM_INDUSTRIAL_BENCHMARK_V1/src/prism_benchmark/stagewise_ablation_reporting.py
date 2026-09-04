@@ -66,6 +66,8 @@ def _manifest_record(unit: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
     if blocks.get("status") != "PASS" or blocks.get("test_accessed") is not False:
         raise RuntimeError(f"invalid development-only block freeze: {block_path}")
     block_matches = [record for record in blocks["records"] if _unit_key(record) == key]
+    if unit["information_set"] == "input_only" and not block_matches:
+        return inference, {"block_length": 1, "not_applicable": True}
     if len(block_matches) != 1:
         raise RuntimeError(f"bootstrap block record is not unique: {unit['label']}")
     return inference, block_matches[0]
@@ -91,6 +93,11 @@ def _stage_records(
     statuses: dict[str, str] = {}
     for stage, model in wanted.items():
         matches = [record for record in inference["records"] if record.get("model") == model]
+        if unit["information_set"] == "input_only" and stage in {"K+C+DELTA_W+A", "J"}:
+            if matches:
+                raise RuntimeError(f"dynamic-only model escaped input-only view: {unit['label']}/{model}")
+            statuses[stage] = "NOT_APPLICABLE_INFORMATION_SET"
+            continue
         if len(matches) != 1:
             raise RuntimeError(f"model record is not unique: {unit['label']}/{model}")
         record = matches[0]
@@ -239,13 +246,22 @@ def _checkpoint_admission(unit: dict[str, Any], records: dict[str, dict[str, Any
     state = _read_json(checkpoint)
     w_family = str(state["w_contract"]["family"])
     a_family = str(state.get("a_contract", {}).get("family", "NOT_APPLICABLE"))
+    dynamic = unit["information_set"] == "dynamic"
     return {
         "unit": unit["label"],
         "K": "ADMITTED" if state["k_contract"].get("channel") else "REJECTED_EXACT_ZERO",
         "C": "ADMITTED" if state["physical"].get("channels") else "REJECTED_NO_ACTIVE_CHANNEL",
         "DELTA_W": "REJECTED_IDENTITY" if w_family == IDENTITY else "ADMITTED",
-        "A": "REJECTED_EXACT_ZERO" if a_family == EXACT_ZERO else "ADMITTED",
-        "J": "ADMITTED" if state.get("joint_status") == "PASS" else "NOT_RUN_PROTOCOL_INCOMPATIBLE",
+        "A": (
+            "NOT_APPLICABLE_INFORMATION_SET"
+            if not dynamic
+            else ("REJECTED_EXACT_ZERO" if a_family == EXACT_ZERO else "ADMITTED")
+        ),
+        "J": (
+            "NOT_APPLICABLE_INFORMATION_SET"
+            if not dynamic
+            else ("ADMITTED" if state.get("joint_status") == "PASS" else "NOT_RUN_PROTOCOL_INCOMPATIBLE")
+        ),
         "W_family": w_family,
         "A_family": a_family,
         "J_reason": state.get("joint_reason"),
