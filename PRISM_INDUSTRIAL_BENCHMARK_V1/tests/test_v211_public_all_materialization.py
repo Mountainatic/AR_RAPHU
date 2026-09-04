@@ -24,6 +24,7 @@ from prism_benchmark.v211_public_all_materialization import (
     _joint_evaluation_k_block,
     _joint_w_materialization_contract,
     _validate_joint_materialization_contract,
+    best_active_k_predictions,
     preflight_public_all_materialization,
 )
 from prism_benchmark.v211_w import IDENTITY
@@ -207,3 +208,39 @@ def test_materialization_preflight_validates_frozen_joint_fields(
     result_path.write_text(json.dumps(payload), encoding="utf-8")
     with pytest.raises(RuntimeError, match="frozen field mismatch"):
         preflight_public_all_materialization(paths, [view])
+
+
+def test_best_active_k_predictions_replays_c_gate_comparator() -> None:
+    fit = np.column_stack([np.arange(5.0), np.arange(5.0) + 10.0])
+    evaluation = np.column_stack([np.arange(3.0), np.arange(3.0) + 20.0])
+    fit_prediction, evaluation_prediction, contract = best_active_k_predictions(
+        {"best_active_k_channel": "k2"},
+        [
+            {"channel": "k1", "contract": {"parameter_count": 4}},
+            {"channel": "k2", "contract": {"parameter_count": 7}},
+        ],
+        np.arange(5.0),
+        fit,
+        evaluation,
+    )
+    np.testing.assert_array_equal(fit_prediction, fit[:, 1])
+    np.testing.assert_array_equal(evaluation_prediction, evaluation[:, 1])
+    assert contract == {
+        "family": "BEST_ACTIVE_K",
+        "channel": "k2",
+        "parameter_count": 7,
+        "intercept": 0.0,
+    }
+
+
+def test_best_active_k_predictions_retains_exact_zero() -> None:
+    fit_prediction, evaluation_prediction, contract = best_active_k_predictions(
+        {"best_active_k_channel": None},
+        [],
+        np.asarray([1.0, 2.0, 3.0]),
+        np.empty((3, 0)),
+        np.empty((2, 0)),
+    )
+    np.testing.assert_array_equal(fit_prediction, 2.0)
+    np.testing.assert_array_equal(evaluation_prediction, 2.0)
+    assert contract["family"] == "K_EXACT_ZERO"

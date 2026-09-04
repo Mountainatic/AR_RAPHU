@@ -33,7 +33,12 @@ from .v211_k import load_active_channels
 from .v211_public_all_baselines import SupportRequirement
 from .v211_public_all_closure import common_support_record
 from .v211_public_all_config import PublicAllPaths
-from .v211_public_all_materialization import _prediction_frame, _prediction_root
+from .v211_public_all_materialization import (
+    K_MODEL,
+    _prediction_frame,
+    _prediction_root,
+    best_active_k_predictions,
+)
 from .v211_support import support_id_hash
 from .v211_w import (
     IDENTITY,
@@ -269,6 +274,17 @@ def fit_prism_checkpoint_for_view(
     physical, c_contract, c_seed, fit_matrices = _fit_c_state(
         paths, view, fit, selected["c"]
     )
+    k_fit, _, k_contract = best_active_k_predictions(
+        selected["c"],
+        [
+            item
+            for item in load_active_channels(paths.output, view)
+            if item.get("channel") in set(selected["c"].get("active_channels", []))
+        ],
+        fit["y_true"].to_numpy(dtype=np.float64),
+        fit_matrices["compressed"],
+        fit_matrices["compressed"],
+    )
     w_selected = selected["w"]["w_contract"]
     if w_selected["family"] == IDENTITY:
         w_contract = dict(w_selected)
@@ -296,6 +312,7 @@ def fit_prism_checkpoint_for_view(
         "availability_scenario": view.availability_scenario,
         "proxy_policy": view.proxy_policy,
         "physical": physical,
+        "k_contract": k_contract,
         "c_contract": c_contract,
         "w_contract": w_contract,
         "fit_partition": "train_plus_validation_common_support",
@@ -304,11 +321,11 @@ def fit_prism_checkpoint_for_view(
         "missing_value_policy": "REJECT_NONFINITE_C1",
         "feature_order": list(physical["channels"]),
         "selection_hash": stable_hash(selected),
-        "models": list(
+        "models": [K_MODEL, *list(
             INPUT_MODELS
             if view.information_set == "input_only"
             else DYNAMIC_MODELS[:4]
-        ),
+        )],
         "reload_prediction_tolerance": 1e-10,
     }
     fit_physical = c_seed + correction
@@ -316,6 +333,7 @@ def fit_prism_checkpoint_for_view(
     replay: dict[str, np.ndarray] = {
         "compressed": fit_matrices["compressed"][:replay_rows],
         "joint": fit_matrices["joint"][:replay_rows],
+        "k_prediction": k_fit[:replay_rows],
         "c_prediction": c_seed[:replay_rows],
         "w_prediction": fit_physical[:replay_rows],
     }
@@ -525,11 +543,22 @@ def verify_prism_checkpoint_reload(checkpoint: Path) -> dict[str, Any]:
     assert_inference_only()
     state, arrays, manifest = load_portable_checkpoint(checkpoint)
     matrices = {"compressed": arrays["compressed"], "joint": arrays["joint"]}
+    _, k_prediction, _ = best_active_k_predictions(
+        {"best_active_k_channel": state["k_contract"].get("channel")},
+        [
+            {"channel": channel, "contract": {}}
+            for channel in state["physical"]["channels"]
+        ],
+        arrays["k_prediction"],
+        matrices["compressed"],
+        matrices["compressed"],
+    )
     c_prediction = _predict_c(
         matrices, state["c_contract"], list(state["physical"]["channels"])
     )
     w_prediction = c_prediction + predict_w_correction(c_prediction, state["w_contract"])
     errors = {
+        "k": float(np.max(np.abs(k_prediction - arrays["k_prediction"]), initial=0.0)),
         "c": float(np.max(np.abs(c_prediction - arrays["c_prediction"]), initial=0.0)),
         "w": float(np.max(np.abs(w_prediction - arrays["w_prediction"]), initial=0.0)),
     }
@@ -595,11 +624,22 @@ def predict_prism_checkpoint_for_view(
     test_matrices = _predict_physical_features(paths, view, samples, split, state["physical"])
     fit_seed = _predict_c(fit_matrices, state["c_contract"], list(state["physical"]["channels"]))
     test_seed = _predict_c(test_matrices, state["c_contract"], list(state["physical"]["channels"]))
+    _, test_k, _ = best_active_k_predictions(
+        {"best_active_k_channel": state["k_contract"].get("channel")},
+        [
+            {"channel": channel, "contract": {}}
+            for channel in state["physical"]["channels"]
+        ],
+        fit["y_true"].to_numpy(dtype=np.float64),
+        fit_matrices["compressed"],
+        test_matrices["compressed"],
+    )
     fit_correction = predict_w_correction(fit_seed, state["w_contract"])
     test_correction = predict_w_correction(test_seed, state["w_contract"])
     fit_physical = fit_seed + fit_correction
     test_physical = test_seed + test_correction
     predictions: dict[str, tuple[np.ndarray, int]] = {
+        K_MODEL: (test_k, int(state["k_contract"].get("parameter_count", 0))),
         INPUT_MODELS[0] if view.information_set == "input_only" else DYNAMIC_MODELS[0]: (
             test_seed,
             int(state["c_contract"].get("parameter_count", 0)),

@@ -1,0 +1,124 @@
+{
+  "schema_version": "1.0",
+  "protocol_id": "PRISM_V211_STAGEWISE_ABLATION_HYBRID_HW_20260904_R1",
+  "status": "FROZEN_BEFORE_STAGEWISE_IMPLEMENTATION_TEST_AND_EXECUTION",
+  "evidence_class": "RETROSPECTIVE_STAGEWISE_ABLATION_ON_PREVIOUSLY_ACCESSED_TEST_SUPPORT",
+  "base": {
+    "release_tag": "prism-v2-1-1-public5-cz-neural3-level-r2-20260901",
+    "commit": "be7557933f4a2ad11c7655c04ce031f524611cb0",
+    "release_role": "TRACEABLE_CODE_AND_LEGACY_EVIDENCE_BASE_NOT_A_COMMON_PROTOCOL_RESULT_POOL"
+  },
+  "task_matrix": [
+    {
+      "dataset": "tep",
+      "head_id": "TEP_G_NOWCAST_H0__H0__W1",
+      "h_steps": 0,
+      "w_steps": 1,
+      "cadence_seconds": 180,
+      "task_type": "STRICT_PAST_CURRENT_STATE_NOWCAST",
+      "history_steps": [128, 256],
+      "common_support_history_steps": 256,
+      "main_view": ["dynamic", "record_time", "proxy_excluded"],
+      "supplementary_views": [
+        ["input_only", "record_time", "proxy_excluded"],
+        ["dynamic", "analyzer_maturity_5_steps", "proxy_excluded"]
+      ]
+    },
+    {
+      "dataset": "debutanizer",
+      "head_id": "DEB_C4__H5__W1",
+      "h_steps": 5,
+      "w_steps": 1,
+      "main_view": ["dynamic", "record_time", "primary"]
+    },
+    {
+      "dataset": "sru",
+      "head_id": "SRU_H2S_REP_H1__H1__W1",
+      "h_steps": 1,
+      "w_steps": 1,
+      "cadence_seconds": 60,
+      "main_view": ["dynamic", "record_time", "primary"]
+    },
+    {
+      "dataset": "sru",
+      "head_id": "SRU_SO2_REP_H1__H1__W1",
+      "h_steps": 1,
+      "w_steps": 1,
+      "cadence_seconds": 60,
+      "main_view": ["dynamic", "record_time", "primary"]
+    },
+    {
+      "dataset": "pmsm",
+      "head_id": "PMSM_PM5__H600__W60",
+      "h_steps": 600,
+      "w_steps": 60,
+      "cadence_seconds": 0.5,
+      "main_view": ["dynamic", "record_time", "proxy_excluded"]
+    },
+    {
+      "dataset": "metropt",
+      "head_id": "METRO_P60__H6__W1",
+      "h_steps": 6,
+      "w_steps": 1,
+      "cadence_seconds": 10,
+      "main_view": ["dynamic", "record_time", "proxy_excluded"]
+    },
+    {
+      "dataset": "metropt",
+      "head_id": "METRO_OIL20__H120__W12",
+      "h_steps": 120,
+      "w_steps": 12,
+      "cadence_seconds": 10,
+      "main_view": ["dynamic", "record_time", "primary"]
+    },
+    {
+      "dataset": "cz_czochralski",
+      "head_id": "CZ_DIAM_RAW2S_CURRENT_L256_H4",
+      "h_steps": 4,
+      "w_steps": 1,
+      "cadence_seconds": 2,
+      "history_steps": [256],
+      "directions": ["Rod_1_to_Rod_2", "Rod_2_to_Rod_1"],
+      "main_view": ["dynamic", "record_time", "primary"],
+      "privacy": "AGGREGATE_ONLY_NO_RAW_ROWS_OR_PREDICTIONS_IN_PUBLIC_BUNDLE"
+    }
+  ],
+  "stagewise_models": [
+    {"label": "K", "model": "PRISM_V2_1_1_K"},
+    {"label": "K+C", "model": "PRISM_V2_1_1_K_C_DYNAMIC"},
+    {"label": "K+C+DELTA_W", "model": "PRISM_V2_1_1_K_C_W_DYNAMIC"},
+    {"label": "K+C+DELTA_W+A", "model": "PRISM_V2_1_1_PHYSICS_FIRST"},
+    {"label": "J", "model": "PRISM_V2_1_1_JOINT_KWA"}
+  ],
+  "stage_semantics": {
+    "K": "BEST_ACTIVE_K_CHANNEL_REPLAYED_ON_THE_ASSEMBLY_COMMON_SUPPORT",
+    "rejected_W": "IDENTITY_SO_KCW_EQUALS_KC_EXACTLY",
+    "rejected_A": "EXACT_ZERO_SO_KCWA_EQUALS_KCW_EXACTLY",
+    "unsupported_J": "NOT_SUPPORTED_ON_DEVELOPMENT_WITH_NO_AR_ONLY_FALLBACK"
+  },
+  "metrics": {
+    "primary": ["rmse_level", "mae_level", "r2_level"],
+    "change_diagnostics": ["rmse_delta", "mae_delta", "r2_delta", "persistence_skill"],
+    "incremental_gain_sign": "POSITIVE_MEANS_LATER_STAGE_HAS_LOWER_RMSE",
+    "increments": {
+      "delta_rmse_C": "rmse(K)-rmse(K+C)",
+      "delta_rmse_W": "rmse(K+C)-rmse(K+C+DELTA_W)",
+      "delta_rmse_A": "rmse(K+C+DELTA_W)-rmse(K+C+DELTA_W+A)"
+    }
+  },
+  "uncertainty": {
+    "method": "PAIRED_MOVING_BLOCK_BOOTSTRAP",
+    "replicates": 500,
+    "block_length_source": "DEVELOPMENT_RESIDUAL_ACF_ONLY",
+    "family": "9_MAIN_ROWS_X_3_ADJACENT_STAGE_INCREMENTS",
+    "multiplicity": "HOLM",
+    "alpha": 0.05
+  },
+  "execution": {
+    "system_disk_large_outputs_forbidden": true,
+    "run_root_parent": "/root/autodl-tmp",
+    "minimum_free_gib_stopline": 15,
+    "blas_threads_per_worker": 1,
+    "formal_start_requires_existing_neural3_job_finished": true
+  }
+}

@@ -41,6 +41,48 @@ _JOINT_MATERIALIZATION_FIELDS = (
     "raw_k_support",
 )
 _JOINT_W_ROUTES = {J_KW, J_KWA}
+K_MODEL = "PRISM_V2_1_1_K"
+
+
+def best_active_k_predictions(
+    c_result: Mapping[str, Any],
+    active: list[dict[str, Any]],
+    fit_target: np.ndarray,
+    fit_compressed: np.ndarray,
+    evaluation_compressed: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, dict[str, Any]]:
+    """Replay the exact best-K comparator used by the C preservation gate."""
+    target = np.asarray(fit_target, dtype=np.float64)
+    if not active or c_result.get("best_active_k_channel") is None:
+        intercept = float(np.mean(target, dtype=np.float64))
+        return (
+            np.full(len(target), intercept, dtype=np.float64),
+            np.full(len(evaluation_compressed), intercept, dtype=np.float64),
+            {
+                "family": "K_EXACT_ZERO",
+                "channel": None,
+                "parameter_count": 1,
+                "intercept": intercept,
+            },
+        )
+    channels = [str(item["channel"]) for item in active]
+    channel = str(c_result["best_active_k_channel"])
+    if channel not in channels:
+        raise RuntimeError("best active K channel is absent from materialized K support")
+    index = channels.index(channel)
+    selected = active[index]
+    selected_contract = selected.get("contract", selected.get("final_selected_contract", {}))
+    parameter_count = int(selected_contract.get("parameter_count", 0))
+    return (
+        np.asarray(fit_compressed[:, index], dtype=np.float64).copy(),
+        np.asarray(evaluation_compressed[:, index], dtype=np.float64).copy(),
+        {
+            "family": "BEST_ACTIVE_K",
+            "channel": channel,
+            "parameter_count": parameter_count,
+            "intercept": 0.0,
+        },
+    )
 
 
 def _read_pass(path: Path) -> dict[str, Any]:
@@ -381,7 +423,13 @@ def materialize_input_prism_view(
     development = _development(paths.shared, view, native_requirements)
     evaluation = _common_evaluation(paths, view, split)
     config = load_frozen_config(paths.project)
-    development_seed, evaluation_seed, development_upstream, _, _ = _fit_c_routed(
+    (
+        development_seed,
+        evaluation_seed,
+        development_upstream,
+        evaluation_upstream,
+        _,
+    ) = _fit_c_routed(
         paths.shared,
         view,
         development,
@@ -391,6 +439,13 @@ def materialize_input_prism_view(
         c,
         fit_split="validation",
         evaluation_split=split,
+    )
+    _, k_evaluation, k_contract = best_active_k_predictions(
+        c,
+        active,
+        development["y_true"].to_numpy(dtype=np.float64),
+        development_upstream,
+        evaluation_upstream,
     )
     w_contract = w["w_contract"]
     if w_contract["family"] == IDENTITY:
@@ -410,6 +465,17 @@ def materialize_input_prism_view(
     c_parameters = int(c.get("fusion_contract", {}).get("parameter_count", 0))
     w_parameters = int(w_contract.get("parameter_count", 0))
     audits = [
+        _write_prediction(
+            paths,
+            view,
+            K_MODEL,
+            evaluation,
+            k_evaluation,
+            int(k_contract["parameter_count"]),
+            started,
+            development,
+            split=split,
+        ),
         _write_prediction(
             paths,
             view,
@@ -578,10 +644,30 @@ def materialize_dynamic_prism_view(
         w,
         evaluation_split=split,
     )
+    _, k_evaluation, k_contract = best_active_k_predictions(
+        c,
+        active,
+        assembly["y_true"].to_numpy(dtype=np.float64),
+        c_w_test["fit_upstream"],
+        c_w_test["evaluation_upstream"],
+    )
     audits: list[dict[str, Any]] = []
     c_parameters = int(c.get("fusion_contract", {}).get("parameter_count", 0))
     w_contract = w["w_contract"]
     w_parameters = int(w_contract.get("parameter_count", 0))
+    audits.append(
+        _write_prediction(
+            paths,
+            view,
+            K_MODEL,
+            evaluation,
+            k_evaluation,
+            int(k_contract["parameter_count"]),
+            started,
+            assembly,
+            split=split,
+        )
+    )
     audits.append(
         _write_prediction(
             paths,
