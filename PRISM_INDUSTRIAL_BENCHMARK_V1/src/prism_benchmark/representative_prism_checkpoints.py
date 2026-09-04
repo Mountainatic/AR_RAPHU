@@ -501,10 +501,20 @@ def _write_model(
     fit_support_hash: str,
     started: float,
     split: str,
+    destination_run_root: Path | None = None,
 ) -> dict[str, Any]:
     frame = _prediction_frame(samples, view, model, prediction, parameter_count)
     frame["split"] = split
-    destination = _prediction_root(paths, split) / view.relative_root / f"{model}.parquet"
+    destination_paths = (
+        paths
+        if destination_run_root is None
+        else PublicAllPaths(paths.project, paths.shared, destination_run_root)
+    )
+    destination = (
+        _prediction_root(destination_paths, split)
+        / view.relative_root
+        / f"{model}.parquet"
+    )
     destination.parent.mkdir(parents=True, exist_ok=True)
     frame.to_parquet(destination, index=False, compression="zstd")
     metrics = metric_bundle_delta_and_level(
@@ -529,7 +539,7 @@ def _write_model(
         "fit_support_hash": fit_support_hash,
         "checkpoint_hash": checkpoint_hash,
         "checkpoint_dir": str(checkpoint),
-        "prediction_path": str(destination.relative_to(paths.run_root)),
+        "prediction_path": str(destination.relative_to(destination_paths.run_root)),
         "prediction_sha256": sha256_file(destination),
         "test_accessed": split == "test",
         "ood_accessed": split == "ood",
@@ -611,6 +621,7 @@ def predict_prism_checkpoint_for_view(
     checkpoint_root: Path,
     *,
     split: str = "test",
+    destination_run_root: Path | None = None,
 ) -> list[dict[str, Any]]:
     assert_inference_only()
     started = time.time()
@@ -730,6 +741,7 @@ def predict_prism_checkpoint_for_view(
             str(state["fit_support_hash"]),
             started,
             split,
+            destination_run_root,
         )
         for model, (prediction, parameter_count) in predictions.items()
     ]
@@ -743,7 +755,14 @@ def predict_prism_checkpoint_for_view(
             }
         )
     write_json(
-        _prediction_root(paths, split) / view.relative_root / "PRISM_INFERENCE_RESULT.json",
+        _prediction_root(
+            paths
+            if destination_run_root is None
+            else PublicAllPaths(paths.project, paths.shared, destination_run_root),
+            split,
+        )
+        / view.relative_root
+        / "PRISM_INFERENCE_RESULT.json",
         {
             "status": "PASS",
             "models": records,
