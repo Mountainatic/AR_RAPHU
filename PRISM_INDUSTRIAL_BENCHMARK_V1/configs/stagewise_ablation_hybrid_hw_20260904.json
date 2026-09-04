@@ -1,7 +1,9 @@
 {
   "schema_version": "1.0",
-  "protocol_id": "PRISM_V211_STAGEWISE_ABLATION_HYBRID_HW_20260904_R1",
-  "status": "FROZEN_BEFORE_STAGEWISE_IMPLEMENTATION_TEST_AND_EXECUTION",
+  "protocol_id": "PRISM_V211_STAGEWISE_ABLATION_HYBRID_HW_20260904_R2",
+  "status": "FROZEN_AFTER_IMPLEMENTATION_PREFLIGHT_BEFORE_EXECUTION",
+  "amends": "PRISM_V211_STAGEWISE_ABLATION_HYBRID_HW_20260904_R1",
+  "amendment_scope": "RUNTIME_CONFIG_SOURCE_ONLY_NO_TASK_METRIC_SELECTION_OR_NUMERICAL_THRESHOLD_CHANGE",
   "evidence_class": "RETROSPECTIVE_STAGEWISE_ABLATION_ON_PREVIOUSLY_ACCESSED_TEST_SUPPORT",
   "base": {
     "release_tag": "prism-v2-1-1-public5-cz-neural3-level-r2-20260901",
@@ -115,6 +117,8 @@
     "alpha": 0.05
   },
   "execution": {
+    "validated_numeric_contract": "PRISM_V2_1_1_NATIVE_SUPPORT_PUBLIC_ALL_RERUN_V1",
+    "representative_descriptor_reuse": "FORBIDDEN_BECAUSE_RELEASE_BASE_HAS_A_PREEXISTING_CZ_CONTRACT_HASH_DRIFT",
     "system_disk_large_outputs_forbidden": true,
     "run_root_parent": "/root/autodl-tmp",
     "minimum_free_gib_stopline": 15,

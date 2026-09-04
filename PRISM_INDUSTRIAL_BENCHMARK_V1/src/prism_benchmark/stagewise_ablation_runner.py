@@ -19,7 +19,7 @@ from .v2_runtime import run_parallel
 from .v2_views import development_dynamic_views, development_input_views
 from .v211_a import run_a_view
 from .v211_c import run_c_view
-from .v211_config import REPRESENTATIVE_STAGE1_PROTOCOL
+from .v211_config import PUBLIC_ALL_PROTOCOL
 from .v211_joint_stability import run_joint_stability_view
 from .v211_k import run_k_channel
 from .v211_public_all_baselines import apply_common_requirements
@@ -34,7 +34,7 @@ from .v211_w import run_w_view
 
 
 CONFIG_RELATIVE_PATH = Path("configs/stagewise_ablation_hybrid_hw_20260904.json")
-PROTOCOL_ID = "PRISM_V211_STAGEWISE_ABLATION_HYBRID_HW_20260904_R1"
+PROTOCOL_ID = "PRISM_V211_STAGEWISE_ABLATION_HYBRID_HW_20260904_R2"
 ACCEPTABLE_JOINT_STATUSES = {
     "PASS",
     "NOT_RUN_PROTOCOL_INCOMPATIBLE",
@@ -48,7 +48,7 @@ def load_stagewise_protocol(project: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     if value.get("protocol_id") != PROTOCOL_ID:
         raise RuntimeError("stagewise ablation protocol id mismatch")
-    if value.get("status") != "FROZEN_BEFORE_STAGEWISE_IMPLEMENTATION_TEST_AND_EXECUTION":
+    if value.get("status") != "FROZEN_AFTER_IMPLEMENTATION_PREFLIGHT_BEFORE_EXECUTION":
         raise RuntimeError("stagewise ablation protocol is not frozen")
     return value
 
@@ -214,7 +214,7 @@ def run_development(
                 paths.output,
                 view,
                 channel,
-                REPRESENTATIVE_STAGE1_PROTOCOL,
+                PUBLIC_ALL_PROTOCOL,
             ),
         )
         for view in input_views
@@ -228,7 +228,7 @@ def run_development(
             [
                 (
                     _result_path(paths.output, "C", view),
-                    (paths.shared, paths.project, paths.output, view, REPRESENTATIVE_STAGE1_PROTOCOL),
+                    (paths.shared, paths.project, paths.output, view, PUBLIC_ALL_PROTOCOL),
                 )
                 for view in input_views
             ],
@@ -239,7 +239,7 @@ def run_development(
             [
                 (
                     _result_path(paths.output, "W", view),
-                    (paths.shared, paths.project, paths.output, view, REPRESENTATIVE_STAGE1_PROTOCOL),
+                    (paths.shared, paths.project, paths.output, view, PUBLIC_ALL_PROTOCOL),
                 )
                 for view in input_views
             ],
@@ -250,7 +250,7 @@ def run_development(
             [
                 (
                     _result_path(paths.output, "A", view),
-                    (paths.shared, paths.project, paths.output, view, REPRESENTATIVE_STAGE1_PROTOCOL),
+                    (paths.shared, paths.project, paths.output, view, PUBLIC_ALL_PROTOCOL),
                 )
                 for view in dynamic_views
             ],
@@ -267,7 +267,7 @@ def run_development(
                         paths.output,
                         None,
                         view,
-                        REPRESENTATIVE_STAGE1_PROTOCOL,
+                        PUBLIC_ALL_PROTOCOL,
                     ),
                 )
                 for view in dynamic_views

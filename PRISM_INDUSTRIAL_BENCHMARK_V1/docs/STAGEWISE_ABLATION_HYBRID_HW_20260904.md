@@ -1,7 +1,9 @@
 # PRISM v2.1.1 stagewise ablation: hybrid h/w protocol
 
 This amendment freezes the submission-critical stagewise ablation before its
-implementation tests and execution. The code base is release tag
+execution. R2 amends only the runtime configuration source after implementation
+preflight exposed a pre-existing checksum drift; no task, metric, selection
+rule, numerical threshold, or test result was changed. The code base is release tag
 `prism-v2-1-1-public5-cz-neural3-level-r2-20260901`, commit
 `be7557933f4a2ad11c7655c04ce031f524611cb0`. The tag is not modified; execution
 uses a new branch and namespace.
@@ -16,6 +18,11 @@ must not be described as a homogeneous forecast leaderboard.
 The exact machine-readable task matrix is
 `configs/stagewise_ablation_hybrid_hw_20260904.json`. No `all-nowcast` registry
 may be used in this experiment.
+
+Numerical K/C/W/A/J settings are loaded from the validated Public-All frozen
+contract in this release. The older representative descriptor is not used as a
+launcher contract because its bound CZ-contract checksum already drifts at the
+release base; the checksum is not edited or bypassed.
 
 ## Stage definitions
 
