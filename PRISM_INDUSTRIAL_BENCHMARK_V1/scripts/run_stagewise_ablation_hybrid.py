@@ -10,6 +10,7 @@ for _name in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUM
 
 from prism_benchmark.stagewise_ablation_runner import (
     fit_checkpoints,
+    freeze_bootstrap_block_lengths,
     infer_checkpoints,
     matching_views,
     run_development,
@@ -19,7 +20,9 @@ from prism_benchmark.v211_public_all_config import PublicAllPaths
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run the frozen hybrid-h/w stagewise ablation.")
-    parser.add_argument("stage", choices=("development", "checkpoint", "infer"))
+    parser.add_argument(
+        "stage", choices=("development", "freeze-bootstrap", "checkpoint", "infer")
+    )
     parser.add_argument("--project", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--shared", type=Path, required=True)
     parser.add_argument("--selection-run-root", type=Path, required=True)
@@ -43,8 +46,6 @@ def main() -> None:
             per_worker_gib=args.per_worker_gib,
         )
     else:
-        if args.checkpoint_root is None:
-            raise RuntimeError("--checkpoint-root is required")
         views = matching_views(
             paths,
             args.head_id,
@@ -52,6 +53,12 @@ def main() -> None:
             availability_scenario=args.availability_scenario,
             proxy_policy=args.proxy_policy,
         )
+        if args.stage == "freeze-bootstrap":
+            result = freeze_bootstrap_block_lengths(paths, views)
+            print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+            return
+        if args.checkpoint_root is None:
+            raise RuntimeError("--checkpoint-root is required")
         if args.stage == "checkpoint":
             result = fit_checkpoints(paths, args.checkpoint_root.resolve(), views)
         else:

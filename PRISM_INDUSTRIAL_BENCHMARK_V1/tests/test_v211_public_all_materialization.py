@@ -6,6 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
+import pandas as pd
 import pytest
 
 
@@ -13,6 +14,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from prism_benchmark.cpu_data import HeadSpec, ViewSpec
+from prism_benchmark.stagewise_ablation_runner import development_residual_block_length
 from prism_benchmark.v211_joint import J_KA, J_KW
 from prism_benchmark.v211_joint_stability_config import (
     CHANNEL_COMPRESSED,
@@ -244,3 +246,18 @@ def test_best_active_k_predictions_retains_exact_zero() -> None:
     np.testing.assert_array_equal(fit_prediction, 2.0)
     np.testing.assert_array_equal(evaluation_prediction, 2.0)
     assert contract["family"] == "K_EXACT_ZERO"
+
+
+def test_development_residual_block_length_does_not_cross_entities() -> None:
+    frame = pd.DataFrame(
+        {
+            "entity_id": ["a", "a", "b", "b"],
+            "origin": [0, 1, 0, 1],
+            "y_true": [1.0, 2.0, 2.0, 1.0],
+            "y_pred": [0.0, 0.0, 0.0, 0.0],
+        }
+    )
+    result = development_residual_block_length(frame)
+    assert result["block_length"] == 1
+    assert result["entity_boundaries_crossed"] is False
+    assert result["acf_until_selection"] == [-0.5]

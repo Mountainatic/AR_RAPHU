@@ -44,9 +44,18 @@ for the required stagewise ladder.
 Level RMSE, MAE, and R2 are primary. Delta RMSE, MAE, R2, and persistence skill
 are retained for dynamic views, especially TEP H0. Adjacent RMSE gains are
 defined with positive values indicating improvement. Uncertainty uses 500
-paired moving-block bootstrap replicates, with block length fixed from
-development residual autocorrelation. Holm correction covers the 27 main
+paired moving-block bootstrap replicates, with block length fixed before test
+inference from the `K+C+DELTA_W+A` development-validation residuals only. The
+deterministic rule selects the first lag whose absolute within-entity ACF is at
+most `1.96/sqrt(N)`, or lag 256 (or the longest available lag) if none qualifies.
+Blocks never cross entity boundaries. Holm correction covers the 27 main
 adjacent-stage comparisons.
+
+The figure is a three-panel horizontal dot-and-interval comparison (`C`,
+`DELTA_W`, `A`). It uses relative RMSE reduction for cross-task readability and
+a visible zero reference; exact raw-unit RMSE gains remain in the table and CSV.
+The palette is limited to blue, gold, and orange, while position, panel labels,
+and signed values preserve meaning without color.
 
 This is retrospective ablation evidence because relevant test supports have
 already been accessed in earlier releases. It must not be relabeled as a fresh

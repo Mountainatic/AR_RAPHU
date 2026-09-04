@@ -7,6 +7,9 @@ import os
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
+import numpy as np
+import pandas as pd
+
 from .cpu_data import ViewSpec, input_columns, sha256_file
 from .portable_checkpoints import INFERENCE_ONLY_ENV, activate_inference_fit_guard
 from .representative_prism_checkpoints import (
@@ -34,13 +37,15 @@ from .v211_w import run_w_view
 
 
 CONFIG_RELATIVE_PATH = Path("configs/stagewise_ablation_hybrid_hw_20260904.json")
-PROTOCOL_ID = "PRISM_V211_STAGEWISE_ABLATION_HYBRID_HW_20260904_R2"
+PROTOCOL_ID = "PRISM_V211_STAGEWISE_ABLATION_HYBRID_HW_20260904_R3"
 ACCEPTABLE_JOINT_STATUSES = {
     "PASS",
     "NOT_RUN_PROTOCOL_INCOMPATIBLE",
     "JOINT_STABILITY_REGISTERED_STABILITY_CONTROLS_INSUFFICIENT",
     "SOLVER_FAILED_RETAINED",
 }
+BOOTSTRAP_BLOCK_REGISTRY = "STAGEWISE_BOOTSTRAP_BLOCK_LENGTHS.json"
+BOOTSTRAP_ACF_MAXIMUM_LAG = 256
 
 
 def load_stagewise_protocol(project: Path) -> dict[str, Any]:
@@ -322,6 +327,116 @@ def matching_views(
     return result
 
 
+def development_residual_block_length(
+    frame: pd.DataFrame, *, maximum_lag: int = BOOTSTRAP_ACF_MAXIMUM_LAG
+) -> dict[str, Any]:
+    """Choose the first immaterial residual-ACF lag without crossing entities."""
+
+    required = {"entity_id", "origin", "y_true", "y_pred"}
+    missing = required - set(frame.columns)
+    if missing:
+        raise RuntimeError(f"development residual frame is missing: {sorted(missing)}")
+    ordered = frame.sort_values(["entity_id", "origin"], kind="stable")
+    residuals = [
+        part["y_true"].to_numpy(dtype=np.float64)
+        - part["y_pred"].to_numpy(dtype=np.float64)
+        for _, part in ordered.groupby("entity_id", sort=False)
+    ]
+    rows = sum(len(values) for values in residuals)
+    if rows < 2:
+        return {
+            "block_length": 1,
+            "rows": rows,
+            "entities": len(residuals),
+            "maximum_lag_evaluated": 0,
+            "acf_threshold": float("inf"),
+            "selection_rule": "SINGLETON_FALLBACK",
+        }
+    centered = [values - np.mean(values, dtype=np.float64) for values in residuals]
+    denominator = float(
+        sum(np.sum(np.square(values), dtype=np.float64) for values in centered)
+    )
+    threshold = float(1.96 / np.sqrt(rows))
+    longest = max(len(values) for values in centered)
+    limit = max(1, min(int(maximum_lag), longest - 1))
+    acf: list[float] = []
+    selected = limit
+    rule = "MAXIMUM_LAG_FALLBACK"
+    for lag in range(1, limit + 1):
+        numerator = float(
+            sum(
+                np.sum(values[:-lag] * values[lag:], dtype=np.float64)
+                for values in centered
+                if len(values) > lag
+            )
+        )
+        value = 0.0 if denominator == 0.0 else numerator / denominator
+        acf.append(value)
+        if abs(value) <= threshold:
+            selected = lag
+            rule = "FIRST_ABSOLUTE_ACF_WITHIN_95_PERCENT_WHITE_NOISE_BAND"
+            break
+    return {
+        "block_length": int(max(1, selected)),
+        "rows": int(rows),
+        "entities": int(len(residuals)),
+        "maximum_lag_evaluated": int(limit),
+        "acf_threshold": threshold,
+        "acf_until_selection": acf,
+        "selection_rule": rule,
+        "entity_boundaries_crossed": False,
+    }
+
+
+def freeze_bootstrap_block_lengths(
+    paths: PublicAllPaths, views: Iterable[ViewSpec]
+) -> dict[str, Any]:
+    """Freeze test-bootstrap block lengths from development residuals only."""
+
+    if os.environ.get(INFERENCE_ONLY_ENV) == "1":
+        raise RuntimeError("bootstrap block selection is forbidden after inference starts")
+    records: list[dict[str, Any]] = []
+    for view in views:
+        source = (
+            paths.output
+            / "DEVELOPMENT"
+            / "A"
+            / view.head.head_id
+            / view.availability_scenario
+            / view.proxy_policy
+            / "validation.parquet"
+        )
+        if not source.is_file():
+            raise RuntimeError(f"development PF prediction is missing: {source}")
+        frame = pd.read_parquet(
+            source, columns=["entity_id", "origin", "y_true", "y_pred"]
+        )
+        records.append(
+            {
+                "target_head": view.head.head_id,
+                "dataset": view.head.dataset,
+                "information_set": view.information_set,
+                "availability_scenario": view.availability_scenario,
+                "proxy_policy": view.proxy_policy,
+                "development_prediction_path": str(source.relative_to(paths.run_root)),
+                "development_prediction_sha256": sha256_file(source),
+                **development_residual_block_length(frame),
+            }
+        )
+    result = {
+        "status": "PASS",
+        "protocol_id": PROTOCOL_ID,
+        "method": "PAIRED_MOVING_BLOCK_BOOTSTRAP",
+        "block_length_source": "DEVELOPMENT_PF_RESIDUAL_ACF_ONLY",
+        "maximum_lag": BOOTSTRAP_ACF_MAXIMUM_LAG,
+        "records": records,
+        "test_accessed": False,
+        "ood_accessed": False,
+    }
+    write_json(paths.freeze / BOOTSTRAP_BLOCK_REGISTRY, result)
+    return result
+
+
 def fit_checkpoints(
     paths: PublicAllPaths,
     checkpoint_root: Path,
@@ -348,6 +463,9 @@ def infer_checkpoints(
 ) -> dict[str, Any]:
     if os.environ.get(INFERENCE_ONLY_ENV) != "1":
         raise RuntimeError("inference requires PRISM_FORMAL_INFERENCE_ONLY=1")
+    block_registry = paths.freeze / BOOTSTRAP_BLOCK_REGISTRY
+    if not block_registry.is_file():
+        raise RuntimeError("development-only bootstrap block-length freeze is missing")
     activate_inference_fit_guard()
     records: list[dict[str, Any]] = []
     reload_audits: list[dict[str, Any]] = []
@@ -379,6 +497,8 @@ def infer_checkpoints(
         "protocol_id": PROTOCOL_ID,
         "records": records,
         "reload_audits": reload_audits,
+        "bootstrap_block_registry": str(block_registry),
+        "bootstrap_block_registry_sha256": sha256_file(block_registry),
         "fit_called_in_inference": False,
         "test_accessed": True,
         "ood_accessed": False,
