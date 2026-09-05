@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import os
 import shutil
 import subprocess
 import sys
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -23,7 +25,9 @@ def _utc() -> str:
 
 def _write_json(path: Path, value: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    temporary = path.with_name(
+        f".{path.name}.{os.getpid()}.{threading.get_ident()}.tmp"
+    )
     temporary.write_text(
         json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -80,7 +84,10 @@ def _run(command: list[str], log_path: Path, env: dict[str, str], data_root: Pat
 
 
 def _runner_command(
-    unit: dict[str, Any], stage: str, run_root: Path
+    unit: dict[str, Any],
+    stage: str,
+    run_root: Path,
+    development_workers: int,
 ) -> list[str]:
     command = [
         sys.executable,
@@ -102,7 +109,9 @@ def _runner_command(
         str(unit["proxy_policy"]),
     ]
     if stage == "development":
-        command.extend(["--workers", "8", "--per-worker-gib", "4"])
+        command.extend(
+            ["--workers", str(development_workers), "--per-worker-gib", "4"]
+        )
     if stage in {"checkpoint", "infer"}:
         command.extend(["--checkpoint-root", str(unit["checkpoint_root"])])
     if stage == "infer":
@@ -162,6 +171,100 @@ def _report_unit(unit: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _unit_groups(units: list[dict[str, Any]]) -> list[list[dict[str, Any]]]:
+    """Keep the three TEP views ordered while exposing independent units."""
+    tep_labels = {"TEP H0", "TEP H0 input-only", "TEP H0 maturity-5"}
+    tep_group = [unit for unit in units if str(unit["label"]) in tep_labels]
+    if [str(unit["label"]) for unit in tep_group] != [
+        "TEP H0",
+        "TEP H0 input-only",
+        "TEP H0 maturity-5",
+    ]:
+        raise RuntimeError("unexpected TEP unit order")
+    return [tep_group] + [
+        [unit] for unit in units if str(unit["label"]) not in tep_labels
+    ]
+
+
+def _run_unit(
+    unit: dict[str, Any],
+    *,
+    run_root: Path,
+    data_root: Path,
+    env: dict[str, str],
+    development_workers: int,
+    status: dict[str, Any],
+    status_path: Path,
+    status_lock: threading.Lock,
+    bootstrap_locks: dict[Path, threading.Lock],
+) -> None:
+    label = str(unit["label"])
+    with status_lock:
+        status["stages"][label] = "RUNNING"
+        _write_json(status_path, status)
+    try:
+        if unit["develop"]:
+            _run(
+                _runner_command(
+                    unit, "development", run_root, development_workers
+                ),
+                run_root / "logs" / f"{label}.development.log",
+                env,
+                data_root,
+            )
+        if unit["information_set"] == "dynamic":
+            selection_root = Path(unit["selection_run_root"]).resolve()
+            with bootstrap_locks[selection_root]:
+                _run(
+                    _runner_command(
+                        unit, "freeze-bootstrap", run_root, development_workers
+                    ),
+                    run_root / "logs" / f"{label}.freeze-bootstrap.log",
+                    env,
+                    data_root,
+                )
+        checkpoint_marker = (
+            unit["checkpoint_root"] / "STAGEWISE_CHECKPOINT_MANIFEST.json"
+        )
+        if not _pass_marker(checkpoint_marker):
+            _run(
+                _runner_command(
+                    unit, "checkpoint", run_root, development_workers
+                ),
+                run_root / "logs" / f"{label}.checkpoint.log",
+                env,
+                data_root,
+            )
+        inference_env = env.copy()
+        inference_env["PRISM_FORMAL_INFERENCE_ONLY"] = "1"
+        inference_marker = (
+            unit["prediction_run_root"] / "STAGEWISE_INFERENCE_COMPLETE.json"
+        )
+        if not _pass_marker(inference_marker):
+            _run(
+                _runner_command(unit, "infer", run_root, development_workers),
+                run_root / "logs" / f"{label}.infer.log",
+                inference_env,
+                data_root,
+            )
+    except Exception:
+        with status_lock:
+            status["stages"][label] = "FAILED"
+            _write_json(status_path, status)
+        raise
+    with status_lock:
+        status["stages"][label] = "PASS"
+        _write_json(status_path, status)
+
+
+def _run_group(
+    group: list[dict[str, Any]],
+    **unit_kwargs: Any,
+) -> None:
+    for unit in group:
+        _run_unit(unit, **unit_kwargs)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Resume-safe AutoDL hybrid-h/w stagewise run.")
     parser.add_argument("--run-root", type=Path, required=True)
@@ -171,7 +274,13 @@ def main() -> None:
     parser.add_argument("--public-root", type=Path, required=True)
     parser.add_argument("--tep-root", type=Path, required=True)
     parser.add_argument("--cz-root", type=Path, required=True)
+    parser.add_argument("--parallel-units", type=int, default=1)
+    parser.add_argument("--development-workers", type=int, default=8)
     args = parser.parse_args()
+    if args.parallel_units < 1:
+        parser.error("--parallel-units must be at least 1")
+    if args.development_workers < 1:
+        parser.error("--development-workers must be at least 1")
 
     run_root = args.run_root.resolve()
     data_root = run_root.parent
@@ -182,6 +291,8 @@ def main() -> None:
         "started_utc": _utc(),
         "wait_pid": args.wait_pid,
         "minimum_free_gib": MINIMUM_FREE_GIB,
+        "parallel_units": args.parallel_units,
+        "development_workers_per_unit": args.development_workers,
         "stages": {},
         "test_accessed": False,
         "ood_accessed": False,
@@ -241,50 +352,47 @@ def main() -> None:
         _write_json(status_path, status)
 
         units = _units(args, representative_shared)
-        for unit in units:
-            label = str(unit["label"])
-            status["stages"][label] = "RUNNING"
-            _write_json(status_path, status)
-            if unit["develop"]:
-                _run(
-                    _runner_command(unit, "development", run_root),
-                    run_root / "logs" / f"{label}.development.log",
-                    env,
-                    data_root,
-                )
-            if unit["information_set"] == "dynamic":
-                _run(
-                    _runner_command(unit, "freeze-bootstrap", run_root),
-                    run_root / "logs" / f"{label}.freeze-bootstrap.log",
-                    env,
-                    data_root,
-                )
-            checkpoint_marker = unit["checkpoint_root"] / "STAGEWISE_CHECKPOINT_MANIFEST.json"
-            if not _pass_marker(checkpoint_marker):
-                _run(
-                    _runner_command(unit, "checkpoint", run_root),
-                    run_root / "logs" / f"{label}.checkpoint.log",
-                    env,
-                    data_root,
-                )
-            inference_env = env.copy()
-            inference_env["PRISM_FORMAL_INFERENCE_ONLY"] = "1"
-            inference_marker = unit["prediction_run_root"] / "STAGEWISE_INFERENCE_COMPLETE.json"
-            if not _pass_marker(inference_marker):
-                _run(
-                    _runner_command(unit, "infer", run_root),
-                    run_root / "logs" / f"{label}.infer.log",
-                    inference_env,
-                    data_root,
-                )
-            status["stages"][label] = "PASS"
-            _write_json(status_path, status)
+        status_lock = threading.Lock()
+        bootstrap_locks = {
+            Path(unit["selection_run_root"]).resolve(): threading.Lock()
+            for unit in units
+        }
+        groups = _unit_groups(units)
+        with ThreadPoolExecutor(max_workers=args.parallel_units) as executor:
+            futures = {
+                executor.submit(
+                    _run_group,
+                    group,
+                    run_root=run_root,
+                    data_root=data_root,
+                    env=env,
+                    development_workers=args.development_workers,
+                    status=status,
+                    status_path=status_path,
+                    status_lock=status_lock,
+                    bootstrap_locks=bootstrap_locks,
+                ): [str(unit["label"]) for unit in group]
+                for group in groups
+            }
+            errors: list[str] = []
+            for future in as_completed(futures):
+                try:
+                    future.result()
+                except Exception as error:
+                    errors.append(f"{futures[future]}: {error}")
+            if errors:
+                raise RuntimeError("parallel unit failures: " + "; ".join(errors))
 
         manifest_path = run_root / "freeze" / "STAGEWISE_REPORT_INPUT_MANIFEST.json"
         report_manifest = {
             "status": "FROZEN_BEFORE_REPORTING",
             "protocol_id": PROTOCOL_ID,
             "bootstrap_replicates": 500,
+            "orchestration": {
+                "parallel_units": args.parallel_units,
+                "development_workers_per_unit": args.development_workers,
+                "threads_per_process": 1,
+            },
             "units": [_report_unit(unit) for unit in units],
         }
         _write_json(manifest_path, report_manifest)
