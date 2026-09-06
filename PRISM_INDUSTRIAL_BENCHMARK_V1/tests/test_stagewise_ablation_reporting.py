@@ -11,6 +11,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from prism_benchmark.stagewise_ablation_reporting import (
+    _moving_block_indices,
     holm_adjust,
     paired_moving_block_gain,
 )
@@ -41,6 +42,37 @@ def test_paired_moving_block_gain_is_deterministic_and_positive() -> None:
     assert first["delta_rmse"] == 1.0
     assert first["ci95_low"] == 1.0
     assert first["ci95_high"] == 1.0
+
+
+def test_vectorized_moving_block_indices_match_scalar_reference() -> None:
+    frame = pd.DataFrame(
+        {
+            "entity_id": ["a"] * 7 + ["b"] * 4,
+            "origin": list(range(7)) + list(range(4)),
+        }
+    )
+
+    def scalar_reference(block_length: int, seed: int) -> np.ndarray:
+        rng = np.random.default_rng(seed)
+        sampled: list[np.ndarray] = []
+        for _, part in frame.groupby("entity_id", sort=False):
+            indices = part.index.to_numpy(dtype=np.int64)
+            count = len(indices)
+            width = min(max(1, block_length), count)
+            starts = np.arange(count - width + 1, dtype=np.int64)
+            blocks = [
+                indices[int(rng.choice(starts)) :][:width]
+                for _ in range((count + width - 1) // width)
+            ]
+            sampled.append(np.concatenate(blocks)[:count])
+        return np.concatenate(sampled)
+
+    for block_length in (1, 2, 3, 10):
+        for seed in (0, 7, 20260904):
+            observed = _moving_block_indices(
+                frame, block_length, np.random.default_rng(seed)
+            )
+            assert np.array_equal(observed, scalar_reference(block_length, seed))
 
 
 def test_holm_adjust_is_monotone_in_sorted_order() -> None:
