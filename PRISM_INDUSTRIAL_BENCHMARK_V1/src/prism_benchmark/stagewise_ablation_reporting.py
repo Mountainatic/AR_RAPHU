@@ -171,12 +171,11 @@ def _moving_block_indices(
         indices = part.index.to_numpy(dtype=np.int64)
         count = len(indices)
         width = min(max(1, int(block_length)), count)
-        starts = np.arange(count - width + 1, dtype=np.int64)
-        blocks: list[np.ndarray] = []
-        while sum(len(block) for block in blocks) < count:
-            start = int(rng.choice(starts))
-            blocks.append(indices[start : start + width])
-        sampled.append(np.concatenate(blocks)[:count])
+        block_count = (count + width - 1) // width
+        starts = rng.choice(count - width + 1, size=block_count)
+        offsets = np.arange(width, dtype=np.int64)
+        positions = (starts[:, None] + offsets).reshape(-1)[:count]
+        sampled.append(indices[positions])
     return np.concatenate(sampled)
 
 
