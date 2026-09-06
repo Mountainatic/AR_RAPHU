@@ -1,0 +1,21 @@
+{
+  "bootstrap_replicates": 500,
+  "expected_primary_comparisons": 27,
+  "input_manifest_sha256": "aaf7e65fba9731c093115560729861c434cc86ab104a93e0cc8f53638e452f18",
+  "multiplicity": "HOLM_ACROSS_27_PRIMARY_ADJACENT_STAGE_COMPARISONS",
+  "outputs": {
+    "STAGEWISE_INCREMENTAL_GAINS.csv": "ef23990eec48dab4e8a96b1312164f8b32cc3555f93477a21eece5a1412edcd4",
+    "STAGEWISE_INCREMENTAL_GAINS_FIGURE.pdf": "82f489df7bb3b53fb38271df34456d1aac38565b487d0811b06cad7c7e8bded1",
+    "STAGEWISE_INCREMENTAL_GAINS_FIGURE.png": "81ffdc07f503d1e4d3658ea4374b79683a1376cb32077937bbfed3237994009c",
+    "STAGEWISE_METRICS_LONG.csv": "3eda7c9520032f2e606f4efed72644269afa3ddb47c747c7cdf84eb60aa1ca22",
+    "STAGEWISE_METRICS_WIDE.csv": "0e0c6c4fe9ecad7384b6b73316b88ebc9826fe3c9e207c1faf3db75b7b7a19b2",
+    "STAGE_ADMISSION_STATUS.csv": "e7ba0f10cc3242855f95972deea4340b19b98380e58cd34086ccfff5031ff61c"
+  },
+  "primary_comparisons": 27,
+  "primary_units": 9,
+  "private_prediction_paths_emitted": false,
+  "protocol_id": "PRISM_V211_STAGEWISE_ABLATION_HYBRID_HW_20260904_R3",
+  "public_outputs_aggregate_only": true,
+  "status": "PASS",
+  "units": 11
+}
