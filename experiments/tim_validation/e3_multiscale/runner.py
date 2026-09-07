@@ -410,9 +410,28 @@ def run_development(args: argparse.Namespace) -> dict[str, Any]:
     multiscale_attempts = _candidate_fit_attempts(
         multiscale_paths.output, dynamic_view
     )
-    uniform_attempts = _candidate_fit_attempts(uniform_paths.output, dynamic_view)
+    uniform_physical_attempts = _candidate_fit_attempts(
+        uniform_paths.output, dynamic_view
+    )
+    uniform_attempts = dict(uniform_physical_attempts)
     shared_profile_fits = sum(
         len(value["profile_fold_losses"]) for value in source_results
+    )
+    shared_profile_fit_attempts = sum(
+        len(losses)
+        for value in source_results
+        for losses in value["profile_fold_losses"].values()
+    )
+    forced_profile_fit_attempts = sum(
+        len(losses)
+        for value in k_results
+        for losses in value["profile_fold_losses"].values()
+    )
+    uniform_attempts["K"] += (
+        shared_profile_fit_attempts - forced_profile_fit_attempts
+    )
+    uniform_attempts["total"] = sum(
+        uniform_attempts[stage] for stage in ("K", "C", "W", "A")
     )
     uniform_counts["shared_scale_search"] = shared_profile_fits
     multiscale_counts["shared_scale_search"] = shared_profile_fits
@@ -428,6 +447,10 @@ def run_development(args: argparse.Namespace) -> dict[str, Any]:
         "multiscale_candidate_configurations_executed": multiscale_counts,
         "uniform_candidate_fit_attempts": uniform_attempts,
         "multiscale_candidate_fit_attempts": multiscale_attempts,
+        "uniform_physical_refit_attempts": uniform_physical_attempts,
+        "shared_profile_fit_attempts_charged_to_both_arms": (
+            shared_profile_fit_attempts
+        ),
         "shared_profile_screen_reused_without_refit": True,
         "duplicate_candidate_padding": False,
         "test_accessed": False,
