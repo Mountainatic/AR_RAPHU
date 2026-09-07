@@ -11,7 +11,7 @@ import shutil
 import subprocess
 import sys
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -324,27 +324,61 @@ def _run_uniform_k(
     selected_history: int,
     workers: int,
 ) -> list[dict[str, Any]]:
-    def run(source: dict[str, Any]) -> dict[str, Any]:
-        losses = {
-            profile: values
-            for profile, values in parse_profile_losses(source).items()
-            if int(profile[1]) == selected_history
-        }
-        return run_k_channel(
-            paths.shared,
-            paths.project,
-            paths.output,
-            input_view,
-            str(source["channel"]),
-            PUBLIC_ALL_PROTOCOL,
-            forced_history_steps=selected_history,
-            profile_fold_losses_override=losses,
+    results: dict[str, dict[str, Any]] = {}
+    pending = []
+    for source in source_results:
+        channel = str(source["channel"])
+        result_path = (
+            paths.output
+            / "DEVELOPMENT"
+            / "K"
+            / input_view.head.head_id
+            / input_view.proxy_policy
+            / channel
+            / "RESULT.json"
         )
-
+        if result_path.is_file():
+            value = _read(result_path)
+            if (
+                value.get("status") == "PASS"
+                and value.get("forced_history_steps") == selected_history
+                and value.get("test_accessed") is False
+            ):
+                results[channel] = value
+                continue
+            raise RuntimeError(f"invalid E3 K resume artifact: {result_path}")
+        pending.append((paths, input_view, source, selected_history))
     if workers <= 1:
-        return [run(source) for source in source_results]
-    with ThreadPoolExecutor(max_workers=workers) as executor:
-        return list(executor.map(run, source_results))
+        completed = map(_run_uniform_k_job, pending)
+    else:
+        executor = ProcessPoolExecutor(max_workers=workers)
+        completed = executor.map(_run_uniform_k_job, pending)
+    try:
+        for value in completed:
+            results[str(value["channel"])] = value
+    finally:
+        if workers > 1:
+            executor.shutdown(wait=True)
+    return [results[str(source["channel"])] for source in source_results]
+
+
+def _run_uniform_k_job(job: tuple[Any, Any, dict[str, Any], int]) -> dict[str, Any]:
+    paths, input_view, source, selected_history = job
+    losses = {
+        profile: values
+        for profile, values in parse_profile_losses(source).items()
+        if int(profile[1]) == selected_history
+    }
+    return run_k_channel(
+        paths.shared,
+        paths.project,
+        paths.output,
+        input_view,
+        str(source["channel"]),
+        PUBLIC_ALL_PROTOCOL,
+        forced_history_steps=selected_history,
+        profile_fold_losses_override=losses,
+    )
 
 
 def run_development(args: argparse.Namespace) -> dict[str, Any]:
@@ -352,7 +386,7 @@ def run_development(args: argparse.Namespace) -> dict[str, Any]:
     project = args.project.resolve()
     shared = args.shared.resolve()
     task_root = args.run_root.resolve() / args.task
-    if task_root.exists() and any(task_root.iterdir()):
+    if task_root.exists() and any(task_root.iterdir()) and not args.resume:
         raise RuntimeError(f"refusing nonempty E3 task root: {task_root}")
     task_root.mkdir(parents=True, exist_ok=True)
     input_view, dynamic_view = _views(shared, args.task)
@@ -594,6 +628,7 @@ def parser() -> argparse.ArgumentParser:
         command.add_argument("--scale-aware-run", type=Path)
         command.add_argument("--task", choices=tuple(TASKS), required=True)
         command.add_argument("--workers", type=int, default=4)
+        command.add_argument("--resume", action="store_true")
     infer = commands.add_parser("infer")
     infer.add_argument("--project", type=Path, required=True)
     infer.add_argument("--shared", type=Path, required=True)
