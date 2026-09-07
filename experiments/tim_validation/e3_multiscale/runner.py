@@ -263,6 +263,60 @@ def _candidate_config_count(result_root: Path, dynamic_view: Any) -> dict[str, i
     return values
 
 
+def _loss_fit_attempts(losses: Any, *, exclude_neutral: bool = False) -> int:
+    if not isinstance(losses, dict):
+        return 0
+    total = 0
+    for key, values in losses.items():
+        if exclude_neutral and str(key) in {"EXACT_ZERO", "IDENTITY"}:
+            continue
+        if isinstance(values, list):
+            total += len(values)
+    return total
+
+
+def _candidate_fit_attempts(result_root: Path, dynamic_view: Any) -> dict[str, int]:
+    input_root = (
+        result_root
+        / "DEVELOPMENT"
+        / "K"
+        / dynamic_view.head.head_id
+        / dynamic_view.proxy_policy
+    )
+    k = 0
+    for path in input_root.glob("*/RESULT.json"):
+        result = _read(path)
+        k += _loss_fit_attempts(result.get("profile_fold_losses"))
+        k += _loss_fit_attempts(
+            result.get("linear_activation_profile_fold_losses")
+        )
+        k += _loss_fit_attempts(
+            result.get("structural_fold_losses"), exclude_neutral=True
+        )
+        for audit in result.get("minimal_stabilizing_ridge_audit", []):
+            k += 1 + len(audit.get("inner_fold_certificates", []))
+    values = {"K": k}
+    for stage, parts in (
+        ("C", (dynamic_view.head.head_id, dynamic_view.proxy_policy)),
+        ("W", (dynamic_view.head.head_id, dynamic_view.proxy_policy)),
+        (
+            "A",
+            (
+                dynamic_view.head.head_id,
+                dynamic_view.availability_scenario,
+                dynamic_view.proxy_policy,
+            ),
+        ),
+    ):
+        path = result_root / "DEVELOPMENT" / stage
+        for part in parts:
+            path /= part
+        result = _read(path / "RESULT.json")
+        values[stage] = _loss_fit_attempts(result.get("candidate_fold_losses")) + 1
+    values["total"] = sum(values.values())
+    return values
+
+
 def _run_uniform_k(
     paths: PublicAllPaths,
     input_view: Any,
@@ -353,21 +407,27 @@ def run_development(args: argparse.Namespace) -> dict[str, Any]:
         multiscale_paths.output, dynamic_view
     )
     uniform_counts = _candidate_config_count(uniform_paths.output, dynamic_view)
+    multiscale_attempts = _candidate_fit_attempts(
+        multiscale_paths.output, dynamic_view
+    )
+    uniform_attempts = _candidate_fit_attempts(uniform_paths.output, dynamic_view)
     shared_profile_fits = sum(
         len(value["profile_fold_losses"]) for value in source_results
     )
     uniform_counts["shared_scale_search"] = shared_profile_fits
     multiscale_counts["shared_scale_search"] = shared_profile_fits
-    registered_cap = max(uniform_counts["total"], multiscale_counts["total"])
+    registered_cap = max(uniform_attempts["total"], multiscale_attempts["total"])
     budget = {
         "status": "FROZEN_BEFORE_TEST_ACCESS",
-        "budget_definition": "unique_candidate_configurations",
+        "budget_definition": "candidate_fit_attempts_including_inner_folds",
         "candidate_fit_budget_scope": "K_C_DeltaW_A_development_selection",
         "fair_budget": registered_cap,
         "B_uniform_max": registered_cap,
         "B_multiscale_max": registered_cap,
         "uniform_candidate_configurations_executed": uniform_counts,
         "multiscale_candidate_configurations_executed": multiscale_counts,
+        "uniform_candidate_fit_attempts": uniform_attempts,
+        "multiscale_candidate_fit_attempts": multiscale_attempts,
         "shared_profile_screen_reused_without_refit": True,
         "duplicate_candidate_padding": False,
         "test_accessed": False,
