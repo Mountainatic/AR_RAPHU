@@ -310,6 +310,11 @@ def run_k_channel(
     view: ViewSpec,
     channel: str,
     protocol: str = "sru",
+    *,
+    forced_history_steps: int | None = None,
+    profile_fold_losses_override: Mapping[
+        tuple[int, int], Sequence[float]
+    ] | None = None,
 ) -> dict[str, Any]:
     started = time.time()
     destination = (
@@ -329,8 +334,21 @@ def run_k_channel(
         accessor.warm_prefixes([channel])
         inner_workers = _k_inner_workers()
         folds = inner_folds(train, int(v21["selection"]["inner_folds"]))
-        profiles = channel_profiles(view, channel, v2)
-        profile_comparison_history = max(int(profile[1]) for profile in profiles)
+        registered_profiles = channel_profiles(view, channel, v2)
+        profile_comparison_history = max(
+            int(profile[1]) for profile in registered_profiles
+        )
+        profiles = registered_profiles
+        if forced_history_steps is not None:
+            profiles = [
+                profile
+                for profile in registered_profiles
+                if int(profile[1]) == int(forced_history_steps)
+            ]
+            if not profiles:
+                raise ValueError(
+                    f"history {forced_history_steps} is not registered for {channel}"
+                )
         pilot = v2["K_module"]["penalties"]["pilot"]
         pilot_lambdas = (
             float(pilot["lambda_0"]),
@@ -354,13 +372,33 @@ def run_k_channel(
             )
             for profile in profiles
         ]
-        profile_losses = dict(
-            zip(
-                profiles,
-                _ordered_parallel_map(evaluate_candidate, profile_jobs, inner_workers),
-                strict=True,
+        if profile_fold_losses_override is None:
+            profile_losses = dict(
+                zip(
+                    profiles,
+                    _ordered_parallel_map(
+                        evaluate_candidate, profile_jobs, inner_workers
+                    ),
+                    strict=True,
+                )
             )
-        )
+            profile_loss_source = "NATIVE_FITS"
+        else:
+            supplied = {
+                tuple(int(value) for value in profile): [
+                    float(loss) for loss in losses
+                ]
+                for profile, losses in profile_fold_losses_override.items()
+            }
+            missing = sorted(set(profiles) - set(supplied))
+            extra = sorted(set(supplied) - set(profiles))
+            if missing or extra:
+                raise ValueError(
+                    "profile loss override does not match the forced profile universe: "
+                    f"missing={missing}, extra={extra}"
+                )
+            profile_losses = {profile: supplied[profile] for profile in profiles}
+            profile_loss_source = "SEALED_SCALE_AWARE_INNER_FOLD_REUSE"
         profile_rule = v211["K"]["profile_selection"]
         profile_selection = profile_one_se_regret_guard(
             profile_losses,
@@ -721,6 +759,8 @@ def run_k_channel(
             "proxy_policy": view.proxy_policy,
             "channel": channel,
             "selected_profile": list(selected_profile),
+            "forced_history_steps": forced_history_steps,
+            "profile_loss_source": profile_loss_source,
             "support_contract": SUPPORT_CONTRACT,
             "selected_profile_history_steps": selected_history,
             "selected_scoring_history_steps": selected_support_history,
