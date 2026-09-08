@@ -6,7 +6,13 @@ from prism_benchmark.v211_support import SUPPORT_CONTRACT, require_native_suppor
 
 
 def test_empty_ood_has_no_observable_contract_value() -> None:
-    frame = pd.DataFrame({"sample_support_contract": pd.Series(dtype="object")})
+    frame = pd.DataFrame(
+        {
+            "sample_support_contract": pd.Series(dtype="object"),
+            "causal_history_floor": pd.Series(dtype="int64"),
+            "anchor_history_steps": pd.Series(dtype="int64"),
+        }
+    )
     # This documents why the metadata freezer must branch before applying the
     # strict non-empty support validator.
     try:
