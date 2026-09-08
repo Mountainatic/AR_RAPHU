@@ -32,6 +32,34 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _read_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _aggregate_metadata(path: Path, mode: str) -> dict[str, Any]:
+    complete_path = path.parent / f"{mode}_COMPLETE.json"
+    metadata = _read_json(complete_path) if complete_path.is_file() else {}
+    per_seed_path = path.parent / "per_seed.csv"
+    if per_seed_path.is_file():
+        rows = _read_csv(per_seed_path)
+        if rows:
+            for key in (
+                "perturbation", "measurement_scope", "information_set",
+                "availability_scenario", "proxy_policy",
+            ):
+                if key not in metadata and rows[0].get(key):
+                    metadata[key] = rows[0][key]
+    perturbation_path = path.parent / "perturbation_manifest.json"
+    if perturbation_path.is_file():
+        frozen = _read_json(perturbation_path)
+        for key in ("perturbation", "measurement_scope"):
+            if key not in metadata and key in frozen:
+                metadata[key] = frozen[key]
+    if mode == "N2" and "perturbation" not in metadata:
+        metadata["perturbation"] = "gaussian_process_only"
+    return metadata
+
+
 def _collect_mode(root: Path, mode: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     per_seed = []
     aggregate = []
@@ -43,7 +71,16 @@ def _collect_mode(root: Path, mode: str) -> tuple[list[dict[str, Any]], list[dic
         per_seed.extend(_read_csv(path))
         provenance.append({"path": str(path), "sha256": _sha256(path)})
     for path in sorted(mode_root.glob("*/aggregate.csv")):
-        aggregate.extend(_read_csv(path))
+        metadata = _aggregate_metadata(path, mode)
+        rows = _read_csv(path)
+        for row in rows:
+            for key in (
+                "perturbation", "measurement_scope", "information_set",
+                "availability_scenario", "proxy_policy",
+            ):
+                if not row.get(key) and metadata.get(key) is not None:
+                    row[key] = metadata[key]
+        aggregate.extend(rows)
         provenance.append({"path": str(path), "sha256": _sha256(path)})
     return per_seed, aggregate, provenance
 

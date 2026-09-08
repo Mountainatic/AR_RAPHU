@@ -35,3 +35,23 @@ def test_required_task_ids_match_frozen_registry(tmp_path) -> None:
             _csv(tmp_path / mode / task / "aggregate.csv", [row])
     result = build_report(tmp_path)
     assert result["status"] == "COMPLETED"
+
+
+def test_legacy_aggregate_rows_recover_measurement_scope(tmp_path) -> None:
+    source = tmp_path / "N1" / "TEP_DYNAMIC_REALISTIC"
+    _csv(
+        source / "per_seed.csv",
+        [{
+            "task": "TEP_H0", "seed": 1,
+            "perturbation": "gaussian_process_only",
+            "measurement_scope": "realistic_dynamic",
+            "information_set": "dynamic",
+            "availability_scenario": "record_time",
+            "proxy_policy": "proxy_excluded",
+        }],
+    )
+    _csv(source / "aggregate.csv", [{"task": "TEP_H0", "metric": "RMSE"}])
+    build_report(tmp_path)
+    rows = list(csv.DictReader((tmp_path / "N1" / "aggregate.csv").open()))
+    assert rows[0]["measurement_scope"] == "realistic_dynamic"
+    assert rows[0]["information_set"] == "dynamic"

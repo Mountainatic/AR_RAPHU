@@ -454,7 +454,12 @@ def run_n2(args: argparse.Namespace) -> dict[str, Any]:
             aggregate.append(
                 {
                     "status": "COMPLETED", "task": args.task, "rod": args.rod,
-                    "mode": "N2", "alpha": alpha, "metric": metric,
+                    "mode": "N2", "perturbation": "gaussian_process_only",
+                    "measurement_scope": args.measurement_scope,
+                    "information_set": args.information_set,
+                    "availability_scenario": args.availability_scenario,
+                    "proxy_policy": args.proxy_policy,
+                    "alpha": alpha, "metric": metric,
                     "seeds": len(values), "mean": mean(values), "median": median(values),
                     "Q1": float(np.quantile(values, 0.25)), "Q3": float(np.quantile(values, 0.75)),
                     "minimum": min(values), "maximum": max(values),

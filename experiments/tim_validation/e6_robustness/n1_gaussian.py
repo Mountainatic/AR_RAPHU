@@ -568,6 +568,10 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
                     {
                         "status": "COMPLETED", "task": args.task, "rod": args.rod,
                         "mode": "N1", "perturbation": args.perturbation,
+                        "measurement_scope": args.measurement_scope,
+                        "information_set": args.information_set,
+                        "availability_scenario": args.availability_scenario,
+                        "proxy_policy": args.proxy_policy,
                         "alpha": alpha, "direction": direction, "metric": metric, "seeds": len(values),
                         "mean": mean(values), "median": median(values),
                         "Q1": _quantile(values, 0.25), "Q3": _quantile(values, 0.75),
