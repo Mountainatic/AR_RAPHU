@@ -227,7 +227,7 @@ def _structure(
             classes[channel] = "intermediate_scale"
     c_family = state["c_contract"].get("family")
     w_family = state["w_contract"].get("family")
-    a_family = state["a_contract"].get("family")
+    a_family = state.get("a_contract", {}).get("family", "IDENTITY_NOT_APPLICABLE")
     flags = [bool(admitted), not _identity_family(c_family), not _identity_family(w_family), not _identity_family(a_family)]
     return StructureSignature(
         task=args.task,

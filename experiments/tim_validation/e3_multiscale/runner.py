@@ -57,6 +57,7 @@ TASKS = {
     },
 }
 FULL_MODEL = "PRISM_V2_1_1_PHYSICS_FIRST"
+CANONICAL_TASK = {"TEP_G12": "TEP_H0"}
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -758,7 +759,7 @@ def _write_structure_signature(
     ]
     budget_path = task_root / "budget_manifest.json"
     signature = StructureSignature(
-        task=task,
+        task=CANONICAL_TASK.get(task, task),
         head=str(record["target_head"]),
         H=int(TASKS[task]["H"]),
         W=int(TASKS[task]["W"]),
@@ -767,7 +768,7 @@ def _write_structure_signature(
         rod=None,
         seed=0,
         candidate_universe="standard",
-        model_variant=f"{FULL_MODEL}:{arm}",
+        model_variant=FULL_MODEL,
         admitted_channels=admitted,
         rejected_channels=rejected,
         selected_profile_by_channel={

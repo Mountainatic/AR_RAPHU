@@ -62,7 +62,7 @@ def convert(args: argparse.Namespace) -> dict[str, Any]:
             scale_classes[channel] = "intermediate_scale"
     c_family = state["c_contract"].get("family")
     w_family = state["w_contract"].get("family")
-    a_family = state["a_contract"].get("family")
+    a_family = state.get("a_contract", {}).get("family", "IDENTITY_NOT_APPLICABLE")
     flags = [bool(admitted), not _identity(c_family), not _identity(w_family), not _identity(a_family)]
     signature = StructureSignature(
         task=args.task, head=args.head, H=args.H, W=args.W,
