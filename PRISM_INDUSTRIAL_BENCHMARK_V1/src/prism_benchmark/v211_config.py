@@ -132,7 +132,11 @@ def load_v211_configs(
         patch = load_representative_stage1_algorithm_config(project)
     else:
         raise ValueError(f"unsupported PRISM v2.1.1 protocol: {protocol}")
-    return patch, load_v21_config(project), load_frozen_config(project)
+    v21 = load_v21_config(project)
+    v2 = load_frozen_config(project)
+    from .tim_e4_universe import maybe_apply_from_environment
+
+    return maybe_apply_from_environment(patch, v21, v2)
 
 
 def input_views_for_protocol(shared: Path, protocol: str):
