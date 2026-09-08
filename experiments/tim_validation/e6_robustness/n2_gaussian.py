@@ -53,7 +53,7 @@ def _perturb_split(
     sigma: dict[str, float],
     realization: str,
     target: str,
-    measurement_scope: str,
+    measurement_scope: str = "process_only",
 ) -> dict[str, Any]:
     clean = pd.read_parquet(source)
     perturbed = clean.copy()
