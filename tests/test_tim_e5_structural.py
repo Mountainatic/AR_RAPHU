@@ -7,6 +7,7 @@ from experiments.tim_validation.e5_structural.runner import (
     _jaccard,
     build_report,
 )
+from experiments.tim_validation.e5_structural.import_stagewise import _full_record
 
 
 def _signature(run: str, channels: list[str], rmse: float) -> dict:
@@ -48,3 +49,20 @@ def test_report_keeps_rashomon_and_empty_empty_semantics(tmp_path) -> None:
     assert result["empty_empty_pair_count"] == 1
     assert result["rashomon_structure_group_count"] == 1
     assert "EMPTY_EMPTY_AGREEMENT" in (output / "pairwise_jaccard.csv").read_text()
+
+
+def test_importer_uses_input_only_terminal_stage_when_physics_first_is_absent(tmp_path) -> None:
+    path = tmp_path / "inference.json"
+    path.write_text(
+        json.dumps(
+            {
+                "records": [
+                    {"status": "PASS", "model": "PRISM_V2_1_1_K"},
+                    {"status": "PASS", "model": "PRISM_V2_1_1_K_C"},
+                    {"status": "PASS", "model": "PRISM_V2_1_1_K_C_W"},
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    assert _full_record(path)["model"] == "PRISM_V2_1_1_K_C_W"

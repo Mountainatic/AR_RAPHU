@@ -12,6 +12,15 @@ from prism_benchmark.cpu_data import input_columns
 
 
 FULL_MODEL = "PRISM_V2_1_1_PHYSICS_FIRST"
+STAGEWISE_FINAL_PREFERENCE = (
+    FULL_MODEL,
+    "PRISM_V2_1_1_K_C_A_ABLATION",
+    "PRISM_V2_1_1_K_C_W_DYNAMIC",
+    "PRISM_V2_1_1_K_C_W",
+    "PRISM_V2_1_1_K_C_DYNAMIC",
+    "PRISM_V2_1_1_K_C",
+    "PRISM_V2_1_1_K",
+)
 
 
 def _identity(value: Any) -> bool:
@@ -21,13 +30,15 @@ def _identity(value: Any) -> bool:
 
 def _full_record(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
-    matches = [
-        record for record in value["records"]
-        if record.get("model") == FULL_MODEL and record.get("status") == "PASS"
-    ]
-    if len(matches) != 1:
-        raise RuntimeError(f"expected one full-model record, got {len(matches)}")
-    return matches[0]
+    passed = {
+        str(record.get("model")): record
+        for record in value["records"]
+        if record.get("status") == "PASS"
+    }
+    for model in STAGEWISE_FINAL_PREFERENCE:
+        if model in passed:
+            return passed[model]
+    raise RuntimeError("no recognized final stagewise PRISM record")
 
 
 def convert(args: argparse.Namespace) -> dict[str, Any]:
@@ -56,7 +67,7 @@ def convert(args: argparse.Namespace) -> dict[str, Any]:
     signature = StructureSignature(
         task=args.task, head=args.head, H=args.H, W=args.W,
         outer_fold="registered_outer_test", run=args.run, rod=args.rod, seed=args.seed,
-        candidate_universe="standard", model_variant=FULL_MODEL,
+        candidate_universe="standard", model_variant=str(record["model"]),
         admitted_channels=admitted, rejected_channels=sorted(set(channels) - set(admitted)),
         selected_profile_by_channel={channel: contracts[channel]["profile"] for channel in admitted},
         selected_history_by_channel=histories,

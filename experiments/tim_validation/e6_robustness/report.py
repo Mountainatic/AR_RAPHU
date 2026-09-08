@@ -108,7 +108,7 @@ def build_report(root: Path) -> dict[str, Any]:
         "quantization": {"N1": "COMPLETED" if "quantization" in n1_perturbations else "NOT_RUN", "N2": "NOT_RUN"},
         "dropout_optional": {"N1": "NOT_RUN", "N2": "NOT_RUN"},
     }
-    required_tasks = {"CZ_H4", "TEP_G12"}
+    required_tasks = {"CZ_H4", "TEP_H0"}
     status = (
         "COMPLETED"
         if required_tasks.issubset(n1_tasks) and required_tasks.issubset(n2_tasks)

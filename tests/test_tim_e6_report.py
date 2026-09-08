@@ -20,3 +20,18 @@ def test_partial_report_does_not_upgrade_missing_perturbations(tmp_path) -> None
     assert result["status"] == "PARTIAL"
     assert result["coverage"]["bias"]["N1"] == "NOT_RUN"
     assert result["N1_structure_evaluated"] is False
+
+
+def test_required_task_ids_match_frozen_registry(tmp_path) -> None:
+    for mode in ("N1", "N2"):
+        for task in ("CZ_H4", "TEP_H0"):
+            row = {
+                "task": task,
+                "seed": 1,
+                "perturbation": "gaussian_process_only",
+                "measurement_scope": "process_only",
+            }
+            _csv(tmp_path / mode / task / "per_seed.csv", [row])
+            _csv(tmp_path / mode / task / "aggregate.csv", [row])
+    result = build_report(tmp_path)
+    assert result["status"] == "COMPLETED"
