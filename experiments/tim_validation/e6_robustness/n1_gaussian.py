@@ -16,6 +16,7 @@ import os
 import shutil
 import time
 import zlib
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from statistics import mean, median
 from typing import Any
@@ -189,6 +190,61 @@ def _quantile(values: list[float], probability: float) -> float:
     return float(np.quantile(np.asarray(values, dtype=np.float64), probability))
 
 
+def _run_case(job: dict[str, Any]) -> dict[str, Any]:
+    clean_shared = Path(job["clean_shared"])
+    run_root = Path(job["run_root"])
+    seed = int(job["seed"])
+    alpha = float(job["alpha"])
+    label = str(alpha).replace(".", "p")
+    case_root = run_root / "_work" / f"seed_{seed}" / f"alpha_{label}"
+    case_shared = case_root / "shared"
+    prediction_root = case_root / "predictions"
+    case_result_path = run_root / "cases" / f"seed_{seed}_alpha_{label}.json"
+    started = time.time()
+    materialization = _materialize_case(
+        clean_shared,
+        case_shared,
+        task=str(job["task"]),
+        dataset=str(job["dataset"]),
+        target=str(job["target"]),
+        seed=seed,
+        alpha=alpha,
+        sigma=dict(job["sigma"]),
+    )
+    os.environ[INFERENCE_ONLY_ENV] = "1"
+    paths = PublicAllPaths(
+        Path(job["project"]), case_shared, Path(job["selection_root"])
+    )
+    views = matching_views(
+        paths,
+        str(job["head_id"]),
+        information_set=str(job["information_set"]),
+        availability_scenario=str(job["availability_scenario"]),
+        proxy_policy=str(job["proxy_policy"]),
+    )
+    result = infer_checkpoints(paths, Path(job["checkpoint_root"]), prediction_root, views)
+    record = _full_record(result)
+    row = {
+        "status": "COMPLETED", "mode": "N1", "task": job["task"],
+        "rod": job["rod"], "perturbation": "gaussian_process_only",
+        "seed": seed, "alpha": alpha, "rows": record["rows"],
+        "RMSE": record["rmse"], "MAE": record["mae"],
+        "R2": record["r2_level_reconstructed"],
+        "delta_RMSE": record["rmse_delta"], "delta_R2": record["r2_delta"],
+        "persistence_skill": record["persistence_skill"],
+        "support_id": record["scoring_support_hash"],
+        "sample_id_order_hash": record["sample_id_order_hash"],
+        "checkpoint_hash": record["checkpoint_hash"],
+        "fit_called_in_inference": False,
+        "structure_evaluated": False,
+        "elapsed_seconds": time.time() - started,
+        **materialization,
+    }
+    _write_json(case_result_path, row)
+    _remove_case_work(case_root, run_root)
+    return row
+
+
 def run_n1(args: argparse.Namespace) -> dict[str, Any]:
     clean_shared = args.clean_shared.resolve(strict=True)
     selection_root = args.selection_root.resolve(strict=True)
@@ -226,59 +282,34 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
     }
     _write_json(run_root / "perturbation_manifest.json", manifest)
     rows: list[dict[str, Any]] = []
-    os.environ[INFERENCE_ONLY_ENV] = "1"
+    jobs: list[dict[str, Any]] = []
     for seed in seeds:
         for alpha in alphas:
             label = str(alpha).replace(".", "p")
             case_root = run_root / "_work" / f"seed_{seed}" / f"alpha_{label}"
-            case_shared = case_root / "shared"
-            prediction_root = case_root / "predictions"
             case_result_path = run_root / "cases" / f"seed_{seed}_alpha_{label}.json"
             if case_result_path.is_file():
                 rows.append(_read_case_row(case_result_path))
                 continue
             if case_root.exists():
                 _remove_case_work(case_root, run_root)
-            started = time.time()
-            materialization = _materialize_case(
-                clean_shared,
-                case_shared,
-                task=args.task,
-                dataset=args.dataset,
-                target=args.target,
-                seed=seed,
-                alpha=alpha,
-                sigma=sigma,
+            jobs.append(
+                {
+                    "clean_shared": str(clean_shared), "run_root": str(run_root),
+                    "selection_root": str(selection_root), "checkpoint_root": str(checkpoint_root),
+                    "project": str(args.project.resolve()), "task": args.task,
+                    "rod": args.rod, "dataset": args.dataset, "target": args.target,
+                    "head_id": args.head_id, "information_set": args.information_set,
+                    "availability_scenario": args.availability_scenario,
+                    "proxy_policy": args.proxy_policy, "sigma": sigma,
+                    "seed": seed, "alpha": alpha,
+                }
             )
-            paths = PublicAllPaths(args.project.resolve(), case_shared, selection_root)
-            views = matching_views(
-                paths,
-                args.head_id,
-                information_set=args.information_set,
-                availability_scenario=args.availability_scenario,
-                proxy_policy=args.proxy_policy,
-            )
-            result = infer_checkpoints(paths, checkpoint_root, prediction_root, views)
-            record = _full_record(result)
-            row = {
-                "status": "COMPLETED", "mode": "N1", "task": args.task,
-                "rod": args.rod, "perturbation": "gaussian_process_only",
-                "seed": seed, "alpha": alpha, "rows": record["rows"],
-                "RMSE": record["rmse"], "MAE": record["mae"],
-                "R2": record["r2_level_reconstructed"],
-                "delta_RMSE": record["rmse_delta"], "delta_R2": record["r2_delta"],
-                "persistence_skill": record["persistence_skill"],
-                "support_id": record["scoring_support_hash"],
-                "sample_id_order_hash": record["sample_id_order_hash"],
-                "checkpoint_hash": record["checkpoint_hash"],
-                "fit_called_in_inference": False,
-                "structure_evaluated": False,
-                "elapsed_seconds": time.time() - started,
-                **materialization,
-            }
-            _write_json(case_result_path, row)
-            rows.append(row)
-            _remove_case_work(case_root, run_root)
+    if args.parallel_cases > 1 and jobs:
+        with ProcessPoolExecutor(max_workers=args.parallel_cases) as executor:
+            rows.extend(executor.map(_run_case, jobs))
+    else:
+        rows.extend(_run_case(job) for job in jobs)
 
     clean_by_seed = {int(row["seed"]): row for row in rows if float(row["alpha"]) == 0.0}
     for row in rows:
@@ -338,6 +369,7 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--proxy-policy", default="primary")
     value.add_argument("--seeds", type=int, default=30)
     value.add_argument("--seed-start", type=int, default=20260910)
+    value.add_argument("--parallel-cases", type=int, default=1)
     value.add_argument("--alpha", type=float, action="append", default=[])
     return value
 
