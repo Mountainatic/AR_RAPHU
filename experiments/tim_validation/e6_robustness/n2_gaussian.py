@@ -23,6 +23,7 @@ from prism_benchmark.portable_checkpoints import INFERENCE_ONLY_ENV
 from .n1_gaussian import (
     DEFAULT_ALPHAS,
     FULL_MODEL,
+    _adjust_dynamic_sample_targets,
     _hardlink_copy,
     _remove_case_work,
     _sample_registry_hash,
@@ -101,6 +102,10 @@ def _materialize_case(
     alpha: float,
     sigma: dict[str, float],
     measurement_scope: str,
+    head_id: str,
+    information_set: str,
+    availability_scenario: str,
+    proxy_policy: str,
 ) -> list[dict[str, Any]]:
     if destination.exists() or destination.is_symlink():
         raise RuntimeError(f"REFUSING_EXISTING_E6_N2_CASE_SHARED:{destination}")
@@ -130,6 +135,35 @@ def _materialize_case(
         raise RuntimeError("STOP_E6_N2_TRAIN_NOT_PERTURBED")
     if not any(record["split"] == "test" for record in records):
         raise RuntimeError("STOP_E6_N2_TEST_NOT_PERTURBED")
+    if measurement_scope == "realistic_dynamic":
+        adjustments = [
+            _adjust_dynamic_sample_targets(
+                clean_shared,
+                destination,
+                dataset=dataset,
+                target=target,
+                head_id=head_id,
+                information_set=information_set,
+                availability_scenario=availability_scenario,
+                proxy_policy=proxy_policy,
+                split=split,
+            )
+            for split in ("train", "validation", "test")
+            if (
+                clean_shared
+                / "sample_ids"
+                / head_id
+                / information_set
+                / availability_scenario
+                / proxy_policy
+                / f"{split}.parquet"
+            ).is_file()
+        ]
+        for record in records:
+            record["dynamic_target_adjustment"] = next(
+                (item for item in adjustments if item["split"] == record["split"]),
+                None,
+            )
     return records
 
 
@@ -326,6 +360,10 @@ def run_n2(args: argparse.Namespace) -> dict[str, Any]:
                 clean_shared, shared, task=args.task, dataset=args.dataset,
                 target=args.target, seed=seed, alpha=alpha, sigma=sigma,
                 measurement_scope=args.measurement_scope,
+                head_id=args.head_id,
+                information_set=args.information_set,
+                availability_scenario=args.availability_scenario,
+                proxy_policy=args.proxy_policy,
             )
             selection = case / "selection"
             checkpoint = case / "checkpoint"

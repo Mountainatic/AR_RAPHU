@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from experiments.tim_validation.e6_robustness.n1_gaussian import (
+    _adjust_dynamic_sample_targets,
     outer_train_sigma,
     perturb_gaussian_process_only,
     perturb_process_measurements,
@@ -105,3 +106,71 @@ def test_realistic_dynamic_perturbs_sensor_target_but_not_other_contracts() -> N
     assert not observed["target"].equals(frame["target"])
     assert observed["entity_id"].equals(frame["entity_id"])
     assert observed["row_in_entity"].equals(frame["row_in_entity"])
+
+
+def test_realistic_dynamic_keeps_future_level_clean_with_noisy_anchor(tmp_path) -> None:
+    import json
+    import shutil
+
+    clean = tmp_path / "clean"
+    base = clean / "base_data" / "d"
+    samples_root = clean / "sample_ids" / "H" / "dynamic" / "record_time" / "primary"
+    base.mkdir(parents=True)
+    samples_root.mkdir(parents=True)
+    (clean / "TASK_REGISTRY.json").write_text(
+        json.dumps(
+            {
+                "heads": [
+                    {
+                        "head_id": "H", "task_id": "T", "dataset": "d",
+                        "target": "target", "cadence_seconds": 1.0,
+                        "h_steps": 0, "w_steps": 1, "w0_steps": 1,
+                        "primary": True,
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    pd.DataFrame(
+        {
+            "target": [10.0, 11.0, 12.0],
+            "entity_id": ["a"] * 3,
+            "row_in_entity": [0, 1, 2],
+        }
+    ).to_parquet(base / "test.parquet", index=False)
+    pd.DataFrame(
+        {
+            "entity_id": ["a", "a"],
+            "origin": [1, 2],
+            "y_true": [1.0, 1.0],
+            "current_level": [10.0, 11.0],
+        }
+    ).to_parquet(samples_root / "test.parquet", index=False)
+    perturbed = tmp_path / "perturbed"
+    shutil.copytree(clean, perturbed)
+    pd.DataFrame(
+        {
+            "target": [10.0, 11.5, 13.0],
+            "entity_id": ["a"] * 3,
+            "row_in_entity": [0, 1, 2],
+        }
+    ).to_parquet(perturbed / "base_data" / "d" / "test.parquet", index=False)
+    audit = _adjust_dynamic_sample_targets(
+        clean,
+        perturbed,
+        dataset="d",
+        target="target",
+        head_id="H",
+        information_set="dynamic",
+        availability_scenario="record_time",
+        proxy_policy="primary",
+        split="test",
+    )
+    adjusted = pd.read_parquet(
+        perturbed / "sample_ids" / "H" / "dynamic" / "record_time" / "primary" / "test.parquet"
+    )
+    assert adjusted["current_level"].tolist() == [10.0, 11.5]
+    assert adjusted["y_true"].tolist() == [1.0, 0.5]
+    assert audit["clean_future_level_preserved"] is True
+    assert audit["reconstruction_max_abs_error"] == 0.0

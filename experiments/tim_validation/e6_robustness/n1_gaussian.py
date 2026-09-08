@@ -24,6 +24,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from prism_benchmark.cpu_data import BaseAccessor, load_heads
 from prism_benchmark.portable_checkpoints import INFERENCE_ONLY_ENV
 from prism_benchmark.stagewise_ablation_runner import infer_checkpoints, matching_views
 from prism_benchmark.v211_public_all_config import PublicAllPaths
@@ -109,6 +110,71 @@ def outer_train_sigma(
     if invalid:
         raise RuntimeError(f"STOP_E6_INVALID_OUTER_TRAIN_SIGMA:{invalid}")
     return sigma, _sha256(path)
+
+
+def _head_w0(shared: Path, head_id: str) -> int:
+    matches = [
+        head for head in load_heads(shared, primary_only=False)
+        if head.head_id == head_id
+    ]
+    if len(matches) != 1:
+        raise RuntimeError(f"STOP_E6_HEAD_REGISTRY_COUNT:{head_id}:{len(matches)}")
+    return int(matches[0].w0_steps)
+
+
+def _adjust_dynamic_sample_targets(
+    clean_shared: Path,
+    perturbed_shared: Path,
+    *,
+    dataset: str,
+    target: str,
+    head_id: str,
+    information_set: str,
+    availability_scenario: str,
+    proxy_policy: str,
+    split: str,
+) -> dict[str, Any]:
+    """Use noisy D[t-1] for dynamic state while retaining clean future D[t]."""
+
+    relative = Path(
+        "sample_ids",
+        head_id,
+        information_set,
+        availability_scenario,
+        proxy_policy,
+        f"{split}.parquet",
+    )
+    source = clean_shared / relative
+    destination = perturbed_shared / relative
+    samples = pd.read_parquet(source)
+    w0 = _head_w0(clean_shared, head_id)
+    clean_accessor = BaseAccessor(clean_shared, dataset, split, [target])
+    noisy_accessor = BaseAccessor(perturbed_shared, dataset, split, [target])
+    clean_anchor = clean_accessor.block_means(samples, target, [(0, w0)]).reshape(-1)
+    noisy_anchor = noisy_accessor.block_means(samples, target, [(0, w0)]).reshape(-1)
+    clean_delta = samples["y_true"].to_numpy(dtype=np.float64)
+    clean_future_level = clean_anchor + clean_delta
+    adjusted = samples.copy()
+    adjusted["y_true"] = clean_future_level - noisy_anchor
+    if "current_level" in adjusted.columns:
+        adjusted["current_level"] = noisy_anchor
+    reconstructed = noisy_anchor + adjusted["y_true"].to_numpy(dtype=np.float64)
+    max_error = float(np.max(np.abs(reconstructed - clean_future_level), initial=0.0))
+    if max_error > 1e-10:
+        raise AssertionError(f"STOP_E6_REALISTIC_DYNAMIC_CLEAN_LEVEL_ERROR:{max_error}")
+    temporary = destination.with_name(f".{destination.name}.e6-target.tmp")
+    adjusted.to_parquet(temporary, index=False, compression="zstd")
+    os.replace(temporary, destination)
+    return {
+        "split": split,
+        "clean_sample_ids_sha256": _sha256(source),
+        "perturbed_sample_ids_sha256": _sha256(destination),
+        "rows": len(samples),
+        "anchor_w0_steps": w0,
+        "clean_future_level_preserved": True,
+        "reconstruction_max_abs_error": max_error,
+        "historical_delta_source": "NOISY_ANCHOR_CLEAN_CURRENT_LEVEL",
+    }
 
 
 def perturb_gaussian_process_only(
@@ -199,6 +265,10 @@ def _materialize_case(
     perturbation: str = "gaussian_process_only",
     direction: int = 0,
     measurement_scope: str = "process_only",
+    head_id: str = "",
+    information_set: str = "dynamic",
+    availability_scenario: str = "record_time",
+    proxy_policy: str = "primary",
 ) -> dict[str, Any]:
     if destination.exists() or destination.is_symlink():
         raise RuntimeError(f"REFUSING_EXISTING_E6_CASE_SHARED:{destination}")
@@ -226,6 +296,19 @@ def _materialize_case(
     )
     if not missing_preserved:
         raise AssertionError("STOP_E6_MISSINGNESS_CHANGED")
+    dynamic_target_adjustment = None
+    if measurement_scope == "realistic_dynamic":
+        dynamic_target_adjustment = _adjust_dynamic_sample_targets(
+            clean_shared,
+            destination,
+            dataset=dataset,
+            target=target,
+            head_id=head_id,
+            information_set=information_set,
+            availability_scenario=availability_scenario,
+            proxy_policy=proxy_policy,
+            split="test",
+        )
     return {
         "clean_test_sha256": _sha256(source),
         "perturbed_test_sha256": _sha256(target_path),
@@ -234,6 +317,7 @@ def _materialize_case(
         "target_reference_source": "IMMUTABLE_SAMPLE_IDS_Y_TRUE",
         "target_base_measurement_perturbed": target_base_changed,
         "measurement_scope": measurement_scope,
+        "dynamic_target_adjustment": dynamic_target_adjustment,
         "missingness_preserved": True,
         "noise_injection_level": "RAW_ALIGNED_MEASUREMENT_BEFORE_HISTORY_CONSTRUCTION",
         "amplitudes": amplitudes,
@@ -286,6 +370,10 @@ def _run_case(job: dict[str, Any]) -> dict[str, Any]:
         perturbation=str(job["perturbation"]),
         direction=direction,
         measurement_scope=str(job["measurement_scope"]),
+        head_id=str(job["head_id"]),
+        information_set=str(job["information_set"]),
+        availability_scenario=str(job["availability_scenario"]),
+        proxy_policy=str(job["proxy_policy"]),
     )
     os.environ[INFERENCE_ONLY_ENV] = "1"
     paths = PublicAllPaths(
