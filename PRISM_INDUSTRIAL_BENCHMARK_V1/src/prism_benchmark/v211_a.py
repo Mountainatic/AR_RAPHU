@@ -285,7 +285,10 @@ def run_a_view(
         alphas = [float(value) for value in v2["A_module"]["ridge_alpha_grid"]]
         mus = [float(value) for value in v21["A"]["soft_overlap_mu"]]
         candidates: list[Any] = [EXACT_ZERO]
-        if MATURE_RESIDUAL_AR in set(v21["A"]["candidates"]):
+        mature_residual_ar_enabled = MATURE_RESIDUAL_AR in set(
+            v21["A"]["candidates"]
+        )
+        if mature_residual_ar_enabled:
             candidates.extend(
                 (MATURE_RESIDUAL_AR, profile, alpha, mu)
                 for profile in profiles
@@ -306,6 +309,8 @@ def run_a_view(
             losses[EXACT_ZERO].append(
                 float(np.mean(y_eval * y_eval, dtype=np.float64))
             )
+            if not mature_residual_ar_enabled:
+                continue
             upstream_columns = [*contribution_columns, "delta_w_oof"]
             if not contribution_columns:
                 upstream_columns.insert(0, "physical_oof")
