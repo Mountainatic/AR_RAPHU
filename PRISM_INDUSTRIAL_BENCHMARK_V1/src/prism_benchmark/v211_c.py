@@ -154,7 +154,7 @@ def run_c_view(
             float(value)
             for value in v2["C_module"]["joint_basis"]["ridge_alpha_grid"]
         )
-        registered_families = set(v21["C"]["C_candidates"])
+        registered_families = set(v21["K_C"]["C_candidates"])
         families = tuple(
             family
             for family in (COMPRESSED, JOINT_BASIS)

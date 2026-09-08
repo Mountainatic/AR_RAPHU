@@ -115,7 +115,9 @@ def apply_candidate_universe(
         outputs[2]["K_module"]["rank_candidates"] = [
             value for value in _coarse(ranks) if value != "FULL"
         ]
-        outputs[1]["C"]["C_candidates"] = list(outputs[1]["C"]["C_candidates"][:-1])
+        outputs[1]["K_C"]["C_candidates"] = list(
+            outputs[1]["K_C"]["C_candidates"][:-1]
+        )
         outputs[0]["W"]["candidates"] = list(outputs[0]["W"]["candidates"][:-1])
         outputs[1]["A"]["candidates"] = list(outputs[1]["A"]["candidates"][:-1])
     else:
@@ -157,7 +159,7 @@ def universe_manifest(
         axes.update(
             {
                 "K.rank_candidates": transformed[2]["K_module"]["rank_candidates"],
-                "C.families": transformed[1]["C"]["C_candidates"],
+                "C.families": transformed[1]["K_C"]["C_candidates"],
                 "W.families": transformed[0]["W"]["candidates"],
                 "W.monotone_knots": transformed[1]["W"]["monotone_knots"],
                 "W.natural_cubic_knots": transformed[1]["W"]["natural_cubic_knots"],
