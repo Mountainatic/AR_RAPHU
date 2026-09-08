@@ -215,7 +215,8 @@ def run_c_view(
                 fold_best_channel_losses[channel].append(
                     mse(evaluation_target, prediction)
                 )
-            for family, key in ((COMPRESSED, "compressed"), (JOINT_BASIS, "joint")):
+            for family in families:
+                key = "compressed" if family == COMPRESSED else "joint"
                 train_x = features[f"{key}_train"]
                 evaluation_x = features[f"{key}_evaluation"]
                 for alpha in alpha_grid:
