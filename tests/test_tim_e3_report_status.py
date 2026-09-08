@@ -4,8 +4,14 @@ import csv
 import json
 
 from experiments.tim_validation.e3_multiscale.report import (
+    _canonical_task,
     _register_cz_single_scale_block,
 )
+
+
+def test_legacy_tep_run_key_is_reported_as_frozen_h0_task() -> None:
+    assert _canonical_task("TEP_G12") == "TEP_H0"
+    assert _canonical_task("DEB_C4") == "DEB_C4"
 
 
 def test_cz_single_frozen_history_is_protocol_blocked(tmp_path) -> None:

@@ -15,6 +15,13 @@ from .runner import FULL_MODEL, TASKS
 
 PRIMARY_TASKS = ("CZ_H4", "TEP_G12", "DEB_C4")
 OPTIONAL_TASKS = ("PMSM_PM5",)
+CANONICAL_TASK = {"TEP_G12": "TEP_H0"}
+
+
+def _canonical_task(task: str) -> str:
+    """Expose the frozen public task identity while retaining legacy run paths."""
+
+    return CANONICAL_TASK.get(task, task)
 
 
 def _read(path: Path) -> dict[str, Any]:
@@ -106,6 +113,7 @@ def build_report(
     efficiency = []
     for result in task_results:
         task = result["task"]
+        canonical_task = _canonical_task(task)
         selection = _read(run_root / task / "UNIFORM_HISTORY_SELECTION.json")
         registered_histories = [int(value) for value in selection["common_histories"]]
         budget = _read(run_root / task / "budget_manifest.json")
@@ -113,7 +121,7 @@ def build_report(
             record = result[arm]
             aggregate.append(
                 {
-                    "task": task,
+                    "task": canonical_task,
                     "dataset": result["dataset"],
                     "arm": arm,
                     "model": FULL_MODEL,
@@ -129,7 +137,7 @@ def build_report(
             for fold, mse in enumerate(a_result["final_selected_fold_losses"]):
                 folds.append(
                     {
-                        "task": task,
+                        "task": canonical_task,
                         "arm": arm,
                         "fold_kind": "development_inner_fold",
                         "fold": fold,
@@ -153,7 +161,7 @@ def build_report(
                 history = int(channel["selected_profile_history_steps"])
                 scales.append(
                     {
-                        "task": task,
+                        "task": canonical_task,
                         "arm": arm,
                         "channel": channel["channel"],
                         "active": channel["active"],
@@ -164,7 +172,7 @@ def build_report(
             fits = budget[f"{arm}_candidate_fit_attempts"]["total"]
             efficiency.append(
                 {
-                    "task": task,
+                    "task": canonical_task,
                     "arm": arm,
                     "candidate_fit_attempts": fits,
                     "fair_budget": budget["fair_budget"],
@@ -184,16 +192,16 @@ def build_report(
     _write_csv(output / "selected_scales.csv", scales)
     _write_csv(output / "efficiency.csv", efficiency)
     gains = {
-        result["task"]: float(result["relative_multiscale_gain"])
+        _canonical_task(result["task"]): float(result["relative_multiscale_gain"])
         for result in task_results
     }
     positive = sum(value > 0.0 for value in gains.values())
     budget_statuses = {
-        task: _read(run_root / task / "budget_manifest.json")["budget_status"]
+        _canonical_task(task): _read(run_root / task / "budget_manifest.json")["budget_status"]
         for task in completed_tasks
     }
     task_status = {
-        task: ("COMPLETED" if task in completed_tasks else "NOT_RUN")
+        _canonical_task(task): ("COMPLETED" if task in completed_tasks else "NOT_RUN")
         for task in TASKS
     }
     task_status["CZ_H4"] = (
@@ -201,7 +209,7 @@ def build_report(
     )
     overall = (
         "COMPLETED"
-        if all(task_status.get(task) == "COMPLETED" for task in PRIMARY_TASKS)
+        if all(task_status.get(_canonical_task(task)) == "COMPLETED" for task in PRIMARY_TASKS)
         else "PARTIAL"
     )
     interpretation = (
