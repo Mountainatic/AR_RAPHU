@@ -85,7 +85,11 @@ def _perturb_split(
         "clean_sha256": _sha256(source),
         "perturbed_sha256": _sha256(destination),
         "rows": len(clean),
-        "target_reference_source": "IMMUTABLE_SAMPLE_IDS_Y_TRUE",
+        "target_reference_source": (
+            "CLEAN_FUTURE_LEVEL_FROM_FROZEN_SAMPLE_IDS_AND_CLEAN_ANCHOR"
+            if measurement_scope == "realistic_dynamic"
+            else "IMMUTABLE_SAMPLE_IDS_Y_TRUE"
+        ),
         "target_base_measurement_perturbed": target_base_changed,
         "measurement_scope": measurement_scope,
     }

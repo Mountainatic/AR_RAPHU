@@ -5,6 +5,7 @@ import pandas as pd
 
 from experiments.tim_validation.e6_robustness.n1_gaussian import (
     _adjust_dynamic_sample_targets,
+    _full_record,
     outer_train_sigma,
     perturb_gaussian_process_only,
     perturb_process_measurements,
@@ -174,3 +175,15 @@ def test_realistic_dynamic_keeps_future_level_clean_with_noisy_anchor(tmp_path) 
     assert adjusted["y_true"].tolist() == [1.0, 0.5]
     assert audit["clean_future_level_preserved"] is True
     assert audit["reconstruction_max_abs_error"] == 0.0
+
+
+def test_n1_uses_input_only_terminal_stage_when_full_name_is_absent() -> None:
+    record = _full_record(
+        {
+            "records": [
+                {"status": "PASS", "model": "PRISM_V2_1_1_K"},
+                {"status": "PASS", "model": "PRISM_V2_1_1_K_C_W"},
+            ]
+        }
+    )
+    assert record["model"] == "PRISM_V2_1_1_K_C_W"

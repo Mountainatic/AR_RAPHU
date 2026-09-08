@@ -31,6 +31,15 @@ from prism_benchmark.v211_public_all_config import PublicAllPaths
 
 
 FULL_MODEL = "PRISM_V2_1_1_PHYSICS_FIRST"
+STAGEWISE_FINAL_PREFERENCE = (
+    FULL_MODEL,
+    "PRISM_V2_1_1_K_C_A_ABLATION",
+    "PRISM_V2_1_1_K_C_W_DYNAMIC",
+    "PRISM_V2_1_1_K_C_W",
+    "PRISM_V2_1_1_K_C_DYNAMIC",
+    "PRISM_V2_1_1_K_C",
+    "PRISM_V2_1_1_K",
+)
 IDENTIFIERS = {"entity_id", "row_in_entity"}
 DEFAULT_ALPHAS = (0.0, 0.01, 0.025, 0.05, 0.10)
 PERTURBATIONS = ("gaussian_process_only", "bias", "linear_drift", "random_walk_drift", "quantization")
@@ -314,7 +323,11 @@ def _materialize_case(
         "perturbed_test_sha256": _sha256(target_path),
         "rows": len(clean),
         "target_clean": True,
-        "target_reference_source": "IMMUTABLE_SAMPLE_IDS_Y_TRUE",
+        "target_reference_source": (
+            "CLEAN_FUTURE_LEVEL_FROM_FROZEN_SAMPLE_IDS_AND_CLEAN_ANCHOR"
+            if measurement_scope == "realistic_dynamic"
+            else "IMMUTABLE_SAMPLE_IDS_Y_TRUE"
+        ),
         "target_base_measurement_perturbed": target_base_changed,
         "measurement_scope": measurement_scope,
         "dynamic_target_adjustment": dynamic_target_adjustment,
@@ -333,13 +346,15 @@ def _remove_case_work(path: Path, run_root: Path) -> None:
 
 
 def _full_record(result: dict[str, Any]) -> dict[str, Any]:
-    records = [
-        value for value in result["records"]
-        if value.get("model") == FULL_MODEL and value.get("status") == "PASS"
-    ]
-    if len(records) != 1:
-        raise RuntimeError(f"STOP_E6_FULL_MODEL_RECORD_COUNT:{len(records)}")
-    return records[0]
+    records = {
+        str(value.get("model")): value
+        for value in result["records"]
+        if value.get("status") == "PASS"
+    }
+    for model in STAGEWISE_FINAL_PREFERENCE:
+        if model in records:
+            return records[model]
+    raise RuntimeError("STOP_E6_NO_RECOGNIZED_FINAL_STAGEWISE_MODEL")
 
 
 def _quantile(values: list[float], probability: float) -> float:
@@ -391,6 +406,7 @@ def _run_case(job: dict[str, Any]) -> dict[str, Any]:
     row = {
         "status": "COMPLETED", "mode": "N1", "task": job["task"],
         "rod": job["rod"], "perturbation": job["perturbation"],
+        "model": record["model"],
         "seed": seed, "alpha": alpha, "direction": direction, "rows": record["rows"],
         "RMSE": record["rmse"], "MAE": record["mae"],
         "R2": record["r2_level_reconstructed"],
