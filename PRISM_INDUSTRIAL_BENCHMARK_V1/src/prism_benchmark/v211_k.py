@@ -212,6 +212,9 @@ def evaluate_candidate(
     for record in records:
         fit = record["fit"]
         evaluation = record["evaluation"]
+        if fit.empty or evaluation.empty:
+            losses.append(float("inf"))
+            continue
         if family == EXACT_ZERO:
             prediction = np.zeros(len(evaluation), dtype=np.float64)
         else:

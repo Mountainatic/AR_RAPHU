@@ -291,6 +291,8 @@ class BaseAccessor:
         intervals: list[tuple[int, int]],
     ) -> np.ndarray:
         result = np.empty((len(samples), len(intervals)), dtype=np.float64)
+        if samples.empty:
+            return result
         entities = samples["entity_id"].astype(str).to_numpy()
         origins = samples["origin"].to_numpy(dtype=np.int64)
         codes, labels = pd.factorize(entities, sort=False)

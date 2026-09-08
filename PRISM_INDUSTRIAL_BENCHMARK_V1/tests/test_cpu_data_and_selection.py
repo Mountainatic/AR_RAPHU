@@ -94,6 +94,20 @@ def test_accessor_grouped_fast_path_preserves_interleaved_row_order() -> None:
     )
 
 
+def test_accessor_block_means_accepts_empty_causal_fold() -> None:
+    accessor = object.__new__(BaseAccessor)
+    accessor.dataset = "demo"
+    accessor.entities = {}
+    samples = pd.DataFrame(
+        {
+            "entity_id": pd.Series(dtype=str),
+            "origin": pd.Series(dtype=np.int64),
+        }
+    )
+    values = accessor.block_means(samples, "u", [(0, 2), (2, 5)])
+    assert values.shape == (0, 2)
+
+
 def test_tep_inner_folds_keep_same_run_across_faults() -> None:
     rows = []
     for run in range(1, 6):
