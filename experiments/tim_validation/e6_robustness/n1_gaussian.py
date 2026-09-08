@@ -32,6 +32,7 @@ from prism_benchmark.v211_public_all_config import PublicAllPaths
 FULL_MODEL = "PRISM_V2_1_1_PHYSICS_FIRST"
 IDENTIFIERS = {"entity_id", "row_in_entity"}
 DEFAULT_ALPHAS = (0.0, 0.01, 0.025, 0.05, 0.10)
+PERTURBATIONS = ("gaussian_process_only", "bias", "linear_drift", "random_walk_drift", "quantization")
 
 
 def _sha256(path: Path) -> str:
@@ -125,6 +126,62 @@ def perturb_gaussian_process_only(
     return result
 
 
+def perturb_process_measurements(
+    frame: pd.DataFrame,
+    *,
+    perturbation: str,
+    task: str,
+    seed: int,
+    alpha: float,
+    sigma: dict[str, float],
+    direction: int = 0,
+) -> tuple[pd.DataFrame, dict[str, dict[str, float]]]:
+    if perturbation == "gaussian_process_only":
+        return (
+            perturb_gaussian_process_only(
+                frame, task=task, seed=seed, alpha=alpha, sigma=sigma
+            ),
+            {},
+        )
+    result = frame.copy()
+    amplitudes: dict[str, dict[str, float]] = {}
+    for channel, scale in sigma.items():
+        values = frame[channel].to_numpy(dtype=np.float64, copy=True)
+        finite = np.isfinite(values)
+        if perturbation == "bias":
+            delta = np.full(len(values), int(direction) * float(alpha) * float(scale))
+        elif perturbation == "linear_drift":
+            delta = np.zeros(len(values), dtype=np.float64)
+            for _, indices in frame.groupby("entity_id", sort=False).indices.items():
+                positions = np.asarray(list(indices), dtype=np.int64)
+                ramp = np.linspace(0.0, 1.0, len(positions), dtype=np.float64)
+                delta[positions] = int(direction) * float(alpha) * float(scale) * ramp
+        elif perturbation == "random_walk_drift":
+            delta = np.zeros(len(values), dtype=np.float64)
+            generator = np.random.default_rng(_stable_channel_seed(f"{task}:random_walk", seed, channel))
+            for _, indices in frame.groupby("entity_id", sort=False).indices.items():
+                positions = np.asarray(list(indices), dtype=np.int64)
+                if not len(positions):
+                    continue
+                increments = generator.standard_normal(len(positions)) / math.sqrt(len(positions))
+                delta[positions] = float(alpha) * float(scale) * np.cumsum(increments)
+        elif perturbation == "quantization":
+            step = float(alpha) * float(scale)
+            delta = np.zeros(len(values), dtype=np.float64)
+            if step > 0:
+                delta[finite] = np.round(values[finite] / step) * step - values[finite]
+        else:
+            raise ValueError(f"unknown perturbation: {perturbation}")
+        values[finite] += delta[finite]
+        result[channel] = values
+        finite_delta = delta[finite]
+        amplitudes[channel] = {
+            "final": float(finite_delta[-1]) if len(finite_delta) else 0.0,
+            "rms": float(np.sqrt(np.mean(np.square(finite_delta)))) if len(finite_delta) else 0.0,
+        }
+    return result, amplitudes
+
+
 def _materialize_case(
     clean_shared: Path,
     destination: Path,
@@ -135,6 +192,8 @@ def _materialize_case(
     seed: int,
     alpha: float,
     sigma: dict[str, float],
+    perturbation: str = "gaussian_process_only",
+    direction: int = 0,
 ) -> dict[str, Any]:
     if destination.exists() or destination.is_symlink():
         raise RuntimeError(f"REFUSING_EXISTING_E6_CASE_SHARED:{destination}")
@@ -142,8 +201,9 @@ def _materialize_case(
     source = clean_shared / "base_data" / dataset / "test.parquet"
     target_path = destination / "base_data" / dataset / "test.parquet"
     clean = pd.read_parquet(source)
-    perturbed = perturb_gaussian_process_only(
-        clean, task=task, seed=seed, alpha=alpha, sigma=sigma
+    perturbed, amplitudes = perturb_process_measurements(
+        clean, perturbation=perturbation, task=task, seed=seed, alpha=alpha,
+        sigma=sigma, direction=direction,
     )
     temporary = target_path.with_name(f".{target_path.name}.e6.tmp")
     perturbed.to_parquet(temporary, index=False, compression="zstd")
@@ -165,6 +225,7 @@ def _materialize_case(
         "target_clean": True,
         "missingness_preserved": True,
         "noise_injection_level": "RAW_ALIGNED_MEASUREMENT_BEFORE_HISTORY_CONSTRUCTION",
+        "amplitudes": amplitudes,
     }
 
 
@@ -195,11 +256,12 @@ def _run_case(job: dict[str, Any]) -> dict[str, Any]:
     run_root = Path(job["run_root"])
     seed = int(job["seed"])
     alpha = float(job["alpha"])
-    label = str(alpha).replace(".", "p")
-    case_root = run_root / "_work" / f"seed_{seed}" / f"alpha_{label}"
+    direction = int(job.get("direction", 0))
+    label = _case_label(seed, alpha, str(job["perturbation"]), direction)
+    case_root = run_root / "_work" / label
     case_shared = case_root / "shared"
     prediction_root = case_root / "predictions"
-    case_result_path = run_root / "cases" / f"seed_{seed}_alpha_{label}.json"
+    case_result_path = run_root / "cases" / f"{label}.json"
     started = time.time()
     materialization = _materialize_case(
         clean_shared,
@@ -210,6 +272,8 @@ def _run_case(job: dict[str, Any]) -> dict[str, Any]:
         seed=seed,
         alpha=alpha,
         sigma=dict(job["sigma"]),
+        perturbation=str(job["perturbation"]),
+        direction=direction,
     )
     os.environ[INFERENCE_ONLY_ENV] = "1"
     paths = PublicAllPaths(
@@ -226,8 +290,8 @@ def _run_case(job: dict[str, Any]) -> dict[str, Any]:
     record = _full_record(result)
     row = {
         "status": "COMPLETED", "mode": "N1", "task": job["task"],
-        "rod": job["rod"], "perturbation": "gaussian_process_only",
-        "seed": seed, "alpha": alpha, "rows": record["rows"],
+        "rod": job["rod"], "perturbation": job["perturbation"],
+        "seed": seed, "alpha": alpha, "direction": direction, "rows": record["rows"],
         "RMSE": record["rmse"], "MAE": record["mae"],
         "R2": record["r2_level_reconstructed"],
         "delta_RMSE": record["rmse_delta"], "delta_R2": record["r2_delta"],
@@ -243,6 +307,13 @@ def _run_case(job: dict[str, Any]) -> dict[str, Any]:
     _write_json(case_result_path, row)
     _remove_case_work(case_root, run_root)
     return row
+
+
+def _case_label(seed: int, alpha: float, perturbation: str, direction: int) -> str:
+    alpha_label = str(alpha).replace(".", "p")
+    if perturbation == "gaussian_process_only" and direction == 0:
+        return f"seed_{seed}_alpha_{alpha_label}"
+    return f"{perturbation}_direction_{direction}_seed_{seed}_alpha_{alpha_label}"
 
 
 def run_n1(args: argparse.Namespace) -> dict[str, Any]:
@@ -265,7 +336,7 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
         "mode": "N1_FROZEN_MODEL",
         "task": args.task,
         "rod": args.rod,
-        "perturbation": "GAUSSIAN_PROCESS_ONLY",
+        "perturbation": args.perturbation.upper(),
         "alpha": alphas,
         "seeds": seeds,
         "nested_noise_key": "task/seed/channel plus immutable test row order",
@@ -283,62 +354,76 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
     _write_json(run_root / "perturbation_manifest.json", manifest)
     rows: list[dict[str, Any]] = []
     jobs: list[dict[str, Any]] = []
+    directions = args.direction or (
+        [-1, 1] if args.perturbation in {"bias", "linear_drift"} else [0]
+    )
     for seed in seeds:
-        for alpha in alphas:
-            label = str(alpha).replace(".", "p")
-            case_root = run_root / "_work" / f"seed_{seed}" / f"alpha_{label}"
-            case_result_path = run_root / "cases" / f"seed_{seed}_alpha_{label}.json"
-            if case_result_path.is_file():
-                rows.append(_read_case_row(case_result_path))
-                continue
-            if case_root.exists():
-                _remove_case_work(case_root, run_root)
-            jobs.append(
-                {
-                    "clean_shared": str(clean_shared), "run_root": str(run_root),
-                    "selection_root": str(selection_root), "checkpoint_root": str(checkpoint_root),
-                    "project": str(args.project.resolve()), "task": args.task,
-                    "rod": args.rod, "dataset": args.dataset, "target": args.target,
-                    "head_id": args.head_id, "information_set": args.information_set,
-                    "availability_scenario": args.availability_scenario,
-                    "proxy_policy": args.proxy_policy, "sigma": sigma,
-                    "seed": seed, "alpha": alpha,
-                }
-            )
+        for direction in directions:
+            for alpha in alphas:
+                label = _case_label(seed, alpha, args.perturbation, direction)
+                case_root = run_root / "_work" / label
+                case_result_path = run_root / "cases" / f"{label}.json"
+                if case_result_path.is_file():
+                    rows.append(_read_case_row(case_result_path))
+                    continue
+                if case_root.exists():
+                    _remove_case_work(case_root, run_root)
+                jobs.append(
+                    {
+                        "clean_shared": str(clean_shared), "run_root": str(run_root),
+                        "selection_root": str(selection_root), "checkpoint_root": str(checkpoint_root),
+                        "project": str(args.project.resolve()), "task": args.task,
+                        "rod": args.rod, "dataset": args.dataset, "target": args.target,
+                        "head_id": args.head_id, "information_set": args.information_set,
+                        "availability_scenario": args.availability_scenario,
+                        "proxy_policy": args.proxy_policy, "sigma": sigma,
+                        "seed": seed, "alpha": alpha, "direction": direction,
+                        "perturbation": args.perturbation,
+                    }
+                )
     if args.parallel_cases > 1 and jobs:
         with ProcessPoolExecutor(max_workers=args.parallel_cases) as executor:
             rows.extend(executor.map(_run_case, jobs))
     else:
         rows.extend(_run_case(job) for job in jobs)
 
-    clean_by_seed = {int(row["seed"]): row for row in rows if float(row["alpha"]) == 0.0}
+    clean_by_seed = {
+        (int(row["seed"]), int(row.get("direction", 0))): row
+        for row in rows if float(row["alpha"]) == 0.0
+    }
     for row in rows:
-        clean = clean_by_seed[int(row["seed"])]
+        clean = clean_by_seed[(int(row["seed"]), int(row.get("direction", 0)))]
         row["relative_RMSE_degradation"] = (
             float(row["RMSE"]) - float(clean["RMSE"])
         ) / float(clean["RMSE"])
         row["R2_change"] = float(row["R2"]) - float(clean["R2"])
     _write_csv(run_root / "per_seed.csv", rows)
     aggregate = []
-    for alpha in alphas:
-        selected = [row for row in rows if float(row["alpha"]) == alpha]
-        for metric in ("RMSE", "MAE", "R2", "delta_RMSE", "delta_R2", "persistence_skill", "relative_RMSE_degradation", "R2_change"):
-            values = [float(row[metric]) for row in selected]
-            aggregate.append(
-                {
-                    "status": "COMPLETED", "task": args.task, "rod": args.rod,
-                    "mode": "N1", "perturbation": "gaussian_process_only",
-                    "alpha": alpha, "metric": metric, "seeds": len(values),
-                    "mean": mean(values), "median": median(values),
-                    "Q1": _quantile(values, 0.25), "Q3": _quantile(values, 0.75),
-                    "minimum": min(values), "maximum": max(values),
-                }
-            )
+    for direction in directions:
+        for alpha in alphas:
+            selected = [
+                row for row in rows
+                if float(row["alpha"]) == alpha
+                and int(row.get("direction", 0)) == direction
+            ]
+            for metric in ("RMSE", "MAE", "R2", "delta_RMSE", "delta_R2", "persistence_skill", "relative_RMSE_degradation", "R2_change"):
+                values = [float(row[metric]) for row in selected]
+                aggregate.append(
+                    {
+                        "status": "COMPLETED", "task": args.task, "rod": args.rod,
+                        "mode": "N1", "perturbation": args.perturbation,
+                        "alpha": alpha, "direction": direction, "metric": metric, "seeds": len(values),
+                        "mean": mean(values), "median": median(values),
+                        "Q1": _quantile(values, 0.25), "Q3": _quantile(values, 0.75),
+                        "minimum": min(values), "maximum": max(values),
+                    }
+                )
     _write_csv(run_root / "aggregate.csv", aggregate)
     final = {
         "status": "COMPLETED", "mode": "N1_FROZEN_MODEL",
         "task": args.task, "rod": args.rod, "seeds": len(seeds),
-        "alpha": alphas, "cases": len(rows), "structure_evaluated": False,
+        "alpha": alphas, "directions": directions, "perturbation": args.perturbation,
+        "cases": len(rows), "structure_evaluated": False,
         "fit_called_in_inference": False,
     }
     _write_json(run_root / "N1_COMPLETE.json", final)
@@ -370,6 +455,8 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--seeds", type=int, default=30)
     value.add_argument("--seed-start", type=int, default=20260910)
     value.add_argument("--parallel-cases", type=int, default=1)
+    value.add_argument("--perturbation", choices=PERTURBATIONS, default="gaussian_process_only")
+    value.add_argument("--direction", type=int, action="append", default=[])
     value.add_argument("--alpha", type=float, action="append", default=[])
     return value
 

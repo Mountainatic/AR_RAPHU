@@ -68,18 +68,20 @@ def build_report(root: Path) -> dict[str, Any]:
 
     n1_tasks = sorted({str(row.get("task")) for row in n1_rows})
     n2_tasks = sorted({str(row.get("task")) for row in n2_rows})
+    n1_perturbations = {str(row.get("perturbation")) for row in n1_rows}
+    n2_perturbations = {str(row.get("perturbation")) for row in n2_rows}
     coverage = {
         "gaussian_process_only": {
-            "N1": "COMPLETED" if n1_rows else "NOT_RUN",
-            "N2": "COMPLETED" if n2_rows else "NOT_RUN",
+            "N1": "COMPLETED" if "gaussian_process_only" in n1_perturbations else "NOT_RUN",
+            "N2": "COMPLETED" if "gaussian_process_only" in n2_perturbations else "NOT_RUN",
             "N1_tasks": n1_tasks,
             "N2_tasks": n2_tasks,
         },
         "gaussian_realistic_dynamic": {"N1": "NOT_RUN", "N2": "NOT_RUN"},
-        "bias": {"N1": "NOT_RUN", "N2": "NOT_RUN"},
-        "linear_drift": {"N1": "NOT_RUN", "N2": "NOT_RUN"},
-        "random_walk_drift": {"N1": "NOT_RUN", "N2": "NOT_RUN"},
-        "quantization": {"N1": "NOT_RUN", "N2": "NOT_RUN"},
+        "bias": {"N1": "COMPLETED" if "bias" in n1_perturbations else "NOT_RUN", "N2": "NOT_RUN"},
+        "linear_drift": {"N1": "COMPLETED" if "linear_drift" in n1_perturbations else "NOT_RUN", "N2": "NOT_RUN"},
+        "random_walk_drift": {"N1": "COMPLETED" if "random_walk_drift" in n1_perturbations else "NOT_RUN", "N2": "NOT_RUN"},
+        "quantization": {"N1": "COMPLETED" if "quantization" in n1_perturbations else "NOT_RUN", "N2": "NOT_RUN"},
         "dropout_optional": {"N1": "NOT_RUN", "N2": "NOT_RUN"},
     }
     required_tasks = {"CZ_H4", "TEP_G12"}
