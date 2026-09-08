@@ -470,6 +470,9 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
         "sigma_sha256": sigma_hash,
         "target_reference": "clean",
         "structure_evaluated": False,
+        "alpha_zero_policy": (
+            "EXECUTE_FIRST_SEED_PER_DIRECTION_AND_REUSE_EXACT_DETERMINISTIC_BASELINE"
+        ),
         "checkpoint_root": str(checkpoint_root),
         "clean_shared": str(clean_shared),
         "clean_registry_sha256": registry_hash,
@@ -478,6 +481,7 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
     _write_json(run_root / "perturbation_manifest.json", manifest)
     rows: list[dict[str, Any]] = []
     jobs: list[dict[str, Any]] = []
+    alpha_zero_reuse: list[tuple[int, int, Path]] = []
     directions = args.direction or (
         [-1, 1] if args.perturbation in {"bias", "linear_drift"} else [0]
     )
@@ -489,6 +493,11 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
                 case_result_path = run_root / "cases" / f"{label}.json"
                 if case_result_path.is_file():
                     rows.append(_read_case_row(case_result_path))
+                    continue
+                if alpha == 0.0 and seed != seeds[0]:
+                    if case_root.exists():
+                        _remove_case_work(case_root, run_root)
+                    alpha_zero_reuse.append((seed, direction, case_result_path))
                     continue
                 if case_root.exists():
                     _remove_case_work(case_root, run_root)
@@ -511,6 +520,28 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
             rows.extend(executor.map(_run_case, jobs))
     else:
         rows.extend(_run_case(job) for job in jobs)
+
+    first_seed = seeds[0]
+    baselines = {
+        int(row.get("direction", 0)): row
+        for row in rows
+        if int(row["seed"]) == first_seed and float(row["alpha"]) == 0.0
+    }
+    for seed, direction, path in alpha_zero_reuse:
+        if direction not in baselines:
+            raise RuntimeError(f"STOP_E6_ALPHA_ZERO_BASELINE_MISSING:{direction}")
+        row = dict(baselines[direction])
+        row.update(
+            {
+                "seed": seed,
+                "elapsed_seconds": 0.0,
+                "deterministic_alpha_zero_reused": True,
+                "reused_from_seed": first_seed,
+                "reuse_reason": "ALPHA_ZERO_HAS_NO_PERTURBATION_REALIZATION",
+            }
+        )
+        _write_json(path, row)
+        rows.append(row)
 
     clean_by_seed = {
         (int(row["seed"]), int(row.get("direction", 0))): row
