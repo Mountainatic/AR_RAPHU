@@ -5,6 +5,7 @@ from pathlib import Path
 
 from prism_benchmark.tim_e4_universe import (
     apply_candidate_universe,
+    history_grid_for_universe,
     universe_manifest,
 )
 from prism_benchmark.v211_config import PUBLIC_ALL_PROTOCOL, load_v211_configs
@@ -29,3 +30,9 @@ def test_standard_is_exact_and_universes_are_nested() -> None:
 def test_manifest_is_json_serializable() -> None:
     configs = load_v211_configs(PROJECT, PUBLIC_ALL_PROTOCOL)
     json.dumps(universe_manifest(*configs), sort_keys=True)
+
+
+def test_task_history_grid_is_mechanically_nested() -> None:
+    assert history_grid_for_universe([128, 256], "coarse") == [128]
+    assert history_grid_for_universe([128, 256], "standard") == [128, 256]
+    assert history_grid_for_universe([128, 256], "expanded") == [64, 128, 256, 512]

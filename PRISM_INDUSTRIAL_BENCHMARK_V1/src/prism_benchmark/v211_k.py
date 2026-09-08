@@ -791,6 +791,9 @@ def run_k_channel(
             "channel": channel,
             "selected_profile": list(selected_profile),
             "forced_history_steps": forced_history_steps,
+            "tim_e4_candidate_universe": os.environ.get(
+                "PRISM_TIM_E4_CANDIDATE_UNIVERSE"
+            ),
             "registered_history_steps": None
             if registered_history_steps is None
             else sorted({int(value) for value in registered_history_steps}),

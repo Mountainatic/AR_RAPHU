@@ -285,12 +285,13 @@ def run_a_view(
         alphas = [float(value) for value in v2["A_module"]["ridge_alpha_grid"]]
         mus = [float(value) for value in v21["A"]["soft_overlap_mu"]]
         candidates: list[Any] = [EXACT_ZERO]
-        candidates.extend(
-            (MATURE_RESIDUAL_AR, profile, alpha, mu)
-            for profile in profiles
-            for alpha in alphas
-            for mu in mus
-        )
+        if MATURE_RESIDUAL_AR in set(v21["A"]["candidates"]):
+            candidates.extend(
+                (MATURE_RESIDUAL_AR, profile, alpha, mu)
+                for profile in profiles
+                for alpha in alphas
+                for mu in mus
+            )
         losses = {candidate: [] for candidate in candidates}
         fold_means: dict[str, float] = {}
         coverage: dict[str, list[float]] = {str(profile): [] for profile in profiles}

@@ -425,10 +425,8 @@ def _w_candidates(
     candidates: list[Any] = [IDENTITY]
     smoothness = [float(value) for value in v2["W_module"]["smoothness_penalties"]]
     mus = [float(value) for value in v211["W"]["soft_overlap_mu"]]
-    include_monotone = bool(
-        monotone
-        or MONOTONE in set(v211.get("W", {}).get("candidates", ()))
-    )
+    registered_families = set(v211.get("W", {}).get("candidates", ()))
+    include_monotone = MONOTONE in registered_families
     if include_monotone:
         candidates.extend(
             (MONOTONE, int(knots), penalty, mu, direction)
@@ -436,12 +434,13 @@ def _w_candidates(
             for penalty in smoothness
             for mu in mus
         )
-    candidates.extend(
-        (NATURAL_CUBIC, int(knots), penalty, mu, 1)
-        for knots in v21["W"]["natural_cubic_knots"]
-        for penalty in smoothness
-        for mu in mus
-    )
+    if NATURAL_CUBIC in registered_families:
+        candidates.extend(
+            (NATURAL_CUBIC, int(knots), penalty, mu, 1)
+            for knots in v21["W"]["natural_cubic_knots"]
+            for penalty in smoothness
+            for mu in mus
+        )
     return candidates
 
 

@@ -51,6 +51,23 @@ def _expanded_numeric(values: Sequence[int | float]) -> list[int | float]:
     return sorted(set([*registered, lower, upper]))
 
 
+def history_grid_for_universe(
+    history_steps: Sequence[int], universe: str
+) -> list[int]:
+    if universe not in UNIVERSES:
+        raise ValueError(f"unsupported TIM E4 universe: {universe}")
+    if universe == "coarse":
+        values = _coarse(history_steps)
+    elif universe == "expanded":
+        registered = sorted({int(value) for value in history_steps})
+        values = sorted(
+            set([*registered, max(1, registered[0] // 2), registered[-1] * 2])
+        )
+    else:
+        values = list(history_steps)
+    return [int(value) for value in values]
+
+
 def _set_path(root: dict[str, Any], path: tuple[str, ...], value: list[Any]) -> None:
     target: dict[str, Any] = root
     for key in path[:-1]:

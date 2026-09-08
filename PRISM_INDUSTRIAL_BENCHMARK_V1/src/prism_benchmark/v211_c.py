@@ -154,7 +154,14 @@ def run_c_view(
             float(value)
             for value in v2["C_module"]["joint_basis"]["ridge_alpha_grid"]
         )
-        families = (COMPRESSED, JOINT_BASIS)
+        registered_families = set(v21["C"]["C_candidates"])
+        families = tuple(
+            family
+            for family in (COMPRESSED, JOINT_BASIS)
+            if family in registered_families
+        )
+        if not families:
+            raise RuntimeError("E4 C universe removed every registered representation")
         candidate_losses = {
             (family, alpha): [] for family in families for alpha in alpha_grid
         }
