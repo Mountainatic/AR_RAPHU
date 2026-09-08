@@ -3,9 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
-from experiments.tim_validation.e4_candidate.runner import _common_support_metrics
+from experiments.tim_validation.e4_candidate import runner as e4_runner
 from prism_benchmark.tim_e4_universe import (
     apply_candidate_universe,
     history_grid_for_universe,
@@ -41,7 +42,9 @@ def test_task_history_grid_is_mechanically_nested() -> None:
     assert history_grid_for_universe([128, 256], "expanded") == [64, 128, 256, 512]
 
 
-def test_common_support_metrics_use_strict_intersection(tmp_path: Path) -> None:
+def test_common_support_metrics_use_strict_intersection(
+    tmp_path: Path, monkeypatch
+) -> None:
     results = {}
     rows = {
         "coarse": (["a", "b", "c"], [0.0, 1.0, 2.0]),
@@ -56,12 +59,25 @@ def test_common_support_metrics_use_strict_intersection(tmp_path: Path) -> None:
             {"base_origin_id": ids, "y_true": truth, "y_pred": truth}
         ).to_parquet(path, index=False)
         results[universe] = {
+            "project_path": str(tmp_path),
+            "shared_path": str(tmp_path),
             "record": {
                 "prediction_path": "final/prediction.parquet",
                 "scoring_support_hash": universe,
             }
         }
-    metrics, audit = _common_support_metrics(tmp_path, "demo", results)
+    monkeypatch.setattr(e4_runner, "_views", lambda shared, task: (None, object()))
+    monkeypatch.setattr(
+        e4_runner,
+        "load_native_samples",
+        lambda shared, view, split: pd.DataFrame(
+            {"base_origin_id": ["a", "b", "c", "d"]}
+        ),
+    )
+    monkeypatch.setattr(
+        e4_runner, "_current_levels", lambda paths, view, samples, split: np.ones(4)
+    )
+    metrics, audit = e4_runner._common_support_metrics(tmp_path, "demo", results)
     assert audit["rows"] == 2
     assert audit["identical_target_rows"] is True
     assert all(value["RMSE"] == 0.0 for value in metrics.values())

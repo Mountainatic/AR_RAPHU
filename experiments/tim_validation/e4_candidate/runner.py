@@ -22,10 +22,12 @@ import pandas as pd
 from prism_benchmark.cpu_data import input_columns
 from prism_benchmark.portable_checkpoints import INFERENCE_ONLY_ENV
 from prism_benchmark.representative_prism_checkpoints import (
+    _current_levels,
     fit_prism_checkpoint_for_view,
     predict_prism_checkpoint_for_view,
     verify_prism_checkpoint_reload,
 )
+from prism_benchmark.level_reconstruction import metric_bundle_delta_and_level, support_hash
 from prism_benchmark.tim_e4_universe import (
     ENVIRONMENT_VARIABLE,
     UNIVERSES,
@@ -38,6 +40,7 @@ from prism_benchmark.v211_c import run_c_view
 from prism_benchmark.v211_config import PUBLIC_ALL_PROTOCOL, load_v211_configs
 from prism_benchmark.v211_k import run_k_channel
 from prism_benchmark.v211_public_all_config import PublicAllPaths
+from prism_benchmark.v211_support import load_native_samples
 from prism_benchmark.v211_w import run_w_view
 
 from experiments.tim_validation.common.structure_signature import StructureSignature
@@ -385,6 +388,8 @@ def finalize_task(args: argparse.Namespace) -> dict[str, Any]:
     result = {
         "status": "COMPLETED", "task": args.task,
         "candidate_universe": args.universe, "record": record,
+        "project_path": str(args.project.resolve()),
+        "shared_path": str(args.shared.resolve()),
         "structure_signature_hash": signature["signature_hash"],
         "test_accessed_only_after_checkpoint_seal": True,
     }
@@ -427,21 +432,32 @@ def _common_support_metrics(
     ]
     if not ordered_ids:
         raise RuntimeError(f"empty E4 common support for {task}")
-    support_id = hashlib.sha256("\n".join(ordered_ids).encode("utf-8")).hexdigest()
+    support_id = support_hash(ordered_ids)
     reference = frames["standard"].loc[ordered_ids, "y_true"].to_numpy(dtype=np.float64)
-    denominator = float(np.sum(np.square(reference - np.mean(reference))))
+    shared = Path(results["standard"]["shared_path"])
+    project = Path(results["standard"]["project_path"])
+    _, view = _views(shared, task)
+    native = load_native_samples(shared, view, "test")
+    current = _current_levels(
+        PublicAllPaths(project, shared, run_root / task / "standard"),
+        view,
+        native,
+        "test",
+    )
+    current_by_id = dict(zip(native["base_origin_id"].astype(str), current, strict=True))
+    common_current = np.asarray([current_by_id[value] for value in ordered_ids], dtype=np.float64)
     metrics: dict[str, dict[str, Any]] = {}
     for universe, frame in frames.items():
         y_true = frame.loc[ordered_ids, "y_true"].to_numpy(dtype=np.float64)
         if not np.array_equal(y_true, reference):
             raise RuntimeError(f"E4 y_true drift on common support for {task}/{universe}")
         prediction = frame.loc[ordered_ids, "y_pred"].to_numpy(dtype=np.float64)
-        error = prediction - reference
-        mse = float(np.mean(np.square(error), dtype=np.float64))
+        bundle = metric_bundle_delta_and_level(reference, prediction, common_current)
         metrics[universe] = {
-            "rows": len(ordered_ids), "RMSE": float(np.sqrt(mse)),
-            "MAE": float(np.mean(np.abs(error), dtype=np.float64)),
-            "R2": float("nan") if denominator == 0.0 else 1.0 - float(np.sum(np.square(error))) / denominator,
+            "rows": len(ordered_ids), "RMSE": float(bundle["rmse"]),
+            "MAE": float(bundle["mae"]),
+            "R2": float(bundle["r2_level_reconstructed"]),
+            "R2_delta": float(bundle["r2_delta"]),
             "support_id": support_id,
         }
     audit = {
