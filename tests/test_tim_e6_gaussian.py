@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from experiments.tim_validation.e6_robustness.n1_gaussian import (
+    outer_train_sigma,
     perturb_gaussian_process_only,
     perturb_process_measurements,
 )
@@ -63,3 +64,44 @@ def test_bias_linear_drift_and_quantization_keep_target_clean() -> None:
         assert observed["target"].equals(frame["target"])
         assert not observed["x"].equals(frame["x"])
         assert amplitudes["x"]["rms"] >= 0.0
+
+
+def test_outer_train_sigma_can_include_dynamic_target(tmp_path) -> None:
+    root = tmp_path / "shared" / "base_data" / "tep"
+    root.mkdir(parents=True)
+    pd.DataFrame(
+        {
+            "x": [1.0, 2.0, 4.0],
+            "target": [10.0, 11.0, 14.0],
+            "entity_id": ["a"] * 3,
+            "row_in_entity": range(3),
+        }
+    ).to_parquet(root / "train.parquet", index=False)
+    process, _ = outer_train_sigma(tmp_path / "shared", "tep", "target")
+    realistic, _ = outer_train_sigma(
+        tmp_path / "shared", "tep", "target", include_target=True
+    )
+    assert set(process) == {"x"}
+    assert set(realistic) == {"x", "target"}
+
+
+def test_realistic_dynamic_perturbs_sensor_target_but_not_other_contracts() -> None:
+    frame = pd.DataFrame(
+        {
+            "x": [1.0, 2.0, 3.0],
+            "target": [4.0, 5.0, 6.0],
+            "entity_id": ["a"] * 3,
+            "row_in_entity": range(3),
+        }
+    )
+    observed = perturb_gaussian_process_only(
+        frame,
+        task="T",
+        seed=7,
+        alpha=0.1,
+        sigma={"x": 1.0, "target": 2.0},
+    )
+    assert not observed["x"].equals(frame["x"])
+    assert not observed["target"].equals(frame["target"])
+    assert observed["entity_id"].equals(frame["entity_id"])
+    assert observed["row_in_entity"].equals(frame["row_in_entity"])

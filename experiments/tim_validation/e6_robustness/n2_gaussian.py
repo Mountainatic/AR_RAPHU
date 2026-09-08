@@ -52,6 +52,7 @@ def _perturb_split(
     sigma: dict[str, float],
     realization: str,
     target: str,
+    measurement_scope: str,
 ) -> dict[str, Any]:
     clean = pd.read_parquet(source)
     perturbed = clean.copy()
@@ -65,8 +66,13 @@ def _perturb_split(
     temporary = destination.with_name(f".{destination.name}.e6.tmp")
     perturbed.to_parquet(temporary, index=False, compression="zstd")
     os.replace(temporary, destination)
-    if not np.array_equal(clean[target].to_numpy(), perturbed[target].to_numpy(), equal_nan=True):
+    target_base_changed = not np.array_equal(
+        clean[target].to_numpy(), perturbed[target].to_numpy(), equal_nan=True
+    )
+    if measurement_scope == "process_only" and target_base_changed:
         raise AssertionError("STOP_E6_N2_CLEAN_TARGET_CHANGED")
+    if measurement_scope == "realistic_dynamic" and target not in sigma:
+        raise AssertionError("STOP_E6_N2_REALISTIC_DYNAMIC_TARGET_NOT_PERTURBED")
     if any(
         not np.array_equal(clean[channel].isna().to_numpy(), perturbed[channel].isna().to_numpy())
         for channel in sigma
@@ -78,6 +84,9 @@ def _perturb_split(
         "clean_sha256": _sha256(source),
         "perturbed_sha256": _sha256(destination),
         "rows": len(clean),
+        "target_reference_source": "IMMUTABLE_SAMPLE_IDS_Y_TRUE",
+        "target_base_measurement_perturbed": target_base_changed,
+        "measurement_scope": measurement_scope,
     }
 
 
@@ -91,6 +100,7 @@ def _materialize_case(
     seed: int,
     alpha: float,
     sigma: dict[str, float],
+    measurement_scope: str,
 ) -> list[dict[str, Any]]:
     if destination.exists() or destination.is_symlink():
         raise RuntimeError(f"REFUSING_EXISTING_E6_N2_CASE_SHARED:{destination}")
@@ -113,6 +123,7 @@ def _materialize_case(
                 sigma=sigma,
                 realization="test_independent" if split == "test" else "development",
                 target=target,
+                measurement_scope=measurement_scope,
             )
         )
     if not any(record["split"] == "train" for record in records):
@@ -266,7 +277,14 @@ def run_n2(args: argparse.Namespace) -> dict[str, Any]:
     clean_shared = args.clean_shared.resolve(strict=True)
     run_root = args.run_root.resolve()
     run_root.mkdir(parents=True, exist_ok=True)
-    sigma, train_hash = outer_train_sigma(clean_shared, args.dataset, args.target)
+    if args.measurement_scope == "realistic_dynamic" and args.information_set != "dynamic":
+        raise RuntimeError("E6_REALISTIC_DYNAMIC_REQUIRES_DYNAMIC_INFORMATION_SET")
+    sigma, train_hash = outer_train_sigma(
+        clean_shared,
+        args.dataset,
+        args.target,
+        include_target=args.measurement_scope == "realistic_dynamic",
+    )
     registry_hash, registry_contract = _sample_registry_hash(clean_shared)
     seeds = list(range(args.seed_start, args.seed_start + args.seeds))
     alphas = sorted(set(args.alpha))
@@ -278,6 +296,7 @@ def run_n2(args: argparse.Namespace) -> dict[str, Any]:
             "status": "FROZEN_BEFORE_PERTURBED_DEVELOPMENT_OR_TEST_ACCESS",
             "mode": "N2_REIDENTIFICATION", "task": args.task, "rod": args.rod,
             "perturbation": "GAUSSIAN_PROCESS_ONLY", "alpha": alphas, "seeds": seeds,
+            "measurement_scope": args.measurement_scope,
             "sigma_source": "outer_train_only", "sigma": sigma,
             "outer_train_sha256": train_hash, "clean_registry_sha256": registry_hash,
             "clean_registry_hash_contract": registry_contract,
@@ -306,6 +325,7 @@ def run_n2(args: argparse.Namespace) -> dict[str, Any]:
             materialization = _materialize_case(
                 clean_shared, shared, task=args.task, dataset=args.dataset,
                 target=args.target, seed=seed, alpha=alpha, sigma=sigma,
+                measurement_scope=args.measurement_scope,
             )
             selection = case / "selection"
             checkpoint = case / "checkpoint"
@@ -331,6 +351,7 @@ def run_n2(args: argparse.Namespace) -> dict[str, Any]:
                 "checkpoint_hash": record["checkpoint_hash"],
                 "fit_called_in_inference": False,
                 "development_test_realizations_independent": True,
+                "measurement_scope": args.measurement_scope,
                 "materialized_splits": materialization,
                 "elapsed_seconds": time.time() - started,
             }
@@ -402,6 +423,7 @@ def run_n2(args: argparse.Namespace) -> dict[str, Any]:
         "status": "COMPLETED", "mode": "N2_REIDENTIFICATION",
         "task": args.task, "rod": args.rod, "seeds": len(seeds),
         "alpha": alphas, "cases": len(rows), "structure_evaluated": True,
+        "measurement_scope": args.measurement_scope,
     }
     _write_json(run_root / "N2_COMPLETE.json", final)
     return final
@@ -427,6 +449,11 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--alpha", type=float, action="append", default=[])
     value.add_argument("--workers", type=int, default=4)
     value.add_argument("--per-worker-gib", type=float, default=4.0)
+    value.add_argument(
+        "--measurement-scope",
+        choices=("process_only", "realistic_dynamic"),
+        default="process_only",
+    )
     return value
 
 

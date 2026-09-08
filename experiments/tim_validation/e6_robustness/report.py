@@ -70,14 +70,37 @@ def build_report(root: Path) -> dict[str, Any]:
     n2_tasks = sorted({str(row.get("task")) for row in n2_rows})
     n1_perturbations = {str(row.get("perturbation")) for row in n1_rows}
     n2_perturbations = {str(row.get("perturbation")) for row in n2_rows}
+    n1_process_only = any(
+        row.get("perturbation") == "gaussian_process_only"
+        and row.get("measurement_scope", "process_only") == "process_only"
+        for row in n1_rows
+    )
+    n2_process_only = any(
+        row.get("perturbation") == "gaussian_process_only"
+        and row.get("measurement_scope", "process_only") == "process_only"
+        for row in n2_rows
+    )
+    n1_realistic = any(
+        row.get("perturbation") == "gaussian_process_only"
+        and row.get("measurement_scope", "process_only") == "realistic_dynamic"
+        for row in n1_rows
+    )
+    n2_realistic = any(
+        row.get("perturbation") == "gaussian_process_only"
+        and row.get("measurement_scope", "process_only") == "realistic_dynamic"
+        for row in n2_rows
+    )
     coverage = {
         "gaussian_process_only": {
-            "N1": "COMPLETED" if "gaussian_process_only" in n1_perturbations else "NOT_RUN",
-            "N2": "COMPLETED" if "gaussian_process_only" in n2_perturbations else "NOT_RUN",
+            "N1": "COMPLETED" if n1_process_only else "NOT_RUN",
+            "N2": "COMPLETED" if n2_process_only else "NOT_RUN",
             "N1_tasks": n1_tasks,
             "N2_tasks": n2_tasks,
         },
-        "gaussian_realistic_dynamic": {"N1": "NOT_RUN", "N2": "NOT_RUN"},
+        "gaussian_realistic_dynamic": {
+            "N1": "COMPLETED" if n1_realistic else "NOT_RUN",
+            "N2": "COMPLETED" if n2_realistic else "NOT_RUN",
+        },
         "bias": {"N1": "COMPLETED" if "bias" in n1_perturbations else "NOT_RUN", "N2": "NOT_RUN"},
         "linear_drift": {"N1": "COMPLETED" if "linear_drift" in n1_perturbations else "NOT_RUN", "N2": "NOT_RUN"},
         "random_walk_drift": {"N1": "COMPLETED" if "random_walk_drift" in n1_perturbations else "NOT_RUN", "N2": "NOT_RUN"},
@@ -108,9 +131,9 @@ def build_report(root: Path) -> dict[str, Any]:
         "channel/scale/stage robustness. Gaussian process-only noise is injected at "
         "the raw aligned measurement level, uses outer-train sigma, preserves missing "
         "values, keeps the target/reference clean, and uses nested alpha realizations.\n\n"
-        "Coverage not present in the machine-readable manifest is `NOT_RUN`; no claim "
+        "Coverage not present in the machine-readable manifest is `NOT_RUN`; claims "
         "about realistic noisy target history/anchor, bias, drift, quantization, or "
-        "dropout follows from process-only Gaussian results.\n"
+        "dropout are made only when the corresponding rows are present.\n"
     )
     (root / "README.md").write_text(interpretation, encoding="utf-8")
     (root / "E6_INTERPRETATION.md").write_text(interpretation, encoding="utf-8")

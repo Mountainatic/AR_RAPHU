@@ -88,13 +88,17 @@ def _stable_channel_seed(task: str, seed: int, channel: str) -> np.random.SeedSe
 
 
 def outer_train_sigma(
-    clean_shared: Path, dataset: str, target: str
+    clean_shared: Path,
+    dataset: str,
+    target: str,
+    *,
+    include_target: bool = False,
 ) -> tuple[dict[str, float], str]:
     path = clean_shared / "base_data" / dataset / "train.parquet"
     frame = pd.read_parquet(path)
     channels = [
         column for column in frame.columns
-        if column not in IDENTIFIERS and column != target
+        if column not in IDENTIFIERS and (include_target or column != target)
         and pd.api.types.is_numeric_dtype(frame[column])
     ]
     sigma = {
@@ -194,6 +198,7 @@ def _materialize_case(
     sigma: dict[str, float],
     perturbation: str = "gaussian_process_only",
     direction: int = 0,
+    measurement_scope: str = "process_only",
 ) -> dict[str, Any]:
     if destination.exists() or destination.is_symlink():
         raise RuntimeError(f"REFUSING_EXISTING_E6_CASE_SHARED:{destination}")
@@ -208,10 +213,13 @@ def _materialize_case(
     temporary = target_path.with_name(f".{target_path.name}.e6.tmp")
     perturbed.to_parquet(temporary, index=False, compression="zstd")
     os.replace(temporary, target_path)
-    if not np.array_equal(
+    target_base_changed = not np.array_equal(
         clean[target].to_numpy(), perturbed[target].to_numpy(), equal_nan=True
-    ):
+    )
+    if measurement_scope == "process_only" and target_base_changed:
         raise AssertionError("STOP_E6_CLEAN_TARGET_CHANGED")
+    if measurement_scope == "realistic_dynamic" and target not in sigma:
+        raise AssertionError("STOP_E6_REALISTIC_DYNAMIC_TARGET_NOT_PERTURBED")
     missing_preserved = all(
         np.array_equal(clean[channel].isna().to_numpy(), perturbed[channel].isna().to_numpy())
         for channel in sigma
@@ -223,6 +231,9 @@ def _materialize_case(
         "perturbed_test_sha256": _sha256(target_path),
         "rows": len(clean),
         "target_clean": True,
+        "target_reference_source": "IMMUTABLE_SAMPLE_IDS_Y_TRUE",
+        "target_base_measurement_perturbed": target_base_changed,
+        "measurement_scope": measurement_scope,
         "missingness_preserved": True,
         "noise_injection_level": "RAW_ALIGNED_MEASUREMENT_BEFORE_HISTORY_CONSTRUCTION",
         "amplitudes": amplitudes,
@@ -274,6 +285,7 @@ def _run_case(job: dict[str, Any]) -> dict[str, Any]:
         sigma=dict(job["sigma"]),
         perturbation=str(job["perturbation"]),
         direction=direction,
+        measurement_scope=str(job["measurement_scope"]),
     )
     os.environ[INFERENCE_ONLY_ENV] = "1"
     paths = PublicAllPaths(
@@ -322,7 +334,14 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
     checkpoint_root = args.checkpoint_root.resolve(strict=True)
     run_root = args.run_root.resolve()
     run_root.mkdir(parents=True, exist_ok=True)
-    sigma, train_hash = outer_train_sigma(clean_shared, args.dataset, args.target)
+    if args.measurement_scope == "realistic_dynamic" and args.information_set != "dynamic":
+        raise RuntimeError("E6_REALISTIC_DYNAMIC_REQUIRES_DYNAMIC_INFORMATION_SET")
+    sigma, train_hash = outer_train_sigma(
+        clean_shared,
+        args.dataset,
+        args.target,
+        include_target=args.measurement_scope == "realistic_dynamic",
+    )
     sigma_hash = hashlib.sha256(
         json.dumps(sigma, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
@@ -337,6 +356,7 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
         "task": args.task,
         "rod": args.rod,
         "perturbation": args.perturbation.upper(),
+        "measurement_scope": args.measurement_scope,
         "alpha": alphas,
         "seeds": seeds,
         "nested_noise_key": "task/seed/channel plus immutable test row order",
@@ -379,6 +399,7 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
                         "proxy_policy": args.proxy_policy, "sigma": sigma,
                         "seed": seed, "alpha": alpha, "direction": direction,
                         "perturbation": args.perturbation,
+                        "measurement_scope": args.measurement_scope,
                     }
                 )
     if args.parallel_cases > 1 and jobs:
@@ -423,6 +444,7 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
         "status": "COMPLETED", "mode": "N1_FROZEN_MODEL",
         "task": args.task, "rod": args.rod, "seeds": len(seeds),
         "alpha": alphas, "directions": directions, "perturbation": args.perturbation,
+        "measurement_scope": args.measurement_scope,
         "cases": len(rows), "structure_evaluated": False,
         "fit_called_in_inference": False,
     }
@@ -456,6 +478,16 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--seed-start", type=int, default=20260910)
     value.add_argument("--parallel-cases", type=int, default=1)
     value.add_argument("--perturbation", choices=PERTURBATIONS, default="gaussian_process_only")
+    value.add_argument(
+        "--measurement-scope",
+        choices=("process_only", "realistic_dynamic"),
+        default="process_only",
+        help=(
+            "realistic_dynamic also perturbs the raw target-sensor trajectory used "
+            "for historical-D features and the D[t-1] anchor; immutable sample-id "
+            "y_true remains the clean scoring reference"
+        ),
+    )
     value.add_argument("--direction", type=int, action="append", default=[])
     value.add_argument("--alpha", type=float, action="append", default=[])
     return value
