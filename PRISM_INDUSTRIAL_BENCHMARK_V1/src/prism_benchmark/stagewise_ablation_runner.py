@@ -165,12 +165,21 @@ def _build_common_support_metadata_only(
             if not source.is_file():
                 continue
             frame = _support_frame(paths.shared, view, split)
-            common = apply_common_requirements(frame, requirements)
+            # An explicitly materialized empty OOD split has no row from which
+            # a support-contract value could be observed.  Preserve the empty
+            # split in the freeze instead of treating the absence of values as
+            # a contract violation.  Non-empty splits retain the strict check.
+            common = (
+                frame.copy()
+                if frame.empty
+                else apply_common_requirements(frame, requirements)
+            )
             splits[split] = {
                 "rows": int(len(common)),
                 "source_rows": int(len(frame)),
                 "support_hash": support_id_hash(common),
                 "support_contract": SUPPORT_CONTRACT,
+                "empty_split": bool(frame.empty),
             }
         records.append(
             {
