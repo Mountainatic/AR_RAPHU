@@ -17,6 +17,7 @@ def _read_csv(path: Path) -> list[dict[str, Any]]:
 
 def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     fields = sorted({key for row in rows for key in row}) if rows else ["status"]
+    path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields)
         writer.writeheader()
