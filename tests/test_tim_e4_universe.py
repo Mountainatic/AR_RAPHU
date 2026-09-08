@@ -3,6 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pandas as pd
+
+from experiments.tim_validation.e4_candidate.runner import _common_support_metrics
 from prism_benchmark.tim_e4_universe import (
     apply_candidate_universe,
     history_grid_for_universe,
@@ -36,3 +39,29 @@ def test_task_history_grid_is_mechanically_nested() -> None:
     assert history_grid_for_universe([128, 256], "coarse") == [128]
     assert history_grid_for_universe([128, 256], "standard") == [128, 256]
     assert history_grid_for_universe([128, 256], "expanded") == [64, 128, 256, 512]
+
+
+def test_common_support_metrics_use_strict_intersection(tmp_path: Path) -> None:
+    results = {}
+    rows = {
+        "coarse": (["a", "b", "c"], [0.0, 1.0, 2.0]),
+        "standard": (["b", "c", "d"], [1.0, 2.0, 3.0]),
+        "expanded": (["b", "c"], [1.0, 2.0]),
+    }
+    for universe, (ids, truth) in rows.items():
+        root = tmp_path / "demo" / universe
+        path = root / "final" / "prediction.parquet"
+        path.parent.mkdir(parents=True)
+        pd.DataFrame(
+            {"base_origin_id": ids, "y_true": truth, "y_pred": truth}
+        ).to_parquet(path, index=False)
+        results[universe] = {
+            "record": {
+                "prediction_path": "final/prediction.parquet",
+                "scoring_support_hash": universe,
+            }
+        }
+    metrics, audit = _common_support_metrics(tmp_path, "demo", results)
+    assert audit["rows"] == 2
+    assert audit["identical_target_rows"] is True
+    assert all(value["RMSE"] == 0.0 for value in metrics.values())

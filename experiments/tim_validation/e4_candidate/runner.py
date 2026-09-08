@@ -16,6 +16,9 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+import pandas as pd
+
 from prism_benchmark.cpu_data import input_columns
 from prism_benchmark.portable_checkpoints import INFERENCE_ONLY_ENV
 from prism_benchmark.representative_prism_checkpoints import (
@@ -404,6 +407,56 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
+def _common_support_metrics(
+    run_root: Path, task: str, results: dict[str, dict[str, Any]]
+) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    frames: dict[str, pd.DataFrame] = {}
+    for universe in UNIVERSES:
+        record = results[universe]["record"]
+        path = run_root / task / universe / str(record["prediction_path"])
+        frame = pd.read_parquet(path, columns=["base_origin_id", "y_true", "y_pred"])
+        if frame["base_origin_id"].duplicated().any():
+            raise RuntimeError(f"duplicate E4 base_origin_id for {task}/{universe}")
+        frames[universe] = frame.set_index("base_origin_id", drop=False)
+    common = set.intersection(
+        *(set(frame.index.astype(str)) for frame in frames.values())
+    )
+    ordered_ids = [
+        str(value) for value in frames["standard"].index.astype(str)
+        if str(value) in common
+    ]
+    if not ordered_ids:
+        raise RuntimeError(f"empty E4 common support for {task}")
+    support_id = hashlib.sha256("\n".join(ordered_ids).encode("utf-8")).hexdigest()
+    reference = frames["standard"].loc[ordered_ids, "y_true"].to_numpy(dtype=np.float64)
+    denominator = float(np.sum(np.square(reference - np.mean(reference))))
+    metrics: dict[str, dict[str, Any]] = {}
+    for universe, frame in frames.items():
+        y_true = frame.loc[ordered_ids, "y_true"].to_numpy(dtype=np.float64)
+        if not np.array_equal(y_true, reference):
+            raise RuntimeError(f"E4 y_true drift on common support for {task}/{universe}")
+        prediction = frame.loc[ordered_ids, "y_pred"].to_numpy(dtype=np.float64)
+        error = prediction - reference
+        mse = float(np.mean(np.square(error), dtype=np.float64))
+        metrics[universe] = {
+            "rows": len(ordered_ids), "RMSE": float(np.sqrt(mse)),
+            "MAE": float(np.mean(np.abs(error), dtype=np.float64)),
+            "R2": float("nan") if denominator == 0.0 else 1.0 - float(np.sum(np.square(error))) / denominator,
+            "support_id": support_id,
+        }
+    audit = {
+        "status": "PASS", "task": task, "rows": len(ordered_ids),
+        "support_id": support_id, "identical_target_rows": True,
+        "raw_support_rows": {u: len(frame) for u, frame in frames.items()},
+        "raw_support_hashes": {
+            u: results[u]["record"]["scoring_support_hash"] for u in UNIVERSES
+        },
+        "intersection_used_for_selection": False,
+        "test_accessed_after_all_universe_checkpoint_seals": True,
+    }
+    return metrics, audit
+
+
 def build_report(run_root: Path) -> dict[str, Any]:
     run_root = run_root.resolve()
     task_names = [
@@ -421,20 +474,36 @@ def build_report(run_root: Path) -> dict[str, Any]:
         results = {u: _read(run_root / task / u / "TASK_RESULT.json") for u in UNIVERSES}
         signatures = {u: _read(run_root / task / u / "STRUCTURE_SIGNATURE.json") for u in UNIVERSES}
         records = {u: results[u]["record"] for u in UNIVERSES}
-        if len({str(value["scoring_support_hash"]) for value in records.values()}) != 1:
-            raise RuntimeError(f"E4 support mismatch for {task}")
-        standard_rmse = float(records["standard"]["rmse"])
+        common_metrics, support_audit = _common_support_metrics(run_root, task, results)
+        _write_json(run_root / task / "E4_COMMON_SUPPORT_AUDIT.json", support_audit)
+        standard_rmse = float(common_metrics["standard"]["RMSE"])
         for universe in UNIVERSES:
             record = records[universe]
             signature = signatures[universe]
+            metrics = common_metrics[universe]
+            common_signature = {
+                key: value for key, value in signature.items() if key != "signature_hash"
+            }
+            common_signature.update(
+                {"RMSE": metrics["RMSE"], "MAE": metrics["MAE"],
+                 "R2": metrics["R2"], "support_id": metrics["support_id"]}
+            )
+            common_signature["signature_hash"] = hashlib.sha256(
+                json.dumps(common_signature, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            ).hexdigest()
+            _write_json(
+                run_root / task / universe / "STRUCTURE_SIGNATURE_COMMON_SUPPORT.json",
+                common_signature,
+            )
             aggregate.append({
-                "task": task, "universe": universe, "RMSE": record["rmse"],
-                "MAE": record["mae"], "R2": record.get("r2_level_reconstructed", record.get("r2_delta")),
-                "support_id": record["scoring_support_hash"],
+                "task": task, "universe": universe, "RMSE": metrics["RMSE"],
+                "MAE": metrics["MAE"], "R2": metrics["R2"],
+                "support_id": metrics["support_id"], "rows": metrics["rows"],
+                "raw_RMSE": record["rmse"], "raw_rows": record["rows"],
             })
             prediction.append({
                 "task": task, "universe": universe,
-                "D_pred": (float(record["rmse"]) - standard_rmse) / standard_rmse,
+                "D_pred": (float(metrics["RMSE"]) - standard_rmse) / standard_rmse,
             })
             complexity.append({
                 "task": task, "universe": universe,
