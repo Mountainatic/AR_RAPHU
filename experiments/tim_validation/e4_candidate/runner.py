@@ -78,6 +78,11 @@ TASKS: dict[str, dict[str, Any]] = {
         "history_steps": [256], "rod": "Rod_2_to_Rod_1",
     },
 }
+CANONICAL_SIGNATURE_TASK = {
+    "TEP_G12": "TEP_H0",
+    "CZ_R1_TO_R2": "CZ_H4",
+    "CZ_R2_TO_R1": "CZ_H4",
+}
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -358,7 +363,8 @@ def _write_structure_signature(
              not _candidate_is_neutral(selected_w), not _candidate_is_neutral(selected_a)]
     task = TASKS[args.task]
     signature = StructureSignature(
-        task=args.task, head=str(record["target_head"]), H=int(task["H"]), W=int(task["W"]),
+        task=CANONICAL_SIGNATURE_TASK.get(args.task, args.task),
+        head=str(record["target_head"]), H=int(task["H"]), W=int(task["W"]),
         outer_fold="registered_outer_test", run=f"E4_{args.universe}", rod=task["rod"], seed=0,
         candidate_universe=args.universe, model_variant=FULL_MODEL,
         admitted_channels=admitted, rejected_channels=rejected,
