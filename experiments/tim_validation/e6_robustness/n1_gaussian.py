@@ -41,6 +41,22 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _sample_registry_hash(shared: Path) -> tuple[str, str]:
+    registry = shared / "SAMPLE_ID_REGISTRY.json"
+    if registry.is_file():
+        return _sha256(registry), "SAMPLE_ID_REGISTRY.json"
+    paths = sorted((shared / "sample_ids").rglob("*.parquet"))
+    if not paths:
+        raise RuntimeError("STOP_E6_NO_SAMPLE_ID_ARTIFACTS")
+    digest = hashlib.sha256()
+    for path in paths:
+        digest.update(path.relative_to(shared).as_posix().encode())
+        digest.update(b"\0")
+        digest.update(_sha256(path).encode())
+        digest.update(b"\0")
+    return digest.hexdigest(), "COMPOSITE_SAMPLE_PARQUET_PATH_AND_SHA256"
+
+
 def _write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -187,6 +203,7 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
     alphas = sorted(set(args.alpha))
     if 0.0 not in alphas:
         raise RuntimeError("E6 N1 requires alpha=0 for paired degradation")
+    registry_hash, registry_hash_contract = _sample_registry_hash(clean_shared)
     manifest = {
         "status": "FROZEN_BEFORE_PERTURBED_TEST_ACCESS",
         "mode": "N1_FROZEN_MODEL",
@@ -204,7 +221,8 @@ def run_n1(args: argparse.Namespace) -> dict[str, Any]:
         "structure_evaluated": False,
         "checkpoint_root": str(checkpoint_root),
         "clean_shared": str(clean_shared),
-        "clean_registry_sha256": _sha256(clean_shared / "SAMPLE_ID_REGISTRY.json"),
+        "clean_registry_sha256": registry_hash,
+        "clean_registry_hash_contract": registry_hash_contract,
     }
     _write_json(run_root / "perturbation_manifest.json", manifest)
     rows: list[dict[str, Any]] = []
