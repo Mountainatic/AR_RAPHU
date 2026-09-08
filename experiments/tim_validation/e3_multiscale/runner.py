@@ -32,12 +32,9 @@ from prism_benchmark.v211_public_all_closure import (
     view_support_requirements,
 )
 from prism_benchmark.v211_public_all_config import PublicAllPaths
-from prism_benchmark.v211_public_all_views import (
-    public_all_dynamic_views,
-    public_all_input_views,
-)
 from prism_benchmark.v211_support import SUPPORT_CONTRACT, support_id_hash
 from prism_benchmark.v211_w import run_w_view
+from prism_benchmark.v2_views import development_dynamic_views, development_input_views
 
 from experiments.tim_validation.common.structure_signature import StructureSignature
 
@@ -87,13 +84,13 @@ def _views(shared: Path, task: str) -> tuple[Any, Any]:
     proxy = TASKS[task]["proxy_policy"]
     input_matches = [
         view
-        for view in public_all_input_views(shared)
-        if view.head.task_id == task and view.proxy_policy == proxy
+        for view in development_input_views(shared)
+        if view.head.head_id == TASKS[task]["head"] and view.proxy_policy == proxy
     ]
     dynamic_matches = [
         view
-        for view in public_all_dynamic_views(shared)
-        if view.head.task_id == task
+        for view in development_dynamic_views(shared)
+        if view.head.head_id == TASKS[task]["head"]
         and view.proxy_policy == proxy
         and view.availability_scenario == "record_time"
     ]
