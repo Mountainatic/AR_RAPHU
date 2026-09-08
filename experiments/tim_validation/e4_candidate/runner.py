@@ -488,6 +488,8 @@ def build_report(run_root: Path) -> dict[str, Any]:
         path.name for path in sorted(run_root.iterdir())
         if path.is_dir() and all((path / universe / "TASK_RESULT.json").is_file() for universe in UNIVERSES)
     ]
+    missing_tasks = sorted(set(TASKS) - set(task_names))
+    report_status = "COMPLETED" if not missing_tasks else "PARTIAL"
     aggregate: list[dict[str, Any]] = []
     prediction: list[dict[str, Any]] = []
     channels: list[dict[str, Any]] = []
@@ -579,14 +581,21 @@ def build_report(run_root: Path) -> dict[str, Any]:
     reversals = sum(bool(row["conclusion_reversal"]) for row in stages)
     text = (
         "# E4 Candidate-Universe Sensitivity\n\n"
-        f"Status: `{'COMPLETED' if task_names else 'PARTIAL'}`.\n\n"
+        f"Status: `{report_status}`.\n\n"
         f"Completed tasks: {', '.join(task_names) or 'none'}.\n\n"
+        f"Missing tasks: {', '.join(missing_tasks) or 'none'}.\n\n"
         f"Stage-admission conclusion reversals: {reversals}/{len(stages)} comparisons.\n\n"
         "Prediction, channel, conditional-scale, stage, and complexity sensitivity are reported separately.\n"
     )
     (run_root / "E4_INTERPRETATION.md").write_text(text, encoding="utf-8")
     (run_root / "README.md").write_text(text, encoding="utf-8")
-    result = {"status": "COMPLETED" if task_names else "PARTIAL", "tasks": task_names, "stage_conclusion_reversals": reversals}
+    result = {
+        "status": report_status,
+        "tasks": task_names,
+        "missing_tasks": missing_tasks,
+        "required_tasks": sorted(TASKS),
+        "stage_conclusion_reversals": reversals,
+    }
     _write_json(run_root / "E4_REPORT_MANIFEST.json", result)
     return result
 

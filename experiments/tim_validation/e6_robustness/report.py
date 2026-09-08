@@ -57,6 +57,8 @@ def _aggregate_metadata(path: Path, mode: str) -> dict[str, Any]:
                 metadata[key] = frozen[key]
     if mode == "N2" and "perturbation" not in metadata:
         metadata["perturbation"] = "gaussian_process_only"
+    if "measurement_scope" not in metadata:
+        metadata["measurement_scope"] = "process_only"
     return metadata
 
 
@@ -100,7 +102,16 @@ def build_report(root: Path) -> dict[str, Any]:
     structural_provenance = []
     for name in structural:
         for path in sorted((root / "N2").glob(f"*/{name}")):
-            structural[name].extend(_read_csv(path))
+            metadata = _aggregate_metadata(path, "N2")
+            rows = _read_csv(path)
+            for row in rows:
+                for key in (
+                    "perturbation", "measurement_scope", "information_set",
+                    "availability_scenario", "proxy_policy",
+                ):
+                    if not row.get(key) and metadata.get(key) is not None:
+                        row[key] = metadata[key]
+            structural[name].extend(rows)
             structural_provenance.append({"path": str(path), "sha256": _sha256(path)})
         _write_csv(root / "N2" / name, structural[name])
 
