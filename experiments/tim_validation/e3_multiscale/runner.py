@@ -803,6 +803,9 @@ def _write_structure_signature(
         ),
         support_id=str(record["scoring_support_hash"]),
         config_hash=_sha256(budget_path),
+        information_set=str(record["information_set"]),
+        availability_scenario=str(record["availability_scenario"]),
+        proxy_policy=str(record["proxy_policy"]),
     )
     signature.write(task_root / arm / "STRUCTURE_SIGNATURE.json")
 

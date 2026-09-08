@@ -45,6 +45,9 @@ class StructureSignature:
     R2: float | None = None
     support_id: str = ""
     config_hash: str = ""
+    information_set: str = ""
+    availability_scenario: str = ""
+    proxy_policy: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         value = asdict(self)
@@ -56,4 +59,3 @@ class StructureSignature:
     def write(self, path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n", encoding="utf-8")
-
