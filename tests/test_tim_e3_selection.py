@@ -7,6 +7,7 @@ from experiments.tim_validation.e3_multiscale.selection import (
     select_uniform_history,
 )
 from experiments.tim_validation.e3_multiscale.runner import classify_budget
+from prism_benchmark.v211_k import profiles_with_registered_histories
 
 
 def _channel(name: str, short: list[float], long: list[float]) -> dict:
@@ -60,3 +61,10 @@ def test_budget_classification_is_explicit() -> None:
     assert exhausted["budget_status"] == "CANDIDATE_SPACE_EXHAUSTED"
     assert exhausted["fair_budget"] == 100
     assert exhausted["strict_equal_budget"] is False
+
+
+def test_frozen_history_grid_preserves_delta_grid() -> None:
+    profiles = profiles_with_registered_histories(
+        [(1, 4), (2, 4), (1, 16), (2, 16)], [128, 256]
+    )
+    assert profiles == [(2, 128), (1, 128), (2, 256), (1, 256)]

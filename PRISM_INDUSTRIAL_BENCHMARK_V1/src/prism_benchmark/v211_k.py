@@ -167,6 +167,25 @@ def _profile_complexity(profile: tuple[int, int]) -> tuple[int, int]:
     return int(profile[1]), -int(profile[0])
 
 
+def profiles_with_registered_histories(
+    profiles: Sequence[tuple[int, int]], history_steps: Sequence[int]
+) -> list[tuple[int, int]]:
+    """Apply a frozen history grid while preserving the registered delta grid."""
+    histories = sorted({int(value) for value in history_steps})
+    if not histories or histories[0] < 1:
+        raise ValueError("registered_history_steps must contain positive integers")
+    deltas = sorted({int(profile[0]) for profile in profiles})
+    return sorted(
+        {
+            (delta, history)
+            for delta in deltas
+            for history in histories
+            if delta <= history
+        },
+        key=lambda value: (value[1], -value[0]),
+    )
+
+
 def _structural_complexity(candidate: Any) -> tuple[Any, ...]:
     if candidate == EXACT_ZERO:
         return (0,)
@@ -315,6 +334,7 @@ def run_k_channel(
     protocol: str = "sru",
     *,
     forced_history_steps: int | None = None,
+    registered_history_steps: Sequence[int] | None = None,
     profile_fold_losses_override: Mapping[
         tuple[int, int], Sequence[float]
     ] | None = None,
@@ -338,6 +358,14 @@ def run_k_channel(
         inner_workers = _k_inner_workers()
         folds = inner_folds(train, int(v21["selection"]["inner_folds"]))
         registered_profiles = channel_profiles(view, channel, v2)
+        if registered_history_steps is not None:
+            if forced_history_steps is not None:
+                raise ValueError(
+                    "registered_history_steps and forced_history_steps are mutually exclusive"
+                )
+            registered_profiles = profiles_with_registered_histories(
+                registered_profiles, registered_history_steps
+            )
         profile_comparison_history = max(
             int(profile[1]) for profile in registered_profiles
         )
@@ -763,6 +791,9 @@ def run_k_channel(
             "channel": channel,
             "selected_profile": list(selected_profile),
             "forced_history_steps": forced_history_steps,
+            "registered_history_steps": None
+            if registered_history_steps is None
+            else sorted({int(value) for value in registered_history_steps}),
             "profile_loss_source": profile_loss_source,
             "support_contract": SUPPORT_CONTRACT,
             "selected_profile_history_steps": selected_history,

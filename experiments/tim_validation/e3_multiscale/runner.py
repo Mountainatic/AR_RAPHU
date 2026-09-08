@@ -159,6 +159,70 @@ def _source_k_results(
     return results, provenance
 
 
+def _run_scale_aware_k_job(job: tuple[Any, Any, str, list[int] | None]) -> dict[str, Any]:
+    paths, input_view, channel, histories = job
+    return run_k_channel(
+        paths.shared,
+        paths.project,
+        paths.output,
+        input_view,
+        channel,
+        PUBLIC_ALL_PROTOCOL,
+        registered_history_steps=histories,
+    )
+
+
+def _build_scale_aware_source(
+    paths: PublicAllPaths,
+    input_view: Any,
+    dynamic_view: Any,
+    workers: int,
+) -> dict[str, Any]:
+    """Materialize a fresh development-only scale-aware source for E3."""
+    histories = TASKS[next(
+        task for task, value in TASKS.items() if value["head"] == input_view.head.head_id
+    )].get("expected_histories")
+    channels = input_columns(paths.shared, input_view.head.task_id, input_view.proxy_policy)
+    jobs = [(paths, input_view, channel, histories) for channel in channels]
+    os.environ["PRISM_V211_K_INNER_WORKERS"] = "1"
+    if workers <= 1:
+        k_results = list(map(_run_scale_aware_k_job, jobs))
+    else:
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            k_results = list(executor.map(_run_scale_aware_k_job, jobs))
+    c_result = run_c_view(
+        paths.shared, paths.project, paths.output, input_view, PUBLIC_ALL_PROTOCOL
+    )
+    w_result = run_w_view(
+        paths.shared, paths.project, paths.output, input_view, PUBLIC_ALL_PROTOCOL
+    )
+    a_result = run_a_view(
+        paths.shared, paths.project, paths.output, dynamic_view, PUBLIC_ALL_PROTOCOL
+    )
+    statuses = {
+        "K": [value.get("status") for value in k_results],
+        "C": c_result.get("status"),
+        "W": w_result.get("status"),
+        "A": a_result.get("status"),
+    }
+    if not all(value == "PASS" for value in statuses["K"]) or any(
+        statuses[stage] != "PASS" for stage in ("C", "W", "A")
+    ):
+        raise RuntimeError(f"scale-aware native stage failure: {statuses}")
+    support = _freeze_common_support(paths, dynamic_view)
+    result = {
+        "status": "PASS",
+        "stage": "TIM_E3_SCALE_AWARE_DEVELOPMENT_SOURCE",
+        "target_head": input_view.head.head_id,
+        "registered_history_steps": histories,
+        "channels": len(channels),
+        "common_support_views": len(support["views"]),
+        "test_accessed": False,
+    }
+    _write_json(paths.freeze / "TIM_E3_SCALE_AWARE_SOURCE.json", result)
+    return result
+
+
 def _copy_tree_hardlinked(source: Path, destination: Path) -> None:
     if destination.exists():
         raise RuntimeError(f"refusing existing E3 shadow path: {destination}")
@@ -436,6 +500,10 @@ def run_development(args: argparse.Namespace) -> dict[str, Any]:
     uniform_paths = PublicAllPaths(project, shared, task_root / "uniform")
     multiscale_paths = PublicAllPaths(project, shared, task_root / "multiscale")
 
+    if args.build_scale_aware_source:
+        _build_scale_aware_source(
+            source_paths, input_view, dynamic_view, args.workers
+        )
     source_results, source_provenance = _source_k_results(source_paths, input_view)
     v211, v21, _ = load_v211_configs(project, protocol=PUBLIC_ALL_PROTOCOL)
     selection = select_uniform_history(
@@ -797,6 +865,7 @@ def parser() -> argparse.ArgumentParser:
         command.add_argument("--task", choices=tuple(TASKS), required=True)
         command.add_argument("--workers", type=int, default=4)
         command.add_argument("--resume", action="store_true")
+        command.add_argument("--build-scale-aware-source", action="store_true")
     infer = commands.add_parser("infer")
     infer.add_argument("--project", type=Path, required=True)
     infer.add_argument("--shared", type=Path, required=True)
