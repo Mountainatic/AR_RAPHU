@@ -39,13 +39,25 @@ from prism_benchmark.v211_public_all_views import (
 from prism_benchmark.v211_support import SUPPORT_CONTRACT, support_id_hash
 from prism_benchmark.v211_w import run_w_view
 
+from experiments.tim_validation.common.structure_signature import StructureSignature
+
 from .selection import parse_profile_losses, select_uniform_history
 
 
 TASKS = {
-    "TEP_G12": {"dataset": "tep", "proxy_policy": "proxy_excluded"},
-    "DEB_C4": {"dataset": "debutanizer", "proxy_policy": "primary"},
-    "PMSM_PM5": {"dataset": "pmsm", "proxy_policy": "proxy_excluded"},
+    "TEP_G12": {
+        "dataset": "tep", "proxy_policy": "proxy_excluded",
+        "head": "TEP_G_NOWCAST_H0__H0__W1", "H": 0, "W": 1,
+        "expected_histories": [128, 256],
+    },
+    "DEB_C4": {
+        "dataset": "debutanizer", "proxy_policy": "primary",
+        "head": "DEB_C4__H5__W1", "H": 5, "W": 1,
+    },
+    "PMSM_PM5": {
+        "dataset": "pmsm", "proxy_policy": "proxy_excluded",
+        "head": "PMSM_PM5__H600__W60", "H": 600, "W": 60,
+    },
 }
 FULL_MODEL = "PRISM_V2_1_1_PHYSICS_FIRST"
 
@@ -90,7 +102,40 @@ def _views(shared: Path, task: str) -> tuple[Any, Any]:
             f"E3 view resolution failed for {task}: "
             f"input={len(input_matches)}, dynamic={len(dynamic_matches)}"
         )
+    expected_head = TASKS[task]["head"]
+    if input_matches[0].head.head_id != expected_head or dynamic_matches[0].head.head_id != expected_head:
+        raise RuntimeError(
+            f"E3 H/W drift for {task}: expected {expected_head}, "
+            f"got {input_matches[0].head.head_id}/{dynamic_matches[0].head.head_id}"
+        )
     return input_matches[0], dynamic_matches[0]
+
+
+def classify_budget(uniform_fits: int, multiscale_fits: int) -> dict[str, Any]:
+    """Classify fit-budget comparability without padding duplicate candidates."""
+    if uniform_fits <= 0 or multiscale_fits <= 0:
+        return {
+            "budget_status": "NOT_COMPARABLE",
+            "fair_budget": 0,
+            "strict_equal_budget": False,
+            "relative_fit_difference": None,
+        }
+    fair = min(uniform_fits, multiscale_fits)
+    relative = abs(uniform_fits - multiscale_fits) / fair
+    if uniform_fits == multiscale_fits:
+        status = "EXACT_BUDGET_MATCH"
+    elif relative <= 0.05:
+        status = "NEAR_BUDGET_MATCH"
+    elif uniform_fits < multiscale_fits:
+        status = "CANDIDATE_SPACE_EXHAUSTED"
+    else:
+        status = "NOT_COMPARABLE"
+    return {
+        "budget_status": status,
+        "fair_budget": fair,
+        "strict_equal_budget": uniform_fits == multiscale_fits,
+        "relative_fit_difference": relative,
+    }
 
 
 def _source_k_results(
@@ -469,14 +514,22 @@ def run_development(args: argparse.Namespace) -> dict[str, Any]:
     )
     uniform_counts["shared_scale_search"] = shared_profile_fits
     multiscale_counts["shared_scale_search"] = shared_profile_fits
-    registered_cap = max(uniform_attempts["total"], multiscale_attempts["total"])
+    comparison = classify_budget(
+        uniform_attempts["total"], multiscale_attempts["total"]
+    )
+    expected_histories = TASKS[args.task].get("expected_histories")
+    if expected_histories is not None and selection["common_histories"] != expected_histories:
+        raise RuntimeError(
+            f"E3 history-grid drift for {args.task}: expected {expected_histories}, "
+            f"got {selection['common_histories']}"
+        )
     budget = {
         "status": "FROZEN_BEFORE_TEST_ACCESS",
         "budget_definition": "candidate_fit_attempts_including_inner_folds",
         "candidate_fit_budget_scope": "K_C_DeltaW_A_development_selection",
-        "fair_budget": registered_cap,
-        "B_uniform_max": registered_cap,
-        "B_multiscale_max": registered_cap,
+        **comparison,
+        "B_uniform_max": uniform_attempts["total"],
+        "B_multiscale_max": multiscale_attempts["total"],
         "uniform_candidate_configurations_executed": uniform_counts,
         "multiscale_candidate_configurations_executed": multiscale_counts,
         "uniform_candidate_fit_attempts": uniform_attempts,
@@ -588,6 +641,107 @@ def _full_record(inference: dict[str, Any]) -> dict[str, Any]:
     return matches[0]
 
 
+def _stage_result(task_root: Path, arm: str, record: dict[str, Any], stage: str) -> dict[str, Any]:
+    path = task_root / arm / "results" / "DEVELOPMENT" / stage / record["target_head"]
+    if stage == "A":
+        path = path / record["availability_scenario"] / record["proxy_policy"]
+    else:
+        path = path / record["proxy_policy"]
+    return _read(path / "RESULT.json")
+
+
+def _candidate_is_neutral(value: Any) -> bool:
+    text = str(value).upper()
+    return any(token in text for token in ("EXACT_ZERO", "IDENTITY", "BEST_ACTIVE_K_CHANNEL"))
+
+
+def _scale_classes(k_results: list[dict[str, Any]]) -> dict[str, str]:
+    histories = sorted({int(value["selected_profile_history_steps"]) for value in k_results})
+    if len(histories) == 1:
+        labels = {histories[0]: "single_scale"}
+    else:
+        labels = {history: "intermediate_scale" for history in histories}
+        labels[histories[0]] = "fast_scale"
+        labels[histories[-1]] = "slow_scale"
+    return {
+        str(value["channel"]): labels[int(value["selected_profile_history_steps"])]
+        for value in k_results
+    }
+
+
+def _write_structure_signature(
+    task_root: Path, task: str, arm: str, record: dict[str, Any]
+) -> None:
+    k_root = (
+        task_root / arm / "results" / "DEVELOPMENT" / "K"
+        / record["target_head"] / record["proxy_policy"]
+    )
+    k_results = [_read(path) for path in sorted(k_root.glob("*/RESULT.json"))]
+    admitted = [str(value["channel"]) for value in k_results if value.get("active") is True]
+    rejected = [str(value["channel"]) for value in k_results if value.get("active") is not True]
+    c_result = _stage_result(task_root, arm, record, "C")
+    w_result = _stage_result(task_root, arm, record, "W")
+    a_result = _stage_result(task_root, arm, record, "A")
+    selected_c = c_result.get("final_selected_candidate", c_result.get("selected_candidate"))
+    selected_w = w_result.get("final_selected_candidate", w_result.get("selected_candidate"))
+    selected_a = a_result.get("final_selected_candidate", a_result.get("selected_candidate"))
+    stage_flags = [
+        bool(admitted),
+        not _candidate_is_neutral(selected_c),
+        not _candidate_is_neutral(selected_w),
+        not _candidate_is_neutral(selected_a),
+    ]
+    budget_path = task_root / "budget_manifest.json"
+    signature = StructureSignature(
+        task=task,
+        head=str(record["target_head"]),
+        H=int(TASKS[task]["H"]),
+        W=int(TASKS[task]["W"]),
+        outer_fold="registered_outer_test",
+        run=f"E3_{arm}",
+        rod=None,
+        seed=0,
+        candidate_universe="standard",
+        model_variant=f"{FULL_MODEL}:{arm}",
+        admitted_channels=admitted,
+        rejected_channels=rejected,
+        selected_profile_by_channel={
+            str(value["channel"]): value.get("selected_profile") for value in k_results
+        },
+        selected_history_by_channel={
+            str(value["channel"]): int(value["selected_profile_history_steps"])
+            for value in k_results
+        },
+        selected_scale_class_by_channel=_scale_classes(k_results),
+        K_admitted=stage_flags[0],
+        C_admitted=stage_flags[1],
+        W_admitted=stage_flags[2],
+        A_admitted=stage_flags[3],
+        selected_K_candidate={
+            str(value["channel"]): value.get("final_selected_candidate") for value in k_results
+        },
+        selected_C_candidate=selected_c,
+        selected_W_candidate=selected_w,
+        selected_A_candidate=selected_a,
+        validation_gain_C=c_result.get("validation_relative_gain"),
+        validation_gain_W=w_result.get("validation_relative_gain"),
+        validation_gain_A=a_result.get("active_near_zero_audit", {}).get("validation_relative_gain"),
+        parameter_count=record.get("parameter_count"),
+        active_channel_count=len(admitted),
+        active_stage_count=sum(stage_flags),
+        RMSE=float(record["rmse"]),
+        MAE=float(record["mae"]),
+        R2=float(
+            record["r2_level_reconstructed"]
+            if record.get("r2_level_reconstructed") is not None
+            else record["r2_delta"]
+        ),
+        support_id=str(record["scoring_support_hash"]),
+        config_hash=_sha256(budget_path),
+    )
+    signature.write(task_root / arm / "STRUCTURE_SIGNATURE.json")
+
+
 def finalize_task(args: argparse.Namespace) -> dict[str, Any]:
     task_root = args.run_root.resolve() / args.task
     records = {
@@ -598,6 +752,11 @@ def finalize_task(args: argparse.Namespace) -> dict[str, Any]:
     }
     uniform_rmse = float(records["uniform"]["rmse"])
     multiscale_rmse = float(records["multiscale"]["rmse"])
+    support_hashes = {arm: str(record["scoring_support_hash"]) for arm, record in records.items()}
+    sample_hashes = {arm: str(record["sample_id_order_hash"]) for arm, record in records.items()}
+    if len(set(support_hashes.values())) != 1 or len(set(sample_hashes.values())) != 1:
+        raise RuntimeError(f"E3 support mismatch: {support_hashes}, {sample_hashes}")
+    budget = _read(task_root / "budget_manifest.json")
     result = {
         "status": "COMPLETED",
         "task": args.task,
@@ -612,8 +771,20 @@ def finalize_task(args: argparse.Namespace) -> dict[str, Any]:
             uniform_rmse - multiscale_rmse
         ) / max(abs(uniform_rmse), sys.float_info.epsilon),
         "test_accessed_only_after_both_checkpoint_seals": True,
+        "budget_status": budget["budget_status"],
     }
     _write_json(task_root / "TASK_RESULT.json", result)
+    support_audit = {
+        "status": "PASS",
+        "identical_target_rows": True,
+        "scoring_support_hashes": support_hashes,
+        "sample_id_order_hashes": sample_hashes,
+        "rows": {arm: int(record["rows"]) for arm, record in records.items()},
+        "selection_used_outer_test": False,
+    }
+    _write_json(task_root / "E3_SUPPORT_AUDIT.json", support_audit)
+    for arm, record in records.items():
+        _write_structure_signature(task_root, args.task, arm, record)
     return result
 
 

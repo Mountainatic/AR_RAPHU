@@ -6,6 +6,7 @@ from experiments.tim_validation.e3_multiscale.selection import (
     parse_profile_losses,
     select_uniform_history,
 )
+from experiments.tim_validation.e3_multiscale.runner import classify_budget
 
 
 def _channel(name: str, short: list[float], long: list[float]) -> dict:
@@ -50,3 +51,12 @@ def test_uniform_history_requires_common_histories() -> None:
             maximum_relative_regret=0.02,
             minimum_usable_folds=3,
         )
+
+
+def test_budget_classification_is_explicit() -> None:
+    assert classify_budget(100, 100)["budget_status"] == "EXACT_BUDGET_MATCH"
+    assert classify_budget(100, 104)["budget_status"] == "NEAR_BUDGET_MATCH"
+    exhausted = classify_budget(100, 150)
+    assert exhausted["budget_status"] == "CANDIDATE_SPACE_EXHAUSTED"
+    assert exhausted["fair_budget"] == 100
+    assert exhausted["strict_equal_budget"] is False

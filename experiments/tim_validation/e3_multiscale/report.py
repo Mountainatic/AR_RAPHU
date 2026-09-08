@@ -117,6 +117,8 @@ def build_report(run_root: Path, output: Path) -> dict[str, Any]:
                     "arm": arm,
                     "candidate_fit_attempts": fits,
                     "fair_budget": budget["fair_budget"],
+                    "budget_status": budget["budget_status"],
+                    "strict_equal_budget": budget["strict_equal_budget"],
                     "test_rmse": record["rmse"],
                     "rmse_per_candidate_fit": float(record["rmse"]) / max(1, fits),
                     "multiscale_gain_per_fair_budget_fit": (
@@ -135,6 +137,10 @@ def build_report(run_root: Path, output: Path) -> dict[str, Any]:
         for result in task_results
     }
     positive = sum(value > 0.0 for value in gains.values())
+    budget_statuses = {
+        task: _read(run_root / task / "budget_manifest.json")["budget_status"]
+        for task in TASKS
+    }
     interpretation = (
         "# E3 Budget-Controlled Multiscale Ablation\n\n"
         "Status: `COMPLETED_WITH_USER_AUTHORIZED_CHECKPOINT_A_OVERRIDE`.\n\n"
@@ -147,6 +153,8 @@ def build_report(run_root: Path, output: Path) -> dict[str, Any]:
         "only; both checkpoints were sealed before isolated test inference.\n\n"
         + "Relative multiscale RMSE gains (positive favors multiscale):\n\n"
         + "\n".join(f"- {task}: {gain:.6%}" for task, gain in gains.items())
+        + "\n\nBudget classifications:\n\n"
+        + "\n".join(f"- {task}: {status}" for task, status in budget_statuses.items())
         + f"\n\nMultiscale improved RMSE on {positive}/{len(gains)} tasks. Small or negative "
         "gains must not be described as a major multiscale contribution.\n"
     )
@@ -155,6 +163,7 @@ def build_report(run_root: Path, output: Path) -> dict[str, Any]:
         "status": "COMPLETED",
         "tasks": list(TASKS),
         "relative_multiscale_gain": gains,
+        "budget_status": budget_statuses,
         "files": {},
     }
     for path in sorted(output.iterdir()):
