@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import inspect
+import json
 import os
-import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -39,7 +39,7 @@ from prism_benchmark.v211_joint_stability import (
     stability_candidate_id,
     stability_guarded_selection_json,
 )
-from prism_benchmark.v21_selection import guarded_local_one_se_select
+from prism_benchmark.strict_oof_selection import strict_nested_oof_select
 
 
 def _blocks(rows: int = 120) -> tuple[dict[str, np.ndarray], np.ndarray]:
@@ -208,7 +208,7 @@ def test_numerical_alpha_selection_ignores_validation_loss() -> None:
     assert audit["selection_loss_used"] is False
 
 
-def test_eta_selection_uses_oof_risk_and_prefers_stronger_one_se_eta() -> None:
+def test_eta_selection_uses_minimum_oof_risk_without_one_se() -> None:
     selected, audit = select_predictive_eta(
         {
             0.0: [1.0, 1.0, 1.0, 1.0],
@@ -216,8 +216,8 @@ def test_eta_selection_uses_oof_risk_and_prefers_stronger_one_se_eta() -> None:
             1.0: [0.91, 1.01, 0.91, 1.01],
         }
     )
-    assert selected == 1.0
-    assert audit["best"] == "0.1"
+    assert selected == 0.1
+    assert audit["one_se_used"] is False
 
 
 def test_representation_one_se_prefers_compressed_when_equal() -> None:
@@ -230,8 +230,8 @@ def test_representation_one_se_prefers_compressed_when_equal() -> None:
     assert selected == CHANNEL_COMPRESSED
 
 
-def test_full_requires_practical_and_fold_consistency_guard() -> None:
-    rejected, _ = select_k_representation(
+def test_every_positive_representation_gain_is_admitted() -> None:
+    small_positive, _ = select_k_representation(
         [1.0, 1.0, 1.0, 1.0],
         [0.995, 0.995, 0.995, 0.995],
         minimum_relative_improvement=0.01,
@@ -243,7 +243,7 @@ def test_full_requires_practical_and_fold_consistency_guard() -> None:
         minimum_relative_improvement=0.01,
         minimum_positive_fraction=0.75,
     )
-    assert rejected == CHANNEL_COMPRESSED
+    assert small_positive == FULL_BASIS
     assert accepted == FULL_BASIS
 
 
@@ -298,17 +298,16 @@ def test_candidate_id_binds_all_stability_hyperparameters() -> None:
 def test_stability_route_selection_serialization_preserves_candidate_identity() -> None:
     neutral = StabilityCandidate(J_K, CHANNEL_COMPRESSED, 0.0, 0.1)
     active = StabilityCandidate(J_KW, FULL_BASIS, 1e-8, 0.01)
-    selection = guarded_local_one_se_select(
-        {neutral: [1.0, 1.0, 1.0, 1.0], active: [0.95, 0.95, 0.95, 0.95]},
-        lambda candidate: (0 if candidate == neutral else 1,),
-        neutral=neutral,
-        minimum_relative_improvement=0.01,
-        minimum_positive_fraction=0.75,
-        minimum_usable_folds=4,
+    selection = strict_nested_oof_select(
+        {active: [0.95, 0.95, 0.95, 0.95]},
+        [1.0, 1.0, 1.0, 1.0],
+        identity=neutral,
+        minimum_inner_folds=3,
+        minimum_outer_folds=4,
     )
     payload = stability_guarded_selection_json(selection)
     assert payload["final_selected_candidate"]["candidate_key"] == active.key()
-    assert set(payload["means"]) == {neutral.key(), active.key()}
+    assert payload["routing_status"] == "ACTIVE"
 
 
 def test_serial_and_fork_candidate_selection_are_identical() -> None:
@@ -346,19 +345,19 @@ def test_original_four_fold_provenance_code_is_retained() -> None:
     assert "w_physical_oof_used_as_training_pool" in source
 
 
-def test_pf_core_estimators_are_unchanged_from_native_support_source_commit() -> None:
+def test_pf_selection_amendment_explicitly_authorizes_k_c_changes() -> None:
     project = Path(__file__).resolve().parents[1]
-    paths = [
-        "src/prism_benchmark/v211_k.py",
-        "src/prism_benchmark/v211_c.py",
-    ]
-    diff = subprocess.run(
-        ["git", "-C", str(project), "diff", "e47542a319640bc045ca0d31ae9b40763182dde8", "--", *paths],
-        check=True,
-        text=True,
-        capture_output=True,
-    ).stdout
-    assert diff == ""
+    config = json.loads(
+        (project / "configs" / "strict_nested_oof_selection_v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert config["parent_commit"] == "be7557933f4a2ad11c7655c04ce031f524611cb0"
+    for name in ("v211_k.py", "v211_c.py"):
+        source = (project / "src" / "prism_benchmark" / name).read_text(
+            encoding="utf-8"
+        )
+        assert "strict_nested_oof_select" in source
 
 
 def test_m5_never_accesses_test_or_ood_and_m7_is_contract_driven() -> None:
