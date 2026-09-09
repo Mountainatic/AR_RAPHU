@@ -171,6 +171,16 @@ def _valid_k_result(path: Path, universe: str, histories: list[int] | None) -> d
         and value.get("tim_e4_candidate_universe") == universe
     ):
         return value
+    if (
+        value.get("status") == "SOLVER_FAILED_RETAINED"
+        and value.get("test_accessed") is False
+        and value.get("tim_e4_candidate_universe") == universe
+        and "no K profile has the minimum usable folds" in str(value.get("error", ""))
+    ):
+        # The failure is the result of the frozen expanded history grid, not an
+        # interrupted artifact.  Reuse it so development can emit an explicit
+        # PROTOCOL_BLOCKED marker without recomputing every channel.
+        return value
     raise RuntimeError(f"invalid E4 K resume artifact: {path}")
 
 
@@ -236,6 +246,15 @@ def _stage_path_from_record(
     return path / "RESULT.json"
 
 
+def _minimum_fold_support_block(k_results: list[dict[str, Any]]) -> bool:
+    """Recognize a mechanically expanded history grid with no usable folds."""
+    return bool(k_results) and all(
+        value.get("status") == "SOLVER_FAILED_RETAINED"
+        and "no K profile has the minimum usable folds" in str(value.get("error", ""))
+        for value in k_results
+    )
+
+
 def run_development(args: argparse.Namespace) -> dict[str, Any]:
     started = time.time()
     manifest_path = args.run_root.resolve() / "universe_manifest.json"
@@ -269,6 +288,22 @@ def run_development(args: argparse.Namespace) -> dict[str, Any]:
         "C": c_result.get("status"), "W": w_result.get("status"),
         "A": a_result.get("status"),
     }
+    if _minimum_fold_support_block(k_results):
+        result = {
+            "status": "PROTOCOL_BLOCKED",
+            "task": args.task,
+            "candidate_universe": args.universe,
+            "stage": "K",
+            "reason": "INSUFFICIENT_INNER_FOLD_SUPPORT_FOR_EXPANDED_HISTORY_GRID",
+            "detail": "no K profile has the minimum usable folds",
+            "blocked_channels": len(k_results),
+            "stage_statuses": statuses,
+            "test_accessed": False,
+            "wall_seconds": time.time() - started,
+            "python": platform.python_version(),
+        }
+        _write_json(task_root / "DEVELOPMENT_PROTOCOL_BLOCKED.json", result)
+        return result
     if not all(value == "PASS" for value in statuses["K"]) or any(
         statuses[stage] != "PASS" for stage in ("C", "W", "A")
     ):
@@ -489,6 +524,20 @@ def build_report(run_root: Path) -> dict[str, Any]:
         if path.is_dir() and all((path / universe / "TASK_RESULT.json").is_file() for universe in UNIVERSES)
     ]
     missing_tasks = sorted(set(TASKS) - set(task_names))
+    protocol_blocked = []
+    for task in sorted(TASKS):
+        for universe in UNIVERSES:
+            path = run_root / task / universe / "DEVELOPMENT_PROTOCOL_BLOCKED.json"
+            if path.is_file():
+                value = _read(path)
+                protocol_blocked.append(
+                    {
+                        "task": task,
+                        "universe": universe,
+                        "stage": value.get("stage"),
+                        "reason": value.get("reason"),
+                    }
+                )
     report_status = "COMPLETED" if not missing_tasks else "PARTIAL"
     aggregate: list[dict[str, Any]] = []
     prediction: list[dict[str, Any]] = []
@@ -584,6 +633,7 @@ def build_report(run_root: Path) -> dict[str, Any]:
         f"Status: `{report_status}`.\n\n"
         f"Completed tasks: {', '.join(task_names) or 'none'}.\n\n"
         f"Missing tasks: {', '.join(missing_tasks) or 'none'}.\n\n"
+        f"Protocol-blocked task/universes: {json.dumps(protocol_blocked, sort_keys=True)}.\n\n"
         f"Stage-admission conclusion reversals: {reversals}/{len(stages)} comparisons.\n\n"
         "Prediction, channel, conditional-scale, stage, and complexity sensitivity are reported separately.\n"
     )
@@ -593,6 +643,7 @@ def build_report(run_root: Path) -> dict[str, Any]:
         "status": report_status,
         "tasks": task_names,
         "missing_tasks": missing_tasks,
+        "protocol_blocked": protocol_blocked,
         "required_tasks": sorted(TASKS),
         "stage_conclusion_reversals": reversals,
     }
