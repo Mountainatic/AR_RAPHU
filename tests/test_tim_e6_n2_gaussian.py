@@ -3,7 +3,13 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from experiments.tim_validation.e6_robustness.n2_gaussian import _jaccard, _perturb_split
+import json
+
+from experiments.tim_validation.e6_robustness.n2_gaussian import (
+    _full_record,
+    _jaccard,
+    _perturb_split,
+)
 
 
 def test_n2_development_and_test_streams_are_independent_and_nested(tmp_path) -> None:
@@ -34,3 +40,20 @@ def test_n2_development_and_test_streams_are_independent_and_nested(tmp_path) ->
 
 def test_n2_empty_agreement_is_not_unqualified() -> None:
     assert _jaccard(set(), set()) == (1.0, True)
+
+
+def test_n2_uses_terminal_input_only_model_when_full_model_is_absent(tmp_path) -> None:
+    path = tmp_path / "STAGEWISE_INFERENCE_COMPLETE.json"
+    path.write_text(
+        json.dumps(
+            {
+                "records": [
+                    {"status": "PASS", "model": "PRISM_V2_1_1_K"},
+                    {"status": "PASS", "model": "PRISM_V2_1_1_K_C_W"},
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert _full_record(path)["model"] == "PRISM_V2_1_1_K_C_W"

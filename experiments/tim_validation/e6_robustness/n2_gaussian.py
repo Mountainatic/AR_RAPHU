@@ -22,7 +22,7 @@ from prism_benchmark.portable_checkpoints import INFERENCE_ONLY_ENV
 
 from .n1_gaussian import (
     DEFAULT_ALPHAS,
-    FULL_MODEL,
+    STAGEWISE_FINAL_PREFERENCE,
     _adjust_dynamic_sample_targets,
     _hardlink_copy,
     _remove_case_work,
@@ -220,13 +220,15 @@ def _run_stage(
 
 def _full_record(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
-    matches = [
-        record for record in value["records"]
-        if record.get("model") == FULL_MODEL and record.get("status") == "PASS"
-    ]
-    if len(matches) != 1:
-        raise RuntimeError(f"STOP_E6_N2_FULL_RECORD_COUNT:{len(matches)}")
-    return matches[0]
+    records = {
+        str(record.get("model")): record
+        for record in value["records"]
+        if record.get("status") == "PASS"
+    }
+    for model in STAGEWISE_FINAL_PREFERENCE:
+        if model in records:
+            return records[model]
+    raise RuntimeError("STOP_E6_N2_NO_RECOGNIZED_FINAL_STAGEWISE_MODEL")
 
 
 def _identity_family(value: Any) -> bool:
@@ -277,7 +279,7 @@ def _structure(
         rod=args.rod,
         seed=seed,
         candidate_universe="standard",
-        model_variant=FULL_MODEL,
+        model_variant=str(record["model"]),
         admitted_channels=admitted,
         rejected_channels=sorted(set(all_channels) - set(admitted)),
         selected_profile_by_channel={channel: contracts[channel]["profile"] for channel in admitted},
