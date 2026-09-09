@@ -38,7 +38,9 @@ from .v211_support import (
 IDENTITY = "IDENTITY_CORRECTION"
 MONOTONE = "MONOTONE_I_SPLINE_CORRECTION"
 NATURAL_CUBIC = "NATURAL_CUBIC_CORRECTION"
-W_FAMILIES = (IDENTITY, MONOTONE, NATURAL_CUBIC)
+# H_W^+ contains only genuine nonzero families.  IDENTITY is the external
+# additive zero element and is deliberately absent from this registry.
+W_FAMILIES = (MONOTONE, NATURAL_CUBIC)
 BEST_ACTIVE_K = "BEST_ACTIVE_K_CHANNEL"
 W_INNER_WORKERS_ENV = "PRISM_V211_W_INNER_WORKERS"
 _W_CANDIDATE_CONTEXT: tuple[list[Any], list[tuple[Any, ...]], list[dict[str, Any]]] | None = None
@@ -426,17 +428,15 @@ def _w_candidates(
     candidates: list[Any] = []
     smoothness = [float(value) for value in v2["W_module"]["smoothness_penalties"]]
     mus = [float(value) for value in v211["W"]["soft_overlap_mu"]]
-    include_monotone = bool(
-        monotone
-        or MONOTONE in set(v211.get("W", {}).get("candidates", ()))
+    # Correlation sign/fold consistency is reporting evidence, not candidate
+    # admission.  Both monotone directions always belong to H_W^+.
+    candidates.extend(
+        (MONOTONE, int(knots), penalty, mu, candidate_direction)
+        for candidate_direction in (-1, 1)
+        for knots in v21["W"]["monotone_knots"]
+        for penalty in smoothness
+        for mu in mus
     )
-    if include_monotone:
-        candidates.extend(
-            (MONOTONE, int(knots), penalty, mu, direction)
-            for knots in v21["W"]["monotone_knots"]
-            for penalty in smoothness
-            for mu in mus
-        )
     candidates.extend(
         (NATURAL_CUBIC, int(knots), penalty, mu, 1)
         for knots in v21["W"]["natural_cubic_knots"]

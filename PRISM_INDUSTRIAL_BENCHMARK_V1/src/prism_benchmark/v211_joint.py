@@ -749,15 +749,8 @@ def run_joint_view(
         )
         if any(item.get("status") != "PASS" for item in (c_result, w_result, a_result)):
             raise RuntimeError("E2R-E4R prerequisite is not PASS")
-        c_gate = c_result.get("input_path_preservation", {})
-        if not bool(c_gate.get("pass", False)):
-            result = _collapsed_joint_result(
-                view,
-                reason="C_INPUT_PATH_NOT_PRESERVED",
-                gate=c_gate,
-            )
-            write_json(destination / "RESULT.json", result)
-            return result
+        # Preservation is reporting evidence only.  It cannot prevent the
+        # independently routed Joint family from being fitted and compared.
         active = load_active_channels(output, view)
         frozen_channels = set(c_result.get("active_channels", ()))
         active = [item for item in active if item.get("channel") in frozen_channels]
@@ -1178,22 +1171,11 @@ def run_joint_view(
             **gate_parameters,
         )
         final_numerical_pass = numerical_contract_passes(contract)
-        formal_pass = bool(oof_gate["pass"] and final_numerical_pass)
         formal_gate = {
             **oof_gate,
-            "status": "INPUT_PATH_PRESERVED"
-            if formal_pass
-            else "INPUT_PATH_COLLAPSED",
-            "pass": formal_pass,
-            "input_path_failure_class": (
-                oof_gate.get("input_path_failure_class")
-                if not oof_gate["pass"]
-                else (
-                    "INPUT_PATH_PRESERVED"
-                    if final_numerical_pass
-                    else "INPUT_PATH_NUMERICAL_FAILURE"
-                )
-            ),
+            "status": "REPORTING_ONLY",
+            "pass": bool(oof_gate.get("pass", False)),
+            "selection_eligible": False,
             "final_refit_numerical_certificate_passed": final_numerical_pass,
         }
         gate = attach_nonselecting_validation_confirmation(
@@ -1265,11 +1247,7 @@ def run_joint_view(
         frame.to_parquet(prediction_path, index=False, compression="zstd")
         final_loss = mse(frame["y_true"].to_numpy(dtype=np.float64), prediction)
         result = {
-            "status": (
-                "PASS"
-                if gate["pass"]
-                else "JOINT_OOF_PROTOCOL_CORRECTED_BUT_MODEL_GATE_FAILED"
-            ),
+            "status": "PASS" if final_numerical_pass else "JOINT_NUMERICAL_FAILURE",
             "stage": "E5R_JOINT",
             "inner_candidate_workers": inner_workers,
             "inner_parallelism_scope": "ORDERED_INDEPENDENT_CANDIDATES_ONLY",

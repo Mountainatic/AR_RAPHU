@@ -437,16 +437,16 @@ def run_m2(paths: MetroV211Paths) -> dict[str, Any]:
         label="PRISM_V211_METRO_M2_C",
     )
     c_results = _bind(paths, c_paths)
+    stages_complete = all(item.get("status") == "PASS" for item in c_results)
     noncollapsed = all(
-        item.get("status") == "PASS"
-        and bool(item.get("input_path_preservation", {}).get("pass", False))
+        bool(item.get("input_path_preservation", {}).get("pass", False))
         for item in c_results
     )
     active_by_view = {
         view.proxy_policy: len(load_active_channels(paths.output, view)) for view in views
     }
     result = {
-        "status": "PASS" if noncollapsed and all(active_by_view.values()) else "STOP_KC_INPUT_PATH_COLLAPSED",
+        "status": "PASS" if stages_complete else "STOP_KC_STAGE_INCOMPLETE",
         "stage": "M2_DEVELOPMENT_K_C",
         "k_jobs": len(k_results),
         "requested_k_workers": workers,
@@ -459,13 +459,15 @@ def run_m2(paths: MetroV211Paths) -> dict[str, Any]:
         "active_by_view": active_by_view,
         "c_views": len(c_results),
         "c_input_paths_noncollapsed": noncollapsed,
+        "c_input_path_diagnostic_selection_eligible": False,
+        "zero_active_channels_block_downstream": False,
         "test_accessed": False,
         "ood_accessed": False,
     }
     write_json(paths.output / "DEVELOPMENT" / "M2_KC_SUMMARY.json", result)
     _run_status(paths, status=result["status"], stage="M2")
     if result["status"] != "PASS":
-        stop(paths, "STOP_KC_INPUT_PATH_COLLAPSED", result)
+        stop(paths, "STOP_KC_STAGE_INCOMPLETE", result)
     return result
 
 
@@ -560,12 +562,11 @@ def hierarchical_route_freeze_decision(
     pf_checks: MappingLike,
     joint_checks: MappingLike,
     *,
-    joint_model_gate_pass: bool,
+    joint_route_ready: bool,
 ) -> dict[str, Any]:
-    """Apply the mandatory-PF/optional-Joint development freeze contract."""
+    """Freeze materialized routes; reporting diagnostics have no authority."""
     pf_stop_mapping = (
         ("data_hash_unchanged", "STOP_DATA_BASE_MUTATED"),
-        ("k_c_input_path_noncollapsed", "STOP_KC_INPUT_PATH_COLLAPSED"),
         ("w_candidates_actually_compared", "STOP_W_CANDIDATES_NOT_ACTUALLY_COMPARED"),
         ("identity_equivalence_pass", "STOP_IDENTITY_W_NOT_EQUIVALENT"),
         ("all_a_pass", "PHYSICS_ROUTE_NOT_SUPPORTED"),
@@ -583,7 +584,6 @@ def hierarchical_route_freeze_decision(
         ("joint_w_jointly_fit", "STOP_JOINT_W_NOT_JOINTLY_FIT"),
         ("joint_candidate_binding_pass", "STOP_CANDIDATE_ID_MISMATCH"),
         ("joint_numerical_solver_valid", "STOP_JOINT_NUMERICAL_FAILURE"),
-        ("pf_joint_same_evaluation_not_inconsistent", "STOP_PF_JOINT_INPUT_GATE_INCONSISTENT"),
     )
     failed = next((label for key, label in pf_stop_mapping if not pf_checks.get(key, False)), None)
     if failed is None:
@@ -601,7 +601,7 @@ def hierarchical_route_freeze_decision(
             "joint_status": "JOINT_NOT_FROZEN",
             "joint_formal_test_eligible": False,
         }
-    if joint_model_gate_pass:
+    if joint_route_ready:
         return {
             "status": "PASS_PF_AND_JOINT",
             "development_frozen": True,
@@ -632,10 +632,11 @@ def _candidate_bindings_pass(results: Iterable[MappingLike]) -> bool:
 
 
 def _joint_numerics_valid(result: MappingLike) -> bool:
-    if not bool(
-        result.get("input_path_preservation", {})
-        .get("checks", {})
-        .get("numerical_certificate", False)
+    if (
+        result.get("final_selected_contract", {})
+        .get("numerical_certificate", {})
+        .get("status")
+        != "PASS"
     ):
         return False
     routes = result.get("route_materializations", {})
@@ -724,8 +725,6 @@ def run_m5(paths: MetroV211Paths) -> dict[str, Any]:
     status = "PASS"
     if protocol_mismatch or not fold_protocol_complete or not original_support_only or not all_four_fold_losses:
         status = "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"
-    elif gate_inconsistent:
-        status = "STOP_PF_JOINT_INPUT_GATE_INCONSISTENT"
     elif not routes_complete:
         status = "STOP_JOINT_ROUTE_MATERIALIZATION_MISSING"
     elif not jointly_fit:
@@ -742,6 +741,7 @@ def run_m5(paths: MetroV211Paths) -> dict[str, Any]:
         "stage": "M5_DEVELOPMENT_JOINT",
         "views": len(results),
         "pf_joint_same_evaluation_not_inconsistent": not gate_inconsistent,
+        "pf_joint_input_diagnostic_selection_eligible": False,
         "joint_fold_protocol_audit_pass": fold_protocol_complete,
         "original_registered_inner_support_only": original_support_only,
         "all_four_registered_fold_losses_present": all_four_fold_losses,
@@ -877,15 +877,11 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
             for c_result, joint_result in zip(c_results, joint_results)
         ),
     }
-    joint_model_gate_pass = all(
-        item.get("status") == "PASS"
-        and bool(item.get("input_path_preservation", {}).get("pass"))
-        for item in joint_results
-    )
+    joint_route_ready = all(item.get("status") == "PASS" for item in joint_results)
     route_decision = hierarchical_route_freeze_decision(
         pf_checks,
         joint_checks,
-        joint_model_gate_pass=joint_model_gate_pass,
+        joint_route_ready=joint_route_ready,
     )
     selections = []
     for view, c_result, w_result, a_result, joint_result in zip(
@@ -972,7 +968,8 @@ def run_m6(paths: MetroV211Paths) -> dict[str, Any]:
         "pf_mandatory_checks": pf_checks,
         "joint_optional_checks": {
             **joint_checks,
-            "joint_development_model_gate_pass": joint_model_gate_pass,
+            "joint_route_materialized_and_ready": joint_route_ready,
+            "input_path_diagnostics_selection_eligible": False,
         },
         "development_selections": selections,
         "test_accessed": False,

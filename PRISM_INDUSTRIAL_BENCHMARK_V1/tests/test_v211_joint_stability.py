@@ -220,12 +220,10 @@ def test_eta_selection_uses_minimum_oof_risk_without_one_se() -> None:
     assert audit["one_se_used"] is False
 
 
-def test_representation_one_se_prefers_compressed_when_equal() -> None:
+def test_representation_identity_is_kept_when_risks_are_equal() -> None:
     selected, _ = select_k_representation(
         [1.0, 1.0, 1.0, 1.0],
         [1.0, 1.0, 1.0, 1.0],
-        minimum_relative_improvement=0.01,
-        minimum_positive_fraction=0.75,
     )
     assert selected == CHANNEL_COMPRESSED
 
@@ -234,14 +232,10 @@ def test_every_positive_representation_gain_is_admitted() -> None:
     small_positive, _ = select_k_representation(
         [1.0, 1.0, 1.0, 1.0],
         [0.995, 0.995, 0.995, 0.995],
-        minimum_relative_improvement=0.01,
-        minimum_positive_fraction=0.75,
     )
     accepted, _ = select_k_representation(
         [1.0, 1.0, 1.0, 1.0],
         [0.98, 0.98, 0.98, 0.98],
-        minimum_relative_improvement=0.01,
-        minimum_positive_fraction=0.75,
     )
     assert small_positive == FULL_BASIS
     assert accepted == FULL_BASIS

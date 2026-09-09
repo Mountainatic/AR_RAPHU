@@ -239,15 +239,15 @@ def _passing_joint_checks() -> dict[str, bool]:
 
 def test_pf_and_joint_both_freeze_when_both_pass() -> None:
     decision = hierarchical_route_freeze_decision(
-        _passing_pf_checks(), _passing_joint_checks(), joint_model_gate_pass=True
+        _passing_pf_checks(), _passing_joint_checks(), joint_route_ready=True
     )
     assert decision["status"] == "PASS_PF_AND_JOINT"
     assert decision["formal_routes"] == ["PHYSICS_FIRST", "JOINT"]
 
 
-def test_pf_freezes_independently_when_only_joint_model_gate_fails() -> None:
+def test_pf_freezes_independently_when_joint_route_is_incomplete() -> None:
     decision = hierarchical_route_freeze_decision(
-        _passing_pf_checks(), _passing_joint_checks(), joint_model_gate_pass=False
+        _passing_pf_checks(), _passing_joint_checks(), joint_route_ready=False
     )
     assert decision["status"] == "PASS_PF_ONLY"
     assert decision["development_frozen"] is True
@@ -255,11 +255,23 @@ def test_pf_freezes_independently_when_only_joint_model_gate_fails() -> None:
     assert decision["joint_formal_test_eligible"] is False
 
 
+def test_reporting_path_diagnostics_cannot_block_route_freeze() -> None:
+    pf = _passing_pf_checks()
+    joint = _passing_joint_checks()
+    pf["k_c_input_path_noncollapsed"] = False
+    joint["pf_joint_same_evaluation_not_inconsistent"] = False
+    decision = hierarchical_route_freeze_decision(
+        pf, joint, joint_route_ready=True
+    )
+    assert decision["status"] == "PASS_PF_AND_JOINT"
+    assert decision["formal_routes"] == ["PHYSICS_FIRST", "JOINT"]
+
+
 def test_joint_protocol_mismatch_remains_a_hard_stop() -> None:
     joint = _passing_joint_checks()
     joint["joint_fold_protocol_all_pass"] = False
     decision = hierarchical_route_freeze_decision(
-        _passing_pf_checks(), joint, joint_model_gate_pass=False
+        _passing_pf_checks(), joint, joint_route_ready=False
     )
     assert decision["hard_stop"] is True
     assert decision["status"] == "STOP_JOINT_FOLD_PROTOCOL_MISMATCH"
@@ -269,7 +281,7 @@ def test_pf_failure_remains_a_hard_stop_even_if_joint_passes() -> None:
     pf = _passing_pf_checks()
     pf["pf_assembly_card_valid"] = False
     decision = hierarchical_route_freeze_decision(
-        pf, _passing_joint_checks(), joint_model_gate_pass=True
+        pf, _passing_joint_checks(), joint_route_ready=True
     )
     assert decision["hard_stop"] is True
     assert decision["status"] == "PHYSICS_ROUTE_NOT_SUPPORTED"

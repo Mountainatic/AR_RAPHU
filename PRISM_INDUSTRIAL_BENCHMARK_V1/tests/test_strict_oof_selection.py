@@ -110,3 +110,9 @@ def test_active_v211_stages_do_not_import_one_se_selectors() -> None:
         text = (source / name).read_text(encoding="utf-8")
         assert "one_se_select" not in text
         assert "guarded_local_one_se_select" not in text
+
+
+def test_w_registry_contains_only_nonzero_families() -> None:
+    from prism_benchmark.v211_w import IDENTITY, W_FAMILIES
+
+    assert IDENTITY not in W_FAMILIES

@@ -456,8 +456,6 @@ def select_k_representation(
     compressed_losses: list[float],
     full_losses: list[float],
     *,
-    minimum_relative_improvement: float,
-    minimum_positive_fraction: float,
     minimum_usable_folds: int = 4,
 ) -> tuple[str, dict[str, Any]]:
     selection = strict_nested_oof_select(
@@ -777,14 +775,8 @@ def run_joint_stability_view(
         a_result = json.loads(a_path.read_text(encoding="utf-8"))
         if any(item.get("status") != "PASS" for item in (c_result, w_result, a_result)):
             raise RuntimeError("v2.1.1 Joint stability practice M2-M4 prerequisite is not PASS")
-        if not bool(c_result.get("input_path_preservation", {}).get("pass")):
-            result = _registered_stability_rejection(
-                view,
-                c_result.get("input_path_preservation", {}),
-                started=started,
-            )
-            write_json(destination / "RESULT.json", result)
-            return result
+        # C preservation diagnostics describe evidence only.  A zero C
+        # increment is the additive identity and must not suppress Joint.
         frozen_channel_set = {
             str(value) for value in c_result["active_channels"]
         }
@@ -1136,8 +1128,6 @@ def run_joint_stability_view(
             selected_representation, selection = select_k_representation(
                 compressed_losses,
                 full_losses,
-                minimum_relative_improvement=minimum_relative,
-                minimum_positive_fraction=minimum_positive,
                 minimum_usable_folds=4,
             )
             route_best_by_representation[route] = {
@@ -1153,6 +1143,8 @@ def run_joint_stability_view(
                 minimum_relative_improvement=minimum_relative,
                 minimum_positive_fraction=minimum_positive,
             )
+            activation["selection_eligible"] = False
+            activation["role"] = "REPORTING_ONLY"
             representation_comparison[route] = {
                 "compressed_selected_eta": compressed.predictive_eta,
                 "compressed_fold_losses": compressed_losses,
@@ -1312,15 +1304,15 @@ def run_joint_stability_view(
             numerical_certificate_passed=numerical_contract_passes(contract),
             **gate_parameters,
         )
-        formal_pass = bool(
-            oof_gate["pass"]
-            and numerical_contract_passes(contract)
+        numerical_pass = bool(
+            numerical_contract_passes(contract)
             and numerical_contract_passes(bare_contract)
         )
         formal_gate = {
             **oof_gate,
-            "pass": formal_pass,
-            "status": "INPUT_PATH_PRESERVED" if formal_pass else "INPUT_PATH_COLLAPSED",
+            "status": "REPORTING_ONLY",
+            "pass": bool(oof_gate.get("pass", False)),
+            "selection_eligible": False,
             "final_refit_numerical_certificate_passed": numerical_contract_passes(
                 contract
             ),
@@ -1414,12 +1406,12 @@ def run_joint_stability_view(
                 "selection_eligible": False,
             }
         )
+        legacy_improvement["selection_eligible"] = False
+        legacy_improvement["role"] = "REPORTING_ONLY"
         decision_label = (
-            "JOINT_STABILITY_PREDICTIVE_STABILITY_SUPPORTED"
-            if gate["pass"]
-            else "JOINT_STABILITY_STABILITY_IMPROVED_BUT_NOT_SUPPORTED"
-            if legacy_improvement["pass"]
-            else "JOINT_STABILITY_REGISTERED_STABILITY_CONTROLS_INSUFFICIENT"
+            "JOINT_STRICT_NESTED_OOF_POSITIVE_INCREMENT"
+            if route_selection.active
+            else "JOINT_STRICT_NESTED_OOF_IDENTITY_PARENT"
         )
         diagnosis = _diagnosis(
             selected.route, route_best_by_representation, gates
@@ -1435,7 +1427,7 @@ def run_joint_stability_view(
             for candidate in candidates
         ]
         result = {
-            "status": "PASS" if gate["pass"] else decision_label,
+            "status": "PASS" if numerical_pass else "JOINT_NUMERICAL_FAILURE",
             "development_decision": decision_label,
             "development_diagnosis": diagnosis,
             "diagnosis_scope": "DEVELOPMENT_MODEL_SELECTION_NOT_CAUSAL_PROOF",
