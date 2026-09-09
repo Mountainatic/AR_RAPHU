@@ -29,13 +29,11 @@ from .v2_k import (
     channel_profiles,
     profile_values,
 )
-from .v2_selection import one_se_select
+from .strict_oof_selection import strict_nested_oof_select, tune_best_nonzero
 from .v2_runtime import run_parallel
 from .v2_urysohn import fit_contract, predict_contract
-from .v21_selection import guarded_local_one_se_select
 from .v21_views import sru_input_views
 from .v211_config import load_v211_configs
-from .v211_selection import profile_one_se_regret_guard
 from .v211_support import (
     SUPPORT_CONTRACT,
     apply_native_support,
@@ -287,17 +285,20 @@ def _smoothness_selection(
                 strict=True,
             )
         )
-        selection = one_se_select(
-            scan,
-            lambda value: (-float(value),),
-            minimum_usable_folds=minimum_folds,
+        selected = tune_best_nonzero(
+            scan, minimum_usable_folds=minimum_folds
         )
         if name == "lambda_tau":
-            lambda_tau = float(selection.selected)
+            lambda_tau = float(selected)
         else:
-            lambda_x = float(selection.selected)
+            lambda_x = float(selected)
         audit[name] = {
-            "selection": selection.to_json(),
+            "selection": {
+                "selected": float(selected),
+                "selection_rule": "MINIMUM_EMPIRICAL_RISK_IN_NONZERO_FAMILY",
+                "one_se_used": False,
+                "complexity_preference_used": False,
+            },
             "fold_losses": {str(key): value for key, value in scan.items()},
         }
     return lambda_tau, lambda_x, audit
@@ -361,17 +362,21 @@ def run_k_channel(
                 strict=True,
             )
         )
-        profile_rule = v211["K"]["profile_selection"]
-        profile_selection = profile_one_se_regret_guard(
-            profile_losses,
-            _profile_complexity,
-            maximum_relative_regret=float(
-                profile_rule["maximum_relative_regret_vs_best"]
-            ),
-            maximum_retained_profiles=int(profile_rule["maximum_retained_profiles"]),
-            minimum_usable_folds=minimum_folds,
+        best_profile = tuple(
+            tune_best_nonzero(
+                profile_losses, minimum_usable_folds=minimum_folds
+            )
         )
-        retained_profiles = [tuple(value) for value in profile_selection.retained_profiles]
+        profile_selection_json = {
+            "selected": str(best_profile),
+            "selection_rule": "MINIMUM_EMPIRICAL_RISK_IN_NONZERO_FAMILY",
+            "one_se_used": False,
+            "regret_guard_used": False,
+            "complexity_preference_used": False,
+        }
+        # Keep all profiles in H_K^+ so the outer-fold winner is tuned without
+        # seeing its own held-out loss.
+        retained_profiles = [tuple(value) for value in profiles]
         local_comparison_history = max(
             int(profile[1]) for profile in retained_profiles
         )
@@ -416,125 +421,106 @@ def run_k_channel(
             target = subset["y_true"].to_numpy(dtype=np.float64)
             zero_losses.append(float(np.mean(target * target, dtype=np.float64)))
 
-        linear_activation_losses: dict[Any, list[float]] = {EXACT_ZERO: zero_losses}
+        linear_activation_losses: dict[Any, list[float]] = {}
         for profile in retained_profiles:
             linear_activation_losses[(profile, "LINEAR_DISTRIBUTED_LAG")] = (
                 activation_profile_losses[profile]
             )
-        activation = guarded_local_one_se_select(
+        activation = strict_nested_oof_select(
             linear_activation_losses,
-            lambda value: (0,)
-            if value == EXACT_ZERO
-            else (1, *_profile_complexity(value[0])),
-            neutral=EXACT_ZERO,
-            minimum_relative_improvement=float(
-                v21["selection"]["minimum_relative_improvement"]["K"]
-            ),
-            minimum_positive_fraction=float(
-                v21["selection"]["minimum_positive_fold_fraction"]
-            ),
-            minimum_usable_folds=minimum_folds,
+            zero_losses,
+            identity=EXACT_ZERO,
+            fold_weights=[len(record["evaluation"]) for record in local_scoring_records],
+            minimum_inner_folds=max(2, minimum_folds - 1),
+            minimum_outer_folds=minimum_folds,
         )
 
-        structural_selection = None
-        structural_losses: dict[Any, list[float]] = {EXACT_ZERO: zero_losses}
-        if activation.final_selected_candidate == EXACT_ZERO:
-            selected_profile = tuple(profile_selection.best_profile)
-            selected_m_tau = pilot_m_tau
-            selected_m_x = 1
-            selected_family = EXACT_ZERO
-            lambda_tau = float(pilot["lambda_tau"])
-            lambda_x = float(pilot["lambda_x"])
-            smoothness_audit: dict[str, Any] = {}
-        else:
-            structural_specs = []
-            structural_jobs = []
-            for profile in retained_profiles:
-                for m_tau in v21["K_C"]["m_tau"]:
+        structural_specs = []
+        structural_jobs = []
+        lambda_tau_values = [
+            float(value) for value in v2["K_module"]["penalties"]["lambda_tau"]
+        ]
+        lambda_x_values = [
+            float(value) for value in v2["K_module"]["penalties"]["lambda_x"]
+        ]
+        for profile in retained_profiles:
+            for m_tau in v21["K_C"]["m_tau"]:
+                for lambda_tau_value in lambda_tau_values:
                     structural_specs.append(
-                        (profile, int(m_tau), "LINEAR_DISTRIBUTED_LAG", 1)
-                    )
-                    structural_jobs.append(
                         (
-                            accessor,
-                            train,
-                            folds,
-                            channel,
                             profile,
                             int(m_tau),
                             "LINEAR_DISTRIBUTED_LAG",
                             1,
-                            pilot_lambdas,
-                            v2,
-                            local_comparison_history,
+                            lambda_tau_value,
+                            0.0,
+                        )
+                    )
+                    structural_jobs.append(
+                        (
+                            accessor, train, folds, channel, profile, int(m_tau),
+                            "LINEAR_DISTRIBUTED_LAG", 1,
+                            (float(pilot["lambda_0"]), lambda_tau_value, 0.0),
+                            v2, local_comparison_history,
                         )
                     )
                     for m_x in v21["K_C"]["m_x"]:
                         for family in FAMILY_ORDER[2:]:
-                            structural_specs.append(
-                                (profile, int(m_tau), family, int(m_x))
-                            )
-                            structural_jobs.append(
-                                (
-                                    accessor,
-                                    train,
-                                    folds,
-                                    channel,
-                                    profile,
-                                    int(m_tau),
-                                    family,
-                                    int(m_x),
-                                    pilot_lambdas,
-                                    v2,
-                                    local_comparison_history,
+                            for lambda_x_value in lambda_x_values:
+                                structural_specs.append(
+                                    (
+                                        profile, int(m_tau), family, int(m_x),
+                                        lambda_tau_value, lambda_x_value,
+                                    )
                                 )
-                            )
-            structural_results = _ordered_parallel_map(
-                evaluate_candidate, structural_jobs, inner_workers
+                                structural_jobs.append(
+                                    (
+                                        accessor, train, folds, channel, profile,
+                                        int(m_tau), family, int(m_x),
+                                        (
+                                            float(pilot["lambda_0"]),
+                                            lambda_tau_value,
+                                            lambda_x_value,
+                                        ),
+                                        v2, local_comparison_history,
+                                    )
+                                )
+        structural_losses = dict(
+            zip(
+                structural_specs,
+                _ordered_parallel_map(evaluate_candidate, structural_jobs, inner_workers),
+                strict=True,
             )
-            structural_losses.update(
-                zip(structural_specs, structural_results, strict=True)
-            )
-            structural_selection = guarded_local_one_se_select(
-                structural_losses,
-                _structural_complexity,
-                neutral=EXACT_ZERO,
-                minimum_relative_improvement=float(
-                    v21["selection"]["minimum_relative_improvement"]["K"]
-                ),
-                minimum_positive_fraction=float(
-                    v21["selection"]["minimum_positive_fold_fraction"]
-                ),
-                minimum_usable_folds=minimum_folds,
-            )
-            selected = structural_selection.final_selected_candidate
-            if selected == EXACT_ZERO:
-                selected_profile = tuple(profile_selection.best_profile)
-                selected_m_tau = pilot_m_tau
-                selected_m_x = 1
-                selected_family = EXACT_ZERO
-                lambda_tau = float(pilot["lambda_tau"])
-                lambda_x = float(pilot["lambda_x"])
-                smoothness_audit = {}
-            else:
-                selected_profile, selected_m_tau, selected_family, selected_m_x = selected
-                selected_profile = tuple(selected_profile)
-                selected_m_tau = int(selected_m_tau)
-                selected_m_x = int(selected_m_x)
-                selected_family = str(selected_family)
-                lambda_tau, lambda_x, smoothness_audit = _smoothness_selection(
-                    accessor=accessor,
-                    train=train,
-                    folds=folds,
-                    channel=channel,
-                    profile=selected_profile,
-                    m_tau=selected_m_tau,
-                    family=selected_family,
-                    m_x=selected_m_x,
-                    v2=v2,
-                    minimum_folds=minimum_folds,
-                    parallel_workers=inner_workers,
-                )
+        )
+        structural_selection = strict_nested_oof_select(
+            structural_losses,
+            zero_losses,
+            identity=EXACT_ZERO,
+            fold_weights=[len(record["evaluation"]) for record in local_scoring_records],
+            minimum_inner_folds=max(2, minimum_folds - 1),
+            minimum_outer_folds=minimum_folds,
+        )
+        tuned_nonzero = structural_selection.tuned_nonzero_candidate
+        (
+            selected_profile,
+            selected_m_tau,
+            tuned_family,
+            selected_m_x,
+            lambda_tau,
+            lambda_x,
+        ) = tuned_nonzero
+        selected_profile = tuple(selected_profile)
+        selected_m_tau = int(selected_m_tau)
+        selected_m_x = int(selected_m_x)
+        selected_family = (
+            str(tuned_family) if structural_selection.active else EXACT_ZERO
+        )
+        lambda_tau = float(lambda_tau)
+        lambda_x = float(lambda_x)
+        smoothness_audit = {
+            "status": "INCLUDED_IN_NONZERO_NESTED_OOF_TUNING",
+            "one_se_used": False,
+        }
 
         selected_history = int(selected_profile[1])
         selected_support_history = (
@@ -678,24 +664,64 @@ def run_k_channel(
         active = selected_family != EXACT_ZERO and _candidate_valid(
             dict(refit_contract), len(final_train), v2
         )
+        final_fold_losses = list(structural_selection.final_selected_fold_losses)
+        oof_records = local_scoring_records
         if selected_family == EXACT_ZERO:
-            final_fold_losses = zero_losses
             certified_fold_predictions = [
                 np.zeros(len(record["evaluation"]), dtype=np.float64)
-                for record in selected_fold_records
+                for record in oof_records
             ]
         else:
-            final_fold_losses = [
-                float(payload["loss"]) for payload in certified_fold_payloads
-            ]
-            certified_fold_predictions = [
-                np.asarray(payload["prediction"], dtype=np.float64)
-                for payload in certified_fold_payloads
-            ]
+            outer_winners = dict(
+                zip(
+                    structural_selection.outer_fold_indices,
+                    structural_selection.outer_selected_nonzero_candidates,
+                    strict=True,
+                )
+            )
+            certified_fold_predictions = []
+            for fold, record in enumerate(oof_records):
+                (
+                    fold_profile,
+                    fold_m_tau,
+                    fold_family,
+                    fold_m_x,
+                    fold_lambda_tau,
+                    fold_lambda_x,
+                ) = outer_winners[fold]
+                fold_fit_values, _ = profile_values(
+                    accessor,
+                    record["fit"],
+                    channel,
+                    tuple(fold_profile),
+                    int(fold_m_tau),
+                )
+                fold_evaluation_values, _ = profile_values(
+                    accessor,
+                    record["evaluation"],
+                    channel,
+                    tuple(fold_profile),
+                    int(fold_m_tau),
+                )
+                fold_contract = fit_contract(
+                    fold_fit_values,
+                    record["fit"]["y_true"].to_numpy(dtype=np.float64),
+                    str(fold_family),
+                    int(fold_m_x),
+                    (
+                        float(pilot["lambda_0"]),
+                        float(fold_lambda_tau),
+                        float(fold_lambda_x),
+                    ),
+                    **_als_kwargs(v2),
+                )
+                certified_fold_predictions.append(
+                    predict_contract(fold_evaluation_values, fold_contract)
+                )
         oof_frames = []
         oof_losses = []
         for fold, (record, fold_prediction) in enumerate(
-            zip(selected_fold_records, certified_fold_predictions, strict=True)
+            zip(oof_records, certified_fold_predictions, strict=True)
         ):
             evaluation = record["evaluation"]
             oof_loss = mse(
@@ -732,7 +758,7 @@ def run_k_channel(
             "selected_lambdas": list(selected_lambdas),
             "ridge_semantics": "NUMERICAL_STABILITY_ONLY",
             "active": active,
-            "profile_selection": profile_selection.to_json(),
+            "profile_selection": profile_selection_json,
             "profile_fold_losses": {
                 str(key): value for key, value in profile_losses.items()
             },
@@ -740,9 +766,8 @@ def run_k_channel(
             "linear_activation_profile_fold_losses": {
                 str(key): value for key, value in activation_profile_losses.items()
             },
-            "structural_selection": None
-            if structural_selection is None
-            else structural_selection.to_json(),
+            "structural_selection": structural_selection.to_json(),
+            "routing_status": structural_selection.routing_status,
             "structural_fold_losses": {
                 str(key): value for key, value in structural_losses.items()
             },
@@ -750,7 +775,7 @@ def run_k_channel(
             "minimal_stabilizing_ridge_audit": ridge_audit,
             "contract": refit_contract,
             "final_selected_candidate": str(
-                (selected_profile, selected_m_tau, selected_family, selected_m_x)
+                structural_selection.final_selected_candidate
             ),
             "final_selected_fold_losses": list(oof_losses),
             "selection_fold_losses_before_oof_replay": list(final_fold_losses),
@@ -768,18 +793,18 @@ def run_k_channel(
             "oof_prediction_sha256": sha256_file(oof_path),
             "oof_prediction_fold_losses": oof_losses,
             "native_fit_rows_by_fold": [
-                len(record["fit_native"]) for record in selected_fold_records
+                len(record["fit_native"]) for record in oof_records
             ],
             "native_fit_support_hash_by_fold": [
                 support_id_hash(record["fit_native"])
-                for record in selected_fold_records
+                for record in oof_records
             ],
             "local_scoring_rows_by_fold": [
-                len(record["evaluation"]) for record in selected_fold_records
+                len(record["evaluation"]) for record in oof_records
             ],
             "local_scoring_support_hash_by_fold": [
                 support_id_hash(record["evaluation"])
-                for record in selected_fold_records
+                for record in oof_records
             ],
             "selected_native_train_rows": len(final_train_native),
             "selected_native_validation_rows": len(selected_validation),

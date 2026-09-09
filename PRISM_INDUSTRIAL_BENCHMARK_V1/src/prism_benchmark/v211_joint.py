@@ -24,8 +24,7 @@ from .v2_c import fit_physical_features
 from .v2_k import _cap
 from .v2_numerics import solve_certified
 from .v2_runtime import ordered_fork_map, run_parallel
-from .v2_selection import one_se_select
-from .v21_selection import guarded_local_one_se_select
+from .strict_oof_selection import strict_nested_oof_select, tune_best_nonzero
 from .v211_a import fit_mature_residual_ar
 from .v211_c import _gate_config, _smallest_stable_alpha
 from .v211_config import load_v211_configs
@@ -986,41 +985,35 @@ def run_joint_view(
             }
             if not subset:
                 continue
-            route_best[route] = one_se_select(
-                subset,
-                lambda value: (
-                    abs(np.log(value[2])),
-                    abs(np.log(value[3])),
-                ),
-                minimum_usable_folds=minimum_folds,
-            ).selected
+            route_best[route] = tune_best_nonzero(
+                subset, minimum_usable_folds=minimum_folds
+            )
         if J_K not in route_best:
             raise RuntimeError("Joint J_K has no numerically stable candidate")
         neutral = route_best[J_K]
-        reduced = {candidate: losses[candidate] for candidate in route_best.values()}
-        selection = guarded_local_one_se_select(
+        reduced = {
+            candidate: losses[candidate]
+            for route, candidate in route_best.items()
+            if route != J_K
+        }
+        selection = strict_nested_oof_select(
             reduced,
-            lambda value: (
-                JOINT_CANDIDATES.index(value[0]),
-                abs(np.log(value[2])),
-                abs(np.log(value[3])),
-            ),
-            neutral=neutral,
-            minimum_relative_improvement=float(
-                v21["selection"]["minimum_relative_improvement"]["J"]
-            ),
-            minimum_positive_fraction=float(
-                v21["selection"]["minimum_positive_fold_fraction"]
-            ),
-            minimum_usable_folds=minimum_folds,
+            losses[neutral],
+            identity=neutral,
+            fold_weights=[len(payload["evaluation_target"]) for payload in fold_payloads],
+            minimum_inner_folds=max(2, minimum_folds - 1),
+            minimum_outer_folds=minimum_folds,
         )
         selected = selection.final_selected_candidate
         selected_route, selected_alpha, selected_rk, selected_rw = selected
-        ar_selection = one_se_select(
-            ar_losses,
-            lambda value: (-value,),
-            minimum_usable_folds=minimum_folds,
+        ar_selected = tune_best_nonzero(
+            ar_losses, minimum_usable_folds=minimum_folds
         )
+        ar_selection = {
+            "selected": ar_selected,
+            "selection_rule": "MINIMUM_EMPIRICAL_RISK_IN_NONZERO_FAMILY",
+            "one_se_used": False,
+        }
         total_oof = []
         input_oof = []
         best_k_oof = []
@@ -1028,7 +1021,20 @@ def run_joint_view(
         input_coefficients = []
         numeric_passes = []
         correlations = []
-        for payload in fold_payloads:
+        outer_winners = (
+            dict(
+                zip(
+                    selection.outer_fold_indices,
+                    selection.outer_selected_nonzero_candidates,
+                    strict=True,
+                )
+            )
+            if selection.active
+            else {}
+        )
+        for fold_position, payload in enumerate(fold_payloads):
+            fold_selected = outer_winners.get(fold_position, neutral)
+            fold_route, fold_alpha, fold_rk, fold_rw = fold_selected
             prediction, contract, components = fit_joint_candidate(
                 {
                     "K": payload["k_train"],
@@ -1041,10 +1047,10 @@ def run_joint_view(
                     "W": payload["w_eval"],
                     "A": payload["a_eval"],
                 },
-                candidate=selected_route,
-                alpha=selected_alpha,
-                k_over_a_ratio=selected_rk,
-                w_over_a_ratio=selected_rw,
+                candidate=fold_route,
+                alpha=fold_alpha,
+                k_over_a_ratio=fold_rk,
+                w_over_a_ratio=fold_rw,
             )
             total_oof.append(prediction)
             input_oof.append(components["INPUT"])
@@ -1286,13 +1292,15 @@ def run_joint_view(
             "ar_profile": list(a_profile),
             "selected_candidate": selected_route,
             "selection": selection.to_json(),
+            "routing_status": selection.routing_status,
             "candidate_fold_losses": {
                 str(key): value for key, value in losses.items()
             },
             "ar_only_diagnostic": {
                 "selection_eligible": False,
-                "selected_alpha": ar_selection.selected,
-                "fold_losses": ar_losses[ar_selection.selected],
+                "selected_alpha": ar_selected,
+                "fold_losses": ar_losses[ar_selected],
+                **ar_selection,
             },
             "input_path_preservation": gate,
             "input_path_gate": gate,
@@ -1343,7 +1351,7 @@ def run_joint_view(
             "block_correlations_by_fold": correlations,
             "joint_contract": contract,
             "final_selected_candidate": selected_route,
-            "final_selected_fold_losses": list(losses[selected]),
+            "final_selected_fold_losses": list(selection.final_selected_fold_losses),
             "final_selected_prediction_path": str(prediction_path.relative_to(output)),
             "final_selected_contract": contract,
             "final_prediction_loss": final_loss,

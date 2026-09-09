@@ -1,5 +1,14 @@
 # PRISM v2 Modular CPU — numerically frozen branch
 
+## r3 strict-OOF branch override
+
+For branch `prism-v2-1-1-public5-cz-neural3-level-r3-strict-oof`, the governing
+selection amendment is `configs/strict_nested_oof_selection_v1.json`, followed
+by `docs/STRICT_NESTED_OOF_IDENTITY_INCREMENT_PROTOCOL.md`. They supersede the
+neutral-candidate and one-SE clauses below for K/C/W/A routing. Zero is an
+external identity increment, is never tuned, and never blocks a later stage.
+Uncertainty and stability statistics are reporting-only.
+
 For branch `prism-v2-modular-cpu-frozen`, authority is, in descending order:
 
 1. `PRISM_V2_MODULAR_NUMERICALLY_FROZEN/PRISM_V2_ASSEMBLY_CONFIG_FROZEN.json`;

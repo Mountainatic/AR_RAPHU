@@ -1,5 +1,14 @@
 # 项目持久约束：AR-RAPHU v2 验证
 
+## r3 strict-OOF 分支覆盖规则（2026-09-09）
+
+在分支 `prism-v2-1-1-public5-cz-neural3-level-r3-strict-oof` 上，
+`PRISM_INDUSTRIAL_BENCHMARK_V1/configs/strict_nested_oof_selection_v1.json`
+和 `docs/STRICT_NESTED_OOF_IDENTITY_INCREMENT_PROTOCOL.md` 覆盖本文件及历史
+协议里所有会影响 K/C/W/A 之 0/nonzero 路由的 one-SE、最小增益、正 fold
+比例、CI、bootstrap、复杂度偏好和近零归零规则。零是外部 identity
+increment，不属于候选空间，也不阻断后续 stage；证据统计只能报告。
+
 本文件是本项目后续 Codex 会话必须遵守的项目记忆。开始任何实现、数据处理、下载或实验前，必须完整阅读：
 
 1. `AR_RAPHU_method_v2.md`

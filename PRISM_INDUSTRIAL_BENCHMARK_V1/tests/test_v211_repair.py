@@ -141,7 +141,7 @@ def test_w_three_of_four_usable_folds():
     assert len(candidates) > 1
 
 
-def test_w_exact_zero_k_forces_identity():
+def test_w_constant_latent_has_no_internal_zero_candidate():
     v211, v21, v2 = _w_configs()
     candidates, audit = w_candidate_scope(
         v211,
@@ -153,9 +153,9 @@ def test_w_exact_zero_k_forces_identity():
         k_exact_zero=True,
         fold_train_latents=[np.ones(100) for _ in range(4)],
     )
-    assert candidates == [IDENTITY]
+    assert candidates == []
     assert audit["identity_forced"] is True
-    assert audit["reason"] == "K_EXACT_ZERO"
+    assert audit["reason"] == "INSUFFICIENT_USABLE_LATENT_FOLDS"
 
 
 def test_w_exact_zero_identity_has_a_registered_identity_ablation():

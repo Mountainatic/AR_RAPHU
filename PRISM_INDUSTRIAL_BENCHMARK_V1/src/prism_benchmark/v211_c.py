@@ -14,7 +14,7 @@ from .cpu_selection import mse, regression_metrics
 from .stage0 import write_json
 from .v2_c import _ridge_fit, fit_physical_features
 from .v2_k import _cap
-from .v2_selection import one_se_select
+from .strict_oof_selection import strict_nested_oof_select
 from .v2_runtime import run_parallel
 from .v21_views import sru_input_views
 from .v211_config import load_v211_configs
@@ -292,10 +292,13 @@ def run_c_view(
                 family: candidate_losses[(family, selected_alphas[family])]
                 for family in families
             }
-            family_selection = one_se_select(
+            family_selection = strict_nested_oof_select(
                 family_losses,
-                lambda family: (0 if family == COMPRESSED else 1,),
-                minimum_usable_folds=minimum_folds,
+                fold_best_channel_losses[best_channel],
+                identity=BEST_ACTIVE_K,
+                fold_weights=[len(target) for target in fold_targets],
+                minimum_inner_folds=max(2, minimum_folds - 1),
+                minimum_outer_folds=minimum_folds,
             )
             family_selection_json = family_selection.to_json()
             y_oof = np.concatenate(fold_targets)
@@ -320,10 +323,8 @@ def run_c_view(
                     ),
                     **gate_parameters,
                 )
-            requested_family = str(family_selection.selected)
-            oof_selected_family = select_c_family_with_fallback(
-                requested_family, family_gates
-            )
+            requested_family = str(family_selection.final_selected_candidate)
+            oof_selected_family = requested_family
             final_train = _cap(
                 assembly_train, int(v2["row_caps"]["joint_physical_fit"])
             )
@@ -339,11 +340,9 @@ def run_c_view(
             )
             best_index = final_features["channels"].index(best_channel)
             best_k_validation = final_features["compressed_evaluation"][:, best_index]
+            # No representation or preservation gate may override the strict
+            # parent/child OOF decision.  Only a numerical refit failure aborts.
             final_order = [oof_selected_family]
-            if oof_selected_family == JOINT_BASIS:
-                final_order.append(COMPRESSED)
-            if BEST_ACTIVE_K not in final_order:
-                final_order.append(BEST_ACTIVE_K)
             final_attempts: dict[str, dict[str, Any]] = {}
             selected_payload: dict[str, Any] | None = None
             for family in final_order:
@@ -397,15 +396,12 @@ def run_c_view(
                     **gate_parameters,
                 )
                 final_numerical_pass = numerical_contract_passes(family_contract)
-                formal_pass = bool(
-                    family_oof_gate.get("pass", False) and final_numerical_pass
-                )
+                formal_pass = bool(final_numerical_pass)
                 formal_gate = {
                     **family_oof_gate,
-                    "status": "INPUT_PATH_PRESERVED"
-                    if formal_pass
-                    else "INPUT_PATH_COLLAPSED",
-                    "pass": formal_pass,
+                    "status": "REPORTING_ONLY",
+                    "pass": bool(family_oof_gate.get("pass", False)),
+                    "selection_eligible": False,
                     "final_refit_numerical_certificate_passed": final_numerical_pass,
                 }
                 combined_gate = attach_nonselecting_validation_confirmation(
@@ -423,18 +419,19 @@ def run_c_view(
                     "alpha": family_alpha,
                     "input_path_preservation": combined_gate,
                 }
-                if formal_pass:
-                    selected_payload = payload
-                    break
-                if family == BEST_ACTIVE_K:
-                    selected_payload = payload
+                if not formal_pass:
+                    raise RuntimeError(
+                        "strictly selected C candidate failed final numerical refit"
+                    )
+                selected_payload = payload
+                break
             if selected_payload is None:
                 raise RuntimeError("C fallback order produced no final candidate")
             selected_family = str(selected_payload["family"])
             selected_alpha = float(selected_payload["alpha"])
             prediction = np.asarray(selected_payload["prediction"], dtype=np.float64)
             contract = dict(selected_payload["contract"])
-            selected_fold_losses = list(selected_payload["fold_losses"])
+            selected_fold_losses = list(family_selection.final_selected_fold_losses)
             input_gate = {
                 **selected_payload["gate"],
                 "requested_family": requested_family,
@@ -442,14 +439,11 @@ def run_c_view(
                 "family_gates": family_gates,
                 "final_attempts": final_attempts,
             }
-            if not input_gate["pass"]:
-                selection_status = "C_INPUT_PATH_COLLAPSE_BUG"
-            elif selected_family == BEST_ACTIVE_K:
-                selection_status = "C_FALLBACK_TO_BEST_ACTIVE_K"
-            elif selected_family != oof_selected_family:
-                selection_status = "C_FALLBACK_TO_COMPRESSED"
-            else:
-                selection_status = "C_REPRESENTATION_SELECTED"
+            selection_status = (
+                "C_ZERO_IDENTITY"
+                if selected_family == BEST_ACTIVE_K
+                else "C_STRICT_NESTED_OOF_SELECTED"
+            )
 
         if selected_family == BEST_ACTIVE_K:
             selected_oof_predictions = fold_best_channel_predictions[best_channel]
@@ -459,8 +453,18 @@ def run_c_view(
                 for evaluation in fold_evaluations
             ]
         else:
-            selected_oof_predictions = candidate_predictions[
-                (selected_family, selected_alpha)
+            outer_winners = dict(
+                zip(
+                    family_selection.outer_fold_indices,
+                    family_selection.outer_selected_nonzero_candidates,
+                    strict=True,
+                )
+            )
+            selected_oof_predictions = [
+                candidate_predictions[
+                    (str(outer_winners[fold]), selected_alphas[str(outer_winners[fold])])
+                ][fold]
+                for fold in range(len(fold_evaluations))
             ]
         oof_frames = []
         oof_losses = []
@@ -526,6 +530,11 @@ def run_c_view(
             "selected_family": selected_family,
             "selected_alpha": float(selected_alpha),
             "selection_status": selection_status,
+            "routing_status": (
+                "ZERO_IDENTITY"
+                if family_selection_json is None
+                else family_selection_json["routing_status"]
+            ),
             "ridge_semantics": "NUMERICAL_STABILITY_ONLY",
             "channel_contracts": final_features.get("channel_contracts", []),
             "global_joint_columns": final_features.get("global_joint_columns", []),

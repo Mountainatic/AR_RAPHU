@@ -20,8 +20,8 @@ from .v2_c import fit_physical_features
 from .v2_k import _cap
 from .v2_numerics import solve_certified_gram
 from .v2_runtime import ordered_fork_map
-from .v2_selection import one_se_select, practical_activation
-from .v21_selection import guarded_local_one_se_select
+from .strict_oof_selection import strict_nested_oof_select, tune_best_nonzero
+from .v2_selection import practical_activation
 from .v211_c import _gate_config
 from .v211_config import load_v211_configs
 from .v211_joint import (
@@ -441,12 +441,15 @@ def select_predictive_eta(
     *,
     minimum_usable_folds: int = 4,
 ) -> tuple[float, dict[str, Any]]:
-    selection = one_se_select(
-        eta_fold_losses,
-        lambda eta: (-float(eta),),
-        minimum_usable_folds=minimum_usable_folds,
+    selected = tune_best_nonzero(
+        eta_fold_losses, minimum_usable_folds=minimum_usable_folds
     )
-    return float(selection.selected), selection.to_json()
+    return float(selected), {
+        "selected": float(selected),
+        "selection_rule": "MINIMUM_EMPIRICAL_RISK_IN_NONZERO_FAMILY",
+        "one_se_used": False,
+        "complexity_preference_used": False,
+    }
 
 
 def select_k_representation(
@@ -457,16 +460,12 @@ def select_k_representation(
     minimum_positive_fraction: float,
     minimum_usable_folds: int = 4,
 ) -> tuple[str, dict[str, Any]]:
-    selection = guarded_local_one_se_select(
-        {
-            CHANNEL_COMPRESSED: compressed_losses,
-            FULL_BASIS: full_losses,
-        },
-        lambda value: (0 if value == CHANNEL_COMPRESSED else 1,),
-        neutral=CHANNEL_COMPRESSED,
-        minimum_relative_improvement=minimum_relative_improvement,
-        minimum_positive_fraction=minimum_positive_fraction,
-        minimum_usable_folds=minimum_usable_folds,
+    selection = strict_nested_oof_select(
+        {FULL_BASIS: full_losses},
+        compressed_losses,
+        identity=CHANNEL_COMPRESSED,
+        minimum_inner_folds=max(2, minimum_usable_folds - 1),
+        minimum_outer_folds=minimum_usable_folds,
     )
     return str(selection.final_selected_candidate), selection.to_json()
 
@@ -482,41 +481,18 @@ def stability_guarded_selection_json(selection: Any) -> dict[str, Any]:
     def descriptor(candidate: StabilityCandidate) -> dict[str, Any]:
         return {"candidate_key": candidate.key(), **candidate.descriptor()}
 
-    return {
-        "best_candidate": descriptor(selection.best_candidate),
-        "best_mean": float(selection.best_mean),
-        "best_standard_error": float(selection.best_standard_error),
-        "acceptable_threshold": float(selection.acceptable_threshold),
-        "acceptable_candidates": [
-            descriptor(candidate) for candidate in selection.acceptable_candidates
-        ],
-        "passing_active_candidates": [
-            descriptor(candidate)
-            for candidate in selection.passing_active_candidates
-        ],
-        "final_selected_candidate": descriptor(
-            selection.final_selected_candidate
-        ),
-        "final_selected_fold_losses": [
-            float(value) for value in selection.final_selected_fold_losses
-        ],
-        "activation_audit": {
-            candidate.key(): audit
-            for candidate, audit in selection.activation_audit.items()
-        },
-        "usable_fold_count": {
-            candidate.key(): int(value)
-            for candidate, value in selection.usable_fold_count.items()
-        },
-        "means": {
-            candidate.key(): float(value)
-            for candidate, value in selection.means.items()
-        },
-        "standard_errors": {
-            candidate.key(): float(value)
-            for candidate, value in selection.standard_errors.items()
-        },
-    }
+    result = selection.to_json()
+    result["tuned_nonzero_candidate"] = descriptor(
+        selection.tuned_nonzero_candidate
+    )
+    result["final_selected_candidate"] = descriptor(
+        selection.final_selected_candidate
+    )
+    result["outer_selected_nonzero_candidates"] = [
+        descriptor(candidate)
+        for candidate in selection.outer_selected_nonzero_candidates
+    ]
+    return result
 
 
 def _evaluate_candidate(candidate_index: int) -> dict[str, Any]:
@@ -1188,20 +1164,16 @@ def run_joint_stability_view(
             }
 
         neutral = route_best[J_K]
-        route_selection = guarded_local_one_se_select(
+        route_selection = strict_nested_oof_select(
             {
                 candidate: evaluation_by_candidate[candidate]["fold_losses"]
-                for candidate in route_best.values()
+                for route, candidate in route_best.items()
+                if route != J_K
             },
-            lambda candidate: (
-                JOINT_CANDIDATES.index(candidate.route),
-                0 if candidate.k_representation == CHANNEL_COMPRESSED else 1,
-                -candidate.predictive_eta,
-            ),
-            neutral=neutral,
-            minimum_relative_improvement=minimum_relative,
-            minimum_positive_fraction=minimum_positive,
-            minimum_usable_folds=4,
+            evaluation_by_candidate[neutral]["fold_losses"],
+            identity=neutral,
+            minimum_inner_folds=3,
+            minimum_outer_folds=4,
         )
         selected = route_selection.final_selected_candidate
         gate_parameters = _gate_config(v211)

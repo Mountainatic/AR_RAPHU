@@ -21,7 +21,7 @@ from .v21_a import (
     mature_residual_features,
     predict_mature_residual_ar,
 )
-from .v21_selection import guarded_local_one_se_select
+from .strict_oof_selection import strict_nested_oof_select
 from .v211_config import load_v211_configs
 from .v211_support import load_native_samples, support_id_hash
 A_INNER_WORKERS_ENV = "PRISM_V211_A_INNER_WORKERS"
@@ -284,14 +284,17 @@ def run_a_view(
         profiles = realized_state_profiles(view.head)
         alphas = [float(value) for value in v2["A_module"]["ridge_alpha_grid"]]
         mus = [float(value) for value in v21["A"]["soft_overlap_mu"]]
-        candidates: list[Any] = [EXACT_ZERO]
-        candidates.extend(
+        # H_A^+ contains only genuine residual-state models.  EXACT_ZERO is
+        # supplied separately as the external identity increment.
+        candidates: list[Any] = list(
             (MATURE_RESIDUAL_AR, profile, alpha, mu)
             for profile in profiles
             for alpha in alphas
             for mu in mus
         )
         losses = {candidate: [] for candidate in candidates}
+        zero_losses: list[float] = []
+        fold_weights: list[int] = []
         fold_means: dict[str, float] = {}
         coverage: dict[str, list[float]] = {str(profile): [] for profile in profiles}
         usable_folds = sorted(int(value) for value in oof["oof_fold"].unique())[1:]
@@ -302,9 +305,10 @@ def run_a_view(
             fold_means[str(fold)] = residual_mean
             y_fit = fit["residual"].to_numpy(dtype=np.float64)
             y_eval = evaluation["residual"].to_numpy(dtype=np.float64)
-            losses[EXACT_ZERO].append(
+            zero_losses.append(
                 float(np.mean(y_eval * y_eval, dtype=np.float64))
             )
+            fold_weights.append(len(evaluation))
             upstream_columns = [*contribution_columns, "delta_w_oof"]
             if not contribution_columns:
                 upstream_columns.insert(0, "physical_oof")
@@ -363,29 +367,15 @@ def run_a_view(
                         candidate_loss
                     )
 
-        def complexity(candidate: Any) -> tuple[Any, ...]:
-            if candidate == EXACT_ZERO:
-                return (0,)
-            _, profile, alpha, mu = candidate
-            return (
-                1,
-                int(profile[1]),
-                -int(profile[0]),
-                -float(alpha),
-                -float(mu),
-            )
-
-        selection = guarded_local_one_se_select(
+        selection = strict_nested_oof_select(
             losses,
-            complexity,
-            neutral=EXACT_ZERO,
-            minimum_relative_improvement=float(
-                v21["selection"]["minimum_relative_improvement"]["A"]
+            zero_losses,
+            identity=EXACT_ZERO,
+            fold_weights=fold_weights,
+            minimum_inner_folds=max(
+                2, int(v21["selection"]["minimum_usable_folds"]) - 1
             ),
-            minimum_positive_fraction=float(
-                v21["selection"]["minimum_positive_fold_fraction"]
-            ),
-            minimum_usable_folds=int(v21["selection"]["minimum_usable_folds"]),
+            minimum_outer_folds=int(v21["selection"]["minimum_usable_folds"]),
         )
         selected = selection.final_selected_candidate
         residual_mean = float(oof["residual"].mean())
@@ -502,11 +492,7 @@ def run_a_view(
             and validation_relative_gain < gain_threshold
         )
         active_near_zero_audit = {
-            "required": bool(
-                v211.get("A", {}).get(
-                    "active_near_zero_must_materialize_as_exact_zero", False
-                )
-            ),
+            "required": False,
             "effective_prediction_variance_ratio": effective_prediction_variance_ratio,
             "variance_ratio_threshold": variance_threshold,
             "maximum_nonintercept_coefficient_abs": maximum_nonintercept_coefficient_abs,
@@ -514,23 +500,10 @@ def run_a_view(
             "validation_relative_gain": validation_relative_gain,
             "relative_gain_threshold": gain_threshold,
             "all_three_below_threshold": active_near_zero,
-            "threshold_source": "FROZEN_V211_NUMERICAL_ZERO_AND_A_ACTIVATION_GATES",
+            "threshold_source": "LEGACY_REPORTING_ONLY_NO_SELECTION_AUTHORITY",
             "materialized_as_exact_zero": False,
+            "selection_eligible": False,
         }
-        if active_near_zero and active_near_zero_audit["required"]:
-            selected = EXACT_ZERO
-            residual_prediction = np.zeros(len(validation_frame), dtype=np.float64)
-            contract = {
-                "family": EXACT_ZERO,
-                "parameter_count": 0,
-                "soft_overlap_mu": 0.0,
-                "hard_feature_residualization": False,
-                "numerical_certificate": {"status": "EXACT_ZERO"},
-                "reason": "ACTIVE_NEAR_ZERO_REMATERIALIZED",
-            }
-            selected_coverage = 1.0
-            prediction = validation_frame["physical_w"].to_numpy(dtype=np.float64)
-            active_near_zero_audit["materialized_as_exact_zero"] = True
         kca_residual, kca_contract, kca_coverage = _fit_frozen_a_route(
             oof,
             validation_frame,
@@ -631,6 +604,8 @@ def run_a_view(
             "selected_candidate": str(selected),
             "a_contract": contract,
             "selection": selection.to_json(),
+            "routing_status": selection.routing_status,
+            "identity_fold_losses": zero_losses,
             "candidate_fold_losses": {
                 str(key): value for key, value in losses.items()
             },
@@ -653,7 +628,7 @@ def run_a_view(
             "active_near_zero_audit": active_near_zero_audit,
             "hard_feature_residualization": False,
             "final_selected_candidate": str(selected),
-            "final_selected_fold_losses": list(losses[selected]),
+            "final_selected_fold_losses": list(selection.final_selected_fold_losses),
             "final_selected_prediction_path": str(prediction_path.relative_to(output)),
             "final_selected_contract": contract,
             "final_prediction_loss": final_loss,

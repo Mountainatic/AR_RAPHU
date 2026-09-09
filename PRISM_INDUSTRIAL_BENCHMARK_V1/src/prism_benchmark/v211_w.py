@@ -21,7 +21,7 @@ from .v2_c import _ridge_fit, fit_physical_features
 from .v2_k import _cap
 from .v2_numerics import difference_penalty, solve_certified
 from .v2_w import _ispline_fixed, fit_w_candidate as fit_hard_projection_replay
-from .v21_selection import guarded_local_one_se_select
+from .strict_oof_selection import strict_nested_oof_select
 from .v21_w import _psd_root, _standardized_columns, soft_overlap_penalty
 from .v211_config import load_v211_configs
 from .v2_runtime import ordered_fork_map, run_parallel
@@ -422,7 +422,8 @@ def _w_candidates(
     direction: int,
     monotone: bool,
 ) -> list[Any]:
-    candidates: list[Any] = [IDENTITY]
+    # Identity is an external increment and must never enter H_W^+.
+    candidates: list[Any] = []
     smoothness = [float(value) for value in v2["W_module"]["smoothness_penalties"]]
     mus = [float(value) for value in v211["W"]["soft_overlap_mu"]]
     include_monotone = bool(
@@ -472,10 +473,7 @@ def w_candidate_scope(
     ]
     usable = sum(bool(audit["pass"]) for audit in audits)
     minimum = int(rule["minimum_usable_folds"])
-    if k_exact_zero:
-        reason = "K_EXACT_ZERO"
-        nonlinear_allowed = False
-    elif usable < minimum:
+    if usable < minimum:
         reason = "INSUFFICIENT_USABLE_LATENT_FOLDS"
         nonlinear_allowed = False
     elif not input_path_preserved:
@@ -487,7 +485,7 @@ def w_candidate_scope(
     candidates = (
         _w_candidates(v211, v21, v2, direction, monotone)
         if nonlinear_allowed
-        else [IDENTITY]
+        else []
     )
     return candidates, {
         "input_path_preserved": bool(input_path_preserved),
@@ -496,9 +494,8 @@ def w_candidate_scope(
         "usable_fold_count": int(usable),
         "minimum_usable_folds": minimum,
         "nonlinear_candidates_allowed": bool(nonlinear_allowed),
-        "formal_nonlinear_interpretation_allowed": bool(
-            nonlinear_allowed and input_path_preserved
-        ),
+        # Input-path diagnostics cannot suppress a positive OOF increment.
+        "formal_nonlinear_interpretation_allowed": bool(nonlinear_allowed),
         "identity_forced": not nonlinear_allowed,
         "raw_absolute_variance_gate_used": False,
         "reason": reason,
@@ -839,8 +836,6 @@ def run_w_view(
             candidate_numeric_audit[str(candidate)].append(audit)
 
         def complexity(candidate: Any) -> tuple[Any, ...]:
-            if candidate == IDENTITY:
-                return (0,)
             family, knots, smoothness, mu, _ = candidate
             return (
                 1,
@@ -854,8 +849,7 @@ def run_w_view(
         applicable_nonlinear = [
             candidate
             for candidate in candidates
-            if candidate != IDENTITY
-            and int(np.count_nonzero(np.isfinite(losses[candidate])))
+            if int(np.count_nonzero(np.isfinite(losses[candidate])))
             >= minimum_usable
         ]
         joint_basis_candidate = (
@@ -877,38 +871,53 @@ def run_w_view(
             else None
         )
 
-        selection = guarded_local_one_se_select(
-            losses,
-            complexity,
-            neutral=IDENTITY,
-            minimum_relative_improvement=float(
-                rule["minimum_relative_mse_improvement"]
-            ),
-            minimum_positive_fraction=float(rule["minimum_positive_fold_fraction"]),
-            minimum_usable_folds=int(rule["minimum_usable_folds"]),
+        identity_losses = [
+            mse(item[7], item[3]) for item in fold_inputs
+        ]
+        selection = (
+            strict_nested_oof_select(
+                {candidate: losses[candidate] for candidate in applicable_nonlinear},
+                identity_losses,
+                identity=IDENTITY,
+                fold_weights=[len(item[1]) for item in fold_inputs],
+                minimum_inner_folds=max(2, minimum_usable - 1),
+                minimum_outer_folds=minimum_usable,
+            )
+            if applicable_nonlinear
+            else None
         )
-        diagnostic_selected = selection.final_selected_candidate
+        diagnostic_selected = (
+            selection.final_selected_candidate if selection is not None else IDENTITY
+        )
         formal_allowed = bool(
             candidate_scope["formal_nonlinear_interpretation_allowed"]
         )
         selected = diagnostic_selected if formal_allowed else IDENTITY
-        # The formal PF activation decision remains exactly the guarded v2.1.1
-        # selection above.  The Metro transfer audit also pre-registers a W-on
-        # ablation when PF selects identity.  Freeze that ablation from the
-        # development-loss-best applicable non-identity construction; it is
-        # never selection eligible and never changes ``selected``.
+        # The Metro transfer audit retains a W-on ablation when PF selects the
+        # external identity.  It is reporting-only and never changes routing.
         pf_ablation_candidate = _pf_ablation_candidate(selected, joint_basis_candidate)
         if pf_ablation_candidate is None:
             raise RuntimeError(
                 "no applicable non-identity W construction for the registered ablation"
             )
         selection_status = (
-            "W_RESCUE_DIAGNOSTIC_ONLY"
-            if not input_path_preserved and not k_exact_zero
-            else "W_FORMAL_SELECTION"
+            "W_NONZERO_FAMILY_INFEASIBLE"
+            if selection is None
+            else "W_STRICT_NESTED_OOF_SELECTION"
+        )
+        outer_winners = (
+            dict(
+                zip(
+                    selection.outer_fold_indices,
+                    selection.outer_selected_nonzero_candidates,
+                    strict=True,
+                )
+            )
+            if selection is not None and selection.active
+            else {}
         )
         oof_frames = []
-        for item in fold_inputs:
+        for fold_position, item in enumerate(fold_inputs):
             (
                 fold,
                 evaluation,
@@ -919,14 +928,15 @@ def run_w_view(
                 fit_target,
                 _,
             ) = item
+            fold_selected = outer_winners.get(fold_position, IDENTITY)
             correction, _ = _fit_registered_w(
-                selected,
+                fold_selected,
                 fit_latent,
                 fit_target,
                 evaluation_latent,
                 fit_upstream,
             )
-            if pf_ablation_candidate == selected:
+            if pf_ablation_candidate == fold_selected:
                 ablation_correction = correction.copy()
             else:
                 ablation_correction, _ = _fit_registered_w(
@@ -1132,7 +1142,11 @@ def run_w_view(
             "input_path_preservation": c_result.get("input_path_preservation", {}),
             "input_path_nonzero": input_path_preserved,
             "c_final_contract": c_contract,
-            "selection": selection.to_json(),
+            "selection": None if selection is None else selection.to_json(),
+            "routing_status": (
+                "ZERO_IDENTITY" if selection is None else selection.routing_status
+            ),
+            "identity_fold_losses": identity_losses,
             "candidate_fold_losses": {
                 str(key): value for key, value in losses.items()
             },
@@ -1192,7 +1206,11 @@ def run_w_view(
             "oof_path": str(oof_path.relative_to(output)),
             "oof_sha256": sha256_file(oof_path),
             "final_selected_candidate": str(selected),
-            "final_selected_fold_losses": list(losses[selected]),
+            "final_selected_fold_losses": (
+                identity_losses
+                if selection is None
+                else list(selection.final_selected_fold_losses)
+            ),
             "final_selected_prediction_path": str(prediction_path.relative_to(output)),
             "final_selected_contract": contract,
             "final_prediction_loss": final_loss,
