@@ -4,12 +4,20 @@ import numpy as np
 import pandas as pd
 
 from experiments.tim_validation.e6_robustness.n1_gaussian import (
+    _materialization_guard,
     _adjust_dynamic_sample_targets,
     _full_record,
     outer_train_sigma,
     perturb_gaussian_process_only,
     perturb_process_measurements,
 )
+
+
+def test_materialization_guard_creates_a_reusable_lock(tmp_path) -> None:
+    with _materialization_guard(tmp_path):
+        assert (tmp_path / ".materialization.lock").is_file()
+    with _materialization_guard(tmp_path):
+        pass
 
 
 def test_gaussian_levels_are_nested_and_target_missingness_is_preserved() -> None:

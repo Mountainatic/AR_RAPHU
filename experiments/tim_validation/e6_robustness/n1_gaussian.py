@@ -15,6 +15,7 @@ import math
 import os
 import shutil
 import time
+from contextlib import contextmanager
 import zlib
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -345,6 +346,29 @@ def _remove_case_work(path: Path, run_root: Path) -> None:
     shutil.rmtree(resolved)
 
 
+@contextmanager
+def _materialization_guard(run_root: Path):
+    """Serialize the high-memory dataframe materialization phase on Linux.
+
+    Case inference remains parallel.  Avoiding simultaneous full-frame copies
+    lets a larger process pool use otherwise idle CPU without breaching the
+    container memory limit.
+    """
+    lock_path = run_root / ".materialization.lock"
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    with lock_path.open("a+b") as stream:
+        try:
+            import fcntl
+        except ImportError:  # pragma: no cover - Windows development hosts
+            yield
+            return
+        fcntl.flock(stream.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+
+
 def _full_record(result: dict[str, Any]) -> dict[str, Any]:
     records = {
         str(value.get("model")): value
@@ -373,23 +397,24 @@ def _run_case(job: dict[str, Any]) -> dict[str, Any]:
     prediction_root = case_root / "predictions"
     case_result_path = run_root / "cases" / f"{label}.json"
     started = time.time()
-    materialization = _materialize_case(
-        clean_shared,
-        case_shared,
-        task=str(job["task"]),
-        dataset=str(job["dataset"]),
-        target=str(job["target"]),
-        seed=seed,
-        alpha=alpha,
-        sigma=dict(job["sigma"]),
-        perturbation=str(job["perturbation"]),
-        direction=direction,
-        measurement_scope=str(job["measurement_scope"]),
-        head_id=str(job["head_id"]),
-        information_set=str(job["information_set"]),
-        availability_scenario=str(job["availability_scenario"]),
-        proxy_policy=str(job["proxy_policy"]),
-    )
+    with _materialization_guard(run_root):
+        materialization = _materialize_case(
+            clean_shared,
+            case_shared,
+            task=str(job["task"]),
+            dataset=str(job["dataset"]),
+            target=str(job["target"]),
+            seed=seed,
+            alpha=alpha,
+            sigma=dict(job["sigma"]),
+            perturbation=str(job["perturbation"]),
+            direction=direction,
+            measurement_scope=str(job["measurement_scope"]),
+            head_id=str(job["head_id"]),
+            information_set=str(job["information_set"]),
+            availability_scenario=str(job["availability_scenario"]),
+            proxy_policy=str(job["proxy_policy"]),
+        )
     os.environ[INFERENCE_ONLY_ENV] = "1"
     paths = PublicAllPaths(
         Path(job["project"]), case_shared, Path(job["selection_root"])
