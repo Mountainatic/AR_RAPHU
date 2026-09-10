@@ -1,0 +1,58 @@
+{
+  "contract_status": "C1_SEMANTICS_APPROVED",
+  "protocol_id": "STRICT_OOF_PUBLIC5_HYBRID_HW_PUBLIC3_C1_V1",
+  "evidence_class": "DEVELOPMENT_ONLY_HYBRID_HW_SMOKE_RUN",
+  "target_index_contract": "HALF_OPEN_V1",
+  "time_realization_contract": "ROUND_HALF_UP_V1",
+  "purge_contract": "DEPENDENCY_INTERVAL_V1",
+  "debutanizer_availability_contract": "SHIFTED_SOURCE_TARGET_V1",
+  "tep_availability_contract": "SAME_ROW_TARGET_V1",
+  "extra_dependency_interval_seconds": 600,
+  "output_policy": "REFUSE_EXISTING",
+  "tasks": [
+    {
+      "task_id": "DEB_C4",
+      "dataset": "debutanizer",
+      "target": "y",
+      "cadence_seconds": 360,
+      "horizons_seconds": [1800],
+      "primary_horizon_seconds": 1800,
+      "window_seconds": 360,
+      "availability_delays_steps": [0, 10],
+      "proxy_policies": ["primary"]
+    },
+    {
+      "task_id": "PMSM_PM5",
+      "dataset": "pmsm",
+      "target": "pm",
+      "cadence_seconds": 0.5,
+      "horizons_seconds": [300],
+      "primary_horizon_seconds": 300,
+      "window_seconds": 30,
+      "availability_delays_steps": [0],
+      "proxy_policies": ["proxy_excluded", "full_sensor_secondary"]
+    },
+    {
+      "task_id": "METRO_P60",
+      "dataset": "metropt",
+      "target": "Reservoirs",
+      "cadence_seconds": 10,
+      "horizons_seconds": [60],
+      "primary_horizon_seconds": 60,
+      "window_seconds": 10,
+      "availability_delays_steps": [0],
+      "proxy_policies": ["proxy_excluded", "full_sensor_secondary"]
+    },
+    {
+      "task_id": "METRO_OIL20",
+      "dataset": "metropt",
+      "target": "Oil_temperature",
+      "cadence_seconds": 10,
+      "horizons_seconds": [1200],
+      "primary_horizon_seconds": 1200,
+      "window_seconds": 120,
+      "availability_delays_steps": [0],
+      "proxy_policies": ["primary"]
+    }
+  ]
+}
