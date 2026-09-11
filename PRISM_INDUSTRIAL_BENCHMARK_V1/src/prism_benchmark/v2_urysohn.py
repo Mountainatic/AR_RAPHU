@@ -292,6 +292,11 @@ def prepare_contract_fit(
         raise ValueError("invalid prepared Urysohn fit inputs")
     basis = AmplitudeBasis.fit(values, int(requested_m_x))
     phi = tensor_design(values, basis)
+    linear_design = (
+        phi[:, :, 0]
+        if basis.dimension > 0
+        else phi.reshape(len(phi), 0)
+    )
     return PreparedContractFit(
         values,
         y,
@@ -299,7 +304,7 @@ def prepare_contract_fit(
         basis,
         phi,
         DesignStatistics.from_design(phi.reshape(len(phi), -1), y),
-        DesignStatistics.from_design(phi[:, :, 0], y),
+        DesignStatistics.from_design(linear_design, y),
     )
 
 

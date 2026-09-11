@@ -126,6 +126,26 @@ def test_prepared_rank_fits_reuse_full_surface_initialization() -> None:
     assert list(prepared._full_solution_cache) == [lambdas]
 
 
+def test_prepared_constant_channel_preserves_exact_zero_semantics() -> None:
+    values = np.ones((120, 5), dtype=np.float64)
+    target = np.linspace(-1.0, 1.0, len(values), dtype=np.float64)
+    for family, m_x in (
+        ("LINEAR_DISTRIBUTED_LAG", 1),
+        ("RANK_1_URYSOHN", 4),
+        ("FULL_FINITE_URYSOHN", 4),
+    ):
+        requested = 1 if family == "LINEAR_DISTRIBUTED_LAG" else m_x
+        prepared = prepare_contract_fit(values, target, requested)
+        assert prepared.phi.shape == (120, 5, 0)
+        assert prepared.full_statistics.gram.shape == (0, 0)
+        assert prepared.linear_statistics.gram.shape == (0, 0)
+        contract = fit_prepared_contract(
+            prepared, family, m_x, (1e-4, 1e-3, 1e-2)
+        )
+        assert contract["family"] == "EXACT_ZERO"
+        assert contract["certificate"]["reason"] == "CONSTANT_CHANNEL"
+
+
 def test_projected_statistics_match_materialized_als_designs() -> None:
     rng = np.random.default_rng(20260912)
     phi = rng.normal(size=(137, 5, 4))
