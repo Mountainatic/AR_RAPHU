@@ -5,6 +5,10 @@ import pytest
 
 from prism_benchmark.v2_basis import tensor_design
 from prism_benchmark.v2_urysohn import (
+    DesignStatistics,
+    _component_transform,
+    _u_transform,
+    _v_transform,
     fit_contract,
     fit_prepared_contract,
     predict_contract,
@@ -119,3 +123,40 @@ def test_prepared_rank_fits_reuse_full_surface_initialization() -> None:
     )
 
     assert list(prepared._full_svd_cache) == [lambdas]
+    assert list(prepared._full_solution_cache) == [lambdas]
+
+
+def test_projected_statistics_match_materialized_als_designs() -> None:
+    rng = np.random.default_rng(20260912)
+    phi = rng.normal(size=(137, 5, 4))
+    target = rng.normal(size=len(phi))
+    full = DesignStatistics.from_design(phi.reshape(len(phi), -1), target)
+    u = rng.normal(size=(5, 3))
+    v = rng.normal(size=(4, 3))
+
+    cases = (
+        (
+            full.project(_u_transform(v, 5)),
+            np.einsum("tbx,xr->trb", phi, v).reshape(len(phi), -1),
+        ),
+        (
+            full.project(_v_transform(u, 4)),
+            np.einsum("tbx,br->trx", phi, u).reshape(len(phi), -1),
+        ),
+        (
+            full.project(_component_transform(u, v.T, 3)),
+            np.column_stack(
+                [
+                    np.einsum("tbx,b,x->t", phi, u[:, index], v[:, index])
+                    for index in range(3)
+                ]
+            ),
+        ),
+    )
+    for projected, materialized in cases:
+        explicit = DesignStatistics.from_design(materialized, target)
+        np.testing.assert_allclose(projected.gram, explicit.gram, rtol=2e-13, atol=2e-12)
+        np.testing.assert_allclose(projected.rhs, explicit.rhs, rtol=2e-13, atol=2e-12)
+        np.testing.assert_allclose(
+            projected.feature_sum, explicit.feature_sum, rtol=2e-13, atol=2e-12
+        )

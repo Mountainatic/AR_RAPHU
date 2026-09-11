@@ -58,6 +58,7 @@ from .v211_support import (
 EXACT_ZERO = "EXACT_ZERO"
 K_INNER_WORKERS_ENV = "PRISM_V211_K_INNER_WORKERS"
 K_CHECKPOINT_BATCH_ENV = "PRISM_V211_K_CHECKPOINT_BATCH"
+K_NUMERICAL_ENGINE = "PRISM_V211_K_SUFFICIENT_STATISTICS_ALS_V1"
 
 
 def _k_checkpoint_batch() -> int:
@@ -87,12 +88,19 @@ def _ordered_parallel_map(
     function: Callable[..., Any],
     jobs: Sequence[tuple[Any, ...]],
     workers: int,
+    *,
+    executor: ThreadPoolExecutor | None = None,
 ) -> list[Any]:
     """Evaluate independent jobs concurrently while preserving registration order."""
     if workers <= 1 or len(jobs) <= 1:
         return [function(*arguments) for arguments in jobs]
-    with ThreadPoolExecutor(max_workers=min(int(workers), len(jobs))) as executor:
+    if executor is not None:
         futures = [executor.submit(function, *arguments) for arguments in jobs]
+        return [future.result() for future in futures]
+    with ThreadPoolExecutor(max_workers=min(int(workers), len(jobs))) as local_executor:
+        futures = [
+            local_executor.submit(function, *arguments) for arguments in jobs
+        ]
         return [future.result() for future in futures]
 
 
@@ -547,49 +555,61 @@ def _run_structural_grid(
     )
     batch_size = max(int(inner_workers), _k_checkpoint_batch())
     index = len(checkpoint.losses)
-    while index < len(specs):
-        profile = tuple(specs[index][0])
-        m_tau = int(specs[index][1])
-        group_stop = index
-        while group_stop < len(specs):
-            candidate = specs[group_stop]
-            if tuple(candidate[0]) != profile or int(candidate[1]) != m_tau:
-                break
-            group_stop += 1
-        native_records = registered_fold_native_masks(
-            train,
-            folds,
-            fit_history_steps=int(profile[1]),
-            scoring_history_steps=int(local_comparison_history),
-            fit_cap=int(v2["row_caps"]["single_channel_k_fit"]),
-            evaluation_cap=int(v2["row_caps"]["validation_selection_per_fold"]),
-        )
-        prepared_records = _prepare_structural_records(
-            accessor, native_records, channel, profile, m_tau
-        )
-        while index < group_stop:
-            stop = min(group_stop, index + batch_size)
-            arguments = []
-            for spec in specs[index:stop]:
-                _, _, family, m_x, lambda_tau, lambda_x = spec
-                arguments.append(
-                    (
-                        prepared_records,
-                        str(family),
-                        int(m_x),
-                        (
-                            float(pilot_lambda_0),
-                            float(lambda_tau),
-                            float(lambda_x),
-                        ),
-                        v2,
-                    )
-                )
-            values = _ordered_parallel_map(
-                _evaluate_prepared_candidate, arguments, inner_workers
+    executor = (
+        ThreadPoolExecutor(max_workers=int(inner_workers))
+        if int(inner_workers) > 1
+        else None
+    )
+    try:
+        while index < len(specs):
+            profile = tuple(specs[index][0])
+            m_tau = int(specs[index][1])
+            group_stop = index
+            while group_stop < len(specs):
+                candidate = specs[group_stop]
+                if tuple(candidate[0]) != profile or int(candidate[1]) != m_tau:
+                    break
+                group_stop += 1
+            native_records = registered_fold_native_masks(
+                train,
+                folds,
+                fit_history_steps=int(profile[1]),
+                scoring_history_steps=int(local_comparison_history),
+                fit_cap=int(v2["row_caps"]["single_channel_k_fit"]),
+                evaluation_cap=int(v2["row_caps"]["validation_selection_per_fold"]),
             )
-            checkpoint.append(index, values)
-            index = stop
+            prepared_records = _prepare_structural_records(
+                accessor, native_records, channel, profile, m_tau
+            )
+            while index < group_stop:
+                stop = min(group_stop, index + batch_size)
+                arguments = []
+                for spec in specs[index:stop]:
+                    _, _, family, m_x, lambda_tau, lambda_x = spec
+                    arguments.append(
+                        (
+                            prepared_records,
+                            str(family),
+                            int(m_x),
+                            (
+                                float(pilot_lambda_0),
+                                float(lambda_tau),
+                                float(lambda_x),
+                            ),
+                            v2,
+                        )
+                    )
+                values = _ordered_parallel_map(
+                    _evaluate_prepared_candidate,
+                    arguments,
+                    inner_workers,
+                    executor=executor,
+                )
+                checkpoint.append(index, values)
+                index = stop
+    finally:
+        if executor is not None:
+            executor.shutdown(wait=True, cancel_futures=False)
     audit = checkpoint.complete()
     audit["checkpoint_path"] = str(
         (destination / "STRUCTURAL_CHECKPOINTS").relative_to(destination)
@@ -832,6 +852,7 @@ def run_k_channel(
                 "als_initialization_seeds": list(
                     v2["randomness"]["als_initialization_seeds"]
                 ),
+                "numerical_engine": K_NUMERICAL_ENGINE,
             },
         )
         structural_selection = strict_nested_oof_select(
