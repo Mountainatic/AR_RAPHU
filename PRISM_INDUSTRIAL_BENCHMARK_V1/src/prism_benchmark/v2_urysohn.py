@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from threading import Lock
 from typing import Any
 
 import numpy as np
@@ -64,6 +65,59 @@ def _factor_penalty(size: int, rank: int, lambda_0: float, smoothness: float) ->
     return np.kron(np.eye(rank, dtype=np.float64), block)
 
 
+@dataclass
+class PreparedContractFit:
+    """Reusable, fit-only transforms for one fixed fold/support and amplitude width."""
+
+    values: np.ndarray
+    target: np.ndarray
+    requested_m_x: int
+    basis: AmplitudeBasis
+    phi: np.ndarray
+    _full_svd_cache: dict[
+        tuple[float, float, float], tuple[np.ndarray, np.ndarray, np.ndarray]
+    ] = field(default_factory=dict, init=False, repr=False)
+    _full_svd_lock: Lock = field(default_factory=Lock, init=False, repr=False)
+
+    def full_svd(
+        self, lambdas: tuple[float, float, float]
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Return the deterministic full-surface initialization shared by ALS seeds/ranks."""
+
+        key = tuple(float(value) for value in lambdas)
+        with self._full_svd_lock:
+            cached = self._full_svd_cache.get(key)
+            if cached is not None:
+                return cached
+            m_tau, m_x = self.phi.shape[1:]
+            full_theta, _, _ = _centered_solve(
+                self.phi.reshape(len(self.phi), -1),
+                self.target,
+                surface_penalty(m_tau, m_x, *key),
+            )
+            value = np.linalg.svd(
+                full_theta.reshape(m_tau, m_x), full_matrices=False
+            )
+            self._full_svd_cache[key] = value
+            return value
+
+
+def prepare_contract_fit(
+    train_values: np.ndarray,
+    target: np.ndarray,
+    requested_m_x: int,
+) -> PreparedContractFit:
+    """Materialize deterministic basis features once for repeated hyperparameter fits."""
+
+    values = np.asarray(train_values, dtype=np.float64)
+    y = np.asarray(target, dtype=np.float64)
+    if values.ndim != 2 or y.shape != (len(values),):
+        raise ValueError("invalid prepared Urysohn fit inputs")
+    basis = AmplitudeBasis.fit(values, int(requested_m_x))
+    phi = tensor_design(values, basis)
+    return PreparedContractFit(values, y, int(requested_m_x), basis, phi)
+
+
 def _rank_als(
     phi: np.ndarray,
     target: np.ndarray,
@@ -75,12 +129,20 @@ def _rank_als(
     tolerance: float,
     maximum_increases: int,
     divergence_factor: float,
+    initial_svd: tuple[np.ndarray, np.ndarray, np.ndarray] | None = None,
 ) -> tuple[np.ndarray, float, dict[str, Any]]:
     lambda_0, lambda_tau, lambda_x = lambdas
     m_tau, m_x = phi.shape[1:]
-    full_design = phi.reshape(len(phi), -1)
-    full_theta, _, _ = _centered_solve(full_design, target, surface_penalty(m_tau, m_x, *lambdas))
-    left, singular, right = np.linalg.svd(full_theta.reshape(m_tau, m_x), full_matrices=False)
+    if initial_svd is None:
+        full_design = phi.reshape(len(phi), -1)
+        full_theta, _, _ = _centered_solve(
+            full_design, target, surface_penalty(m_tau, m_x, *lambdas)
+        )
+        left, singular, right = np.linalg.svd(
+            full_theta.reshape(m_tau, m_x), full_matrices=False
+        )
+    else:
+        left, singular, right = initial_svd
     rng = np.random.default_rng(seed)
     used = min(rank, len(singular))
     u = np.zeros((m_tau, rank), dtype=np.float64)
@@ -155,6 +217,109 @@ def _rank_als(
     }
 
 
+def fit_prepared_contract(
+    prepared: PreparedContractFit,
+    family: str,
+    m_x: int,
+    lambdas: tuple[float, float, float],
+    *,
+    als_seeds: tuple[int, ...] = (20260804, 20260805, 20260806),
+    als_max_iterations: int = 100,
+    als_tolerance: float = 1e-8,
+    als_max_increases: int = 5,
+    als_divergence_factor: float = 1e6,
+) -> dict[str, Any]:
+    """Fit one contract while reusing immutable fold-local transforms/statistics."""
+
+    if family == "EXACT_ZERO":
+        return {
+            "family": family,
+            "intercept": 0.0,
+            "theta": [],
+            "basis": None,
+            "certificate": {"status": "EXACT_ZERO"},
+            "parameter_count": 0,
+        }
+    requested = 1 if family == "LINEAR_DISTRIBUTED_LAG" else int(m_x)
+    if requested != prepared.requested_m_x:
+        raise ValueError(
+            "prepared amplitude width does not match the requested contract"
+        )
+    basis = prepared.basis
+    if basis.dimension == 0:
+        return {
+            "family": "EXACT_ZERO",
+            "intercept": 0.0,
+            "theta": [],
+            "basis": basis.metadata(),
+            "certificate": {
+                "status": "NOT_APPLICABLE",
+                "reason": "CONSTANT_CHANNEL",
+            },
+            "parameter_count": 0,
+        }
+    y = prepared.target
+    phi = prepared.phi
+    m_tau, realized_m_x = phi.shape[1:]
+    if family == "LINEAR_DISTRIBUTED_LAG":
+        coefficient, intercept, certificate = _centered_solve(
+            phi[:, :, 0],
+            y,
+            lambdas[0] * np.eye(m_tau)
+            + lambdas[1] * difference_penalty(m_tau),
+        )
+        theta = coefficient[:, None]
+    elif family == "FULL_FINITE_URYSOHN":
+        coefficient, intercept, certificate = _centered_solve(
+            phi.reshape(len(phi), -1),
+            y,
+            surface_penalty(m_tau, realized_m_x, *lambdas),
+        )
+        theta = coefficient.reshape(m_tau, realized_m_x)
+    elif family.startswith("RANK_"):
+        rank = int(family.split("_")[1])
+        initial_svd = prepared.full_svd(lambdas)
+        candidates = [
+            _rank_als(
+                phi,
+                y,
+                rank,
+                lambdas,
+                seed=seed,
+                maximum_iterations=als_max_iterations,
+                tolerance=als_tolerance,
+                maximum_increases=als_max_increases,
+                divergence_factor=als_divergence_factor,
+                initial_svd=initial_svd,
+            )
+            for seed in als_seeds
+        ]
+        theta, intercept, certificate = min(
+            candidates, key=lambda item: item[2]["train_mse"]
+        )
+        certificate = {
+            **certificate,
+            "initializations": len(candidates),
+            "initialization_train_mse": [
+                item[2]["train_mse"] for item in candidates
+            ],
+        }
+    else:
+        raise KeyError(family)
+    rank = int(family.split("_")[1]) if family.startswith("RANK_") else None
+    free_parameters = (
+        rank * (m_tau + realized_m_x) if rank is not None else theta.size
+    ) + 1
+    return {
+        "family": family,
+        "intercept": float(intercept),
+        "theta": theta.tolist(),
+        "basis": basis.metadata(),
+        "certificate": certificate,
+        "parameter_count": int(free_parameters),
+    }
+
+
 def fit_contract(
     train_values: np.ndarray,
     target: np.ndarray,
@@ -193,11 +358,19 @@ def fit_contract(
     elif family.startswith("RANK_"):
         phi = tensor_design(values, basis)
         rank = int(family.split("_")[1])
+        full_theta, _, _ = _centered_solve(
+            phi.reshape(len(phi), -1),
+            y,
+            surface_penalty(m_tau, realized_m_x, *lambdas),
+        )
+        initial_svd = np.linalg.svd(
+            full_theta.reshape(m_tau, realized_m_x), full_matrices=False
+        )
         candidates = [
             _rank_als(
                 phi, y, rank, lambdas, seed=seed, maximum_iterations=als_max_iterations,
                 tolerance=als_tolerance, maximum_increases=als_max_increases,
-                divergence_factor=als_divergence_factor,
+                divergence_factor=als_divergence_factor, initial_svd=initial_svd,
             )
             for seed in als_seeds
         ]
@@ -223,6 +396,32 @@ def basis_from_metadata(value: dict[str, Any]) -> AmplitudeBasis:
         knots=tuple(float(x) for x in value["knots"]), levels=tuple(float(x) for x in value["levels"]),
         feature_mean=tuple(float(x) for x in value["feature_mean"]),
     )
+
+
+def predict_contract_from_design(
+    phi: np.ndarray, contract: dict[str, Any]
+) -> np.ndarray:
+    """Predict from a transform created by the contract's fit-local basis."""
+
+    design = np.asarray(phi, dtype=np.float64)
+    if contract["family"] == "EXACT_ZERO":
+        return np.zeros(len(design), dtype=np.float64)
+    theta = np.asarray(contract["theta"], dtype=np.float64)
+    if (
+        design.ndim != 3
+        or design.shape[1] != theta.shape[0]
+        or design.shape[2] < theta.shape[1]
+    ):
+        raise ValueError("prepared prediction design does not match contract")
+    design = design[:, :, : theta.shape[1]]
+    result = np.empty(len(design), dtype=np.float64)
+    for start in range(0, len(design), STREAM_CHUNK_ROWS):
+        stop = min(start + STREAM_CHUNK_ROWS, len(design))
+        result[start:stop] = (
+            np.einsum("tbx,bx->t", design[start:stop], theta)
+            + float(contract["intercept"])
+        )
+    return result
 
 
 def predict_contract(values: np.ndarray, contract: dict[str, Any]) -> np.ndarray:

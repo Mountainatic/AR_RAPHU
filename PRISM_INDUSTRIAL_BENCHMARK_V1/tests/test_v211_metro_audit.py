@@ -24,7 +24,9 @@ from prism_benchmark.v211_joint import (
     registered_joint_candidates,
 )
 from prism_benchmark.v211_k import (
+    _StructuralCheckpoint,
     _ordered_parallel_map,
+    _structural_specs,
     oof_replay_audit,
     select_smallest_stable_full_and_folds,
 )
@@ -265,6 +267,44 @@ def test_reporting_path_diagnostics_cannot_block_route_freeze() -> None:
     )
     assert decision["status"] == "PASS_PF_AND_JOINT"
     assert decision["formal_routes"] == ["PHYSICS_FIRST", "JOINT"]
+
+
+def test_structural_checkpoint_resumes_only_a_matching_contiguous_prefix(
+    tmp_path: Path,
+) -> None:
+    specs = _structural_specs(
+        profiles=[(2, 8)],
+        m_tau_values=[4],
+        lambda_tau_values=[0.0, 1e-3],
+        m_x_values=[4],
+        lambda_x_values=[0.0],
+    )
+    root = tmp_path / "STRUCTURAL_CHECKPOINTS"
+    context = {
+        "protocol": "strict-test",
+        "target_head": "HEAD",
+        "proxy_policy": "primary",
+        "channel": "u1",
+    }
+    first = _StructuralCheckpoint(root, specs, context)
+    first.append(0, [[1.0, 2.0, 3.0, 4.0], [5.0, 6.0, 7.0, 8.0]])
+
+    resumed = _StructuralCheckpoint(root, specs, context)
+    assert resumed.reused == 2
+    assert resumed.losses == [
+        [1.0, 2.0, 3.0, 4.0],
+        [5.0, 6.0, 7.0, 8.0],
+    ]
+    progress = json.loads(
+        (tmp_path / "STRUCTURAL_PROGRESS.json").read_text(encoding="utf-8")
+    )
+    assert progress["completed_candidates"] == 2
+    assert progress["total_candidates"] == len(specs)
+    assert progress["test_accessed"] is False
+    assert progress["ood_accessed"] is False
+
+    with pytest.raises(RuntimeError, match="manifest mismatch"):
+        _StructuralCheckpoint(root, specs, {**context, "channel": "u2"})
 
 
 def test_joint_protocol_mismatch_remains_a_hard_stop() -> None:

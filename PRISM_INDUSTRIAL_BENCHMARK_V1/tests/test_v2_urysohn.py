@@ -1,8 +1,16 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
-from prism_benchmark.v2_urysohn import fit_contract, predict_contract
+from prism_benchmark.v2_basis import tensor_design
+from prism_benchmark.v2_urysohn import (
+    fit_contract,
+    fit_prepared_contract,
+    predict_contract,
+    predict_contract_from_design,
+    prepare_contract_fit,
+)
 from prism_benchmark.v2_numerics import (
     centered_sufficient_statistics,
     solve_centered_certified_gram,
@@ -47,3 +55,67 @@ def test_streamed_centered_gram_matches_dense_centered_solve() -> None:
     np.testing.assert_allclose(streamed, dense, rtol=5e-11, atol=5e-12)
     np.testing.assert_allclose(intercept, y_mean - center @ dense, rtol=5e-11, atol=5e-12)
     assert certificate.status in {"PASS", "PASS_WITH_WARNING"}
+
+
+@pytest.mark.parametrize(
+    ("family", "m_x"),
+    [
+        ("LINEAR_DISTRIBUTED_LAG", 1),
+        ("RANK_1_URYSOHN", 4),
+        ("RANK_2_URYSOHN", 4),
+        ("FULL_FINITE_URYSOHN", 4),
+    ],
+)
+def test_prepared_fit_is_numerically_equivalent_to_direct_fit(
+    family: str, m_x: int
+) -> None:
+    rng = np.random.default_rng(20260911)
+    train = rng.normal(size=(240, 5))
+    validation = rng.normal(size=(91, 5))
+    target = np.sin(train[:, 0]) + 0.25 * train[:, 2] - 0.1 * train[:, 4]
+    kwargs = {
+        "als_seeds": (17, 19),
+        "als_max_iterations": 8,
+        "als_tolerance": 1e-8,
+        "als_max_increases": 5,
+        "als_divergence_factor": 1e6,
+    }
+    lambdas = (1e-4, 1e-3, 1e-2)
+    direct = fit_contract(train, target, family, m_x, lambdas, **kwargs)
+    requested = 1 if family == "LINEAR_DISTRIBUTED_LAG" else m_x
+    prepared = prepare_contract_fit(train, target, requested)
+    cached = fit_prepared_contract(prepared, family, m_x, lambdas, **kwargs)
+
+    assert cached["family"] == direct["family"]
+    assert cached["basis"] == direct["basis"]
+    assert cached["parameter_count"] == direct["parameter_count"]
+    np.testing.assert_allclose(
+        cached["theta"], direct["theta"], rtol=2e-13, atol=2e-13
+    )
+    np.testing.assert_allclose(
+        cached["intercept"], direct["intercept"], rtol=2e-13, atol=2e-13
+    )
+    direct_prediction = predict_contract(validation, direct)
+    prepared_design = tensor_design(validation, prepared.basis)
+    cached_prediction = predict_contract_from_design(prepared_design, cached)
+    np.testing.assert_allclose(
+        cached_prediction, direct_prediction, rtol=2e-13, atol=2e-13
+    )
+
+
+def test_prepared_rank_fits_reuse_full_surface_initialization() -> None:
+    rng = np.random.default_rng(29)
+    values = rng.normal(size=(180, 4))
+    target = rng.normal(size=len(values))
+    prepared = prepare_contract_fit(values, target, 4)
+    kwargs = {"als_seeds": (3,), "als_max_iterations": 3}
+    lambdas = (1e-4, 1e-3, 1e-2)
+
+    fit_prepared_contract(
+        prepared, "RANK_1_URYSOHN", 4, lambdas, **kwargs
+    )
+    fit_prepared_contract(
+        prepared, "RANK_2_URYSOHN", 4, lambdas, **kwargs
+    )
+
+    assert list(prepared._full_svd_cache) == [lambdas]

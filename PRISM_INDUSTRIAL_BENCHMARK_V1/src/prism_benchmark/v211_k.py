@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
 from pathlib import Path
+from threading import Lock
 from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
@@ -20,6 +23,7 @@ from .cpu_data import (
 )
 from .cpu_selection import mse, regression_metrics
 from .stage0 import write_json
+from .v2_basis import tensor_design
 from .v2_k import (
     CHANNEL_SAMPLE_COLUMNS,
     FAMILY_ORDER,
@@ -31,7 +35,14 @@ from .v2_k import (
 )
 from .strict_oof_selection import strict_nested_oof_select, tune_best_nonzero
 from .v2_runtime import run_parallel
-from .v2_urysohn import fit_contract, predict_contract
+from .v2_urysohn import (
+    PreparedContractFit,
+    fit_contract,
+    fit_prepared_contract,
+    predict_contract,
+    predict_contract_from_design,
+    prepare_contract_fit,
+)
 from .v21_views import sru_input_views
 from .v211_config import load_v211_configs
 from .v211_support import (
@@ -46,6 +57,18 @@ from .v211_support import (
 
 EXACT_ZERO = "EXACT_ZERO"
 K_INNER_WORKERS_ENV = "PRISM_V211_K_INNER_WORKERS"
+K_CHECKPOINT_BATCH_ENV = "PRISM_V211_K_CHECKPOINT_BATCH"
+
+
+def _k_checkpoint_batch() -> int:
+    raw = os.environ.get(K_CHECKPOINT_BATCH_ENV, "16")
+    try:
+        batch = int(raw)
+    except ValueError as error:
+        raise RuntimeError(f"{K_CHECKPOINT_BATCH_ENV} must be an integer") from error
+    if batch < 1:
+        raise RuntimeError(f"{K_CHECKPOINT_BATCH_ENV} must be positive")
+    return batch
 
 
 def _k_inner_workers() -> int:
@@ -71,6 +94,238 @@ def _ordered_parallel_map(
     with ThreadPoolExecutor(max_workers=min(int(workers), len(jobs))) as executor:
         futures = [executor.submit(function, *arguments) for arguments in jobs]
         return [future.result() for future in futures]
+
+
+def _atomic_write_json(path: Path, value: Mapping[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    temporary.write_text(
+        json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
+
+
+def _jsonable_structural_spec(spec: tuple[Any, ...]) -> list[Any]:
+    profile, m_tau, family, m_x, lambda_tau, lambda_x = spec
+    return [
+        [int(profile[0]), int(profile[1])],
+        int(m_tau),
+        str(family),
+        int(m_x),
+        float(lambda_tau),
+        float(lambda_x),
+    ]
+
+
+def _structural_specs(
+    profiles: Sequence[tuple[int, int]],
+    m_tau_values: Sequence[int],
+    lambda_tau_values: Sequence[float],
+    m_x_values: Sequence[int],
+    lambda_x_values: Sequence[float],
+) -> list[tuple[Any, ...]]:
+    specs: list[tuple[Any, ...]] = []
+    for profile in profiles:
+        for m_tau in m_tau_values:
+            for lambda_tau in lambda_tau_values:
+                specs.append(
+                    (
+                        tuple(profile),
+                        int(m_tau),
+                        "LINEAR_DISTRIBUTED_LAG",
+                        1,
+                        float(lambda_tau),
+                        0.0,
+                    )
+                )
+                for m_x in m_x_values:
+                    for family in FAMILY_ORDER[2:]:
+                        for lambda_x in lambda_x_values:
+                            specs.append(
+                                (
+                                    tuple(profile),
+                                    int(m_tau),
+                                    str(family),
+                                    int(m_x),
+                                    float(lambda_tau),
+                                    float(lambda_x),
+                                )
+                            )
+    return specs
+
+
+def _checkpoint_fingerprint(
+    specs: Sequence[tuple[Any, ...]], context: Mapping[str, Any]
+) -> str:
+    payload = {
+        "schema": "PRISM_V211_K_STRUCTURAL_CHECKPOINT_V1",
+        "context": dict(context),
+        "specs": [_jsonable_structural_spec(spec) for spec in specs],
+    }
+    canonical = json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+class _StructuralCheckpoint:
+    def __init__(
+        self,
+        root: Path,
+        specs: Sequence[tuple[Any, ...]],
+        context: Mapping[str, Any],
+    ) -> None:
+        self.root = root
+        self.specs = list(specs)
+        self.fingerprint = _checkpoint_fingerprint(self.specs, context)
+        self.manifest_path = root / "MANIFEST.json"
+        self.progress_path = root.parent / "STRUCTURAL_PROGRESS.json"
+        self.root.mkdir(parents=True, exist_ok=True)
+        manifest = {
+            "schema": "PRISM_V211_K_STRUCTURAL_CHECKPOINT_V1",
+            "fingerprint": self.fingerprint,
+            "candidate_count": len(self.specs),
+            "context": dict(context),
+            "test_accessed": False,
+            "ood_accessed": False,
+        }
+        if self.manifest_path.exists():
+            existing = json.loads(self.manifest_path.read_text(encoding="utf-8"))
+            if existing != manifest:
+                raise RuntimeError("structural checkpoint manifest mismatch")
+        else:
+            _atomic_write_json(self.manifest_path, manifest)
+        self.losses = self._load_batches()
+        self.reused = len(self.losses)
+        self._write_progress("RUNNING")
+
+    def _load_batches(self) -> list[list[float]]:
+        losses: list[list[float]] = []
+        for path in sorted(self.root.glob("BATCH_*.json")):
+            value = json.loads(path.read_text(encoding="utf-8"))
+            start = int(value["start"])
+            items = list(value["items"])
+            if value.get("fingerprint") != self.fingerprint or start != len(losses):
+                raise RuntimeError("structural checkpoint batch is not a valid prefix")
+            for item in items:
+                index = len(losses)
+                if int(item["index"]) != index:
+                    raise RuntimeError("structural checkpoint candidate index mismatch")
+                if item["spec"] != _jsonable_structural_spec(self.specs[index]):
+                    raise RuntimeError("structural checkpoint candidate registry mismatch")
+                fold_losses = [float(value) for value in item["losses"]]
+                losses.append(fold_losses)
+        return losses
+
+    def append(self, start: int, values: Sequence[list[float]]) -> None:
+        if start != len(self.losses):
+            raise RuntimeError("structural checkpoint append is not contiguous")
+        items = [
+            {
+                "index": start + offset,
+                "spec": _jsonable_structural_spec(self.specs[start + offset]),
+                "losses": [float(loss) for loss in losses],
+            }
+            for offset, losses in enumerate(values)
+        ]
+        stop = start + len(items)
+        path = self.root / f"BATCH_{start:06d}_{stop:06d}.json"
+        if path.exists():
+            raise RuntimeError("structural checkpoint batch already exists")
+        _atomic_write_json(
+            path,
+            {
+                "fingerprint": self.fingerprint,
+                "start": start,
+                "stop": stop,
+                "items": items,
+                "test_accessed": False,
+                "ood_accessed": False,
+            },
+        )
+        self.losses.extend([list(value) for value in values])
+        self._write_progress("RUNNING")
+
+    def complete(self) -> dict[str, Any]:
+        if len(self.losses) != len(self.specs):
+            raise RuntimeError("structural checkpoint is incomplete")
+        self._write_progress("PASS")
+        return {
+            "status": "PASS",
+            "schema": "PRISM_V211_K_STRUCTURAL_CHECKPOINT_V1",
+            "fingerprint": self.fingerprint,
+            "candidate_count": len(self.specs),
+            "reused_candidate_count": self.reused,
+            "checkpoint_path": str(self.root),
+            "test_accessed": False,
+            "ood_accessed": False,
+        }
+
+    def _write_progress(self, status: str) -> None:
+        _atomic_write_json(
+            self.progress_path,
+            {
+                "status": status,
+                "fingerprint": self.fingerprint,
+                "completed_candidates": len(self.losses),
+                "total_candidates": len(self.specs),
+                "reused_candidate_count": self.reused,
+                "test_accessed": False,
+                "ood_accessed": False,
+            },
+        )
+
+
+@dataclass
+class _PreparedKFold:
+    fit_values: np.ndarray
+    fit_target: np.ndarray
+    evaluation_values: np.ndarray
+    evaluation_target: np.ndarray
+    fit_rows: int
+    _prepared: dict[int, tuple[PreparedContractFit, np.ndarray]] = field(
+        default_factory=dict, init=False, repr=False
+    )
+    _lock: Lock = field(default_factory=Lock, init=False, repr=False)
+
+    def for_width(self, requested_m_x: int) -> tuple[PreparedContractFit, np.ndarray]:
+        width = int(requested_m_x)
+        with self._lock:
+            cached = self._prepared.get(width)
+            if cached is not None:
+                return cached
+            prepared = prepare_contract_fit(self.fit_values, self.fit_target, width)
+            evaluation_design = tensor_design(self.evaluation_values, prepared.basis)
+            value = (prepared, evaluation_design)
+            self._prepared[width] = value
+            return value
+
+
+def _evaluate_prepared_candidate(
+    records: Sequence[_PreparedKFold],
+    family: str,
+    m_x: int,
+    lambdas: tuple[float, float, float],
+    config: Mapping[str, Any],
+) -> list[float]:
+    losses: list[float] = []
+    requested = 1 if family == "LINEAR_DISTRIBUTED_LAG" else int(m_x)
+    for record in records:
+        prepared, evaluation_design = record.for_width(requested)
+        contract = fit_prepared_contract(
+            prepared,
+            family,
+            int(m_x),
+            lambdas,
+            **_als_kwargs(dict(config)),
+        )
+        if not _candidate_valid(contract, record.fit_rows, dict(config)):
+            losses.append(float("inf"))
+            continue
+        prediction = predict_contract_from_design(evaluation_design, contract)
+        losses.append(mse(record.evaluation_target, prediction))
+    return losses
 
 
 def oof_replay_audit(
@@ -233,6 +488,113 @@ def evaluate_candidate(
             mse(evaluation["y_true"].to_numpy(dtype=np.float64), prediction)
         )
     return losses
+
+
+def _prepare_structural_records(
+    accessor: BaseAccessor,
+    records: Sequence[Mapping[str, Any]],
+    channel: str,
+    profile: tuple[int, int],
+    m_tau: int,
+) -> list[_PreparedKFold]:
+    prepared: list[_PreparedKFold] = []
+    for record in records:
+        fit = record["fit"]
+        evaluation = record["evaluation"]
+        fit_values, _ = profile_values(accessor, fit, channel, profile, m_tau)
+        evaluation_values, _ = profile_values(
+            accessor, evaluation, channel, profile, m_tau
+        )
+        prepared.append(
+            _PreparedKFold(
+                fit_values=fit_values,
+                fit_target=fit["y_true"].to_numpy(dtype=np.float64),
+                evaluation_values=evaluation_values,
+                evaluation_target=evaluation["y_true"].to_numpy(dtype=np.float64),
+                fit_rows=len(fit),
+            )
+        )
+    return prepared
+
+
+def _run_structural_grid(
+    *,
+    accessor: BaseAccessor,
+    train: pd.DataFrame,
+    folds: list[tuple[np.ndarray, np.ndarray]],
+    channel: str,
+    profiles: Sequence[tuple[int, int]],
+    local_comparison_history: int,
+    m_tau_values: Sequence[int],
+    m_x_values: Sequence[int],
+    lambda_tau_values: Sequence[float],
+    lambda_x_values: Sequence[float],
+    pilot_lambda_0: float,
+    v2: dict[str, Any],
+    inner_workers: int,
+    destination: Path,
+    checkpoint_context: Mapping[str, Any],
+) -> tuple[dict[Any, list[float]], dict[str, Any]]:
+    specs = _structural_specs(
+        profiles,
+        m_tau_values,
+        lambda_tau_values,
+        m_x_values,
+        lambda_x_values,
+    )
+    checkpoint = _StructuralCheckpoint(
+        destination / "STRUCTURAL_CHECKPOINTS", specs, checkpoint_context
+    )
+    batch_size = max(int(inner_workers), _k_checkpoint_batch())
+    index = len(checkpoint.losses)
+    while index < len(specs):
+        profile = tuple(specs[index][0])
+        m_tau = int(specs[index][1])
+        group_stop = index
+        while group_stop < len(specs):
+            candidate = specs[group_stop]
+            if tuple(candidate[0]) != profile or int(candidate[1]) != m_tau:
+                break
+            group_stop += 1
+        native_records = registered_fold_native_masks(
+            train,
+            folds,
+            fit_history_steps=int(profile[1]),
+            scoring_history_steps=int(local_comparison_history),
+            fit_cap=int(v2["row_caps"]["single_channel_k_fit"]),
+            evaluation_cap=int(v2["row_caps"]["validation_selection_per_fold"]),
+        )
+        prepared_records = _prepare_structural_records(
+            accessor, native_records, channel, profile, m_tau
+        )
+        while index < group_stop:
+            stop = min(group_stop, index + batch_size)
+            arguments = []
+            for spec in specs[index:stop]:
+                _, _, family, m_x, lambda_tau, lambda_x = spec
+                arguments.append(
+                    (
+                        prepared_records,
+                        str(family),
+                        int(m_x),
+                        (
+                            float(pilot_lambda_0),
+                            float(lambda_tau),
+                            float(lambda_x),
+                        ),
+                        v2,
+                    )
+                )
+            values = _ordered_parallel_map(
+                _evaluate_prepared_candidate, arguments, inner_workers
+            )
+            checkpoint.append(index, values)
+            index = stop
+    audit = checkpoint.complete()
+    audit["checkpoint_path"] = str(
+        (destination / "STRUCTURAL_CHECKPOINTS").relative_to(destination)
+    )
+    return dict(zip(specs, checkpoint.losses, strict=True)), audit
 
 
 def _smoothness_selection(
@@ -435,62 +797,42 @@ def run_k_channel(
             minimum_outer_folds=minimum_folds,
         )
 
-        structural_specs = []
-        structural_jobs = []
         lambda_tau_values = [
             float(value) for value in v2["K_module"]["penalties"]["lambda_tau"]
         ]
         lambda_x_values = [
             float(value) for value in v2["K_module"]["penalties"]["lambda_x"]
         ]
-        for profile in retained_profiles:
-            for m_tau in v21["K_C"]["m_tau"]:
-                for lambda_tau_value in lambda_tau_values:
-                    structural_specs.append(
-                        (
-                            profile,
-                            int(m_tau),
-                            "LINEAR_DISTRIBUTED_LAG",
-                            1,
-                            lambda_tau_value,
-                            0.0,
-                        )
-                    )
-                    structural_jobs.append(
-                        (
-                            accessor, train, folds, channel, profile, int(m_tau),
-                            "LINEAR_DISTRIBUTED_LAG", 1,
-                            (float(pilot["lambda_0"]), lambda_tau_value, 0.0),
-                            v2, local_comparison_history,
-                        )
-                    )
-                    for m_x in v21["K_C"]["m_x"]:
-                        for family in FAMILY_ORDER[2:]:
-                            for lambda_x_value in lambda_x_values:
-                                structural_specs.append(
-                                    (
-                                        profile, int(m_tau), family, int(m_x),
-                                        lambda_tau_value, lambda_x_value,
-                                    )
-                                )
-                                structural_jobs.append(
-                                    (
-                                        accessor, train, folds, channel, profile,
-                                        int(m_tau), family, int(m_x),
-                                        (
-                                            float(pilot["lambda_0"]),
-                                            lambda_tau_value,
-                                            lambda_x_value,
-                                        ),
-                                        v2, local_comparison_history,
-                                    )
-                                )
-        structural_losses = dict(
-            zip(
-                structural_specs,
-                _ordered_parallel_map(evaluate_candidate, structural_jobs, inner_workers),
-                strict=True,
-            )
+        structural_losses, structural_execution_audit = _run_structural_grid(
+            accessor=accessor,
+            train=train,
+            folds=folds,
+            channel=channel,
+            profiles=retained_profiles,
+            local_comparison_history=local_comparison_history,
+            m_tau_values=[int(value) for value in v21["K_C"]["m_tau"]],
+            m_x_values=[int(value) for value in v21["K_C"]["m_x"]],
+            lambda_tau_values=lambda_tau_values,
+            lambda_x_values=lambda_x_values,
+            pilot_lambda_0=float(pilot["lambda_0"]),
+            v2=v2,
+            inner_workers=inner_workers,
+            destination=destination,
+            checkpoint_context={
+                "protocol": protocol,
+                "target_head": view.head.head_id,
+                "proxy_policy": view.proxy_policy,
+                "channel": channel,
+                "train_support_hash": support_id_hash(train),
+                "inner_folds": int(v21["selection"]["inner_folds"]),
+                "minimum_usable_folds": minimum_folds,
+                "local_comparison_history": local_comparison_history,
+                "row_caps": dict(v2["row_caps"]),
+                "als": dict(v2["numerical_certification"]["als"]),
+                "als_initialization_seeds": list(
+                    v2["randomness"]["als_initialization_seeds"]
+                ),
+            },
         )
         structural_selection = strict_nested_oof_select(
             structural_losses,
@@ -771,6 +1113,7 @@ def run_k_channel(
             "structural_fold_losses": {
                 str(key): value for key, value in structural_losses.items()
             },
+            "structural_execution_audit": structural_execution_audit,
             "smoothness_audit": smoothness_audit,
             "minimal_stabilizing_ridge_audit": ridge_audit,
             "contract": refit_contract,
