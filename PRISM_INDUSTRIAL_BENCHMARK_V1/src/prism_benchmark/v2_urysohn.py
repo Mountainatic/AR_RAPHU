@@ -349,58 +349,91 @@ def _rank_als(
     initial = None
     increases = 0
     history: list[float] = []
+    train_mse_history: list[float] = []
     subproblems: dict[str, Any] = {}
     status = "PASS"
+    termination_reason = "MAXIMUM_ITERATIONS"
+    penalty_u = _factor_penalty(m_tau, rank, lambda_0, lambda_tau)
+    penalty_v = _factor_penalty(m_x, rank, lambda_0, lambda_x)
     for iteration in range(maximum_iterations):
         if sufficient_statistics is None:
             design_u = np.einsum("tbx,xr->trb", phi, v).reshape(len(phi), rank * m_tau)
             u_vector, intercept_u, cert_u = _centered_solve(
-                design_u, target, _factor_penalty(m_tau, rank, lambda_0, lambda_tau)
+                design_u, target, penalty_u
             )
         else:
             u_vector, intercept_u, cert_u = _statistics_solve(
                 sufficient_statistics.project(_u_transform(v, m_tau)),
-                _factor_penalty(m_tau, rank, lambda_0, lambda_tau),
+                penalty_u,
             )
         u = u_vector.reshape(rank, m_tau).T
         if sufficient_statistics is None:
             design_v = np.einsum("tbx,br->trx", phi, u).reshape(len(phi), rank * m_x)
             v_vector, intercept_v, cert_v = _centered_solve(
-                design_v, target, _factor_penalty(m_x, rank, lambda_0, lambda_x)
+                design_v, target, penalty_v
             )
         else:
             v_vector, intercept_v, cert_v = _statistics_solve(
                 sufficient_statistics.project(_v_transform(u, m_x)),
-                _factor_penalty(m_x, rank, lambda_0, lambda_x),
+                penalty_v,
             )
         v = v_vector.reshape(rank, m_x).T
         theta = u @ v.T
         if sufficient_statistics is None:
             component = np.einsum("tbx,bx->t", phi, theta)
             intercept = float(np.mean(target - component, dtype=np.float64))
-            objective = float(np.mean(np.square(target - component - intercept), dtype=np.float64))
+            train_mse = float(
+                np.mean(
+                    np.square(target - component - intercept), dtype=np.float64
+                )
+            )
         else:
             coefficient = theta.reshape(-1)
             intercept = float(
                 (sufficient_statistics.target_sum - coefficient @ sufficient_statistics.feature_sum)
                 / sufficient_statistics.rows
             )
-            objective = _statistics_mse(
+            train_mse = _statistics_mse(
                 sufficient_statistics, coefficient, intercept
             )
+        rows = len(target) if sufficient_statistics is None else sufficient_statistics.rows
+        penalty_per_row = float(
+            u_vector @ penalty_u @ u_vector + v_vector @ penalty_v @ v_vector
+        ) / rows
+        # Each ALS half-step solves a penalized least-squares problem.  Its
+        # monotone objective is therefore MSE plus both current factor
+        # penalties, not bare training MSE.  Bare MSE can legitimately rise as
+        # smoothness improves and must remain reporting-only.
+        objective = train_mse + penalty_per_row
         history.append(objective)
+        train_mse_history.append(train_mse)
         initial = objective if initial is None else initial
-        if objective > previous:
+        subproblems = {
+            "u": cert_u,
+            "v": cert_v,
+            "intercepts": [intercept_u, intercept_v],
+        }
+        if not np.isfinite(objective) or not np.isfinite(train_mse):
+            status = "NUMERICALLY_INVALID"
+            termination_reason = "NON_FINITE_OBJECTIVE"
+            break
+        increase_tolerance = tolerance * max(abs(previous), 1.0)
+        if objective > previous + increase_tolerance:
             increases += 1
         else:
             increases = 0
-        if objective > divergence_factor * max(initial, np.finfo(np.float64).tiny) or increases > maximum_increases:
+        if objective > divergence_factor * max(initial, np.finfo(np.float64).tiny):
             status = "NUMERICALLY_INVALID"
+            termination_reason = "RELATIVE_OBJECTIVE_DIVERGENCE"
+            break
+        if increases > maximum_increases:
+            status = "NUMERICALLY_INVALID"
+            termination_reason = "CONSECUTIVE_OBJECTIVE_INCREASES"
             break
         if np.isfinite(previous) and abs(previous - objective) <= tolerance * max(abs(previous), 1.0):
+            termination_reason = "RELATIVE_OBJECTIVE_TOLERANCE"
             break
         previous = objective
-        subproblems = {"u": cert_u, "v": cert_v, "intercepts": [intercept_u, intercept_v]}
     theta = u @ v.T
     # Fixed-support refit: preserve singular directions, refit component weights and intercept.
     left, singular, right = np.linalg.svd(theta, full_matrices=False)
@@ -436,6 +469,10 @@ def _rank_als(
         "status": status,
         "iterations": len(history),
         "objective_history": history,
+        "objective_definition": "TRAIN_MSE_PLUS_FACTOR_PENALTIES_PER_ROW",
+        "train_mse_history": train_mse_history,
+        "consecutive_increases": increases,
+        "termination_reason": termination_reason,
         "train_mse": train_mse,
         "requested_rank": rank,
         "realized_rank": int(np.linalg.matrix_rank(theta, tol=values.max(initial=0.0) * 1e-10)),

@@ -291,6 +291,9 @@ class BaseAccessor:
         intervals: list[tuple[int, int]],
     ) -> np.ndarray:
         result = np.empty((len(samples), len(intervals)), dtype=np.float64)
+        # Long-history support filtering can leave a fold empty; preserve shape.
+        if len(samples) == 0 or len(intervals) == 0:
+            return result
         entities = samples["entity_id"].astype(str).to_numpy()
         origins = samples["origin"].to_numpy(dtype=np.int64)
         codes, labels = pd.factorize(entities, sort=False)

@@ -419,8 +419,34 @@ def select_smallest_stable_full_and_folds(
             )
             if passed:
                 return float(candidate), full_contract, fold_payloads, audits
+    # Keep a compact rejection trace in the exception.  The normal successful
+    # path is unchanged; this makes retained solver failures diagnosable
+    # without rerunning the entire structural search.
+    rejection_summary = []
+    for audit in audits:
+        full_certificate = audit.get("full_refit_certificate", {})
+        inner = audit.get("inner_fold_certificates", [])
+        rejection_summary.append({
+            "candidate": audit["candidate"],
+            "full_refit_pass": audit["full_refit_pass"],
+            "full_status": full_certificate.get("status"),
+            "full_iterations": full_certificate.get("iterations"),
+            "full_increases": full_certificate.get("consecutive_increases", full_certificate.get("increase_count")),
+            "full_fixed_support_status": (full_certificate.get("fixed_support_refit_certificate") or {}).get("status"),
+            "inner": [
+                {
+                    "fold": item.get("fold"),
+                    "pass": item.get("pass"),
+                    "status": (item.get("certificate") or {}).get("status"),
+                    "iterations": (item.get("certificate") or {}).get("iterations"),
+                    "fixed_support_status": ((item.get("certificate") or {}).get("fixed_support_refit_certificate") or {}).get("status"),
+                }
+                for item in inner
+            ],
+        })
     raise RuntimeError(
-        "no registered ridge candidate passed full-refit and all-inner-fold certificates"
+        "no registered ridge candidate passed full-refit and all-inner-fold certificates; "
+        + json.dumps({"ridge_rejections": rejection_summary}, sort_keys=True)
     )
 
 

@@ -46,6 +46,41 @@ def test_rank_ladder_returns_rank_bounded_surface() -> None:
     assert model["certificate"]["fixed_support_refit"]
 
 
+def test_rank_als_certifies_the_penalized_objective_not_bare_mse() -> None:
+    rng = np.random.default_rng(253)
+    values = rng.normal(size=(240, 6))
+    target = np.sin(values).sum(axis=1) + 0.2 * rng.normal(size=len(values))
+    model = fit_contract(
+        values,
+        target,
+        "RANK_1_URYSOHN",
+        6,
+        (0.0, 1000.0, 1000.0),
+        als_seeds=(11,),
+        als_max_iterations=12,
+        als_tolerance=1e-12,
+        als_max_increases=5,
+    )
+
+    certificate = model["certificate"]
+    train_mse = np.asarray(certificate["train_mse_history"])
+    objective = np.asarray(certificate["objective_history"])
+
+    # The regularized optimum trades a tiny increase in data error for a
+    # larger decrease in smoothness cost.  Six such MSE increases used to be
+    # misclassified as ALS divergence even though the optimized objective is
+    # strictly decreasing.
+    assert np.all(np.diff(train_mse)[1:] > 1e-12)
+    assert np.all(np.diff(objective) < 0.0)
+    assert certificate["status"] == "PASS"
+    assert certificate["termination_reason"] == "MAXIMUM_ITERATIONS"
+    assert certificate["consecutive_increases"] == 0
+    assert (
+        certificate["objective_definition"]
+        == "TRAIN_MSE_PLUS_FACTOR_PENALTIES_PER_ROW"
+    )
+
+
 def test_streamed_centered_gram_matches_dense_centered_solve() -> None:
     rng = np.random.default_rng(41)
     x = rng.normal(size=(35003, 17))

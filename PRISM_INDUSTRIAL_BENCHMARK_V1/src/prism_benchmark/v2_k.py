@@ -49,7 +49,14 @@ CHANNEL_SAMPLE_COLUMNS = [
 def channel_profiles(view: ViewSpec, channel: str, config: dict[str, Any]) -> list[tuple[int, int]]:
     category = channel_class(view.head.dataset, channel)
     deltas = [int(value) for value in config["time_profile_grid"]["class_delta_ratio_steps"][category]]
-    if view.head.h_steps > 0:
+    # TEP H0 nowcast is frozen to the explicit L128/L256 comparison.  The
+    # generic H0 multipliers can create empty common support on TEP folds.
+    if (
+        view.head.task_id == "TEP_G_NOWCAST_H0"
+        and view.head.head_id == "TEP_G_NOWCAST_H0__H0__W1"
+    ):
+        histories = [128, 256]
+    elif view.head.h_steps > 0:
         histories = [int(value) * view.head.h_steps for value in config["time_profile_grid"]["positive_h_history_multipliers"]]
     else:
         histories = sorted({delta * int(value) for delta in deltas for value in config["time_profile_grid"]["zero_h_history_in_delta_multipliers"]})
