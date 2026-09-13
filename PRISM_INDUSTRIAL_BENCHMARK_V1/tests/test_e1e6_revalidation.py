@@ -20,7 +20,11 @@ from prism_benchmark.e1e6_phase_b import (
     _history_supported,
     run_synthetic_variant,
 )
-from prism_benchmark.e1e6_robustness import _keyed_normal, perturbation_conditions
+from prism_benchmark.e1e6_robustness import (
+    _keyed_normal,
+    _perturb_raw_process_block,
+    perturbation_conditions,
+)
 from prism_benchmark.v211_joint_stability import _revalidation_counterfactual_specs
 
 
@@ -215,3 +219,32 @@ def test_e6_group_lags_and_outer_folds_do_not_cross_entities() -> None:
         groups_override=labels,
     )
     assert len(result["stage_vector"]) == 3
+
+
+def test_e6_raw_measurement_noise_precedes_history_fusion() -> None:
+    clean = np.zeros((2, 3), dtype=np.float64)
+    indices = np.asarray([[5, 6, 5], [5, 7, 8]], dtype=np.int64)
+    groups = np.asarray([0, 1], dtype=np.int64)
+    low = _perturb_raw_process_block(
+        clean,
+        indices,
+        groups,
+        sigma=2.0,
+        channel_key=4,
+        condition="GAUSSIAN",
+        magnitude=0.05,
+        seed=3,
+    )
+    high = _perturb_raw_process_block(
+        clean,
+        indices,
+        groups,
+        sigma=2.0,
+        channel_key=4,
+        condition="GAUSSIAN",
+        magnitude=0.10,
+        seed=3,
+    )
+    assert np.allclose(high, 2.0 * low)
+    assert low[0, 0] == low[0, 2]
+    assert low[0, 0] != low[1, 0]

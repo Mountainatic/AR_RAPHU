@@ -228,15 +228,39 @@ def _registered_tep_arrays(
     # the compact re-identification screen, so the physical history remains
     # {128,256} even though the downstream array runner consumes ready-made
     # scale summaries.
-    process = np.column_stack(
-        [
-            accessor.input_regular_lags(frame, [channel], 1, history, 8).mean(
-                axis=1, dtype=np.float64
+    raw_process_blocks: list[np.ndarray] = []
+    raw_process_indices: list[np.ndarray] = []
+    raw_process_channel_keys: list[int] = []
+    origins = frame["origin"].to_numpy(dtype=np.int64)
+    for channel_index, channel in enumerate(channels):
+        for history in TEP_HISTORIES:
+            offsets = np.unique(
+                np.rint(np.linspace(1, history, 8)).astype(np.int64)
             )
-            for channel in channels
-            for history in TEP_HISTORIES
-        ]
+            indices = origins[:, None] - offsets[None, :]
+            raw_process_blocks.append(accessor.gather(frame, [channel], indices))
+            raw_process_indices.append(indices)
+            raw_process_channel_keys.append(channel_index)
+    process = np.column_stack(
+        [block.mean(axis=1, dtype=np.float64) for block in raw_process_blocks]
     )
+    raw_channel_sigmas = np.asarray(
+        [
+            np.std(
+                np.concatenate(
+                    [
+                        raw_process_blocks[index].ravel()
+                        for index, key in enumerate(raw_process_channel_keys)
+                        if key == channel_index
+                    ]
+                ),
+                dtype=np.float64,
+            )
+            for channel_index in range(len(channels))
+        ],
+        dtype=np.float64,
+    )
+    raw_channel_sigmas[raw_channel_sigmas == 0] = 1.0
     latest = frame["latest_available_target_index"].to_numpy(dtype=np.int64)
     if information_set == "dynamic":
         historical = accessor.gather(frame, ["xmeas_40"], latest)
@@ -248,92 +272,187 @@ def _registered_tep_arrays(
         "x": x,
         "y": frame["y_true"].to_numpy(dtype=np.float64),
         "anchor": anchor,
-        "origins": frame["origin"].to_numpy(dtype=np.int64),
+        "origins": origins,
         "groups": group_labels,
         "latest_target": latest,
         "process_columns": process.shape[1],
         "channels": channels,
+        "raw_process_blocks": raw_process_blocks,
+        "raw_process_indices": raw_process_indices,
+        "raw_process_channel_keys": raw_process_channel_keys,
+        "raw_channel_sigmas": raw_channel_sigmas,
         "support_hash": support_hash(frame["base_origin_id"].astype(str)),
     }
 
 
-def _n2_worker(spec: tuple[Any, ...]) -> dict[str, Any]:
-    (
-        view_name,
-        mode,
-        x,
-        y,
-        anchor,
-        origins,
-        latest,
-        groups,
-        process_columns,
-        support,
-        condition,
-        magnitude,
-        seed,
-    ) = spec
-    for name in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
-        os.environ[name] = "1"
-    sigmas = np.asarray(x, dtype=np.float64).std(axis=0, dtype=np.float64)
-    sigmas[sigmas == 0] = 1.0
-    perturbed = _perturb_matrix(
-        x,
-        sigmas,
-        origins,
-        latest,
-        groups,
-        process_columns=process_columns,
-        mode=mode,
-        condition=condition,
-        magnitude=magnitude,
-        seed=seed,
-    )
-    result = run_synthetic_variant(
-        seed,
-        "REAL_TEP",
-        histories=(1,),
-        ridges=TEP_RIDGES,
-        include_a=("input_only" not in view_name),
-        x_override=perturbed,
-        y_override=y,
-        return_prediction=True,
-        precomputed_k=True,
-        groups_override=groups,
-    )
-    prediction = np.asarray(result.pop("prediction"), dtype=np.float64)
-    prediction_anchor = (
-        _anchor_noise(
-            anchor,
-            origins,
-            groups,
+def _perturb_raw_process_block(
+    clean: np.ndarray,
+    indices: np.ndarray,
+    groups: np.ndarray,
+    *,
+    sigma: float,
+    channel_key: int,
+    condition: str,
+    magnitude: float,
+    seed: int,
+) -> np.ndarray:
+    values = np.asarray(clean, dtype=np.float64).copy()
+    group_matrix = np.broadcast_to(np.asarray(groups)[:, None], indices.shape)
+    composite = np.asarray(indices, dtype=np.int64) + group_matrix * 10_000_000
+    if condition == "GAUSSIAN":
+        values += magnitude * sigma * _keyed_normal(
+            composite.ravel(), channel_key, seed
+        ).reshape(values.shape)
+    elif condition == "BIAS":
+        values += magnitude * sigma
+    elif condition == "LINEAR_DRIFT":
+        drift = np.empty_like(values)
+        for group in pd.unique(groups):
+            mask = groups == group
+            source = indices[mask]
+            low = float(source.min())
+            high = float(source.max())
+            drift[mask] = 0.0 if high == low else 2.0 * (source - low) / (high - low) - 1.0
+        values += magnitude * sigma * drift
+    elif condition == "RANDOM_WALK_DRIFT":
+        drift = np.empty_like(values)
+        for group in pd.unique(groups):
+            mask = groups == group
+            source = indices[mask]
+            unique = np.unique(source)
+            composite_unique = unique + int(group) * 10_000_000
+            walk = np.cumsum(
+                _keyed_normal(composite_unique, channel_key, seed), dtype=np.float64
+            )
+            walk -= walk.mean(dtype=np.float64)
+            if walk.std(dtype=np.float64) > 0:
+                walk /= walk.std(dtype=np.float64)
+            drift[mask] = walk[np.searchsorted(unique, source)]
+        values += magnitude * sigma * drift
+    elif condition == "QUANTIZATION":
+        resolution = max(magnitude * sigma, np.finfo(np.float64).eps)
+        values = np.rint(values / resolution) * resolution
+    else:
+        raise ValueError(condition)
+    return values
+
+
+def _perturb_tep_features(
+    data: Mapping[str, Any],
+    *,
+    mode: str,
+    condition: str,
+    magnitude: float,
+    seed: int,
+) -> np.ndarray:
+    summaries = []
+    for block, indices, channel_key in zip(
+        data["raw_process_blocks"],
+        data["raw_process_indices"],
+        data["raw_process_channel_keys"],
+        strict=True,
+    ):
+        perturbed = _perturb_raw_process_block(
+            block,
+            indices,
+            data["groups"],
+            sigma=float(data["raw_channel_sigmas"][channel_key]),
+            channel_key=int(channel_key),
             condition=condition,
             magnitude=magnitude,
             seed=seed,
         )
-        if mode == "realistic"
-        else anchor
-    )
-    return {
-        "phase": "N2_REIDENTIFICATION",
-        "view": view_name,
-        "mode": mode,
-        "condition": condition,
-        "magnitude": magnitude,
-        "seed": seed,
-        "C_active": result["C_active"],
-        "W_active": result["W_active"],
-        "A_active": result["A_active"],
-        "C_margin": result["C_margin"],
-        "W_margin": result["W_margin"],
-        "A_margin": result["A_margin"],
-        "stage_vector": result["stage_vector"],
-        **_level_metrics(y, prediction, anchor, prediction_anchor),
-        "support_hash": support,
-        "prediction_hash": result["prediction_hash"],
-        "test_accessed": False,
-        "ood_accessed": False,
-    }
+        summaries.append(perturbed.mean(axis=1, dtype=np.float64))
+    result = np.column_stack(summaries)
+    if data["x"].shape[1] > data["process_columns"]:
+        historical = data["x"][:, data["process_columns"] :]
+        if mode == "realistic":
+            target_sigma = np.std(historical, axis=0, dtype=np.float64)
+            target_sigma[target_sigma == 0] = 1.0
+            historical = _perturb_matrix(
+                historical,
+                target_sigma,
+                data["latest_target"] + 1,
+                data["latest_target"],
+                data["groups"],
+                process_columns=historical.shape[1],
+                mode="process_only",
+                condition=condition,
+                magnitude=magnitude,
+                seed=seed,
+            )
+        result = np.column_stack([result, historical])
+    return result
+
+
+def _n2_worker(spec: tuple[Any, ...]) -> list[dict[str, Any]]:
+    (
+        view_name,
+        mode,
+        data,
+        seed,
+    ) = spec
+    for name in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
+        os.environ[name] = "1"
+    rows = []
+    for condition, magnitude in perturbation_conditions():
+        perturbed = _perturb_tep_features(
+            data,
+            mode=mode,
+            condition=condition,
+            magnitude=magnitude,
+            seed=seed,
+        )
+        result = run_synthetic_variant(
+            seed,
+            "REAL_TEP",
+            histories=(1,),
+            ridges=TEP_RIDGES,
+            include_a=("input_only" not in view_name),
+            x_override=perturbed,
+            y_override=data["y"],
+            return_prediction=True,
+            precomputed_k=True,
+            groups_override=data["groups"],
+        )
+        prediction = np.asarray(result.pop("prediction"), dtype=np.float64)
+        prediction_anchor = (
+            _anchor_noise(
+                data["anchor"],
+                data["origins"],
+                data["groups"],
+                condition=condition,
+                magnitude=magnitude,
+                seed=seed,
+            )
+            if mode == "realistic"
+            else data["anchor"]
+        )
+        rows.append(
+            {
+                "phase": "N2_REIDENTIFICATION",
+                "view": view_name,
+                "mode": mode,
+                "condition": condition,
+                "magnitude": magnitude,
+                "seed": seed,
+                "C_active": result["C_active"],
+                "W_active": result["W_active"],
+                "A_active": result["A_active"],
+                "C_margin": result["C_margin"],
+                "W_margin": result["W_margin"],
+                "A_margin": result["A_margin"],
+                "stage_vector": result["stage_vector"],
+                **_level_metrics(
+                    data["y"], prediction, data["anchor"], prediction_anchor
+                ),
+                "support_hash": data["support_hash"],
+                "prediction_hash": result["prediction_hash"],
+                "test_accessed": False,
+                "ood_accessed": False,
+            }
+        )
+    return rows
 
 
 def _n1_design(values: np.ndarray) -> np.ndarray:
@@ -391,20 +510,13 @@ def run_e6(
         contract_hash = hashlib.sha256(
             np.ascontiguousarray(contract["coefficient"], dtype=np.float64).tobytes()
         ).hexdigest()
-        sigmas = data["x"][fit_mask].std(axis=0, dtype=np.float64)
-        sigmas[sigmas == 0] = 1.0
         for mode in modes:
             for condition, magnitude in conditions:
                 if condition != "GAUSSIAN":
                     continue
                 for seed in N1_SEEDS:
-                    perturbed = _perturb_matrix(
-                        data["x"],
-                        sigmas,
-                        data["origins"],
-                        data["latest_target"],
-                        data["groups"],
-                        process_columns=data["process_columns"],
+                    perturbed = _perturb_tep_features(
+                        data,
                         mode=mode,
                         condition=condition,
                         magnitude=magnitude,
@@ -448,30 +560,14 @@ def run_e6(
     for view_name, _, _, modes in definitions:
         data = arrays[view_name]
         for mode in modes:
-            for condition, magnitude in conditions:
-                for seed in N2_SEEDS:
-                    specs.append(
-                        (
-                            view_name,
-                            mode,
-                            data["x"],
-                            data["y"],
-                            data["anchor"],
-                            data["origins"],
-                            data["latest_target"],
-                            data["groups"],
-                            data["process_columns"],
-                            data["support_hash"],
-                            condition,
-                            magnitude,
-                            seed,
-                        )
-                    )
+            for seed in N2_SEEDS:
+                specs.append((view_name, mode, data, seed))
     if workers <= 1:
-        n2_rows = [_n2_worker(spec) for spec in specs]
+        nested_n2_rows = [_n2_worker(spec) for spec in specs]
     else:
         with ProcessPoolExecutor(max_workers=workers) as pool:
-            n2_rows = list(pool.map(_n2_worker, specs, chunksize=1))
+            nested_n2_rows = list(pool.map(_n2_worker, specs, chunksize=1))
+    n2_rows = [row for rows in nested_n2_rows for row in rows]
     n2 = pd.DataFrame(n2_rows)
     n2.to_csv(destination / "n2_reidentification.csv", index=False)
     summary = n2.groupby(["view", "mode", "condition", "magnitude"], as_index=False).agg(
@@ -495,7 +591,7 @@ def run_e6(
             "histories": list(TEP_HISTORIES),
             "n1_seeds": list(N1_SEEDS),
             "n2_seeds": list(N2_SEEDS),
-            "injection_point": "registered strict-past {128,256} scale summaries before normalization and PRISM-like stage routing",
+            "injection_point": "raw aligned strict-past lag measurement before {128,256} fusion, normalization, and PRISM-like stage routing",
             "same_realization_across_magnitudes": True,
             "formal_test_used_as_evaluation": False,
             "development_validation_policy": "N1 fourth entity held out; N2 four entity-held-out development OOF folds",

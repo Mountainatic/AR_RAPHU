@@ -1138,7 +1138,7 @@ def write_freeze(output: Path, project: Path, provenance: Mapping[str, Any]) -> 
                 "drift": ["LINEAR", "RANDOM_WALK"],
                 "quantization": "outer-train-std-normalized resolution",
                 "noise_realization_key": ["task", "seed", "channel", "timestamp"],
-                "injection_point": "raw aligned measurement before preprocessing",
+                "injection_point": "raw aligned strict-past lag measurement before {128,256} fusion and normalization",
                 "TEP_modes": ["process_only", "realistic"],
                 "scope": "TEP H0/W1 development-only compact reidentification universe",
                 "views": ["input_only/record_time", "dynamic/record_time", "dynamic/analyzer_maturity_5_steps"],
