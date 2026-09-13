@@ -1043,7 +1043,10 @@ def write_freeze(output: Path, project: Path, provenance: Mapping[str, Any]) -> 
     files = {
         "strict_selector": project / "PRISM_INDUSTRIAL_BENCHMARK_V1" / "configs" / "strict_nested_oof_selection_v1.json",
         "hybrid_hw": project / "PRISM_INDUSTRIAL_BENCHMARK_V1" / "configs" / "strict_oof_public5_hybrid_hw_public3_c1.json",
-        "joint_config": project / "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_PACKAGE" / "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_CONFIG.json",
+        "joint_config": project
+        / "PRISM_INDUSTRIAL_BENCHMARK_V1"
+        / "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_PACKAGE"
+        / "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_CONFIG.json",
     }
     freeze = {
         "protocol_id": PROTOCOL_ID,
