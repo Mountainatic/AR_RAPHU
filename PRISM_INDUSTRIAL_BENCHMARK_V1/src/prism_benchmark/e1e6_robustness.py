@@ -73,6 +73,7 @@ def _perturb_matrix(
     sigmas: np.ndarray,
     origins: np.ndarray,
     latest_target: np.ndarray,
+    groups: np.ndarray,
     *,
     process_columns: int,
     mode: str,
@@ -83,7 +84,9 @@ def _perturb_matrix(
     values = np.asarray(clean, dtype=np.float64).copy()
     affected = process_columns if mode == "process_only" else values.shape[1]
     for column in range(affected):
-        source_indices = origins - 1 if column < process_columns else latest_target
+        source_indices = (
+            origins - 1 if column < process_columns else latest_target
+        ) + np.asarray(groups, dtype=np.int64) * 10_000_000
         key = column if column < process_columns else 1000003
         sigma = float(sigmas[column])
         if condition == "GAUSSIAN":
@@ -92,14 +95,22 @@ def _perturb_matrix(
             values[:, column] += magnitude * sigma
         elif condition == "LINEAR_DRIFT":
             direction = -1.0 if int(hashlib.sha256(f"{seed}|{key}".encode()).hexdigest()[:2], 16) % 2 else 1.0
-            values[:, column] += direction * magnitude * sigma * np.linspace(-1.0, 1.0, len(values))
+            drift = np.empty(len(values), dtype=np.float64)
+            for group in pd.unique(groups):
+                index = np.flatnonzero(groups == group)
+                drift[index] = np.linspace(-1.0, 1.0, len(index))
+            values[:, column] += direction * magnitude * sigma * drift
         elif condition == "RANDOM_WALK_DRIFT":
             innovations = _keyed_normal(source_indices, key, seed)
-            walk = np.cumsum(innovations, dtype=np.float64)
-            walk -= walk.mean(dtype=np.float64)
-            walk_scale = walk.std(dtype=np.float64)
-            if walk_scale > 0:
-                walk /= walk_scale
+            walk = np.empty(len(values), dtype=np.float64)
+            for group in pd.unique(groups):
+                index = np.flatnonzero(groups == group)
+                part = np.cumsum(innovations[index], dtype=np.float64)
+                part -= part.mean(dtype=np.float64)
+                walk_scale = part.std(dtype=np.float64)
+                if walk_scale > 0:
+                    part /= walk_scale
+                walk[index] = part
             values[:, column] += magnitude * sigma * walk
         elif condition == "QUANTIZATION":
             resolution = max(magnitude * sigma, np.finfo(np.float64).eps)
@@ -112,6 +123,7 @@ def _perturb_matrix(
 def _anchor_noise(
     anchor: np.ndarray,
     origins: np.ndarray,
+    groups: np.ndarray,
     *,
     condition: str,
     magnitude: float,
@@ -120,16 +132,27 @@ def _anchor_noise(
     clean = np.asarray(anchor, dtype=np.float64)
     sigma = float(clean.std(dtype=np.float64))
     if condition == "GAUSSIAN":
-        return clean + magnitude * sigma * _keyed_normal(origins - 1, 1000003, seed)
+        keys = origins - 1 + np.asarray(groups, dtype=np.int64) * 10_000_000
+        return clean + magnitude * sigma * _keyed_normal(keys, 1000003, seed)
     if condition == "BIAS":
         return clean + magnitude * sigma
     if condition == "LINEAR_DRIFT":
-        return clean + magnitude * sigma * np.linspace(-1.0, 1.0, len(clean))
+        drift = np.empty(len(clean), dtype=np.float64)
+        for group in pd.unique(groups):
+            index = np.flatnonzero(groups == group)
+            drift[index] = np.linspace(-1.0, 1.0, len(index))
+        return clean + magnitude * sigma * drift
     if condition == "RANDOM_WALK_DRIFT":
-        walk = np.cumsum(_keyed_normal(origins - 1, 1000003, seed), dtype=np.float64)
-        walk -= walk.mean(dtype=np.float64)
-        if walk.std(dtype=np.float64) > 0:
-            walk /= walk.std(dtype=np.float64)
+        keys = origins - 1 + np.asarray(groups, dtype=np.int64) * 10_000_000
+        innovations = _keyed_normal(keys, 1000003, seed)
+        walk = np.empty(len(clean), dtype=np.float64)
+        for group in pd.unique(groups):
+            index = np.flatnonzero(groups == group)
+            part = np.cumsum(innovations[index], dtype=np.float64)
+            part -= part.mean(dtype=np.float64)
+            if part.std(dtype=np.float64) > 0:
+                part /= part.std(dtype=np.float64)
+            walk[index] = part
         return clean + magnitude * sigma * walk
     if condition == "QUANTIZATION":
         resolution = max(magnitude * sigma, np.finfo(np.float64).eps)
@@ -192,9 +215,13 @@ def _registered_tep_arrays(
         for _, group in samples.groupby("entity_id", sort=True)
         if len(group) >= 239
     ]
-    if not groups:
-        raise RuntimeError("E6 TEP requires a contiguous development entity with >=239 rows")
-    frame = max(groups, key=len).iloc[:239].reset_index(drop=True)
+    if len(groups) < 4:
+        raise RuntimeError("E6 TEP requires four development entities with >=239 rows")
+    selected_groups = sorted(groups, key=lambda frame: str(frame["entity_id"].iloc[0]))[:4]
+    frame = pd.concat(
+        [group.iloc[:239] for group in selected_groups], ignore_index=True
+    )
+    group_labels = np.repeat(np.arange(4, dtype=np.int64), 239)
     accessor = BaseAccessor(shared, "tep", "train", [*channels, "xmeas_40"])
     # Each original process channel is represented at both frozen TEP history
     # scales.  The eight deterministic lags within a scale are fused before
@@ -222,6 +249,7 @@ def _registered_tep_arrays(
         "y": frame["y_true"].to_numpy(dtype=np.float64),
         "anchor": anchor,
         "origins": frame["origin"].to_numpy(dtype=np.int64),
+        "groups": group_labels,
         "latest_target": latest,
         "process_columns": process.shape[1],
         "channels": channels,
@@ -238,6 +266,7 @@ def _n2_worker(spec: tuple[Any, ...]) -> dict[str, Any]:
         anchor,
         origins,
         latest,
+        groups,
         process_columns,
         support,
         condition,
@@ -253,6 +282,7 @@ def _n2_worker(spec: tuple[Any, ...]) -> dict[str, Any]:
         sigmas,
         origins,
         latest,
+        groups,
         process_columns=process_columns,
         mode=mode,
         condition=condition,
@@ -269,10 +299,18 @@ def _n2_worker(spec: tuple[Any, ...]) -> dict[str, Any]:
         y_override=y,
         return_prediction=True,
         precomputed_k=True,
+        groups_override=groups,
     )
     prediction = np.asarray(result.pop("prediction"), dtype=np.float64)
     prediction_anchor = (
-        _anchor_noise(anchor, origins, condition=condition, magnitude=magnitude, seed=seed)
+        _anchor_noise(
+            anchor,
+            origins,
+            groups,
+            condition=condition,
+            magnitude=magnitude,
+            seed=seed,
+        )
         if mode == "realistic"
         else anchor
     )
@@ -346,13 +384,14 @@ def run_e6(
     n1_rows = []
     for view_name, _, _, modes in definitions:
         data = arrays[view_name]
-        split = 179
         clean_design = _n1_design(data["x"])
-        contract = _frozen_ridge_contract(clean_design[:split], data["y"][:split])
+        fit_mask = data["groups"] != 3
+        evaluation_mask = data["groups"] == 3
+        contract = _frozen_ridge_contract(clean_design[fit_mask], data["y"][fit_mask])
         contract_hash = hashlib.sha256(
             np.ascontiguousarray(contract["coefficient"], dtype=np.float64).tobytes()
         ).hexdigest()
-        sigmas = data["x"][:split].std(axis=0, dtype=np.float64)
+        sigmas = data["x"][fit_mask].std(axis=0, dtype=np.float64)
         sigmas[sigmas == 0] = 1.0
         for mode in modes:
             for condition, magnitude in conditions:
@@ -364,18 +403,20 @@ def run_e6(
                         sigmas,
                         data["origins"],
                         data["latest_target"],
+                        data["groups"],
                         process_columns=data["process_columns"],
                         mode=mode,
                         condition=condition,
                         magnitude=magnitude,
                         seed=seed,
                     )
-                    prediction = _apply_contract(contract, _n1_design(perturbed)[split:])
-                    anchor = data["anchor"][split:]
+                    prediction = _apply_contract(contract, _n1_design(perturbed)[evaluation_mask])
+                    anchor = data["anchor"][evaluation_mask]
                     prediction_anchor = (
                         _anchor_noise(
                             anchor,
-                            data["origins"][split:],
+                            data["origins"][evaluation_mask],
+                            data["groups"][evaluation_mask],
                             condition=condition,
                             magnitude=magnitude,
                             seed=seed,
@@ -392,7 +433,7 @@ def run_e6(
                             "magnitude": magnitude,
                             "seed": seed,
                             **_level_metrics(
-                                data["y"][split:], prediction, anchor, prediction_anchor
+                                data["y"][evaluation_mask], prediction, anchor, prediction_anchor
                             ),
                             "frozen_contract_hash": contract_hash,
                             "support_hash": data["support_hash"],
@@ -418,6 +459,7 @@ def run_e6(
                             data["anchor"],
                             data["origins"],
                             data["latest_target"],
+                            data["groups"],
                             data["process_columns"],
                             data["support_hash"],
                             condition,
@@ -456,7 +498,7 @@ def run_e6(
             "injection_point": "registered strict-past {128,256} scale summaries before normalization and PRISM-like stage routing",
             "same_realization_across_magnitudes": True,
             "formal_test_used_as_evaluation": False,
-            "development_validation_policy": "N1 held-out tail; N2 four disjoint development OOF evidence blocks",
+            "development_validation_policy": "N1 fourth entity held out; N2 four entity-held-out development OOF folds",
             "test_accessed": False,
             "ood_accessed": False,
         },

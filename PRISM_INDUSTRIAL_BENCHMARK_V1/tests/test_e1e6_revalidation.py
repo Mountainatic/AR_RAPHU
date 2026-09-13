@@ -16,6 +16,7 @@ from prism_benchmark.e1e6_phase_b import (
     E3_RIDGES,
     E4_UNIVERSES,
     _e3_candidates,
+    _group_lag_block,
     _history_supported,
     run_synthetic_variant,
 )
@@ -192,3 +193,25 @@ def test_e3_history_support_is_entity_local() -> None:
         ("a", 4),
         ("b", 14),
     ]
+
+
+def test_e6_group_lags_and_outer_folds_do_not_cross_entities() -> None:
+    values = np.asarray([1.0, 2.0, 100.0, 200.0])
+    groups = np.asarray([0, 0, 1, 1])
+    observed = _group_lag_block(values, (1,), groups)
+    assert observed[:, 0].tolist() == [1.0, 1.0, 100.0, 100.0]
+    rng = np.random.default_rng(4)
+    x = rng.normal(size=(128, 4))
+    y = rng.normal(size=128)
+    labels = np.repeat(np.arange(4), 32)
+    result = run_synthetic_variant(
+        1,
+        "REAL_GROUPED",
+        histories=(1,),
+        ridges=(1e-3,),
+        x_override=x,
+        y_override=y,
+        precomputed_k=True,
+        groups_override=labels,
+    )
+    assert len(result["stage_vector"]) == 3

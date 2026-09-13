@@ -392,6 +392,21 @@ def _zero_report(identity: str) -> dict[str, Any]:
     }
 
 
+def _group_lag_block(
+    values: np.ndarray, lags: Sequence[int], groups: np.ndarray | None
+) -> np.ndarray:
+    if groups is None:
+        return _lag_block(values, lags)
+    labels = np.asarray(groups)
+    if labels.shape != (len(values),):
+        raise ValueError("group labels must align with the lag source")
+    result = np.empty((len(values), len(lags)), dtype=np.float64)
+    for label in pd.unique(labels):
+        index = np.flatnonzero(labels == label)
+        result[index] = _lag_block(np.asarray(values)[index], lags)
+    return result
+
+
 def run_synthetic_variant(
     seed: int,
     regime: str,
@@ -407,6 +422,7 @@ def run_synthetic_variant(
     y_override: np.ndarray | None = None,
     return_prediction: bool = False,
     precomputed_k: bool = False,
+    groups_override: np.ndarray | None = None,
 ) -> dict[str, Any]:
     if (x_override is None) != (y_override is None):
         raise ValueError("x_override and y_override must be supplied together")
@@ -419,7 +435,15 @@ def run_synthetic_variant(
         y = np.asarray(y_override, dtype=np.float64)
         if x.ndim != 2 or y.shape != (len(x),):
             raise ValueError("array variant requires aligned 2-D inputs and 1-D target")
-    folds = _folds(len(y))
+    if groups_override is None:
+        folds = _folds(len(y))
+        groups = None
+    else:
+        groups = np.asarray(groups_override)
+        labels = pd.unique(groups)
+        if len(labels) != 4:
+            raise ValueError("array re-identification requires exactly four entity folds")
+        folds = [np.flatnonzero(groups == label) for label in labels]
     parent = _constant_oof(y, folds)
     channel_predictions: dict[int, np.ndarray] = {}
     selected_histories: dict[int, int] = {}
@@ -432,7 +456,7 @@ def run_synthetic_variant(
                 offsets = np.unique(
                     np.rint(np.linspace(1, int(history), min(8, int(history)))).astype(np.int64)
                 )
-                lagged = _lag_block(x[:, channel], offsets.tolist())
+                lagged = _group_lag_block(x[:, channel], offsets.tolist(), groups)
             features = (
                 np.column_stack([lagged, np.square(lagged)])
                 if include_nonlinear_k
@@ -465,8 +489,8 @@ def run_synthetic_variant(
         true_pair = (
             x[:, 0] * x[:, 2]
             if precomputed_k
-            else _lag_block(x[:, 0], [1])[:, 0]
-            * _lag_block(x[:, 2], [2])[:, 0]
+            else _group_lag_block(x[:, 0], [1], groups)[:, 0]
+            * _group_lag_block(x[:, 2], [2], groups)[:, 0]
         )
         c_candidates = {}
         for alpha in ridges:
@@ -489,7 +513,7 @@ def run_synthetic_variant(
         residual = y - kcw
         a_candidates = {}
         for lags in ((1,), (1, 2), (1, 2, 4)):
-            block = _lag_block(residual, lags)
+            block = _group_lag_block(residual, lags, groups)
             for alpha in ridges:
                 a_candidates[f"A_LAGS_{'_'.join(map(str, lags))}|alpha={alpha}"] = block
         prediction, a_report, _ = _select_increment(y, kcw, a_candidates, folds, identity="A_ZERO_IDENTITY")
