@@ -31,7 +31,10 @@ from .strict_oof_selection import ACTIVE, ZERO_IDENTITY, strict_nested_oof_selec
 from .v21_a import EXACT_ZERO, fit_mature_residual_ar, mature_residual_features
 from .v2_views import development_dynamic_views
 from .v211_config import PUBLIC_ALL_PROTOCOL, load_v211_configs
-from .v211_joint import registered_joint_inner_fold_frames
+from .v211_joint import (
+    register_joint_fold_on_oof_support,
+    registered_joint_inner_fold_frames,
+)
 from .v211_k import load_active_channels
 from .v211_support import load_native_samples
 
@@ -1336,6 +1339,9 @@ def _common_fold_standalone_a(
     w_result = _result(
         diagnostic_results / f"DEVELOPMENT/W/{head}/{proxy}/RESULT.json"
     )
+    c_result = _result(
+        diagnostic_results / f"DEVELOPMENT/C/{head}/{proxy}/RESULT.json"
+    )
     selected_text = str(a_result["selection"]["final_selected_candidate"])
     selected = EXACT_ZERO if selected_text == EXACT_ZERO else ast.literal_eval(selected_text)
     views = [
@@ -1370,6 +1376,10 @@ def _common_fold_standalone_a(
         active=active,
     )
     oof = pd.read_parquet(diagnostic_results / str(w_result["oof_path"]))
+    c_oof = pd.read_parquet(
+        diagnostic_results / str(c_result["oof_prediction_path"]),
+        columns=["base_origin_id", "oof_fold"],
+    )
     contribution_columns = sorted(
         column for column in oof if column.startswith("k_channel_contribution_")
     )
@@ -1378,6 +1388,19 @@ def _common_fold_standalone_a(
     fold_records: list[dict[str, Any]] = []
     for fold in folds[1:]:
         fold_index = int(fold["fold_index"])
+        # Joint does not evaluate on an independently capped dynamic support.
+        # It registers each fold on the frozen C/W OOF intersection.  Reapply
+        # that exact registration before fitting/evaluating standalone A so
+        # both estimators have the same ordered evidence rows.
+        w_fold_oof = oof.loc[
+            oof["oof_fold"] == fold_index,
+            ["base_origin_id", "oof_fold"],
+        ].reset_index(drop=True)
+        c_fold_oof = c_oof.loc[
+            c_oof["oof_fold"] == fold_index,
+            ["base_origin_id", "oof_fold"],
+        ].reset_index(drop=True)
+        fold = register_joint_fold_on_oof_support(fold, w_fold_oof, c_fold_oof)
         fit = oof.loc[oof["oof_fold"] < fold_index].reset_index(drop=True)
         reference = fold["evaluation"][["base_origin_id"]]
         evaluation = reference.merge(
