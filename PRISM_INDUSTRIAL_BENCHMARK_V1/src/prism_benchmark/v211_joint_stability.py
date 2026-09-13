@@ -151,6 +151,32 @@ def _serializable_metric_bundle(
     return bundle
 
 
+def _metric_sufficient_statistics(
+    target: np.ndarray, prediction: np.ndarray, current_level: np.ndarray
+) -> dict[str, Any]:
+    """Lossless additive statistics for exact fold-subset metric aggregation."""
+
+    y = np.asarray(target, dtype=np.float64)
+    p = np.asarray(prediction, dtype=np.float64)
+    current = np.asarray(current_level, dtype=np.float64)
+    if not (y.shape == p.shape == current.shape and y.ndim == 1):
+        raise ValueError("counterfactual metric arrays must be aligned vectors")
+    error = y - p
+    level = current + y
+    return {
+        "rows": len(y),
+        "sum_delta_true": float(np.sum(y, dtype=np.float64)),
+        "sum_sq_delta_true": float(np.sum(np.square(y), dtype=np.float64)),
+        "sum_level_true": float(np.sum(level, dtype=np.float64)),
+        "sum_sq_level_true": float(
+            np.sum(np.square(level), dtype=np.float64)
+        ),
+        "sum_error": float(np.sum(error, dtype=np.float64)),
+        "sum_abs_error": float(np.sum(np.abs(error), dtype=np.float64)),
+        "sum_sq_error": float(np.sum(np.square(error), dtype=np.float64)),
+    }
+
+
 def registered_joint_stability_candidates() -> tuple[str, ...]:
     return JOINT_CANDIDATES
 
@@ -1164,6 +1190,11 @@ def run_joint_stability_view(
                         "support_hash": fold_support_hashes[fold_index],
                         "prediction_sha256": _prediction_array_sha256(fold_prediction),
                         "metrics": _serializable_metric_bundle(
+                            fold_target,
+                            fold_prediction,
+                            fold_current_levels[fold_index],
+                        ),
+                        "metric_sufficient_statistics": _metric_sufficient_statistics(
                             fold_target,
                             fold_prediction,
                             fold_current_levels[fold_index],

@@ -154,6 +154,7 @@ def main() -> None:
             args.output,
             args.output / "DIAGNOSTIC_WORK/D2/results",
             args.shared_root / "tep_shared",
+            args.project,
         )
     elif args.stage == "freeze":
         provenance = write_provenance(

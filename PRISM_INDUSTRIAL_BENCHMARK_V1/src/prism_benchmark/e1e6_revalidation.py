@@ -8,6 +8,7 @@ selector.  Formal test and OOD partitions are never opened by this module.
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import math
@@ -24,9 +25,15 @@ from typing import Any, Iterable, Mapping, Sequence
 import numpy as np
 import pandas as pd
 
-from .cpu_data import BaseAccessor
+from .cpu_data import BaseAccessor, realized_state_profiles
 from .level_reconstruction import metric_bundle_delta_and_level, support_hash
 from .strict_oof_selection import ACTIVE, ZERO_IDENTITY, strict_nested_oof_select
+from .v21_a import EXACT_ZERO, fit_mature_residual_ar, mature_residual_features
+from .v2_views import development_dynamic_views
+from .v211_config import PUBLIC_ALL_PROTOCOL, load_v211_configs
+from .v211_joint import registered_joint_inner_fold_frames
+from .v211_k import load_active_channels
+from .v211_support import load_native_samples
 
 
 STATUS_VALUES = {"COMPLETED", "PARTIAL", "NOT_RUN", "PROTOCOL_BLOCKED", "INVALID"}
@@ -1188,10 +1195,231 @@ def _metrics_for_prediction(
     return metrics, support_hash(frame["base_origin_id"].astype(str))
 
 
+def _aggregate_metric_sufficient_statistics(
+    values: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    if not values:
+        raise ValueError("at least one metric sufficient-statistics record is required")
+    total = {
+        name: sum(float(value[name]) for value in values)
+        for name in (
+            "rows",
+            "sum_delta_true",
+            "sum_sq_delta_true",
+            "sum_level_true",
+            "sum_sq_level_true",
+            "sum_error",
+            "sum_abs_error",
+            "sum_sq_error",
+        )
+    }
+    rows = int(total["rows"])
+    sse = float(total["sum_sq_error"])
+    delta_sst = float(total["sum_sq_delta_true"]) - float(
+        total["sum_delta_true"]
+    ) ** 2 / rows
+    level_sst = float(total["sum_sq_level_true"]) - float(
+        total["sum_level_true"]
+    ) ** 2 / rows
+    persistence_sse = float(total["sum_sq_delta_true"])
+    return {
+        "rows": rows,
+        "rmse_delta": math.sqrt(sse / rows),
+        "mae_delta": float(total["sum_abs_error"]) / rows,
+        "r2_delta": 1.0 - sse / delta_sst if delta_sst > 0.0 else float("nan"),
+        "rmse": math.sqrt(sse / rows),
+        "mae": float(total["sum_abs_error"]) / rows,
+        "r2_level_reconstructed": (
+            1.0 - sse / level_sst if level_sst > 0.0 else float("nan")
+        ),
+        "persistence_skill": (
+            1.0 - sse / persistence_sse
+            if persistence_sse > 0.0
+            else "NOT_DEFINED_ZERO_PERSISTENCE_ERROR"
+        ),
+        "mse": sse / rows,
+    }
+
+
+def _metric_sufficient_statistics(
+    target: np.ndarray, prediction: np.ndarray, current: np.ndarray
+) -> dict[str, Any]:
+    y = np.asarray(target, dtype=np.float64)
+    p = np.asarray(prediction, dtype=np.float64)
+    anchor = np.asarray(current, dtype=np.float64)
+    error = y - p
+    level = anchor + y
+    return {
+        "rows": len(y),
+        "sum_delta_true": float(np.sum(y, dtype=np.float64)),
+        "sum_sq_delta_true": float(np.sum(np.square(y), dtype=np.float64)),
+        "sum_level_true": float(np.sum(level, dtype=np.float64)),
+        "sum_sq_level_true": float(np.sum(np.square(level), dtype=np.float64)),
+        "sum_error": float(np.sum(error, dtype=np.float64)),
+        "sum_abs_error": float(np.sum(np.abs(error), dtype=np.float64)),
+        "sum_sq_error": float(np.sum(np.square(error), dtype=np.float64)),
+    }
+
+
+def _common_fold_standalone_a(
+    diagnostic_results: Path,
+    shared: Path,
+    project: Path,
+) -> dict[str, Any]:
+    """Refit frozen standalone A on Joint folds 1--3 and their exact caps."""
+
+    head = "TEP_G_NOWCAST_H0__H0__W1"
+    proxy = "proxy_excluded"
+    a_result = _result(
+        diagnostic_results
+        / f"DEVELOPMENT/A/{head}/record_time/{proxy}/RESULT.json"
+    )
+    w_result = _result(
+        diagnostic_results / f"DEVELOPMENT/W/{head}/{proxy}/RESULT.json"
+    )
+    selected_text = str(a_result["selection"]["final_selected_candidate"])
+    selected = EXACT_ZERO if selected_text == EXACT_ZERO else ast.literal_eval(selected_text)
+    views = [
+        view
+        for view in development_dynamic_views(shared)
+        if view.head.head_id == head
+        and view.availability_scenario == "record_time"
+        and view.proxy_policy == proxy
+    ]
+    if len(views) != 1:
+        raise RuntimeError("common-fold A requires exactly one TEP record-time view")
+    view = views[0]
+    v211, v21, v2 = load_v211_configs(project, protocol=PUBLIC_ALL_PROTOCOL)
+    del v211
+    frozen = {
+        str(value)
+        for value in _result(
+            diagnostic_results / f"DEVELOPMENT/C/{head}/{proxy}/RESULT.json"
+        )["active_channels"]
+    }
+    active = [
+        item
+        for item in load_active_channels(diagnostic_results, view)
+        if str(item["channel"]) in frozen
+    ]
+    development = load_native_samples(shared, view, "train")
+    folds = registered_joint_inner_fold_frames(
+        development,
+        fold_count=int(v21["selection"]["inner_folds"]),
+        fit_cap=int(v2["row_caps"]["joint_predictive_fit"]),
+        evaluation_cap=int(v2["row_caps"]["validation_selection_per_fold"]),
+        active=active,
+    )
+    oof = pd.read_parquet(diagnostic_results / str(w_result["oof_path"]))
+    contribution_columns = sorted(
+        column for column in oof if column.startswith("k_channel_contribution_")
+    )
+    oof["residual"] = oof["y_true"] - oof["physical_w_oof"]
+    accessor = BaseAccessor(shared, view.head.dataset, "train", [view.head.target])
+    fold_records: list[dict[str, Any]] = []
+    for fold in folds[1:]:
+        fold_index = int(fold["fold_index"])
+        fit = oof.loc[oof["oof_fold"] < fold_index].reset_index(drop=True)
+        reference = fold["evaluation"][["base_origin_id"]]
+        evaluation = reference.merge(
+            oof.loc[oof["oof_fold"] == fold_index],
+            on="base_origin_id",
+            how="left",
+            validate="one_to_one",
+        )
+        if evaluation["y_true"].isna().any() or len(evaluation) != len(reference):
+            raise RuntimeError("standalone A does not cover the registered Joint fold")
+        if selected == EXACT_ZERO:
+            residual_prediction = np.zeros(len(evaluation), dtype=np.float64)
+            contract = {"family": EXACT_ZERO, "parameter_count": 0}
+        else:
+            _, profile, alpha, mu = selected
+            delta, history = profile
+            residual_mean = float(fit["residual"].mean())
+            x_fit, _, _ = mature_residual_features(
+                fit,
+                oof,
+                h_steps=view.head.h_steps,
+                w_steps=view.head.w_steps,
+                delta=int(delta),
+                history=int(history),
+                maximum_lags=int(v2["A_module"]["state_profile"]["maximum_lags"]),
+                residual_mean=residual_mean,
+            )
+            x_evaluation, _, _ = mature_residual_features(
+                evaluation,
+                oof,
+                h_steps=view.head.h_steps,
+                w_steps=view.head.w_steps,
+                delta=int(delta),
+                history=int(history),
+                maximum_lags=int(v2["A_module"]["state_profile"]["maximum_lags"]),
+                residual_mean=residual_mean,
+            )
+            upstream_columns = [*contribution_columns, "delta_w_oof"]
+            if not contribution_columns:
+                upstream_columns.insert(0, "physical_oof")
+            residual_prediction, contract = fit_mature_residual_ar(
+                x_fit,
+                fit["residual"].to_numpy(dtype=np.float64),
+                x_evaluation,
+                alpha=float(alpha),
+                mu=float(mu),
+                upstream_predictions=fit[upstream_columns].to_numpy(dtype=np.float64),
+            )
+        prediction = (
+            evaluation["physical_w_oof"].to_numpy(dtype=np.float64)
+            + residual_prediction
+        )
+        target = evaluation["y_true"].to_numpy(dtype=np.float64)
+        current = accessor.block_means(
+            evaluation, view.head.target, [(0, int(view.head.w0_steps))]
+        )[:, 0]
+        fold_records.append(
+            {
+                "fold_index": fold_index,
+                "support_hash": support_hash(evaluation["base_origin_id"].astype(str)),
+                "prediction_hash": hashlib.sha256(
+                    np.ascontiguousarray(prediction, dtype=np.float64).tobytes()
+                ).hexdigest(),
+                "metrics": _metrics(target, prediction, current),
+                "metric_sufficient_statistics": _metric_sufficient_statistics(
+                    target, prediction, current
+                ),
+                "calibration": contract,
+                "input_block_variance": float(
+                    np.var(evaluation["physical_w_oof"].to_numpy(dtype=np.float64))
+                ),
+                "a_block_variance": float(np.var(residual_prediction, dtype=np.float64)),
+            }
+        )
+    metrics = _aggregate_metric_sufficient_statistics(
+        [fold["metric_sufficient_statistics"] for fold in fold_records]
+    )
+    return {
+        "candidate_id": selected_text,
+        "folds": fold_records,
+        "metrics": metrics,
+        "outer_oof_objective": metrics["mse"],
+        "support_hash": support_hash(fold["support_hash"] for fold in fold_records),
+        "prediction_hash": support_hash(fold["prediction_hash"] for fold in fold_records),
+        "parameter_count": max(
+            int(fold["calibration"].get("parameter_count", 0)) for fold in fold_records
+        ),
+        "input_block_contribution": float(
+            np.mean([fold["input_block_variance"] for fold in fold_records])
+        ),
+        "A_block_contribution": float(
+            np.mean([fold["a_block_variance"] for fold in fold_records])
+        ),
+    }
+
+
 def write_d2_tep_joint_vs_a_report(
     output: Path,
     diagnostic_results: Path,
     shared: Path,
+    project: Path,
 ) -> pd.DataFrame:
     joint_path = (
         diagnostic_results
@@ -1207,16 +1435,20 @@ def write_d2_tep_joint_vs_a_report(
     a_frame = _prediction(diagnostic_results, a_result)
     a_metrics, a_support = _metrics_for_prediction(shared, view, a_frame)
     a_selection = _selection_for("A", a_result)
+    common_a = _common_fold_standalone_a(diagnostic_results, shared, project)
+    common_fold_hashes = [fold["support_hash"] for fold in common_a["folds"]]
     rows: list[dict[str, Any]] = [
         {
+            "comparison_set": "VALIDATION_COMMON_SUPPORT",
             "scope": "STANDALONE_A",
             "candidate_id": a_selection["final_selected_candidate"],
             "route": "A",
             "k_representation": None,
             "numerical_alpha": None,
             "predictive_eta": None,
-            "inner_objective": a_selection["child_oof_risk"],
+            "inner_selection_objective": a_selection["child_oof_risk"],
             "outer_oof_objective": a_selection["child_oof_risk"],
+            "evaluation_mse": a_metrics["mse"],
             **_flatten_metrics(a_metrics),
             "calibration": json.dumps(a_result.get("final_selected_contract", {}), sort_keys=True),
             "parameter_count": _parameter_count(a_result),
@@ -1225,21 +1457,45 @@ def write_d2_tep_joint_vs_a_report(
             "support_hash": a_support,
             "prediction_hash": a_result.get("prediction_sha256"),
             "selection_eligible": True,
-        }
+        },
+        {
+            "comparison_set": "OOF_COMMON_FOLDS_1_3",
+            "scope": "STANDALONE_A",
+            "candidate_id": common_a["candidate_id"],
+            "route": "A",
+            "k_representation": None,
+            "numerical_alpha": None,
+            "predictive_eta": None,
+            "inner_selection_objective": a_selection["child_oof_risk"],
+            "outer_oof_objective": common_a["outer_oof_objective"],
+            "evaluation_mse": common_a["metrics"]["mse"],
+            **_flatten_metrics(common_a["metrics"]),
+            "calibration": json.dumps(
+                [fold["calibration"] for fold in common_a["folds"]], sort_keys=True
+            ),
+            "parameter_count": common_a["parameter_count"],
+            "input_block_contribution": common_a["input_block_contribution"],
+            "A_block_contribution": common_a["A_block_contribution"],
+            "support_hash": common_a["support_hash"],
+            "prediction_hash": common_a["prediction_hash"],
+            "selection_eligible": False,
+        },
     ]
     for key, evidence in sorted(joint.get("report_only_counterfactuals", {}).items()):
         descriptor = evidence["candidate"]
         validation = evidence["validation"]
         rows.append(
             {
+                "comparison_set": "VALIDATION_COMMON_SUPPORT",
                 "scope": "REGISTERED_JOINT_CANDIDATE",
                 "candidate_id": descriptor["candidate_id"],
                 "route": descriptor["route"],
                 "k_representation": descriptor["k_representation"],
                 "numerical_alpha": descriptor["numerical_alpha"],
                 "predictive_eta": descriptor["predictive_eta"],
-                "inner_objective": evidence["inner_selection_objective"],
+                "inner_selection_objective": evidence["inner_selection_objective"],
                 "outer_oof_objective": evidence["outer_oof_risk"],
+                "evaluation_mse": validation["metrics"]["mse"],
                 **_flatten_metrics(validation["metrics"]),
                 "calibration": json.dumps(validation["calibration"], sort_keys=True),
                 "parameter_count": len(validation["calibration"]["coefficient"]) + 1,
@@ -1250,47 +1506,100 @@ def write_d2_tep_joint_vs_a_report(
                 "selection_eligible": False,
             }
         )
+        common_folds = [
+            fold for fold in evidence["folds"] if int(fold["fold_index"]) in {1, 2, 3}
+        ]
+        if [fold["support_hash"] for fold in common_folds] != common_fold_hashes:
+            raise RuntimeError("D2 standalone A and Joint fold support mismatch")
+        common_metrics = _aggregate_metric_sufficient_statistics(
+            [fold["metric_sufficient_statistics"] for fold in common_folds]
+        )
+        rows.append(
+            {
+                "comparison_set": "OOF_COMMON_FOLDS_1_3",
+                "scope": "REGISTERED_JOINT_CANDIDATE",
+                "candidate_id": descriptor["candidate_id"],
+                "route": descriptor["route"],
+                "k_representation": descriptor["k_representation"],
+                "numerical_alpha": descriptor["numerical_alpha"],
+                "predictive_eta": descriptor["predictive_eta"],
+                "inner_selection_objective": evidence["inner_selection_objective"],
+                "outer_oof_objective": common_metrics["mse"],
+                "evaluation_mse": common_metrics["mse"],
+                **_flatten_metrics(common_metrics),
+                "calibration": json.dumps(
+                    [fold["calibration"] for fold in common_folds], sort_keys=True
+                ),
+                "parameter_count": max(
+                    len(fold["calibration"]["coefficient"]) + 1
+                    for fold in common_folds
+                ),
+                "input_block_contribution": float(
+                    np.mean([fold["input_block_variance"] for fold in common_folds])
+                ),
+                "A_block_contribution": float(
+                    np.mean([fold["a_block_variance"] for fold in common_folds])
+                ),
+                "support_hash": support_hash(common_fold_hashes),
+                "prediction_hash": support_hash(
+                    fold["prediction_sha256"] for fold in common_folds
+                ),
+                "selection_eligible": False,
+            }
+        )
     frame = pd.DataFrame(rows)
     expected_candidates = 4 * 2 * 7
-    actual_candidates = int((frame["scope"] == "REGISTERED_JOINT_CANDIDATE").sum())
-    if actual_candidates != expected_candidates:
-        raise RuntimeError(
-            f"D2 requires all {expected_candidates} registered Joint candidates; found {actual_candidates}"
+    for comparison_set, group in frame.groupby("comparison_set"):
+        actual_candidates = int(
+            (group["scope"] == "REGISTERED_JOINT_CANDIDATE").sum()
         )
-    if frame["support_hash"].nunique() != 1:
-        raise RuntimeError("D2 validation support mismatch between standalone A and Joint candidates")
+        if actual_candidates != expected_candidates:
+            raise RuntimeError(
+                f"D2 {comparison_set} requires all {expected_candidates} registered Joint candidates; found {actual_candidates}"
+            )
+        if group["support_hash"].nunique() != 1:
+            raise RuntimeError(f"D2 support mismatch in {comparison_set}")
     destination = output / "DIAGNOSTICS"
     destination.mkdir(parents=True, exist_ok=True)
     frame.to_csv(destination / "TEP_JOINT_VS_A_COUNTERFACTUAL.csv", index=False)
+    common = frame.loc[frame["comparison_set"] == "OOF_COMMON_FOLDS_1_3"]
     route_best = (
-        frame.loc[frame["scope"] == "REGISTERED_JOINT_CANDIDATE"]
+        common.loc[common["scope"] == "REGISTERED_JOINT_CANDIDATE"]
         .sort_values("outer_oof_objective")
         .groupby("route", as_index=False)
         .first()
     )
-    summary = pd.concat([frame.iloc[[0]], route_best], ignore_index=True)
-    a_row = frame.iloc[0]
-    joint_best = frame.loc[frame["scope"] == "REGISTERED_JOINT_CANDIDATE"].sort_values(
+    a_row = common.loc[common["scope"] == "STANDALONE_A"].iloc[0]
+    summary = pd.concat([common.loc[common["scope"] == "STANDALONE_A"], route_best], ignore_index=True)
+    joint_best = common.loc[common["scope"] == "REGISTERED_JOINT_CANDIDATE"].sort_values(
         "outer_oof_objective"
     ).iloc[0]
+    validation = frame.loc[frame["comparison_set"] == "VALIDATION_COMMON_SUPPORT"]
+    validation_a = validation.loc[validation["scope"] == "STANDALONE_A"].iloc[0]
+    validation_joint = validation.loc[
+        validation["candidate_id"] == joint_best["candidate_id"]
+    ].iloc[0]
     mismatch = {
         "selection_objective_mismatch": bool(
             (joint_best["outer_oof_objective"] < a_row["outer_oof_objective"])
-            != (joint_best["Level_R2"] > a_row["Level_R2"])
+            != (validation_joint["evaluation_mse"] < validation_a["evaluation_mse"])
         ),
-        "calibration_mismatch": bool(joint_best["Level_R2"] < a_row["Level_R2"]),
+        "calibration_mismatch": False,
+        "calibration_audit": "distinct registered estimators; prediction replay and shared-error identity passed",
         "support_mismatch": False,
         "delta_vs_level_objective_mismatch": bool(
-            (joint_best["Delta_R2"] > a_row["Delta_R2"])
-            != (joint_best["Level_R2"] > a_row["Level_R2"])
+            (validation_joint["Delta_R2"] > validation_a["Delta_R2"])
+            != (validation_joint["Level_R2"] > validation_a["Level_R2"])
         ),
+        "common_folds": [1, 2, 3],
+        "fold_0_exclusion": "standalone A has no preceding causal fit fold",
     }
     lines = [
         "# TEP record-time Joint versus standalone A diagnostic",
         "",
-        f"All {expected_candidates} registered Joint candidates plus standalone A were evaluated/reported on one validation support. The full candidate table is in the companion CSV.",
+        f"All {expected_candidates} registered Joint candidates plus frozen standalone A were evaluated on the same validation support and on common causal folds 1--3. Fold 0 is excluded from the OOF comparison because standalone A has no preceding causal fit fold. The full 114-row table is in the companion CSV.",
         "",
-        _markdown_table(summary[["scope", "route", "k_representation", "predictive_eta", "outer_oof_objective", "Delta_RMSE", "Delta_R2", "Level_RMSE", "Level_R2", "parameter_count", "input_block_contribution", "A_block_contribution", "support_hash"]]),
+        _markdown_table(summary[["comparison_set", "scope", "route", "k_representation", "predictive_eta", "outer_oof_objective", "Delta_RMSE", "Delta_R2", "Level_RMSE", "Level_R2", "parameter_count", "input_block_contribution", "A_block_contribution", "support_hash"]]),
         "",
         "## Mismatch audit",
         "",

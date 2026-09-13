@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from prism_benchmark.e1e6_revalidation import (
-    _selection_report,
+    _aggregate_metric_sufficient_statistics,
     _markdown_table,
+    _metric_sufficient_statistics,
+    _selection_report,
     run_identifiable_seed,
 )
+from prism_benchmark.level_reconstruction import metric_bundle_delta_and_level
 from prism_benchmark.v211_joint_stability import _revalidation_counterfactual_specs
 
 
@@ -65,3 +69,24 @@ def test_markdown_table_has_no_optional_dependency() -> None:
     assert "| name | value |" in rendered
     assert "a\\|b" in rendered
     assert "1.25" in rendered
+
+
+def test_metric_sufficient_statistics_reconstruct_fold_subset_exactly() -> None:
+    target = np.asarray([0.2, -0.1, 0.4, -0.3])
+    prediction = np.asarray([0.1, -0.2, 0.35, -0.1])
+    current = np.asarray([10.0, 10.2, 9.8, 10.1])
+    pieces = [
+        _metric_sufficient_statistics(target[:2], prediction[:2], current[:2]),
+        _metric_sufficient_statistics(target[2:], prediction[2:], current[2:]),
+    ]
+    observed = _aggregate_metric_sufficient_statistics(pieces)
+    expected = metric_bundle_delta_and_level(target, prediction, current)
+    assert observed["rmse_delta"] == pytest.approx(expected["rmse_delta"])
+    assert observed["mae_delta"] == pytest.approx(expected["mae_delta"])
+    assert observed["r2_delta"] == pytest.approx(expected["r2_delta"])
+    assert observed["r2_level_reconstructed"] == pytest.approx(
+        expected["r2_level_reconstructed"]
+    )
+    assert observed["persistence_skill"] == pytest.approx(
+        expected["persistence_skill"]
+    )
