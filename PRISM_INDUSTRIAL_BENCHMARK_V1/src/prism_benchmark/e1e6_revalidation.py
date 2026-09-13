@@ -1084,6 +1084,30 @@ def _flatten_metrics(metrics: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _markdown_table(frame: pd.DataFrame) -> str:
+    """Serialize a compact Markdown table without pandas' optional tabulate."""
+
+    def cell(value: Any) -> str:
+        if value is None or (isinstance(value, float) and math.isnan(value)):
+            return ""
+        if isinstance(value, (float, np.floating)):
+            rendered = f"{float(value):.10g}"
+        else:
+            rendered = str(value)
+        return rendered.replace("|", "\\|").replace("\n", " ")
+
+    headers = [cell(value) for value in frame.columns]
+    lines = [
+        "| " + " | ".join(headers) + " |",
+        "| " + " | ".join("---" for _ in headers) + " |",
+    ]
+    lines.extend(
+        "| " + " | ".join(cell(value) for value in row) + " |"
+        for row in frame.itertuples(index=False, name=None)
+    )
+    return "\n".join(lines)
+
+
 def write_d1_so2_eta_report(output: Path, diagnostic_results: Path) -> pd.DataFrame:
     path = (
         diagnostic_results
@@ -1139,7 +1163,7 @@ def write_d1_so2_eta_report(output: Path, diagnostic_results: Path) -> pd.DataFr
         "",
         "Both eta values were evaluated on the same registered folds, rows, support and candidate universe. This diagnostic has no selection authority and formal test/OOD data were not opened.",
         "",
-        frame.to_markdown(index=False),
+        _markdown_table(frame),
         "",
         f"Development-only observation: the lower row-weighted outer OOF risk is eta={preferred['eta']}; no formal eta was changed.",
     ]
@@ -1266,7 +1290,7 @@ def write_d2_tep_joint_vs_a_report(
         "",
         f"All {expected_candidates} registered Joint candidates plus standalone A were evaluated/reported on one validation support. The full candidate table is in the companion CSV.",
         "",
-        summary[["scope", "route", "k_representation", "predictive_eta", "outer_oof_objective", "Delta_RMSE", "Delta_R2", "Level_RMSE", "Level_R2", "parameter_count", "input_block_contribution", "A_block_contribution", "support_hash"]].to_markdown(index=False),
+        _markdown_table(summary[["scope", "route", "k_representation", "predictive_eta", "outer_oof_objective", "Delta_RMSE", "Delta_R2", "Level_RMSE", "Level_R2", "parameter_count", "input_block_contribution", "A_block_contribution", "support_hash"]]),
         "",
         "## Mismatch audit",
         "",

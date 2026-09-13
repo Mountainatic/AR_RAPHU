@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import json
-
 import numpy as np
+import pandas as pd
 
 from prism_benchmark.e1e6_revalidation import (
     _selection_report,
+    _markdown_table,
     run_identifiable_seed,
 )
 from prism_benchmark.v211_joint_stability import _revalidation_counterfactual_specs
@@ -58,3 +58,10 @@ def test_joint_counterfactual_parser_rejects_unregistered_eta(monkeypatch) -> No
         assert "outside the frozen grid" in str(error)
     else:
         raise AssertionError("an unregistered eta must not be materialized")
+
+
+def test_markdown_table_has_no_optional_dependency() -> None:
+    rendered = _markdown_table(pd.DataFrame([{"name": "a|b", "value": 1.25}]))
+    assert "| name | value |" in rendered
+    assert "a\\|b" in rendered
+    assert "1.25" in rendered
