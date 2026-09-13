@@ -200,7 +200,13 @@ def align_registered_joint_fold(
     joint_fold: Mapping[str, Any],
     registered_input_fold: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Align input-only fold provenance to an availability-specific Joint fold."""
+    """Align input-only provenance to one shared availability-specific cap.
+
+    ``joint_fold`` owns the registered capped row namespace.  The input-only
+    view is a support superset, so capped rows must be projected from its
+    uncapped supported frame.  Independently capping the superset can select a
+    different deterministic subset and break the required containment.
+    """
     aligned = dict(registered_input_fold)
     for name in (
         "fit_raw",
@@ -211,8 +217,12 @@ def align_registered_joint_fold(
         "evaluation",
     ):
         if name in joint_fold and name in registered_input_fold:
+            source_name = {
+                "fit": "fit_supported",
+                "evaluation": "evaluation_supported",
+            }.get(name, name)
             aligned[name] = _align_frame_by_base_origin_id(
-                registered_input_fold[name],
+                registered_input_fold[source_name],
                 joint_fold[name],
                 label=f"registered input {name}",
             )

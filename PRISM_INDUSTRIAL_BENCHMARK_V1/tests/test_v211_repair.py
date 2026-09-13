@@ -6,7 +6,10 @@ import pytest
 
 from prism_benchmark.cpu_selection import mse
 from prism_benchmark.v21_selection import assert_final_prediction_contract
-from prism_benchmark.v211_a import _merge_w_validation_for_a
+from prism_benchmark.v211_a import (
+    _merge_w_validation_for_a,
+    _replay_selected_pf_route,
+)
 from prism_benchmark.v211_assembly import pf_and_joint_input_status_match
 from prism_benchmark.v211_c import (
     BEST_ACTIVE_K,
@@ -206,6 +209,37 @@ def test_a_rejects_empty_dynamic_w_support_intersection():
 
     with pytest.raises(RuntimeError, match="no rows"):
         _merge_w_validation_for_a(validation, w_validation)
+
+
+@pytest.mark.parametrize(
+    ("w_active", "a_active", "expected_route", "expected"),
+    [
+        (False, False, "KC", [1.0, 2.0]),
+        (True, False, "KCW", [1.1, 2.2]),
+        (False, True, "KCA", [1.3, 2.4]),
+        (True, True, "KCWA", [1.4, 2.6]),
+    ],
+)
+def test_a_selected_pf_route_replays_frozen_components(
+    w_active: bool,
+    a_active: bool,
+    expected_route: str,
+    expected: list[float],
+) -> None:
+    validation = pd.DataFrame(
+        {
+            "physical_latent": [1.0, 2.0],
+            "physical_w": [1.1, 2.2],
+        }
+    )
+    route, prediction = _replay_selected_pf_route(
+        validation,
+        np.asarray([0.3, 0.4], dtype=np.float64),
+        w_active=w_active,
+        a_active=a_active,
+    )
+    assert route == expected_route
+    np.testing.assert_allclose(prediction, expected, rtol=0.0, atol=1e-15)
 
 
 def test_pf_and_joint_share_input_path_gate():

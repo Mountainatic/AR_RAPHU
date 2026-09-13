@@ -239,6 +239,41 @@ def _fit_frozen_a_route(
     return prediction, contract, min(observed_train, observed_validation)
 
 
+def _replay_selected_pf_route(
+    validation: pd.DataFrame,
+    residual_prediction: np.ndarray,
+    *,
+    w_active: bool,
+    a_active: bool,
+) -> tuple[str, np.ndarray]:
+    """Replay the selected PF route from its already-frozen components.
+
+    The selected A fit is defined on the selected W OOF path.  Re-fitting A on
+    a separately materialized W-ablation OOF path is a different estimator and
+    therefore cannot certify the selected PF prediction.  This replay performs
+    no fitting: it composes the selected physical path and selected A increment.
+    """
+    route = (
+        "KCWA"
+        if w_active and a_active
+        else "KCW"
+        if w_active
+        else "KCA"
+        if a_active
+        else "KC"
+    )
+    physical_column = "physical_w" if w_active else "physical_latent"
+    physical = validation[physical_column].to_numpy(dtype=np.float64)
+    increment = (
+        np.asarray(residual_prediction, dtype=np.float64)
+        if a_active
+        else np.zeros(len(validation), dtype=np.float64)
+    )
+    if increment.shape != physical.shape:
+        raise RuntimeError("selected A increment shape does not match PF support")
+    return route, physical + increment
+
+
 def run_a_view(
     shared: Path,
     project: Path,
@@ -534,16 +569,20 @@ def run_a_view(
         route_predictions["KCWA"] = route_predictions["KCW"] + kcwa_residual
         w_active = w_result.get("w_contract", {}).get("family") != "IDENTITY_CORRECTION"
         a_active = selected != EXACT_ZERO
-        pf_selected_route = (
-            "KCWA"
-            if w_active and a_active
-            else "KCW"
-            if w_active
-            else "KCA"
-            if a_active
-            else "KC"
+        pf_selected_route, selected_route_prediction = _replay_selected_pf_route(
+            validation_frame,
+            residual_prediction,
+            w_active=w_active,
+            a_active=a_active,
         )
-        route_predictions["PF_SELECTED"] = route_predictions[pf_selected_route].copy()
+        route_predictions[pf_selected_route] = selected_route_prediction
+        if pf_selected_route == "KCA":
+            kca_contract = contract
+            kca_coverage = selected_coverage
+        elif pf_selected_route == "KCWA":
+            kcwa_contract = contract
+            kcwa_coverage = selected_coverage
+        route_predictions["PF_SELECTED"] = selected_route_prediction.copy()
         selected_route_error = float(
             np.max(
                 np.abs(route_predictions["PF_SELECTED"] - prediction),

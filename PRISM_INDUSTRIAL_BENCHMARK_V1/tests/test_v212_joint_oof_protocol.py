@@ -194,6 +194,34 @@ def test_availability_specific_joint_support_reuses_record_time_input_namespace(
     ]["base_origin_id"].tolist()
 
 
+def test_joint_cap_is_shared_before_input_only_projection() -> None:
+    registered = _train_frame(rows=1200, information_set="input")
+    dynamic = _train_frame(rows=1200, information_set="dynamic").iloc[
+        np.arange(1200) % 3 != 1
+    ].reset_index(drop=True)
+    joint_folds = registered_joint_inner_fold_frames(
+        dynamic, fold_count=4, fit_cap=73, evaluation_cap=41
+    )
+    input_folds = registered_joint_inner_fold_frames(
+        registered, fold_count=4, fit_cap=73, evaluation_cap=41
+    )
+    assert any(
+        not set(joint_fold["fit"]["base_origin_id"]).issubset(
+            set(input_fold["fit"]["base_origin_id"])
+        )
+        for joint_fold, input_fold in zip(joint_folds, input_folds, strict=True)
+    )
+    for joint_fold, input_fold in zip(joint_folds, input_folds, strict=True):
+        aligned = align_registered_joint_fold(joint_fold, input_fold)
+        for name in ("fit", "evaluation"):
+            assert aligned[name]["base_origin_id"].tolist() == joint_fold[name][
+                "base_origin_id"
+            ].tolist()
+            assert aligned[name]["view_sample_id"].str.startswith(
+                "input-sample-"
+            ).all()
+
+
 def test_joint_does_not_skip_fold_zero() -> None:
     frames = registered_joint_inner_fold_frames(
         _train_frame(), fold_count=4, fit_cap=10000, evaluation_cap=10000
