@@ -116,3 +116,23 @@ def test_w_registry_contains_only_nonzero_families() -> None:
     from prism_benchmark.v211_w import IDENTITY, W_FAMILIES
 
     assert IDENTITY not in W_FAMILIES
+
+
+def test_admission_margin_is_serialized_as_reporting_only() -> None:
+    result = strict_nested_oof_select(
+        {"nonzero": [8.0, 9.0, 10.0, 11.0]},
+        [10.0, 10.0, 10.0, 10.0],
+        identity="zero",
+    )
+    payload = result.to_json()
+    assert payload["absolute_oof_gain"] == pytest.approx(
+        payload["parent_oof_risk"] - payload["child_oof_risk"]
+    )
+    assert payload["relative_admission_margin"] == pytest.approx(
+        payload["absolute_oof_gain"] / payload["parent_oof_risk"]
+    )
+    assert payload["outer_fold_margins"] == pytest.approx(
+        [0.2, 0.1, 0.0, -0.1]
+    )
+    assert payload["margin_signs"] == [1, 1, 0, -1]
+    assert payload["admission_margin_role"] == "REPORTING_ONLY"

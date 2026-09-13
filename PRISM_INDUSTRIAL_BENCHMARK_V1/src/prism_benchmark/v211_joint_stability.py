@@ -15,6 +15,7 @@ import pandas as pd
 
 from .cpu_data import BaseAccessor, realized_state_profiles, sha256_file
 from .cpu_selection import mse, regression_metrics
+from .level_reconstruction import metric_bundle_delta_and_level, support_hash
 from .stage0 import write_json
 from .v2_c import fit_physical_features
 from .v2_k import _cap
@@ -108,6 +109,46 @@ _STABILITY_EVALUATION_CONTEXT: tuple[
     list[np.ndarray],
     list[StabilityCandidate],
 ] | None = None
+
+
+def _prediction_array_sha256(values: np.ndarray) -> str:
+    array = np.ascontiguousarray(values, dtype=np.float64)
+    return hashlib.sha256(array.tobytes(order="C")).hexdigest()
+
+
+def _revalidation_counterfactual_specs() -> list[tuple[str, str, float]]:
+    """Parse report-only Joint counterfactual requests from the environment.
+
+    Syntax is a comma-separated list of ``route|representation|eta`` items.
+    The switch only materializes extra evidence after the registered candidate
+    universe has been evaluated.  It never changes tuning or routing.
+    """
+    raw = os.environ.get("PRISM_REVALIDATION_JOINT_COUNTERFACTUALS", "").strip()
+    if not raw:
+        return []
+    result: list[tuple[str, str, float]] = []
+    for item in raw.split(","):
+        route, representation, eta_text = item.split("|", maxsplit=2)
+        if route not in JOINT_CANDIDATES:
+            raise ValueError(f"unregistered counterfactual Joint route: {route}")
+        if representation not in K_REPRESENTATIONS:
+            raise ValueError(
+                f"unregistered counterfactual K representation: {representation}"
+            )
+        eta = float(eta_text)
+        if eta not in ETA_PRED_GRID:
+            raise ValueError(f"counterfactual eta is outside the frozen grid: {eta}")
+        result.append((route, representation, eta))
+    return result
+
+
+def _serializable_metric_bundle(
+    target: np.ndarray, prediction: np.ndarray, current_level: np.ndarray
+) -> dict[str, Any]:
+    bundle = metric_bundle_delta_and_level(target, prediction, current_level)
+    bundle.pop("future_level_true")
+    bundle.pop("future_level_pred")
+    return bundle
 
 
 def registered_joint_stability_candidates() -> tuple[str, ...]:
@@ -850,6 +891,8 @@ def run_joint_stability_view(
         observed_legacy_losses: list[float] = []
         prepared_folds: list[dict[str, PreparedRepresentation]] = []
         fold_records: list[dict[str, Any]] = []
+        fold_current_levels: list[np.ndarray] = []
+        fold_support_hashes: list[str] = []
         protocol_audits: list[dict[str, Any]] = []
         representation_audits: list[dict[str, Any]] = []
         for fold_record, registered_input_fold in zip(
@@ -961,6 +1004,16 @@ def run_joint_stability_view(
                     raw_k_support=frozen_channels,
                 )
             prepared_folds.append(prepared_by_representation)
+            fold_current_levels.append(
+                inner_target_accessor.block_means(
+                    evaluation,
+                    view.head.target,
+                    [(0, int(view.head.w0_steps))],
+                )[:, 0]
+            )
+            fold_support_hashes.append(
+                support_hash(evaluation["base_origin_id"].astype(str))
+            )
             fold_records.append(
                 {
                     "fold_index": fold,
@@ -1077,6 +1130,89 @@ def run_joint_stability_view(
             candidate: evaluation
             for candidate, evaluation in zip(candidates, evaluations, strict=True)
         }
+        counterfactual_materializations: dict[str, Any] = {}
+        for route, representation, eta in _revalidation_counterfactual_specs():
+            candidate = next(
+                item
+                for item in candidates
+                if item.route == route
+                and item.k_representation == representation
+                and item.predictive_eta == eta
+            )
+            predictions: list[np.ndarray] = []
+            targets: list[np.ndarray] = []
+            levels: list[np.ndarray] = []
+            fold_evidence: list[dict[str, Any]] = []
+            for fold_index, (prepared_by_representation, fold_record) in enumerate(
+                zip(prepared_folds, fold_records, strict=True)
+            ):
+                fold_prediction, fold_contract, fold_components = solve_prepared_stability(
+                    prepared_by_representation[representation],
+                    route=route,
+                    numerical_alpha=candidate.numerical_alpha,
+                    predictive_eta=eta,
+                )
+                fold_target = np.asarray(
+                    fold_record["evaluation_target"], dtype=np.float64
+                )
+                predictions.append(fold_prediction)
+                targets.append(fold_target)
+                levels.append(fold_current_levels[fold_index])
+                fold_evidence.append(
+                    {
+                        "fold_index": fold_index,
+                        "support_hash": fold_support_hashes[fold_index],
+                        "prediction_sha256": _prediction_array_sha256(fold_prediction),
+                        "metrics": _serializable_metric_bundle(
+                            fold_target,
+                            fold_prediction,
+                            fold_current_levels[fold_index],
+                        ),
+                        "calibration": {
+                            "intercept": fold_contract["intercept"],
+                            "coefficient": fold_contract["coefficient"],
+                            "block_dimensions": {
+                                block: int(value["columns"])
+                                for block, value in fold_contract["blocks"].items()
+                            },
+                        },
+                        "input_block_variance": float(
+                            np.var(fold_components["INPUT"], dtype=np.float64)
+                        ),
+                        "a_block_variance": float(
+                            np.var(
+                                fold_components.get(
+                                    "A", np.zeros_like(fold_prediction)
+                                ),
+                                dtype=np.float64,
+                            )
+                        ),
+                    }
+                )
+            all_prediction = np.concatenate(predictions)
+            all_target = np.concatenate(targets)
+            all_level = np.concatenate(levels)
+            key = f"{route}|{representation}|eta={eta:.17g}"
+            counterfactual_materializations[key] = {
+                "role": "REPORT_ONLY_COUNTERFACTUAL",
+                "selection_eligible": False,
+                "candidate": {
+                    "candidate_id": stability_candidate_id(
+                        view.relative_root.as_posix(), candidate
+                    ),
+                    **candidate.descriptor(),
+                },
+                "inner_selection_objective": evaluation_by_candidate[candidate][
+                    "mean_loss"
+                ],
+                "outer_oof_risk": mse(all_target, all_prediction),
+                "support_hash": support_hash(fold_support_hashes),
+                "prediction_sha256": _prediction_array_sha256(all_prediction),
+                "metrics": _serializable_metric_bundle(
+                    all_target, all_prediction, all_level
+                ),
+                "folds": fold_evidence,
+            }
         eta_selected: dict[tuple[str, str], StabilityCandidate] = {}
         eta_selections: dict[str, Any] = {}
         regularization_path: dict[str, list[dict[str, Any]]] = {}
@@ -1284,6 +1420,67 @@ def run_joint_stability_view(
                 k_representation=representation,
                 raw_k_support=frozen_channels,
             )
+        final_current_level = final_accessor.block_means(
+            validation,
+            view.head.target,
+            [(0, int(view.head.w0_steps))],
+        )[:, 0]
+        for key, counterfactual in counterfactual_materializations.items():
+            descriptor = counterfactual["candidate"]
+            cf_prediction, cf_contract, cf_components = solve_prepared_stability(
+                final_prepared[str(descriptor["k_representation"])],
+                route=str(descriptor["route"]),
+                numerical_alpha=float(descriptor["numerical_alpha"]),
+                predictive_eta=float(descriptor["predictive_eta"]),
+            )
+            safe_key = (
+                key.replace("|", "_")
+                .replace("=", "-")
+                .replace(".", "p")
+            )
+            cf_frame = validation[
+                [
+                    "base_origin_id",
+                    "view_sample_id",
+                    "entity_id",
+                    "origin",
+                    "latest_available_target_index",
+                    "y_true",
+                ]
+            ].copy()
+            cf_frame["current_level"] = final_current_level
+            cf_frame["y_pred"] = cf_prediction
+            cf_path = destination / f"counterfactual_{safe_key}.parquet"
+            cf_frame.to_parquet(cf_path, index=False, compression="zstd")
+            counterfactual["validation"] = {
+                "support_hash": support_hash(
+                    cf_frame["base_origin_id"].astype(str)
+                ),
+                "prediction_path": str(cf_path.relative_to(output)),
+                "prediction_sha256": sha256_file(cf_path),
+                "metrics": _serializable_metric_bundle(
+                    cf_frame["y_true"].to_numpy(dtype=np.float64),
+                    cf_prediction,
+                    final_current_level,
+                ),
+                "calibration": {
+                    "intercept": cf_contract["intercept"],
+                    "coefficient": cf_contract["coefficient"],
+                    "block_dimensions": {
+                        block: int(value["columns"])
+                        for block, value in cf_contract["blocks"].items()
+                    },
+                },
+                "input_block_variance": float(
+                    np.var(cf_components["INPUT"], dtype=np.float64)
+                ),
+                "a_block_variance": float(
+                    np.var(
+                        cf_components.get("A", np.zeros_like(cf_prediction)),
+                        dtype=np.float64,
+                    )
+                ),
+            }
         prediction, contract, components = solve_prepared_stability(
             final_prepared[selected.k_representation],
             route=selected.route,
@@ -1479,6 +1676,7 @@ def run_joint_stability_view(
                 for candidate in candidates
             },
             "candidate_registry": candidate_registry,
+            "report_only_counterfactuals": counterfactual_materializations,
             "candidate_id_binding": {
                 "status": "PASS",
                 "candidate_identity_fields": [

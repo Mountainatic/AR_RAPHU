@@ -141,6 +141,27 @@ class StrictOOFSelection:
         ]
         result["active"] = self.active
         result["evidence_role"] = "REPORTING_ONLY"
+        # E1--E6 revalidation reporting fields.  They are derived only after
+        # the strict route is frozen and therefore cannot affect selection.
+        scale = max(float(self.parent_oof_risk), np.finfo(np.float64).eps)
+        result["absolute_oof_gain"] = float(self.incremental_gain)
+        result["relative_admission_margin"] = float(
+            self.incremental_gain / scale
+        )
+        fold_margins = [
+            float((parent - child) / max(parent, np.finfo(np.float64).eps))
+            for parent, child in zip(
+                self.parent_outer_fold_losses,
+                self.child_outer_fold_losses,
+                strict=True,
+            )
+        ]
+        result["outer_fold_margins"] = fold_margins
+        result["margin_signs"] = [
+            1 if value > 0.0 else (-1 if value < 0.0 else 0)
+            for value in fold_margins
+        ]
+        result["admission_margin_role"] = "REPORTING_ONLY"
         return result
 
 
