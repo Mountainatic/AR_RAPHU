@@ -21,7 +21,9 @@ from prism_benchmark.e1e6_phase_b import (
     run_synthetic_variant,
 )
 from prism_benchmark.e1e6_robustness import (
+    _causal_group_lag_block,
     _keyed_normal,
+    _outer_train_target_sigma,
     _perturb_raw_process_block,
     perturbation_conditions,
 )
@@ -248,3 +250,29 @@ def test_e6_raw_measurement_noise_precedes_history_fusion() -> None:
     assert np.allclose(high, 2.0 * low)
     assert low[0, 0] == low[0, 2]
     assert low[0, 0] != low[1, 0]
+
+
+def test_e6_residual_history_is_strict_past_at_entity_boundaries() -> None:
+    values = np.asarray([11.0, 12.0, 100.0, 200.0])
+    groups = np.asarray([0, 0, 1, 1])
+    observed = _causal_group_lag_block(values, (1, 2), groups)
+    assert observed.tolist() == [
+        [0.0, 0.0],
+        [11.0, 0.0],
+        [0.0, 0.0],
+        [100.0, 0.0],
+    ]
+
+
+def test_e6_target_scale_excludes_outer_evaluation_entity() -> None:
+    data = {
+        "groups": np.asarray([0, 0, 1, 1]),
+        "origins": np.asarray([10, 11, 10, 11]),
+        "anchor": np.asarray([1.0, 3.0, 1000.0, 2000.0]),
+        "latest_target": np.asarray([6, 7, 6, 7]),
+        "x": np.asarray([[9.0], [11.0], [900.0], [1900.0]]),
+        "process_columns": 0,
+    }
+    fit_mask = np.asarray([True, True, False, False])
+    observed = _outer_train_target_sigma(data, fit_mask)
+    assert observed == pytest.approx(np.std([1.0, 3.0, 9.0, 11.0]))

@@ -20,8 +20,14 @@ import numpy as np
 import pandas as pd
 
 from .cpu_data import BaseAccessor
-from .e1e6_phase_b import _fit_ridge, run_synthetic_variant
-from .e1e6_revalidation import support_hash, write_json
+from .e1e6_phase_b import _fit_ridge
+from .e1e6_revalidation import (
+    _constant_oof,
+    _ridge_oof,
+    _select_increment,
+    support_hash,
+    write_json,
+)
 from .v2_views import registered_views
 from .v211_support import load_native_samples
 
@@ -125,12 +131,13 @@ def _anchor_noise(
     origins: np.ndarray,
     groups: np.ndarray,
     *,
+    sigma: float | None = None,
     condition: str,
     magnitude: float,
     seed: int,
 ) -> np.ndarray:
     clean = np.asarray(anchor, dtype=np.float64)
-    sigma = float(clean.std(dtype=np.float64))
+    sigma = float(clean.std(dtype=np.float64)) if sigma is None else float(sigma)
     if condition == "GAUSSIAN":
         keys = origins - 1 + np.asarray(groups, dtype=np.int64) * 10_000_000
         return clean + magnitude * sigma * _keyed_normal(keys, 1000003, seed)
@@ -281,8 +288,67 @@ def _registered_tep_arrays(
         "raw_process_indices": raw_process_indices,
         "raw_process_channel_keys": raw_process_channel_keys,
         "raw_channel_sigmas": raw_channel_sigmas,
+        "availability": availability,
+        "a_lags": (1, 2, 4) if availability == "record_time" else (5, 6, 8),
+        "base_origin_ids": frame["base_origin_id"].astype(str).to_numpy(),
         "support_hash": support_hash(frame["base_origin_id"].astype(str)),
     }
+
+
+def _outer_train_process_sigmas(
+    data: Mapping[str, Any], fit_mask: np.ndarray
+) -> np.ndarray:
+    """Estimate each physical channel scale from unique outer-train readings."""
+
+    result = []
+    groups = np.asarray(data["groups"], dtype=np.int64)
+    for channel_key in range(len(data["channels"])):
+        keyed_values: dict[int, float] = {}
+        for block, indices, key in zip(
+            data["raw_process_blocks"],
+            data["raw_process_indices"],
+            data["raw_process_channel_keys"],
+            strict=True,
+        ):
+            if int(key) != channel_key:
+                continue
+            selected_indices = np.asarray(indices)[fit_mask]
+            selected_values = np.asarray(block)[fit_mask]
+            selected_groups = np.broadcast_to(groups[fit_mask, None], selected_indices.shape)
+            composite = selected_indices + selected_groups * 10_000_000
+            for timestamp, value in zip(
+                composite.ravel(), selected_values.ravel(), strict=True
+            ):
+                keyed_values.setdefault(int(timestamp), float(value))
+        sigma = float(np.std(tuple(keyed_values.values()), dtype=np.float64))
+        result.append(sigma if sigma > 0.0 else 1.0)
+    return np.asarray(result, dtype=np.float64)
+
+
+def _outer_train_target_sigma(
+    data: Mapping[str, Any], fit_mask: np.ndarray
+) -> float:
+    """Estimate the target-channel scale without reading the held-out entity."""
+
+    groups = np.asarray(data["groups"], dtype=np.int64)
+    keyed_values: dict[int, float] = {}
+    anchor_indices = np.asarray(data["origins"], dtype=np.int64) - 1
+    for timestamp, group, value in zip(
+        anchor_indices[fit_mask],
+        groups[fit_mask],
+        np.asarray(data["anchor"])[fit_mask],
+        strict=True,
+    ):
+        keyed_values.setdefault(int(timestamp + group * 10_000_000), float(value))
+    if data["x"].shape[1] > data["process_columns"]:
+        historical = np.asarray(data["x"][:, data["process_columns"]], dtype=np.float64)
+        latest = np.asarray(data["latest_target"], dtype=np.int64)
+        for timestamp, group, value in zip(
+            latest[fit_mask], groups[fit_mask], historical[fit_mask], strict=True
+        ):
+            keyed_values.setdefault(int(timestamp + group * 10_000_000), float(value))
+    sigma = float(np.std(tuple(keyed_values.values()), dtype=np.float64))
+    return sigma if sigma > 0.0 else 1.0
 
 
 def _perturb_raw_process_block(
@@ -344,7 +410,11 @@ def _perturb_tep_features(
     condition: str,
     magnitude: float,
     seed: int,
+    process_sigmas: np.ndarray | None = None,
+    target_sigma: float | None = None,
 ) -> np.ndarray:
+    if process_sigmas is None:
+        process_sigmas = np.asarray(data["raw_channel_sigmas"], dtype=np.float64)
     summaries = []
     for block, indices, channel_key in zip(
         data["raw_process_blocks"],
@@ -356,7 +426,7 @@ def _perturb_tep_features(
             block,
             indices,
             data["groups"],
-            sigma=float(data["raw_channel_sigmas"][channel_key]),
+            sigma=float(process_sigmas[channel_key]),
             channel_key=int(channel_key),
             condition=condition,
             magnitude=magnitude,
@@ -367,11 +437,18 @@ def _perturb_tep_features(
     if data["x"].shape[1] > data["process_columns"]:
         historical = data["x"][:, data["process_columns"] :]
         if mode == "realistic":
-            target_sigma = np.std(historical, axis=0, dtype=np.float64)
-            target_sigma[target_sigma == 0] = 1.0
+            historical_sigma = np.asarray(
+                [
+                    float(target_sigma)
+                    if target_sigma is not None
+                    else float(np.std(historical, dtype=np.float64))
+                ],
+                dtype=np.float64,
+            )
+            historical_sigma[historical_sigma == 0] = 1.0
             historical = _perturb_matrix(
                 historical,
-                target_sigma,
+                historical_sigma,
                 data["latest_target"] + 1,
                 data["latest_target"],
                 data["groups"],
@@ -385,16 +462,235 @@ def _perturb_tep_features(
     return result
 
 
+def _route_outer_stage(
+    y_train: np.ndarray,
+    parent_train: np.ndarray,
+    parent_evaluation: np.ndarray,
+    train_candidates: Mapping[str, np.ndarray],
+    evaluation_candidates: Mapping[str, np.ndarray],
+    folds: Sequence[np.ndarray],
+    *,
+    identity: str,
+) -> tuple[np.ndarray, np.ndarray, dict[str, Any]]:
+    """Select on inner OOF evidence, then refit the selected increment once."""
+
+    routed_train, report, _ = _select_increment(
+        y_train, parent_train, train_candidates, folds, identity=identity
+    )
+    routed_evaluation = np.asarray(parent_evaluation, dtype=np.float64).copy()
+    if report["routing_status"] == "ACTIVE":
+        candidate = str(report["tuned_nonzero_candidate"])
+        alpha = float(candidate.rsplit("alpha=", maxsplit=1)[1])
+        increment = _fit_ridge(
+            np.asarray(train_candidates[candidate]),
+            y_train - parent_train,
+            np.asarray(evaluation_candidates[candidate]),
+            alpha,
+        )
+        routed_evaluation += increment
+    return routed_train, routed_evaluation, report
+
+
+def _causal_group_lag_block(
+    values: np.ndarray, lags: Sequence[int], groups: np.ndarray | None = None
+) -> np.ndarray:
+    """Build strict-past residual lags with a non-informative zero boundary."""
+
+    raw = np.asarray(values, dtype=np.float64)
+    labels = np.zeros(len(raw), dtype=np.int64) if groups is None else np.asarray(groups)
+    if labels.shape != (len(raw),):
+        raise ValueError("causal lag groups must align with values")
+    result = np.zeros((len(raw), len(lags)), dtype=np.float64)
+    for label in pd.unique(labels):
+        index = np.flatnonzero(labels == label)
+        part = raw[index]
+        for column, lag in enumerate(lags):
+            lag = int(lag)
+            if lag <= 0:
+                raise ValueError("causal residual lags must be positive")
+            if lag < len(part):
+                result[index[lag:], column] = part[:-lag]
+    return result
+
+
+def _run_outer_pipeline(
+    x_train: np.ndarray,
+    y_train: np.ndarray,
+    train_groups: np.ndarray,
+    x_evaluation: np.ndarray,
+    y_evaluation: np.ndarray,
+    *,
+    include_a: bool,
+    a_lags: Sequence[int],
+) -> dict[str, Any]:
+    """Fully refit the compact PRISM route inside one held-out entity fold."""
+
+    labels = pd.unique(train_groups)
+    if len(labels) != 3:
+        raise ValueError("E6 outer refit requires exactly three training entities")
+    folds = [np.flatnonzero(train_groups == label) for label in labels]
+    parent_train = _constant_oof(y_train, folds)
+    parent_evaluation = np.full(len(y_evaluation), y_train.mean(dtype=np.float64))
+    train_channel_predictions: list[np.ndarray] = []
+    evaluation_channel_predictions: list[np.ndarray] = []
+    active_channels: list[int] = []
+    for channel in range(x_train.shape[1]):
+        candidate = f"channel={channel}|history=1|alpha={TEP_RIDGES[0]}"
+        train_features = np.column_stack(
+            [x_train[:, channel], np.square(x_train[:, channel])]
+        )
+        evaluation_features = np.column_stack(
+            [x_evaluation[:, channel], np.square(x_evaluation[:, channel])]
+        )
+        routed_train, routed_evaluation, report = _route_outer_stage(
+            y_train,
+            parent_train,
+            parent_evaluation,
+            {candidate: train_features},
+            {candidate: evaluation_features},
+            folds,
+            identity=f"K_ZERO_CHANNEL_{channel}",
+        )
+        if report["routing_status"] == "ACTIVE":
+            active_channels.append(channel)
+            train_channel_predictions.append(routed_train)
+            evaluation_channel_predictions.append(routed_evaluation)
+    if train_channel_predictions:
+        train_stack = np.column_stack(train_channel_predictions)
+        evaluation_stack = np.column_stack(evaluation_channel_predictions)
+        k_train = _ridge_oof(train_stack, y_train, folds, TEP_RIDGES[0])
+        k_evaluation = _fit_ridge(
+            train_stack, y_train, evaluation_stack, TEP_RIDGES[0]
+        )
+    else:
+        k_train, k_evaluation = parent_train, parent_evaluation
+
+    interaction_columns = min(8, x_train.shape[1])
+    train_pairs = [
+        x_train[:, left] * x_train[:, right]
+        for left in range(interaction_columns)
+        for right in range(left + 1, interaction_columns)
+    ]
+    evaluation_pairs = [
+        x_evaluation[:, left] * x_evaluation[:, right]
+        for left in range(interaction_columns)
+        for right in range(left + 1, interaction_columns)
+    ]
+    alpha = TEP_RIDGES[0]
+    c_train = {
+        f"C_TRUE_PAIR_02|alpha={alpha}": (x_train[:, 0] * x_train[:, 2])[:, None],
+        f"C_ALL_PAIRS|alpha={alpha}": np.column_stack(train_pairs),
+    }
+    c_evaluation = {
+        f"C_TRUE_PAIR_02|alpha={alpha}": (
+            x_evaluation[:, 0] * x_evaluation[:, 2]
+        )[:, None],
+        f"C_ALL_PAIRS|alpha={alpha}": np.column_stack(evaluation_pairs),
+    }
+    kc_train, kc_evaluation, c_report = _route_outer_stage(
+        y_train,
+        k_train,
+        k_evaluation,
+        c_train,
+        c_evaluation,
+        folds,
+        identity="C_ZERO_IDENTITY",
+    )
+
+    train_square = np.square(kc_train) - np.mean(np.square(kc_train))
+    train_cube = np.power(kc_train, 3) - np.mean(np.power(kc_train, 3))
+    evaluation_square = np.square(kc_evaluation) - np.mean(np.square(kc_train))
+    evaluation_cube = np.power(kc_evaluation, 3) - np.mean(np.power(kc_train, 3))
+    w_train = {
+        f"W_QUADRATIC|alpha={alpha}": train_square[:, None],
+        f"W_SMOOTH_POLY|alpha={alpha}": np.column_stack(
+            [train_square, train_cube, np.tanh(kc_train)]
+        ),
+    }
+    w_evaluation = {
+        f"W_QUADRATIC|alpha={alpha}": evaluation_square[:, None],
+        f"W_SMOOTH_POLY|alpha={alpha}": np.column_stack(
+            [evaluation_square, evaluation_cube, np.tanh(kc_evaluation)]
+        ),
+    }
+    kcw_train, kcw_evaluation, w_report = _route_outer_stage(
+        y_train,
+        kc_train,
+        kc_evaluation,
+        w_train,
+        w_evaluation,
+        folds,
+        identity="W_ZERO_IDENTITY",
+    )
+
+    if include_a:
+        train_residual = y_train - kcw_train
+        evaluation_residual = y_evaluation - kcw_evaluation
+        lag_sets = (
+            (int(a_lags[0]),),
+            (int(a_lags[0]), int(a_lags[1])),
+            tuple(int(value) for value in a_lags),
+        )
+        a_train = {}
+        a_evaluation = {}
+        for lags in lag_sets:
+            candidate = f"A_LAGS_{'_'.join(map(str, lags))}|alpha={alpha}"
+            a_train[candidate] = _causal_group_lag_block(
+                train_residual, lags, train_groups
+            )
+            a_evaluation[candidate] = _causal_group_lag_block(
+                evaluation_residual, lags
+            )
+        prediction_train, prediction, a_report = _route_outer_stage(
+            y_train,
+            kcw_train,
+            kcw_evaluation,
+            a_train,
+            a_evaluation,
+            folds,
+            identity="A_ZERO_IDENTITY",
+        )
+    else:
+        prediction_train, prediction = kcw_train, kcw_evaluation
+        a_report = {
+            "routing_status": "ZERO_IDENTITY",
+            "absolute_oof_gain": 0.0,
+            "relative_admission_margin": 0.0,
+            "outer_fold_margins": [],
+            "margin_signs": [],
+            "final_selected_candidate": "A_NOT_AVAILABLE_INPUT_ONLY",
+            "parent_candidate_id": "A_NOT_AVAILABLE_INPUT_ONLY",
+        }
+    reports = {"C": c_report, "W": w_report, "A": a_report}
+    return {
+        "prediction": prediction,
+        "train_prediction_hash": hashlib.sha256(
+            np.ascontiguousarray(prediction_train, dtype=np.float64).tobytes()
+        ).hexdigest(),
+        "active_channels": json.dumps(active_channels),
+        "stage_vector": "".join(
+            "1" if reports[stage]["routing_status"] == "ACTIVE" else "0"
+            for stage in ("C", "W", "A")
+        ),
+        "reports": reports,
+    }
+
+
 def _n2_worker(spec: tuple[Any, ...]) -> list[dict[str, Any]]:
     (
         view_name,
         mode,
         data,
         seed,
+        outer_group,
     ) = spec
     for name in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
         os.environ[name] = "1"
     rows = []
+    fit_mask = np.asarray(data["groups"]) != outer_group
+    evaluation_mask = ~fit_mask
+    process_sigmas = np.asarray(data["outer_process_sigmas"][outer_group])
+    target_sigma = float(data["outer_target_sigmas"][outer_group])
     for condition, magnitude in perturbation_conditions():
         perturbed = _perturb_tep_features(
             data,
@@ -402,32 +698,33 @@ def _n2_worker(spec: tuple[Any, ...]) -> list[dict[str, Any]]:
             condition=condition,
             magnitude=magnitude,
             seed=seed,
+            process_sigmas=process_sigmas,
+            target_sigma=target_sigma,
         )
-        result = run_synthetic_variant(
-            seed,
-            "REAL_TEP",
-            histories=(1,),
-            ridges=TEP_RIDGES,
+        result = _run_outer_pipeline(
+            perturbed[fit_mask],
+            np.asarray(data["y"])[fit_mask],
+            np.asarray(data["groups"])[fit_mask],
+            perturbed[evaluation_mask],
+            np.asarray(data["y"])[evaluation_mask],
             include_a=("input_only" not in view_name),
-            x_override=perturbed,
-            y_override=data["y"],
-            return_prediction=True,
-            precomputed_k=True,
-            groups_override=data["groups"],
+            a_lags=data["a_lags"],
         )
-        prediction = np.asarray(result.pop("prediction"), dtype=np.float64)
+        prediction = np.asarray(result["prediction"], dtype=np.float64)
         prediction_anchor = (
             _anchor_noise(
-                data["anchor"],
-                data["origins"],
-                data["groups"],
+                np.asarray(data["anchor"])[evaluation_mask],
+                np.asarray(data["origins"])[evaluation_mask],
+                np.asarray(data["groups"])[evaluation_mask],
+                sigma=target_sigma,
                 condition=condition,
                 magnitude=magnitude,
                 seed=seed,
             )
             if mode == "realistic"
-            else data["anchor"]
+            else np.asarray(data["anchor"])[evaluation_mask]
         )
+        reports = result["reports"]
         rows.append(
             {
                 "phase": "N2_REIDENTIFICATION",
@@ -436,18 +733,40 @@ def _n2_worker(spec: tuple[Any, ...]) -> list[dict[str, Any]]:
                 "condition": condition,
                 "magnitude": magnitude,
                 "seed": seed,
-                "C_active": result["C_active"],
-                "W_active": result["W_active"],
-                "A_active": result["A_active"],
-                "C_margin": result["C_margin"],
-                "W_margin": result["W_margin"],
-                "A_margin": result["A_margin"],
+                "outer_fold": int(outer_group),
+                "C_active": reports["C"]["routing_status"] == "ACTIVE",
+                "W_active": reports["W"]["routing_status"] == "ACTIVE",
+                "A_active": reports["A"]["routing_status"] == "ACTIVE",
+                "C_margin": reports["C"]["relative_admission_margin"],
+                "W_margin": reports["W"]["relative_admission_margin"],
+                "A_margin": reports["A"]["relative_admission_margin"],
+                "C_absolute_oof_gain": reports["C"].get("absolute_oof_gain", 0.0),
+                "W_absolute_oof_gain": reports["W"].get("absolute_oof_gain", 0.0),
+                "A_absolute_oof_gain": reports["A"].get("absolute_oof_gain", 0.0),
+                "C_outer_fold_margins": json.dumps(reports["C"].get("outer_fold_margins", [])),
+                "W_outer_fold_margins": json.dumps(reports["W"].get("outer_fold_margins", [])),
+                "A_outer_fold_margins": json.dumps(reports["A"].get("outer_fold_margins", [])),
+                "C_candidate": reports["C"].get("final_selected_candidate"),
+                "W_candidate": reports["W"].get("final_selected_candidate"),
+                "A_candidate": reports["A"].get("final_selected_candidate"),
                 "stage_vector": result["stage_vector"],
+                "active_channels": result["active_channels"],
                 **_level_metrics(
-                    data["y"], prediction, data["anchor"], prediction_anchor
+                    np.asarray(data["y"])[evaluation_mask],
+                    prediction,
+                    np.asarray(data["anchor"])[evaluation_mask],
+                    prediction_anchor,
                 ),
-                "support_hash": data["support_hash"],
-                "prediction_hash": result["prediction_hash"],
+                "support_hash": support_hash(
+                    np.asarray(data["base_origin_ids"])[evaluation_mask]
+                ),
+                "prediction_hash": hashlib.sha256(
+                    np.ascontiguousarray(prediction, dtype=np.float64).tobytes()
+                ).hexdigest(),
+                "outer_train_process_sigma_hash": hashlib.sha256(
+                    np.ascontiguousarray(process_sigmas, dtype=np.float64).tobytes()
+                ).hexdigest(),
+                "outer_train_target_sigma": target_sigma,
                 "test_accessed": False,
                 "ood_accessed": False,
             }
@@ -498,6 +817,19 @@ def run_e6(
         name: _registered_tep_arrays(shared, baseline_run, information, availability)
         for name, information, availability, _ in definitions
     }
+    for data in arrays.values():
+        data["outer_process_sigmas"] = {
+            group: _outer_train_process_sigmas(
+                data, np.asarray(data["groups"]) != group
+            )
+            for group in range(4)
+        }
+        data["outer_target_sigmas"] = {
+            group: _outer_train_target_sigma(
+                data, np.asarray(data["groups"]) != group
+            )
+            for group in range(4)
+        }
     conditions = perturbation_conditions()
 
     n1_rows = []
@@ -506,6 +838,8 @@ def run_e6(
         clean_design = _n1_design(data["x"])
         fit_mask = data["groups"] != 3
         evaluation_mask = data["groups"] == 3
+        process_sigmas = np.asarray(data["outer_process_sigmas"][3])
+        target_sigma = float(data["outer_target_sigmas"][3])
         contract = _frozen_ridge_contract(clean_design[fit_mask], data["y"][fit_mask])
         contract_hash = hashlib.sha256(
             np.ascontiguousarray(contract["coefficient"], dtype=np.float64).tobytes()
@@ -521,6 +855,8 @@ def run_e6(
                         condition=condition,
                         magnitude=magnitude,
                         seed=seed,
+                        process_sigmas=process_sigmas,
+                        target_sigma=target_sigma,
                     )
                     prediction = _apply_contract(contract, _n1_design(perturbed)[evaluation_mask])
                     anchor = data["anchor"][evaluation_mask]
@@ -529,6 +865,7 @@ def run_e6(
                             anchor,
                             data["origins"][evaluation_mask],
                             data["groups"][evaluation_mask],
+                            sigma=target_sigma,
                             condition=condition,
                             magnitude=magnitude,
                             seed=seed,
@@ -548,7 +885,13 @@ def run_e6(
                                 data["y"][evaluation_mask], prediction, anchor, prediction_anchor
                             ),
                             "frozen_contract_hash": contract_hash,
-                            "support_hash": data["support_hash"],
+                            "support_hash": support_hash(
+                                np.asarray(data["base_origin_ids"])[evaluation_mask]
+                            ),
+                            "outer_train_process_sigma_hash": hashlib.sha256(
+                                np.ascontiguousarray(process_sigmas, dtype=np.float64).tobytes()
+                            ).hexdigest(),
+                            "outer_train_target_sigma": target_sigma,
                             "test_accessed": False,
                             "ood_accessed": False,
                         }
@@ -561,7 +904,8 @@ def run_e6(
         data = arrays[view_name]
         for mode in modes:
             for seed in N2_SEEDS:
-                specs.append((view_name, mode, data, seed))
+                for outer_group in range(4):
+                    specs.append((view_name, mode, data, seed, outer_group))
     if workers <= 1:
         nested_n2_rows = [_n2_worker(spec) for spec in specs]
     else:
@@ -569,6 +913,21 @@ def run_e6(
             nested_n2_rows = list(pool.map(_n2_worker, specs, chunksize=1))
     n2_rows = [row for rows in nested_n2_rows for row in rows]
     n2 = pd.DataFrame(n2_rows)
+    expected_n1 = sum(len(modes) for _, _, _, modes in definitions) * len(GAUSSIAN_LEVELS) * len(N1_SEEDS)
+    expected_n2 = sum(len(modes) for _, _, _, modes in definitions) * len(conditions) * len(N2_SEEDS) * 4
+    if len(n1) != expected_n1 or len(n2) != expected_n2:
+        raise RuntimeError(
+            f"E6 row-count certificate failed: N1={len(n1)}/{expected_n1}, "
+            f"N2={len(n2)}/{expected_n2}"
+        )
+    numeric = n2.select_dtypes(include=[np.number])
+    if not np.isfinite(numeric.to_numpy(dtype=np.float64)).all():
+        raise RuntimeError("E6 produced non-finite numeric evidence")
+    clean = n2[(n2["condition"] == "GAUSSIAN") & (n2["magnitude"] == 0.0)]
+    clean_groups = clean.groupby(["view", "mode", "outer_fold"], dropna=False)
+    for column in ("prediction_hash", "stage_vector", "active_channels"):
+        if not (clean_groups[column].nunique() == 1).all():
+            raise RuntimeError(f"E6 alpha=0 seed invariance failed for {column}")
     n2.to_csv(destination / "n2_reidentification.csv", index=False)
     summary = n2.groupby(["view", "mode", "condition", "magnitude"], as_index=False).agg(
         P_C_ACTIVE=("C_active", "mean"),
@@ -594,7 +953,14 @@ def run_e6(
             "injection_point": "raw aligned strict-past lag measurement before {128,256} fusion, normalization, and PRISM-like stage routing",
             "same_realization_across_magnitudes": True,
             "formal_test_used_as_evaluation": False,
-            "development_validation_policy": "N1 fourth entity held out; N2 four entity-held-out development OOF folds",
+            "development_validation_policy": "N1 fourth entity held out; N2 four fully refit entity-held-out development outer folds with three entity inner folds",
+            "noise_scale_policy": "per-outer-fold std from unique outer-train raw measurements only",
+            "maturity_a_lags": {"record_time": [1, 2, 4], "analyzer_maturity_5_steps": [5, 6, 8]},
+            "n1_rows": len(n1),
+            "n2_rows": len(n2),
+            "row_count_certificate": True,
+            "finite_numeric_certificate": True,
+            "alpha_zero_seed_invariance_certificate": True,
             "test_accessed": False,
             "ood_accessed": False,
         },
