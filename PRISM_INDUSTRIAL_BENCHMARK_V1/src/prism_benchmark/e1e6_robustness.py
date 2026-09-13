@@ -798,6 +798,73 @@ def _apply_contract(contract: Mapping[str, Any], x: np.ndarray) -> np.ndarray:
     ) @ np.asarray(contract["coefficient"]) + float(contract["target_mean"])
 
 
+def _plot_e6_summary(
+    n1: pd.DataFrame, summary: pd.DataFrame, destination: Path
+) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    combinations = list(
+        summary[["view", "mode"]].drop_duplicates().itertuples(index=False, name=None)
+    )
+    gaussian = summary[summary["condition"] == "GAUSSIAN"]
+    for filename, columns, ylabel in (
+        (
+            "noise_stage_activation_probability.png",
+            ("P_C_ACTIVE", "P_W_ACTIVE", "P_A_ACTIVE"),
+            "activation probability",
+        ),
+        (
+            "noise_median_admission_margin.png",
+            ("median_m_C", "median_m_W", "median_m_A"),
+            "median relative admission margin",
+        ),
+    ):
+        figure, axes = plt.subplots(
+            len(combinations), 1, figsize=(10, 3.0 * len(combinations)), sharex=True
+        )
+        axes = np.atleast_1d(axes)
+        for axis, (view, mode) in zip(axes, combinations, strict=True):
+            part = gaussian[(gaussian["view"] == view) & (gaussian["mode"] == mode)]
+            part = part.sort_values("magnitude")
+            for column, stage in zip(columns, ("C", "W", "A"), strict=True):
+                axis.plot(part["magnitude"], part[column], marker="o", label=stage)
+            if "margin" in filename:
+                axis.axhline(0.0, color="black", linewidth=0.8)
+            axis.set_title(f"{view} — {mode}")
+            axis.set_ylabel(ylabel)
+            axis.grid(alpha=0.25)
+            axis.legend(ncol=3)
+        axes[-1].set_xlabel("Gaussian noise alpha × outer-train channel std")
+        figure.tight_layout()
+        figure.savefig(destination / filename, dpi=180)
+        plt.close(figure)
+
+    frozen = n1[n1["condition"] == "GAUSSIAN"]
+    figure, axes = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+    for (view, mode), part in frozen.groupby(["view", "mode"], sort=False):
+        curve = part.groupby("magnitude", as_index=False).agg(
+            Level_R2=("Level_R2", "mean"),
+            persistence_skill=("persistence_skill", "mean"),
+        )
+        label = f"{view} — {mode}"
+        axes[0].plot(curve["magnitude"], curve["Level_R2"], marker="o", label=label)
+        axes[1].plot(
+            curve["magnitude"], curve["persistence_skill"], marker="o", label=label
+        )
+    axes[0].set_ylabel("Level R²")
+    axes[1].set_ylabel("persistence skill")
+    axes[1].set_xlabel("Gaussian noise alpha × outer-train channel std")
+    for axis in axes:
+        axis.grid(alpha=0.25)
+        axis.legend(fontsize=8)
+    figure.tight_layout()
+    figure.savefig(destination / "n1_prediction_robustness.png", dpi=180)
+    plt.close(figure)
+
+
 def run_e6(
     output: Path,
     shared_root: Path,
@@ -941,6 +1008,7 @@ def run_e6(
         persistence_skill=("persistence_skill", "mean"),
     )
     summary.to_csv(destination / "n2_robustness_summary.csv", index=False)
+    _plot_e6_summary(n1, summary, destination)
     write_json(
         destination / "STATUS.json",
         {

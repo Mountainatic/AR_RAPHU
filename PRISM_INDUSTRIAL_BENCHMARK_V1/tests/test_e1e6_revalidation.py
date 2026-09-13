@@ -221,6 +221,7 @@ def test_e6_group_lags_and_outer_folds_do_not_cross_entities() -> None:
         groups_override=labels,
     )
     assert len(result["stage_vector"]) == 3
+    assert result["parameter_count"] > 0
 
 
 def test_e6_raw_measurement_noise_precedes_history_fusion() -> None:

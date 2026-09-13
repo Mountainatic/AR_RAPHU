@@ -119,6 +119,7 @@ def main() -> None:
             "freeze",
             "phase-a",
             "phase-b",
+            "e3-e5-only",
             "e6-only",
         ),
     )
@@ -229,6 +230,23 @@ def main() -> None:
             workers=args.workers,
         )
         print(json.dumps({"e6_status": "COMPLETED"}, sort_keys=True))
+    elif args.stage == "e3-e5-only":
+        gate_path = args.output / "PHASE_A_GATE.json"
+        freeze_path = args.output / "PROVENANCE/FINAL_ABLATION_PROTOCOL_FREEZE.json"
+        if not gate_path.is_file() or not freeze_path.is_file():
+            raise FileNotFoundError("E3--E5-only requires the frozen protocol and Phase A gate")
+        gate = json.loads(gate_path.read_text(encoding="utf-8"))
+        if gate.get("verdict") != "GO":
+            raise RuntimeError(f"E3--E5 are forbidden by Phase A verdict: {gate.get('verdict')}")
+        e3 = run_e3(
+            args.output,
+            args.shared_root,
+            args.baseline_run,
+            workers=args.workers,
+        )
+        e4a, e4b = run_e4(args.output, workers=args.workers)
+        run_e5_final(args.output, e3, e4a, e4b)
+        print(json.dumps({"e3_e5_status": "COMPLETED"}, sort_keys=True))
 
 
 if __name__ == "__main__":

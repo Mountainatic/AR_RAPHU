@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 import os
+import time
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
@@ -245,6 +246,7 @@ def _run_e3_task(
     rows: list[dict[str, Any]] = []
     for seed in E3_SEEDS:
         for arm in ("UNIFORM_SCALE", "CHANNEL_SPECIFIC_MULTISCALE"):
+            started = time.perf_counter()
             candidates = _e3_candidates(channels, task.histories, seed, arm)
             # Both spaces are explicitly truncated to the same legal fit budget.
             budget = len(task.histories) * len(E3_RIDGES)
@@ -322,6 +324,7 @@ def _run_e3_task(
                     "validation_rows_before_history_support": len(validation_unfiltered),
                     "validation_rows_after_history_support": len(validation_full),
                     "parameter_count": int(design_train.shape[1] + 1),
+                    "wall_time_seconds": float(time.perf_counter() - started),
                     "Delta_RMSE": metric["rmse_delta"],
                     "Delta_MAE": metric["mae_delta"],
                     "Delta_R2": metric["r2_delta"],
@@ -520,6 +523,33 @@ def run_synthetic_variant(
     else:
         prediction, a_report = kcw.copy(), _zero_report("A_FAMILY_REMOVED")
     reports = {"C": c_report, "W": w_report, "A": a_report}
+    parameter_count = 1
+    for history in selected_histories.values():
+        lag_count = len(
+            np.unique(
+                np.rint(
+                    np.linspace(1, int(history), min(8, int(history)))
+                ).astype(np.int64)
+            )
+        )
+        parameter_count += lag_count * (2 if include_nonlinear_k else 1) + 1
+    if channel_predictions:
+        parameter_count += len(channel_predictions) + 1
+    if c_report["routing_status"] == ACTIVE:
+        c_candidate = str(c_report["final_selected_candidate"])
+        parameter_count += (
+            2 if "C_TRUE_PAIR_02" in c_candidate else len(pair_columns) + 1
+        )
+    if w_report["routing_status"] == ACTIVE:
+        parameter_count += (
+            2
+            if "W_QUADRATIC" in str(w_report["final_selected_candidate"])
+            else 4
+        )
+    if a_report["routing_status"] == ACTIVE:
+        a_candidate = str(a_report["final_selected_candidate"])
+        lag_text = a_candidate.split("|", maxsplit=1)[0].removeprefix("A_LAGS_")
+        parameter_count += len(lag_text.split("_")) + 1
     result = {
         "seed": seed,
         "regime": regime,
@@ -536,6 +566,7 @@ def run_synthetic_variant(
         "prediction_hash": hashlib.sha256(
             np.ascontiguousarray(prediction, dtype=np.float64).tobytes()
         ).hexdigest(),
+        "parameter_count": int(parameter_count),
     }
     if return_prediction:
         result["prediction"] = prediction
