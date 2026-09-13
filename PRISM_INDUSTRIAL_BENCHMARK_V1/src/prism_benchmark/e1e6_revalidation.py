@@ -393,18 +393,36 @@ def _plot_margin_distribution(frame: pd.DataFrame, path: Path) -> None:
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    fig, axis = plt.subplots(figsize=(14, 7))
+    fig, axis = plt.subplots(figsize=(15, 8))
     labels = frame["task"].astype(str) + "\n" + frame["stage"].astype(str)
     order = list(dict.fromkeys(labels.tolist()))
+    colors = {"C": "#1f77b4", "W": "#ff7f0e", "A": "#2ca02c"}
     for index, label in enumerate(order):
-        values = frame.loc[labels == label, "margin"].to_numpy(dtype=np.float64)
-        axis.scatter(np.full(len(values), index), values, s=20, alpha=0.8)
+        selected = frame.loc[labels == label]
+        values = selected["margin"].to_numpy(dtype=np.float64)
+        stage = str(selected["stage"].iloc[0])
+        axis.scatter(
+            np.full(len(values), index),
+            values,
+            s=28,
+            alpha=0.75,
+            color=colors[stage],
+            edgecolors="white",
+            linewidths=0.4,
+        )
         if len(values):
             axis.plot(index, np.median(values), marker="_", markersize=14, color="black")
     axis.axhline(0.0, color="black", linewidth=1)
+    axis.set_yscale("symlog", linthresh=1e-4, linscale=1.0)
     axis.set_xticks(range(len(order)), order, rotation=75, ha="right")
-    axis.set_ylabel("relative admission margin (reporting only)")
+    axis.set_ylabel("relative admission margin (symmetric-log scale; reporting only)")
     axis.set_title("Strict nested-OOF admission margins by task and stage")
+    axis.grid(axis="y", alpha=0.25)
+    handles = [
+        plt.Line2D([], [], marker="o", linestyle="", color=color, label=stage)
+        for stage, color in colors.items()
+    ]
+    axis.legend(handles=handles, title="stage", ncol=3, loc="lower left")
     fig.tight_layout()
     fig.savefig(path, dpi=180)
     plt.close(fig)
