@@ -16,6 +16,7 @@ from prism_benchmark.e1e6_phase_b import (
     E3_RIDGES,
     E4_UNIVERSES,
     _e3_candidates,
+    _history_supported,
     run_synthetic_variant,
 )
 from prism_benchmark.e1e6_robustness import _keyed_normal, perturbation_conditions
@@ -171,3 +172,23 @@ def test_e6_noise_is_timestamp_keyed_and_condition_grid_is_frozen() -> None:
     assert len(conditions) == 19
     assert ("GAUSSIAN", 0.0) in conditions
     assert ("RANDOM_WALK_DRIFT", 0.05) in conditions
+
+
+def test_e3_history_support_is_entity_local() -> None:
+    class Accessor:
+        entities = {
+            "a": (np.asarray([0, 1, 2, 3, 4]), {}),
+            "b": (np.asarray([10, 11, 12, 13, 14]), {}),
+        }
+
+    samples = pd.DataFrame(
+        {
+            "entity_id": ["a", "a", "b", "b"],
+            "origin": [2, 4, 12, 14],
+        }
+    )
+    observed = _history_supported(samples, Accessor(), 3)
+    assert observed[["entity_id", "origin"]].to_records(index=False).tolist() == [
+        ("a", 4),
+        ("b", 14),
+    ]

@@ -169,6 +169,31 @@ def _candidate_design(
     return np.column_stack([raw, np.square(raw)])
 
 
+def _history_supported(
+    samples: pd.DataFrame, accessor: BaseAccessor, history: int
+) -> pd.DataFrame:
+    """Restrict rows to exact entity-local raw support for a strict-past lag."""
+
+    minimum = {
+        str(entity): int(rows.min())
+        for entity, (rows, _) in accessor.entities.items()
+    }
+    entities = samples["entity_id"].astype(str).to_numpy()
+    origins = samples["origin"].to_numpy(dtype=np.int64)
+    keep = np.fromiter(
+        (
+            entity in minimum and origin - int(history) >= minimum[entity]
+            for entity, origin in zip(entities, origins, strict=True)
+        ),
+        dtype=bool,
+        count=len(samples),
+    )
+    result = samples.loc[keep].reset_index(drop=True)
+    if result.empty:
+        raise RuntimeError("candidate history support filtering removed every row")
+    return result
+
+
 def _run_e3_task(
     task: E3Task,
     shared_root: Path,
@@ -189,15 +214,21 @@ def _run_e3_task(
     channels = tuple(str(value) for value in c_result["active_channels"])
     if not channels:
         raise RuntimeError(f"E3 {task.name} has no frozen active input channels")
-    train_full = load_native_samples(shared, view, "train")
-    validation_full = load_native_samples(shared, view, "validation")
+    train_accessor = BaseAccessor(shared, task.dataset, "train", [*channels, task.target])
+    validation_accessor = BaseAccessor(shared, task.dataset, "validation", [*channels, task.target])
+    train_unfiltered = load_native_samples(shared, view, "train")
+    validation_unfiltered = load_native_samples(shared, view, "validation")
+    train_full = _history_supported(
+        train_unfiltered, train_accessor, max(task.histories)
+    )
+    validation_full = _history_supported(
+        validation_unfiltered, validation_accessor, max(task.histories)
+    )
     train = train_full.iloc[deterministic_subsample(train_full, 20000)].reset_index(drop=True)
     validation = validation_full.iloc[
         deterministic_subsample(validation_full, 20000)
     ].reset_index(drop=True)
     folds = inner_folds(train, count=4)
-    train_accessor = BaseAccessor(shared, task.dataset, "train", [*channels, task.target])
-    validation_accessor = BaseAccessor(shared, task.dataset, "validation", [*channels, task.target])
     train_cache: dict[tuple[str, int], np.ndarray] = {}
     validation_cache: dict[tuple[str, int], np.ndarray] = {}
     for channel in channels:
@@ -286,6 +317,10 @@ def _run_e3_task(
                     "selected_scale_assignment": json.dumps(list(assignment)),
                     "distinct_selected_scales": len(set(assignment)),
                     "channels": len(channels),
+                    "train_rows_before_history_support": len(train_unfiltered),
+                    "train_rows_after_history_support": len(train_full),
+                    "validation_rows_before_history_support": len(validation_unfiltered),
+                    "validation_rows_after_history_support": len(validation_full),
                     "parameter_count": int(design_train.shape[1] + 1),
                     "Delta_RMSE": metric["rmse_delta"],
                     "Delta_MAE": metric["mae_delta"],
