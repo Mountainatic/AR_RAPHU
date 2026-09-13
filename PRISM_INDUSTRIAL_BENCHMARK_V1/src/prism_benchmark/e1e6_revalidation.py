@@ -27,7 +27,12 @@ import pandas as pd
 
 from .cpu_data import BaseAccessor, realized_state_profiles
 from .level_reconstruction import metric_bundle_delta_and_level, support_hash
-from .strict_oof_selection import ACTIVE, ZERO_IDENTITY, strict_nested_oof_select
+from .strict_oof_selection import (
+    ACTIVE,
+    ZERO_IDENTITY,
+    numerical_epsilon,
+    strict_nested_oof_select,
+)
 from .v21_a import EXACT_ZERO, fit_mature_residual_ar, mature_residual_features
 from .v2_views import development_dynamic_views
 from .v211_config import PUBLIC_ALL_PROTOCOL, load_v211_configs
@@ -86,7 +91,18 @@ def _git(project: Path, *args: str) -> str:
 def _selection_report(selection: Mapping[str, Any]) -> dict[str, Any]:
     parent = float(selection["parent_oof_risk"])
     child = float(selection["child_oof_risk"])
-    gain = float(selection.get("absolute_oof_gain", selection["incremental_gain"]))
+    # Cached candidate fits and nested-OOF losses may be reused, but E1 must
+    # not inherit an earlier serialized stage decision.  Recompute the only
+    # admissible gate from the frozen evidence and fail closed if it differs
+    # from the stored strict run.
+    gain = float(parent - child)
+    epsilon_num = numerical_epsilon(parent, child)
+    route = ACTIVE if gain > epsilon_num else ZERO_IDENTITY
+    stored_route = str(selection["routing_status"])
+    if stored_route != route:
+        raise RuntimeError(
+            "cached strict stage route does not replay from its frozen OOF evidence"
+        )
     parents = np.asarray(selection["parent_outer_fold_losses"], dtype=np.float64)
     children = np.asarray(selection["child_outer_fold_losses"], dtype=np.float64)
     fold_margins = (parents - children) / np.maximum(
@@ -100,15 +116,21 @@ def _selection_report(selection: Mapping[str, Any]) -> dict[str, Any]:
                 gain / max(parent, np.finfo(np.float64).eps),
             )
         ),
-        "route": str(selection["routing_status"]),
+        "route": route,
         "outer_fold_margins": fold_margins.tolist(),
         "margin_signs": [
             1 if value > 0 else (-1 if value < 0 else 0)
             for value in fold_margins
         ],
-        "candidate_id": str(selection["final_selected_candidate"]),
+        "candidate_id": str(
+            selection.get(
+                "tuned_nonzero_candidate", selection["final_selected_candidate"]
+            )
+        ),
         "parent_candidate_id": str(selection["identity"]),
-        "epsilon_num": float(selection["epsilon_num"]),
+        "epsilon_num": epsilon_num,
+        "stored_epsilon_num": float(selection["epsilon_num"]),
+        "stage_decision_recomputed": True,
         "reporting_only": True,
     }
 

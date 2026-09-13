@@ -40,7 +40,26 @@ def test_selection_reporting_margin_has_no_routing_authority() -> None:
     )
     assert report["relative_admission_margin"] == 0.1
     assert report["margin_signs"] == [1, 1, 0, -1]
+    assert report["stage_decision_recomputed"] is True
     assert report["reporting_only"] is True
+
+
+def test_cached_stage_route_must_replay_from_oof_evidence() -> None:
+    with pytest.raises(RuntimeError, match="does not replay"):
+        _selection_report(
+            {
+                "parent_oof_risk": 1.0,
+                "child_oof_risk": 0.9,
+                "incremental_gain": 0.1,
+                "parent_outer_fold_losses": [1.0, 1.0, 1.0],
+                "child_outer_fold_losses": [0.9, 0.9, 0.9],
+                "routing_status": "ZERO_IDENTITY",
+                "final_selected_candidate": "zero",
+                "tuned_nonzero_candidate": "candidate",
+                "identity": "zero",
+                "epsilon_num": np.finfo(np.float64).eps,
+            }
+        )
 
 
 def test_joint_counterfactual_parser_rejects_unregistered_eta(monkeypatch) -> None:
