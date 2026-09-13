@@ -119,6 +119,7 @@ def main() -> None:
             "freeze",
             "phase-a",
             "phase-b",
+            "e6-only",
         ),
     )
     parser.add_argument("--kind", choices=("d1", "d2"))
@@ -213,6 +214,21 @@ def main() -> None:
             workers=args.workers,
         )
         print(json.dumps({"phase_b_status": "COMPLETED"}, sort_keys=True))
+    elif args.stage == "e6-only":
+        gate_path = args.output / "PHASE_A_GATE.json"
+        freeze_path = args.output / "PROVENANCE/FINAL_ABLATION_PROTOCOL_FREEZE.json"
+        if not gate_path.is_file() or not freeze_path.is_file():
+            raise FileNotFoundError("E6-only requires the frozen protocol and Phase A gate")
+        gate = json.loads(gate_path.read_text(encoding="utf-8"))
+        if gate.get("verdict") != "GO":
+            raise RuntimeError(f"E6 is forbidden by Phase A verdict: {gate.get('verdict')}")
+        run_e6(
+            args.output,
+            args.shared_root,
+            args.baseline_run,
+            workers=args.workers,
+        )
+        print(json.dumps({"e6_status": "COMPLETED"}, sort_keys=True))
 
 
 if __name__ == "__main__":
