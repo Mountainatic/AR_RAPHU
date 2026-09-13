@@ -12,6 +12,13 @@ from prism_benchmark.e1e6_revalidation import (
     run_identifiable_seed,
 )
 from prism_benchmark.level_reconstruction import metric_bundle_delta_and_level
+from prism_benchmark.e1e6_phase_b import (
+    E3_RIDGES,
+    E4_UNIVERSES,
+    _e3_candidates,
+    run_synthetic_variant,
+)
+from prism_benchmark.e1e6_robustness import _keyed_normal, perturbation_conditions
 from prism_benchmark.v211_joint_stability import _revalidation_counterfactual_specs
 
 
@@ -109,3 +116,58 @@ def test_metric_sufficient_statistics_reconstruct_fold_subset_exactly() -> None:
     assert observed["persistence_skill"] == pytest.approx(
         expected["persistence_skill"]
     )
+
+
+def test_e3_equal_budget_candidate_registration_is_exact() -> None:
+    channels = ("a", "b", "c")
+    histories = (8, 16, 32)
+    uniform = _e3_candidates(channels, histories, 3, "UNIFORM_SCALE")
+    multiscale = _e3_candidates(
+        channels, histories, 3, "CHANNEL_SPECIFIC_MULTISCALE"
+    )
+    expected = len(histories) * len(E3_RIDGES)
+    assert len(uniform) == expected
+    assert len(multiscale) == expected
+    assert len(set(uniform)) == expected
+    assert len(set(multiscale)) == expected
+    assert all(len(set(assignment)) == 1 for assignment, _ in uniform)
+    assert any(len(set(assignment)) > 1 for assignment, _ in multiscale)
+
+
+def test_e4_grids_are_nested_and_family_removal_is_external_zero() -> None:
+    histories = [set(E4_UNIVERSES[name]["histories"]) for name in ("COARSE", "STANDARD", "EXPANDED")]
+    ridges = [set(E4_UNIVERSES[name]["ridges"]) for name in ("COARSE", "STANDARD", "EXPANDED")]
+    assert histories[0] < histories[1] < histories[2]
+    assert ridges[0] < ridges[1] < ridges[2]
+    left = run_synthetic_variant(
+        2,
+        "S4",
+        histories=(1, 4),
+        ridges=(1e-3, 1.0),
+        include_w=False,
+        n=512,
+    )
+    right = run_synthetic_variant(
+        2,
+        "S4",
+        histories=(1, 4),
+        ridges=(1e-3, 1.0),
+        include_w=False,
+        n=512,
+    )
+    assert left["W_active"] is False
+    assert left["W_margin"] == 0.0
+    assert left["prediction_hash"] == right["prediction_hash"]
+
+
+def test_e6_noise_is_timestamp_keyed_and_condition_grid_is_frozen() -> None:
+    indices = np.asarray([10, 11, 10, 15], dtype=np.int64)
+    left = _keyed_normal(indices, 3, 7)
+    right = _keyed_normal(indices, 3, 7)
+    assert np.array_equal(left, right)
+    assert left[0] == left[2]
+    assert not np.array_equal(left, _keyed_normal(indices, 4, 7))
+    conditions = perturbation_conditions()
+    assert len(conditions) == 19
+    assert ("GAUSSIAN", 0.0) in conditions
+    assert ("RANDOM_WALK_DRIFT", 0.05) in conditions

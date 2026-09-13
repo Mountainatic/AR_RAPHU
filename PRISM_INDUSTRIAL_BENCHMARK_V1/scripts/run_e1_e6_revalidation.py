@@ -26,6 +26,8 @@ from prism_benchmark.e1e6_revalidation import (
     write_json,
     write_provenance,
 )
+from prism_benchmark.e1e6_phase_b import run_e3, run_e4, run_e5_final
+from prism_benchmark.e1e6_robustness import run_e6
 from prism_benchmark.v2_views import development_dynamic_views
 from prism_benchmark.v211_config import PUBLIC_ALL_PROTOCOL
 from prism_benchmark.v211_joint_stability import (
@@ -110,7 +112,14 @@ def main() -> None:
     )
     parser.add_argument(
         "stage",
-        choices=("provenance", "joint-diagnostic", "diagnostic-reports", "freeze", "phase-a"),
+        choices=(
+            "provenance",
+            "joint-diagnostic",
+            "diagnostic-reports",
+            "freeze",
+            "phase-a",
+            "phase-b",
+        ),
     )
     parser.add_argument("--kind", choices=("d1", "d2"))
     parser.add_argument("--repo", type=Path, required=True)
@@ -182,6 +191,28 @@ def main() -> None:
         audit = audit_before_gate(args.output, e2, null)
         verdict = phase_a_gate(args.output, e2, null, audit)
         print(json.dumps({"phase_a_verdict": verdict}, sort_keys=True))
+    elif args.stage == "phase-b":
+        gate_path = args.output / "PHASE_A_GATE.json"
+        if not gate_path.is_file():
+            raise FileNotFoundError("Phase B requires the completed Phase A gate")
+        gate = json.loads(gate_path.read_text(encoding="utf-8"))
+        if gate.get("verdict") != "GO":
+            raise RuntimeError(f"Phase B is forbidden by Phase A verdict: {gate.get('verdict')}")
+        e3 = run_e3(
+            args.output,
+            args.shared_root,
+            args.baseline_run,
+            workers=args.workers,
+        )
+        e4a, e4b = run_e4(args.output, workers=args.workers)
+        run_e5_final(args.output, e3, e4a, e4b)
+        run_e6(
+            args.output,
+            args.shared_root,
+            args.baseline_run,
+            workers=args.workers,
+        )
+        print(json.dumps({"phase_b_status": "COMPLETED"}, sort_keys=True))
 
 
 if __name__ == "__main__":
