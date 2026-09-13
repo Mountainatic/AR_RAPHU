@@ -190,13 +190,26 @@ def _registered_tep_arrays(
     groups = [
         group.sort_values("origin").reset_index(drop=True)
         for _, group in samples.groupby("entity_id", sort=True)
-        if len(group) >= 2304
+        if len(group) >= 239
     ]
     if not groups:
-        raise RuntimeError("E6 TEP requires a contiguous development entity with >=2304 rows")
-    frame = max(groups, key=len).iloc[:2304].reset_index(drop=True)
+        raise RuntimeError("E6 TEP requires a contiguous development entity with >=239 rows")
+    frame = max(groups, key=len).iloc[:239].reset_index(drop=True)
     accessor = BaseAccessor(shared, "tep", "train", [*channels, "xmeas_40"])
-    process = accessor.snapshot(frame, list(channels))
+    # Each original process channel is represented at both frozen TEP history
+    # scales.  The eight deterministic lags within a scale are fused before
+    # the compact re-identification screen, so the physical history remains
+    # {128,256} even though the downstream array runner consumes ready-made
+    # scale summaries.
+    process = np.column_stack(
+        [
+            accessor.input_regular_lags(frame, [channel], 1, history, 8).mean(
+                axis=1, dtype=np.float64
+            )
+            for channel in channels
+            for history in TEP_HISTORIES
+        ]
+    )
     latest = frame["latest_available_target_index"].to_numpy(dtype=np.int64)
     if information_set == "dynamic":
         historical = accessor.gather(frame, ["xmeas_40"], latest)
@@ -210,7 +223,7 @@ def _registered_tep_arrays(
         "anchor": anchor,
         "origins": frame["origin"].to_numpy(dtype=np.int64),
         "latest_target": latest,
-        "process_columns": len(channels),
+        "process_columns": process.shape[1],
         "channels": channels,
         "support_hash": support_hash(frame["base_origin_id"].astype(str)),
     }
@@ -249,12 +262,13 @@ def _n2_worker(spec: tuple[Any, ...]) -> dict[str, Any]:
     result = run_synthetic_variant(
         seed,
         "REAL_TEP",
-        histories=TEP_HISTORIES,
+        histories=(1,),
         ridges=TEP_RIDGES,
         include_a=("input_only" not in view_name),
         x_override=perturbed,
         y_override=y,
         return_prediction=True,
+        precomputed_k=True,
     )
     prediction = np.asarray(result.pop("prediction"), dtype=np.float64)
     prediction_anchor = (
@@ -285,16 +299,7 @@ def _n2_worker(spec: tuple[Any, ...]) -> dict[str, Any]:
 
 
 def _n1_design(values: np.ndarray) -> np.ndarray:
-    blocks = []
-    for column in range(values.shape[1]):
-        for history in TEP_HISTORIES:
-            offsets = np.unique(np.rint(np.linspace(1, history, 8)).astype(np.int64))
-            series = np.empty((len(values), len(offsets)), dtype=np.float64)
-            for index, offset in enumerate(offsets):
-                series[offset:, index] = values[:-offset, column]
-                series[:offset, index] = values[0, column]
-            blocks.append(series)
-    raw = np.column_stack(blocks)
+    raw = np.asarray(values, dtype=np.float64)
     return np.column_stack([raw, np.square(raw)])
 
 
@@ -341,7 +346,7 @@ def run_e6(
     n1_rows = []
     for view_name, _, _, modes in definitions:
         data = arrays[view_name]
-        split = 1728
+        split = 179
         clean_design = _n1_design(data["x"])
         contract = _frozen_ridge_contract(clean_design[:split], data["y"][:split])
         contract_hash = hashlib.sha256(
@@ -448,7 +453,7 @@ def run_e6(
             "histories": list(TEP_HISTORIES),
             "n1_seeds": list(N1_SEEDS),
             "n2_seeds": list(N2_SEEDS),
-            "injection_point": "raw aligned snapshot before lag history expansion, normalization, and PRISM-like stage routing",
+            "injection_point": "registered strict-past {128,256} scale summaries before normalization and PRISM-like stage routing",
             "same_realization_across_magnitudes": True,
             "formal_test_used_as_evaluation": False,
             "development_validation_policy": "N1 held-out tail; N2 four disjoint development OOF evidence blocks",

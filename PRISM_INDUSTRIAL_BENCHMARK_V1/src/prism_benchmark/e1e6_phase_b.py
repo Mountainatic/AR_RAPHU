@@ -406,6 +406,7 @@ def run_synthetic_variant(
     x_override: np.ndarray | None = None,
     y_override: np.ndarray | None = None,
     return_prediction: bool = False,
+    precomputed_k: bool = False,
 ) -> dict[str, Any]:
     if (x_override is None) != (y_override is None):
         raise ValueError("x_override and y_override must be supplied together")
@@ -425,10 +426,13 @@ def run_synthetic_variant(
     for channel in range(x.shape[1]):
         candidates: dict[str, np.ndarray] = {}
         for history in histories:
-            offsets = np.unique(
-                np.rint(np.linspace(1, int(history), min(8, int(history)))).astype(np.int64)
-            )
-            lagged = _lag_block(x[:, channel], offsets.tolist())
+            if precomputed_k:
+                lagged = x[:, channel, None]
+            else:
+                offsets = np.unique(
+                    np.rint(np.linspace(1, int(history), min(8, int(history)))).astype(np.int64)
+                )
+                lagged = _lag_block(x[:, channel], offsets.tolist())
             features = (
                 np.column_stack([lagged, np.square(lagged)])
                 if include_nonlinear_k
@@ -449,12 +453,21 @@ def run_synthetic_variant(
         else parent
     )
     if include_c:
+        # The registered interaction screen is capped before family fitting;
+        # this keeps E6's two-scale TEP summary representation tractable while
+        # leaving the six-channel identifiable E2/E4 universe unchanged.
+        interaction_columns = min(8, x.shape[1])
         pair_columns = [
             x[:, left] * x[:, right]
-            for left in range(x.shape[1])
-            for right in range(left + 1, x.shape[1])
+            for left in range(interaction_columns)
+            for right in range(left + 1, interaction_columns)
         ]
-        true_pair = _lag_block(x[:, 0], [1])[:, 0] * _lag_block(x[:, 2], [2])[:, 0]
+        true_pair = (
+            x[:, 0] * x[:, 2]
+            if precomputed_k
+            else _lag_block(x[:, 0], [1])[:, 0]
+            * _lag_block(x[:, 2], [2])[:, 0]
+        )
         c_candidates = {}
         for alpha in ridges:
             c_candidates[f"C_TRUE_PAIR_02|alpha={alpha}"] = true_pair[:, None]

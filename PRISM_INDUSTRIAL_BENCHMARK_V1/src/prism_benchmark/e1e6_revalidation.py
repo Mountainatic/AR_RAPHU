@@ -1144,7 +1144,7 @@ def write_freeze(output: Path, project: Path, provenance: Mapping[str, Any]) -> 
                 "views": ["input_only/record_time", "dynamic/record_time", "dynamic/analyzer_maturity_5_steps"],
                 "history_grid": [128, 256],
                 "ridge_grid": [1e-3],
-                "source_rows_per_view": 2304,
+                "source_rows_per_view": 239,
                 "N1_evaluation": "held-out development tail; Gaussian only",
                 "N2_evaluation": "four disjoint development OOF evidence blocks",
             },
