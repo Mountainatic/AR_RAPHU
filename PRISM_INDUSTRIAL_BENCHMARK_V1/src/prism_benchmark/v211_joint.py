@@ -243,6 +243,50 @@ def align_joint_oof_rows(
     )
 
 
+def register_joint_fold_on_oof_support(
+    joint_fold: Mapping[str, Any],
+    w_oof_rows: pd.DataFrame,
+    c_oof_rows: pd.DataFrame,
+) -> dict[str, Any]:
+    """Register Joint evaluation on the frozen C/W OOF row namespace.
+
+    C and W materialize their OOF rows from the record-time input-only view and
+    apply the frozen per-fold cap there.  An availability-specific Joint view
+    can have a smaller supported set, but it must not apply that cap
+    independently: doing so can select rows that do not exist in the frozen
+    upstream OOF artifacts.  The legal Joint evaluation support is therefore
+    the availability-supported intersection with both registered OOF sets.
+    """
+    supported = joint_fold.get("evaluation_supported")
+    if not isinstance(supported, pd.DataFrame):
+        raise JointFoldProtocolMismatch(
+            "Joint fold is missing uncapped availability-supported evaluation rows"
+        )
+    for label, frame in (("W OOF", w_oof_rows), ("C OOF", c_oof_rows)):
+        if "base_origin_id" not in frame.columns:
+            raise JointFoldProtocolMismatch(f"{label} is missing base_origin_id")
+        if frame["base_origin_id"].astype(str).duplicated().any():
+            raise JointFoldProtocolMismatch(
+                f"{label} requires unique registered base_origin_id rows"
+            )
+    registered_ids = set(w_oof_rows["base_origin_id"].astype(str)).intersection(
+        c_oof_rows["base_origin_id"].astype(str)
+    )
+    evaluation = supported.loc[
+        supported["base_origin_id"].astype(str).isin(registered_ids)
+    ].reset_index(drop=True)
+    if evaluation.empty:
+        raise JointFoldProtocolMismatch(
+            "Joint evaluation has no availability-supported rows on the frozen C/W OOF intersection"
+        )
+    aligned = dict(joint_fold)
+    aligned["evaluation"] = evaluation
+    aligned["registered_w_oof_rows"] = len(w_oof_rows)
+    aligned["registered_c_oof_rows"] = len(c_oof_rows)
+    aligned["registered_common_oof_rows"] = len(registered_ids)
+    return aligned
+
+
 def intersect_by_base_origin_id(
     samples: pd.DataFrame,
     registered_support: pd.DataFrame,
@@ -844,18 +888,23 @@ def run_joint_view(
             joint_folds, registered_input_folds, strict=True
         ):
             fold = int(fold_record["fold_index"])
+            w_fold_oof = w_oof[w_oof["oof_fold"] == fold].reset_index(drop=True)
+            c_fold_oof = c_oof[c_oof["oof_fold"] == fold].reset_index(drop=True)
+            fold_record = register_joint_fold_on_oof_support(
+                fold_record, w_fold_oof, c_fold_oof
+            )
             fit = fold_record["fit"]
             evaluation = fold_record["evaluation"]
             registered_input_fold = align_registered_joint_fold(
                 fold_record, registered_input_fold
             )
             w_evaluation = align_joint_oof_rows(
-                w_oof[w_oof["oof_fold"] == fold].reset_index(drop=True),
+                w_fold_oof,
                 evaluation,
                 label=f"W OOF fold {fold}",
             )
             c_evaluation = align_joint_oof_rows(
-                c_oof[c_oof["oof_fold"] == fold].reset_index(drop=True),
+                c_fold_oof,
                 evaluation,
                 label=f"C OOF fold {fold}",
             )

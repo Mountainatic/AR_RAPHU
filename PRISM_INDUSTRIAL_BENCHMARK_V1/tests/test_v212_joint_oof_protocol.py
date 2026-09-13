@@ -23,6 +23,7 @@ from prism_benchmark.v211_joint import (
     evaluate_joint_candidates_ordered,
     fit_joint_candidate,
     intersect_by_base_origin_id,
+    register_joint_fold_on_oof_support,
     registered_joint_candidates,
     registered_joint_inner_fold_frames,
     run_joint_view,
@@ -220,6 +221,50 @@ def test_joint_cap_is_shared_before_input_only_projection() -> None:
             assert aligned[name]["view_sample_id"].str.startswith(
                 "input-sample-"
             ).all()
+
+
+def test_joint_evaluation_is_registered_on_frozen_c_w_oof_cap() -> None:
+    registered = _train_frame(rows=1200, information_set="input")
+    dynamic = _train_frame(rows=1200, information_set="dynamic").iloc[
+        np.arange(1200) % 3 != 1
+    ].reset_index(drop=True)
+    joint_folds = registered_joint_inner_fold_frames(
+        dynamic, fold_count=4, fit_cap=73, evaluation_cap=41
+    )
+    input_folds = registered_joint_inner_fold_frames(
+        registered, fold_count=4, fit_cap=73, evaluation_cap=41
+    )
+    assert any(
+        not set(joint_fold["evaluation"]["base_origin_id"]).issubset(
+            set(input_fold["evaluation"]["base_origin_id"])
+        )
+        for joint_fold, input_fold in zip(joint_folds, input_folds, strict=True)
+    )
+    for joint_fold, input_fold in zip(joint_folds, input_folds, strict=True):
+        oof = input_fold["evaluation"][
+            ["base_origin_id", "view_sample_id"]
+        ].copy()
+        registered_joint = register_joint_fold_on_oof_support(
+            joint_fold, oof, oof.copy()
+        )
+        aligned_input = align_registered_joint_fold(
+            registered_joint, input_fold
+        )
+        w_evaluation = align_joint_oof_rows(
+            oof, registered_joint["evaluation"], label="W test OOF"
+        )
+        c_evaluation = align_joint_oof_rows(
+            oof, registered_joint["evaluation"], label="C test OOF"
+        )
+        assert set(registered_joint["evaluation"]["base_origin_id"]).issubset(
+            set(oof["base_origin_id"])
+        )
+        assert audit_joint_fold_protocol(
+            registered_joint,
+            aligned_input,
+            w_evaluation,
+            c_evaluation,
+        )["pass"] is True
 
 
 def test_joint_does_not_skip_fold_zero() -> None:

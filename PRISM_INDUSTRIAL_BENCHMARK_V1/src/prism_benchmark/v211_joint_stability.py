@@ -38,6 +38,7 @@ from .v211_joint import (
     fit_joint_candidate,
     intersect_by_base_origin_id,
     joint_w_basis,
+    register_joint_fold_on_oof_support,
     registered_joint_inner_fold_frames,
 )
 from .v211_k import load_active_channels
@@ -855,6 +856,11 @@ def run_joint_stability_view(
             joint_folds, registered_input_folds, strict=True
         ):
             fold = int(fold_record["fold_index"])
+            w_fold_oof = w_oof[w_oof["oof_fold"] == fold].reset_index(drop=True)
+            c_fold_oof = c_oof[c_oof["oof_fold"] == fold].reset_index(drop=True)
+            fold_record = register_joint_fold_on_oof_support(
+                fold_record, w_fold_oof, c_fold_oof
+            )
             fit = fold_record["fit"]
             evaluation = fold_record["evaluation"]
             registered_input_fold = align_registered_joint_fold(
@@ -864,12 +870,12 @@ def run_joint_stability_view(
                 fold_record,
                 registered_input_fold,
                 align_joint_oof_rows(
-                    w_oof[w_oof["oof_fold"] == fold].reset_index(drop=True),
+                    w_fold_oof,
                     evaluation,
                     label=f"W OOF fold {fold}",
                 ),
                 align_joint_oof_rows(
-                    c_oof[c_oof["oof_fold"] == fold].reset_index(drop=True),
+                    c_fold_oof,
                     evaluation,
                     label=f"C OOF fold {fold}",
                 ),
