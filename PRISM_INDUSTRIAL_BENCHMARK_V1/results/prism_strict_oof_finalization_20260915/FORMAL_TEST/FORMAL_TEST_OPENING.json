@@ -1,0 +1,8 @@
+{
+  "FORMAL_TEST_OPENED": true,
+  "commit": "73d0bd4c69148c0cb91459f39f166acacf5856b6",
+  "execution_lock_sha256": "f22d139ac2b4aff7d2e24b01a57cf9fb8fd3706b34163849d0a6a6ea1e99f558",
+  "first_target_access_follows_this_event": true,
+  "partition_lock_sha256": "23f8b0290585160a8b2890db1abbce85e36f6981d3b75f0426feb5011bb5b792",
+  "timestamp_utc": "2026-09-14T16:21:14.597515+00:00"
+}

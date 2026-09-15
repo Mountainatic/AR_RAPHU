@@ -108,16 +108,27 @@ def _selection_report(selection: Mapping[str, Any]) -> dict[str, Any]:
     fold_margins = (parents - children) / np.maximum(
         parents, np.finfo(np.float64).eps
     )
+    symmetric_denominator = np.maximum(
+        np.maximum(parents, children), np.finfo(np.float64).eps
+    )
+    symmetric_fold_margins = (parents - children) / symmetric_denominator
+    raw_margin = float(
+        selection.get(
+            "relative_admission_margin",
+            gain / max(parent, np.finfo(np.float64).eps),
+        )
+    )
+    symmetric_margin = float(
+        gain / max(parent, child, np.finfo(np.float64).eps)
+    )
     return {
         "absolute_oof_gain": gain,
-        "relative_admission_margin": float(
-            selection.get(
-                "relative_admission_margin",
-                gain / max(parent, np.finfo(np.float64).eps),
-            )
-        ),
+        "relative_admission_margin": raw_margin,
+        "raw_relative_admission_margin": raw_margin,
+        "symmetric_reporting_margin": symmetric_margin,
         "route": route,
         "outer_fold_margins": fold_margins.tolist(),
+        "outer_fold_symmetric_margins": symmetric_fold_margins.tolist(),
         "margin_signs": [
             1 if value > 0 else (-1 if value < 0 else 0)
             for value in fold_margins
@@ -164,6 +175,46 @@ def _parameter_count(result: Mapping[str, Any]) -> int:
     return 0
 
 
+def _prediction_hash(frame: pd.DataFrame) -> str:
+    values = np.ascontiguousarray(frame["y_pred"].to_numpy(dtype=np.float64))
+    return hashlib.sha256(values.tobytes()).hexdigest()
+
+
+def _frame_support_hash(frame: pd.DataFrame) -> str:
+    return support_hash(frame["base_origin_id"].astype(str))
+
+
+def _metrics_equal(left: Mapping[str, Any], right: Mapping[str, Any]) -> bool:
+    return json.dumps(left, sort_keys=True, default=_json_default) == json.dumps(
+        right, sort_keys=True, default=_json_default
+    )
+
+
+def _safe_slug(value: str) -> str:
+    return "".join(character if character.isalnum() or character in "-_" else "_" for character in value)
+
+
+def _replay_prefix_frames(
+    raw_frames: Mapping[str, pd.DataFrame],
+    routes: Mapping[str, str],
+) -> dict[str, pd.DataFrame]:
+    """Build chain-consistent prefixes without changing any raw artifact."""
+
+    chain: dict[str, pd.DataFrame] = {"K": raw_frames["K"].copy(deep=True)}
+    for stage, parent, child in (
+        ("C", "K", "KC"),
+        ("W", "KC", "KCW"),
+        ("A", "KCW", "KCWA"),
+    ):
+        if routes.get(stage) == ACTIVE:
+            chain[child] = raw_frames[child].copy(deep=True)
+        else:
+            chain[child] = chain[parent].copy(deep=True)
+    if "J" in raw_frames:
+        chain["J"] = raw_frames["J"].copy(deep=True)
+    return chain
+
+
 def _result(path: Path) -> dict[str, Any]:
     if not path.is_file():
         raise FileNotFoundError(path)
@@ -171,13 +222,19 @@ def _result(path: Path) -> dict[str, Any]:
 
 
 def _prediction(results: Path, result: Mapping[str, Any]) -> pd.DataFrame:
+    return pd.read_parquet(_prediction_file(results, result))
+
+
+def _prediction_file(results: Path, result: Mapping[str, Any]) -> Path:
     relative = result.get("prediction_path") or result.get("final_selected_prediction_path")
     if not relative:
         raise KeyError("prediction_path")
     path = results / str(relative)
     if not path.is_file() and str(relative).startswith("DEVELOPMENT/"):
         path = results / str(relative)
-    return pd.read_parquet(path)
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    return path
 
 
 @dataclass(frozen=True)
@@ -234,10 +291,14 @@ def run_e1_cached(
 ) -> pd.DataFrame:
     destination = output / "E1_STAGEWISE"
     destination.mkdir(parents=True, exist_ok=True)
+    chain_destination = destination / "chain_consistent_prefix_predictions"
+    chain_destination.mkdir(parents=True, exist_ok=True)
     base_results = baseline_run / "results"
     tep_results = tep_repair_run / "results"
     table_rows: list[dict[str, Any]] = []
     margin_rows: list[dict[str, Any]] = []
+    replay_rows: list[dict[str, Any]] = []
+    parameter_rows: list[dict[str, Any]] = []
     for view in FORMAL_VIEWS:
         shared = shared_root / view.shared_name
         c_path = base_results / "DEVELOPMENT" / "C" / view.head / view.proxy / "RESULT.json"
@@ -297,41 +358,24 @@ def run_e1_cached(
         aligned = {name: _align_to(reference, frame) for name, frame in frames.items()}
         reference_meta = reference[["base_origin_id", "entity_id", "origin"]].copy()
         current = _current_levels(shared, view, reference_meta)
-        prefix_metrics: dict[str, dict[str, Any]] = {}
-        for name, frame in aligned.items():
-            prefix_metrics[name] = _metrics(
-                frame["y_true"].to_numpy(dtype=np.float64),
-                frame["y_pred"].to_numpy(dtype=np.float64),
-                current,
-            )
-        row: dict[str, Any] = {
-            "task": view.task,
-            "view": "input_only/record_time" if not view.dynamic else f"dynamic/{view.availability}",
-            "rows": len(reference),
-            "support_hash": support_hash(reference["base_origin_id"].astype(str)),
-            "active_channel_count": len(c_result.get("active_channels", [])),
-        }
-        for prefix in ("K", "KC", "KCW", "KCWA", "J"):
-            metric = prefix_metrics[prefix]
-            row[f"{prefix}_RMSE"] = metric["rmse_delta"]
-            row[f"{prefix}_MAE"] = metric["mae_delta"]
-            row[f"{prefix}_Delta_R2"] = metric["r2_delta"]
-            row[f"{prefix}_Level_R2"] = metric["r2_level_reconstructed"]
-            row[f"{prefix}_persistence_skill"] = metric["persistence_skill"]
-            row[f"{prefix}_parameter_count"] = _parameter_count(results_by_prefix[prefix])
+        view_label = "input_only/record_time" if not view.dynamic else f"dynamic/{view.availability}"
         stage_pairs = {"C": ("K", "KC"), "W": ("KC", "KCW"), "A": ("KCW", "KCWA")}
         stage_results: dict[str, Mapping[str, Any] | None] = {
             "C": c_result,
             "W": w_result,
             "A": results_by_prefix.get("KCWA") if view.dynamic else None,
         }
+        stage_reports: dict[str, dict[str, Any]] = {}
         for stage, (parent, child) in stage_pairs.items():
             if stage_results[stage] is None:
-                report = {
-                    "route": "ZERO_IDENTITY",
+                stage_reports[stage] = {
+                    "route": ZERO_IDENTITY,
                     "relative_admission_margin": 0.0,
+                    "raw_relative_admission_margin": 0.0,
+                    "symmetric_reporting_margin": 0.0,
                     "absolute_oof_gain": 0.0,
                     "outer_fold_margins": [],
+                    "outer_fold_symmetric_margins": [],
                     "margin_signs": [],
                     "candidate_id": "NOT_APPLICABLE_INPUT_ONLY",
                     "parent_candidate_id": parent,
@@ -339,9 +383,158 @@ def run_e1_cached(
                     "reporting_only": True,
                 }
             else:
-                report = _selection_report(
+                stage_reports[stage] = _selection_report(
                     _selection_for(stage, stage_results[stage] or {})
                 )
+
+        # Route prefixes from the frozen stage evidence.  A ZERO stage is an
+        # external identity element and therefore copies its parent frame
+        # byte-for-byte; raw full-refit stage artifacts remain available in
+        # ``aligned`` for the reporting audit below.
+        chain_frames = _replay_prefix_frames(
+            aligned,
+            {stage: report["route"] for stage, report in stage_reports.items()},
+        )
+
+        prefix_metrics: dict[str, dict[str, Any]] = {
+            name: _metrics(
+                frame["y_true"].to_numpy(dtype=np.float64),
+                frame["y_pred"].to_numpy(dtype=np.float64),
+                current,
+            )
+            for name, frame in chain_frames.items()
+        }
+        task_slug = _safe_slug(view.task)
+        view_slug = _safe_slug(view_label)
+        artifact_dir = chain_destination / task_slug / view_slug
+        artifact_dir.mkdir(parents=True, exist_ok=True)
+        chain_paths: dict[str, str] = {}
+        for prefix, frame in chain_frames.items():
+            path = artifact_dir / f"{prefix}.parquet"
+            # Include the frozen reference metadata in every replay artifact.
+            output_frame = reference_meta.copy()
+            output_frame["y_true"] = frame["y_true"].to_numpy(dtype=np.float64)
+            output_frame["y_pred"] = frame["y_pred"].to_numpy(dtype=np.float64)
+            output_frame.to_parquet(path, index=False)
+            chain_paths[prefix] = str(path.relative_to(output))
+
+        # Compare every routed prefix with its parent and retain both raw and
+        # chain-consistent paths for exact-zero auditing.
+        for stage, (parent, child) in stage_pairs.items():
+            parent_frame = chain_frames[parent]
+            raw_child_frame = aligned[child]
+            child_frame = chain_frames[child]
+            differences = np.abs(
+                parent_frame["y_pred"].to_numpy(dtype=np.float64)
+                - child_frame["y_pred"].to_numpy(dtype=np.float64)
+            )
+            raw_differences = np.abs(
+                parent_frame["y_pred"].to_numpy(dtype=np.float64)
+                - raw_child_frame["y_pred"].to_numpy(dtype=np.float64)
+            )
+            identity_required = stage_reports[stage]["route"] == ZERO_IDENTITY
+            replay_rows.append(
+                {
+                    "task": view.task,
+                    "view": view_label,
+                    "stage": stage,
+                    "route": stage_reports[stage]["route"],
+                    "identity_required": identity_required,
+                    "parent_prefix": parent,
+                    "child_prefix": child,
+                    "raw_stage_prediction_path": str(
+                        _prediction_file(
+                            tep_results if (view.dataset == "tep" and view.dynamic) else base_results,
+                            results_by_prefix[child],
+                        )
+                    ),
+                    "chain_consistent_prefix_prediction_path": chain_paths[child],
+                    "parent_support_hash": _frame_support_hash(parent_frame),
+                    "child_support_hash": _frame_support_hash(child_frame),
+                    "raw_child_support_hash": _frame_support_hash(raw_child_frame),
+                    "parent_prediction_hash": _prediction_hash(parent_frame),
+                    "child_prediction_hash": _prediction_hash(child_frame),
+                    "raw_child_prediction_hash": _prediction_hash(raw_child_frame),
+                    "max_abs_difference": float(np.max(differences, initial=0.0)),
+                    "raw_max_abs_difference": float(np.max(raw_differences, initial=0.0)),
+                    "metrics_parent_json": json.dumps(prefix_metrics[parent], sort_keys=True),
+                    "metrics_child_json": json.dumps(prefix_metrics[child], sort_keys=True),
+                    "metrics_equal": _metrics_equal(prefix_metrics[parent], prefix_metrics[child]),
+                    "exact_identity_pass": (
+                        not identity_required
+                        or (
+                            _frame_support_hash(parent_frame) == _frame_support_hash(child_frame)
+                            and _prediction_hash(parent_frame) == _prediction_hash(child_frame)
+                            and float(np.max(differences, initial=0.0)) == 0.0
+                            and _metrics_equal(prefix_metrics[parent], prefix_metrics[child])
+                        )
+                    ),
+                }
+            )
+        row: dict[str, Any] = {
+            "task": view.task,
+            "view": view_label,
+            "rows": len(reference),
+            "support_hash": _frame_support_hash(reference),
+            "active_channel_count": len(c_result.get("active_channels", [])),
+        }
+        local_params = {
+            "K": _parameter_count(k_result),
+            "C": _parameter_count(c_result) if stage_reports["C"]["route"] == ACTIVE else 0,
+            "W": _parameter_count(w_result) if stage_reports["W"]["route"] == ACTIVE else 0,
+            "A": (
+                _parameter_count(results_by_prefix["KCWA"])
+                if stage_reports["A"]["route"] == ACTIVE
+                else 0
+            ),
+        }
+        prefix_params = {
+            "K": local_params["K"],
+            "KC": local_params["K"] + local_params["C"],
+            "KCW": local_params["K"] + local_params["C"] + local_params["W"],
+            "KCWA": local_params["K"] + local_params["C"] + local_params["W"] + local_params["A"],
+        }
+        row.update({f"{stage}_local_params": count for stage, count in local_params.items()})
+        row.update({f"{prefix}_prefix_params": count for prefix, count in prefix_params.items()})
+        row["J_local_params"] = _parameter_count(results_by_prefix["J"])
+        row["J_prefix_params"] = row["J_local_params"]
+        parameter_rows.extend(
+            {
+                "task": view.task,
+                "view": view_label,
+                "stage": stage,
+                "route": "K_BASE" if stage == "K" else stage_reports[stage]["route"],
+                "local_params": local_params[stage],
+                "prefix_params": prefix_params[prefix],
+                "prefix": prefix,
+                "parameter_semantics": "cumulative active-stage prefix; ZERO local contribution is 0",
+            }
+            for stage, prefix in (("K", "K"), ("C", "KC"), ("W", "KCW"), ("A", "KCWA"))
+        )
+        parameter_rows.append(
+            {
+                "task": view.task,
+                "view": view_label,
+                "stage": "J",
+                "route": "JOINT",
+                "local_params": row["J_local_params"],
+                "prefix_params": row["J_prefix_params"],
+                "prefix": "J",
+                "parameter_semantics": "joint complexity reported separately",
+            }
+        )
+        for prefix in ("K", "KC", "KCW", "KCWA", "J"):
+            metric = prefix_metrics[prefix]
+            row[f"{prefix}_RMSE"] = metric["rmse_delta"]
+            row[f"{prefix}_MAE"] = metric["mae_delta"]
+            row[f"{prefix}_Delta_R2"] = metric["r2_delta"]
+            row[f"{prefix}_Level_R2"] = metric["r2_level_reconstructed"]
+            row[f"{prefix}_persistence_skill"] = metric["persistence_skill"]
+            row[f"{prefix}_parameter_count"] = (
+                row[f"{prefix}_prefix_params"] if prefix != "J" else row["J_prefix_params"]
+            )
+        for stage, (parent, child) in stage_pairs.items():
+            report = stage_reports[stage]
             parent_rmse = float(prefix_metrics[parent]["rmse_delta"])
             child_rmse = float(prefix_metrics[child]["rmse_delta"])
             validation_gain = (
@@ -349,6 +542,8 @@ def run_e1_cached(
             )
             row[f"{stage}_route"] = report["route"]
             row[f"{stage}_margin"] = report["relative_admission_margin"]
+            row[f"{stage}_raw_relative_admission_margin"] = report["raw_relative_admission_margin"]
+            row[f"{stage}_symmetric_reporting_margin"] = report["symmetric_reporting_margin"]
             row[f"{stage}_absolute_oof_gain"] = report["absolute_oof_gain"]
             row[f"{stage}_validation_gain"] = validation_gain
             for fold_index, fold_margin in enumerate(report["outer_fold_margins"]):
@@ -359,6 +554,8 @@ def run_e1_cached(
                         "stage": stage,
                         "fold": fold_index,
                         "margin": fold_margin,
+                        "raw_relative_admission_margin": fold_margin,
+                        "symmetric_reporting_margin": report["outer_fold_symmetric_margins"][fold_index],
                         "sign": report["margin_signs"][fold_index],
                         "route": report["route"],
                         "candidate_id": report["candidate_id"],
@@ -369,9 +566,62 @@ def run_e1_cached(
         table_rows.append(row)
     table = pd.DataFrame(table_rows)
     margins = pd.DataFrame(margin_rows)
+    replay = pd.DataFrame(replay_rows)
+    parameter_audit = pd.DataFrame(parameter_rows)
     table.to_csv(destination / "table_stagewise.csv", index=False)
     margins.to_csv(destination / "admission_margin_distribution.csv", index=False)
+    replay.to_csv(destination / "exact_zero_replay_audit.csv", index=False)
+    parameter_audit.to_csv(destination / "parameter_count_audit.csv", index=False)
     _plot_margin_distribution(margins, destination / "admission_margin_by_stage_task.png")
+    audit_markdown = "\n".join(
+        [
+            "# E1 Reporting Fix Audit",
+            "",
+            "This regeneration replays frozen development artifacts only. It does not refit a model or alter the strict selector.",
+            "",
+            "| Surface | Changed | Evidence |",
+            "|---|---|---|",
+            "| model | NO | frozen candidate fits reused under audit |",
+            "| selector | NO | route recomputed from frozen OOF evidence; symmetric margin has no selector authority |",
+            "| candidate | NO | candidate universe and selected candidates preserved |",
+            "| stage route | NO | cached route must agree with strict OOF replay |",
+            "| OOF evidence | NO | raw stage prediction paths preserved |",
+            "| production prediction | NO | no production refit or prediction path changed |",
+            "| E1 reporting representation | YES | chain-consistent prefix artifacts, parameter semantics, and symmetric reporting margin added |",
+            "",
+            "ZERO stages are represented as exact copies of their parent prefix. The independent full-refit artifact remains available in `raw_stage_prediction_path`; the replayed artifact is recorded in `chain_consistent_prefix_prediction_path`.",
+            "",
+            "The symmetric reporting margin is used only for plots and descriptive summaries. Routing remains the strict positive-gain versus FP64 numerical-epsilon decision.",
+            "",
+            f"Exact-zero audit rows requiring identity: {int(replay['identity_required'].sum()) if not replay.empty else 0}",
+            f"Exact-zero audit pass: {'YES' if (bool(replay.loc[replay['identity_required'], 'exact_identity_pass'].all()) if not replay.empty else True) else 'NO'}",
+            "",
+            "Formal test and OOD artifacts are not accessed by this E1 regeneration.",
+            "",
+        ]
+    )
+    (destination / "E1_REPORTING_FIX_AUDIT.md").write_text(
+        audit_markdown,
+        encoding="utf-8",
+    )
+    write_json(
+        destination / "E1_REPORTING_FIX_AUDIT.json",
+        {
+            "model_changed": "NO",
+            "selector_changed": "NO",
+            "candidate_changed": "NO",
+            "stage_route_changed": "NO",
+            "oof_evidence_changed": "NO",
+            "production_prediction_changed": "NO",
+            "e1_reporting_representation_changed": "YES",
+            "raw_stage_prediction_paths_preserved": True,
+            "chain_consistent_prefix_paths_added": True,
+            "symmetric_reporting_margin_selector_authority": False,
+            "e2_e6_rerun": False,
+            "exact_zero_rows": int(replay["identity_required"].sum()) if not replay.empty else 0,
+            "exact_zero_pass": bool(replay.loc[replay["identity_required"], "exact_identity_pass"].all()) if not replay.empty else True,
+        },
+    )
     write_json(
         destination / "STATUS.json",
         {
@@ -380,6 +630,8 @@ def run_e1_cached(
             "source": "frozen strict nested-OOF development OOF predictions",
             "old_stage_decisions_reused": False,
             "candidate_fits_reused_under_audit": True,
+            "exact_zero_replay_audit": "E1_STAGEWISE/exact_zero_replay_audit.csv",
+            "parameter_count_audit": "E1_STAGEWISE/parameter_count_audit.csv",
             "test_accessed": False,
             "ood_accessed": False,
         },
@@ -399,7 +651,12 @@ def _plot_margin_distribution(frame: pd.DataFrame, path: Path) -> None:
     colors = {"C": "#1f77b4", "W": "#ff7f0e", "A": "#2ca02c"}
     for index, label in enumerate(order):
         selected = frame.loc[labels == label]
-        values = selected["margin"].to_numpy(dtype=np.float64)
+        margin_column = (
+            "symmetric_reporting_margin"
+            if "symmetric_reporting_margin" in selected
+            else "margin"
+        )
+        values = selected[margin_column].to_numpy(dtype=np.float64)
         stage = str(selected["stage"].iloc[0])
         axis.scatter(
             np.full(len(values), index),
@@ -415,7 +672,7 @@ def _plot_margin_distribution(frame: pd.DataFrame, path: Path) -> None:
     axis.axhline(0.0, color="black", linewidth=1)
     axis.set_yscale("symlog", linthresh=1e-4, linscale=1.0)
     axis.set_xticks(range(len(order)), order, rotation=75, ha="right")
-    axis.set_ylabel("relative admission margin (symmetric-log scale; reporting only)")
+    axis.set_ylabel("symmetric reporting margin (symmetric-log scale; reporting only)")
     axis.set_title("Strict nested-OOF admission margins by task and stage")
     axis.grid(axis="y", alpha=0.25)
     handles = [

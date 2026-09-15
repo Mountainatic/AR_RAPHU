@@ -1,0 +1,3 @@
+task,runs,conditional_scale_agreement,selection_entropy_bits,prediction_unique_hashes
+Debutanizer,10,0.2,2.521928094887362,6
+TEP input-only,10,0.1,3.321928094887362,1

@@ -1,0 +1,5 @@
+truth_scale,predicted_scale,size
+fast,fast,113
+fast,mid,7
+mid,mid,112
+mid,slow,8

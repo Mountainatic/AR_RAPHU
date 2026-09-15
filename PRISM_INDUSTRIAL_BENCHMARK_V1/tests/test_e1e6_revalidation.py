@@ -6,8 +6,12 @@ import pytest
 
 from prism_benchmark.e1e6_revalidation import (
     _aggregate_metric_sufficient_statistics,
+    _frame_support_hash,
     _markdown_table,
     _metric_sufficient_statistics,
+    _metrics,
+    _prediction_hash,
+    _replay_prefix_frames,
     _selection_report,
     run_identifiable_seed,
 )
@@ -75,6 +79,68 @@ def test_cached_stage_route_must_replay_from_oof_evidence() -> None:
                 "epsilon_num": np.finfo(np.float64).eps,
             }
         )
+
+
+def _zero_replay_fixture() -> tuple[dict[str, pd.DataFrame], dict[str, str]]:
+    ids = np.asarray(["a", "b", "c"])
+    target = np.asarray([1.0, 2.0, 3.0])
+    parent = pd.DataFrame(
+        {"base_origin_id": ids, "y_true": target, "y_pred": [0.9, 2.1, 2.8]}
+    )
+    raw_child = pd.DataFrame(
+        {"base_origin_id": ids, "y_true": target, "y_pred": [0.1, 0.2, 0.3]}
+    )
+    raw_a = pd.DataFrame(
+        {"base_origin_id": ids, "y_true": target, "y_pred": [9.0, 9.0, 9.0]}
+    )
+    return {
+        "K": parent,
+        "KC": raw_child,
+        "KCW": raw_child.copy(deep=True),
+        "KCWA": raw_a,
+        "J": raw_a.copy(deep=True),
+    }, {"C": "ZERO_IDENTITY", "W": "ZERO_IDENTITY", "A": "ZERO_IDENTITY"}
+
+
+@pytest.mark.parametrize(
+    ("stage", "parent", "child"),
+    (("C", "K", "KC"), ("W", "KC", "KCW"), ("A", "KCW", "KCWA")),
+)
+def test_e1_zero_stage_replays_parent_exactly(
+    stage: str, parent: str, child: str
+) -> None:
+    raw, routes = _zero_replay_fixture()
+    replayed = _replay_prefix_frames(raw, routes)
+    assert _frame_support_hash(replayed[parent]) == _frame_support_hash(replayed[child])
+    assert _prediction_hash(replayed[parent]) == _prediction_hash(replayed[child])
+    assert float(
+        np.max(
+            np.abs(
+                replayed[parent]["y_pred"].to_numpy(dtype=np.float64)
+                - replayed[child]["y_pred"].to_numpy(dtype=np.float64)
+            ),
+            initial=0.0,
+        )
+    ) == 0.0
+    metrics_parent = _metrics(
+        replayed[parent]["y_true"].to_numpy(dtype=np.float64),
+        replayed[parent]["y_pred"].to_numpy(dtype=np.float64),
+        np.asarray([10.0, 10.0, 10.0]),
+    )
+    metrics_child = _metrics(
+        replayed[child]["y_true"].to_numpy(dtype=np.float64),
+        replayed[child]["y_pred"].to_numpy(dtype=np.float64),
+        np.asarray([10.0, 10.0, 10.0]),
+    )
+    assert metrics_parent == metrics_child
+
+
+def test_e1_parameter_reporting_distinguishes_local_and_prefix_counts() -> None:
+    raw, routes = _zero_replay_fixture()
+    replayed = _replay_prefix_frames(raw, routes)
+    assert list(replayed) == ["K", "KC", "KCW", "KCWA", "J"]
+    local = {"K": 7, "C": 0, "W": 0, "A": 0}
+    assert local["K"] + local["C"] + local["W"] + local["A"] == 7
 
 
 def test_joint_counterfactual_parser_rejects_unregistered_eta(monkeypatch) -> None:

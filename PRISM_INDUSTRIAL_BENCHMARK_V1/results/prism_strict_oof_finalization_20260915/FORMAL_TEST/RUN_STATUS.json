@@ -1,0 +1,21 @@
+{
+  "completed_tasks": [
+    "Debutanizer",
+    "SRU H2S",
+    "SRU SO2",
+    "PMSM proxy-excluded",
+    "MetroPT P60",
+    "MetroPT Oil20",
+    "TEP input-only",
+    "TEP record-time",
+    "TEP maturity-5"
+  ],
+  "completed_utc": "2026-09-14T17:25:26.860096+00:00",
+  "fit_calls": 0,
+  "joint_not_applicable": [
+    "TEP maturity-5"
+  ],
+  "opened_utc": "2026-09-14T16:21:14.597515+00:00",
+  "selection_calls": 0,
+  "status": "COMPLETED"
+}

@@ -1,0 +1,32 @@
+{
+  "C_route": "ZERO_IDENTITY",
+  "KC": {
+    "delta_r2": 0.9995757536302486,
+    "level_mae": 6.666686151748427e-07,
+    "level_r2": 0.9999999995154708,
+    "level_rmse": 1.818098173097678e-06,
+    "mae": 6.666686151748403e-07,
+    "rmse": 1.818098173097628e-06
+  },
+  "KCW": {
+    "delta_r2": 0.9995757536302486,
+    "level_mae": 6.666686151748427e-07,
+    "level_r2": 0.9999999995154708,
+    "level_rmse": 1.818098173097678e-06,
+    "mae": 6.666686151748403e-07,
+    "rmse": 1.818098173097628e-06
+  },
+  "W_gain": 0.0,
+  "W_route": "ZERO_IDENTITY",
+  "completed_utc": "2026-09-14T17:38:38.351482+00:00",
+  "development_W_margin": 0.00026813740577177105,
+  "development_freeze_sha256": "ceabb190c073afc68bb64666b48b9b5d0332c4b75eb3785cd0db694873d24b11",
+  "fit_calls_after_test_open": 0,
+  "residual_skill": 0.0,
+  "sampling_time": 0.001000008018988966,
+  "selection_calls_after_test_open": 0,
+  "status": "COMPLETED",
+  "test_file_sha256_after_open": "0eab75bb1f6b16228ee78791343a88bf9bfd9a51036ac9807d7b5fc11c0e1704",
+  "test_rows": 24809,
+  "verdict": "W_CORRECTLY_REJECTED_ON_THIS_TASK"
+}

@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "status": "FROZEN_BEFORE_DATA_DOWNLOAD_OR_TARGET_ACCESS",
+  "created_utc": "2026-09-14T17:30:29.3505496Z",
+  "experiment_id": "PRISM_STRICT_OOF_EXTERNAL_W_EMPS_20260915_R1",
+  "purpose": "Test whether native PRISM W adds out-of-sample value after frozen K/C on a separate real nonlinear system.",
+  "dataset": {
+    "name": "EMPS Electro-Mechanical Positioning System",
+    "citation": "A. Janot, M. Gautier and M. Brunot, Data Set and Reference Models of EMPS, 2019 Workshop on Nonlinear System Identification Benchmarks.",
+    "loader_repository": "https://github.com/GerbenBeintema/nonlinear_benchmarks",
+    "loader_commit": "f9fb3883086870a27b31917ccde1f78c95d53cb2",
+    "official_download": "https://drive.google.com/file/d/1zwoXYa9-3f8NQ0ohzmjpF7UxbNgRTHkS/view",
+    "development_file": "DATA_EMPS.mat",
+    "test_file": "DATA_EMPS_PULSES.mat",
+    "split_rule": "Official file-level split exposed by nonlinear_benchmarks.EMPS: DATA_EMPS for development, DATA_EMPS_PULSES for untouched test.",
+    "test_target_accessed_before_freeze": false
+  },
+  "prediction_contract": {
+    "sampling_time": "read from consecutive t values and report without changing protocol",
+    "h_steps": 1,
+    "w_steps": 1,
+    "target": "qm[t+1]-qm[t]",
+    "level_anchor": "qm[t]",
+    "inputs": ["vir", "qg"],
+    "input_availability": "indices <= t only",
+    "target_history_for_KC_or_W": "none",
+    "support": "origin t must provide the frozen maximum causal input history; official test state initialization rows are excluded mechanically",
+    "primary_comparison": "KC versus KCW"
+  },
+  "development_protocol": {
+    "outer_oof": "four deterministic expanding chronological folds over the official development file; boundaries are relative row quantiles 0.50/0.625/0.75/0.875/1.00 after common support",
+    "inner_selection": "within each outer fit, nonzero candidates are selected by three deterministic expanding chronological validation folds using mean MSE",
+    "final_selection": "repeat the same inner rule on the complete official development file, then fit exactly once on complete development",
+    "stage_admission": "ACTIVE iff outer nested-OOF parent MSE minus child MSE exceeds epsilon_num; otherwise ZERO_IDENTITY",
+    "epsilon_num": "1000 * eps(float64) * max(1, abs(parent_mse), abs(child_mse))",
+    "seed": 20260915,
+    "test_selection_authority": false
+  },
+  "candidate_universes": {
+    "K": {
+      "family": "per-channel causal linear distributed-lag ridge",
+      "history_steps": [4, 8, 16, 32],
+      "geometric_blocks": [1, 2, 4, 8],
+      "ridge_alpha": [1e-06, 0.0001, 0.01, 1.0]
+    },
+    "C": {
+      "nonzero_families": ["ADDITIVE_CHANNEL_COMBINATION_RIDGE"],
+      "ridge_alpha": [1e-06, 0.0001, 0.01, 1.0],
+      "zero_identity_external_to_ranking": true
+    },
+    "W": {
+      "nonzero_family": "NATURAL_CUBIC_CORRECTION",
+      "knot_count": [4, 6, 8, 12],
+      "smoothness": [0.0, 0.0001, 0.01, 1.0],
+      "soft_overlap_mu": [0.0, 0.03, 0.3],
+      "direction": 1,
+      "zero_identity_external_to_ranking": true
+    },
+    "A": {
+      "family": "EXACT_ZERO_IDENTITY_ONLY",
+      "reason": "The external experiment is preregistered to isolate W incremental value."
+    }
+  },
+  "metrics": [
+    "RMSE",
+    "MAE",
+    "Delta_R2",
+    "Level_RMSE",
+    "Level_MAE",
+    "Level_R2",
+    "W_gain=(RMSE_KC-RMSE_KCW)/RMSE_KC",
+    "residual_skill=1-MSE(y-KCW)/MSE(y-KC)"
+  ],
+  "interpretation": {
+    "active_and_test_gain_positive": "REAL-WORLD W INCREMENTAL VALUE SUPPORTED",
+    "zero_route": "W correctly rejected on this task",
+    "active_and_test_gain_nonpositive": "W admission did not generalize on this task"
+  },
+  "fallback": {
+    "dataset": "Cascaded Tanks",
+    "allowed_only_if_emps_unobtainable": true,
+    "semantics": "MECHANISM_REPLICATION_ONLY_NOT_UNTOUCHED_CONFIRMATION"
+  }
+}

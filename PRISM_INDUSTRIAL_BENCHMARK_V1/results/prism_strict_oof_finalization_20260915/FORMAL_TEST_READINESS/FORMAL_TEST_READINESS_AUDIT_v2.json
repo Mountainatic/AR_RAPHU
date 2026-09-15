@@ -1,0 +1,91 @@
+{
+  "created_utc": "2026-09-14T15:12:39.931498+00:00",
+  "formal_metrics_computed": false,
+  "formal_predictions_generated": false,
+  "formal_target_values_read": false,
+  "formal_test_opened": false,
+  "formal_test_ready": true,
+  "protocol_frozen": true,
+  "protocol_lock_sha256": "23f8b0290585160a8b2890db1abbce85e36f6981d3b75f0426feb5011bb5b792",
+  "schema_version": 2,
+  "status": "READY",
+  "tasks": [
+    {
+      "availability_valid": true,
+      "formal_partition_exists": true,
+      "no_leakage": true,
+      "no_overlap": true,
+      "partition_hash_exists": true,
+      "protocol_frozen": true,
+      "status": "PASS",
+      "support_valid": true,
+      "task": "TEP"
+    },
+    {
+      "availability_valid": true,
+      "formal_partition_exists": true,
+      "no_leakage": true,
+      "no_overlap": true,
+      "partition_hash_exists": true,
+      "protocol_frozen": true,
+      "status": "PASS",
+      "support_valid": true,
+      "task": "Debutanizer"
+    },
+    {
+      "availability_valid": true,
+      "formal_partition_exists": true,
+      "no_leakage": true,
+      "no_overlap": true,
+      "partition_hash_exists": true,
+      "protocol_frozen": true,
+      "status": "PASS",
+      "support_valid": true,
+      "task": "SRU-H2S"
+    },
+    {
+      "availability_valid": true,
+      "formal_partition_exists": true,
+      "no_leakage": true,
+      "no_overlap": true,
+      "partition_hash_exists": true,
+      "protocol_frozen": true,
+      "status": "PASS",
+      "support_valid": true,
+      "task": "SRU-SO2"
+    },
+    {
+      "availability_valid": true,
+      "formal_partition_exists": true,
+      "no_leakage": true,
+      "no_overlap": true,
+      "partition_hash_exists": true,
+      "protocol_frozen": true,
+      "status": "PASS",
+      "support_valid": true,
+      "task": "PMSM"
+    },
+    {
+      "availability_valid": true,
+      "formal_partition_exists": true,
+      "no_leakage": true,
+      "no_overlap": true,
+      "partition_hash_exists": true,
+      "protocol_frozen": true,
+      "status": "PASS",
+      "support_valid": true,
+      "task": "MetroPT-P60"
+    },
+    {
+      "availability_valid": true,
+      "formal_partition_exists": true,
+      "no_leakage": true,
+      "no_overlap": true,
+      "partition_hash_exists": true,
+      "protocol_frozen": true,
+      "status": "PASS",
+      "support_valid": true,
+      "task": "MetroPT-Oil20"
+    }
+  ]
+}

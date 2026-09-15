@@ -1,0 +1,17 @@
+{
+  "created_utc": "2026-09-14T17:51:32.228841+00:00",
+  "external_w_completed": true,
+  "formal_completed": true,
+  "formal_partition_lock_sha256": "23f8b0290585160a8b2890db1abbce85e36f6981d3b75f0426feb5011bb5b792",
+  "formal_test_opened": true,
+  "model_changed": false,
+  "model_commit": "73d0bd4c69148c0cb91459f39f166acacf5856b6",
+  "ood_accessed": false,
+  "oof_evidence_changed": false,
+  "production_prediction_changed": false,
+  "reporting_changed": true,
+  "reporting_commit": "d1090d4123daf63d3d31a9653d60155376f2b688",
+  "route_changed_after_formal_open": false,
+  "selector_changed": false,
+  "status": "COMPLETED"
+}

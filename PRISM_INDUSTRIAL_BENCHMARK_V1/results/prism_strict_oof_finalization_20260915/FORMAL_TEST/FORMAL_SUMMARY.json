@@ -1,0 +1,21 @@
+{
+  "active_stage_count": 17,
+  "active_stage_positive_formal_gain_count": 15,
+  "baseline_exception": "AR/ARX/Linear-NARX: NOT_APPLICABLE_MISSING_PRE_FROZEN_DEVELOPMENT_CONTRACT",
+  "claims": {
+    "A_strict_nested_oof_rejects_unnecessary_stages": "SUPPORTED",
+    "B_stage_utility_is_task_dependent": "SUPPORTED",
+    "C_margin_distinguishes_boundary_activity": "SUPPORTED",
+    "D_heterogeneous_formal_generalization": "PARTIALLY_SUPPORTED",
+    "E_multiscale_beyond_search_budget": "PARTIALLY_SUPPORTED",
+    "F_unique_structural_interpretation": "NOT_SUPPORTED"
+  },
+  "created_utc": "2026-09-14T17:51:02.845868+00:00",
+  "exact_zero_failures": 0,
+  "formal_model_rows": 43,
+  "formal_test_opened": true,
+  "formal_views": 9,
+  "joint_exception": "TEP maturity-5: NOT_APPLICABLE_MISSING_FROZEN_FEATURE_CONTRACT",
+  "prediction_audit_failures": 0,
+  "status": "COMPLETED_AND_AUDITED"
+}

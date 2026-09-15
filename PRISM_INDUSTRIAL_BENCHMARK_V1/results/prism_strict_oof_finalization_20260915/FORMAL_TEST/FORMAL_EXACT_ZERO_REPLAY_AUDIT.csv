@@ -1,0 +1,11 @@
+task,stage,max_abs_difference,prediction_hash_equal,status
+Debutanizer,C,0.0,True,PASS
+Debutanizer,W,0.0,True,PASS
+Debutanizer,A,0.0,True,PASS
+SRU H2S,W,0.0,True,PASS
+SRU SO2,W,0.0,True,PASS
+MetroPT P60,C,0.0,True,PASS
+MetroPT Oil20,C,0.0,True,PASS
+MetroPT Oil20,W,0.0,True,PASS
+TEP input-only,A,0.0,True,PASS
+TEP maturity-5,A,0.0,True,PASS

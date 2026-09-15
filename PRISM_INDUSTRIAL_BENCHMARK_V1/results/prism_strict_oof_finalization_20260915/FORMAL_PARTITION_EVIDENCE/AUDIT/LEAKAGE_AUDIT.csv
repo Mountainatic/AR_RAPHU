@@ -1,0 +1,8 @@
+task,isolation_rule,entity_audit,status
+TEP,"TEP_RUN_FAULT_HOLDOUT_V1; [t-L,t), D[t] excluded, Lmax=256",PASS,PASS
+Debutanizer,chronological_60_20_20_floor_boundaries with registered purge,PASS,PASS
+SRU-H2S,chronological_60_20_20_floor_boundaries with registered purge,PASS,PASS
+SRU-SO2,chronological_60_20_20_floor_boundaries with registered purge,PASS,PASS
+PMSM,PRISM_PMSM_SPLIT_V1 profile_id isolation,PASS,PASS
+MetroPT-P60,calendar month test and registered fault-window OOD with purge,PASS,PASS
+MetroPT-Oil20,calendar month test and registered fault-window OOD with purge,PASS,PASS

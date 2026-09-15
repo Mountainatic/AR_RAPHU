@@ -1,0 +1,85 @@
+{
+  "formal_target_columns_read": false,
+  "hash_contract": "SHA-256 of deterministic parquet bytes containing ordered sample identifiers and partition membership",
+  "partitions": {
+    "DEB_C4__H5__W1_ood": {
+      "applicability": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/Debutanizer/formal_ood.parquet",
+      "rows": 0,
+      "sha256": "a18775ca84780ba37ba2c8df2755a369448259f499479e6f79e1231fb77a7b40"
+    },
+    "DEB_C4__H5__W1_test": {
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/Debutanizer/formal_test.parquet",
+      "rows": 1403,
+      "sha256": "0f90f4d1ef83c0ec033aa6792d772b1950ee6da1aa6a27a65ff2cda229a988e2"
+    },
+    "METRO_OIL20__H120__W12_ood": {
+      "applicability": "APPLICABLE",
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/MetroPT-Oil20/formal_ood.parquet",
+      "rows": 58284,
+      "sha256": "abe3c3b3da8845a9414fffc8e437370851c110907cd894ed30055d2e26407a1d"
+    },
+    "METRO_OIL20__H120__W12_test": {
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/MetroPT-Oil20/formal_test.parquet",
+      "rows": 1280080,
+      "sha256": "646892a35c3f7957382573ab5b5dbabca507bac5638cdb71f0dec432e8574857"
+    },
+    "METRO_P60__H6__W1_ood": {
+      "applicability": "APPLICABLE",
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/MetroPT-P60/formal_ood.parquet",
+      "rows": 118744,
+      "sha256": "2f45cde799e9e23673331e4e1a96fac1e95189f861a396be951cf94fbbfc110d"
+    },
+    "METRO_P60__H6__W1_test": {
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/MetroPT-P60/formal_test.parquet",
+      "rows": 2561792,
+      "sha256": "abeced34bb1061e40b88b75f5bc12632adf23d338e2369af2a58816d56c1a282"
+    },
+    "PMSM_PM5__H600__W60_ood": {
+      "applicability": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/PMSM/formal_ood.parquet",
+      "rows": 0,
+      "sha256": "a18775ca84780ba37ba2c8df2755a369448259f499479e6f79e1231fb77a7b40"
+    },
+    "PMSM_PM5__H600__W60_test": {
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/PMSM/formal_test.parquet",
+      "rows": 928044,
+      "sha256": "1f163b3d8f8ddff48e52ffa7aaaf480d8b41385839559bb684e1c469253f60a4"
+    },
+    "SRU_H2S_REP_H1__H1__W1_ood": {
+      "applicability": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/SRU-H2S/formal_ood.parquet",
+      "rows": 0,
+      "sha256": "a18775ca84780ba37ba2c8df2755a369448259f499479e6f79e1231fb77a7b40"
+    },
+    "SRU_H2S_REP_H1__H1__W1_test": {
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/SRU-H2S/formal_test.parquet",
+      "rows": 4010,
+      "sha256": "14d4d6645b653e3ccc65e29933ce2ebccba4253a4782a1175aa24165f312a7cf"
+    },
+    "SRU_SO2_REP_H1__H1__W1_ood": {
+      "applicability": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/SRU-SO2/formal_ood.parquet",
+      "rows": 0,
+      "sha256": "a18775ca84780ba37ba2c8df2755a369448259f499479e6f79e1231fb77a7b40"
+    },
+    "SRU_SO2_REP_H1__H1__W1_test": {
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/SRU-SO2/formal_test.parquet",
+      "rows": 4010,
+      "sha256": "b71ee7ff6fd29c971cf230280973c42faab7913c559d85e3a6770494ee172d95"
+    },
+    "TEP_G_NOWCAST_H0__H0__W1_ood": {
+      "applicability": "APPLICABLE",
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/TEP/formal_ood.parquet",
+      "rows": 5267500,
+      "sha256": "f3ad07bfaf38fb60b5bd30c8c8d1a763b70a2a0e60f9895213ed1eacf2e3d451"
+    },
+    "TEP_G_NOWCAST_H0__H0__W1_test": {
+      "path": "/root/autodl-tmp/FORMAL_PARTITION_MATERIALIZATION_20260914/PARTITIONS/TEP/formal_test.parquet",
+      "rows": 16856000,
+      "sha256": "62c53dcc1c4ba65337a220c3e815f886f10d60af34f6d5a88f4277ac93f5922a"
+    }
+  },
+  "schema_version": 2,
+  "status": "PASS"
+}

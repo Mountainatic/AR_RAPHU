@@ -1,0 +1,9 @@
+{
+  "error_type": "EMPTY_MEMBERSHIP_FROM_SOURCE_VIEW_KEY_FORMAT",
+  "formal_metrics_computed": false,
+  "formal_predictions_generated": false,
+  "formal_target_values_read": true,
+  "model_or_protocol_changed": false,
+  "opened_utc": "2026-09-14T16:21:14.597515+00:00",
+  "status": "FAILED_BEFORE_PREDICTION_OR_METRIC"
+}

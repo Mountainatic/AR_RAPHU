@@ -1,0 +1,15 @@
+{
+  "completed_tasks_preserved": [
+    "Debutanizer",
+    "SRU H2S",
+    "SRU SO2"
+  ],
+  "error_message": "ValueError: block outside entity support: 2",
+  "error_type": "FROZEN_COMMON_SUPPORT_NOT_APPLIED_BEFORE_LONG_HISTORY_FEATURE_ACCESS",
+  "formal_target_values_read": true,
+  "formal_test_opened": true,
+  "model_or_protocol_changed": false,
+  "observed_utc": "2026-09-14T16:27:36.720637+00:00",
+  "remediation": "MECHANICAL_FROZEN_CONTRACT_COMMON_SUPPORT_FILTER_AND_RESUME",
+  "status": "FAILED_AFTER_PARTIAL_PREDICTION_AND_METRICS"
+}

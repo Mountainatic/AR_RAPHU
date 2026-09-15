@@ -1,0 +1,12 @@
+{
+  "ood_accessed": false,
+  "rod_status": "PROTOCOL_BLOCKED_NO_LEGALLY_COMPARABLE_CZ_RODS",
+  "sources": [
+    "seed",
+    "candidate-universe",
+    "family-ablation",
+    "E3 task"
+  ],
+  "status": "COMPLETED",
+  "test_accessed": false
+}

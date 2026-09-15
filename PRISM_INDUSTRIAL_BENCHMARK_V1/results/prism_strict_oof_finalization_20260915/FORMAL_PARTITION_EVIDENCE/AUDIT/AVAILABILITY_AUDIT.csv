@@ -1,0 +1,8 @@
+task,h_w,null_identifiers,availability_violations,interval_violations,status
+TEP,H0/W1,0,0,0,PASS
+Debutanizer,H5/W1,0,0,0,PASS
+SRU-H2S,H1/W1,0,0,0,PASS
+SRU-SO2,H1/W1,0,0,0,PASS
+PMSM,H600/W60,0,0,0,PASS
+MetroPT-P60,H6/W1,0,0,0,PASS
+MetroPT-Oil20,H120/W12,0,0,0,PASS

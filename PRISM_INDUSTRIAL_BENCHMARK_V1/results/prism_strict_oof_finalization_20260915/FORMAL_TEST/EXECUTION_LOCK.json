@@ -1,0 +1,13 @@
+{
+  "commit": "73d0bd4c69148c0cb91459f39f166acacf5856b6",
+  "created_utc": "2026-09-14T16:21:14.593155+00:00",
+  "final_fit_policy": "NO_REFIT_REUSE_DEVELOPMENT_FINAL_SELECTED_CONTRACTS",
+  "fit_calls_allowed": false,
+  "formal_test_opened": false,
+  "formal_views": 9,
+  "joint_exception": "TEP maturity-5: NOT_APPLICABLE_MISSING_FROZEN_FEATURE_CONTRACT",
+  "partition_lock_sha256": "23f8b0290585160a8b2890db1abbce85e36f6981d3b75f0426feb5011bb5b792",
+  "preflight_sha256": "01e3ef8ea2fd6852c8ecef6d0389f98c2ecd2560e035a36a723eadc868ea310b",
+  "selection_calls_allowed": false,
+  "status": "FROZEN"
+}

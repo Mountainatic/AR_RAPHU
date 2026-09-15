@@ -1,0 +1,119 @@
+{
+  "created_utc": "2026-09-14T15:12:39.931498+00:00",
+  "formal_metrics_computed": false,
+  "formal_predictions_generated": false,
+  "formal_target_values_read": false,
+  "formal_test_opened": false,
+  "freeze_basis": "all required partitions exist, hash, and pass overlap, leakage, availability, and support audits",
+  "git": {
+    "branch": "prism-v2-1-1-public5-cz-neural3-level-r5-strict-oof-stats-optimized",
+    "commit": "73d0bd4c69148c0cb91459f39f166acacf5856b6",
+    "worktree": "CLEAN"
+  },
+  "metric_access_before_freeze": false,
+  "protocol_frozen": true,
+  "registry_hashes": {
+    "public3_shared": {
+      "DATASET_HASHES.json": "44b6f71f9e0a0e36076e796ce9d87a4b68a54432d2d527c6b1aec090caae95f3",
+      "PROTOCOL.json": "c3d82e4b4339996a14ec1ef1a677ff30815c66206533d64e236bf4a83482af9a",
+      "SAMPLE_ID_REGISTRY.json": "5ecdfd1b8779572ca2504b7e83379b7f81974048bf18a5bc6a5141ce86c07207",
+      "SPLIT_REGISTRY.json": "d56c8e7fa399df33ed8dd4d5a72a74262fb1174dacac62daaa7558a2961da273",
+      "TASK_REGISTRY.json": "666397b4de6e344427e90fe92f92d6a0e69b01530ede40c45557bb3c2172fdb2"
+    },
+    "sru_shared": {
+      "DATASET_HASHES.json": "b57f24e164a41d3bb0f0507f50104b7eaa36228039769425e3103927d341a4ca",
+      "PROTOCOL.json": "b3afa5360639e081120f3c220284490d2295765ab52a62baffe5f21f6aa194ff",
+      "SAMPLE_ID_REGISTRY.json": "1eb0eb6524e612a92e4d17b53503e39e0c8d5ce7820ad1711ac4c2bd8f6ea561",
+      "SPLIT_REGISTRY.json": "4e9b5b3ac91e95ad292c159d82f8a08b6b95ba3661e1a793e79e1c7dca7c7cb6",
+      "TASK_REGISTRY.json": "2282d93b6b0cc0f24eb59b59462b5eefaeee09f052521b15db29f1b60cc2d2c3"
+    },
+    "tep_shared": {
+      "DATASET_HASHES.json": "b57f24e164a41d3bb0f0507f50104b7eaa36228039769425e3103927d341a4ca",
+      "PROTOCOL.json": "0265c7e0ce70cdca4b3424bd99bf6c2c4751314644b1ba51d36c0be51fc78f13",
+      "SAMPLE_ID_REGISTRY.json": "18dbcb93f98fd734557bbc5c644f88138e49c84ea061990e623da1ec8dce88c5",
+      "SPLIT_REGISTRY.json": "4e9b5b3ac91e95ad292c159d82f8a08b6b95ba3661e1a793e79e1c7dca7c7cb6",
+      "TASK_REGISTRY.json": "7412a183c49e9c00d0e881bafc06393d8ea3915cfbb57b000b13cee0de071a87"
+    }
+  },
+  "schema_version": 2,
+  "status": "FROZEN",
+  "tasks": [
+    {
+      "formal_ood_applicability": "APPLICABLE",
+      "formal_ood_sha256": "f3ad07bfaf38fb60b5bd30c8c8d1a763b70a2a0e60f9895213ed1eacf2e3d451",
+      "formal_test_sha256": "62c53dcc1c4ba65337a220c3e815f886f10d60af34f6d5a88f4277ac93f5922a",
+      "h_w": "H0/W1",
+      "split_rule": "TEP_RUN_FAULT_HOLDOUT_V1; [t-L,t), D[t] excluded, Lmax=256",
+      "split_source": "frozen TEP run/fault split registry; H0 strict-past C1 sample IDs",
+      "status": "PASS",
+      "task": "TEP",
+      "task_id": "TEP_G_NOWCAST_H0__H0__W1"
+    },
+    {
+      "formal_ood_applicability": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+      "formal_ood_sha256": "a18775ca84780ba37ba2c8df2755a369448259f499479e6f79e1231fb77a7b40",
+      "formal_test_sha256": "0f90f4d1ef83c0ec033aa6792d772b1950ee6da1aa6a27a65ff2cda229a988e2",
+      "h_w": "H5/W1",
+      "split_rule": "chronological_60_20_20_floor_boundaries with registered purge",
+      "split_source": "frozen chronological C1 sample IDs",
+      "status": "PASS",
+      "task": "Debutanizer",
+      "task_id": "DEB_C4__H5__W1"
+    },
+    {
+      "formal_ood_applicability": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+      "formal_ood_sha256": "a18775ca84780ba37ba2c8df2755a369448259f499479e6f79e1231fb77a7b40",
+      "formal_test_sha256": "14d4d6645b653e3ccc65e29933ce2ebccba4253a4782a1175aa24165f312a7cf",
+      "h_w": "H1/W1",
+      "split_rule": "chronological_60_20_20_floor_boundaries with registered purge",
+      "split_source": "frozen chronological C1 sample IDs",
+      "status": "PASS",
+      "task": "SRU-H2S",
+      "task_id": "SRU_H2S_REP_H1__H1__W1"
+    },
+    {
+      "formal_ood_applicability": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+      "formal_ood_sha256": "a18775ca84780ba37ba2c8df2755a369448259f499479e6f79e1231fb77a7b40",
+      "formal_test_sha256": "b71ee7ff6fd29c971cf230280973c42faab7913c559d85e3a6770494ee172d95",
+      "h_w": "H1/W1",
+      "split_rule": "chronological_60_20_20_floor_boundaries with registered purge",
+      "split_source": "frozen chronological C1 sample IDs",
+      "status": "PASS",
+      "task": "SRU-SO2",
+      "task_id": "SRU_SO2_REP_H1__H1__W1"
+    },
+    {
+      "formal_ood_applicability": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+      "formal_ood_sha256": "a18775ca84780ba37ba2c8df2755a369448259f499479e6f79e1231fb77a7b40",
+      "formal_test_sha256": "1f163b3d8f8ddff48e52ffa7aaaf480d8b41385839559bb684e1c469253f60a4",
+      "h_w": "H600/W60",
+      "split_rule": "PRISM_PMSM_SPLIT_V1 profile_id isolation",
+      "split_source": "frozen profile-holdout C1 sample IDs",
+      "status": "PASS",
+      "task": "PMSM",
+      "task_id": "PMSM_PM5__H600__W60"
+    },
+    {
+      "formal_ood_applicability": "APPLICABLE",
+      "formal_ood_sha256": "2f45cde799e9e23673331e4e1a96fac1e95189f861a396be951cf94fbbfc110d",
+      "formal_test_sha256": "abeced34bb1061e40b88b75f5bc12632adf23d338e2369af2a58816d56c1a282",
+      "h_w": "H6/W1",
+      "split_rule": "calendar month test and registered fault-window OOD with purge",
+      "split_source": "frozen calendar-month and fault-window C1 sample IDs",
+      "status": "PASS",
+      "task": "MetroPT-P60",
+      "task_id": "METRO_P60__H6__W1"
+    },
+    {
+      "formal_ood_applicability": "APPLICABLE",
+      "formal_ood_sha256": "abe3c3b3da8845a9414fffc8e437370851c110907cd894ed30055d2e26407a1d",
+      "formal_test_sha256": "646892a35c3f7957382573ab5b5dbabca507bac5638cdb71f0dec432e8574857",
+      "h_w": "H120/W12",
+      "split_rule": "calendar month test and registered fault-window OOD with purge",
+      "split_source": "frozen calendar-month and fault-window C1 sample IDs",
+      "status": "PASS",
+      "task": "MetroPT-Oil20",
+      "task_id": "METRO_OIL20__H120__W12"
+    }
+  ]
+}

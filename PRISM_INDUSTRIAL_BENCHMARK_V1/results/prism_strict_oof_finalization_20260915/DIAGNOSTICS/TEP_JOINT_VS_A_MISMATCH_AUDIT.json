@@ -1,0 +1,13 @@
+{
+  "calibration_audit": "distinct registered estimators; prediction replay and shared-error identity passed",
+  "calibration_mismatch": false,
+  "common_folds": [
+    1,
+    2,
+    3
+  ],
+  "delta_vs_level_objective_mismatch": false,
+  "fold_0_exclusion": "standalone A has no preceding causal fit fold",
+  "selection_objective_mismatch": true,
+  "support_mismatch": false
+}

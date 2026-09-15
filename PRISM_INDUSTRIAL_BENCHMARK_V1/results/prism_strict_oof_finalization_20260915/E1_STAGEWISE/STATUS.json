@@ -1,0 +1,9 @@
+{
+  "candidate_fits_reused_under_audit": true,
+  "old_stage_decisions_reused": false,
+  "ood_accessed": false,
+  "source": "frozen strict nested-OOF development OOF predictions",
+  "status": "COMPLETED",
+  "tasks": 9,
+  "test_accessed": false
+}

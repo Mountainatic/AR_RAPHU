@@ -1,0 +1,69 @@
+{
+  "status": "COMPLETED",
+  "lock_role": "development E1-E6 protocol lock before any formal-test target access",
+  "git": {
+    "branch": "prism-v2-1-1-strict-oof-e1-e6-revalidation-20260913",
+    "commit": "df7bcbc6a09f0e40a0c93958ab934bf275736f3e",
+    "historical_model_base": "73d0bd4c69148c0cb91459f39f166acacf5856b6",
+    "status": "CLEAN"
+  },
+  "protocol_freeze_sha256": "d552d7cb194306f34c3f40f7cb79fed7b9a4f734bf8e4a9f0dea52782b67140b",
+  "registries": {
+    "tep_shared": {
+      "task_registry_sha256": "7412a183c49e9c00d0e881bafc06393d8ea3915cfbb57b000b13cee0de071a87",
+      "split_registry_sha256": "4e9b5b3ac91e95ad292c159d82f8a08b6b95ba3661e1a793e79e1c7dca7c7cb6",
+      "sample_id_registry_sha256": "18dbcb93f98fd734557bbc5c644f88138e49c84ea061990e623da1ec8dce88c5",
+      "dataset_hashes_sha256": "b57f24e164a41d3bb0f0507f50104b7eaa36228039769425e3103927d341a4ca"
+    },
+    "sru_shared": {
+      "task_registry_sha256": "2282d93b6b0cc0f24eb59b59462b5eefaeee09f052521b15db29f1b60cc2d2c3",
+      "split_registry_sha256": "4e9b5b3ac91e95ad292c159d82f8a08b6b95ba3661e1a793e79e1c7dca7c7cb6",
+      "sample_id_registry_sha256": "1eb0eb6524e612a92e4d17b53503e39e0c8d5ce7820ad1711ac4c2bd8f6ea561",
+      "dataset_hashes_sha256": "b57f24e164a41d3bb0f0507f50104b7eaa36228039769425e3103927d341a4ca"
+    },
+    "public3_shared": {
+      "task_registry_sha256": "666397b4de6e344427e90fe92f92d6a0e69b01530ede40c45557bb3c2172fdb2",
+      "split_registry_sha256": "d56c8e7fa399df33ed8dd4d5a72a74262fb1174dacac62daaa7558a2961da273",
+      "sample_id_registry_sha256": "5ecdfd1b8779572ca2504b7e83379b7f81974048bf18a5bc6a5141ce86c07207",
+      "dataset_hashes_sha256": "44b6f71f9e0a0e36076e796ce9d87a4b68a54432d2d527c6b1aec090caae95f3"
+    }
+  },
+  "h_w": {
+    "TEP": "H0/W1, cadence 180 s, history {128,256}, strict-past nowcast",
+    "Debutanizer": "H5/W1, cadence 360 s",
+    "SRU_H2S": "H1/W1, cadence 60 s",
+    "SRU_SO2": "H1/W1, cadence 60 s",
+    "PMSM": "H600/W60, cadence 0.5 s",
+    "MetroPT_P60": "H6/W1, cadence 10 s",
+    "MetroPT_Oil20": "H120/W12, cadence 10 s"
+  },
+  "selector": {
+    "rule": "ACTIVE iff parent nested-OOF risk minus tuned nonzero-child nested-OOF risk exceeds epsilon_num",
+    "epsilon_num": "1000 * eps(float64) * max(1, abs(parent risk), abs(child risk))",
+    "zero_semantics": "external structural ZERO_IDENTITY; absent from candidate grids",
+    "uncertainty_selection_authority": false,
+    "zero_blocks_downstream": false
+  },
+  "seed_and_perturbation_lock": {
+    "E2_formal": "0..29 per S1-S4",
+    "E2_null": "0..29 per n={1024,2048,4096,8192}",
+    "E3": "0..9",
+    "E4": "0..9",
+    "E6_N1": "0..29",
+    "E6_N2": "0..9",
+    "gaussian_alpha": [0.0, 0.01, 0.025, 0.05, 0.1],
+    "bias_std_fraction": [-0.1, -0.05, -0.025, -0.01, 0.01, 0.025, 0.05, 0.1],
+    "drift": ["LINEAR_DRIFT@0.05", "RANDOM_WALK_DRIFT@0.05"],
+    "quantization_std_fraction": [0.01, 0.025, 0.05, 0.1]
+  },
+  "code_sha256": {
+    "strict_oof_selection.py": "e7eb8c242b202dbfefc48bed575af0d93c52b8621fe746dd305a53c8241c79ed",
+    "e1e6_revalidation.py": "5b802ec40eaa6ef7b944d0f7047dec7e60591ed9f693bceeea46885f1ae7f343",
+    "e1e6_phase_b.py": "f5ef94c2f0b2fcb57351299178dbc32b42dfa2bbdb8cd6a4902597391bc99054",
+    "e1e6_robustness.py": "b0d44b9fac65b45163438b9275a59356685847f44e1c2d56e77e96153b755f72",
+    "level_reconstruction.py": "a2e5880b6924a66a12b204caf112d14498d46952a710c8d94b21c1a2bb7cc371",
+    "run_e1_e6_revalidation.py": "55d8d58a93131e03bb0f4408f4c5e7abd26379a210d14296a27c580ec820961b"
+  },
+  "formal_test_opened": false,
+  "ood_opened": false
+}

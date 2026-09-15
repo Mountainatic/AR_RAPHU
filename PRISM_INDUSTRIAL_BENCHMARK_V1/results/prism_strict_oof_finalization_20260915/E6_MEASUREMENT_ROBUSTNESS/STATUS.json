@@ -1,0 +1,81 @@
+{
+  "alpha_zero_seed_invariance_certificate": true,
+  "development_validation_policy": "N1 fourth entity held out; N2 four fully refit entity-held-out development outer folds with three entity inner folds",
+  "finite_numeric_certificate": true,
+  "formal_test_used_as_evaluation": false,
+  "histories": [
+    128,
+    256
+  ],
+  "injection_point": "raw aligned strict-past lag measurement before {128,256} fusion, normalization, and PRISM-like stage routing",
+  "maturity_a_lags": {
+    "analyzer_maturity_5_steps": [
+      5,
+      6,
+      8
+    ],
+    "record_time": [
+      1,
+      2,
+      4
+    ]
+  },
+  "n1_rows": 750,
+  "n1_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29
+  ],
+  "n2_rows": 3800,
+  "n2_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "noise_scale_policy": "per-outer-fold std from unique outer-train raw measurements only",
+  "ood_accessed": false,
+  "row_count_certificate": true,
+  "same_realization_across_magnitudes": true,
+  "scope": "TEP H0/W1 development-only compact reidentification universe",
+  "status": "COMPLETED",
+  "test_accessed": false,
+  "views": [
+    "input_only/record_time",
+    "dynamic/record_time",
+    "dynamic/analyzer_maturity_5_steps"
+  ]
+}

@@ -1,0 +1,1125 @@
+{
+  "formal_target_columns_read": false,
+  "status": "PASS",
+  "tasks": {
+    "Debutanizer": {
+      "entity_audit": null,
+      "formal_target_columns_read": false,
+      "ood": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 0,
+        "status": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+        "target_value_columns_read": false
+      },
+      "restored_row_audit_status": "PASS",
+      "status": "PASS",
+      "task": {
+        "h_w": "H5/W1",
+        "head": "DEB_C4__H5__W1",
+        "name": "Debutanizer",
+        "ood": "NOT_APPLICABLE",
+        "root": "public3_shared",
+        "rule": "chronological_60_20_20_floor_boundaries with registered purge",
+        "source": "frozen chronological C1 sample IDs"
+      },
+      "test": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 1403,
+        "sources": [
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/DEB_C4__H5__W1/dynamic/delay_10_steps/primary/test.parquet",
+            "rows": 461,
+            "sha256": "7aa0ce9182980d36e0532acfe258afbb36ec6c1b880ab493742528a44e87fce3",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/DEB_C4__H5__W1/dynamic/record_time/primary/test.parquet",
+            "rows": 471,
+            "sha256": "bd46c06ba6e48d5b8fbe4c582a22a3d70d5dfe9c3b35c2fda45ed0ec371461ac",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/DEB_C4__H5__W1/input_only/record_time/primary/test.parquet",
+            "rows": 471,
+            "sha256": "b90b7425c2b29dae3f36748a521d0e0a3cb65de79485f6a74313d10763e163af",
+            "target_value_columns_read": false
+          }
+        ]
+      }
+    },
+    "MetroPT-Oil20": {
+      "entity_audit": null,
+      "formal_target_columns_read": false,
+      "ood": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 58284,
+        "sources": [
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_OIL20__H120__W12/dynamic/record_time/primary/ood.parquet",
+            "rows": 29142,
+            "sha256": "af0bfdba8586f96d063f67a28a985b765ad9bb76141f0ba4e79402397aae5d4a",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_OIL20__H120__W12/input_only/record_time/primary/ood.parquet",
+            "rows": 29142,
+            "sha256": "d5f3a533ac3437c037d0da252c5f20aa992d870d9b4db144893a0c097e0241b4",
+            "target_value_columns_read": false
+          }
+        ]
+      },
+      "restored_row_audit_status": "PASS",
+      "status": "PASS",
+      "task": {
+        "h_w": "H120/W12",
+        "head": "METRO_OIL20__H120__W12",
+        "name": "MetroPT-Oil20",
+        "ood": "REGISTERED",
+        "root": "public3_shared",
+        "rule": "calendar month test and registered fault-window OOD with purge",
+        "source": "frozen calendar-month and fault-window C1 sample IDs"
+      },
+      "test": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 1280080,
+        "sources": [
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_OIL20__H120__W12/dynamic/record_time/primary/test.parquet",
+            "rows": 640040,
+            "sha256": "9d77fade423d1b335041bbf93c15da504ef058b17504c054fc97e37a76958431",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_OIL20__H120__W12/input_only/record_time/primary/test.parquet",
+            "rows": 640040,
+            "sha256": "69c0612ecff1b94f8a7a98d9b67a72697129a7c43e564e9ed83fb5e45b890775",
+            "target_value_columns_read": false
+          }
+        ]
+      }
+    },
+    "MetroPT-P60": {
+      "entity_audit": null,
+      "formal_target_columns_read": false,
+      "ood": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 118744,
+        "sources": [
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_P60__H6__W1/dynamic/record_time/full_sensor_secondary/ood.parquet",
+            "rows": 29686,
+            "sha256": "5333fb3fafabeacecd2c06c697d4129207f7d1a0fce16bd049b06750bd0d6cdd",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_P60__H6__W1/dynamic/record_time/proxy_excluded/ood.parquet",
+            "rows": 29686,
+            "sha256": "aa7853fdb958ae090f591d3e2275936b7499a8c244a0b14012c2e6212875d221",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_P60__H6__W1/input_only/record_time/full_sensor_secondary/ood.parquet",
+            "rows": 29686,
+            "sha256": "7995adcd38b1e096d7392cf9ef203ec3589abb4be04b0be041f62d4135491911",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_P60__H6__W1/input_only/record_time/proxy_excluded/ood.parquet",
+            "rows": 29686,
+            "sha256": "51dc4eafeb16f2092cc9631e632fc2a25a08e0ba302b8e785414e33376a8c394",
+            "target_value_columns_read": false
+          }
+        ]
+      },
+      "restored_row_audit_status": "PASS",
+      "status": "PASS",
+      "task": {
+        "h_w": "H6/W1",
+        "head": "METRO_P60__H6__W1",
+        "name": "MetroPT-P60",
+        "ood": "REGISTERED",
+        "root": "public3_shared",
+        "rule": "calendar month test and registered fault-window OOD with purge",
+        "source": "frozen calendar-month and fault-window C1 sample IDs"
+      },
+      "test": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 2561792,
+        "sources": [
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_P60__H6__W1/dynamic/record_time/full_sensor_secondary/test.parquet",
+            "rows": 640448,
+            "sha256": "a3dfce980c948c6da99afd61be9de2c42bd801e32e289034c9d082ea24846a2d",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_P60__H6__W1/dynamic/record_time/proxy_excluded/test.parquet",
+            "rows": 640448,
+            "sha256": "c612aa88112694a5b1e1be02ffc26520b8aba4956b9da37b98b8976f9a6970e6",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_P60__H6__W1/input_only/record_time/full_sensor_secondary/test.parquet",
+            "rows": 640448,
+            "sha256": "e054bbb58b50cf3fc07d360e05f69fa678e112841e60b9370ba2b9e8dcae91e2",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/METRO_P60__H6__W1/input_only/record_time/proxy_excluded/test.parquet",
+            "rows": 640448,
+            "sha256": "872426fd50f8b3dc1e550c2f4a362052effb2ef3dabbf5f8e8e9396d109ed8e7",
+            "target_value_columns_read": false
+          }
+        ]
+      }
+    },
+    "PMSM": {
+      "entity_audit": {
+        "pairs": {
+          "train_vs_test": {
+            "overlap_entities": 0,
+            "status": "PASS"
+          },
+          "train_vs_validation": {
+            "overlap_entities": 0,
+            "status": "PASS"
+          },
+          "validation_vs_test": {
+            "overlap_entities": 0,
+            "status": "PASS"
+          }
+        },
+        "split_entity_counts": {
+          "test": 12,
+          "train": 42,
+          "validation": 15
+        }
+      },
+      "formal_target_columns_read": false,
+      "ood": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 0,
+        "status": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+        "target_value_columns_read": false
+      },
+      "restored_row_audit_status": "PASS",
+      "status": "PASS",
+      "task": {
+        "h_w": "H600/W60",
+        "head": "PMSM_PM5__H600__W60",
+        "name": "PMSM",
+        "ood": "NOT_APPLICABLE",
+        "root": "public3_shared",
+        "rule": "PRISM_PMSM_SPLIT_V1 profile_id isolation",
+        "source": "frozen profile-holdout C1 sample IDs"
+      },
+      "test": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 928044,
+        "sources": [
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/PMSM_PM5__H600__W60/dynamic/record_time/full_sensor_secondary/test.parquet",
+            "rows": 232011,
+            "sha256": "ad963568260bbdc5ccdf373cee2649df0ad15b82ce034b64f94698fe08be65e9",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/PMSM_PM5__H600__W60/dynamic/record_time/proxy_excluded/test.parquet",
+            "rows": 232011,
+            "sha256": "16904f932694bfbf8be9fe1123ad362e0244e01a9dfa1cc9479ec0b66d80a113",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/PMSM_PM5__H600__W60/input_only/record_time/full_sensor_secondary/test.parquet",
+            "rows": 232011,
+            "sha256": "b4da8c15228b0778e94c8d312839583d09cc5cf5e46fc96f129c4af2aa9554af",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/public3_shared/sample_ids/PMSM_PM5__H600__W60/input_only/record_time/proxy_excluded/test.parquet",
+            "rows": 232011,
+            "sha256": "3322bb371543e9733035546a2922d91c51052e88cf0f3f8ad9b93a65e3d12f5b",
+            "target_value_columns_read": false
+          }
+        ]
+      }
+    },
+    "SRU-H2S": {
+      "entity_audit": null,
+      "formal_target_columns_read": false,
+      "ood": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 0,
+        "status": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+        "target_value_columns_read": false
+      },
+      "restored_row_audit_status": "PASS",
+      "status": "PASS",
+      "task": {
+        "h_w": "H1/W1",
+        "head": "SRU_H2S_REP_H1__H1__W1",
+        "name": "SRU-H2S",
+        "ood": "NOT_APPLICABLE",
+        "root": "sru_shared",
+        "rule": "chronological_60_20_20_floor_boundaries with registered purge",
+        "source": "frozen chronological C1 sample IDs"
+      },
+      "test": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 4010,
+        "sources": [
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/sru_shared/sample_ids/SRU_H2S_REP_H1__H1__W1/dynamic/record_time/primary/test.parquet",
+            "rows": 2005,
+            "sha256": "6e02d6bc43c05337e65e011d5704ecb11bfdb382d3dd3b694ba6379523e64052",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/sru_shared/sample_ids/SRU_H2S_REP_H1__H1__W1/input_only/record_time/primary/test.parquet",
+            "rows": 2005,
+            "sha256": "ca1cbf90b7378028692b4d70ff12a1ec1837f297cbf779b67bb90922161187a8",
+            "target_value_columns_read": false
+          }
+        ]
+      }
+    },
+    "SRU-SO2": {
+      "entity_audit": null,
+      "formal_target_columns_read": false,
+      "ood": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 0,
+        "status": "NOT_APPLICABLE_NO_REGISTERED_OOD_SPLIT",
+        "target_value_columns_read": false
+      },
+      "restored_row_audit_status": "PASS",
+      "status": "PASS",
+      "task": {
+        "h_w": "H1/W1",
+        "head": "SRU_SO2_REP_H1__H1__W1",
+        "name": "SRU-SO2",
+        "ood": "NOT_APPLICABLE",
+        "root": "sru_shared",
+        "rule": "chronological_60_20_20_floor_boundaries with registered purge",
+        "source": "frozen chronological C1 sample IDs"
+      },
+      "test": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 4010,
+        "sources": [
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/sru_shared/sample_ids/SRU_SO2_REP_H1__H1__W1/dynamic/record_time/primary/test.parquet",
+            "rows": 2005,
+            "sha256": "a5b48d2d4d3c1f4a3aad28b50bfad99df6abc9f32d89209a96362bb6de390ede",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/sru_shared/sample_ids/SRU_SO2_REP_H1__H1__W1/input_only/record_time/primary/test.parquet",
+            "rows": 2005,
+            "sha256": "ef9cdfc3d24b4c096e8e24d034ee8a2c63f425eb5fb9cf526d0a8e56efcffaaf",
+            "target_value_columns_read": false
+          }
+        ]
+      }
+    },
+    "TEP": {
+      "entity_audit": {
+        "pairs": {
+          "test_vs_ood": {
+            "overlap_entities": 0,
+            "status": "PASS"
+          },
+          "train_vs_ood": {
+            "overlap_entities": 0,
+            "status": "PASS"
+          },
+          "train_vs_test": {
+            "overlap_entities": 0,
+            "status": "PASS"
+          },
+          "train_vs_validation": {
+            "overlap_entities": 0,
+            "status": "PASS"
+          },
+          "validation_vs_ood": {
+            "overlap_entities": 0,
+            "status": "PASS"
+          },
+          "validation_vs_test": {
+            "overlap_entities": 0,
+            "status": "PASS"
+          }
+        },
+        "split_entity_counts": {
+          "ood": 2500,
+          "test": 8000,
+          "train": 6400,
+          "validation": 1600
+        }
+      },
+      "formal_target_columns_read": false,
+      "ood": {
+        "derivation": "H0/W1 frozen formula from tep_nowcast_c1.py; origin>=256+delay; no H1/W2 sample file used",
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 5267500,
+        "source": {
+          "columns_read": [
+            "entity_id",
+            "row_in_entity"
+          ],
+          "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/sru_shared/base_data/tep/ood.parquet",
+          "rows": 2400000,
+          "sha256": "d13abfe59fc1cbcbe33bce286091831c517c8236c98d86bb5d6493422043ac7c",
+          "target_value_columns_read": false
+        },
+        "split_registry_sha256": "4e9b5b3ac91e95ad292c159d82f8a08b6b95ba3661e1a793e79e1c7dca7c7cb6",
+        "view_rows": {
+          "dynamic/analyzer_maturity_5_steps/proxy_excluded": 1747500,
+          "dynamic/record_time/proxy_excluded": 1760000,
+          "input_only/record_time/proxy_excluded": 1760000
+        }
+      },
+      "restored_row_audit_status": "PROTOCOL_BLOCKED_MISSING_FORMAL_SPLIT",
+      "status": "PASS",
+      "task": {
+        "h_w": "H0/W1",
+        "head": "TEP_G_NOWCAST_H0__H0__W1",
+        "name": "TEP",
+        "ood": "DERIVE_H0_FROM_FROZEN_BASE",
+        "root": "tep_shared",
+        "rule": "TEP_RUN_FAULT_HOLDOUT_V1; [t-L,t), D[t] excluded, Lmax=256",
+        "source": "frozen TEP run/fault split registry; H0 strict-past C1 sample IDs"
+      },
+      "test": {
+        "failures": {
+          "availability_violations": 0,
+          "interval_violations": 0,
+          "null_identifiers": 0
+        },
+        "rows": 16856000,
+        "sources": [
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/tep_shared/sample_ids/TEP_G_NOWCAST_H0__H0__W1/dynamic/analyzer_maturity_5_steps/proxy_excluded/test.parquet",
+            "rows": 5592000,
+            "sha256": "b3e100cf1304ae0d56d756a38b592185fb7bd615a9069f895533fd61e000c0ad",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/tep_shared/sample_ids/TEP_G_NOWCAST_H0__H0__W1/dynamic/record_time/proxy_excluded/test.parquet",
+            "rows": 5632000,
+            "sha256": "24449618d8d1f4166a82792ceb58b6a83727cc70e20f7acbb2f8a86d04aced53",
+            "target_value_columns_read": false
+          },
+          {
+            "columns_read": [
+              "base_origin_id",
+              "view_sample_id",
+              "dataset",
+              "entity_id",
+              "task_id",
+              "target_head",
+              "split",
+              "origin",
+              "current_start",
+              "current_stop_exclusive",
+              "target_start",
+              "target_stop_exclusive",
+              "dependency_start",
+              "dependency_stop_exclusive",
+              "latest_available_target_index",
+              "availability_delay_steps",
+              "availability_scenario",
+              "proxy_policy",
+              "information_set",
+              "causal_history_floor",
+              "anchor_history_steps",
+              "sample_support_contract",
+              "lmax_steps"
+            ],
+            "path": "/root/autodl-tmp/PRISM_R5_SHARED_INPUTS/tep_shared/sample_ids/TEP_G_NOWCAST_H0__H0__W1/input_only/record_time/proxy_excluded/test.parquet",
+            "rows": 5632000,
+            "sha256": "280ba5262834bbc0e13b34fa60590b9fbb4ac5ccf20c11cf84dc43ae11f65789",
+            "target_value_columns_read": false
+          }
+        ]
+      }
+    }
+  }
+}

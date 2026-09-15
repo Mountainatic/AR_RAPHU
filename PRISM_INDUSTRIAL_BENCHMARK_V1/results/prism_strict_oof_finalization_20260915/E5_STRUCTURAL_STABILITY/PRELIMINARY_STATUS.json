@@ -1,0 +1,10 @@
+{
+  "ood_accessed": false,
+  "prediction_vs_structure_interpretation": "REPORTING_ONLY",
+  "sources": [
+    "E1 folds",
+    "E2 formal seeds"
+  ],
+  "status": "COMPLETED",
+  "test_accessed": false
+}

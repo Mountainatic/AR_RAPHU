@@ -1,0 +1,5 @@
+regime,best_rmse,near_optimal_runs,near_optimal_stage_vectors,performance_stable_structure_unstable
+S1,0.2616394463661738,5,1,False
+S2,0.2779545806523702,3,1,False
+S3,0.4382458216688932,1,1,False
+S4,0.5155533769882383,4,2,True
