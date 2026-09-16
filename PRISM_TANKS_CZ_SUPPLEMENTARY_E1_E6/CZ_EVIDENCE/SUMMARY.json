@@ -1,0 +1,105 @@
+{
+  "E1_active_routes": {
+    "Rod_1_to_Rod_2:dynamic": [
+      "A"
+    ],
+    "Rod_1_to_Rod_2:input_only": [],
+    "Rod_2_to_Rod_1:dynamic": [],
+    "Rod_2_to_Rod_1:input_only": []
+  },
+  "E2_false_admission_rate": 0.10625,
+  "E2_overall_recovery_rate": 0.65,
+  "E3_mean_multiscale_gain": -0.03997775819983086,
+  "E4_best_variants": [
+    {
+      "direction": "Rod_1_to_Rod_2",
+      "experiment": "candidate_universe",
+      "rmse_delta": 0.7554096980382877,
+      "variant": "COARSE"
+    },
+    {
+      "direction": "Rod_1_to_Rod_2",
+      "experiment": "family_ablation",
+      "rmse_delta": 0.7653136656473267,
+      "variant": "REMOVE_A"
+    },
+    {
+      "direction": "Rod_2_to_Rod_1",
+      "experiment": "candidate_universe",
+      "rmse_delta": 0.1487940766680371,
+      "variant": "COARSE"
+    },
+    {
+      "direction": "Rod_2_to_Rod_1",
+      "experiment": "family_ablation",
+      "rmse_delta": 0.13199122915419392,
+      "variant": "REMOVE_W"
+    }
+  ],
+  "E5_conditions": 118,
+  "E6_N1_rows": 160,
+  "E6_N2_rows": 160,
+  "completed_utc": "2026-09-15T14:40:19.327733+00:00",
+  "formal_metrics": [
+    {
+      "direction": "Rod_1_to_Rod_2",
+      "information_set": "input_only",
+      "mae_delta": 0.2159920511908345,
+      "partition": "formal_target_rod",
+      "persistence_skill": -0.006749622987176185,
+      "r2_delta": -0.023211030826759238,
+      "r2_level_reconstructed": -0.1044817899891115,
+      "rmse_delta": 0.271936460484259,
+      "rows": 2885,
+      "support_hash": "60999dc9b3208a1a6877addd743d1225e9008683e81544d4077ce51cf074f7c7"
+    },
+    {
+      "direction": "Rod_1_to_Rod_2",
+      "information_set": "dynamic",
+      "mae_delta": 0.21958379791401977,
+      "partition": "formal_target_rod",
+      "persistence_skill": -0.06676222261045539,
+      "r2_delta": -0.14883462735636366,
+      "r2_level_reconstructed": -0.24008331360417356,
+      "rmse_delta": 0.28814666166376457,
+      "rows": 2885,
+      "support_hash": "60999dc9b3208a1a6877addd743d1225e9008683e81544d4077ce51cf074f7c7"
+    },
+    {
+      "direction": "Rod_2_to_Rod_1",
+      "information_set": "input_only",
+      "mae_delta": 0.525706166288929,
+      "partition": "formal_target_rod",
+      "persistence_skill": -0.001743940023917645,
+      "r2_delta": -0.00400946101743771,
+      "r2_level_reconstructed": -0.8905754721384023,
+      "rmse_delta": 0.6481237750487358,
+      "rows": 2782,
+      "support_hash": "b87fc4e1286cf6a30242e5a097931724fb9e8f80ef4f42f909c553399d4c0fe6"
+    },
+    {
+      "direction": "Rod_2_to_Rod_1",
+      "information_set": "dynamic",
+      "mae_delta": 0.525706166288929,
+      "partition": "formal_target_rod",
+      "persistence_skill": -0.001743940023917645,
+      "r2_delta": -0.00400946101743771,
+      "r2_level_reconstructed": -0.8905754721384023,
+      "rmse_delta": 0.6481237750487358,
+      "rows": 2782,
+      "support_hash": "b87fc4e1286cf6a30242e5a097931724fb9e8f80ef4f42f909c553399d4c0fe6"
+    }
+  ],
+  "limitations": [
+    "E2 uses observed CZ input trajectories with generated outcomes, so its structural truth is semisynthetic.",
+    "The private CZ adapter uses explicit auditable feature blocks and the canonical strict nested-OOF routing rule; it is not a byte-for-byte rerun of the public multi-dataset E1-E6 task registry.",
+    "Two transfer directions are selected independently; macro summaries are reporting-only."
+  ],
+  "privacy": {
+    "github_upload": false,
+    "raw_workbook_in_results": false,
+    "server_namespace_private": true
+  },
+  "protocol_id": "PRISM_CZ_D20_PRIVATE_E1_E6_STRICT_NESTED_OOF_R2",
+  "status": "COMPLETED"
+}

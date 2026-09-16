@@ -1,0 +1,9 @@
+{
+  "authoritative_base_commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7",
+  "authoritative_branch": "prism-tanks-cz-supplementary-e1-e6-20260916",
+  "created_utc": "2026-09-16T15:11:03.979007+00:00",
+  "cz_status": "COMPLETED_R5_REUSED",
+  "formal_results_untouched": true,
+  "supplementary_branch": "prism-tanks-cz-supplementary-e1-e6-20260916",
+  "tanks_status": "BLOCKED_PRE_RUN_NATIVE_ADAPTER_MISSING"
+}

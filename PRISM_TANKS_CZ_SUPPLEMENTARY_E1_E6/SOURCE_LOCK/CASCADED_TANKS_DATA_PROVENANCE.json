@@ -1,0 +1,19 @@
+{
+  "DOI": "10.4121/12960104.v1",
+  "bytes": 7520592,
+  "created_utc": "2026-09-16T15:11:03.979007+00:00",
+  "dataset_version": "Version 1",
+  "download_url": "https://data.4tu.nl/ndownloader/items/d4810b78-6cdd-48fe-8950-9bd601e5f47f/versions/1",
+  "filename": "CascadedTanksFiles.zip",
+  "observed_md5": "f832776ed1efdca4572338f467b7baec",
+  "observed_sha256": "eb0fa05851e8a7136846c2e3b61fbef87def78d0852c86ab91b02ac5db541b51",
+  "official_md5": "f832776ed1efdca4572338f467b7baec",
+  "outer_archive": {
+    "bytes": 11676590,
+    "observed_md5": "5cd6d1cb1bac13c9fc8a86852debf7a7",
+    "observed_sha256": "15be22bcf6b8e41723af1a8c186f98db94a801bd4e164def9cd975567352a84e",
+    "path": "/root/autodl-tmp/PRISM_TANKS_CZ_SUPPLEMENTARY_20260916/SOURCE_LOCK/CascadedTanksFiles.zip"
+  },
+  "source": "4TU.ResearchData",
+  "verification_status": "OFFICIAL_DATA_MATCH_TRUE"
+}

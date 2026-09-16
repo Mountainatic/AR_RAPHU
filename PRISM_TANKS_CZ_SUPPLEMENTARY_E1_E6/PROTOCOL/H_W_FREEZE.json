@@ -1,0 +1,25 @@
+{
+  "created_utc": "2026-09-16T15:11:03.979007+00:00",
+  "cz": {
+    "frozen_source": "/root/autodl-tmp/PRISM_CZ_E1_E6_PRIVATE_20260915_R5/freeze/INPUT_MANIFEST.json",
+    "primary": [
+      {
+        "H": 120,
+        "W": 12,
+        "name": "CZ-Mid"
+      },
+      {
+        "H": 240,
+        "W": 12,
+        "name": "CZ-Slow"
+      }
+    ]
+  },
+  "tanks": {
+    "primary": {
+      "H": 16,
+      "source": "official problem definition"
+    },
+    "status": "BLOCKED_BEFORE_TEST"
+  }
+}

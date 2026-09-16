@@ -1,0 +1,3 @@
+dataset,experiment,status,result_source,notes
+Cascaded Tanks,E2,BLOCKED_PRE_RUN_NATIVE_ADAPTER_MISSING,none,No metric reported
+CZ,E2,COMPLETED_R5_REUSED,/root/autodl-tmp/PRISM_CZ_E1_E6_PRIVATE_20260915_R5,Supplementary evidence; not new confirmatory test
