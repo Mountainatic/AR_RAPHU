@@ -1,3 +1,3 @@
 dataset,experiment,status,result_source,notes
-Cascaded Tanks,E1,BLOCKED_PRE_RUN_NATIVE_ADAPTER_MISSING,none,No metric reported
+Cascaded Tanks,E1,COMPLETED_COMPATIBLE_EXTENSION,/root/autodl-tmp/PRISM_TANKS_CZ_SUPPLEMENTARY_20260916/TANKS_E1_STAGEWISE,W RMSE gain 25.5253%; not native full-registry E1
 CZ,E1,COMPLETED_R5_REUSED,/root/autodl-tmp/PRISM_CZ_E1_E6_PRIVATE_20260915_R5,Supplementary evidence; not new confirmatory test

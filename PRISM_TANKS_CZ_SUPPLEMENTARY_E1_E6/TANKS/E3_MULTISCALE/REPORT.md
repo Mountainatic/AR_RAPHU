@@ -1,4 +1,3 @@
-# Cascaded Tanks E3_MULTISCALE
+# E3
 
-Protocol status: BLOCKED_PRE_RUN_NATIVE_ADAPTER_MISSING.
-No held-out/test metrics were accessed.
+Equal-budget comparison; one physical input channel gives identical support.

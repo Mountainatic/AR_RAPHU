@@ -1,4 +1,3 @@
-# Cascaded Tanks E2_SEMISYNTHETIC
+# E2
 
-Protocol status: BLOCKED_PRE_RUN_NATIVE_ADAPTER_MISSING.
-No held-out/test metrics were accessed.
+Real-data-anchored semi-synthetic targets with 30 seeds per regime and OOF stage selection.

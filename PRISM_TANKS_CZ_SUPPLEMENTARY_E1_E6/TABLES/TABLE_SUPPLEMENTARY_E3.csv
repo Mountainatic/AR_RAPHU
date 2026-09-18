@@ -1,3 +1,3 @@
 dataset,experiment,status,result_source,notes
-Cascaded Tanks,E3,BLOCKED_PRE_RUN_NATIVE_ADAPTER_MISSING,none,No metric reported
-CZ,E3,COMPLETED_R5_REUSED,/root/autodl-tmp/PRISM_CZ_E1_E6_PRIVATE_20260915_R5,Supplementary evidence; not new confirmatory test
+Cascaded Tanks,E3,COMPLETED_VALIDATED,/root/autodl-tmp/PRISM_TANKS_CZ_SUPPLEMENTARY_20260916/TANKS_E2_E6_VALIDATED_R4/E3_MULTISCALE,Equal-budget gain 0.0 on single physical channel
+CZ,E3,COMPLETED_R5_REUSED,/root/autodl-tmp/PRISM_CZ_E1_E6_PRIVATE_20260915_R5,Mean multiscale gain -3.9978%

@@ -1,4 +1,3 @@
-# Cascaded Tanks E6_MEASUREMENT_ROBUSTNESS
+# E6
 
-Protocol status: BLOCKED_PRE_RUN_NATIVE_ADAPTER_MISSING.
-No held-out/test metrics were accessed.
+N1 frozen-model and N2 perturbed-train re-identification under raw measurement perturbations.

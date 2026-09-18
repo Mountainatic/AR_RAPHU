@@ -1,5 +1,8 @@
 # Cascaded Tanks E2_SEMISYNTHETIC
 
-STATUS: BLOCKED_PRE_RUN_NATIVE_ADAPTER_MISSING
+STATUS: COMPLETED_VALIDATED
 
-The official archive was recovered and verified, but the authoritative PRISM branch does not contain a Cascaded Tanks dataset adapter or an E1-E6 runner. No metrics are fabricated. This block must be resolved before any Tanks claim is made.
+Source: /root/autodl-tmp/PRISM_TANKS_CZ_SUPPLEMENTARY_20260916/TANKS_E2_E6_VALIDATED_R4/E2_SEMISYNTHETIC
+Protocol: PRISM_V211_CASCADED_TANKS_E2_E6_VALIDATED_EXTENSION_20260918_R2
+
+Historical invalid outputs are superseded and excluded.

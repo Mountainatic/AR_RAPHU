@@ -1,0 +1,5 @@
+unit,stage,status
+Cascaded Tanks H16 prediction,K,ADMITTED
+Cascaded Tanks H16 prediction,C,REJECTED_IDENTITY
+Cascaded Tanks H16 prediction,DELTA_W,ADMITTED
+Cascaded Tanks H16 prediction,A,REJECTED_IDENTITY

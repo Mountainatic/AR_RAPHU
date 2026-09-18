@@ -1,0 +1,4 @@
+unit,earlier_stage,later_stage,increment,rmse_earlier,rmse_later,delta_rmse,relative_delta_rmse_percent,ci95_low,ci95_high,relative_ci95_low_percent,relative_ci95_high_percent,bootstrap_tail_probability_two_sided,replicates,block_length,paired,entity_boundaries_crossed,p_adjusted_holm,significant_holm_0_05
+Cascaded Tanks H16 prediction,K,K+C,C,0.5265446796860122,0.5265446796860122,0.0,0.0,0.0,0.0,0.0,0.0,1.0,500,14,True,False,1.0,False
+Cascaded Tanks H16 prediction,K+C,K+C+DELTA_W,DELTA_W,0.5265446796860122,0.3921427451403756,0.13440193454563654,25.525266844550167,0.07573850999834945,0.20740122531493438,14.384061395039383,39.389102827629245,0.003992015968063872,500,14,True,False,0.011976047904191616,True
+Cascaded Tanks H16 prediction,K+C+DELTA_W,K+C+DELTA_W+A,A,0.3921427451403756,0.3921427451403756,0.0,0.0,0.0,0.0,0.0,0.0,1.0,500,14,True,False,1.0,False

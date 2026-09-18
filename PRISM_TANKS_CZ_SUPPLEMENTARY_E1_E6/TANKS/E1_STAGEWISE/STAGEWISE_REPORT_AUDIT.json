@@ -1,0 +1,30 @@
+{
+  "bootstrap_block_length": 14,
+  "bootstrap_replicates": 500,
+  "checkpoint_manifest": "/root/autodl-tmp/PRISM_TANKS_CZ_SUPPLEMENTARY_20260916/TANKS_E1_STAGEWISE/STAGEWISE_CHECKPOINT_MANIFEST.json",
+  "checkpoint_manifest_sha256": "443bda22360f6a75d343f7c9b1415b72985cacf9e29621e4726fd9f9714ee30e",
+  "multiplicity": "HOLM_ACROSS_3_PRIMARY_ADJACENT_STAGE_COMPARISONS",
+  "outputs": {
+    "STAGEWISE_INCREMENTAL_GAINS.csv": "9ce07c7afed674b579abb3669749a04c8d6c176b76f4c33c36c2c23d75db34a1",
+    "STAGEWISE_INCREMENTAL_GAINS_FIGURE.pdf": "27fa27eaaa0881e13d920a72abcbc4e8d4b6614b321c48b501f655791eaccb42",
+    "STAGEWISE_INCREMENTAL_GAINS_FIGURE.png": "b66cfe1d49438e34402658202b69a241aad54b9e3520e4fc1cd66799b8e4db5c",
+    "STAGEWISE_METRICS_LONG.csv": "60b0c4d07efdf0fd9fc85ffb2c85edecb59c0a8b2f4e4420e6befa14879f50c2",
+    "STAGEWISE_METRICS_WIDE.csv": "33f2bfa7b4e05d511d95d8204376795bcb1653f08c3c59a5d19c2ccb3511e46f",
+    "STAGE_ADMISSION_STATUS.csv": "e570995f8af9c19b69d95182600e5b09db9f625ba0db7483d33e2c947833fd11"
+  },
+  "protocol_class": "E1_COMPATIBLE_SINGLE_TASK_EXTENSION",
+  "protocol_id": "PRISM_V211_CASCADED_TANKS_E1_STAGEWISE_20260908_R1",
+  "same_scoring_support": true,
+  "scoring_support_hash": "7170fbe89ce0e92fe926295e2431bf8e678d8d68294fbd89c487d44407c28cfc",
+  "source_prediction_sha256": "03712112fa82fad52bc5116aff3fcc4a2efa2d7f9620bca2fa6152389715385c",
+  "source_result_sha256": "45f37024e2e18133cf1534bdef71101ac9534eec33deb0fa420eb857fa6df4cb",
+  "stage_order": [
+    "K",
+    "K+C",
+    "K+C+DELTA_W",
+    "K+C+DELTA_W+A"
+  ],
+  "status": "PASS",
+  "test_accessed": true,
+  "unit_count": 1
+}

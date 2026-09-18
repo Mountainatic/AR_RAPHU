@@ -1,0 +1,5 @@
+sample_size,false_admission_rate
+128,0.3
+256,0.3
+512,0.3
+768,0.3
