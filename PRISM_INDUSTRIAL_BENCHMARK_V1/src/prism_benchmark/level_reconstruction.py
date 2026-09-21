@@ -113,10 +113,16 @@ def metric_bundle_delta_and_level(
             raise AssertionError(f"STOP_LEVEL_RECONSTRUCTION_{name}_IDENTITY_FAILED")
     persistence_mse = float(persistence["mse_persistence"])
     model_mse = float(level_metrics["mse"])
-    skill: float | str = (
+    skill_mse: float | str = (
         "NOT_DEFINED_ZERO_PERSISTENCE_ERROR"
         if persistence_mse == 0.0
         else 1.0 - model_mse / persistence_mse
+    )
+    persistence_rmse = float(persistence["rmse_persistence"])
+    skill_rmse: float | str = (
+        "NOT_DEFINED_ZERO_PERSISTENCE_ERROR"
+        if persistence_rmse == 0.0
+        else 1.0 - float(level_metrics["rmse"]) / persistence_rmse
     )
     variance_delta = float(np.var(truth, dtype=np.float64))
     variance_level = float(np.var(future_truth, dtype=np.float64))
@@ -147,7 +153,12 @@ def metric_bundle_delta_and_level(
         "rmse_delta": delta_metrics["rmse"],
         "mae_delta": delta_metrics["mae"],
         "r2_level_persistence": persistence["r2_level_persistence"],
-        "persistence_skill": skill,
+        # Backward-compatible alias.  The historical public benchmark defines
+        # persistence_skill on squared error.  Keep both explicit names because
+        # the private CZ raw-2s reports used the RMSE-relative form.
+        "persistence_skill": skill_mse,
+        "persistence_skill_mse": skill_mse,
+        "persistence_skill_rmse": skill_rmse,
         "std_level_target": float(np.std(future_truth, dtype=np.float64)),
         "std_level_prediction": float(
             np.std(future_prediction, dtype=np.float64)

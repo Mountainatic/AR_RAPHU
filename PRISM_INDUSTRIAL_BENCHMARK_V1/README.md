@@ -1,5 +1,10 @@
 # PRISM INDUSTRIAL BENCHMARK V1
 
+Current unified H/W/W0 and R² integration:
+`docs/UNIFIED_HW_R2_PROTOCOLS_20260921.md`.  Its machine-readable registry is
+`configs/unified_hw_r2_protocols_20260921.json` and executable index/reporting
+logic is in `src/prism_benchmark/unified_hw_protocol.py`.
+
 本目录包含：
 
 - `PRISM_INDUSTRIAL_BENCHMARK_V1_MASTER_PROTOCOL.md`：总协议、3+2 数据集、任务、baseline 与统计合同；

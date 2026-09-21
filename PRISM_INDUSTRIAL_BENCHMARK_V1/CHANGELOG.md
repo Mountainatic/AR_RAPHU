@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-21 — unified H/W, R² and CZ raw-2s integration
+
+- froze one machine-readable registry for all six public dataset families and
+  the private CZ raw-2s primary/scan protocols;
+- made delta R² versus reconstructed level R² explicit and named both MSE- and
+  RMSE-relative persistence-skill definitions;
+- added executable target-index and reporting helpers plus regression tests;
+- incorporated the audited zero-C Joint routing fix used by the CZ rerun;
+- retained private CZ raw data outside GitHub.
+
 ## Representative H1/W2 realized-profile uniqueness correction
 
 - Fixes a prospective H1/W2 implementation defect discovered during the

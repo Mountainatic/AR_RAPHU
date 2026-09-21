@@ -843,6 +843,16 @@ def run_joint_stability_view(
         a_result = json.loads(a_path.read_text(encoding="utf-8"))
         if any(item.get("status") != "PASS" for item in (c_result, w_result, a_result)):
             raise RuntimeError("v2.1.1 Joint stability practice M2-M4 prerequisite is not PASS")
+        c_input_gate = c_result.get("input_path_preservation", {})
+        if (
+            c_input_gate.get("pass") is False
+            and w_result.get("joint_w_basis_contract") is None
+        ):
+            result = _registered_stability_rejection(
+                view, c_input_gate, started=started
+            )
+            write_json(destination / "RESULT.json", result)
+            return result
         # C preservation diagnostics describe evidence only.  A zero C
         # increment is the additive identity and must not suppress Joint.
         frozen_channel_set = {
@@ -968,9 +978,6 @@ def run_joint_stability_view(
                 features, frozen_channels
             )
             representation_audits.append({"fold_index": fold, **representation_audit})
-            best_index = features["channels"].index(
-                str(c_result["best_active_k_channel"])
-            )
             fit_seed, evaluation_seed, _, _, _ = _fit_c_routed(
                 shared,
                 view,
@@ -981,6 +988,14 @@ def run_joint_stability_view(
                 c_result,
                 fit_split="train",
                 evaluation_split="train",
+            )
+            best_active_k_channel = c_result.get("best_active_k_channel")
+            best_k_evaluation = (
+                evaluation_seed
+                if best_active_k_channel is None
+                else features["compressed_evaluation"][:, features["channels"].index(
+                    str(best_active_k_channel)
+                )]
             )
             if w_contract["family"] == IDENTITY:
                 w_train = np.empty((len(fit), 0), dtype=np.float64)
@@ -1044,7 +1059,7 @@ def run_joint_stability_view(
                 {
                     "fold_index": fold,
                     "evaluation_target": evaluation_target,
-                    "best_k_eval": features["compressed_evaluation"][:, best_index],
+                    "best_k_eval": best_k_evaluation,
                 }
             )
         if len(prepared_folds) != 4:
@@ -1411,10 +1426,6 @@ def run_joint_stability_view(
         final_k_blocks, final_representation_audit = k_representation_blocks(
             final_features, frozen_channels
         )
-        best_index = final_features["channels"].index(
-            str(c_result["best_active_k_channel"])
-        )
-        best_k_validation = final_features["compressed_evaluation"][:, best_index]
         fit_seed, validation_seed, _, _, _ = _fit_c_routed(
             shared,
             view,
@@ -1425,6 +1436,14 @@ def run_joint_stability_view(
             c_result,
             fit_split="train",
             evaluation_split="validation",
+        )
+        best_active_k_channel = c_result.get("best_active_k_channel")
+        best_k_validation = (
+            validation_seed
+            if best_active_k_channel is None
+            else final_features["compressed_evaluation"][:, final_features["channels"].index(
+                str(best_active_k_channel)
+            )]
         )
         if w_contract["family"] == IDENTITY:
             w_train = np.empty((len(train), 0), dtype=np.float64)

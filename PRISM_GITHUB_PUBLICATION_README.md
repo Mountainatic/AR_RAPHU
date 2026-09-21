@@ -1,5 +1,14 @@
 # PRISM Strict Nested-OOF Finalization
 
+## 2026-09-21 unified H/W and R² integration
+
+The consolidated six-public-dataset plus private-CZ protocol is documented in
+[`PRISM_INDUSTRIAL_BENCHMARK_V1/docs/UNIFIED_HW_R2_PROTOCOLS_20260921.md`](PRISM_INDUSTRIAL_BENCHMARK_V1/docs/UNIFIED_HW_R2_PROTOCOLS_20260921.md).
+The corresponding machine-readable registry, executable index rules, metric
+reporter and tests are in the same benchmark directory.  This integration is
+based on the strict nested-OOF authority and retains the supplementary Tanks
+evidence; private CZ raw data is intentionally excluded.
+
 This directory publishes the reproducible code, frozen protocol, audited summary tables, figures, and external-W result for the 2026-09-15 strict nested-OOF finalization.
 
 ## Results
