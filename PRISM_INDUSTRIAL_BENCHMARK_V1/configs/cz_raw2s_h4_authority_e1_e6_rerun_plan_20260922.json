@@ -1,0 +1,294 @@
+{
+  "plan_id": "CZ_RAW2S_H4_AUTHORITY_E1_E6_RERUN_PLAN_20260922_R1",
+  "status": "PLANNED_NOT_STARTED",
+  "authority": {
+    "branch": "prism-strict-oof-finalization-20260915",
+    "commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7",
+    "required_core_modules": [
+      "src/prism_benchmark/cz_k_support.py",
+      "src/prism_benchmark/v211_c.py",
+      "src/prism_benchmark/v211_w.py",
+      "src/prism_benchmark/v211_a.py",
+      "src/prism_benchmark/v211_joint_stability.py",
+      "src/prism_benchmark/strict_oof_selection.py",
+      "src/prism_benchmark/representative_prism_checkpoints.py"
+    ],
+    "custom_proxy_models_forbidden": true,
+    "reviewed_patches_allowed": [
+      "v211_joint_stability zero-C routing guard",
+      "level_reconstruction metric-label correction"
+    ]
+  },
+  "task": {
+    "task_id": "CZ_DIAM_RAW2S_CURRENT_L256_H4",
+    "sampling_period_seconds": 2,
+    "history_steps": 256,
+    "h_steps": 4,
+    "w_steps": 1,
+    "w0_steps": 1,
+    "forecast_seconds": 8,
+    "input_interval": "[t-256,t)",
+    "anchor": "D[t-1]",
+    "target_delta": "D[t+3]-D[t-1]",
+    "level_reconstruction": "D[t-1]+delta_prediction",
+    "dependency_purge_steps": 260,
+    "directions": [
+      "Rod_1_to_Rod_2",
+      "Rod_2_to_Rod_1"
+    ],
+    "directions_are_independent": true
+  },
+  "evidence_boundary": {
+    "e1_anchor_run": "/root/autodl-tmp/PRISM_CZ_RAW2S_H4_AUTHORITY_E1_E6_20260922_R3",
+    "e1_anchor_execution_commit": "551c491db200d362c65b92c928d5a98f86bf96f4",
+    "e2_e6_use_source_rod_development_only": true,
+    "e2_e6_formal_target_rod_access": false,
+    "e2_e6_ood_access": false,
+    "future_clean_formal_test_role": "REPLAY_ONLY_NO_SELECTION_AUTHORITY",
+    "raw_workbook_publication_forbidden": true
+  },
+  "selector": {
+    "rule": "ACTIVE iff row-weighted nested-OOF parent risk minus best tuned nonzero-child risk exceeds epsilon_num",
+    "epsilon_num": "1000 * eps(float64) * max(1, abs(parent_risk), abs(child_risk))",
+    "zero_semantics": "EXTERNAL_EXACT_IDENTITY",
+    "zero_is_candidate": false,
+    "minimum_inner_folds": 3,
+    "test_metrics_have_selection_authority": false
+  },
+  "experiments": {
+    "E1_STAGEWISE": {
+      "role": "complete the authority stagewise ladder without changing the sealed R3 selection",
+      "stages": [
+        "K",
+        "K+C",
+        "K+C+DELTA_W",
+        "K+C+DELTA_W+A",
+        "JOINT"
+      ],
+      "work": [
+        "implement a pure-K portable checkpoint codec from frozen authority K contracts",
+        "prove pure-K OOF replay equals the K parent consumed by C",
+        "replay the pure-K checkpoint on the already sealed support",
+        "merge pure-K with the existing R3 K+C through Joint ladder"
+      ],
+      "no_refit_after_formal_metrics": true,
+      "acceptance": [
+        "all prefixes use one common sample-id order and support hash per direction",
+        "every inactive stage is bitwise identical to its parent",
+        "delta and reconstructed-level metric identities pass",
+        "pure-K replay uses no C/W/A/Joint coefficient"
+      ]
+    },
+    "E2_SEMISYNTHETIC_RECOVERY": {
+      "role": "test whether the authority chain recovers known K/C/W/A truth",
+      "generator": "CZ_REAL_INPUT_TRAJECTORY_AUTHORITY_OPERATOR_V1",
+      "recovery_regimes": [
+        "S1_K",
+        "S2_KC",
+        "S3_KCW",
+        "S4_KCWA"
+      ],
+      "screening_seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "formal_seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+      "formal_sample_size": 2048,
+      "null_sample_sizes": [1024, 2048, 4096, 8192],
+      "null_seeds_per_size": 30,
+      "null_regime": "S0_NULL with K/C/W/A all inactive",
+      "input_policy": "source-rod raw input trajectories only; independently block-circular-shift channels within legal segments before target generation",
+      "target_policy": "generate a complete synthetic diameter trajectory from pre-registered authority K/C/W/A operators before C1 materialization",
+      "effect_scale_policy": "freeze stage RMS fractions and innovation SNR from source-rod training statistics before screening",
+      "full_authority_refit_per_seed": true,
+      "go_gate": {
+        "true_stage_recovery_rate_min_exclusive": 0.5,
+        "null_stage_activation_rate_max_exclusive": 0.5,
+        "null_false_admission_slope_vs_log2_n": "negative_or_identically_zero"
+      }
+    },
+    "E3_MULTISCALE": {
+      "role": "compare shared-scale and channel-specific-scale K structures at equal fit budget",
+      "registered_k_profiles": [
+        [2, 8], [4, 8], [8, 8],
+        [2, 16], [4, 16], [8, 16], [16, 16],
+        [2, 32], [4, 32], [8, 32], [16, 32]
+      ],
+      "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "uniform_arm": "11 assignments; every channel receives the same registered profile",
+      "multiscale_arm": "11 balanced Latin-hypercube assignments per seed; every channel uses every registered profile exactly once",
+      "candidate_assignment_budget_per_arm": 11,
+      "cache_unit": "direction + channel + profile + fold-hash + data-hash + code-hash",
+      "downstream_policy": "rerun authority C/W/A/Joint for every assignment on the same support",
+      "primary_readout": "paired relative delta-RMSE gain of multiscale over uniform",
+      "selection_authority": false
+    },
+    "E4_CANDIDATE_SENSITIVITY": {
+      "role": "measure dependence on candidate density and family availability",
+      "E4A_nested_grids": {
+        "COARSE": {
+          "k_profiles": [[8, 8], [16, 16], [16, 32]],
+          "w_monotone_knots": [4],
+          "w_natural_cubic_knots": [4],
+          "w_smoothness": [0.1, 1.0],
+          "w_soft_overlap_mu": [0.0, 3.0, 30.0],
+          "a_profiles": [[1, 32], [2, 32]],
+          "joint_routes": ["J_K", "J_KA"],
+          "joint_predictive_eta": [0.001, 0.01]
+        },
+        "STANDARD": {
+          "k_profiles": [[4, 8], [8, 8], [4, 16], [8, 16], [16, 16], [8, 32], [16, 32]],
+          "w_monotone_knots": [4, 6],
+          "w_natural_cubic_knots": [4, 6],
+          "w_smoothness": [0.0, 0.1, 1.0],
+          "w_soft_overlap_mu": [0.0, 0.3, 3.0, 30.0],
+          "a_profiles": [[1, 16], [1, 32], [2, 16], [2, 32]],
+          "joint_routes": ["J_K", "J_KW", "J_KA", "J_KWA"],
+          "joint_predictive_eta": [0.0001, 0.001, 0.01, 0.1]
+        },
+        "EXPANDED": {
+          "k_profiles": [[2, 8], [4, 8], [8, 8], [2, 16], [4, 16], [8, 16], [16, 16], [2, 32], [4, 32], [8, 32], [16, 32]],
+          "w_monotone_knots": [4, 6],
+          "w_natural_cubic_knots": [4, 6, 8],
+          "w_smoothness": [0.0, 0.1, 1.0],
+          "w_soft_overlap_mu": [0.0, 0.03, 0.3, 3.0, 30.0],
+          "a_profiles": [[1, 8], [1, 16], [1, 32], [2, 8], [2, 16], [2, 32]],
+          "joint_routes": ["J_K", "J_KW", "J_KA", "J_KWA"],
+          "joint_predictive_eta": [0.0, 0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0]
+        },
+        "same_support_and_folds": true,
+        "independent_full_refit": true
+      },
+      "E4B_family_ablations": [
+        "FULL",
+        "NO_NONLINEAR_K",
+        "NO_C",
+        "NO_W",
+        "NO_A"
+      ],
+      "ablation_policy": "remove exactly one family, rebuild every downstream parent, reselect within the surviving authority universe",
+      "selection_authority": false
+    },
+    "E5_STRUCTURAL_STABILITY": {
+      "role": "separate prediction stability from structural stability",
+      "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "development_perturbation": "moving-block resampling inside legal source-rod segments with chronology and dependency purge preserved",
+      "sources": [
+        "causal_outer_fold",
+        "moving_block_seed",
+        "candidate_universe",
+        "family_ablation",
+        "direction"
+      ],
+      "never_pool_across": [
+        "direction",
+        "information_set",
+        "h_steps",
+        "w_steps"
+      ],
+      "rashomon_primary": "delta_RMSE <= 1.01 * best_delta_RMSE",
+      "readouts": [
+        "stage_activation_frequency",
+        "channel_admission_frequency",
+        "pairwise_jaccard",
+        "selected_profile_distribution",
+        "modal_stage_vector_frequency",
+        "rashomon_structure_count"
+      ],
+      "claim_label_rule": {
+        "stable": "modal_stage_vector_frequency >= 0.8 and median_pairwise_jaccard >= 0.75",
+        "otherwise": "SENSITIVE"
+      }
+    },
+    "E6_MEASUREMENT_ROBUSTNESS": {
+      "role": "measure frozen-model degradation and full-chain structural reidentification under raw measurement error",
+      "injection_point": "raw aligned source-rod measurements before C1 materialization, normalization, lag construction and target anchoring",
+      "future_truth_remains_clean": true,
+      "modes": [
+        "PROCESS_ONLY",
+        "REALISTIC_PROCESS_PLUS_OBSERVED_DIAMETER_HISTORY"
+      ],
+      "information_sets": [
+        "dynamic/record_time primary",
+        "input_only/record_time secondary attribution"
+      ],
+      "scoring_policy": "score reconstructed level against clean D[t+3]; when diameter history is perturbed, delta truth is clean D[t+3] minus the perturbed observed anchor",
+      "conditions": {
+        "gaussian_std_fraction": [0.0, 0.01, 0.025, 0.05, 0.1],
+        "bias_signed_std_fraction": [-0.1, -0.05, -0.025, -0.01, 0.01, 0.025, 0.05, 0.1],
+        "drift": ["LINEAR@0.05", "RANDOM_WALK@0.05"],
+        "quantization_std_fraction": [0.01, 0.025, 0.05, 0.1]
+      },
+      "noise_scale": "per-direction outer-train std from unique raw source-rod measurements only",
+      "noise_key": ["direction", "mode", "condition", "seed", "channel", "raw_timestamp"],
+      "N1": {
+        "mode": "FROZEN_CLEAN_AUTHORITY_CHECKPOINT",
+        "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+        "refit": false
+      },
+      "N2": {
+        "mode": "FULL_AUTHORITY_REIDENTIFICATION",
+        "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        "refit_from_raw": true,
+        "all_conditions_required": true
+      },
+      "mandatory_certificates": [
+        "alpha-zero seed invariance",
+        "alpha-zero equality to clean replay",
+        "noise never crosses a segment boundary",
+        "no future target value is perturbed or used as input",
+        "N2 candidate universe equals the clean frozen universe"
+      ]
+    }
+  },
+  "execution": {
+    "phases": [
+      "P0_PLAN_AND_CODE_FREEZE",
+      "P1_ADAPTER_UNIT_TESTS_AND_TINY_PILOTS",
+      "P2_E1_PURE_K_REPLAY",
+      "P3_E2_AND_PHASE_A_GATE",
+      "P4_E3_E4_DEVELOPMENT",
+      "P5_E5_E6_DEVELOPMENT",
+      "P6_COMMON_SUPPORT_AND_CHECKPOINT_SEAL",
+      "P7_REPORT_AND_PRIVATE_EVIDENCE_PACKAGE"
+    ],
+    "outer_parallel_units_max": 4,
+    "inner_workers_default": 1,
+    "worker_equivalence_test_required_before_parallel_run": true,
+    "ordered_collection_required": true,
+    "per_unit_isolated_output": true,
+    "content_addressed_cache": true,
+    "cache_reuse_requires_exact_data_fold_candidate_code_hash_match": true,
+    "estimated_units": {
+      "E2_full_authority_refits": 560,
+      "E3_k_profile_cache_fits": 88,
+      "E3_downstream_assignment_evaluations": 242,
+      "E4_full_authority_refits": 16,
+      "E5_full_authority_refits": 20,
+      "E6_N1_frozen_evaluations": 2280,
+      "E6_N2_full_authority_refits": 760
+    },
+    "estimated_wall_clock_hours": [96, 160],
+    "estimated_private_storage_gib": [200, 300],
+    "current_private_free_space_observed_gib": 14,
+    "storage_gate": "STOP unless at least 300 GiB private writable storage is available",
+    "raw_or_private_artifacts_on_public_mount_forbidden": true
+  },
+  "global_stop_rules": [
+    "authority or reviewed-patch blob mismatch",
+    "raw workbook hash mismatch",
+    "any formal-target or OOD access during E2-E6",
+    "support or fold hash mismatch within a comparison",
+    "worker-count prediction-hash mismatch",
+    "insufficient private storage",
+    "non-finite prediction or metric",
+    "missing exact-zero identity certificate",
+    "attempt to replace an authority module with a compact proxy"
+  ],
+  "required_outputs": {
+    "E1": ["stagewise_metrics.csv", "incremental_gains.csv", "exact_zero_audit.json", "pure_k_replay_certificate.json"],
+    "E2": ["formal_30seed.csv", "null_calibration.csv", "stage_recovery.csv", "channel_recovery.csv", "phase_a_gate.json"],
+    "E3": ["equal_budget_multiscale.csv", "paired_gain.csv", "fit_budget_audit.json"],
+    "E4": ["grid_sensitivity.csv", "family_ablation.csv", "candidate_universe_hashes.json"],
+    "E5": ["structure_runs.csv", "pairwise_jaccard.csv", "admission_frequency.csv", "rashomon.csv"],
+    "E6": ["n1_frozen.csv", "n2_reidentified.csv", "robustness_summary.csv", "noise_injection_audit.json"],
+    "global": ["PLAN_FREEZE.json", "CODE_BINDINGS.json", "SUPPORT_FREEZE.json", "CHECKPOINT_MANIFEST.json", "PRIVACY_AUDIT.json", "RUN_STATUS.json"]
+  }
+}

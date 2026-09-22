@@ -74,3 +74,9 @@ appropriate checks for improvement over that easy level baseline.
 is complete from K+C onward, but pure K and E2--E6 have not been rerun.  The
 failed pre-correction R1/R2 attempts and `CZ_RAW2S_H4_CORRECTED_R2` are not
 valid result sources.
+
+The pre-registered implementation and execution plan for completing pure K
+and E2--E6 is `docs/CZ_RAW2S_H4_AUTHORITY_E1_E6_RERUN_PLAN_20260922.md`, with
+its machine-readable companion at
+`configs/cz_raw2s_h4_authority_e1_e6_rerun_plan_20260922.json`.  Both remain
+`PLANNED_NOT_STARTED`; their presence is not evidence that E2--E6 ran.
