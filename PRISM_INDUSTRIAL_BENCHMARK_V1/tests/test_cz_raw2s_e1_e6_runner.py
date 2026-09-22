@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -104,3 +105,22 @@ def test_cz_authority_config_is_h4_only_and_pins_exact_commit() -> None:
     assert config["cz"]["sampling_period_seconds"] == 2
     assert config["cz"]["history_steps"] == 256
     assert config["cz"]["target_formula"] == "D[t+h-1]-D[t-1]"
+
+
+def test_representative_extension_code_bindings_match_current_files() -> None:
+    project = Path(__file__).resolve().parents[1]
+    descriptor = json.loads(
+        (
+            project
+            / "configs"
+            / "representative_horizon_stage1_tep_sru_cpu_extension_20260825.json"
+        ).read_text(encoding="utf-8")
+    )
+    for record in descriptor["formal_code_bindings"]:
+        raw = (project / record["path"]).read_bytes()
+        observed = {
+            hashlib.sha256(raw).hexdigest(),
+            hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest(),
+        }
+        assert len(record["sha256"]) == 64
+        assert record["sha256"] in observed
