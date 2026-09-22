@@ -1,6 +1,6 @@
 # CZ raw-2s H4 authority correction
 
-Status: `IMPLEMENTED_NOT_YET_RERUN`
+Status: `AUTHORITY_H4_RERUN_PARTIAL`
 
 The aggregate results previously published under
 `CZ_RAW2S_H4_CORRECTED_R2` were produced by a custom rolling-statistics,
@@ -30,3 +30,47 @@ The authoritative final checkpoint currently emits the formal ladder from
 `NOT_YET_RUN`.  E2--E6 are also `NOT_YET_RUN` until their perturbation and
 candidate-universe adapters rerun the full authority chain.  The corrected
 runner must not substitute compact Ridge models for those experiments.
+
+## Validated execution receipt
+
+The valid corrected run is based on execution commit
+`551c491db200d362c65b92c928d5a98f86bf96f4` and is stored privately at:
+
+```text
+/root/autodl-tmp/PRISM_CZ_RAW2S_H4_AUTHORITY_E1_E6_20260922_R3/
+```
+
+The run passed scope, environment, pilot, pilot acceptance, development,
+development reconciliation, selection freeze, common-support freeze,
+checkpoint sealing, formal test and report.  Development accessed neither
+test nor OOD data.  The sealed manifest contains 32 checkpoint files and the
+report privacy audit has no violations.  The server-side targeted regression
+suite passed 54 tests.
+
+The registered task is `CZ_DIAM_RAW2S_CURRENT_L256_H4`: 2-second sampling,
+256-point strictly-past history, H/W/W0 = 4/1/1, hence an 8-second forecast.
+Rod1 to Rod2 and Rod2 to Rod1 were fitted independently.  Formal test metrics
+are:
+
+| Direction | Stage | Delta RMSE | Delta R2 | Reconstructed level R2 | Persistence skill |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Rod1 to Rod2 | K+C | 0.015238 | 0.093504 | 0.998294 | 0.094468 |
+| Rod1 to Rod2 | K+C+Delta-W | 0.015238 | 0.093504 | 0.998294 | 0.094468 |
+| Rod1 to Rod2 | K+C+A ablation | 0.013819 | 0.254551 | 0.998597 | 0.255344 |
+| Rod1 to Rod2 | K+C+Delta-W+A | 0.013819 | 0.254551 | 0.998597 | 0.255344 |
+| Rod1 to Rod2 | Joint KWA | 0.013712 | 0.266011 | 0.998618 | 0.266791 |
+| Rod2 to Rod1 | K+C | 0.016605 | 0.077985 | 0.999161 | 0.077993 |
+| Rod2 to Rod1 | K+C+Delta-W | 0.016605 | 0.077985 | 0.999161 | 0.077993 |
+| Rod2 to Rod1 | K+C+A ablation | 0.015223 | 0.225043 | 0.999295 | 0.225051 |
+| Rod2 to Rod1 | K+C+Delta-W+A | 0.015223 | 0.225043 | 0.999295 | 0.225051 |
+| Rod2 to Rod1 | Joint KWA | 0.014822 | 0.265376 | 0.999331 | 0.265383 |
+
+The near-one level R2 and the approximately 0.265 delta R2 measure different
+quantities and must not be interchanged.  Level R2 is high partly because the
+diameter level is strongly persistent; persistence skill and delta R2 are the
+appropriate checks for improvement over that easy level baseline.
+
+`RUN_STATUS.json` is intentionally `PARTIAL`: the authority-backed H4 ladder
+is complete from K+C onward, but pure K and E2--E6 have not been rerun.  The
+failed pre-correction R1/R2 attempts and `CZ_RAW2S_H4_CORRECTED_R2` are not
+valid result sources.
