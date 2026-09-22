@@ -7,5 +7,7 @@ corrected Tanks E2–E6 are under `TANKS_H16_CORRECTED_R3/`. The original
 history because their runner used an 8-second target.
 
 For CZ, the current primary evidence is raw-2s L256 with H4/W1/W0=1. The
-included older D20 evidence is historical-only and cannot be mixed with the
-raw-2s ranking. Private raw workbooks are not included.
+corrected private-data E1–E6 run is complete and its aggregate-only evidence
+is under `CZ_RAW2S_H4_CORRECTED_R2/`. The included older `CZ_EVIDENCE/` D20
+evidence is historical-only and cannot be mixed with the raw-2s ranking.
+Private raw workbooks and sample-level predictions are not included.

@@ -1,3 +1,3 @@
 dataset,experiment,status,result_source,notes
 Cascaded Tanks,E3,COMPLETED,TANKS_H16_CORRECTED_R3/E3_MULTISCALE,Equal-budget stage-specific multiscale gain 7.0353%
-CZ,E3,NOT_YET_RUN,scripts/run_cz_raw2s_e1_e6.py,Corrected raw-2s L256 H4 runner ready; old D20 result excluded
+CZ,E3,COMPLETED,CZ_RAW2S_H4_CORRECTED_R2/E3_MULTISCALE,Mean equal-budget multiscale gain 0.2663%; some seed gains negative

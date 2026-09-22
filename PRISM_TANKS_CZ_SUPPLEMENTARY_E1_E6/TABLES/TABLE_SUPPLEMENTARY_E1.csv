@@ -1,3 +1,3 @@
 dataset,experiment,status,result_source,notes
 Cascaded Tanks,E1,COMPLETED,TANKS/E1_STAGEWISE,W RMSE gain 25.5253%; H16 direct 64-second task
-CZ,E1,NOT_YET_RUN,scripts/run_cz_raw2s_e1_e6.py,Corrected raw-2s L256 H4 runner ready; old D20 result excluded
+CZ,E1,COMPLETED,CZ_RAW2S_H4_CORRECTED_R2/E1_STAGEWISE,Only A admitted in both dynamic directions; formal RMSE 0.0151283/0.0161298

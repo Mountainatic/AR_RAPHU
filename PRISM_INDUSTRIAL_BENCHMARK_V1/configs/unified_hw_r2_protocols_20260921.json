@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "protocol_id": "PRISM_UNIFIED_HW_R2_PROTOCOLS_20260921_R2_CORRECTED_20260922",
-  "status": "CORRECTED_AFTER_CODE_AND_RESULT_AUDIT",
+  "status": "CORRECTED_AND_RERUN_AFTER_CODE_AUDIT",
   "authority": {
     "repository": "Mountainatic/AR_RAPHU",
     "method_branch": "prism-strict-oof-finalization-20260915",
@@ -212,6 +212,22 @@
       "Rod1_to_Rod2": [0.060365698193735495, 0.09095896250084268, 0.14372375486026367, 0.17313260754867188, 0.19819176342355294],
       "Rod2_to_Rod1": [0.07754554624036747, 0.09914219940008595, 0.1429021220094142, 0.18582908227500894, 0.21981928888222313]
     }
+  },
+  "cz_raw2s_h4_e1_e6": {
+    "status": "COMPLETED",
+    "protocol_id": "PRISM_CZ_RAW2S_L256_H4_PRIVATE_E1_E6_STRICT_NESTED_OOF_R2",
+    "execution_commit": "6de39fedbba18d3fbc4333d5cd250d10fbd263e3",
+    "strict_base_is_ancestor": true,
+    "dependency_purge_steps": 260,
+    "evidence_source": "../PRISM_TANKS_CZ_SUPPLEMENTARY_E1_E6/CZ_RAW2S_H4_CORRECTED_R2",
+    "formal_dynamic": {
+      "Rod1_to_Rod2": {"rows": 20109, "rmse": 0.015128300580706161, "r2_delta": 0.10654724182217956, "r2_level_reconstructed": 0.9983181390211966, "persistence_skill_mse": 0.10749719252754941, "persistence_skill_rmse": 0.05527633274462174, "active_route": ["A"]},
+      "Rod2_to_Rod1": {"rows": 19280, "rmse": 0.01612984685703561, "r2_delta": 0.1300067378854627, "r2_level_reconstructed": 0.9992080950335173, "persistence_skill_mse": 0.1300147211063657, "persistence_skill_rmse": 0.06726998606583146, "active_route": ["A"]}
+    },
+    "E2": {"overall_recovery_rate": 0.6375, "false_admission_rate": 0.10625},
+    "E3": {"mean_equal_budget_multiscale_gain": 0.0026627453040062006},
+    "E5": {"conditions": 118},
+    "E6": {"N1_rows": 200, "N2_rows": 200}
   },
   "historical_protocols_excluded_from_primary_ranking": [
     "TEP H1/W2/W0=2",

@@ -1,9 +1,9 @@
 {
   "files": [
     {
-      "bytes": 941,
+      "bytes": 1347,
       "path": "CLAIM_IMPACT_ASSESSMENT.md",
-      "sha256": "4554e5dea02c9aea239a08fc89eac03bf104d26ffe87ef48c8a632320ccf7857"
+      "sha256": "71d34c20a7a6c9ed32b58d627a9b4238b7c18a91bb33ff547fcadac77c28dfe9"
     },
     {
       "bytes": 984,
@@ -86,6 +86,96 @@
       "sha256": "6d0668afdbf263791902a37970dfd298431704bdbcfcf567f62f099c3bde081e"
     },
     {
+      "bytes": 1209,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/E1_STAGEWISE/formal_metrics.csv",
+      "sha256": "804da5daf5413c76b920790d8099e388c912c6b1fb0d411bccd1e7f295762109"
+    },
+    {
+      "bytes": 3461,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/E1_STAGEWISE/Rod_1_to_Rod_2_development.csv",
+      "sha256": "4cdad4eb799548b9d6f4e0b62ef74282b707f1f6a54afd2f5edee2d1480b5252"
+    },
+    {
+      "bytes": 6234,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/E1_STAGEWISE/Rod_1_to_Rod_2_dynamic_routes.json",
+      "sha256": "220f88920d9e7d56eda0cc7dd76ba14ce8c786dd95d9559b03b544edcf7f8baf"
+    },
+    {
+      "bytes": 3445,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/E1_STAGEWISE/Rod_2_to_Rod_1_development.csv",
+      "sha256": "51fc94cb9752e8423ffc271879546cfeae62768cc2b7492d149b7bdf3f69d079"
+    },
+    {
+      "bytes": 6229,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/E1_STAGEWISE/Rod_2_to_Rod_1_dynamic_routes.json",
+      "sha256": "bec16c22496c55afef792ad1f91c07f9130ac1f701073d967d79b885f8c5aa7d"
+    },
+    {
+      "bytes": 444,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/E2_CZ_INPUT_SEMISYNTHETIC_RECOVERY/aggregate.csv",
+      "sha256": "3a878eab052a4cd6152974ae052c46d5fd319cd89f4db12f2134fcd16949290f"
+    },
+    {
+      "bytes": 1659,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/E3_MULTISCALE/paired_gain.csv",
+      "sha256": "ea2f276f157e89047bd9fa518ea825d53afe08adfbc97414f2c65747577064cb"
+    },
+    {
+      "bytes": 4889,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/E4_CANDIDATE_SENSITIVITY/all_variants.csv",
+      "sha256": "7b60c38bd009d2c468b7725fcc2b73d29da88de98a17aec11dc91de0cf9e4d05"
+    },
+    {
+      "bytes": 500,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/E5_STRUCTURAL_STABILITY/aggregate.csv",
+      "sha256": "a114eca168d3f8681ed3de69579d8f3a93fad63de2d3bac3478a58f16cd94905"
+    },
+    {
+      "bytes": 1662,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/E6_MEASUREMENT_ROBUSTNESS/N1_aggregate.csv",
+      "sha256": "6f1a67ac2311d923d95ca677b00370596eefde90ccd3edce171e106cd111eed0"
+    },
+    {
+      "bytes": 1395,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/E6_MEASUREMENT_ROBUSTNESS/N2_aggregate.csv",
+      "sha256": "580e8b640212ce5c4d31e579cd830246a5612236f4a4b4b52ab50a9f3f3ff1f4"
+    },
+    {
+      "bytes": 872,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/FREEZE/CHECKPOINT_MANIFEST.json",
+      "sha256": "91faf450495e1131204c3b081a1851b96b76fc3f7409773732c1513cba08489b"
+    },
+    {
+      "bytes": 445,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/FREEZE/GLOBAL_SELECTION_FREEZE.json",
+      "sha256": "0d1d19baf9509216056266a0c07bd156c172d028db975d9e9372523d432a4cbc"
+    },
+    {
+      "bytes": 1166,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/README.md",
+      "sha256": "f2a6c68c13e1f71caf3b09c274ad6d81e399e593b7b5cc48e12e1163dc9513c2"
+    },
+    {
+      "bytes": 153,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/RUN_STATUS.json",
+      "sha256": "fd2290435c8322b6b0c20b953cd9bbb1c8fd9714f28a1165016e0d97ebc9771c"
+    },
+    {
+      "bytes": 1083,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/SANITIZED_PROVENANCE.json",
+      "sha256": "5ecb579bc3a098276a01aec6f0d177b959dd93c31d3a3bec7d13397bdfccfc65"
+    },
+    {
+      "bytes": 4083,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/SUMMARY.json",
+      "sha256": "105624c8e42abf318ef048f75f2f9bd6b5708a5c9476290512eeb33ec531229e"
+    },
+    {
+      "bytes": 1184,
+      "path": "CZ_RAW2S_H4_CORRECTED_R2/SUMMARY.md",
+      "sha256": "5c8a2bed2168c3b27d54973ea1751f699da17a232f68ad973cb86573a1e00b3e"
+    },
+    {
       "bytes": 332,
       "path": "PROTOCOL/DATASET_HASHES.json",
       "sha256": "2b4cdd27f2a56f7a25754c8ee141d6f819b8a7f97e8e561a5c6e2ac4fb7c2d55"
@@ -101,19 +191,19 @@
       "sha256": "29fc1aa647ea56d345e8faadf38a2b16f81878071b9f106f5852f50ef7f06649"
     },
     {
-      "bytes": 741,
+      "bytes": 745,
       "path": "PROTOCOL/TASK_PROTOCOL.md",
-      "sha256": "d1262cad6a9d26e401baecc098f54cbf66b3e2b07e70d31d92a93de5eaa9e24a"
+      "sha256": "ea11f8650e77c71967c0732b6f5cfbce307a7b54ab72d357ea3e56d0eae5c5f3"
     },
     {
-      "bytes": 644,
+      "bytes": 876,
       "path": "PROVENANCE/PROVENANCE.json",
-      "sha256": "7a0c86d61eb806c7f78c947753a27aa5d0da49d6b7648bd8cefa0d186d85dada"
+      "sha256": "0a384ce33eb714ae88ee33e85debc9b4cefefc0ccae34ba0076929c3745bc088"
     },
     {
-      "bytes": 601,
+      "bytes": 766,
       "path": "README.md",
-      "sha256": "85bc68536e0a3df5e75dd521065428e901b117462f8f4d501db6a5d4fdfe51d5"
+      "sha256": "caa3cacd00e4710d215b2a07da7725178cbc8c4ef98cbf89b283b74146adca3a"
     },
     {
       "bytes": 40,
@@ -141,34 +231,34 @@
       "sha256": "bfad5cb4205cc084765e0ec92aa58a9bf2ee14d9fb4ed1821150af154c35642c"
     },
     {
-      "bytes": 253,
+      "bytes": 272,
       "path": "TABLES/TABLE_SUPPLEMENTARY_E1.csv",
-      "sha256": "e5652e13377e448087cec744e4f51ec323a4c49fb67ca23dbe849b8b6f790f6f"
+      "sha256": "ec95d02e7cbdf5e36aca9b05bcc7bfbe4955f189bea0f46836cf2835291214e3"
     },
     {
-      "bytes": 306,
+      "bytes": 320,
       "path": "TABLES/TABLE_SUPPLEMENTARY_E2.csv",
-      "sha256": "d1920cf07a27af869c1ccc8041a8a237ad7540cecc79100bbb9578ad2e866392"
+      "sha256": "ad699e9d19c1dfa3ffeefdb6613b8a7cceca94fb66d2ef51cb42b15db78f1927"
     },
     {
-      "bytes": 275,
+      "bytes": 287,
       "path": "TABLES/TABLE_SUPPLEMENTARY_E3.csv",
-      "sha256": "83a9e14f801a00be280eab9935e85a2e59495adc456fbd8ad7f444f6599b26f5"
+      "sha256": "99c2867904cdc7461fd51eaf208b30571f09cc0781e644597f788c2e149e5094"
     },
     {
-      "bytes": 280,
+      "bytes": 311,
       "path": "TABLES/TABLE_SUPPLEMENTARY_E4.csv",
-      "sha256": "dedae73e591f31ac8cff392375fac6da29983be80ddc8b662be9d2f4f0c29451"
+      "sha256": "b5404b35f40f93f7bf5b9dca03d24096c50f39140b905813d7e39b2b4c5c91a6"
     },
     {
-      "bytes": 280,
+      "bytes": 281,
       "path": "TABLES/TABLE_SUPPLEMENTARY_E5.csv",
-      "sha256": "7ce93154c3493883c2d00a5abd9634c23df3df5ee42109130c1a45a0f8bcd938"
+      "sha256": "8b25b3fca754571d49475127b9cc18b7c892a7a53e4c1f71f794c6818585114c"
     },
     {
-      "bytes": 300,
+      "bytes": 308,
       "path": "TABLES/TABLE_SUPPLEMENTARY_E6.csv",
-      "sha256": "0ed6935ef9e4049763c3b16579406d9ddcf2282e494da4d06ab5c36668a2c27b"
+      "sha256": "af0ac32516dfd4e8b46214e55b940a904e2462c4fdaea3ff7c37b205400883d8"
     },
     {
       "bytes": 291,
@@ -366,9 +456,9 @@
       "sha256": "9ae839074cbbb9434cd1ca219fe647ffa709869a620a52f342d6efad9a1003fa"
     },
     {
-      "bytes": 1929,
+      "bytes": 2731,
       "path": "TANKS_CZ_E1_E6_MASTER_REPORT.md",
-      "sha256": "5cadada2d0f5beffa051df64c39cd1a67a9a618d4c51d4482df86011880aeada"
+      "sha256": "3c6d951f85be84f10c87cb98bb21d94e8cda94053a3af482ecb82e7bb9071d22"
     },
     {
       "bytes": 58,
@@ -506,5 +596,5 @@
       "sha256": "aef81fe3ec37fc2c035aaa645caa8dbfa319453f39f2ed4844d2d4e949d9d2b0"
     }
   ],
-  "status": "CORRECTED_AFTER_CODE_AND_RESULT_AUDIT"
+  "status": "CORRECTED_AND_RERUN_AFTER_CODE_AUDIT"
 }

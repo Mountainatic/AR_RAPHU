@@ -32,7 +32,7 @@ def main() -> int:
         if path.is_file() and path.name not in EXCLUDED
     ]
     manifest = {
-        "status": "CORRECTED_AFTER_CODE_AND_RESULT_AUDIT",
+        "status": "CORRECTED_AND_RERUN_AFTER_CODE_AUDIT",
         "files": files,
     }
     (root / "FILE_MANIFEST.json").write_text(

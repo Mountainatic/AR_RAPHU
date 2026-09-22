@@ -1,0 +1,28 @@
+{
+  "created_utc": "2026-09-22T09:30:45.500746+00:00",
+  "entries": [
+    {
+      "bytes": 375,
+      "path": "checkpoints/Rod_1_to_Rod_2/input_only/checkpoint.json",
+      "sha256": "fb543e97f62c91e5748b79ac3395889c80fba5c69c9cb08656bd4fd4e8c5a9ab"
+    },
+    {
+      "bytes": 1886,
+      "path": "checkpoints/Rod_1_to_Rod_2/dynamic/checkpoint.json",
+      "sha256": "d2bca2a6f1ea54fa6fc784f7e4b757ba8f0fa285cb1c7d8e3c71f46ebdd919f1"
+    },
+    {
+      "bytes": 375,
+      "path": "checkpoints/Rod_2_to_Rod_1/input_only/checkpoint.json",
+      "sha256": "2714b706ad402ad4206d6551e82a4fbbf3507bea08051c650e1ebab1311a502f"
+    },
+    {
+      "bytes": 1894,
+      "path": "checkpoints/Rod_2_to_Rod_1/dynamic/checkpoint.json",
+      "sha256": "d01ecf576ad1fb3cd5fbbda9791d6ebd03a9f4c0c50a9feea896cb865bd87dd4"
+    }
+  ],
+  "sealed": true,
+  "status": "CHECKPOINTS_SEALED"
+}
+

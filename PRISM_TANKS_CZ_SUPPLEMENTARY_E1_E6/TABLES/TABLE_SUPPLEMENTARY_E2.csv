@@ -1,3 +1,3 @@
 dataset,experiment,status,result_source,notes
 Cascaded Tanks,E2,COMPLETED,TANKS_H16_CORRECTED_R3/E2_SEMISYNTHETIC,30 seeds per regime; stage-vector accuracy 0.4466667; null false-admission 0.30
-CZ,E2,NOT_YET_RUN,scripts/run_cz_raw2s_e1_e6.py,Corrected raw-2s L256 H4 runner ready; old D20 result excluded
+CZ,E2,COMPLETED,CZ_RAW2S_H4_CORRECTED_R2/E2_CZ_INPUT_SEMISYNTHETIC_RECOVERY,Overall recovery 0.6375; false-admission 0.10625

@@ -1,0 +1,17 @@
+{
+  "created_utc": "2026-09-22T09:29:32.200617+00:00",
+  "direction_freezes": [
+    {
+      "direction": "Rod_1_to_Rod_2",
+      "sha256": "dfd41a41b2fea6e37f2d9d9587abb6b2729642b72f62135e10f52087b8758c4f"
+    },
+    {
+      "direction": "Rod_2_to_Rod_1",
+      "sha256": "dcdfd37dac874b08f511cb4d39377d7155746dc87f4d6945b221d5315a9b5a07"
+    }
+  ],
+  "sealed": true,
+  "status": "GLOBAL_SELECTION_FROZEN",
+  "target_metrics_accessed": false
+}
+
