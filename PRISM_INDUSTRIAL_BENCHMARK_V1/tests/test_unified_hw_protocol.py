@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 
 import numpy as np
@@ -11,14 +12,23 @@ from prism_benchmark.unified_hw_protocol import (
     registered_levels,
     registered_target,
     report_delta_predictions,
+    report_direct_level_predictions,
 )
 
 
 def test_registry_contains_six_public_dataset_families_and_private_cz() -> None:
     registry = load_registry()
+    assert registry["protocol_id"].endswith("R2_CORRECTED_20260922")
     names = {item["dataset"] for item in registry["heads"]}
     assert {"TEP", "Debutanizer", "SRU", "PMSM", "MetroPT", "Cascaded Tanks"} <= names
     assert "Private CZ" in names
+
+
+def test_registry_code_map_points_to_committed_files() -> None:
+    root = Path(__file__).resolve().parents[1]
+    registry = load_registry()
+    for relative in registry["code_map"].values():
+        assert (root / relative).is_file(), relative
 
 
 def test_registered_public_window_indices_are_half_open() -> None:
@@ -51,6 +61,20 @@ def test_tanks_is_direct_level_at_origin_plus_16() -> None:
     assert p.horizon_seconds == 64
     assert registered_levels(values, 7, p) == (None, 23.0)
     assert registered_target(values, 7, p) == 23.0
+
+
+def test_origins_must_be_exact_and_cannot_use_negative_slices() -> None:
+    values = np.arange(20, dtype=np.float64)
+    p = protocols()["SRU_H2S_REP_H1__H1__W1"]
+    with np.testing.assert_raises(ValueError):
+        registered_levels(values, 7.5, p)
+    with np.testing.assert_raises(IndexError):
+        registered_levels(values, 0, p)
+
+
+def test_constant_direct_level_target_reports_json_safe_null_r2() -> None:
+    metrics = report_direct_level_predictions([1.0, 1.0], [1.0, 2.0])
+    assert metrics["r2_level"] is None
 
 
 def test_reporting_names_both_persistence_skill_definitions() -> None:
@@ -116,3 +140,36 @@ def test_registered_public_results_match_committed_evidence() -> None:
     assert np.isclose(
         float(frozen_tanks["r2_level"]), float(tanks["K+C+DELTA_W_r2_level"])
     )
+
+
+def test_registered_cz_results_and_skill_names_match_derived_evidence() -> None:
+    root = Path(__file__).resolve().parents[1]
+    evidence_path = (
+        root / "results" / "cz_raw2s_hscan_20260920" / "selected_dynamic_metrics.json"
+    )
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    records = {
+        (item["direction"], int(item["h_steps"])): item
+        for item in evidence["records"]
+    }
+    registry = {item["head_id"]: item for item in load_registry()["heads"]}
+    mapping = {
+        "CZ_ROD1_TO_ROD2_RAW2S_L256_H4": "Rod_1_to_Rod_2",
+        "CZ_ROD2_TO_ROD1_RAW2S_L256_H4": "Rod_2_to_Rod_1",
+    }
+    for head_id, direction in mapping.items():
+        source = records[(direction, 4)]
+        frozen = registry[head_id]["result"]
+        for key in (
+            "rows",
+            "rmse",
+            "r2_level_reconstructed",
+            "persistence_skill_mse",
+            "persistence_skill_rmse",
+        ):
+            assert np.isclose(float(frozen[key]), float(source[key]))
+        assert frozen["model"] == source["model"]
+        expected_rmse_skill = 1.0 - np.sqrt(
+            1.0 - float(source["persistence_skill_mse"])
+        )
+        assert np.isclose(float(source["persistence_skill_rmse"]), expected_rmse_skill)

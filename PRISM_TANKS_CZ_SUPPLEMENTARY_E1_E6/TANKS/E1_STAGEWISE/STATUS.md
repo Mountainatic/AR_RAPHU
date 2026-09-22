@@ -1,5 +1,7 @@
 # Cascaded Tanks E1_STAGEWISE
 
-STATUS: BLOCKED_PRE_RUN_NATIVE_ADAPTER_MISSING
+STATUS: COMPLETED
 
-The official archive was recovered and verified, but the authoritative PRISM branch does not contain a Cascaded Tanks dataset adapter or an E1-E6 runner. No metrics are fabricated. This block must be resolved before any Tanks claim is made.
+Protocol: H16 direct level prediction at 4-second cadence (64 seconds).
+The frozen validation result is RMSE 0.3921427451 and level R2 0.9656782911
+for K+C+DELTA_W. C and A are registered identity increments.

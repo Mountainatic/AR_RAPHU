@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "protocol_id": "PRISM_UNIFIED_HW_R2_PROTOCOLS_20260921_R1",
-  "status": "FROZEN_INTEGRATION_OF_EXISTING_AUDITED_RESULTS",
+  "protocol_id": "PRISM_UNIFIED_HW_R2_PROTOCOLS_20260921_R2_CORRECTED_20260922",
+  "status": "CORRECTED_AFTER_CODE_AND_RESULT_AUDIT",
   "authority": {
     "repository": "Mountainatic/AR_RAPHU",
     "method_branch": "prism-strict-oof-finalization-20260915",
@@ -16,10 +16,12 @@
     "joint_stability_and_zero_c_route": "src/prism_benchmark/v211_joint_stability.py",
     "cz_raw2s_materialization": "src/prism_benchmark/cz_l256_nowcast.py",
     "cz_horizon_scan_runner": "scripts/run_independent_extension_20260825.py",
+    "cz_private_e1_e6_runner": "scripts/run_cz_raw2s_e1_e6.py",
     "tanks_w_runner": "scripts/run_cascaded_tanks_w_experiment.py",
     "tanks_e1_runner": "scripts/build_cascaded_tanks_e1_stagewise.py",
     "tanks_e2_e6_runner": "scripts/tanks_validated_e2_e6.py",
-    "standalone_r2_reporter": "scripts/report_unified_hw_r2.py"
+    "standalone_r2_reporter": "scripts/report_unified_hw_r2.py",
+    "supplementary_manifest_builder": "scripts/build_supplementary_manifest.py"
   },
   "reporting_contract": {
     "primary_r2": "r2_level_reconstructed for delta heads; r2_level for direct-level heads",
@@ -171,7 +173,8 @@
       "formula": "D[t+3]-D[t-1]",
       "task": "eight-second-ahead raw-2s single-level forecast",
       "evidence_scope": "private-data strict-authority run; public derived metrics only",
-      "result": {"rmse": 0.013712, "r2_level_reconstructed": 0.998618, "persistence_skill_rmse": 0.266791}
+      "result_source": "results/cz_raw2s_hscan_20260920/selected_dynamic_metrics.json:Rod_1_to_Rod_2/H4",
+      "result": {"rows": 20109, "model": "PRISM_V2_1_1_JOINT_KWA", "rmse": 0.013711950769928823, "r2_level_reconstructed": 0.9986183173772429, "persistence_skill_mse": 0.26679099200939416, "persistence_skill_rmse": 0.14372375486026367}
     },
     {
       "head_id": "CZ_ROD2_TO_ROD1_RAW2S_L256_H4",
@@ -187,7 +190,8 @@
       "formula": "D[t+3]-D[t-1]",
       "task": "eight-second-ahead raw-2s single-level forecast",
       "evidence_scope": "private-data strict-authority run; public derived metrics only",
-      "result": {"rmse": 0.014822, "r2_level_reconstructed": 0.999331, "persistence_skill_rmse": 0.265383}
+      "result_source": "results/cz_raw2s_hscan_20260920/selected_dynamic_metrics.json:Rod_2_to_Rod_1/H4",
+      "result": {"rows": 19280, "model": "PRISM_V2_1_1_JOINT_KWA", "rmse": 0.014821928432608674, "r2_level_reconstructed": 0.9993313143513081, "persistence_skill_mse": 0.265383227544035, "persistence_skill_rmse": 0.1429021220094142}
     }
   ],
   "cz_horizon_scan": {
@@ -198,9 +202,16 @@
     "primary_h_steps": 4,
     "h_steps": [1, 2, 4, 8, 16],
     "horizon_seconds": [2, 4, 8, 16, 32],
-    "metric": "persistence_skill_rmse",
-    "Rod1_to_Rod2": [0.11709, 0.17364, 0.26679, 0.31629, 0.35710],
-    "Rod2_to_Rod1": [0.14908, 0.18846, 0.26538, 0.33713, 0.39132]
+    "primary_metric": "persistence_skill_mse",
+    "evidence_source": "results/cz_raw2s_hscan_20260920/selected_dynamic_metrics.json",
+    "persistence_skill_mse": {
+      "Rod1_to_Rod2": [0.11708737886905385, 0.17364439214245564, 0.26679099200939416, 0.31629031530074136, 0.3571035517581683],
+      "Rod2_to_Rod1": [0.149077780739018, 0.18845522309828544, 0.265383227544035, 0.3371257167308458, 0.39131805799975994]
+    },
+    "persistence_skill_rmse": {
+      "Rod1_to_Rod2": [0.060365698193735495, 0.09095896250084268, 0.14372375486026367, 0.17313260754867188, 0.19819176342355294],
+      "Rod2_to_Rod1": [0.07754554624036747, 0.09914219940008595, 0.1429021220094142, 0.18582908227500894, 0.21981928888222313]
+    }
   },
   "historical_protocols_excluded_from_primary_ranking": [
     "TEP H1/W2/W0=2",

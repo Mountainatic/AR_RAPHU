@@ -66,9 +66,9 @@ persistence_skill_mse  = 1 - MSE_model / MSE_persistence
 persistence_skill_rmse = 1 - RMSE_model / RMSE_persistence
 ```
 
-Both names are now emitted explicitly.  The private CZ runner historically
-used the RMSE-relative definition, so CZ aggregate values below are labeled
-`persistence_skill_rmse`.
+Both names are emitted explicitly.  The frozen CZ formal report's historical
+`persistence_skill` field is MSE-relative; this release binds it to
+`persistence_skill_mse` and derives the separately named RMSE-relative value.
 
 ## Dataset-specific constraints
 
@@ -99,27 +99,28 @@ W/W0              = 1/1
 Rod1→Rod2 and Rod2→Rod1 are trained and selected independently.  The primary
 task is h=4 (8 seconds); the complete registered scan is:
 
-| h | real horizon | Rod1→Rod2 persistence skill (RMSE) | Rod2→Rod1 persistence skill (RMSE) |
+| h | real horizon | Rod1→Rod2 skill (MSE / RMSE) | Rod2→Rod1 skill (MSE / RMSE) |
 |---:|---:|---:|---:|
-| 1 | 2 s | 0.11709 | 0.14908 |
-| 2 | 4 s | 0.17364 | 0.18846 |
-| 4 | 8 s | 0.26679 | 0.26538 |
-| 8 | 16 s | 0.31629 | 0.33713 |
-| 16 | 32 s | 0.35710 | 0.39132 |
+| 1 | 2 s | 0.11709 / 0.06037 | 0.14908 / 0.07755 |
+| 2 | 4 s | 0.17364 / 0.09096 | 0.18846 / 0.09914 |
+| 4 | 8 s | 0.26679 / 0.14372 | 0.26538 / 0.14290 |
+| 8 | 16 s | 0.31629 / 0.17313 | 0.33713 / 0.18583 |
+| 16 | 32 s | 0.35710 / 0.19819 | 0.39132 / 0.21982 |
 
 At primary h=4, Joint gives:
 
-| direction | RMSE | reconstructed level R² | persistence skill (RMSE) |
-|---|---:|---:|---:|
-| Rod1→Rod2 | 0.013712 | 0.998618 | 0.266791 |
-| Rod2→Rod1 | 0.014822 | 0.999331 | 0.265383 |
+| direction | RMSE | reconstructed level R² | skill MSE | skill RMSE |
+|---|---:|---:|---:|---:|
+| Rod1→Rod2 | 0.013712 | 0.998618 | 0.266791 | 0.143724 |
+| Rod2→Rod1 | 0.014822 | 0.999331 | 0.265383 | 0.142902 |
 
 These are private-data aggregate results and do not make the raw workbook or
 sample-level predictions public.
 
 The corresponding public code is not a placeholder: CZ materialization,
 segment/purge logic and the exact `D[t+h-1]-D[t-1]` target live in
-`src/prism_benchmark/cz_l256_nowcast.py`; the registered 1/2/4/8/16 scan is
+`src/prism_benchmark/cz_l256_nowcast.py`; the private E1–E6 adapter is
+`scripts/run_cz_raw2s_e1_e6.py`; and the registered 1/2/4/8/16 scan is
 orchestrated by `scripts/run_independent_extension_20260825.py`.  The latter
 requires a private `raw_root` supplied at execution time and therefore does
 not embed or upload the workbook.
@@ -152,16 +153,20 @@ python -m pytest tests/test_level_reconstruction.py tests/test_unified_hw_protoc
 ```
 
 Report a delta head from a CSV containing
-`delta_true,delta_pred,current_level`:
+`delta_true,delta_pred,current_level`.  To verify the H/W target rather than
+only calculate metrics, also include `origin` and pass a one-column source CSV
+whose column is named `value`:
 
 ```bash
 PYTHONPATH=src python scripts/report_unified_hw_r2.py \
   --head-id METRO_P60__H6__W1 \
   --predictions /path/to/predictions.csv \
+  --series /path/to/source_series.csv \
   --output /path/to/metrics.json
 ```
 
-For Tanks/direct-level heads, the input CSV columns are `y_true,y_pred`.
+For Tanks/direct-level heads, the input CSV columns are `y_true,y_pred`; target
+verification additionally requires `origin` and `--series`.
 
 ## Historical protocols excluded from the primary ranking
 

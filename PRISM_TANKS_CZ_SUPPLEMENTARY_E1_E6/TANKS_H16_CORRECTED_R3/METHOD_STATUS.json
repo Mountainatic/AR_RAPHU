@@ -1,0 +1,9 @@
+{
+  "horizon_steps": 16,
+  "protocol_id": "PRISM_V211_CASCADED_TANKS_E2_E6_H16_STRICT_OOF_20260922_R3",
+  "sample_period_seconds": 4,
+  "status": "COMPLETED",
+  "strict_oof_selector": "prism_benchmark.strict_oof_selection.strict_nested_oof_select",
+  "target_formula": "y[origin+16] with observations through origin",
+  "test_accessed": true
+}

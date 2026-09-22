@@ -1,3 +1,3 @@
 dataset,experiment,status,result_source,notes
-Cascaded Tanks,E1,COMPLETED_COMPATIBLE_EXTENSION,/root/autodl-tmp/PRISM_TANKS_CZ_SUPPLEMENTARY_20260916/TANKS_E1_STAGEWISE,W RMSE gain 25.5253%; not native full-registry E1
-CZ,E1,COMPLETED_R5_REUSED,/root/autodl-tmp/PRISM_CZ_E1_E6_PRIVATE_20260915_R5,Supplementary evidence; not new confirmatory test
+Cascaded Tanks,E1,COMPLETED,TANKS/E1_STAGEWISE,W RMSE gain 25.5253%; H16 direct 64-second task
+CZ,E1,NOT_YET_RUN,scripts/run_cz_raw2s_e1_e6.py,Corrected raw-2s L256 H4 runner ready; old D20 result excluded

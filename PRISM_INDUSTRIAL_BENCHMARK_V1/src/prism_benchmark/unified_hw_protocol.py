@@ -107,9 +107,21 @@ def registered_levels(
     values = np.asarray(series, dtype=np.float64)
     if values.ndim != 1 or not np.isfinite(values).all():
         raise ValueError("series must be a finite one-dimensional array")
-    t = int(origin)
+    try:
+        numeric_origin = float(origin)
+    except (TypeError, ValueError) as exc:
+        raise TypeError("origin must be an integer sample index") from exc
+    if not np.isfinite(numeric_origin) or not numeric_origin.is_integer():
+        raise ValueError("origin must be an exact finite integer sample index")
+    t = int(numeric_origin)
     if protocol.target_kind == "window_delta":
         assert protocol.w0_steps is not None
+        if (
+            t - protocol.w0_steps < 0
+            or t + protocol.h_steps < 0
+            or t + protocol.h_steps + protocol.w_steps > len(values)
+        ):
+            raise IndexError("origin does not have complete registered windows")
         current = values[t - protocol.w0_steps : t]
         future = values[
             t + protocol.h_steps : t + protocol.h_steps + protocol.w_steps
@@ -147,7 +159,7 @@ def report_delta_predictions(
 
 def report_direct_level_predictions(
     level_true: Iterable[float], level_pred: Iterable[float]
-) -> dict[str, float]:
+) -> dict[str, float | None]:
     truth = np.asarray(level_true, dtype=np.float64)
     prediction = np.asarray(level_pred, dtype=np.float64)
     if truth.ndim != 1 or prediction.ndim != 1 or len(truth) != len(prediction):
@@ -159,9 +171,7 @@ def report_direct_level_predictions(
     return {
         "rmse": float(np.sqrt(np.mean(np.square(residual)))),
         "mae": float(np.mean(np.abs(residual))),
-        "r2_level": (
-            float("nan")
-            if denominator == 0.0
-            else 1.0 - float(np.sum(np.square(residual))) / denominator
-        ),
+        "r2_level": None
+        if denominator == 0.0
+        else 1.0 - float(np.sum(np.square(residual))) / denominator,
     }

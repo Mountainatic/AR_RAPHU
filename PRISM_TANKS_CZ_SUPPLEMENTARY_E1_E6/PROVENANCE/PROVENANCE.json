@@ -1,9 +1,11 @@
 {
   "authoritative_base_commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7",
-  "authoritative_branch": "prism-tanks-cz-supplementary-e1-e6-20260916",
+  "authoritative_branch": "prism-strict-oof-finalization-20260915",
   "created_utc": "2026-09-16T15:11:03.979007+00:00",
-  "cz_status": "COMPLETED_R5_REUSED",
+  "cz_status": "RAW2S_HSCAN_COMPLETED; E1_E6_R2_RUNNER_FIXED_RERUN_REQUIRED",
   "formal_results_untouched": true,
-  "supplementary_branch": "prism-tanks-cz-supplementary-e1-e6-20260916",
-  "tanks_status": "BLOCKED_PRE_RUN_NATIVE_ADAPTER_MISSING"
+  "supplementary_branch": "prism-unified-hw-r2-protocols-20260921",
+  "tanks_status": "COMPLETED_E1_AND_CORRECTED_E2_E6_R3",
+  "superseded_tanks_e2_e6_protocol": "PRISM_V211_CASCADED_TANKS_E2_E6_VALIDATED_EXTENSION_20260918_R2",
+  "corrected_tanks_e2_e6_protocol": "PRISM_V211_CASCADED_TANKS_E2_E6_H16_STRICT_OOF_20260922_R3"
 }

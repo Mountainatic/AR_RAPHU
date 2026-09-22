@@ -1,365 +1,510 @@
 {
-  "status": "COMPLETED_VALIDATED_PACKAGE",
   "files": [
     {
+      "bytes": 941,
       "path": "CLAIM_IMPACT_ASSESSMENT.md",
-      "bytes": 753,
-      "sha256": "8e246174ec4e993812c674540dc32e98d2a29d95dc81feb3ee5c0e5124095d9a"
+      "sha256": "4554e5dea02c9aea239a08fc89eac03bf104d26ffe87ef48c8a632320ccf7857"
     },
     {
+      "bytes": 984,
       "path": "CZ_EVIDENCE/E1_STAGEWISE/formal_metrics.csv",
-      "bytes": 979,
-      "sha256": "46c974ed5f069ffac80a878c9b1af533b61e0ad164924dcf9b654112db4108b1"
+      "sha256": "0144aa4df1e2593f04b135beeb98758a4f1858f23e58977458222df1007ebe1e"
     },
     {
+      "bytes": 468,
       "path": "CZ_EVIDENCE/E2_CZ_INPUT_SEMISYNTHETIC_RECOVERY/aggregate.csv",
-      "bytes": 451,
-      "sha256": "170e3f2e8c798e4e6c1662f4da2586c72ca60aa8b90f8f461149b5681c09bd97"
+      "sha256": "44c7dc2d54a17860d64ed572962e685b76a391e814ac7a5010c8c13c35456095"
     },
     {
+      "bytes": 23895,
       "path": "CZ_EVIDENCE/E2_CZ_INPUT_SEMISYNTHETIC_RECOVERY/per_seed_stage_recovery.csv",
-      "bytes": 23574,
-      "sha256": "9150be0d056493024dec23f843c0bbc012d3045dff9de1a49f7c050023dcc129"
+      "sha256": "0b6558044a747db8b63ed02d745ff1462f5a1d5d15030e869163f3fedaf380c0"
     },
     {
+      "bytes": 12028,
       "path": "CZ_EVIDENCE/E3_MULTISCALE/equal_budget_multiscale.csv",
-      "bytes": 11987,
-      "sha256": "e2fc9066e4c66e91c47cf36ed849993cb212549c788fd6175b7ac6acbd384bc8"
+      "sha256": "2200f7e90ee1f54afe13b37ccbb01e73f6c8f2ebe0b6c883479a295577b2a865"
     },
     {
+      "bytes": 1617,
       "path": "CZ_EVIDENCE/E3_MULTISCALE/paired_gain.csv",
-      "bytes": 1596,
-      "sha256": "d48f871fe60e8930d19fa6cb99284a3eae15c4a3eb5be3c27b24418e8512399f"
+      "sha256": "a476cf17f404057634e32f9fa048395c79ef76f13cca310817c174e4e6df96e7"
     },
     {
+      "bytes": 4252,
       "path": "CZ_EVIDENCE/E4_CANDIDATE_SENSITIVITY/all_variants.csv",
-      "bytes": 4237,
-      "sha256": "618cebb62682f9d8a7510f6c7f626910b0605919e56bb228c954b2a8ebe9c43b"
+      "sha256": "7e934dfffa36857afab7e84cba38f619a021f9bf7afbd39d22e834e36974e827"
     },
     {
+      "bytes": 499,
       "path": "CZ_EVIDENCE/E5_STRUCTURAL_STABILITY/aggregate.csv",
-      "bytes": 490,
-      "sha256": "d6dbfa08d20134c4b166d803ab8348b4704bbb8335727186c8c16763c03981ea"
+      "sha256": "89ca4d6304ec02852065e7b6a05774036f11c16c092d716f6af14ba6e3009b52"
     },
     {
+      "bytes": 5594,
       "path": "CZ_EVIDENCE/E5_STRUCTURAL_STABILITY/stability_evidence.csv",
-      "bytes": 5475,
-      "sha256": "604ba371f3c8be8d9f2aa4c65c48ee088f566debc6f45acf044fdfa1e58e4007"
+      "sha256": "2d68aa16cad90f812ca85feaae670c9c0c1fa7bc4e6a54fa1d46e29999325ca8"
     },
     {
+      "bytes": 1280,
       "path": "CZ_EVIDENCE/E6_MEASUREMENT_ROBUSTNESS/N1_aggregate.csv",
-      "bytes": 1263,
-      "sha256": "2b9545a451e7971c6dfb57a8177f9edf583ebfad8bc694a5f0dae1fab39d0ec9"
+      "sha256": "6d1ef2dbdc547002b3d5e33b87a7d3590d14c47c8701824ca42c7cdbd6f238b2"
     },
     {
+      "bytes": 24651,
       "path": "CZ_EVIDENCE/E6_MEASUREMENT_ROBUSTNESS/N1_frozen_per_seed.csv",
-      "bytes": 24490,
-      "sha256": "1e3ec24b5346afa9086217819b565a270d41941264611bf23f6040d6661f17bb"
+      "sha256": "1dd4dc77527c3a666ec3e745dc24e7cdba658a2fe73bc79487755aa0a9f58899"
     },
     {
+      "bytes": 1151,
       "path": "CZ_EVIDENCE/E6_MEASUREMENT_ROBUSTNESS/N2_aggregate.csv",
-      "bytes": 1134,
-      "sha256": "da2891664fc29676d742a2db5219b56970c063d289b898a5f727b89137447549"
+      "sha256": "d8e12e57c9cb17c3af95b21b667c026c2d6ad658120a5d07fe0ba05f9653f999"
     },
     {
+      "bytes": 24943,
       "path": "CZ_EVIDENCE/E6_MEASUREMENT_ROBUSTNESS/N2_reidentified_per_seed.csv",
-      "bytes": 24782,
-      "sha256": "4186c96d4574195aa356e582337ad4a1b887e9bbc19cdd7fd0c1abf466295ab3"
+      "sha256": "1c8ab6fc16acc4e53bb729601b739839f045b52d116802319c5088907b468229"
     },
     {
+      "bytes": 553,
+      "path": "CZ_EVIDENCE/RAW2S_PROTOCOL_NOTICE_20260922.md",
+      "sha256": "fa29105462d771530df3fb1710c77af2a0b3bb336705ad042e4f333dbb05d7f0"
+    },
+    {
+      "bytes": 158,
       "path": "CZ_EVIDENCE/RUN_STATUS.json",
-      "bytes": 152,
-      "sha256": "7687c84c76903be8f76a924c1f1c2e33ad325d686409dd028c2a458fb2c4a6c4"
+      "sha256": "58f9298d31a98d85c931c25ce1983c5eb96b2664d6376a4ffec5bf25227e34fc"
     },
     {
+      "bytes": 3705,
       "path": "CZ_EVIDENCE/SUMMARY.json",
-      "bytes": 3600,
-      "sha256": "06734e5e7cdd6b878ff3be98145f23046739092019846b74ab82d42324b7b343"
+      "sha256": "f0663759d9f7bc0969d26e4c6549f3d715830e753d76f2d882bcda09ee15555a"
     },
     {
+      "bytes": 972,
       "path": "CZ_EVIDENCE/SUMMARY.md",
-      "bytes": 950,
-      "sha256": "3098f27deb6bb0af4800500c49a6e81f55cc07955e60860b24828461ef47d66d"
+      "sha256": "6d0668afdbf263791902a37970dfd298431704bdbcfcf567f62f099c3bde081e"
     },
     {
+      "bytes": 332,
       "path": "PROTOCOL/DATASET_HASHES.json",
-      "bytes": 321,
-      "sha256": "1e7a7d83cc35e764b7c18ecb63d1bc6d3130b4ceac1c2d07da997ccad4534036"
+      "sha256": "2b4cdd27f2a56f7a25754c8ee141d6f819b8a7f97e8e561a5c6e2ac4fb7c2d55"
     },
     {
+      "bytes": 540,
       "path": "PROTOCOL/DATASET_RECOVERY_AUDIT.md",
-      "bytes": 533,
-      "sha256": "cb24ae1368277fa80934a02cb936a7d588ce19a6ad7530968891e0b5b83aa7c1"
+      "sha256": "ad9d2c3a32e88df6c3cad769bb283ae35ae794e74a654ee35d45fa6b054a73c6"
     },
     {
+      "bytes": 414,
       "path": "PROTOCOL/H_W_FREEZE.json",
-      "bytes": 490,
-      "sha256": "5339a7c2b91194a2701d0240d623532ab084cacea5adbd46b1845574b83b457e"
+      "sha256": "29fc1aa647ea56d345e8faadf38a2b16f81878071b9f106f5852f50ef7f06649"
     },
     {
+      "bytes": 741,
       "path": "PROTOCOL/TASK_PROTOCOL.md",
-      "bytes": 380,
-      "sha256": "b04f72bc27e581f3d4c31e6588f0e5412e6c7111721b294f187f36c67171d2b5"
+      "sha256": "d1262cad6a9d26e401baecc098f54cbf66b3e2b07e70d31d92a93de5eaa9e24a"
     },
     {
+      "bytes": 644,
       "path": "PROVENANCE/PROVENANCE.json",
-      "bytes": 411,
-      "sha256": "c42bc85183e02462748ac4cdf9505fb57a5df4e670a3edac2336cc78e9605629"
+      "sha256": "7a0c86d61eb806c7f78c947753a27aa5d0da49d6b7648bd8cefa0d186d85dada"
     },
     {
+      "bytes": 601,
       "path": "README.md",
-      "bytes": 369,
-      "sha256": "d7388d221ebfe36feeecd0ae99284993723d1255c0ad501399d8caae0972077b"
+      "sha256": "85bc68536e0a3df5e75dd521065428e901b117462f8f4d501db6a5d4fdfe51d5"
     },
     {
+      "bytes": 40,
       "path": "SOURCE_LOCK/AUTHORITATIVE_BASE_BRANCH.txt",
-      "bytes": 39,
-      "sha256": "379fdab7b657e341262b4a6701923ac9f42acc9aee00fce55bfdee0bce698299"
+      "sha256": "9c7fbdc4b501aa4cd8a0a15b98e6422d84e9b7201c845f2761f69f26a2445eaf"
     },
     {
+      "bytes": 42,
       "path": "SOURCE_LOCK/AUTHORITATIVE_BASE_COMMIT.txt",
-      "bytes": 41,
-      "sha256": "2f4e8594048ad1e50117b223014a44e13260c2241f4f2a75f0b24aa15acdecf8"
+      "sha256": "79e8a63f19d159727cb92c440f51ed0bdb719932195bec98563497dd913405fb"
     },
     {
+      "bytes": 890,
       "path": "SOURCE_LOCK/CASCADED_TANKS_DATA_PROVENANCE.json",
-      "bytes": 871,
-      "sha256": "b0405444005a43506019bb6cbb6cc6bdfd5782f6c8a893ef65278e78f6c200bf"
+      "sha256": "b45bc2defeebd901342af3e87d21d896e9af4fdc5204fdbe109a8ec1b4eb93c9"
     },
     {
+      "bytes": 370,
       "path": "SOURCE_LOCK/CASCADED_TANKS_OFFICIAL_FILE_AUDIT.md",
-      "bytes": 361,
-      "sha256": "a873314a53b61e280beec604427d0255b4817af632d950294774680a3dd6eb56"
+      "sha256": "5b9ebcc88f751f58c750c7f9266b3964fd7974c2ecff6e48e2415921cfd26048"
     },
     {
+      "bytes": 562,
       "path": "SOURCE_LOCK/CZ_DATA_PROVENANCE.json",
-      "bytes": 551,
-      "sha256": "01a79045bf57a4efb7a99938ce689eba32afab410e22ac763d253483789bf3d6"
+      "sha256": "bfad5cb4205cc084765e0ec92aa58a9bf2ee14d9fb4ed1821150af154c35642c"
     },
     {
+      "bytes": 253,
       "path": "TABLES/TABLE_SUPPLEMENTARY_E1.csv",
-      "bytes": 347,
-      "sha256": "130e0e5ebc4691891e0f82f53e531fed8d196893c21bcbffdfa6ce3990fb6a00"
+      "sha256": "e5652e13377e448087cec744e4f51ec323a4c49fb67ca23dbe849b8b6f790f6f"
     },
     {
-      "path": "TABLES/TABLE_SUPPLEMENTARY_E2.csv",
-      "bytes": 395,
-      "sha256": "f6ced25bc6c7bbd25198b7f823c4ea94176e6550328309c4882c2a6baa58368b"
-    },
-    {
-      "path": "TABLES/TABLE_SUPPLEMENTARY_E3.csv",
-      "bytes": 335,
-      "sha256": "a1fca57daf56a1e139614f91b1370e15ed3b9a0e3a7b2b4a48d56dfaf44e451a"
-    },
-    {
-      "path": "TABLES/TABLE_SUPPLEMENTARY_E4.csv",
-      "bytes": 345,
-      "sha256": "a1c994794e4f44f108a0f1fa81195895d143717af467da9a7d86993a37b387dd"
-    },
-    {
-      "path": "TABLES/TABLE_SUPPLEMENTARY_E5.csv",
-      "bytes": 331,
-      "sha256": "51b44afe76801127cac4378cd9d10feceba1cef456dac4647a371504200f986c"
-    },
-    {
-      "path": "TABLES/TABLE_SUPPLEMENTARY_E6.csv",
-      "bytes": 352,
-      "sha256": "af2b165b1c2fa0ac872f4f085e89bb0d895a87eb2cf6374fd280cf94160bc7be"
-    },
-    {
-      "path": "TANKS/E1_STAGEWISE/REPORT.md",
-      "bytes": 128,
-      "sha256": "fa4df30a03cdb8cc7f740fffd027e8500b4e637d531a0421d425d994b7d19069"
-    },
-    {
-      "path": "TANKS/E1_STAGEWISE/STAGEWISE_INCREMENTAL_GAINS.csv",
-      "bytes": 866,
-      "sha256": "9ce07c7afed674b579abb3669749a04c8d6c176b76f4c33c36c2c23d75db34a1"
-    },
-    {
-      "path": "TANKS/E1_STAGEWISE/STAGEWISE_METRICS_WIDE.csv",
-      "bytes": 435,
-      "sha256": "33f2bfa7b4e05d511d95d8204376795bcb1653f08c3c59a5d19c2ccb3511e46f"
-    },
-    {
-      "path": "TANKS/E1_STAGEWISE/STAGEWISE_REPORT_AUDIT.json",
-      "bytes": 1628,
-      "sha256": "1101e57a523eda5c35260630372abe587ef50ae5d063e485eb5cf9d99ba81945"
-    },
-    {
-      "path": "TANKS/E1_STAGEWISE/STAGE_ADMISSION_STATUS.csv",
-      "bytes": 206,
-      "sha256": "e570995f8af9c19b69d95182600e5b09db9f625ba0db7483d33e2c947833fd11"
-    },
-    {
-      "path": "TANKS/E1_STAGEWISE/STATUS.md",
-      "bytes": 320,
-      "sha256": "1667f3b8d4b601a02595befef6deee1c4c9f71c68c7027b7179162a87aaa2cf9"
-    },
-    {
-      "path": "TANKS/E2_SEMISYNTHETIC/REPORT.md",
-      "bytes": 98,
-      "sha256": "6164c584983b6fd8eecb55de93d98e0ec96ea8bed31896bbbd91d62b6f97af00"
-    },
-    {
-      "path": "TANKS/E2_SEMISYNTHETIC/STATUS.md",
-      "bytes": 300,
-      "sha256": "35a2161fcb542693d7c4ef48efa979c61415b2b155e84f5567c7b4bc3d609e5a"
-    },
-    {
-      "path": "TANKS/E2_SEMISYNTHETIC/channel_recovery.csv",
-      "bytes": 51,
-      "sha256": "aa2c0bb0a18d91db0becc89629d7f6ef4c5f2942ac32b0a0efabcbac7057bffe"
-    },
-    {
-      "path": "TANKS/E2_SEMISYNTHETIC/false_admission_vs_sample_size.csv",
-      "bytes": 65,
-      "sha256": "9fb93348f80f59d3148ffab21c2b0badba8f2b6cd349ee2ad52ff5f7912ed167"
-    },
-    {
-      "path": "TANKS/E2_SEMISYNTHETIC/ground_truth_recovery.csv",
-      "bytes": 113059,
-      "sha256": "1f248823399f84d9dccaa8e2875630c683f854912f1af5500d07466c3853a1a6"
-    },
-    {
-      "path": "TANKS/E2_SEMISYNTHETIC/null_calibration.csv",
-      "bytes": 37,
-      "sha256": "f40c24cada356686170e87b3d3e0f8a42f5300042f8f3a6444a770feb2328659"
-    },
-    {
-      "path": "TANKS/E2_SEMISYNTHETIC/scale_recovery.csv",
-      "bytes": 28,
-      "sha256": "8db1b083ce757dcef01ad178d0a9ae8fa46794b0289c56f94eac7cf2eddd018a"
-    },
-    {
-      "path": "TANKS/E2_SEMISYNTHETIC/stage_recovery.csv",
-      "bytes": 81,
-      "sha256": "b53ee860bab9723b91169186bc9f67fa1e2506e807c834154e5f493dbbc352d6"
-    },
-    {
-      "path": "TANKS/E3_MULTISCALE/REPORT.md",
-      "bytes": 83,
-      "sha256": "e21b9fd20f34dce3f3a21016a2c951d43b7dda63e150044c85232237db54cd0e"
-    },
-    {
-      "path": "TANKS/E3_MULTISCALE/STATUS.md",
-      "bytes": 294,
-      "sha256": "a6b20e7c9817be7c317e31b65f1d21372adf4df13c2f2aa1022084d1dcce5723"
-    },
-    {
-      "path": "TANKS/E3_MULTISCALE/equal_budget_multiscale.csv",
-      "bytes": 574,
-      "sha256": "f5d18f2367934e9471b24a84ebac529d6f51795d34375db9db507263ea040d5f"
-    },
-    {
-      "path": "TANKS/E3_MULTISCALE/paired_multiscale_gain.csv",
-      "bytes": 574,
-      "sha256": "f5d18f2367934e9471b24a84ebac529d6f51795d34375db9db507263ea040d5f"
-    },
-    {
-      "path": "TANKS/E3_MULTISCALE/selected_history_by_channel.csv",
-      "bytes": 62,
-      "sha256": "75fec4f6a3ce791c8317e126ab5f9d9bf52ddd68eeb3fae687ee380d54e208b2"
-    },
-    {
-      "path": "TANKS/E4A_GRID_SENSITIVITY/REPORT.md",
-      "bytes": 68,
-      "sha256": "13678e6b0944318455e8bd59b842149d23351593122ecdf01f0259440d2eebab"
-    },
-    {
-      "path": "TANKS/E4A_GRID_SENSITIVITY/STATUS.md",
-      "bytes": 308,
-      "sha256": "c89be8384ea6f1aa3a1c909865444f4b9782b63314973d6947362b8b42327e29"
-    },
-    {
-      "path": "TANKS/E4A_GRID_SENSITIVITY/all_variants.csv",
-      "bytes": 859,
-      "sha256": "8b48da0fde7c287cd2603e0c2eefc84871ccd719b532c5d3a2afa2657694c173"
-    },
-    {
-      "path": "TANKS/E4B_FAMILY_ABLATION/REPORT.md",
-      "bytes": 70,
-      "sha256": "af14607bc75077b771ed8ccc6dacc679b469765617f99cc359c223a1e22c519b"
-    },
-    {
-      "path": "TANKS/E4B_FAMILY_ABLATION/STATUS.md",
       "bytes": 306,
-      "sha256": "5b8ec06197ed5101c0837b1af13acf91934fb808372118f8188d2aa7ae9048dd"
+      "path": "TABLES/TABLE_SUPPLEMENTARY_E2.csv",
+      "sha256": "d1920cf07a27af869c1ccc8041a8a237ad7540cecc79100bbb9578ad2e866392"
     },
     {
-      "path": "TANKS/E4B_FAMILY_ABLATION/all_variants.csv",
-      "bytes": 475,
-      "sha256": "82d04329d05d95716d30ca4435c95e99b513e20096fdee6cc283918857296258"
+      "bytes": 275,
+      "path": "TABLES/TABLE_SUPPLEMENTARY_E3.csv",
+      "sha256": "83a9e14f801a00be280eab9935e85a2e59495adc456fbd8ad7f444f6599b26f5"
     },
     {
-      "path": "TANKS/E5_STRUCTURAL_STABILITY/REPORT.md",
-      "bytes": 37,
-      "sha256": "7d22701df5f4be8a0d105bbd1d6d2f172da0edcc42256d1111f3b1110bf994c2"
+      "bytes": 280,
+      "path": "TABLES/TABLE_SUPPLEMENTARY_E4.csv",
+      "sha256": "dedae73e591f31ac8cff392375fac6da29983be80ddc8b662be9d2f4f0c29451"
     },
     {
-      "path": "TANKS/E5_STRUCTURAL_STABILITY/STATUS.md",
-      "bytes": 314,
-      "sha256": "856955fc4fe29210a6191ba02f065252433e1eacfefedea20d893af6c44f1e66"
+      "bytes": 280,
+      "path": "TABLES/TABLE_SUPPLEMENTARY_E5.csv",
+      "sha256": "7ce93154c3493883c2d00a5abd9634c23df3df5ee42109130c1a45a0f8bcd938"
     },
     {
-      "path": "TANKS/E5_STRUCTURAL_STABILITY/channel_admission_frequency.csv",
-      "bytes": 33,
-      "sha256": "a5279665e46d8497ee64c0b7048127eb9b464e09ba0f9240c7925112fe2148b9"
+      "bytes": 300,
+      "path": "TABLES/TABLE_SUPPLEMENTARY_E6.csv",
+      "sha256": "0ed6935ef9e4049763c3b16579406d9ddcf2282e494da4d06ab5c36668a2c27b"
     },
     {
-      "path": "TANKS/E5_STRUCTURAL_STABILITY/pairwise_jaccard.csv",
-      "bytes": 21,
-      "sha256": "839b0abf6c22eaa030e28ed937f0ad71234e2710f4dbccba8ffdf610665b29cb"
+      "bytes": 291,
+      "path": "TANKS/E1_STAGEWISE/REPORT.md",
+      "sha256": "e9232515139b3c601802267dc6d01dd3e39df75eed19f11f786c7eb501d5638a"
     },
     {
-      "path": "TANKS/E5_STRUCTURAL_STABILITY/rashomon_analysis.csv",
-      "bytes": 104,
-      "sha256": "f024e53ce0041b55de311a1f7880bdd80e262140f975cc428071bfa3f3169a27"
+      "bytes": 211,
+      "path": "TANKS/E1_STAGEWISE/STAGE_ADMISSION_STATUS.csv",
+      "sha256": "89c3e5fe099dbf5c9655dcddccc30d095dd3b92e1039bb23529fdccec6847346"
     },
     {
-      "path": "TANKS/E5_STRUCTURAL_STABILITY/seed_stability.csv",
-      "bytes": 628,
-      "sha256": "180af2b73c2f7450be28ad549705bfbc91e21e8b968ca9795654bcd40fcfc470"
+      "bytes": 870,
+      "path": "TANKS/E1_STAGEWISE/STAGEWISE_INCREMENTAL_GAINS.csv",
+      "sha256": "0f7cc6eba74c18528af4a512f5baad5871b0547a08584ca03f8a6567eaacaf4a"
     },
     {
-      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/REPORT.md",
-      "bytes": 100,
-      "sha256": "4b34d742b7b8c03f963c97e93effac81f3316e68749946384933ff44ff0db260"
+      "bytes": 437,
+      "path": "TANKS/E1_STAGEWISE/STAGEWISE_METRICS_WIDE.csv",
+      "sha256": "fe25282fc8d9642ad2bd05ad3880dae501619ed75612ecf4520291e35b5382b2"
     },
     {
-      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/STATUS.md",
-      "bytes": 318,
-      "sha256": "09c92c0b91b4367ee078f69adda7c7be6f8865f7e9e9b786d7dd25f97885b7b9"
+      "bytes": 1658,
+      "path": "TANKS/E1_STAGEWISE/STAGEWISE_REPORT_AUDIT.json",
+      "sha256": "f1f5142c10ca9e8efd3a72330a9649295ad80109fc46b4bf3909618dce17712c"
     },
     {
-      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/n1_frozen_model.csv",
-      "bytes": 1441,
-      "sha256": "1f5c088fb54dee173013d65af4cc7ee90002b65d01e5c2ec39e632bbc3dbcc94"
+      "bytes": 262,
+      "path": "TANKS/E1_STAGEWISE/STATUS.md",
+      "sha256": "35a1eb8ee22befec3705da7332127e003c8127f57cde46729863d99da0331771"
     },
     {
-      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/n2_reidentification.csv",
-      "bytes": 1441,
-      "sha256": "1f5c088fb54dee173013d65af4cc7ee90002b65d01e5c2ec39e632bbc3dbcc94"
+      "bytes": 53,
+      "path": "TANKS/E2_SEMISYNTHETIC/channel_recovery.csv",
+      "sha256": "f84b8d4ff002f98fb93bcffb680b074323ee90a8c76313f181fb3ca7811fa6de"
     },
     {
-      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/n2_robustness_summary.csv",
-      "bytes": 1441,
-      "sha256": "1f5c088fb54dee173013d65af4cc7ee90002b65d01e5c2ec39e632bbc3dbcc94"
+      "bytes": 70,
+      "path": "TANKS/E2_SEMISYNTHETIC/false_admission_vs_sample_size.csv",
+      "sha256": "339f7371ffbfffcdffa6276dcc5e1dc0816e345c05ce6c66b9f1566f45eeac62"
     },
     {
-      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/noise_admission_margin.csv",
-      "bytes": 418,
-      "sha256": "8d52b589afc1a3a5e147f1a0409cf49f569d5ab3cc372a8e21ece22b471276a4"
+      "bytes": 113210,
+      "path": "TANKS/E2_SEMISYNTHETIC/ground_truth_recovery.csv",
+      "sha256": "4b68a7ba2233be9bceff7ca7bc32a5aed0d25007a7dccd463c678293c8853d7a"
     },
     {
-      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/noise_stage_activation_probability.csv",
+      "bytes": 39,
+      "path": "TANKS/E2_SEMISYNTHETIC/null_calibration.csv",
+      "sha256": "8b7a06f38a7f9c959a28e1248516a768637bffc5eea161a16862e430c20cb8e0"
+    },
+    {
+      "bytes": 101,
+      "path": "TANKS/E2_SEMISYNTHETIC/REPORT.md",
+      "sha256": "736edff9659f7cce406a235d47a5cee864777c854c6b2eaf6ed13c7938e71969"
+    },
+    {
+      "bytes": 30,
+      "path": "TANKS/E2_SEMISYNTHETIC/scale_recovery.csv",
+      "sha256": "9ce056703f27e95345ed095c3778305e675788ce27f169e632146e964f9c4e74"
+    },
+    {
+      "bytes": 84,
+      "path": "TANKS/E2_SEMISYNTHETIC/stage_recovery.csv",
+      "sha256": "3bb75379c2a663a266f06f54bed8e6a58e53952556d9c00b2d10116092969329"
+    },
+    {
+      "bytes": 429,
+      "path": "TANKS/E2_SEMISYNTHETIC/STATUS.md",
+      "sha256": "35a1749862c93880a1fd0d9cd421024b5765a26b01784e3d0e9534d1e6b0abd3"
+    },
+    {
+      "bytes": 585,
+      "path": "TANKS/E3_MULTISCALE/equal_budget_multiscale.csv",
+      "sha256": "c1f86a4bc917f4b85cf3a92b4da041f6976b22bfea6fdff8ef44c3bfcb172359"
+    },
+    {
+      "bytes": 585,
+      "path": "TANKS/E3_MULTISCALE/paired_multiscale_gain.csv",
+      "sha256": "c1f86a4bc917f4b85cf3a92b4da041f6976b22bfea6fdff8ef44c3bfcb172359"
+    },
+    {
+      "bytes": 86,
+      "path": "TANKS/E3_MULTISCALE/REPORT.md",
+      "sha256": "96bb339e30f6a47d38c0c9d475fdc124a4aa91f6a0240ecc2dec15fae3fc3cfa"
+    },
+    {
+      "bytes": 64,
+      "path": "TANKS/E3_MULTISCALE/selected_history_by_channel.csv",
+      "sha256": "05cc2bda066c316df722c20e18b372540e46df557c88d8f0963deb21dd93f1d0"
+    },
+    {
       "bytes": 423,
-      "sha256": "63793a06e7fe7f69dec1248b3226626a6e4a438591688243605f2b3f10a6e86b"
+      "path": "TANKS/E3_MULTISCALE/STATUS.md",
+      "sha256": "eba0b492117e5e99403bcd713f3e2b2544738c469f4973e4fb695ef5deafcc70"
     },
     {
+      "bytes": 870,
+      "path": "TANKS/E4A_GRID_SENSITIVITY/all_variants.csv",
+      "sha256": "411b15590582fb0a75803674d54dbfcddd11574d16f8eb6fc1eec0806dd3f2ef"
+    },
+    {
+      "bytes": 71,
+      "path": "TANKS/E4A_GRID_SENSITIVITY/REPORT.md",
+      "sha256": "c535cd9892ed3300ab6901bade76d2c766a3e212cccf042255b3e141a9296c5e"
+    },
+    {
+      "bytes": 437,
+      "path": "TANKS/E4A_GRID_SENSITIVITY/STATUS.md",
+      "sha256": "9ce0ffde6896cbbb08005d7ebea698db0cc0a1e22c90d56fb29aa24747e9425b"
+    },
+    {
+      "bytes": 481,
+      "path": "TANKS/E4B_FAMILY_ABLATION/all_variants.csv",
+      "sha256": "05e6fa1e923f73a77fc4ae28c81c4d82ce2b514a086134a385fca7b1f1719dd0"
+    },
+    {
+      "bytes": 73,
+      "path": "TANKS/E4B_FAMILY_ABLATION/REPORT.md",
+      "sha256": "99cbc4abf6ae7a50a65bff84cb4e2ed43e5df62ea39618d6b71ea2e00526c664"
+    },
+    {
+      "bytes": 435,
+      "path": "TANKS/E4B_FAMILY_ABLATION/STATUS.md",
+      "sha256": "442f06ecdd74286f0dc8012188675358cb3d8978482cb429adffc9ea112907f4"
+    },
+    {
+      "bytes": 35,
+      "path": "TANKS/E5_STRUCTURAL_STABILITY/channel_admission_frequency.csv",
+      "sha256": "4bb08bda2250a725a64252004471635d644efdbf36f8988ec5461a535defe807"
+    },
+    {
+      "bytes": 23,
+      "path": "TANKS/E5_STRUCTURAL_STABILITY/pairwise_jaccard.csv",
+      "sha256": "9dd907e02deeb1b134751857146c7f6f5545a57b05ca983e3de5683220804c9f"
+    },
+    {
+      "bytes": 106,
+      "path": "TANKS/E5_STRUCTURAL_STABILITY/rashomon_analysis.csv",
+      "sha256": "8d9e1599f416ba55b2bbd7ba65cf3ed3a4b5fb9edb9acc7576facf672e45f593"
+    },
+    {
+      "bytes": 40,
+      "path": "TANKS/E5_STRUCTURAL_STABILITY/REPORT.md",
+      "sha256": "763799f85790b3a0153d6071bf5d20f742a682c7ccd11b77caec944f5549a847"
+    },
+    {
+      "bytes": 639,
+      "path": "TANKS/E5_STRUCTURAL_STABILITY/seed_stability.csv",
+      "sha256": "73d42ce7893a3d90b306bbf49b7cb4495ff500e7e40f1b7036c28d3616e001cf"
+    },
+    {
+      "bytes": 443,
+      "path": "TANKS/E5_STRUCTURAL_STABILITY/STATUS.md",
+      "sha256": "0fc98eb44a7301264b58a3e1e2ee1b3276269f886464d2f8a064a60afc39b19f"
+    },
+    {
+      "bytes": 1462,
+      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/n1_frozen_model.csv",
+      "sha256": "874330f3a3e04deab0ca3c58c2cbdbc3e81e22138ff7f5d47688b76918a95bd0"
+    },
+    {
+      "bytes": 1462,
+      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/n2_reidentification.csv",
+      "sha256": "874330f3a3e04deab0ca3c58c2cbdbc3e81e22138ff7f5d47688b76918a95bd0"
+    },
+    {
+      "bytes": 1462,
+      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/n2_robustness_summary.csv",
+      "sha256": "874330f3a3e04deab0ca3c58c2cbdbc3e81e22138ff7f5d47688b76918a95bd0"
+    },
+    {
+      "bytes": 439,
+      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/noise_admission_margin.csv",
+      "sha256": "756b0a34fe14df7a48d9b8addcd74e6e35db42e14e1cd3fdcd8b01b5e1748e3e"
+    },
+    {
+      "bytes": 444,
+      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/noise_stage_activation_probability.csv",
+      "sha256": "b173bf7ee082be91022dd071f9515bb078205c7adf8e5c511dc34569278792aa"
+    },
+    {
+      "bytes": 103,
+      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/REPORT.md",
+      "sha256": "18b24e9716b8db35975018787f6a3ce07eb94f6acac71dcc91dc0e36cb4b29bb"
+    },
+    {
+      "bytes": 447,
+      "path": "TANKS/E6_MEASUREMENT_ROBUSTNESS/STATUS.md",
+      "sha256": "3329c147556511306cc3940cfd432eb046af8c3bbf7482b5667a1539e9204d0f"
+    },
+    {
+      "bytes": 652,
+      "path": "TANKS/INVALIDATED_E2_E6_20260922.md",
+      "sha256": "9ae839074cbbb9434cd1ca219fe647ffa709869a620a52f342d6efad9a1003fa"
+    },
+    {
+      "bytes": 1929,
       "path": "TANKS_CZ_E1_E6_MASTER_REPORT.md",
-      "bytes": 1327,
-      "sha256": "31c4dc73285864339dc85c156f357a24ac16286060160e613f31c1c5a960c0c8"
+      "sha256": "5cadada2d0f5beffa051df64c39cd1a67a9a618d4c51d4482df86011880aeada"
+    },
+    {
+      "bytes": 58,
+      "path": "TANKS_H16_CORRECTED_R3/E2_SEMISYNTHETIC/channel_recovery.csv",
+      "sha256": "036a62a125df165cc44b101ca3dc617622ce2bb5e4caf466dc869db850e0eef7"
+    },
+    {
+      "bytes": 63,
+      "path": "TANKS_H16_CORRECTED_R3/E2_SEMISYNTHETIC/false_admission_vs_sample_size.csv",
+      "sha256": "21433b268f8cea1102c148e57d040ba385f5efb5a8492177dd437400f62661fc"
+    },
+    {
+      "bytes": 863743,
+      "path": "TANKS_H16_CORRECTED_R3/E2_SEMISYNTHETIC/ground_truth_recovery.csv",
+      "sha256": "c1e3997e74223024770a453be05a979800107cc16e70cc06b6dee1bdff655b61"
+    },
+    {
+      "bytes": 39,
+      "path": "TANKS_H16_CORRECTED_R3/E2_SEMISYNTHETIC/null_calibration.csv",
+      "sha256": "8b7a06f38a7f9c959a28e1248516a768637bffc5eea161a16862e430c20cb8e0"
+    },
+    {
+      "bytes": 83,
+      "path": "TANKS_H16_CORRECTED_R3/E2_SEMISYNTHETIC/REPORT.md",
+      "sha256": "b44e78137eb9b20829c16379f5ef6525698000ad11de3004077e1865abea017d"
+    },
+    {
+      "bytes": 37,
+      "path": "TANKS_H16_CORRECTED_R3/E2_SEMISYNTHETIC/scale_recovery.csv",
+      "sha256": "c20d98e3e3c3210d94609d04332045fc25638a0d66aa2a214edb118eeb3adfb3"
+    },
+    {
+      "bytes": 83,
+      "path": "TANKS_H16_CORRECTED_R3/E2_SEMISYNTHETIC/stage_recovery.csv",
+      "sha256": "db402ea8a68a852509c4c478189f43d420f6c23de34d68d766df04d911fc3e67"
+    },
+    {
+      "bytes": 1052,
+      "path": "TANKS_H16_CORRECTED_R3/E3_MULTISCALE/equal_budget_multiscale.csv",
+      "sha256": "0f45f39b006bda28175963474605216fb2e58ce7e5d2cf34882c3e46f62cd88f"
+    },
+    {
+      "bytes": 1052,
+      "path": "TANKS_H16_CORRECTED_R3/E3_MULTISCALE/paired_multiscale_gain.csv",
+      "sha256": "0f45f39b006bda28175963474605216fb2e58ce7e5d2cf34882c3e46f62cd88f"
+    },
+    {
+      "bytes": 116,
+      "path": "TANKS_H16_CORRECTED_R3/E3_MULTISCALE/REPORT.md",
+      "sha256": "9204256b150ab1e703aa5276c5d0030014a9f52dbe31a3e95d17aa8849124c86"
+    },
+    {
+      "bytes": 263,
+      "path": "TANKS_H16_CORRECTED_R3/E3_MULTISCALE/selected_history_by_channel.csv",
+      "sha256": "1bcb20d60f23432102ba928f666f0a65c39870870e19b9979ee03221336975c8"
+    },
+    {
+      "bytes": 389,
+      "path": "TANKS_H16_CORRECTED_R3/E4A_GRID_SENSITIVITY/all_variants.csv",
+      "sha256": "53ca657f6ba61324528e2592ced4191a2fba66690040ac94b58a41c885e2d345"
+    },
+    {
+      "bytes": 89,
+      "path": "TANKS_H16_CORRECTED_R3/E4A_GRID_SENSITIVITY/REPORT.md",
+      "sha256": "2a2f356cd1345e6b0fd40af9e5b07ce0ebebb2c24c7814106f99e76427862a0b"
+    },
+    {
+      "bytes": 23380,
+      "path": "TANKS_H16_CORRECTED_R3/E4B_FAMILY_ABLATION/all_variants.csv",
+      "sha256": "cd61300dde854117c709f5c0fb01a1c43177c1976e9a000d46879dcb123eed66"
+    },
+    {
+      "bytes": 86,
+      "path": "TANKS_H16_CORRECTED_R3/E4B_FAMILY_ABLATION/REPORT.md",
+      "sha256": "507f9ded52d2707b67f231c7bc0020cbc92ffb7b96177df3946570ed47d37f4b"
+    },
+    {
+      "bytes": 35,
+      "path": "TANKS_H16_CORRECTED_R3/E5_STRUCTURAL_STABILITY/channel_admission_frequency.csv",
+      "sha256": "4bb08bda2250a725a64252004471635d644efdbf36f8988ec5461a535defe807"
+    },
+    {
+      "bytes": 23,
+      "path": "TANKS_H16_CORRECTED_R3/E5_STRUCTURAL_STABILITY/pairwise_jaccard.csv",
+      "sha256": "9dd907e02deeb1b134751857146c7f6f5545a57b05ca983e3de5683220804c9f"
+    },
+    {
+      "bytes": 106,
+      "path": "TANKS_H16_CORRECTED_R3/E5_STRUCTURAL_STABILITY/rashomon_analysis.csv",
+      "sha256": "8d9e1599f416ba55b2bbd7ba65cf3ed3a4b5fb9edb9acc7576facf672e45f593"
+    },
+    {
+      "bytes": 76,
+      "path": "TANKS_H16_CORRECTED_R3/E5_STRUCTURAL_STABILITY/REPORT.md",
+      "sha256": "7952e0bde7cf9cad9a8208842b6123eef3a0a5901d85f476276f65a3fc3610bf"
+    },
+    {
+      "bytes": 1548,
+      "path": "TANKS_H16_CORRECTED_R3/E5_STRUCTURAL_STABILITY/seed_stability.csv",
+      "sha256": "1c6bf567318e098695d9338e8ac7862fb8bd8a5492935ff52bb2ad860939db3f"
+    },
+    {
+      "bytes": 1496,
+      "path": "TANKS_H16_CORRECTED_R3/E6_MEASUREMENT_ROBUSTNESS/n1_frozen_model.csv",
+      "sha256": "b72fb9bbf4e410e4fe89c5e34ecbb5f82434aa6e5a4ff6bcff265e2dc9c7f57e"
+    },
+    {
+      "bytes": 1496,
+      "path": "TANKS_H16_CORRECTED_R3/E6_MEASUREMENT_ROBUSTNESS/n2_reidentification.csv",
+      "sha256": "b72fb9bbf4e410e4fe89c5e34ecbb5f82434aa6e5a4ff6bcff265e2dc9c7f57e"
+    },
+    {
+      "bytes": 1496,
+      "path": "TANKS_H16_CORRECTED_R3/E6_MEASUREMENT_ROBUSTNESS/n2_robustness_summary.csv",
+      "sha256": "b72fb9bbf4e410e4fe89c5e34ecbb5f82434aa6e5a4ff6bcff265e2dc9c7f57e"
+    },
+    {
+      "bytes": 379,
+      "path": "TANKS_H16_CORRECTED_R3/E6_MEASUREMENT_ROBUSTNESS/noise_admission_margin.csv",
+      "sha256": "98c729bec4656fdffcde5e306c998386503a74d8909328777db4be6572a3c6b9"
+    },
+    {
+      "bytes": 444,
+      "path": "TANKS_H16_CORRECTED_R3/E6_MEASUREMENT_ROBUSTNESS/noise_stage_activation_probability.csv",
+      "sha256": "a1fdcad9760d40743454868f433cfcec0422173376fbf7f20c4976704b6e509f"
+    },
+    {
+      "bytes": 111,
+      "path": "TANKS_H16_CORRECTED_R3/E6_MEASUREMENT_ROBUSTNESS/REPORT.md",
+      "sha256": "9069bae0bdd8ddc10f102ed9a9d6a1595e7b9ce94d4a00d78a4c649bc2a03820"
+    },
+    {
+      "bytes": 353,
+      "path": "TANKS_H16_CORRECTED_R3/METHOD_STATUS.json",
+      "sha256": "aef81fe3ec37fc2c035aaa645caa8dbfa319453f39f2ed4844d2d4e949d9d2b0"
     }
-  ]
+  ],
+  "status": "CORRECTED_AFTER_CODE_AND_RESULT_AUDIT"
 }

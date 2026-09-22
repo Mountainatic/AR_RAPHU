@@ -1,25 +1,15 @@
 {
   "created_utc": "2026-09-16T15:11:03.979007+00:00",
   "cz": {
-    "frozen_source": "/root/autodl-tmp/PRISM_CZ_E1_E6_PRIVATE_20260915_R5/freeze/INPUT_MANIFEST.json",
-    "primary": [
-      {
-        "H": 120,
-        "W": 12,
-        "name": "CZ-Mid"
-      },
-      {
-        "H": 240,
-        "W": 12,
-        "name": "CZ-Slow"
-      }
-    ]
+    "primary": {"sampling_seconds": 2, "history": 256, "H": 4, "W": 1, "W0": 1},
+    "scan_h_steps": [1, 2, 4, 8, 16],
+    "old_d20_status": "HISTORICAL_ONLY_EXCLUDED_FROM_PRIMARY"
   },
   "tanks": {
     "primary": {
       "H": 16,
       "source": "official problem definition"
     },
-    "status": "BLOCKED_BEFORE_TEST"
+    "status": "COMPLETED_E1_AND_CORRECTED_E2_E6_R3"
   }
 }
