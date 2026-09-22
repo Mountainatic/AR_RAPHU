@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -52,3 +53,53 @@ def test_cz_runner_names_mse_and_rmse_skill_separately() -> None:
     assert np.isclose(result["persistence_skill"], 0.75)
     assert np.isclose(result["persistence_skill_mse"], 0.75)
     assert np.isclose(result["persistence_skill_rmse"], 0.5)
+
+
+def test_cz_runner_delegates_to_authority_without_proxy_model_code() -> None:
+    module = _module()
+    assert module.AUTHORITY_COMMIT == "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7"
+    assert module.AUTHORITY_RUNNER_RELATIVE_PATH.as_posix() == (
+        "scripts/run_independent_extension_20260825.py"
+    )
+    forbidden = {
+        "fit_ridge",
+        "predict_ridge",
+        "block_design",
+        "candidate_specs",
+        "select_chain",
+        "RouteSpec",
+        "RidgeContract",
+    }
+    assert forbidden.isdisjoint(vars(module))
+
+
+def test_cz_runner_pins_every_authority_module_and_zero_c_patch() -> None:
+    module = _module()
+    project = Path(__file__).resolve().parents[1]
+    audit = module.authority_audit(project)
+    assert audit["status"] == "PASS"
+    assert audit["authority_is_ancestor"] is True
+    assert audit["custom_prism_feature_or_estimator_code_present"] is False
+    statuses = {item["status"] for item in audit["modules"]}
+    assert statuses == {
+        "BYTE_IDENTICAL_TO_AUTHORITY",
+        "AUTHORITY_PLUS_REVIEWED_ZERO_C_PATCH",
+    }
+
+
+def test_cz_authority_config_is_h4_only_and_pins_exact_commit() -> None:
+    project = Path(__file__).resolve().parents[1]
+    config = json.loads(
+        (
+            project
+            / "configs"
+            / "cz_raw2s_h4_authoritative_e1_e6_20260922.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert config["baseline_commit"] == (
+        "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7"
+    )
+    assert config["cz"]["h_steps"] == [4]
+    assert config["cz"]["sampling_period_seconds"] == 2
+    assert config["cz"]["history_steps"] == 256
+    assert config["cz"]["target_formula"] == "D[t+h-1]-D[t-1]"

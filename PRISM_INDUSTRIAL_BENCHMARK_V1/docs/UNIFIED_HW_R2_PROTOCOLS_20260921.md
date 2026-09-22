@@ -117,13 +117,15 @@ At primary h=4, Joint gives:
 These are private-data aggregate results and do not make the raw workbook or
 sample-level predictions public.
 
-The corresponding public code is not a placeholder: CZ materialization,
-segment/purge logic and the exact `D[t+h-1]-D[t-1]` target live in
-`src/prism_benchmark/cz_l256_nowcast.py`; the private E1–E6 adapter is
-`scripts/run_cz_raw2s_e1_e6.py`; and the registered 1/2/4/8/16 scan is
-orchestrated by `scripts/run_independent_extension_20260825.py`.  The latter
-requires a private `raw_root` supplied at execution time and therefore does
-not embed or upload the workbook.
+CZ materialization, segment/purge logic and the exact
+`D[t+h-1]-D[t-1]` target live in `src/prism_benchmark/cz_l256_nowcast.py`.
+The corrected private H4 entry point `scripts/run_cz_raw2s_e1_e6.py` now
+delegates K/C/W/A/Joint fitting and checkpoint replay to
+`scripts/run_independent_extension_20260825.py` and verifies authority-module
+Git blobs before data access.  The earlier custom Ridge/PCA E1–E6 output is
+invalid for authoritative-PRISM claims; see
+`docs/CZ_RAW2S_AUTHORITY_CORRECTION_20260922.md`.  The runner requires a
+private `raw_root` at execution time and never embeds or uploads the workbook.
 
 ## E1–E6 interpretation
 

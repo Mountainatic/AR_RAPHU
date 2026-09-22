@@ -212,7 +212,13 @@ def load_config() -> dict[str, Any]:
         raise RuntimeError("STOP_BASELINE_COMMIT_CONFIG_MISMATCH")
     if tuple(config["tep"]["history_steps"]) != (128, 256):
         raise RuntimeError("STOP_TEP_HISTORY_GRID_MISMATCH")
-    if tuple(config["cz"]["h_steps"]) != (1, 2, 4, 8, 16):
+    horizons = tuple(int(value) for value in config["cz"]["h_steps"])
+    registered_horizons = (1, 2, 4, 8, 16)
+    if (
+        not horizons
+        or tuple(dict.fromkeys(horizons)) != horizons
+        or any(value not in registered_horizons for value in horizons)
+    ):
         raise RuntimeError("STOP_CZ_H_GRID_MISMATCH")
     return config
 
