@@ -20,6 +20,8 @@ Before any data access, the runner verifies that:
   `representative_prism_checkpoints.py`, `strict_oof_selection.py` and
   `cz_l256_nowcast.py` are byte-identical to that authority commit;
 - `v211_joint_stability.py` is exactly the reviewed zero-C patched blob;
+- `level_reconstruction.py` is exactly the reviewed reporting-only patch that
+  names MSE-relative and RMSE-relative persistence skill separately;
 - the task remains 2-second sampling, L256, H4/W1/W0=1, with a 260-point
   dependency purge and target `D[t+3]-D[t-1]`.
 
@@ -28,4 +30,3 @@ The authoritative final checkpoint currently emits the formal ladder from
 `NOT_YET_RUN`.  E2--E6 are also `NOT_YET_RUN` until their perturbation and
 candidate-universe adapters rerun the full authority chain.  The corrected
 runner must not substitute compact Ridge models for those experiments.
-

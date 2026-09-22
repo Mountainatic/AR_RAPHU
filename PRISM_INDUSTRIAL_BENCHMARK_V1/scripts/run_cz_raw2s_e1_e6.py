@@ -58,6 +58,9 @@ AUTHORITY_BLOBS = {
 JOINT_RELATIVE_PATH = "src/prism_benchmark/v211_joint_stability.py"
 JOINT_AUTHORITY_BLOB = "ba3b5d2783fe94c1e46158878560c28a721c2958"
 JOINT_ZERO_C_PATCHED_BLOB = "52719bb7c2b29ac242be0fa927e9ffc80e8144bb"
+METRIC_RELATIVE_PATH = "src/prism_benchmark/level_reconstruction.py"
+METRIC_AUTHORITY_BLOB = "511c00d6f88e021618d018c3a111ffc1dddb1c89"
+METRIC_LABEL_PATCHED_BLOB = "abca993161b7650fdf4c7f67a8d80e2ab38bf609"
 
 
 def utc() -> str:
@@ -236,6 +239,26 @@ def authority_audit(project: Path) -> dict[str, Any]:
             "status": "AUTHORITY_PLUS_REVIEWED_ZERO_C_PATCH",
         }
     )
+    metric = project / METRIC_RELATIVE_PATH
+    authority_metric = _git(
+        repo,
+        "rev-parse",
+        f"{AUTHORITY_COMMIT}:PRISM_INDUSTRIAL_BENCHMARK_V1/{METRIC_RELATIVE_PATH}",
+    ).stdout.strip()
+    current_metric = _git(repo, "hash-object", str(metric)).stdout.strip()
+    if authority_metric != METRIC_AUTHORITY_BLOB:
+        raise RuntimeError("STOP_METRIC_AUTHORITY_BLOB_DRIFT")
+    if current_metric != METRIC_LABEL_PATCHED_BLOB:
+        raise RuntimeError("STOP_METRIC_LABEL_PATCH_DRIFT")
+    modules.append(
+        {
+            "path": METRIC_RELATIVE_PATH,
+            "authority_blob": authority_metric,
+            "current_blob": current_metric,
+            "sha256": sha256_file(metric),
+            "status": "AUTHORITY_PLUS_REVIEWED_METRIC_LABEL_PATCH",
+        }
+    )
     return {
         "status": "PASS",
         "protocol_id": PROTOCOL_ID,
@@ -245,6 +268,7 @@ def authority_audit(project: Path) -> dict[str, Any]:
         "execution_commit": _git(repo, "rev-parse", "HEAD").stdout.strip(),
         "modules": modules,
         "joint_patch_scope": "zero-C routing guard and nullable best-active-K reference only",
+        "metric_patch_scope": "report both MSE-relative and RMSE-relative persistence skill names",
         "custom_prism_feature_or_estimator_code_present": False,
         "created_utc": utc(),
     }

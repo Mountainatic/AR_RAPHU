@@ -84,6 +84,7 @@ def test_cz_runner_pins_every_authority_module_and_zero_c_patch() -> None:
     assert statuses == {
         "BYTE_IDENTICAL_TO_AUTHORITY",
         "AUTHORITY_PLUS_REVIEWED_ZERO_C_PATCH",
+        "AUTHORITY_PLUS_REVIEWED_METRIC_LABEL_PATCH",
     }
 
 
