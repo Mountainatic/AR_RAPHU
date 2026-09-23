@@ -1,0 +1,67 @@
+{
+  "amendment_id": "CZ_RAW2S_H4_AUTHORITY_E2_E6_STREAMING_EXECUTION_AMENDMENT_20260924_R2",
+  "status": "EXECUTION_AMENDMENT_ACTIVE",
+  "supersedes": "CZ_RAW2S_H4_AUTHORITY_E2_E6_STREAMING_EXECUTION_AMENDMENT_20260923_R1",
+  "parent_plan": "CZ_RAW2S_H4_AUTHORITY_E1_E6_RERUN_PLAN_20260922_R1",
+  "reason": "Preserve the bounded-retention rules while allowing measured tiny-pilot units to use the CPU allocation more effectively.",
+  "scope": "Scheduling, retention, and storage checks only",
+  "statistical_protocol_changed": false,
+  "model_or_selector_changed": false,
+  "authority_modules_changed": false,
+  "h_w_protocol_changed": false,
+  "evidence_boundary_changed": false,
+  "streaming_execution": {
+    "unit": "one experiment + direction + regime/condition + seed",
+    "isolated_unit_output_required": true,
+    "ordered_collection_required": true,
+    "maximum_concurrent_units": 2,
+    "inner_workers_per_unit": 1,
+    "worker_equivalence_required_before_two_way_parallelism": true,
+    "persistent_private_low_watermark_gib": 8,
+    "scratch_low_watermark_gib": 8,
+    "maximum_persistent_unit_gib": 4,
+    "maximum_scratch_unit_gib": 12,
+    "scratch_may_use_tmpfs": true,
+    "scratch_is_non_authoritative": true,
+    "collection_sequence": [
+      "run isolated unit",
+      "validate unit certificates and finite metrics",
+      "append aggregate row and content hashes",
+      "fsync aggregate and manifest",
+      "delete only the validated unit scratch/intermediate tree"
+    ],
+    "aggregate_and_manifests_are_retained": true,
+    "private_raw_or_per_sample_artifacts_must_not_be_uploaded_publicly": true,
+    "public_upload_allowlist": [
+      "aggregate metrics without row-level data",
+      "protocol/status documents",
+      "hash manifests without private paths or filenames",
+      "privacy audit"
+    ]
+  },
+  "tiny_pilot_execution": {
+    "scope": "P1_TINY_PILOT_NON_SELECTION_AUTHORITY only",
+    "maximum_concurrent_units": 4,
+    "inner_workers_per_unit": 2,
+    "maximum_measured_persistent_unit_gib": 0.25,
+    "private_required_before_batch_gib": 9,
+    "scratch_required_before_batch_gib": 8,
+    "worker_equivalence_certificate_required": true,
+    "completed_unit_resource_certificate_required": true,
+    "formal_target_or_ood_access_forbidden": true,
+    "statistical_claims_allowed": false,
+    "fallback": "Use the general two-unit, one-inner-worker limits when any tiny-pilot condition is not met."
+  },
+  "formal_execution_gate": {
+    "requires_streaming_preflight_pass": true,
+    "requires_tiny_pilot_pass": true,
+    "requires_worker_equivalence_pass_before_parallelism": true,
+    "requires_phase_a_gate_for_e3_e6": true
+  },
+  "invalidated_artifact_policy": {
+    "public_safe_forensic_evidence_may_be_archived_to_github": true,
+    "archive_must_say_invalid_do_not_cite": true,
+    "raw_private_data_and_row_level_predictions_forbidden": true,
+    "server_deletion_requires_archive_hash_verification_and_explicit_path_allowlist": true
+  }
+}

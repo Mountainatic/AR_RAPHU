@@ -31,7 +31,7 @@ def test_streaming_amendment_does_not_change_statistical_protocol() -> None:
         (
             project
             / "configs"
-            / "cz_raw2s_h4_authority_e2_e6_streaming_amendment_20260923.json"
+            / "cz_raw2s_h4_authority_e2_e6_streaming_amendment_20260924.json"
         ).read_text(encoding="utf-8")
     )
     assert amendment["status"] == "EXECUTION_AMENDMENT_ACTIVE"
@@ -40,6 +40,8 @@ def test_streaming_amendment_does_not_change_statistical_protocol() -> None:
     assert amendment["h_w_protocol_changed"] is False
     assert amendment["evidence_boundary_changed"] is False
     assert amendment["streaming_execution"]["maximum_concurrent_units"] == 2
+    assert amendment["tiny_pilot_execution"]["maximum_concurrent_units"] == 4
+    assert amendment["tiny_pilot_execution"]["inner_workers_per_unit"] == 2
 
 
 def test_streaming_gate_reserves_low_watermarks(monkeypatch, tmp_path: Path) -> None:
@@ -57,6 +59,7 @@ def test_streaming_gate_reserves_low_watermarks(monkeypatch, tmp_path: Path) -> 
     assert result["status"] == "PASS"
     assert result["authorized_outer_units"] == 1
     assert result["two_way_parallelism"] == "BLOCKED_PENDING_WORKER_EQUIVALENCE"
+    assert result["tiny_pilot_parallelism"] == "BLOCKED_PENDING_RESOURCE_CERTIFICATE"
     assert result["private_required_before_unit_gib"] == 12
     assert result["scratch_required_before_unit_gib"] == 20
 

@@ -26,7 +26,7 @@ PLAN_RELATIVE_PATH = Path(
     "configs/cz_raw2s_h4_authority_e1_e6_rerun_plan_20260922.json"
 )
 STREAMING_AMENDMENT_RELATIVE_PATH = Path(
-    "configs/cz_raw2s_h4_authority_e2_e6_streaming_amendment_20260923.json"
+    "configs/cz_raw2s_h4_authority_e2_e6_streaming_amendment_20260924.json"
 )
 LEGACY_RUNNER_RELATIVE_PATH = Path("scripts/run_cz_raw2s_e1_e6.py")
 MINIMUM_FULL_PRIVATE_GIB = 300
@@ -203,6 +203,7 @@ def streaming_storage_gate(
         "scratch_required_before_unit_gib": scratch_required_gib,
         "authorized_outer_units": 1,
         "two_way_parallelism": "BLOCKED_PENDING_WORKER_EQUIVALENCE",
+        "tiny_pilot_parallelism": "BLOCKED_PENDING_RESOURCE_CERTIFICATE",
     }
     _write_json(run_root / "STREAMING_STORAGE_GATE.json", result)
     if not passed:
