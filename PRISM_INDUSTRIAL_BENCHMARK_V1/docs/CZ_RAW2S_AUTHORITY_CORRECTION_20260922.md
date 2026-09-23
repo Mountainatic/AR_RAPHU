@@ -70,13 +70,16 @@ quantities and must not be interchanged.  Level R2 is high partly because the
 diameter level is strongly persistent; persistence skill and delta R2 are the
 appropriate checks for improvement over that easy level baseline.
 
-`RUN_STATUS.json` is intentionally `PARTIAL`: the authority-backed H4 ladder
-is complete from K+C onward, but pure K and E2--E6 have not been rerun.  The
-failed pre-correction R1/R2 attempts and `CZ_RAW2S_H4_CORRECTED_R2` are not
-valid result sources.
+This table records the original R3 report and is superseded for E1 by
+`docs/CZ_RAW2S_H4_AUTHORITY_E1_EXECUTION_20260923.md`.  Execution exposed and
+corrected the final-checkpoint `BEST_ACTIVE_K_CHANNEL` enum-binding defect;
+the corrected E1 now includes pure K and passes all exact-zero identities.
+The failed pre-correction R1/R2 attempts and `CZ_RAW2S_H4_CORRECTED_R2` remain
+invalid result sources.
 
 The pre-registered implementation and execution plan for completing pure K
 and E2--E6 is `docs/CZ_RAW2S_H4_AUTHORITY_E1_E6_RERUN_PLAN_20260922.md`, with
 its machine-readable companion at
-`configs/cz_raw2s_h4_authority_e1_e6_rerun_plan_20260922.json`.  Both remain
-`PLANNED_NOT_STARTED`; their presence is not evidence that E2--E6 ran.
+`configs/cz_raw2s_h4_authority_e1_e6_rerun_plan_20260922.json`.  P0--P2 are
+complete.  E2--E6 remain blocked, not run, because the executed storage gate
+found 13.295 GiB free versus the required 300 GiB of private writable storage.
