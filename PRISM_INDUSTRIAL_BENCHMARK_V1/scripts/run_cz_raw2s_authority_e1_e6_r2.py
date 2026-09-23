@@ -232,10 +232,22 @@ def _prediction_difference(left: Path, right: Path) -> dict[str, Any]:
     return {
         "rows": int(len(merged)),
         "maximum_absolute_truth_error": float(
-            np.max(np.abs(merged["a_true"] - merged["b_true"]), initial=0.0)
+            np.max(
+                np.abs(
+                    merged["a_true"].to_numpy(dtype=np.float64)
+                    - merged["b_true"].to_numpy(dtype=np.float64)
+                ),
+                initial=0.0,
+            )
         ),
         "maximum_absolute_prediction_error": float(
-            np.max(np.abs(merged["a_pred"] - merged["b_pred"]), initial=0.0)
+            np.max(
+                np.abs(
+                    merged["a_pred"].to_numpy(dtype=np.float64)
+                    - merged["b_pred"].to_numpy(dtype=np.float64)
+                ),
+                initial=0.0,
+            )
         ),
     }
 
