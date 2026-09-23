@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 
 from .cpu_data import BaseAccessor
+from .cz_l256_nowcast import TARGET_COLUMN
 from .portable_checkpoints import INFERENCE_ONLY_ENV, load_portable_checkpoint
 from .stage0 import write_json
 from .v2_k import profile_values
@@ -265,7 +266,7 @@ def materialize_s1_k_pilot(
     base_path = output_shared / "base_data" / "cz_czochralski" / "train.parquet"
     original_base = pd.read_parquet(base_path)
     original_levels = {
-        str(entity): group.sort_values("row_in_entity")["diameter"].to_numpy(
+        str(entity): group.sort_values("row_in_entity")[TARGET_COLUMN].to_numpy(
             dtype=np.float64
         )
         for entity, group in original_base.groupby("entity_id", sort=False)
@@ -324,7 +325,7 @@ def materialize_s1_k_pilot(
         synthetic_levels[entity] = level
     for entity, group in shifted.groupby("entity_id", sort=False):
         ordered = group.sort_values("row_in_entity")
-        shifted.loc[ordered.index, "diameter"] = synthetic_levels[str(entity)]
+        shifted.loc[ordered.index, TARGET_COLUMN] = synthetic_levels[str(entity)]
     shifted.to_parquet(base_path, index=False, compression="zstd")
     counts = _update_samples(output_shared, synthetic_levels, int(sample_size))
     audit = {
