@@ -1,0 +1,53 @@
+{
+  "amendment_id": "CZ_RAW2S_H4_AUTHORITY_E2_E6_STREAMING_EXECUTION_AMENDMENT_20260923_R1",
+  "status": "EXECUTION_AMENDMENT_ACTIVE",
+  "parent_plan": "CZ_RAW2S_H4_AUTHORITY_E1_E6_RERUN_PLAN_20260922_R1",
+  "reason": "The execution host has a 50 GiB private data disk, so the preregistered 300 GiB simultaneous-retention gate cannot be satisfied on that host.",
+  "scope": "Scheduling, retention, and storage checks only",
+  "statistical_protocol_changed": false,
+  "model_or_selector_changed": false,
+  "authority_modules_changed": false,
+  "h_w_protocol_changed": false,
+  "evidence_boundary_changed": false,
+  "streaming_execution": {
+    "unit": "one experiment + direction + regime/condition + seed",
+    "isolated_unit_output_required": true,
+    "ordered_collection_required": true,
+    "maximum_concurrent_units": 2,
+    "inner_workers_per_unit": 1,
+    "worker_equivalence_required_before_two_way_parallelism": true,
+    "persistent_private_low_watermark_gib": 8,
+    "scratch_low_watermark_gib": 8,
+    "maximum_persistent_unit_gib": 4,
+    "maximum_scratch_unit_gib": 12,
+    "scratch_may_use_tmpfs": true,
+    "scratch_is_non_authoritative": true,
+    "collection_sequence": [
+      "run isolated unit",
+      "validate unit certificates and finite metrics",
+      "append aggregate row and content hashes",
+      "fsync aggregate and manifest",
+      "delete only the validated unit scratch/intermediate tree"
+    ],
+    "aggregate_and_manifests_are_retained": true,
+    "private_raw_or_per_sample_artifacts_must_not_be_uploaded_publicly": true,
+    "public_upload_allowlist": [
+      "aggregate metrics without row-level data",
+      "protocol/status documents",
+      "hash manifests without private paths or filenames",
+      "privacy audit"
+    ]
+  },
+  "formal_execution_gate": {
+    "requires_streaming_preflight_pass": true,
+    "requires_tiny_pilot_pass": true,
+    "requires_worker_equivalence_pass_before_parallelism": true,
+    "requires_phase_a_gate_for_e3_e6": true
+  },
+  "invalidated_artifact_policy": {
+    "public_safe_forensic_evidence_may_be_archived_to_github": true,
+    "archive_must_say_invalid_do_not_cite": true,
+    "raw_private_data_and_row_level_predictions_forbidden": true,
+    "server_deletion_requires_archive_hash_verification_and_explicit_path_allowlist": true
+  }
+}

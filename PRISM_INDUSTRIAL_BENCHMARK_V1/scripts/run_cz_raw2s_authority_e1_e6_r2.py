@@ -25,8 +25,15 @@ import pandas as pd
 PLAN_RELATIVE_PATH = Path(
     "configs/cz_raw2s_h4_authority_e1_e6_rerun_plan_20260922.json"
 )
+STREAMING_AMENDMENT_RELATIVE_PATH = Path(
+    "configs/cz_raw2s_h4_authority_e2_e6_streaming_amendment_20260923.json"
+)
 LEGACY_RUNNER_RELATIVE_PATH = Path("scripts/run_cz_raw2s_e1_e6.py")
 MINIMUM_FULL_PRIVATE_GIB = 300
+MINIMUM_STREAMING_PRIVATE_GIB = 8
+MINIMUM_STREAMING_SCRATCH_GIB = 8
+MAXIMUM_STREAMING_UNIT_PRIVATE_GIB = 4
+MAXIMUM_STREAMING_UNIT_SCRATCH_GIB = 12
 DIRECTIONS = ("Rod_1_to_Rod_2", "Rod_2_to_Rod_1")
 H_STEPS = 4
 
@@ -136,6 +143,91 @@ def full_storage_gate(run_root: Path) -> dict[str, Any]:
         raise RuntimeError(
             f"STOP_INSUFFICIENT_PRIVATE_STORAGE:{free_gib:.3f}GiB<{MINIMUM_FULL_PRIVATE_GIB}GiB"
         )
+    return result
+
+
+def streaming_storage_gate(
+    project: Path, run_root: Path, scratch_root: Path
+) -> dict[str, Any]:
+    """Authorize the separately documented bounded-retention execution mode.
+
+    This is not a silent relaxation of the frozen 300 GiB full-retention gate:
+    the immutable parent plan and its gate remain recorded.  The amendment is
+    hashed into every result, and only one isolated unit is authorized by this
+    check.  Parallel execution has its own worker-equivalence prerequisite.
+    """
+
+    _private_path_audit(run_root)
+    amendment_path = project / STREAMING_AMENDMENT_RELATIVE_PATH
+    if not amendment_path.is_file():
+        raise RuntimeError("STOP_STREAMING_EXECUTION_AMENDMENT_MISSING")
+    amendment = _read_json(amendment_path)
+    if (
+        amendment.get("status") != "EXECUTION_AMENDMENT_ACTIVE"
+        or amendment.get("statistical_protocol_changed") is not False
+        or amendment.get("model_or_selector_changed") is not False
+    ):
+        raise RuntimeError("STOP_INVALID_STREAMING_EXECUTION_AMENDMENT")
+    private_usage = shutil.disk_usage(_nearest_existing(run_root))
+    scratch_usage = shutil.disk_usage(_nearest_existing(scratch_root))
+    private_free_gib = private_usage.free / (1024**3)
+    scratch_free_gib = scratch_usage.free / (1024**3)
+    private_required_gib = (
+        MINIMUM_STREAMING_PRIVATE_GIB + MAXIMUM_STREAMING_UNIT_PRIVATE_GIB
+    )
+    scratch_required_gib = (
+        MINIMUM_STREAMING_SCRATCH_GIB + MAXIMUM_STREAMING_UNIT_SCRATCH_GIB
+    )
+    passed = (
+        private_free_gib >= private_required_gib
+        and scratch_free_gib >= scratch_required_gib
+    )
+    result = {
+        "status": "PASS" if passed else "BLOCKED",
+        "mode": "STREAMING_BOUNDED_RETENTION",
+        "checked_utc": _utc(),
+        "parent_full_retention_gate_gib": MINIMUM_FULL_PRIVATE_GIB,
+        "parent_full_retention_gate_status": "NOT_APPLICABLE_TO_STREAMING_MODE",
+        "amendment_path": str(amendment_path),
+        "amendment_sha256": _sha256(amendment_path),
+        "statistical_protocol_changed": False,
+        "private_path": str(run_root),
+        "private_free_gib": private_free_gib,
+        "private_low_watermark_gib": MINIMUM_STREAMING_PRIVATE_GIB,
+        "maximum_private_unit_gib": MAXIMUM_STREAMING_UNIT_PRIVATE_GIB,
+        "private_required_before_unit_gib": private_required_gib,
+        "scratch_path": str(scratch_root),
+        "scratch_free_gib": scratch_free_gib,
+        "scratch_low_watermark_gib": MINIMUM_STREAMING_SCRATCH_GIB,
+        "maximum_scratch_unit_gib": MAXIMUM_STREAMING_UNIT_SCRATCH_GIB,
+        "scratch_required_before_unit_gib": scratch_required_gib,
+        "authorized_outer_units": 1,
+        "two_way_parallelism": "BLOCKED_PENDING_WORKER_EQUIVALENCE",
+    }
+    _write_json(run_root / "STREAMING_STORAGE_GATE.json", result)
+    if not passed:
+        raise RuntimeError(
+            "STOP_INSUFFICIENT_STREAMING_STORAGE:"
+            f"private={private_free_gib:.3f}/{private_required_gib}GiB,"
+            f"scratch={scratch_free_gib:.3f}/{scratch_required_gib}GiB"
+        )
+    status_path = run_root / "RUN_STATUS.json"
+    run_status = _read_json(status_path) if status_path.is_file() else {}
+    run_status.update(
+        {
+            "status": "PARTIAL",
+            "E2_E6": "STREAMING_EXECUTION_AUTHORIZED",
+            "execution_mode": "STREAMING_BOUNDED_RETENTION",
+            "next_stage": "P1_E2_AUTHORITY_ADAPTER_TINY_PILOT",
+            "reason": (
+                "The 300 GiB full-retention gate remains unsatisfied; the "
+                "separately hashed execution amendment authorizes one isolated "
+                "unit after the bounded-retention gate passes."
+            ),
+            "updated_utc": _utc(),
+        }
+    )
+    _write_json(status_path, run_status)
     return result
 
 
@@ -400,16 +492,31 @@ def status(run_root: Path) -> dict[str, Any]:
             if (run_root / name).is_file()
             else {"status": "NOT_YET_RUN"}
         )
-        for name in ("PLAN_FREEZE.json", "FULL_STORAGE_GATE.json", "RUN_STATUS.json")
+        for name in (
+            "PLAN_FREEZE.json",
+            "FULL_STORAGE_GATE.json",
+            "STREAMING_STORAGE_GATE.json",
+            "RUN_STATUS.json",
+        )
     }
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("stage", choices=("preflight", "e1", "full-storage-gate", "status"))
+    parser.add_argument(
+        "stage",
+        choices=(
+            "preflight",
+            "e1",
+            "full-storage-gate",
+            "streaming-storage-gate",
+            "status",
+        ),
+    )
     parser.add_argument("--project", type=Path, required=True)
     parser.add_argument("--anchor-run-root", type=Path, required=True)
     parser.add_argument("--run-root", type=Path, required=True)
+    parser.add_argument("--scratch-root", type=Path, default=Path("/dev/shm"))
     args = parser.parse_args()
     project = args.project.resolve()
     anchor = args.anchor_run_root.resolve()
@@ -421,6 +528,8 @@ def main() -> int:
         result = run_e1(project, anchor, run_root)
     elif args.stage == "full-storage-gate":
         result = full_storage_gate(run_root)
+    elif args.stage == "streaming-storage-gate":
+        result = streaming_storage_gate(project, run_root, args.scratch_root.resolve())
     else:
         result = status(run_root)
     print(json.dumps({"stage": args.stage, "result": result}, sort_keys=True))
