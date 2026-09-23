@@ -325,7 +325,15 @@ def pure_k_oof_identity_certificate(
     if not required.issubset(c_frame.columns):
         raise RuntimeError("STOP_C_SELECTED_OOF_SCHEMA_MISMATCH")
     observed_losses = [
-        float(np.mean(np.square(group["y_true"] - group["y_pred"]), dtype=np.float64))
+        float(
+            np.mean(
+                np.square(
+                    group["y_true"].to_numpy(dtype=np.float64)
+                    - group["y_pred"].to_numpy(dtype=np.float64)
+                ),
+                dtype=np.float64,
+            )
+        )
         for _, group in c_frame.groupby("oof_fold", sort=True)
     ]
     parent_losses = [float(value) for value in selection["parent_outer_fold_losses"]]
