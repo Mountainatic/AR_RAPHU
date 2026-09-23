@@ -1,0 +1,18 @@
+{
+  "checkpoint_dir": "E:\\silicon\\withhzf\\v211_cz\\unified_hw_r2_20260921\\PRISM_INDUSTRIAL_BENCHMARK_V1\\.pytest-tmp3\\test_pure_k_checkpoint_reload_0\\pure-k",
+  "checkpoint_hash": "84eefb4d785dc0ddd55c4df25bb960ad7c2144388eb9cbf0bcf94d9c1fb81882",
+  "deletion_forbidden": true,
+  "files": [
+    {
+      "bytes": 444,
+      "name": "arrays.npz",
+      "sha256": "ef835e9e43597429e16d111a92d00f830ead6fa1490eb3d233a982164bc7967e"
+    },
+    {
+      "bytes": 508,
+      "name": "checkpoint.json",
+      "sha256": "46d66c8cb2125af09a0458cc7c8476a37c422c2178a154f1e57a99b031923975"
+    }
+  ],
+  "format": "PRISM_PORTABLE_CHECKPOINT_V1"
+}

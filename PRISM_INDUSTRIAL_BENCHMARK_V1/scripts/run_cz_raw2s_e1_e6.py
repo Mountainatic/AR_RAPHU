@@ -44,17 +44,18 @@ PURGE = HISTORY_LENGTH + H
 DIRECTIONS = ("Rod_1_to_Rod_2", "Rod_2_to_Rod_1")
 
 # Every unmodified model/selector module must be byte-identical to the authority
-# commit. Joint is the single reviewed exception: the recorded zero-C patch
-# keeps an exact-zero C increment external and fixes a missing best-K reference.
+# commit. Reviewed exceptions are pinned separately below.
 AUTHORITY_BLOBS = {
     "src/prism_benchmark/cz_k_support.py": "5853b3157a90b8b0fc84e8bee497aa861fa4a443",
     "src/prism_benchmark/v211_c.py": "f2ca61ac43ece6dfda6e65379bcfb4015b67e2ae",
     "src/prism_benchmark/v211_w.py": "2113e4ae119969e63569206a4e6ca9eda4cb0a1f",
     "src/prism_benchmark/v211_a.py": "5adbeeeeb9fa804fef71f88706c58e34608b0229",
-    "src/prism_benchmark/representative_prism_checkpoints.py": "71d9c729f69dbead855a5a2ef70e04cd024a6719",
     "src/prism_benchmark/strict_oof_selection.py": "a399fd6740447585a1a3c0853c5493ccbe0b99e8",
     "src/prism_benchmark/cz_l256_nowcast.py": "cc2a9ef5251ed8eb292c114b19f8d9528cddbf46",
 }
+CHECKPOINT_RELATIVE_PATH = "src/prism_benchmark/representative_prism_checkpoints.py"
+CHECKPOINT_AUTHORITY_BLOB = "71d9c729f69dbead855a5a2ef70e04cd024a6719"
+CHECKPOINT_BEST_K_PATCHED_BLOB = "e33057996ba4e1a616b47609a90fa2b9fc83b7cf"
 JOINT_RELATIVE_PATH = "src/prism_benchmark/v211_joint_stability.py"
 JOINT_AUTHORITY_BLOB = "ba3b5d2783fe94c1e46158878560c28a721c2958"
 JOINT_ZERO_C_PATCHED_BLOB = "52719bb7c2b29ac242be0fa927e9ffc80e8144bb"
@@ -219,6 +220,27 @@ def authority_audit(project: Path) -> dict[str, Any]:
             }
         )
 
+    checkpoint = project / CHECKPOINT_RELATIVE_PATH
+    authority_checkpoint = _git(
+        repo,
+        "rev-parse",
+        f"{AUTHORITY_COMMIT}:PRISM_INDUSTRIAL_BENCHMARK_V1/{CHECKPOINT_RELATIVE_PATH}",
+    ).stdout.strip()
+    current_checkpoint = _git(repo, "hash-object", str(checkpoint)).stdout.strip()
+    if authority_checkpoint != CHECKPOINT_AUTHORITY_BLOB:
+        raise RuntimeError("STOP_CHECKPOINT_AUTHORITY_BLOB_DRIFT")
+    if current_checkpoint != CHECKPOINT_BEST_K_PATCHED_BLOB:
+        raise RuntimeError("STOP_CHECKPOINT_BEST_K_PATCH_DRIFT")
+    modules.append(
+        {
+            "path": CHECKPOINT_RELATIVE_PATH,
+            "authority_blob": authority_checkpoint,
+            "current_blob": current_checkpoint,
+            "sha256": sha256_file(checkpoint),
+            "status": "AUTHORITY_PLUS_REVIEWED_BEST_K_ENUM_PATCH",
+        }
+    )
+
     joint = project / JOINT_RELATIVE_PATH
     authority_joint = _git(
         repo,
@@ -268,6 +290,10 @@ def authority_audit(project: Path) -> dict[str, Any]:
         "execution_commit": _git(repo, "rev-parse", "HEAD").stdout.strip(),
         "modules": modules,
         "joint_patch_scope": "zero-C routing guard and nullable best-active-K reference only",
+        "checkpoint_patch_scope": (
+            "bind the BEST_ACTIVE_K_CHANNEL enum during final checkpoint refit; "
+            "no estimator or selection change"
+        ),
         "metric_patch_scope": "report both MSE-relative and RMSE-relative persistence skill names",
         "custom_prism_feature_or_estimator_code_present": False,
         "created_utc": utc(),

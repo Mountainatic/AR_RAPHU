@@ -16,7 +16,8 @@
     "custom_proxy_models_forbidden": true,
     "reviewed_patches_allowed": [
       "v211_joint_stability zero-C routing guard",
-      "level_reconstruction metric-label correction"
+      "level_reconstruction metric-label correction",
+      "representative checkpoint BEST_ACTIVE_K_CHANNEL enum binding correction"
     ]
   },
   "task": {

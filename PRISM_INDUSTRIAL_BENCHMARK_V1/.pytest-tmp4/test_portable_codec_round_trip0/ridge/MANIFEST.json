@@ -1,0 +1,18 @@
+{
+  "checkpoint_dir": "E:\\silicon\\withhzf\\v211_cz\\unified_hw_r2_20260921\\PRISM_INDUSTRIAL_BENCHMARK_V1\\.pytest-tmp4\\test_portable_codec_round_trip0\\ridge",
+  "checkpoint_hash": "f7b724a64fdf1188038cd6fe916825a05098806e643d2f7db4fda33ce22923a2",
+  "deletion_forbidden": true,
+  "files": [
+    {
+      "bytes": 707,
+      "name": "arrays.npz",
+      "sha256": "e8d05869cf7f637a03f368bcb3edd41739b1695f64f5c2aa0279bc18a6fc069c"
+    },
+    {
+      "bytes": 302,
+      "name": "checkpoint.json",
+      "sha256": "8a1e7707f8c86e499c8166a65d55aed5634a82e7f6a5eba82f67ad61cfb615ff"
+    }
+  ],
+  "format": "PRISM_PORTABLE_CHECKPOINT_V1"
+}

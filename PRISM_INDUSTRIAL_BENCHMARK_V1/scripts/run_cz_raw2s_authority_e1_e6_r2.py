@@ -159,6 +159,65 @@ def _anchor_paths(project: Path, anchor: Path, direction: str) -> tuple[Any, Any
     return paths, dynamic_view, checkpoint_root
 
 
+def _checked_directory_symlink(destination: Path, source: Path) -> None:
+    if destination.exists() or destination.is_symlink():
+        if not destination.is_symlink() or destination.resolve() != source.resolve():
+            raise RuntimeError(f"STOP_CORRECTION_INPUT_BINDING_DRIFT:{destination}")
+        return
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.symlink_to(source.resolve(), target_is_directory=True)
+
+
+def _corrected_authority_replay(
+    project: Path,
+    anchor_paths: Any,
+    view: Any,
+    direction: str,
+    run_root: Path,
+) -> tuple[Any, Path, list[dict[str, Any]]]:
+    """Refit only the sealed final checkpoint, then replay formal test once."""
+
+    from prism_benchmark.portable_checkpoints import INFERENCE_ONLY_ENV
+    from prism_benchmark.representative_prism_checkpoints import (
+        _checkpoint_dir,
+        fit_prism_checkpoint_for_view,
+        predict_prism_checkpoint_for_view,
+    )
+    from prism_benchmark.v211_public_all_config import PublicAllPaths
+
+    correction_direction = run_root / "CORRECTED_AUTHORITY" / "directions" / direction
+    _checked_directory_symlink(correction_direction / "results", anchor_paths.output)
+    _checked_directory_symlink(correction_direction / "freeze", anchor_paths.freeze)
+    paths = PublicAllPaths(project, anchor_paths.shared, correction_direction)
+    checkpoint_root = run_root / "CORRECTED_AUTHORITY" / "checkpoints" / direction
+    checkpoint = _checkpoint_dir(checkpoint_root, view)
+    if not checkpoint.exists():
+        fit_prism_checkpoint_for_view(paths, view, checkpoint_root)
+
+    result_path = paths.final / "test_predictions" / view.relative_root / "PRISM_INFERENCE_RESULT.json"
+    if result_path.is_file():
+        payload = _read_json(result_path)
+        records = [dict(item) for item in payload.get("models", [])]
+        if not records:
+            raise RuntimeError("STOP_CORRECTED_FORMAL_RESULT_EMPTY")
+    else:
+        previous = os.environ.get(INFERENCE_ONLY_ENV)
+        os.environ[INFERENCE_ONLY_ENV] = "1"
+        try:
+            records = [
+                dict(item)
+                for item in predict_prism_checkpoint_for_view(
+                    paths, view, checkpoint_root, split="test"
+                )
+            ]
+        finally:
+            if previous is None:
+                os.environ.pop(INFERENCE_ONLY_ENV, None)
+            else:
+                os.environ[INFERENCE_ONLY_ENV] = previous
+    return paths, checkpoint_root, records
+
+
 def _prediction_difference(left: Path, right: Path) -> dict[str, Any]:
     a = pd.read_parquet(left)[["base_origin_id", "y_true", "y_pred"]]
     b = pd.read_parquet(right)[["base_origin_id", "y_true", "y_pred"]]
@@ -195,7 +254,6 @@ def run_e1(project: Path, anchor: Path, run_root: Path) -> dict[str, Any]:
     formal_records: list[dict[str, Any]] = []
     certificates: list[dict[str, Any]] = []
     zero_audits: list[dict[str, Any]] = []
-    anchor_report = _read_json(anchor / "final" / "INDEPENDENT_EXTENSION_REPORT.json")
     stage_map = {
         "PRISM_V2_1_1_K_C_DYNAMIC": "K+C",
         "PRISM_V2_1_1_K_C_W_DYNAMIC": "K+C+DELTA_W",
@@ -204,9 +262,23 @@ def run_e1(project: Path, anchor: Path, run_root: Path) -> dict[str, Any]:
     }
 
     for direction in DIRECTIONS:
-        paths, view, authority_checkpoint_root = _anchor_paths(
+        anchor_paths, view, _ = _anchor_paths(
             project, anchor, direction
         )
+        paths, authority_checkpoint_root, corrected_records = _corrected_authority_replay(
+            project, anchor_paths, view, direction, run_root
+        )
+        for record in corrected_records:
+            model = str(record.get("model"))
+            if model in stage_map:
+                formal_records.append(
+                    {
+                        "direction": direction,
+                        "h_steps": H_STEPS,
+                        "stage": stage_map[model],
+                        **record,
+                    }
+                )
         derivation = derive_pure_k_checkpoint_for_view(
             paths, view, authority_checkpoint_root, pure_k_root / direction
         )
@@ -244,15 +316,6 @@ def run_e1(project: Path, anchor: Path, run_root: Path) -> dict[str, Any]:
                 "W": {"status": "PASS", **w_identity},
             }
         )
-
-    for record in anchor_report.get("cz", []):
-        model = str(record.get("model"))
-        if (
-            int(record.get("h_steps", -1)) == H_STEPS
-            and record.get("information_set") == "dynamic"
-            and model in stage_map
-        ):
-            formal_records.append({"stage": stage_map[model], **record})
 
     order = {"K": 0, "K+C": 1, "K+C+DELTA_W": 2, "K+C+DELTA_W+A": 3, "JOINT": 4}
     formal_records.sort(key=lambda row: (str(row["direction"]), order[str(row["stage"])]))

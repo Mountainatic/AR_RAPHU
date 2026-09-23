@@ -27,6 +27,7 @@ from .v2_config import load_frozen_config
 from .v2_k import profile_values
 from .v2_urysohn import basis_from_metadata, predict_contract
 from .v211_a import EXACT_ZERO, fit_mature_residual_ar, mature_residual_features
+from .v211_c import BEST_ACTIVE_K
 from .v211_joint import joint_w_basis
 from .v211_joint_stability import fit_joint_candidate_stability, k_representation_blocks
 from .v211_k import load_active_channels
@@ -148,7 +149,7 @@ def _fit_c_state(
             "parameter_count": 1,
         }
         prediction = np.full(len(fit), float(contract["intercept"]), dtype=np.float64)
-    elif family == "BEST_ACTIVE_K":
+    elif family == BEST_ACTIVE_K:
         channel = str(c_result["best_active_k_channel"])
         prediction = features["compressed_train"][:, features["channels"].index(channel)].copy()
         contract = {
