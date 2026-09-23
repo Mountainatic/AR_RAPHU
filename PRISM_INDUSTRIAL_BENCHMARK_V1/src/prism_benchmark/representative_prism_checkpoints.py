@@ -221,7 +221,7 @@ def _predict_c(
     rows = len(next(iter(matrices.values())))
     if family == "K_EXACT_ZERO":
         return np.full(rows, float(c_contract["intercept"]), dtype=np.float64)
-    if family == "BEST_ACTIVE_K":
+    if family == BEST_ACTIVE_K:
         return matrices["compressed"][:, channels.index(str(c_contract["channel"]))]
     key = "joint" if family == "ADDITIVE_JOINT_BASIS" else "compressed"
     return _ridge_predict(matrices[key], dict(c_contract))

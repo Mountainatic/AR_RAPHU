@@ -134,3 +134,9 @@ def test_authority_checkpoint_refit_preserves_best_k_identity(monkeypatch: pytes
     assert contract["family"] == BEST_ACTIVE_K
     assert contract["channel"] == "joint_lift"
     np.testing.assert_array_equal(prediction, compressed[:, 0])
+    replay = module._predict_c(
+        {"compressed": compressed, "joint": compressed},
+        contract,
+        ["joint_lift"],
+    )
+    np.testing.assert_array_equal(replay, prediction)

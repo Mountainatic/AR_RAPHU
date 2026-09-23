@@ -55,7 +55,7 @@ AUTHORITY_BLOBS = {
 }
 CHECKPOINT_RELATIVE_PATH = "src/prism_benchmark/representative_prism_checkpoints.py"
 CHECKPOINT_AUTHORITY_BLOB = "71d9c729f69dbead855a5a2ef70e04cd024a6719"
-CHECKPOINT_BEST_K_PATCHED_BLOB = "e33057996ba4e1a616b47609a90fa2b9fc83b7cf"
+CHECKPOINT_BEST_K_PATCHED_BLOB = "5ecc15b6b7b3199c4b9442922955a5c39bbfd32a"
 JOINT_RELATIVE_PATH = "src/prism_benchmark/v211_joint_stability.py"
 JOINT_AUTHORITY_BLOB = "ba3b5d2783fe94c1e46158878560c28a721c2958"
 JOINT_ZERO_C_PATCHED_BLOB = "52719bb7c2b29ac242be0fa927e9ffc80e8144bb"
@@ -291,8 +291,8 @@ def authority_audit(project: Path) -> dict[str, Any]:
         "modules": modules,
         "joint_patch_scope": "zero-C routing guard and nullable best-active-K reference only",
         "checkpoint_patch_scope": (
-            "bind the BEST_ACTIVE_K_CHANNEL enum during final checkpoint refit; "
-            "no estimator or selection change"
+            "bind the BEST_ACTIVE_K_CHANNEL enum during final checkpoint refit "
+            "and replay; no estimator or selection change"
         ),
         "metric_patch_scope": "report both MSE-relative and RMSE-relative persistence skill names",
         "custom_prism_feature_or_estimator_code_present": False,
