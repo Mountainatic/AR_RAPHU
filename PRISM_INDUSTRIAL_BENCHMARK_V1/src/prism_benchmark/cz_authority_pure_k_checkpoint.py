@@ -248,6 +248,7 @@ def pure_k_oof_identity_certificate(
         _predict_c,
         _predict_physical_features,
     )
+    from .level_reconstruction import support_hash
 
     checkpoint = pure_k_checkpoint_dir(pure_k_root, view)
     with _checkpoint_read_context():
@@ -285,7 +286,10 @@ def pure_k_oof_identity_certificate(
         how="inner",
         validate="one_to_one",
     )
-    if len(expected) != len(fit) or len(expected) != len(c_frame):
+    # The C artifact is the held-out OOF validation subset, whereas ``fit`` is
+    # the full frozen development support needed to replay physical contracts.
+    # Every C row must match exactly; training-only development rows are valid.
+    if len(expected) != len(c_frame):
         raise RuntimeError("STOP_PURE_K_C_IDENTITY_SUPPORT_MISMATCH")
     maximum = float(
         np.max(
@@ -302,7 +306,10 @@ def pure_k_oof_identity_certificate(
         "status": "PASS",
         "model": PURE_K_MODEL,
         "rows": int(len(expected)),
-        "sample_id_order_hash": support_id_hash(fit),
+        "development_rows": int(len(fit)),
+        "validation_base_origin_order_hash": support_hash(
+            c_frame[key].astype(str).tolist()
+        ),
         "fit_support_hash": str(state["fit_support_hash"]),
         "checkpoint_hash": str(manifest["checkpoint_hash"]),
         "c_routing_status": str(c_result["routing_status"]),
