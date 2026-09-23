@@ -1,0 +1,115 @@
+{
+  "E1_active_routes": {
+    "Rod_1_to_Rod_2:dynamic": [
+      "A"
+    ],
+    "Rod_1_to_Rod_2:input_only": [],
+    "Rod_2_to_Rod_1:dynamic": [
+      "A"
+    ],
+    "Rod_2_to_Rod_1:input_only": []
+  },
+  "E2_false_admission_rate": 0.10625,
+  "E2_overall_recovery_rate": 0.6375,
+  "E3_mean_multiscale_gain": 0.0026627453040062006,
+  "E4_best_variants": [
+    {
+      "direction": "Rod_1_to_Rod_2",
+      "experiment": "candidate_universe",
+      "rmse_delta": 0.016084289959826352,
+      "variant": "STANDARD"
+    },
+    {
+      "direction": "Rod_1_to_Rod_2",
+      "experiment": "family_ablation",
+      "rmse_delta": 0.016033589121077992,
+      "variant": "REMOVE_C"
+    },
+    {
+      "direction": "Rod_2_to_Rod_1",
+      "experiment": "candidate_universe",
+      "rmse_delta": 0.015921896805934786,
+      "variant": "EXPANDED"
+    },
+    {
+      "direction": "Rod_2_to_Rod_1",
+      "experiment": "family_ablation",
+      "rmse_delta": 0.01577887227879766,
+      "variant": "REMOVE_C"
+    }
+  ],
+  "E5_conditions": 118,
+  "E6_N1_rows": 200,
+  "E6_N2_rows": 200,
+  "completed_utc": "2026-09-22T09:34:09.983527+00:00",
+  "formal_metrics": [
+    {
+      "direction": "Rod_1_to_Rod_2",
+      "information_set": "input_only",
+      "mae_delta": 0.012335861526282903,
+      "partition": "formal_target_rod",
+      "persistence_skill": 0.00020263493399441668,
+      "persistence_skill_mse": 0.00020263493399441668,
+      "persistence_skill_rmse": 0.00010132260013195893,
+      "r2_delta": -0.0008615165781571399,
+      "r2_level_reconstructed": 0.9981159497080161,
+      "rmse_delta": 0.01601184374463932,
+      "rows": 20109,
+      "support_hash": "3346f1725c03d77960584f06c53f28e02ac67042fd1f7e11b19360f6472fe5a3"
+    },
+    {
+      "direction": "Rod_1_to_Rod_2",
+      "information_set": "dynamic",
+      "mae_delta": 0.012061402979999886,
+      "partition": "formal_target_rod",
+      "persistence_skill": 0.10749719252754941,
+      "persistence_skill_mse": 0.10749719252754941,
+      "persistence_skill_rmse": 0.05527633274462174,
+      "r2_delta": 0.10654724182217956,
+      "r2_level_reconstructed": 0.9983181390211966,
+      "rmse_delta": 0.015128300580706161,
+      "rows": 20109,
+      "support_hash": "3346f1725c03d77960584f06c53f28e02ac67042fd1f7e11b19360f6472fe5a3"
+    },
+    {
+      "direction": "Rod_2_to_Rod_1",
+      "information_set": "input_only",
+      "mae_delta": 0.013495201779248569,
+      "partition": "formal_target_rod",
+      "persistence_skill": -0.0007287683985084392,
+      "persistence_skill_mse": -0.0007287683985084392,
+      "persistence_skill_rmse": -0.00036431783551171826,
+      "r2_delta": -0.0007379513571352803,
+      "r2_level_reconstructed": 0.9990890856419954,
+      "rmse_delta": 0.017299457513831593,
+      "rows": 19280,
+      "support_hash": "fcdc8fb92405ce04ad43918e9797ef262dcadd43819fa1f5429de661aac21e7b"
+    },
+    {
+      "direction": "Rod_2_to_Rod_1",
+      "information_set": "dynamic",
+      "mae_delta": 0.012893223838366687,
+      "partition": "formal_target_rod",
+      "persistence_skill": 0.1300147211063657,
+      "persistence_skill_mse": 0.1300147211063657,
+      "persistence_skill_rmse": 0.06726998606583146,
+      "r2_delta": 0.1300067378854627,
+      "r2_level_reconstructed": 0.9992080950335173,
+      "rmse_delta": 0.01612984685703561,
+      "rows": 19280,
+      "support_hash": "fcdc8fb92405ce04ad43918e9797ef262dcadd43819fa1f5429de661aac21e7b"
+    }
+  ],
+  "limitations": [
+    "E2 uses observed CZ input trajectories with generated outcomes, so its structural truth is semisynthetic.",
+    "The private CZ adapter uses explicit auditable feature blocks and the canonical strict nested-OOF routing rule; it is not a byte-for-byte rerun of the public multi-dataset E1-E6 task registry.",
+    "Two transfer directions are selected independently; macro summaries are reporting-only."
+  ],
+  "privacy": {
+    "github_upload": false,
+    "raw_workbook_in_results": false,
+    "server_namespace_private": true
+  },
+  "protocol_id": "PRISM_CZ_RAW2S_L256_H4_PRIVATE_E1_E6_STRICT_NESTED_OOF_R2",
+  "status": "COMPLETED"
+}

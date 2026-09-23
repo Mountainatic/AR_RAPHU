@@ -1,0 +1,16 @@
+{
+  "checks": {
+    "finite_margins": true,
+    "four_regimes_present": true,
+    "no_formal_test_code_path": true,
+    "no_ood_code_path": true,
+    "strict_selector_manual_positive_gain": true,
+    "synthetic_deterministic": true,
+    "thirty_null_seeds_per_size": true,
+    "thirty_seeds_per_regime": true,
+    "uncertainty_no_authority": true,
+    "zero_external": true
+  },
+  "implementation_bug_found": false,
+  "status": "COMPLETED"
+}

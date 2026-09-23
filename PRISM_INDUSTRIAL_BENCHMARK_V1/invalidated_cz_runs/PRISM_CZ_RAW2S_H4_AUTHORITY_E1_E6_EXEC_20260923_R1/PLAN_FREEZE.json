@@ -1,0 +1,93 @@
+{
+  "anchor_report_sha256": "65db6bc2a501057bf13125967f8fe810e8e84fd85355e21f6771989be0a9fec3",
+  "anchor_run": "/root/autodl-tmp/PRISM_CZ_RAW2S_H4_AUTHORITY_E1_E6_20260922_R3",
+  "authority": {
+    "authority_branch": "prism-strict-oof-finalization-20260915",
+    "authority_commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7",
+    "authority_is_ancestor": true,
+    "created_utc": "2026-09-23T11:58:37.801197+00:00",
+    "custom_prism_feature_or_estimator_code_present": false,
+    "execution_commit": "0174dad68806ce2971d8557360f11a0313459567",
+    "joint_patch_scope": "zero-C routing guard and nullable best-active-K reference only",
+    "metric_patch_scope": "report both MSE-relative and RMSE-relative persistence skill names",
+    "modules": [
+      {
+        "authority_blob": "5853b3157a90b8b0fc84e8bee497aa861fa4a443",
+        "current_blob": "5853b3157a90b8b0fc84e8bee497aa861fa4a443",
+        "path": "src/prism_benchmark/cz_k_support.py",
+        "sha256": "f8424b8eae5ff1af1ee6fd811d609b60f2c7d40b5dab60f5bdfe68e313e10a67",
+        "status": "BYTE_IDENTICAL_TO_AUTHORITY"
+      },
+      {
+        "authority_blob": "f2ca61ac43ece6dfda6e65379bcfb4015b67e2ae",
+        "current_blob": "f2ca61ac43ece6dfda6e65379bcfb4015b67e2ae",
+        "path": "src/prism_benchmark/v211_c.py",
+        "sha256": "70a990d421f63836af51c9573a5be456c5482731ae9fa6ea25ebdcd230366296",
+        "status": "BYTE_IDENTICAL_TO_AUTHORITY"
+      },
+      {
+        "authority_blob": "2113e4ae119969e63569206a4e6ca9eda4cb0a1f",
+        "current_blob": "2113e4ae119969e63569206a4e6ca9eda4cb0a1f",
+        "path": "src/prism_benchmark/v211_w.py",
+        "sha256": "19433b3d90ea3fef74069861feb64d41e785c761d97bf48765c30724e9d67374",
+        "status": "BYTE_IDENTICAL_TO_AUTHORITY"
+      },
+      {
+        "authority_blob": "5adbeeeeb9fa804fef71f88706c58e34608b0229",
+        "current_blob": "5adbeeeeb9fa804fef71f88706c58e34608b0229",
+        "path": "src/prism_benchmark/v211_a.py",
+        "sha256": "43bdc453ca9975a54b0d9c59249e2c6d88a97c44f41cc152c6b542baa07636ab",
+        "status": "BYTE_IDENTICAL_TO_AUTHORITY"
+      },
+      {
+        "authority_blob": "71d9c729f69dbead855a5a2ef70e04cd024a6719",
+        "current_blob": "71d9c729f69dbead855a5a2ef70e04cd024a6719",
+        "path": "src/prism_benchmark/representative_prism_checkpoints.py",
+        "sha256": "4a5cc95b1a53fd7d7d9a564d00c8fd97650a5887397757d0463faafb41369ee9",
+        "status": "BYTE_IDENTICAL_TO_AUTHORITY"
+      },
+      {
+        "authority_blob": "a399fd6740447585a1a3c0853c5493ccbe0b99e8",
+        "current_blob": "a399fd6740447585a1a3c0853c5493ccbe0b99e8",
+        "path": "src/prism_benchmark/strict_oof_selection.py",
+        "sha256": "e7eb8c242b202dbfefc48bed575af0d93c52b8621fe746dd305a53c8241c79ed",
+        "status": "BYTE_IDENTICAL_TO_AUTHORITY"
+      },
+      {
+        "authority_blob": "cc2a9ef5251ed8eb292c114b19f8d9528cddbf46",
+        "current_blob": "cc2a9ef5251ed8eb292c114b19f8d9528cddbf46",
+        "path": "src/prism_benchmark/cz_l256_nowcast.py",
+        "sha256": "d4c0dc3d5346ef4c86bc56137af3c5203d1e99bee05f595a25216f185f6b84c4",
+        "status": "BYTE_IDENTICAL_TO_AUTHORITY"
+      },
+      {
+        "authority_blob": "ba3b5d2783fe94c1e46158878560c28a721c2958",
+        "current_blob": "52719bb7c2b29ac242be0fa927e9ffc80e8144bb",
+        "path": "src/prism_benchmark/v211_joint_stability.py",
+        "sha256": "659920b536460dc7cf4bccd083f0d4398d16f3eed894d3a4dcfbd9c023b27a00",
+        "status": "AUTHORITY_PLUS_REVIEWED_ZERO_C_PATCH"
+      },
+      {
+        "authority_blob": "511c00d6f88e021618d018c3a111ffc1dddb1c89",
+        "current_blob": "abca993161b7650fdf4c7f67a8d80e2ab38bf609",
+        "path": "src/prism_benchmark/level_reconstruction.py",
+        "sha256": "44fff9e2633321863936c3805c8f3b11b57062cc645bb8bf6273a619a5fad7b5",
+        "status": "AUTHORITY_PLUS_REVIEWED_METRIC_LABEL_PATCH"
+      }
+    ],
+    "protocol_id": "CZ_RAW2S_H4_AUTHORITATIVE_PRISM_E1_E6_CORRECTION_20260922_R1",
+    "status": "PASS"
+  },
+  "created_utc": "2026-09-23T11:58:37.801691+00:00",
+  "e1_no_refit_execution_allowed": true,
+  "e2_e6_full_execution_gate": "BLOCKED_INSUFFICIENT_STORAGE",
+  "minimum_full_private_gib": 300,
+  "plan_path": "/root/autodl-tmp/PRISM_CZ_AUTHORITY_FIX_20260922_CODE/PRISM_INDUSTRIAL_BENCHMARK_V1/configs/cz_raw2s_h4_authority_e1_e6_rerun_plan_20260922.json",
+  "plan_sha256": "7abed5c4c4af34b098458867a8382ad9ea224d4aec78beb15d3830a88341bdaf",
+  "private_free_gib": 13.322338104248047,
+  "private_output_path": "/root/autodl-tmp/PRISM_CZ_RAW2S_H4_AUTHORITY_E1_E6_EXEC_20260923_R1",
+  "private_path_audit": "PASS",
+  "raw_workbook_copy_forbidden": true,
+  "stage": "P0_PLAN_AND_CODE_FREEZE",
+  "status": "PASS"
+}

@@ -1,0 +1,36 @@
+{
+  "downstream_status": "E3_E6_COMPUTED_BUT_EXPLORATORY_NOT_GATE_AUTHORIZED",
+  "evaluated_utc": "2026-09-21T09:42:25.762934+00:00",
+  "overall_false_admission_rate": 0.1,
+  "overall_recovery_rate": 0.646875,
+  "reason": "legacy private adapter had no pre-Phase-A gate; audit applies claim restriction after computation",
+  "rule": "every structurally true stage must have recovery_rate > 0.5",
+  "status": "EVALUATED_POST_AUDIT",
+  "triggers": [
+    {
+      "recovery_rate": 0.0,
+      "regime": "FULL",
+      "required": ">0.5",
+      "stage": "C"
+    },
+    {
+      "recovery_rate": 0.5,
+      "regime": "FULL",
+      "required": ">0.5",
+      "stage": "K"
+    },
+    {
+      "recovery_rate": 0.5,
+      "regime": "FULL",
+      "required": ">0.5",
+      "stage": "W"
+    },
+    {
+      "recovery_rate": 0.0,
+      "regime": "KCW",
+      "required": ">0.5",
+      "stage": "C"
+    }
+  ],
+  "verdict": "STOP"
+}

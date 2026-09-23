@@ -1,0 +1,19 @@
+{
+  "status": "INVALID_DO_NOT_CITE",
+  "archive_sha256": "46c20945d75b8d8383a5acb8b3beecaaf34bfdfd84fbc04191f6deb3188d00be",
+  "raw_private_data_included": false,
+  "per_sample_predictions_included": false,
+  "replacement": {
+    "report": "docs/CZ_RAW2S_H4_AUTHORITY_E1_EXECUTION_20260923.md",
+    "server_run": "/root/autodl-tmp/PRISM_CZ_RAW2S_H4_AUTHORITY_E1_E6_EXEC_20260923_R3"
+  },
+  "invalidated_runs": [
+    "PRISM_CZ_RAW2S_L256_H4_E1_E6_20260921_R2",
+    "PRISM_CZ_RAW2S_L256_H4_E1_E6_STRICT_AUTH_20260921_R1",
+    "PRISM_CZ_RAW2S_L256_H4_E1_E6_STRICT_AUTH_20260921_R2",
+    "PRISM_CZ_RAW2S_L256_H4_E1_E6_STRICT_AUTH_20260921_R3_PARALLEL",
+    "PRISM_CZ_RAW2S_L256_H4_E1_E6_CORRECTED_20260922",
+    "PRISM_CZ_RAW2S_H4_AUTHORITY_E1_E6_EXEC_20260923_R1",
+    "PRISM_CZ_RAW2S_H4_AUTHORITY_E1_E6_EXEC_20260923_R2"
+  ]
+}

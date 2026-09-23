@@ -1,0 +1,85 @@
+{
+  "checks": {
+    "all_csv_numeric_finite": true,
+    "direction_support_consistent": true,
+    "e3_equal_budget": true,
+    "e6_levels_exact": true,
+    "e6_n1_zero_closes_to_formal": true,
+    "e6_raw_prefusion_provenance": true,
+    "git_exact": true,
+    "prediction_rows_match": true,
+    "protocol_exact": true,
+    "raw_absent": true,
+    "row_counts_exact": true,
+    "run_completed": true,
+    "target_audits_pass": true,
+    "worktree_still_clean": true
+  },
+  "formal_metrics": [
+    {
+      "direction": "Rod_1_to_Rod_2",
+      "information_set": "input_only",
+      "mae_delta": 0.0123358615262829,
+      "partition": "formal_target_rod",
+      "persistence_skill": 0.0001013226001319,
+      "r2_delta": -0.0008615165781569,
+      "r2_level_reconstructed": 0.998115949708016,
+      "rmse_delta": 0.0160118437446393,
+      "rows": 20109,
+      "support_hash": "3346f1725c03d77960584f06c53f28e02ac67042fd1f7e11b19360f6472fe5a3"
+    },
+    {
+      "direction": "Rod_1_to_Rod_2",
+      "information_set": "dynamic",
+      "mae_delta": 0.0120614029799998,
+      "partition": "formal_target_rod",
+      "persistence_skill": 0.0552763327446218,
+      "r2_delta": 0.1065472418221799,
+      "r2_level_reconstructed": 0.9983181390211966,
+      "rmse_delta": 0.0151283005807061,
+      "rows": 20109,
+      "support_hash": "3346f1725c03d77960584f06c53f28e02ac67042fd1f7e11b19360f6472fe5a3"
+    },
+    {
+      "direction": "Rod_2_to_Rod_1",
+      "information_set": "input_only",
+      "mae_delta": 0.0134952017792485,
+      "partition": "formal_target_rod",
+      "persistence_skill": -0.0003643178355119,
+      "r2_delta": -0.0007379513571352,
+      "r2_level_reconstructed": 0.9990890856419954,
+      "rmse_delta": 0.0172994575138315,
+      "rows": 19280,
+      "support_hash": "fcdc8fb92405ce04ad43918e9797ef262dcadd43819fa1f5429de661aac21e7b"
+    },
+    {
+      "direction": "Rod_2_to_Rod_1",
+      "information_set": "dynamic",
+      "mae_delta": 0.0128932238383666,
+      "partition": "formal_target_rod",
+      "persistence_skill": 0.0672699860658312,
+      "r2_delta": 0.1300067378854627,
+      "r2_level_reconstructed": 0.9992080950335172,
+      "rmse_delta": 0.0161298468570356,
+      "rows": 19280,
+      "support_hash": "fcdc8fb92405ce04ad43918e9797ef262dcadd43819fa1f5429de661aac21e7b"
+    }
+  ],
+  "row_counts": {
+    "E1_STAGEWISE/formal_metrics.csv": 4,
+    "E2_CZ_INPUT_SEMISYNTHETIC_RECOVERY/per_seed_stage_recovery.csv": 320,
+    "E3_MULTISCALE/equal_budget_multiscale.csv": 40,
+    "E4_CANDIDATE_SENSITIVITY/all_variants.csv": 14,
+    "E5_STRUCTURAL_STABILITY/stability_evidence.csv": 118,
+    "E6_MEASUREMENT_ROBUSTNESS/N1_frozen_per_seed.csv": 200,
+    "E6_MEASUREMENT_ROBUSTNESS/N2_reidentified_per_seed.csv": 200
+  },
+  "scientific_gate": {
+    "downstream_status": "E3_E6_COMPUTED_BUT_EXPLORATORY_NOT_GATE_AUTHORIZED",
+    "path": "PHASE_A_GATE.json",
+    "verdict": "STOP"
+  },
+  "status": "PASS",
+  "status_scope": "COMPUTATIONAL_INTEGRITY",
+  "validated_utc": "2026-09-21T09:33:10.149475+00:00"
+}
