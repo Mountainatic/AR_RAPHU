@@ -74,8 +74,13 @@ def fit_authority(project: Path, unit_root: Path) -> dict[str, Any]:
     shared = unit_root / "shared"
     output = unit_root / "results"
     output.mkdir(parents=True, exist_ok=True)
-    input_view = view("input_only", h_steps=4)
-    dynamic_view = view("dynamic", h_steps=4)
+    registry = json.loads((shared / "TASK_REGISTRY.json").read_text(encoding="utf-8"))
+    heads = registry.get("heads", [])
+    if len(heads) != 1 or int(heads[0].get("h_steps", -1)) != 4:
+        raise RuntimeError("STOP_E2_UNIT_TASK_REGISTRY_IS_NOT_SINGLE_H4")
+    task_id = str(heads[0]["head_id"])
+    input_view = view("input_only", h_steps=4, task_id=task_id)
+    dynamic_view = view("dynamic", h_steps=4, task_id=task_id)
     records: list[dict[str, Any]] = []
     for channel in INPUT_COLUMNS:
         records.append(
