@@ -194,6 +194,40 @@ def derive_pure_k_checkpoint_for_view(
         "reload_prediction_tolerance": 1e-10,
     }
     destination = pure_k_checkpoint_dir(pure_k_root, view)
+    if destination.exists():
+        with _checkpoint_read_context():
+            existing_state, existing_arrays, existing_manifest = load_portable_checkpoint(
+                destination
+            )
+        bindings_match = (
+            existing_state.get("codec") == PURE_K_CODEC
+            and existing_state.get("source_authority_checkpoint_hash")
+            == manifest["checkpoint_hash"]
+            and existing_state.get("source_selection_hash") == state["selection_hash"]
+            and existing_state.get("target_head") == view.head.head_id
+            and existing_state.get("information_set") == view.information_set
+            and existing_state.get("refit_performed") is False
+        )
+        prediction_error = float(
+            np.max(
+                np.abs(existing_arrays["pure_k_prediction"] - replay), initial=0.0
+            )
+        )
+        if not bindings_match or prediction_error > 1e-10:
+            raise RuntimeError("STOP_EXISTING_PURE_K_CHECKPOINT_BINDING_MISMATCH")
+        return {
+            "status": "PASS",
+            "model": PURE_K_MODEL,
+            "checkpoint_dir": str(destination),
+            "checkpoint_hash": str(existing_manifest["checkpoint_hash"]),
+            "source_checkpoint_hash": str(manifest["checkpoint_hash"]),
+            "fit_rows": int(state["fit_rows"]),
+            "fit_support_hash": str(state["fit_support_hash"]),
+            "refit_performed": False,
+            "test_accessed": False,
+            "reused_verified_checkpoint": True,
+            "maximum_absolute_replay_error": prediction_error,
+        }
     derived = write_portable_checkpoint(
         destination,
         metadata,
@@ -212,6 +246,7 @@ def derive_pure_k_checkpoint_for_view(
         "fit_support_hash": str(state["fit_support_hash"]),
         "refit_performed": False,
         "test_accessed": False,
+        "reused_verified_checkpoint": False,
     }
 
 
