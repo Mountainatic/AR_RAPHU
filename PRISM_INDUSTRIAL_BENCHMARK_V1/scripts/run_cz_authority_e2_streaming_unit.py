@@ -54,7 +54,9 @@ def materialize(
     )
 
 
-def fit_authority(project: Path, unit_root: Path) -> dict[str, Any]:
+def fit_authority(
+    project: Path, unit_root: Path, *, inner_workers: int = 1
+) -> dict[str, Any]:
     from prism_benchmark.cz_k_support import run_cz_k_channel
     from prism_benchmark.cz_l256_nowcast import INPUT_COLUMNS, view
     from prism_benchmark.v211_a import run_a_view
@@ -63,6 +65,8 @@ def fit_authority(project: Path, unit_root: Path) -> dict[str, Any]:
     from prism_benchmark.v211_joint_stability import run_joint_stability_view
     from prism_benchmark.v211_w import run_w_view
 
+    if inner_workers < 1:
+        raise ValueError("inner_workers must be positive")
     for name in (
         "PRISM_V211_K_INNER_WORKERS",
         "PRISM_V211_C_INNER_WORKERS",
@@ -70,7 +74,7 @@ def fit_authority(project: Path, unit_root: Path) -> dict[str, Any]:
         "PRISM_V211_A_INNER_WORKERS",
         "PRISM_V211_JOINT_INNER_WORKERS",
     ):
-        os.environ[name] = "1"
+        os.environ[name] = str(int(inner_workers))
     shared = unit_root / "shared"
     output = unit_root / "results"
     output.mkdir(parents=True, exist_ok=True)
@@ -144,6 +148,7 @@ def fit_authority(project: Path, unit_root: Path) -> dict[str, Any]:
         ),
         "role": "P1_TINY_PILOT_NON_SELECTION_AUTHORITY",
         "authority_modules": "K_C_W_A_JOINT_UNMODIFIED",
+        "inner_workers": int(inner_workers),
         "records": compact,
         "formal_target_or_ood_accessed": False,
         "completed_utc": _utc(),
@@ -164,6 +169,7 @@ def main() -> int:
     parser.add_argument("--unit-root", type=Path, required=True)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--sample-size", type=int, default=2048)
+    parser.add_argument("--inner-workers", type=int, default=1)
     args = parser.parse_args()
     project = args.project.resolve()
     unit_root = args.unit_root.resolve()
@@ -178,6 +184,7 @@ def main() -> int:
             "regime": "S1_K",
             "seed": int(args.seed),
             "sample_size": int(args.sample_size),
+            "inner_workers": int(args.inner_workers),
             "streaming_amendment_sha256": gate["amendment_sha256"],
             "started_utc": _utc(),
         },
@@ -192,7 +199,9 @@ def main() -> int:
             sample_size=int(args.sample_size),
         )
     if args.stage in {"fit", "all"}:
-        result["fit"] = fit_authority(project, unit_root)
+        result["fit"] = fit_authority(
+            project, unit_root, inner_workers=int(args.inner_workers)
+        )
     print(json.dumps({"stage": args.stage, "result": result}, sort_keys=True))
     return 0
 
