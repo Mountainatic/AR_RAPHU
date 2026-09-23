@@ -85,11 +85,14 @@ def _block_circular_shift(
     array = np.asarray(values, dtype=np.float64)
     if len(array) < 2:
         return array.copy(), 0
-    block_count = max(1, len(array) // max(1, int(block_steps)))
+    block_steps = max(1, int(block_steps))
+    # The last partial block is a legal block.  Using floor division would
+    # silently leave 257--511-row eligible segments unshifted.
+    block_count = max(1, (len(array) + block_steps - 1) // block_steps)
     block_offset = int(rng.integers(0, block_count))
-    offset = block_offset * int(block_steps)
+    offset = block_offset * block_steps
     if offset == 0 and block_count > 1:
-        offset = int(block_steps)
+        offset = block_steps
     return np.roll(array, offset), offset
 
 
