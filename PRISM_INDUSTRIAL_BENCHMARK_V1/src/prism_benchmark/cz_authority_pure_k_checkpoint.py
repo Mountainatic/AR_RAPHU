@@ -32,6 +32,7 @@ from .v211_public_all_closure import common_support_record
 from .v211_public_all_baselines import SupportRequirement
 from .v211_public_all_config import PublicAllPaths
 from .v211_support import support_id_hash
+from .v211_c import BEST_ACTIVE_K
 
 
 PURE_K_MODEL = "PRISM_V2_1_1_K"
@@ -114,7 +115,7 @@ def pure_k_contract_from_c_result(
     if not channel or channel not in active or channel not in physical_channels:
         raise RuntimeError("STOP_PURE_K_BEST_ACTIVE_CHANNEL_NOT_FROZEN")
     return {
-        "family": "BEST_ACTIVE_K",
+        "family": BEST_ACTIVE_K,
         "channel": channel,
         "intercept": 0.0,
         "coefficient": [1.0],
@@ -131,7 +132,7 @@ def predict_pure_k_from_compressed(
     family = str(contract["family"])
     if family == "K_EXACT_ZERO":
         return np.full(len(matrix), float(contract["intercept"]), dtype=np.float64)
-    if family != "BEST_ACTIVE_K":
+    if family != BEST_ACTIVE_K:
         raise RuntimeError(f"STOP_UNSUPPORTED_PURE_K_CONTRACT:{family}")
     channel = str(contract["channel"])
     if channel not in physical_channels:
@@ -204,6 +205,7 @@ def derive_pure_k_checkpoint_for_view(
             and existing_state.get("source_authority_checkpoint_hash")
             == manifest["checkpoint_hash"]
             and existing_state.get("source_selection_hash") == state["selection_hash"]
+            and existing_state.get("k_contract") == contract
             and existing_state.get("target_head") == view.head.head_id
             and existing_state.get("information_set") == view.information_set
             and existing_state.get("refit_performed") is False

@@ -27,7 +27,7 @@ def test_pure_k_contract_uses_frozen_best_active_channel() -> None:
         result, ["main_heater_power", "joint_lift"]
     )
     assert contract == {
-        "family": "BEST_ACTIVE_K",
+        "family": BEST_ACTIVE_K,
         "channel": "joint_lift",
         "intercept": 0.0,
         "coefficient": [1.0],
@@ -39,7 +39,7 @@ def test_pure_k_prediction_selects_only_registered_channel() -> None:
     compressed = np.asarray([[1.0, 2.0], [3.0, 5.0]], dtype=np.float64)
     observed = predict_pure_k_from_compressed(
         compressed,
-        {"family": "BEST_ACTIVE_K", "channel": "joint_lift"},
+        {"family": BEST_ACTIVE_K, "channel": "joint_lift"},
         ["main_heater_power", "joint_lift"],
     )
     np.testing.assert_array_equal(observed, np.asarray([2.0, 5.0]))
@@ -71,7 +71,7 @@ def test_pure_k_exact_zero_requires_frozen_intercept() -> None:
 def test_pure_k_checkpoint_reload_is_exact(tmp_path: Path) -> None:
     checkpoint = tmp_path / "pure-k"
     compressed = np.asarray([[1.0, 2.0], [3.0, 5.0]], dtype=np.float64)
-    contract = {"family": "BEST_ACTIVE_K", "channel": "joint_lift"}
+    contract = {"family": BEST_ACTIVE_K, "channel": "joint_lift"}
     prediction = predict_pure_k_from_compressed(
         compressed, contract, ["main_heater_power", "joint_lift"]
     )
