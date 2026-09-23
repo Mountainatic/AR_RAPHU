@@ -279,80 +279,91 @@ def pure_k_oof_identity_certificate(
     view: ViewSpec,
     pure_k_root: Path,
 ) -> dict[str, Any]:
-    """Prove the derived K replay equals the authority C parent when C is identity."""
+    """Certify that C selected its own nested-OOF K parent unchanged.
 
-    from .representative_prism_checkpoints import (
-        _predict_c,
-        _predict_physical_features,
-    )
+    C has its own outer-fold K refits, so those predictions must not be compared
+    with the final full-development checkpoint or the K stage's different fold
+    system.  The sealed C selector contract and its selected OOF artifact are
+    the authoritative evidence for the development identity route.
+    """
+
     from .level_reconstruction import support_hash
 
     checkpoint = pure_k_checkpoint_dir(pure_k_root, view)
     with _checkpoint_read_context():
         state, _, manifest = load_portable_checkpoint(checkpoint)
     c_result = _read_json(_c_result_path(paths, view))
-    if c_result.get("routing_status") != "ZERO_IDENTITY":
+    selection = dict(c_result.get("family_selection") or {})
+    identity_checks = {
+        "routing_zero_identity": c_result.get("routing_status") == "ZERO_IDENTITY",
+        "selection_status": c_result.get("selection_status") == "C_ZERO_IDENTITY",
+        "selected_family_is_k_parent": c_result.get("selected_family") == BEST_ACTIVE_K,
+        "selector_inactive": selection.get("active") is False,
+        "selector_route_zero_identity": selection.get("routing_status") == "ZERO_IDENTITY",
+        "selector_identity_is_k_parent": selection.get("identity") == BEST_ACTIVE_K,
+        "final_candidate_is_identity": selection.get("final_selected_candidate")
+        == BEST_ACTIVE_K,
+    }
+    if not all(identity_checks.values()):
         raise RuntimeError("STOP_PURE_K_OOF_IDENTITY_REQUIRES_C_ZERO_IDENTITY")
-    fit = _common_development(paths, view)
-    matrices = _predict_physical_features(
-        paths, view, fit, "validation", state["physical"]
-    )
-    pure_k = _predict_c(
-        matrices, state["k_contract"], list(state["physical"]["channels"])
-    )
+    if (
+        state.get("k_contract", {}).get("family") != BEST_ACTIVE_K
+        or state.get("k_contract", {}).get("channel")
+        != c_result.get("best_active_k_channel")
+    ):
+        raise RuntimeError("STOP_PURE_K_FINAL_CONTRACT_NOT_BOUND_TO_C_PARENT")
     c_path = (
         paths.output
         / "DEVELOPMENT"
         / "C"
         / view.head.head_id
         / view.proxy_policy
-        / "validation.parquet"
+        / "SELECTED_OOF.parquet"
     )
     c_frame = pd.read_parquet(c_path)
-    prediction_column = "y_pred" if "y_pred" in c_frame else "prediction"
-    if prediction_column not in c_frame:
-        raise RuntimeError("STOP_C_VALIDATION_PREDICTION_COLUMN_MISSING")
-    key = "base_origin_id"
-    if key not in c_frame or key not in fit:
-        raise RuntimeError("STOP_PURE_K_IDENTITY_SAMPLE_ID_MISSING")
-    expected = pd.DataFrame(
-        {key: fit[key].astype(str), "pure_k": pure_k}
-    ).merge(
-        c_frame[[key, prediction_column]].assign(**{key: c_frame[key].astype(str)}),
-        on=key,
-        how="inner",
-        validate="one_to_one",
-    )
-    # The C artifact is the held-out OOF validation subset, whereas ``fit`` is
-    # the full frozen development support needed to replay physical contracts.
-    # Every C row must match exactly; training-only development rows are valid.
-    if len(expected) != len(c_frame):
-        raise RuntimeError("STOP_PURE_K_C_IDENTITY_SUPPORT_MISMATCH")
+    required = {"base_origin_id", "oof_fold", "y_true", "y_pred"}
+    if not required.issubset(c_frame.columns):
+        raise RuntimeError("STOP_C_SELECTED_OOF_SCHEMA_MISMATCH")
+    observed_losses = [
+        float(np.mean(np.square(group["y_true"] - group["y_pred"]), dtype=np.float64))
+        for _, group in c_frame.groupby("oof_fold", sort=True)
+    ]
+    parent_losses = [float(value) for value in selection["parent_outer_fold_losses"]]
+    final_losses = [float(value) for value in selection["final_selected_fold_losses"]]
+    best_k_losses = [float(value) for value in c_result["best_active_k_fold_losses"]]
+    if not (len(observed_losses) == len(parent_losses) == len(final_losses) == len(best_k_losses)):
+        raise RuntimeError("STOP_PURE_K_C_IDENTITY_FOLD_COUNT_MISMATCH")
     maximum = float(
         np.max(
             np.abs(
-                expected["pure_k"].to_numpy(dtype=np.float64)
-                - expected[prediction_column].to_numpy(dtype=np.float64)
+                np.asarray(
+                    [*np.subtract(observed_losses, final_losses),
+                     *np.subtract(parent_losses, final_losses),
+                     *np.subtract(best_k_losses, final_losses)],
+                    dtype=np.float64,
+                )
             ),
             initial=0.0,
         )
     )
-    if maximum > 1e-10:
-        raise RuntimeError("STOP_PURE_K_C_IDENTITY_PREDICTION_MISMATCH")
+    if maximum > 1e-15:
+        raise RuntimeError("STOP_PURE_K_C_IDENTITY_FOLD_LOSS_MISMATCH")
     return {
         "status": "PASS",
         "model": PURE_K_MODEL,
-        "rows": int(len(expected)),
-        "development_rows": int(len(fit)),
+        "rows": int(len(c_frame)),
+        "folds": int(len(observed_losses)),
         "validation_base_origin_order_hash": support_hash(
-            c_frame[key].astype(str).tolist()
+            c_frame["base_origin_id"].astype(str).tolist()
         ),
         "fit_support_hash": str(state["fit_support_hash"]),
         "checkpoint_hash": str(manifest["checkpoint_hash"]),
         "c_routing_status": str(c_result["routing_status"]),
         "c_selected_family": str(c_result["selected_family"]),
-        "maximum_absolute_prediction_error": maximum,
-        "tolerance": 1e-10,
+        "identity_checks": identity_checks,
+        "observed_oof_fold_losses": observed_losses,
+        "maximum_absolute_fold_loss_error": maximum,
+        "tolerance": 1e-15,
         "refit_performed": False,
         "test_accessed": False,
     }
