@@ -1,0 +1,28 @@
+{
+  "correction_id": "CZ_RAW2S_H4_PHASE_A_GATE_SCOPE_CORRECTION_20260924_R1",
+  "status": "ACTIVE",
+  "authority_commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7",
+  "corrected_plan_commit": "cf0eff5",
+  "reason": "The generic greater-than-0.5 recovery phrase in the later CZ plan was incorrectly applied to S1_K 10-seed screening. The authority implementation does not make that comparison.",
+  "authority_behavior": {
+    "recovery_gate_scope": ["S2:C", "S3:W", "S4:A"],
+    "recovery_gate_evidence": "formal_30seed_only",
+    "recovery_threshold": "strictly_greater_than_0.5",
+    "s1_k_screening_gate_authority": false,
+    "screening_seed_count": 10,
+    "formal_seed_count": 30
+  },
+  "affected_evidence": {
+    "s1_k_seed_results": "UNCHANGED_VALID_DIAGNOSTIC_EVIDENCE",
+    "s1_k_recovery_rates": "REPORTING_ONLY",
+    "prior_s1_k_go_stop_interpretation": "INVALID_DO_NOT_CITE",
+    "formal_target_or_ood_accessed": false
+  },
+  "execution_effect": {
+    "model_changed": false,
+    "selector_changed": false,
+    "h_w_protocol_changed": false,
+    "completed_unit_outputs_changed": false,
+    "next_required_adapter": "S2_KC_SCREENING"
+  }
+}

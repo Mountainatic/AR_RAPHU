@@ -62,3 +62,20 @@ def test_cz_plan_matches_authority_phase_a_scope() -> None:
     assert gate["true_stage_recovery_scope"] == ["S2:C", "S3:W", "S4:A"]
     assert gate["true_stage_recovery_evidence"] == "formal_30seed_only"
     assert gate["s1_k_screening_gate_authority"] is False
+    correction = json.loads(
+        (
+            project
+            / "configs"
+            / "cz_raw2s_h4_phase_a_gate_scope_correction_20260924.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert correction["status"] == "ACTIVE"
+    assert correction["authority_commit"].startswith("2ee6273b")
+    assert correction["authority_behavior"]["recovery_gate_scope"] == [
+        "S2:C",
+        "S3:W",
+        "S4:A",
+    ]
+    assert correction["affected_evidence"]["prior_s1_k_go_stop_interpretation"] == (
+        "INVALID_DO_NOT_CITE"
+    )
