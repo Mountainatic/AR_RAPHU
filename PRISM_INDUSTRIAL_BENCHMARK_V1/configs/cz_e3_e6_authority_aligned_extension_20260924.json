@@ -1,0 +1,42 @@
+{
+  "protocol_id": "CZ_RAW2S_H4_AUTHORITY_ALIGNED_E3_E6_EXTENSION_20260924_R5",
+  "status": "COMPLETED_ON_PRIVATE_SERVER",
+  "authority_base": {
+    "branch": "prism-strict-oof-finalization-20260915",
+    "commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7"
+  },
+  "scope_label": "PRIVATE_CZ_AUTHORITY_ALIGNED_EXTENSION_NOT_AUTHORITY_BRANCH_OUTPUT",
+  "task": {
+    "sampling_seconds": 2,
+    "history_points": 256,
+    "H": 4,
+    "W": 1,
+    "W0": 1,
+    "forecast_seconds": 8,
+    "directions": ["Rod_1_to_Rod_2", "Rod_2_to_Rod_1"]
+  },
+  "server_evidence": {
+    "E1": "/root/autodl-tmp/PRISM_CZ_RAW2S_H4_AUTHORITY_E1_E6_20260922_R3",
+    "E2": "/root/autodl-tmp/PRISM_CZ_AUTHORITY_BRANCH_LOGIC_20260924_R4",
+    "E3_E6": "/root/autodl-tmp/PRISM_CZ_RAW2S_H4_AUTHORITY_ALIGNED_E3_E6_20260924_R5"
+  },
+  "experiment_scope": {
+    "E3": "private CZ development data; exact authority equal-budget selection logic",
+    "E4": "exact authority dataset-independent synthetic candidate sensitivity",
+    "E5": "CZ E3 plus authority E4 structural stability summary",
+    "E6": "private CZ development-only compact re-identification adapter using frozen authority robustness operators"
+  },
+  "privacy": {
+    "formal_target_accessed": false,
+    "ood_accessed": false,
+    "private_raw_data_uploaded": false,
+    "per_sample_predictions_uploaded": false,
+    "private_checkpoints_uploaded": false
+  },
+  "interpretation_guards": [
+    "E3 is degenerate by construction because each frozen CZ direction has one active K channel; uniform and channel-specific candidate sets are identical.",
+    "E4 is the authority synthetic sensitivity audit and is not direction-specific CZ evidence.",
+    "E6 is an authority-aligned private-CZ extension, not a native output of the public authority branch.",
+    "Only the public code, protocol metadata, and aggregate summaries may be pushed to GitHub."
+  ]
+}
