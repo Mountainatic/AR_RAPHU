@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 
 
@@ -15,7 +16,7 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
-def test_gate_interpretation_preserves_directional_disagreement() -> None:
+def test_s1_screening_has_no_phase_a_gate_authority() -> None:
     rows = []
     for direction, recovered in (("Rod_1_to_Rod_2", 5), ("Rod_2_to_Rod_1", 6)):
         for seed in range(10):
@@ -34,7 +35,30 @@ def test_gate_interpretation_preserves_directional_disagreement() -> None:
             )
     summary = MODULE.summarize(rows)
     assert summary["pooled"]["recovery_rate"] == 0.55
-    assert summary["pooled"]["exclusive_gt_0_5_gate"] is True
-    assert summary["directions"][0]["exclusive_gt_0_5_gate"] is False
-    assert summary["directions"][1]["exclusive_gt_0_5_gate"] is True
-    assert summary["gate_interpretation"] == "REQUIRES_DIRECTIONAL_SCOPE_DECISION"
+    assert summary["pooled"]["phase_a_gate_authority"] is False
+    assert all(
+        item["phase_a_gate_authority"] is False
+        for item in summary["directions"]
+    )
+    assert summary["phase_a_gate_applicability"] == "NONE_S1_K_SCREENING_ONLY"
+    assert summary["authority_phase_a_recovery_scope"] == [
+        "S2:C",
+        "S3:W",
+        "S4:A",
+    ]
+    assert summary["authority_phase_a_evidence"] == "formal_30seed_only"
+
+
+def test_cz_plan_matches_authority_phase_a_scope() -> None:
+    project = Path(__file__).resolve().parents[1]
+    plan = json.loads(
+        (
+            project
+            / "configs"
+            / "cz_raw2s_h4_authority_e1_e6_rerun_plan_20260922.json"
+        ).read_text(encoding="utf-8")
+    )
+    gate = plan["experiments"]["E2_SEMISYNTHETIC_RECOVERY"]["go_gate"]
+    assert gate["true_stage_recovery_scope"] == ["S2:C", "S3:W", "S4:A"]
+    assert gate["true_stage_recovery_evidence"] == "formal_30seed_only"
+    assert gate["s1_k_screening_gate_authority"] is False

@@ -122,7 +122,7 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 "mean_r2_among_recovered": mean(
                     float(row["r2"]) for row in recovered
                 ),
-                "exclusive_gt_0_5_gate": rate > 0.5,
+                "phase_a_gate_authority": False,
             }
         )
     total_recovered = sum(row["true_k_recovered"] for row in rows)
@@ -143,13 +143,12 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 row["unit_status"] == "COMPLETED_WITH_RETAINED_FAILURES"
                 for row in rows
             ),
-            "exclusive_gt_0_5_gate": pooled_rate > 0.5,
+            "phase_a_gate_authority": False,
         },
-        "gate_interpretation": (
-            "REQUIRES_DIRECTIONAL_SCOPE_DECISION"
-            if len({item["exclusive_gt_0_5_gate"] for item in directions}) > 1
-            else "DIRECTIONAL_RESULTS_AGREE"
-        ),
+        "phase_a_gate_applicability": "NONE_S1_K_SCREENING_ONLY",
+        "authority_phase_a_recovery_scope": ["S2:C", "S3:W", "S4:A"],
+        "authority_phase_a_evidence": "formal_30seed_only",
+        "next_stage": "S2_KC_SCREENING_ADAPTER_REQUIRED",
         "formal_target_or_ood_accessed": False,
         "completed_utc": _utc(),
     }

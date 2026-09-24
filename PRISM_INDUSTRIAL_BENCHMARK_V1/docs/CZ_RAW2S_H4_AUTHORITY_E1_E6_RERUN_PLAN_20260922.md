@@ -102,7 +102,9 @@ screening 使用 10 seeds，正式恢复使用 30 seeds、每组 2048 点。S0 N
 
 Phase-A 门禁：
 
-- 每个真实新增 stage 的恢复率必须严格大于 0.5；
+- 只有正式 30-seed 结果具有门禁权威；10-seed screening 只用于执行诊断；
+- 按原始权威实现，只检查 S2 的 C、S3 的 W、S4 的 A，其恢复率必须严格大于 0.5；
+- S1 的 K 恢复率只报告，不进入 Phase-A GO/REVIEW 判定；
 - 每个 NULL stage 在每个 n 上的激活率必须严格小于 0.5；
 - false-admission 对 `log2(n)` 的斜率必须为负，或整条曲线恒为零。
 

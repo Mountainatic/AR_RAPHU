@@ -101,6 +101,9 @@
       "full_authority_refit_per_seed": true,
       "go_gate": {
         "true_stage_recovery_rate_min_exclusive": 0.5,
+        "true_stage_recovery_scope": ["S2:C", "S3:W", "S4:A"],
+        "true_stage_recovery_evidence": "formal_30seed_only",
+        "s1_k_screening_gate_authority": false,
         "null_stage_activation_rate_max_exclusive": 0.5,
         "null_false_admission_slope_vs_log2_n": "negative_or_identically_zero"
       }
