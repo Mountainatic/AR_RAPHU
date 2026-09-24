@@ -1,0 +1,33 @@
+{
+  "format": "CZ_AUTHORITY_BRANCH_LOGIC_CORRECTION_V1",
+  "status": "ACTIVE_SUPERSEDES_RAW_CZ_E2_ADAPTER",
+  "authority_commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7",
+  "preserved_result": {
+    "stage": "CZ_E1",
+    "server_root": "/root/autodl-tmp/PRISM_CZ_RAW2S_H4_AUTHORITY_E1_E6_20260922_R3",
+    "status": "VALID_PARTIAL",
+    "protocol": "2 second sampling; L256; H/W/W0=4/1/1; directions independent"
+  },
+  "E2": {
+    "generator": "IDENTIFIABLE_E2_V2",
+    "implementation": "src/prism_benchmark/e1e6_revalidation.py::run_e2",
+    "scope": "dataset-independent synthetic selector recovery audit",
+    "private_cz_data_accessed": false,
+    "industrial_cz_kcwa_refit": false,
+    "screening_seeds": 10,
+    "formal_seeds": 30,
+    "null_sample_sizes": [1024, 2048, 4096, 8192],
+    "null_seeds_per_size": 30
+  },
+  "CZ_E3_E6": {
+    "status": "PROTOCOL_BLOCKED_UNDER_AUTHORITY_BRANCH",
+    "reason": "The authority freeze marks private CZ unavailable and explicitly marks CZ E3 PROTOCOL_BLOCKED; no raw-CZ E3-E6 extension may be presented as authority-branch output."
+  },
+  "invalidated": {
+    "adapter": "CZ_REAL_INPUT_TRAJECTORY_AUTHORITY_OPERATOR_V1",
+    "registry": "configs/cz_raw2s_h4_e2_truth_operator_registry_v1.json",
+    "execution_freeze": "configs/cz_raw2s_h4_e2_s2_execution_freeze_20260924.json",
+    "server_results": "/root/autodl-tmp/PRISM_CZ_RAW2S_H4_AUTHORITY_E1_E6_EXEC_20260923_R3/E2_SEMISYNTHETIC/PILOT_S2_KC",
+    "disposition": "INVALID_DIAGNOSTIC_DO_NOT_CITE"
+  }
+}

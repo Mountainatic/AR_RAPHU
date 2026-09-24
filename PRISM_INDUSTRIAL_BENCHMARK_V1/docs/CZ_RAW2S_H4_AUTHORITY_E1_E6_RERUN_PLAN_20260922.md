@@ -80,21 +80,24 @@ target rod，也不允许访问 OOD。这样后续适配器开发不会利用已
 
 E1 不进行新的模型选择，正式测试只做封存 checkpoint 的确定性 replay。
 
-### E2：半合成结构恢复
+### E2：权威分支原始半合成结构恢复
+
+2026-09-24 范围修正：这里必须直接使用权威提交中的
+`IDENTIFIABLE_E2_V2` 与 `e1e6_revalidation.py::run_e2`。它是数据集无关的严格
+OOF selector recovery audit，不读取私有 CZ 原始数据，也不逐 seed 重拟合工业 CZ
+K/C/W/A/Joint 链。此前登记的 raw-CZ/full-industrial-chain E2 适配器不属于权威
+分支逻辑，其 seed-0 结果已作废并禁止引用。
 
 研究问题：当真实 K/C/W/A 结构已知时，权威严格 OOF 路由能否恢复正确结构，
 以及样本增加时空阶段误接纳是否下降。
 
-生成方式不是独立的简化 Ridge 模型，而是：
+权威生成与恢复方式为：
 
-1. 只读取 source rod 的真实四路输入轨迹。
-2. 在合法 segment 内对各通道做 seed-keyed block-circular shift，保持单通道时间
-   结构，同时降低通道间偶然共线性。
-3. 预先从权威候选宇宙登记 K、C、W、A truth operator；冻结 stage RMS 比例和
-   innovation SNR。
-4. 先生成完整的合成直径轨迹，再进入 C1、lag、anchor 和 target 构造。A 的历史
-   因此来自一致的递归轨迹，而不是事后拼接特征。
-5. 每个 seed 和方向完整重跑权威 K/C/W/A/Joint。
+1. 六维独立标准正态创新输入；
+2. 已登记的 K lag/scale、C pair product、W smooth transform 与 A residual AR 真值；
+3. `HISTORIES=(1,4,8)`、`RIDGES=(1e-6,1e-3,1.0)`；
+4. 直接调用权威 `strict_nested_oof_select`；
+5. 不访问任何数据集的 formal test、OOD 或私有 CZ workbook。
 
 登记的 regime 为 S0=NULL、S1=K、S2=K+C、S3=K+C+W、S4=K+C+W+A。S1–S4
 screening 使用 10 seeds，正式恢复使用 30 seeds、每组 2048 点。S0 NULL 校准使用
@@ -110,17 +113,15 @@ Phase-A 门禁：
 
 门禁不通过时，E3–E6 停止，结论写为 selector calibration 未通过。
 
-S2 适配器在 screening 前另行冻结于
-`configs/cz_raw2s_h4_e2_truth_operator_registry_v1.json`（SHA-256
-`e4501d1325b726a41916da2907c342067abb0edbc814f837037b37a0a60f58a1`）。CZ
-正式 checkpoint 的 C contract 是 `BEST_ACTIVE_K_CHANNEL` 回退，不能冒充非零 C
-truth。登记的 S2 保留方向特定 checkpoint 中的 `joint_lift` K parent，并加入
-`main_heater_power` 的注册 `LINEAR_DISTRIBUTED_LAG` 通道作为
-`ADDITIVE_COMPRESSED` C 融合增量；K:C:innovation 的标准差比例固定为
-`1:0.6:0.25`。该 10-seed screening 仍没有统计选择权，只有后续 30-seed formal
-结果能进入 Phase-A 门禁。
+原 raw-CZ S2 registry 与 execution freeze 已标记
+`INVALIDATED_DO_NOT_RUN_OR_CITE`。权威分支同时明确写明私有 CZ 不在 public strict
+branch 中，且 CZ E3 为 `PROTOCOL_BLOCKED`；因此 E3–E6 的 raw-CZ 扩展不得冒充
+权威分支结果。
 
 ### E3：等预算多尺度
+
+权威范围状态：`PROTOCOL_BLOCKED_FOR_PRIVATE_CZ`。以下内容仅保留为历史扩展设计，
+不得执行后标成权威分支结果；E4–E6 的 raw-CZ 设计同样如此。
 
 研究问题：每个通道独立选择时间尺度是否比所有通道共享一个尺度更好。
 

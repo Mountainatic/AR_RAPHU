@@ -81,8 +81,10 @@
       ]
     },
     "E2_SEMISYNTHETIC_RECOVERY": {
-      "role": "test whether the authority chain recovers known K/C/W/A truth",
-      "generator": "CZ_REAL_INPUT_TRAJECTORY_AUTHORITY_OPERATOR_V1",
+      "role": "run the exact dataset-independent selector recovery audit frozen in the authority branch",
+      "generator": "IDENTIFIABLE_E2_V2",
+      "implementation": "src/prism_benchmark/e1e6_revalidation.py::run_e2",
+      "scope": "DATASET_INDEPENDENT_NOT_PRIVATE_CZ",
       "recovery_regimes": [
         "S1_K",
         "S2_KC",
@@ -95,16 +97,9 @@
       "null_sample_sizes": [1024, 2048, 4096, 8192],
       "null_seeds_per_size": 30,
       "null_regime": "S0_NULL with K/C/W/A all inactive",
-      "input_policy": "source-rod raw input trajectories only; independently block-circular-shift channels within legal segments before target generation",
-      "target_policy": "generate a complete synthetic diameter trajectory from pre-registered authority K/C/W/A operators before C1 materialization",
-      "effect_scale_policy": "freeze stage RMS fractions and innovation SNR from source-rod training statistics before screening",
-      "S2_truth_operator_registry": {
-        "path": "configs/cz_raw2s_h4_e2_truth_operator_registry_v1.json",
-        "sha256": "e4501d1325b726a41916da2907c342067abb0edbc814f837037b37a0a60f58a1",
-        "status": "FROZEN_BEFORE_S2_SCREENING",
-        "selection_authority": false
-      },
-      "full_authority_refit_per_seed": true,
+      "private_cz_data_accessed": false,
+      "industrial_cz_kcwa_refit": false,
+      "raw_cz_adapter_status": "INVALIDATED_DO_NOT_CITE",
       "go_gate": {
         "true_stage_recovery_rate_min_exclusive": 0.5,
         "true_stage_recovery_scope": ["S2:C", "S3:W", "S4:A"],
@@ -113,6 +108,11 @@
         "null_stage_activation_rate_max_exclusive": 0.5,
         "null_false_admission_slope_vs_log2_n": "negative_or_identically_zero"
       }
+    },
+    "AUTHORITY_BRANCH_CZ_SCOPE": {
+      "E1": "VALID_REAL_CZ_RESULT",
+      "E2": "DATASET_INDEPENDENT_IDENTIFIABLE_E2_V2",
+      "E3_E6": "PROTOCOL_BLOCKED_FOR_PRIVATE_CZ_UNDER_AUTHORITY_BRANCH"
     },
     "E3_MULTISCALE": {
       "role": "compare shared-scale and channel-specific-scale K structures at equal fit budget",

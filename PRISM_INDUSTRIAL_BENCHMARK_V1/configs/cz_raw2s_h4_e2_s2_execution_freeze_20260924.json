@@ -1,6 +1,6 @@
 {
   "format": "CZ_RAW2S_H4_E2_S2_EXECUTION_FREEZE_V1",
-  "status": "ACTIVE_TINY_PILOT_ONLY",
+  "status": "INVALIDATED_DO_NOT_CONTINUE",
   "authority_base_commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7",
   "adapter_implementation_commit": "de9ee63",
   "truth_registry": {
@@ -16,13 +16,7 @@
     "w0_steps": 1,
     "directions_independent": true
   },
-  "allowed_now": {
-    "regime": "S2_KC",
-    "role": "P1_TINY_PILOT_NON_SELECTION_AUTHORITY",
-    "screening_seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    "maximum_concurrent_outer_units": 4,
-    "inner_workers_per_unit": 2
-  },
+  "allowed_now": {},
   "forbidden_now": [
     "formal_30seed",
     "S3_KCW",
@@ -36,5 +30,5 @@
     "upload_per_sample_predictions",
     "upload_private_checkpoints"
   ],
-  "gate_note": "S2 10-seed screening is diagnostic only; Phase-A recovery authority requires the later formal 30-seed S2:C result."
+  "gate_note": "Invalidated by cz_authority_branch_logic_correction_20260924.json. The exact authority E2 is dataset-independent IDENTIFIABLE_E2_V2. Existing raw-CZ S2 pilots are diagnostic failures and must not be cited."
 }

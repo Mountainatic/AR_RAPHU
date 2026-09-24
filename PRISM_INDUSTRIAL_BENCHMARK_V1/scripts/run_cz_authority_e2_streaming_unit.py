@@ -248,7 +248,12 @@ def main() -> int:
         "--regime", choices=("S1_K", "S2_KC", "S3_KCW", "S4_KCWA"), default="S1_K"
     )
     parser.add_argument("--truth-registry", type=Path)
+    parser.add_argument("--allow-invalidated-diagnostic-replay", action="store_true")
     args = parser.parse_args()
+    if args.stage != "summarize" and not args.allow_invalidated_diagnostic_replay:
+        raise RuntimeError(
+            "STOP_RAW_CZ_E2_ADAPTER_INVALIDATED_USE_AUTHORITY_IDENTIFIABLE_E2_V2"
+        )
     project = args.project.resolve()
     unit_root = args.unit_root.resolve()
     sys.path.insert(0, str(project / "src"))

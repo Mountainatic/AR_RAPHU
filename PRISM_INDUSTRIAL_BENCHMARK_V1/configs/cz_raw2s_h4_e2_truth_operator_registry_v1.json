@@ -1,6 +1,6 @@
 {
   "format": "CZ_RAW2S_H4_E2_TRUTH_OPERATOR_REGISTRY_V1",
-  "status": "FROZEN_BEFORE_S2_SCREENING",
+  "status": "INVALIDATED_DO_NOT_RUN_OR_CITE",
   "authority_base_commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7",
   "protocol": {
     "sampling_seconds": 2,
@@ -36,6 +36,7 @@
     "authority_c_semantics": "v211 C compares additive fusion of active K channels with BEST_ACTIVE_K_CHANNEL",
     "why_not_checkpoint_c_contract": "the CZ checkpoints contain BEST_ACTIVE_K_CHANNEL fallback, not a nonzero C operator",
     "why_not_generic_pair_product": "the generic authority E2 product term is not a registered nonzero family in the industrial v211 C implementation",
-    "effect_ratio_source": "authority identifiable E2 uses K-scale terms, a 0.6 C increment, and innovation standard deviation 0.25"
+    "effect_ratio_source": "authority identifiable E2 uses K-scale terms, a 0.6 C increment, and innovation standard deviation 0.25",
+    "invalidation_reason": "This raw-CZ/full-industrial-chain adapter is not the E2 implementation frozen in authority commit 2ee6273; seed-0 also failed to preserve two simultaneously admissible K truth channels."
   }
 }

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from prism_benchmark.cz_authority_semisynthetic import (
     BLOCK_SHIFT_STEPS,
@@ -53,17 +55,16 @@ def test_partial_terminal_block_still_permits_nonzero_shift() -> None:
     assert np.array_equal(np.sort(shifted), values)
 
 
-def test_s2_truth_registry_is_frozen_and_authority_scoped() -> None:
+def test_s2_truth_registry_is_invalidated_and_loader_refuses_it() -> None:
     path = (
         Path(__file__).parents[1]
         / "configs"
         / "cz_raw2s_h4_e2_truth_operator_registry_v1.json"
     )
-    registry, digest = _load_s2_registry(path)
-    assert len(digest) == 64
-    assert registry["S2_KC"]["C_increment"]["authority_c_family"] == "ADDITIVE_COMPRESSED"
-    assert registry["S2_KC"]["C_increment"]["channel"] == "main_heater_power"
-    assert registry["S2_KC"]["selection_authority"] is False
+    registry = json.loads(path.read_text(encoding="utf-8"))
+    assert registry["status"] == "INVALIDATED_DO_NOT_RUN_OR_CITE"
+    with pytest.raises(RuntimeError, match="TRUTH_REGISTRY_HASH_MISMATCH"):
+        _load_s2_registry(path)
 
 
 def test_registered_linear_signal_applies_only_frozen_interval_weights(monkeypatch) -> None:
