@@ -42,16 +42,34 @@ def materialize(
     *,
     seed: int,
     sample_size: int,
+    regime: str,
+    truth_registry: Path | None,
 ) -> dict[str, Any]:
-    from prism_benchmark.cz_authority_semisynthetic import materialize_s1_k_pilot
-
-    return materialize_s1_k_pilot(
-        template_shared,
-        checkpoint,
-        unit_root / "shared",
-        seed=seed,
-        sample_size=sample_size,
+    from prism_benchmark.cz_authority_semisynthetic import (
+        materialize_s1_k_pilot,
+        materialize_s2_kc_pilot,
     )
+
+    if regime == "S1_K":
+        return materialize_s1_k_pilot(
+            template_shared,
+            checkpoint,
+            unit_root / "shared",
+            seed=seed,
+            sample_size=sample_size,
+        )
+    if regime == "S2_KC":
+        if truth_registry is None:
+            raise RuntimeError("STOP_E2_S2_TRUTH_REGISTRY_ARGUMENT_MISSING")
+        return materialize_s2_kc_pilot(
+            template_shared,
+            checkpoint,
+            truth_registry,
+            unit_root / "shared",
+            seed=seed,
+            sample_size=sample_size,
+        )
+    raise RuntimeError(f"STOP_E2_REGIME_ADAPTER_NOT_IMPLEMENTED:{regime}")
 
 
 def _classify_authority_records(records: list[dict[str, Any]]) -> str:
@@ -86,6 +104,19 @@ def _compact_record(item: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _materialized_regime(unit_root: Path) -> str:
+    path = unit_root / "shared" / "E2_SEMISYNTHETIC_DERIVATION.json"
+    if not path.is_file():
+        raise RuntimeError("STOP_E2_DERIVATION_AUDIT_MISSING")
+    value = json.loads(path.read_text(encoding="utf-8"))
+    regime = str(value.get("regime", ""))
+    if regime not in {"S1_K", "S2_KC"}:
+        raise RuntimeError(f"STOP_E2_DERIVATION_REGIME_INVALID:{regime}")
+    if value.get("formal_target_or_ood_accessed") is not False:
+        raise RuntimeError("STOP_E2_DERIVATION_HAS_TARGET_OR_OOD_ACCESS")
+    return regime
+
+
 def summarize_existing(unit_root: Path, *, inner_workers: int) -> dict[str, Any]:
     paths = sorted((unit_root / "results" / "DEVELOPMENT").rglob("RESULT.json"))
     records = [json.loads(path.read_text(encoding="utf-8")) for path in paths]
@@ -95,6 +126,7 @@ def summarize_existing(unit_root: Path, *, inner_workers: int) -> dict[str, Any]
     result = {
         "status": _classify_authority_records(records),
         "role": "P1_TINY_PILOT_NON_SELECTION_AUTHORITY",
+        "regime": _materialized_regime(unit_root),
         "authority_modules": "K_C_W_A_JOINT_UNMODIFIED",
         "inner_workers": int(inner_workers),
         "records": compact,
@@ -185,6 +217,7 @@ def fit_authority(
     result = {
         "status": _classify_authority_records(records),
         "role": "P1_TINY_PILOT_NON_SELECTION_AUTHORITY",
+        "regime": _materialized_regime(unit_root),
         "authority_modules": "K_C_W_A_JOINT_UNMODIFIED",
         "inner_workers": int(inner_workers),
         "records": compact,
@@ -211,6 +244,10 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--sample-size", type=int, default=2048)
     parser.add_argument("--inner-workers", type=int, default=1)
+    parser.add_argument(
+        "--regime", choices=("S1_K", "S2_KC", "S3_KCW", "S4_KCWA"), default="S1_K"
+    )
+    parser.add_argument("--truth-registry", type=Path)
     args = parser.parse_args()
     project = args.project.resolve()
     unit_root = args.unit_root.resolve()
@@ -223,7 +260,7 @@ def main() -> int:
             {
                 "status": "RUNNING",
                 "role": "P1_TINY_PILOT_NON_SELECTION_AUTHORITY",
-                "regime": "S1_K",
+                "regime": args.regime,
                 "seed": int(args.seed),
                 "sample_size": int(args.sample_size),
                 "inner_workers": int(args.inner_workers),
@@ -239,6 +276,10 @@ def main() -> int:
             unit_root,
             seed=int(args.seed),
             sample_size=int(args.sample_size),
+            regime=str(args.regime),
+            truth_registry=(
+                args.truth_registry.resolve() if args.truth_registry is not None else None
+            ),
         )
     if args.stage in {"fit", "all"}:
         result["fit"] = fit_authority(

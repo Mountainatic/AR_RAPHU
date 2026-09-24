@@ -1,0 +1,41 @@
+{
+  "format": "CZ_RAW2S_H4_E2_TRUTH_OPERATOR_REGISTRY_V1",
+  "status": "FROZEN_BEFORE_S2_SCREENING",
+  "authority_base_commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7",
+  "protocol": {
+    "sampling_seconds": 2,
+    "history_steps": 256,
+    "h_steps": 4,
+    "w_steps": 1,
+    "w0_steps": 1,
+    "directions_independent": true,
+    "source_rod_only": true,
+    "formal_target_or_ood_access_forbidden": true
+  },
+  "S2_KC": {
+    "K_parent": {
+      "source": "direction-specific frozen authority checkpoint BEST_ACTIVE_K_CHANNEL",
+      "stage_rms_fraction": 1.0
+    },
+    "C_increment": {
+      "stage_semantics": "ADDITIVE_COMPRESSED_SECOND_ACTIVE_K_CHANNEL",
+      "authority_c_family": "ADDITIVE_COMPRESSED",
+      "channel": "main_heater_power",
+      "family": "LINEAR_DISTRIBUTED_LAG",
+      "profile": [4, 32],
+      "m_tau": 8,
+      "interval_weights": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+      "stage_rms_fraction": 0.6
+    },
+    "innovation_snr": 4.0,
+    "scale_reference": "source-rod training target delta standard deviation",
+    "selection_authority": false,
+    "screening_role": "P1_TINY_PILOT_NON_SELECTION_AUTHORITY"
+  },
+  "rationale": {
+    "authority_c_semantics": "v211 C compares additive fusion of active K channels with BEST_ACTIVE_K_CHANNEL",
+    "why_not_checkpoint_c_contract": "the CZ checkpoints contain BEST_ACTIVE_K_CHANNEL fallback, not a nonzero C operator",
+    "why_not_generic_pair_product": "the generic authority E2 product term is not a registered nonzero family in the industrial v211 C implementation",
+    "effect_ratio_source": "authority identifiable E2 uses K-scale terms, a 0.6 C increment, and innovation standard deviation 0.25"
+  }
+}

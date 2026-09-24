@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -7,6 +9,8 @@ from prism_benchmark.cz_authority_semisynthetic import (
     BLOCK_SHIFT_STEPS,
     _all_origins,
     _block_circular_shift,
+    _load_s2_registry,
+    _registered_linear_signal,
 )
 
 
@@ -47,3 +51,39 @@ def test_partial_terminal_block_still_permits_nonzero_shift() -> None:
     assert offset == BLOCK_SHIFT_STEPS
     assert not np.array_equal(shifted, values)
     assert np.array_equal(np.sort(shifted), values)
+
+
+def test_s2_truth_registry_is_frozen_and_authority_scoped() -> None:
+    path = (
+        Path(__file__).parents[1]
+        / "configs"
+        / "cz_raw2s_h4_e2_truth_operator_registry_v1.json"
+    )
+    registry, digest = _load_s2_registry(path)
+    assert len(digest) == 64
+    assert registry["S2_KC"]["C_increment"]["authority_c_family"] == "ADDITIVE_COMPRESSED"
+    assert registry["S2_KC"]["C_increment"]["channel"] == "main_heater_power"
+    assert registry["S2_KC"]["selection_authority"] is False
+
+
+def test_registered_linear_signal_applies_only_frozen_interval_weights(monkeypatch) -> None:
+    values = np.arange(24, dtype=np.float64).reshape(3, 8)
+    intervals = [(4 * index, 4 * (index + 1)) for index in range(8)]
+
+    def fake_profile_values(*args, **kwargs):
+        return values, intervals
+
+    monkeypatch.setattr(
+        "prism_benchmark.cz_authority_semisynthetic.profile_values",
+        fake_profile_values,
+    )
+    signal, actual_intervals = _registered_linear_signal(
+        object(),
+        pd.DataFrame(),
+        channel="main_heater_power",
+        profile=(4, 32),
+        m_tau=8,
+        interval_weights=(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+    )
+    assert np.array_equal(signal, values[:, 0])
+    assert actual_intervals == intervals

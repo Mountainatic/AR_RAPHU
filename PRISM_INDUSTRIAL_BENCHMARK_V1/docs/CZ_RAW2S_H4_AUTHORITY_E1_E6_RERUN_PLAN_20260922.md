@@ -110,6 +110,16 @@ Phase-A 门禁：
 
 门禁不通过时，E3–E6 停止，结论写为 selector calibration 未通过。
 
+S2 适配器在 screening 前另行冻结于
+`configs/cz_raw2s_h4_e2_truth_operator_registry_v1.json`（SHA-256
+`e4501d1325b726a41916da2907c342067abb0edbc814f837037b37a0a60f58a1`）。CZ
+正式 checkpoint 的 C contract 是 `BEST_ACTIVE_K_CHANNEL` 回退，不能冒充非零 C
+truth。登记的 S2 保留方向特定 checkpoint 中的 `joint_lift` K parent，并加入
+`main_heater_power` 的注册 `LINEAR_DISTRIBUTED_LAG` 通道作为
+`ADDITIVE_COMPRESSED` C 融合增量；K:C:innovation 的标准差比例固定为
+`1:0.6:0.25`。该 10-seed screening 仍没有统计选择权，只有后续 30-seed formal
+结果能进入 Phase-A 门禁。
+
 ### E3：等预算多尺度
 
 研究问题：每个通道独立选择时间尺度是否比所有通道共享一个尺度更好。
