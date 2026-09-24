@@ -1,0 +1,40 @@
+{
+  "format": "CZ_RAW2S_H4_E2_S2_EXECUTION_FREEZE_V1",
+  "status": "ACTIVE_TINY_PILOT_ONLY",
+  "authority_base_commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7",
+  "adapter_implementation_commit": "de9ee63",
+  "truth_registry": {
+    "path": "configs/cz_raw2s_h4_e2_truth_operator_registry_v1.json",
+    "sha256": "e4501d1325b726a41916da2907c342067abb0edbc814f837037b37a0a60f58a1",
+    "status": "FROZEN_BEFORE_S2_SCREENING"
+  },
+  "protocol": {
+    "sampling_seconds": 2,
+    "history_steps": 256,
+    "h_steps": 4,
+    "w_steps": 1,
+    "w0_steps": 1,
+    "directions_independent": true
+  },
+  "allowed_now": {
+    "regime": "S2_KC",
+    "role": "P1_TINY_PILOT_NON_SELECTION_AUTHORITY",
+    "screening_seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "maximum_concurrent_outer_units": 4,
+    "inner_workers_per_unit": 2
+  },
+  "forbidden_now": [
+    "formal_30seed",
+    "S3_KCW",
+    "S4_KCWA",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "formal_target_or_ood_access",
+    "upload_private_raw_data",
+    "upload_per_sample_predictions",
+    "upload_private_checkpoints"
+  ],
+  "gate_note": "S2 10-seed screening is diagnostic only; Phase-A recovery authority requires the later formal 30-seed S2:C result."
+}
