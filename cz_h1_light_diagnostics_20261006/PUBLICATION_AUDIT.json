@@ -1,0 +1,582 @@
+{
+  "status": "PASS",
+  "publication_date": "2026-10-07",
+  "scope": "explicit allowlist; code and aggregate results only",
+  "raw_inputs_accessed": false,
+  "training_performed": false,
+  "pointwise_data_models_and_archives_included": false,
+  "original_experiment_files_byte_identical": true,
+  "python_files_syntax_checked": 9,
+  "aggregate_csvs": [
+    {
+      "path": "analysis_outputs/cz_h1_light_whitening_20261006/A_MODEL_SELECTION.csv",
+      "columns": [
+        "arm",
+        "history_samples",
+        "history_seconds",
+        "alpha_A",
+        "fit_rows",
+        "validation_rows",
+        "validation_cold_start_rows",
+        "validation_RMSE",
+        "selected"
+      ],
+      "rows": 90
+    },
+    {
+      "path": "analysis_outputs/cz_h1_light_whitening_20261006/ACF_ALL_ARMS.csv",
+      "columns": [
+        "arm",
+        "split",
+        "stage",
+        "lag_samples",
+        "lag_seconds",
+        "ACF",
+        "pairs"
+      ],
+      "rows": 16218
+    },
+    {
+      "path": "analysis_outputs/cz_h1_light_whitening_20261006/BASE_MODEL_SELECTION.csv",
+      "columns": [
+        "arm",
+        "history_samples",
+        "history_seconds",
+        "alpha",
+        "train_CV_RMSE",
+        "alpha_selected_for_history",
+        "validation_RMSE",
+        "selected",
+        "validation_used_only_after_train_alpha_selection"
+      ],
+      "rows": 90
+    },
+    {
+      "path": "analysis_outputs/cz_h1_light_whitening_20261006/METRICS_ALL_ARMS.csv",
+      "columns": [
+        "arm",
+        "split",
+        "stage",
+        "n",
+        "RMSE",
+        "MAE",
+        "bias"
+      ],
+      "rows": 18
+    },
+    {
+      "path": "analysis_outputs/cz_h1_light_whitening_20261006/PACF_ALL_ARMS.csv",
+      "columns": [
+        "arm",
+        "split",
+        "stage",
+        "lag_samples",
+        "lag_seconds",
+        "PACF"
+      ],
+      "rows": 2898
+    },
+    {
+      "path": "analysis_outputs/cz_h1_light_whitening_20261006/PSD_ALL_ARMS.csv",
+      "columns": [
+        "arm",
+        "split",
+        "stage",
+        "frequency_Hz",
+        "period_seconds",
+        "PSD"
+      ],
+      "rows": 9234
+    },
+    {
+      "path": "analysis_outputs/cz_h1_light_whitening_20261006/RESIDUAL_PREDICTABILITY.csv",
+      "columns": [
+        "arm",
+        "split",
+        "stage",
+        "support",
+        "n",
+        "probe_H",
+        "probe_alpha",
+        "R2",
+        "probe_RMSE",
+        "zero_baseline_RMSE",
+        "train_mean_baseline_RMSE",
+        "RMSE_improvement_vs_zero_percent",
+        "RMSE_improvement_vs_train_mean_percent"
+      ],
+      "rows": 24
+    },
+    {
+      "path": "analysis_outputs/cz_h1_light_whitening_20261006/SPECTRAL_SUMMARY.csv",
+      "columns": [
+        "arm",
+        "split",
+        "stage",
+        "dominant_frequency_Hz",
+        "dominant_period_seconds",
+        "dominant_PSD",
+        "low_frequency_energy",
+        "seven_second_band_energy",
+        "total_energy",
+        "welch_segments"
+      ],
+      "rows": 18
+    },
+    {
+      "path": "analysis_outputs/cz_h1_light_whitening_20261006/TOP_PEAKS.csv",
+      "columns": [
+        "arm",
+        "split",
+        "stage",
+        "peak_type",
+        "rank",
+        "frequency_Hz",
+        "period_seconds",
+        "value",
+        "lag_samples",
+        "lag_seconds"
+      ],
+      "rows": 288
+    },
+    {
+      "path": "analysis_outputs/cz_h1_light_whitening_20261006/VARIABLE_SCHEMA_AUDIT.csv",
+      "columns": [
+        "rod",
+        "field_name",
+        "canonical_name",
+        "dtype",
+        "missing_ratio",
+        "variance",
+        "unique_count",
+        "Rod1_exists",
+        "Rod2_exists",
+        "common",
+        "Rod1_only",
+        "Rod2_only",
+        "category",
+        "available_at_prediction",
+        "allowed_predictor",
+        "exclusion_reason",
+        "availability_evidence"
+      ],
+      "rows": 20
+    },
+    {
+      "path": "analysis_outputs/cz_h1_light_whitening_20261006/WHITENING_METRICS.csv",
+      "columns": [
+        "arm",
+        "split",
+        "n",
+        "E160_raw",
+        "E160_base",
+        "E160_final",
+        "E160_reduction_percent",
+        "E900_raw",
+        "E900_base",
+        "E900_final",
+        "E900_reduction_percent",
+        "lag1_raw",
+        "lag1_base",
+        "lag1_final",
+        "lag7_raw",
+        "lag7_base",
+        "lag7_final",
+        "lag14_raw",
+        "lag14_base",
+        "lag14_final"
+      ],
+      "rows": 6
+    },
+    {
+      "path": "analysis_outputs/cz_h1_short_cycle_a_20261006/SHORT_CYCLE_ACF.csv",
+      "columns": [
+        "arm",
+        "split",
+        "A_model",
+        "lag_samples",
+        "lag_seconds",
+        "ACF",
+        "pairs"
+      ],
+      "rows": 5406
+    },
+    {
+      "path": "analysis_outputs/cz_h1_short_cycle_a_20261006/SHORT_CYCLE_COMPARISONS.csv",
+      "columns": [
+        "arm",
+        "split",
+        "comparison",
+        "RMSE",
+        "MAE",
+        "E160",
+        "E900",
+        "band_power",
+        "nearest_0140_PSD",
+        "dominant_PSD"
+      ],
+      "rows": 6
+    },
+    {
+      "path": "analysis_outputs/cz_h1_short_cycle_a_20261006/SHORT_CYCLE_MODEL_SELECTION.csv",
+      "columns": [
+        "arm",
+        "A_model",
+        "H",
+        "alpha_A",
+        "features",
+        "fit_rows",
+        "validation_RMSE",
+        "validation_MAE",
+        "validation_bias",
+        "selected_alpha_for_history",
+        "primary_frozen_H",
+        "selected_primary",
+        "sensitivity_best_H",
+        "status"
+      ],
+      "rows": 36
+    },
+    {
+      "path": "analysis_outputs/cz_h1_short_cycle_a_20261006/SHORT_CYCLE_PSD.csv",
+      "columns": [
+        "arm",
+        "split",
+        "A_model",
+        "frequency_Hz",
+        "period_seconds",
+        "PSD"
+      ],
+      "rows": 3078
+    },
+    {
+      "path": "analysis_outputs/cz_h1_short_cycle_a_20261006/SHORT_CYCLE_RESIDUAL_PREDICTABILITY.csv",
+      "columns": [
+        "arm",
+        "split",
+        "A_model",
+        "support",
+        "n",
+        "probe_H",
+        "probe_alpha",
+        "R2",
+        "probe_RMSE",
+        "zero_baseline_RMSE",
+        "train_mean_baseline_RMSE",
+        "RMSE_improvement_vs_zero_percent",
+        "RMSE_improvement_vs_train_mean_percent"
+      ],
+      "rows": 12
+    },
+    {
+      "path": "analysis_outputs/cz_h1_short_cycle_a_20261006/SHORT_CYCLE_WHITENING_METRICS.csv",
+      "columns": [
+        "n",
+        "RMSE",
+        "MAE",
+        "bias",
+        "E160",
+        "E900",
+        "band_power",
+        "nearest_0140_frequency_Hz",
+        "nearest_0140_PSD",
+        "dominant_frequency_Hz",
+        "dominant_period_seconds",
+        "dominant_PSD",
+        "band_peak_frequency_Hz",
+        "band_peak_PSD",
+        "A_cold_start_rows",
+        "rho_lag3",
+        "rho_lag4",
+        "rho_lag7",
+        "rho_lag14",
+        "arm",
+        "split",
+        "A_model",
+        "H",
+        "alpha_A"
+      ],
+      "rows": 6
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/COHERENCE_SPECTRA.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "scope",
+        "arm",
+        "target",
+        "channel",
+        "input_alignment",
+        "frequency_Hz",
+        "coherence",
+        "nperseg",
+        "Welch_averages"
+      ],
+      "rows": 61560
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/CONTROL_OUTPUT_COHERENCE.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "scope",
+        "arm",
+        "target",
+        "channel",
+        "input_alignment",
+        "n",
+        "nperseg",
+        "Welch_averages",
+        "status",
+        "coherence_nearest_0138",
+        "band_mean_coherence",
+        "band_max_coherence",
+        "band_max_frequency_Hz",
+        "nearest_frequency_Hz",
+        "independent_segment_null_pointwise95",
+        "null_limit_note"
+      ],
+      "rows": 144
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/CONTROL_PSD.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "channel",
+        "scope",
+        "frequency_Hz",
+        "PSD",
+        "nperseg",
+        "Welch_averages"
+      ],
+      "rows": 10614
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/CONTROL_SPECTRAL_SUMMARY.csv",
+      "columns": [
+        "dominant_frequency_Hz",
+        "dominant_period_seconds",
+        "band_power",
+        "band_peak_frequency_Hz",
+        "band_peak_PSD",
+        "nearest_0138_frequency_Hz",
+        "nearest_0138_PSD",
+        "near_0138_local_peak_frequency_Hz",
+        "near_0138_peak_to_background",
+        "frequency_resolution_Hz",
+        "rod",
+        "entity",
+        "channel",
+        "n",
+        "nperseg",
+        "Welch_averages"
+      ],
+      "rows": 36
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/LATTICE_AND_INTERVAL_SUMMARY.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "n",
+        "D_unique_exact",
+        "dD_unique_exact",
+        "dD_unique_hundredth_grid",
+        "dD_zero_ratio",
+        "lattice_q",
+        "max_lattice_distance",
+        "lattice_fraction_within_5e_5",
+        "float32_grid_match_fraction",
+        "step_events",
+        "step_intervals",
+        "interval_median_samples",
+        "interval_mode_samples",
+        "interval_3_4_fraction",
+        "independent_geometric_3_4_fraction"
+      ],
+      "rows": 8
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/LOCAL_EVENT_PEAKS.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "global_start",
+        "signal",
+        "dominant_frequency_Hz",
+        "dominant_period_seconds",
+        "band_power",
+        "band_peak_frequency_Hz",
+        "band_peak_PSD",
+        "nearest_0138_frequency_Hz",
+        "nearest_0138_PSD",
+        "near_0138_local_peak_frequency_Hz",
+        "near_0138_peak_to_background",
+        "frequency_resolution_Hz"
+      ],
+      "rows": 54
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/LOCAL_PEAK_TRACKING.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "window_start_local",
+        "window_stop_exclusive_local",
+        "global_start",
+        "global_stop_exclusive",
+        "n",
+        "peak_frequency_0125_0155",
+        "peak_power",
+        "median_crystal_rotation",
+        "median_crucible_rotation",
+        "nonzero_step_rate",
+        "nonzero_step_rate_Hz",
+        "Welch_averages"
+      ],
+      "rows": 18
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/LOCAL_TRACKING_CORRELATIONS.csv",
+      "columns": [
+        "rod",
+        "variable",
+        "n",
+        "Pearson_r",
+        "Spearman_r",
+        "first_difference_Pearson_r",
+        "linear_time_partial_Pearson_r",
+        "direction_match_fraction",
+        "warning"
+      ],
+      "rows": 6
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/OUTPUT_PSD.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "signal",
+        "frequency_Hz",
+        "PSD",
+        "nperseg",
+        "Welch_averages"
+      ],
+      "rows": 10599
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/POINTWISE_ALIGNMENT_AUDIT.csv",
+      "columns": [
+        "rod",
+        "arm",
+        "split",
+        "entity",
+        "n",
+        "global_origin_min",
+        "global_origin_max",
+        "raw_target_alignment_max_error",
+        "status"
+      ],
+      "rows": 6
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/QUANTIZATION_DIAGNOSTIC.csv",
+      "columns": [
+        "dominant_frequency_Hz",
+        "dominant_period_seconds",
+        "band_power",
+        "band_peak_frequency_Hz",
+        "band_peak_PSD",
+        "nearest_0138_frequency_Hz",
+        "nearest_0138_PSD",
+        "near_0138_local_peak_frequency_Hz",
+        "near_0138_peak_to_background",
+        "frequency_resolution_Hz",
+        "rod",
+        "entity",
+        "scope",
+        "signal",
+        "n",
+        "nperseg",
+        "Welch_averages",
+        "band_max_permutation_p",
+        "band_max_permutation_null95",
+        "near_0138_prominent_local_peak",
+        "arm"
+      ],
+      "rows": 72
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/ROTATION_PHASE_HELDOUT.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "arm",
+        "split",
+        "target",
+        "phase_model",
+        "status",
+        "heldout_RMSE_change",
+        "E160_change",
+        "E900_change",
+        "band_power_change",
+        "peak_0138_power_change"
+      ],
+      "rows": 36
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/ROTATION_SPEED_DISTRIBUTIONS.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "channel",
+        "unit",
+        "p10",
+        "median",
+        "p90",
+        "min",
+        "max"
+      ],
+      "rows": 36
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/SIGNED_UNIT_STEP_DIAGNOSTIC.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "scope",
+        "dD_signed_unit_step_correlation",
+        "amplitude_only_residual_variance_fraction",
+        "signed_unit_band_power_over_dD",
+        "signed_unit_band_peak_Hz"
+      ],
+      "rows": 6
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/STEP_INTERVAL_HISTOGRAM.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "scope",
+        "interval_samples",
+        "interval_seconds",
+        "count",
+        "fraction"
+      ],
+      "rows": 89
+    },
+    {
+      "path": "analysis_outputs/cz_seven_second_peak_20261006/STEP_SIZE_COUNTS.csv",
+      "columns": [
+        "rod",
+        "entity",
+        "step_size_grid",
+        "nonzero_count",
+        "nonzero_fraction"
+      ],
+      "rows": 16
+    }
+  ]
+}

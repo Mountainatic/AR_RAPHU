@@ -1,0 +1,17 @@
+{
+  "status": "COMPLETE",
+  "analysis_wall_seconds": 10.690306300006341,
+  "request_to_analysis_seconds": 657.7752561569214,
+  "raw_sha256": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+  "model_training_performed": false,
+  "rotation_units_confirmed": false,
+  "phase_models_fitted": 0,
+  "prior_pointwise_alignment": "PASS",
+  "prior_input_hashes_unchanged": {
+    "POINTWISE_VALIDATION.parquet": true,
+    "POINTWISE_TEST.parquet": true,
+    "GLOBAL_SELECTION_FREEZE.json": true,
+    "WHITENING_METRICS.csv": true,
+    "SPECTRAL_SUMMARY.csv": true
+  }
+}

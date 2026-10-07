@@ -1,0 +1,76 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "arm": "Rod1_Common4",
+      "split": "validation",
+      "pointwise_rows": 1800,
+      "cold_start_rows": 96,
+      "model_replay_max_error": 0.0,
+      "ACF_direct_comparison_error": 4.163336342344337e-17,
+      "future_control_perturbation_pass": true,
+      "current_and_future_residual_perturbation_pass": true
+    },
+    {
+      "arm": "Rod1_AllLegal",
+      "split": "validation",
+      "pointwise_rows": 1800,
+      "cold_start_rows": 64,
+      "model_replay_max_error": 0.0,
+      "ACF_direct_comparison_error": 6.331740687315346e-17,
+      "future_control_perturbation_pass": true,
+      "current_and_future_residual_perturbation_pass": true
+    },
+    {
+      "arm": "Rod2_Common4",
+      "split": "validation",
+      "pointwise_rows": 1883,
+      "cold_start_rows": 96,
+      "model_replay_max_error": 0.0,
+      "ACF_direct_comparison_error": 8.326672684688674e-17,
+      "future_control_perturbation_pass": true,
+      "current_and_future_residual_perturbation_pass": true
+    },
+    {
+      "arm": "Rod1_Common4",
+      "split": "test",
+      "pointwise_rows": 1544,
+      "cold_start_rows": 96,
+      "model_replay_max_error": 0.0,
+      "ACF_direct_comparison_error": 8.326672684688674e-17,
+      "future_control_perturbation_pass": true,
+      "current_and_future_residual_perturbation_pass": true
+    },
+    {
+      "arm": "Rod1_AllLegal",
+      "split": "test",
+      "pointwise_rows": 1544,
+      "cold_start_rows": 64,
+      "model_replay_max_error": 0.0,
+      "ACF_direct_comparison_error": 5.551115123125783e-17,
+      "future_control_perturbation_pass": true,
+      "current_and_future_residual_perturbation_pass": true
+    },
+    {
+      "arm": "Rod2_Common4",
+      "split": "test",
+      "pointwise_rows": 1626,
+      "cold_start_rows": 96,
+      "model_replay_max_error": 0.0,
+      "ACF_direct_comparison_error": 5.551115123125783e-17,
+      "future_control_perturbation_pass": true,
+      "current_and_future_residual_perturbation_pass": true
+    }
+  ],
+  "independent_sklearn_Ridge_errors": {
+    "1e-06": 1.0824674490095276e-15,
+    "0.0001": 1.1657341758564144e-15,
+    "0.01": 1.1102230246251565e-15,
+    "1.0": 1.1102230246251565e-15,
+    "100.0": 9.159339953157541e-16
+  },
+  "train_membership_unchanged": true,
+  "OOF_fit_end_before_score": true,
+  "artifacts_unchanged_since_freeze": true,
+  "original_workbook_sha256": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3"
+}

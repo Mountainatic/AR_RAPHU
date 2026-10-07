@@ -1,0 +1,63 @@
+{
+  "classification": "POST_HOC_RESIDUAL_WHITENING_DIAGNOSTIC",
+  "user_authorized_split_amendment": true,
+  "split_rule": "retain original source train exactly; source validation first floor(n/2) selection; next257 excluded; remaining tail descriptive test",
+  "membership_sha256": "585d1297e679b2f5755aa41c281ebbc86c5aeb336f087e692fcff7127b4e9a06",
+  "histories": [
+    8,
+    16,
+    32,
+    64,
+    96,
+    128
+  ],
+  "alphas": [
+    1e-06,
+    0.0001,
+    0.01,
+    1.0,
+    100.0
+  ],
+  "A_histories": [
+    8,
+    16,
+    32,
+    64,
+    96,
+    128
+  ],
+  "A_alphas": [
+    1e-06,
+    0.0001,
+    0.01,
+    1.0,
+    100.0
+  ],
+  "alpha_selection": "4 expanding prequential blocks, first 1/5 initial fit",
+  "history_selection": "source-validation RMSE; within 0.1% of minimum prefer shorter L",
+  "A_selection": "trainOOF-only fit, minimum online cold-start validation RMSE; within 0.1% prefer shorter H, then stronger alpha",
+  "probe": {
+    "history": 32,
+    "alpha": 1.0,
+    "fit": "base OOF / second-stage prequential final residuals"
+  },
+  "base_test_fit": "source train only, same model as validation; no validation refit",
+  "A_test_fit": "train base OOF residuals only; same model as validation",
+  "acf": "segmented globally centered biased FFT estimator, never cross segments or gaps; E sums lags1..k",
+  "PSD": {
+    "fs": 0.5,
+    "nperseg": 1024,
+    "noverlap": 512,
+    "low_frequency_band": [
+      0,
+      0.02
+    ],
+    "seven_second_band": [
+      0.125,
+      0.155
+    ]
+  },
+  "test_use": "only after all three recipes + probes frozen",
+  "rod1_variable_sha256": "f01a2aec21c66b9683a54c7d16722ea4c856f36eee6bf5773049435c9c8dd473",
+  "initial_time_unix": 1791217897.998398
+}

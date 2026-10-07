@@ -1,0 +1,39 @@
+[
+  {
+    "arm": "Rod2_Common4",
+    "verdict": "NO_ADDITIONAL_SHORT_CYCLE_GAIN",
+    "recommendation": "A0; A2 diagnostic only",
+    "A1_validation_success": false,
+    "A1_holdout_success": false,
+    "A1_stable_success": false,
+    "A2_extra_validation_success": false,
+    "A2_extra_holdout_success": false,
+    "A1_holdout_change": {
+      "RMSE": 0.3171197565515427,
+      "MAE": 0.230492397767601,
+      "E160": 2.8967772566725114,
+      "E900": 1.6484317413438476,
+      "band_power": 3.696026910486716,
+      "nearest_0140_PSD": 12.994332209102366,
+      "dominant_PSD": 5.629256260810978
+    },
+    "A2_vs_A1_validation_change": {
+      "RMSE": -0.0038298318640439533,
+      "MAE": -0.004112079022267068,
+      "E160": -0.1906438179755554,
+      "E900": -0.14452428736795309,
+      "band_power": -0.07413309355939202,
+      "nearest_0140_PSD": 0.2544656475141238,
+      "dominant_PSD": -0.16975641182261914
+    },
+    "A2_vs_A1_holdout_change": {
+      "RMSE": -0.003855163812205298,
+      "MAE": -0.003915575973989505,
+      "E160": -0.14627024266509192,
+      "E900": -0.10066057688369323,
+      "band_power": -0.08241332923912825,
+      "nearest_0140_PSD": 0.3048308826933632,
+      "dominant_PSD": -0.18045884739272822
+    }
+  }
+]

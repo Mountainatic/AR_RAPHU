@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "pointwise_checks": [
+    {
+      "arm": "Rod2_Common4",
+      "split": "descriptive_holdout",
+      "n": 1626,
+      "common_scoring_rows": true,
+      "frozen_base_exact": true,
+      "A0_prior_output_exact": true,
+      "cold_start_rows": 96,
+      "causal_residual_and_target_perturbations": "PASS",
+      "direct_ACF": "PASS"
+    },
+    {
+      "arm": "Rod2_Common4",
+      "split": "validation",
+      "n": 1883,
+      "common_scoring_rows": true,
+      "frozen_base_exact": true,
+      "A0_prior_output_exact": true,
+      "cold_start_rows": 96,
+      "causal_residual_and_target_perturbations": "PASS",
+      "direct_ACF": "PASS"
+    }
+  ],
+  "prior_files_and_base_models_unchanged": true,
+  "source_row_ids_exactly_reused": true,
+  "all_model_and_probe_hashes_unchanged_since_freeze": true,
+  "independent_sklearn_Ridge_max_errors": {
+    "0.0001": 4.881511861398735e-15,
+    "0.01": 4.9960036108132044e-15,
+    "1.0": 5.138250935843303e-15,
+    "100.0": 3.2751579226442118e-15
+  },
+  "short_block_feature_formulas_checked": true,
+  "harmonics_exact_linear_combinations_of_raw_lags": true,
+  "probe_training_prequential_only": true,
+  "base_refit_or_search": false,
+  "raw_controls_or_workbook_read": false
+}

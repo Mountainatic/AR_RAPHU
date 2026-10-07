@@ -1,0 +1,16 @@
+{
+  "status": "COMPLETE",
+  "runner_wall_seconds": 2.8130322999786586,
+  "request_to_runner_completion_seconds": 379.0079274177551,
+  "included_arms": [
+    "Rod2_Common4"
+  ],
+  "source_files_unchanged": true,
+  "raw_workbook_opened": false,
+  "raw_controls_read": false,
+  "base_models_refitted": false,
+  "base_search_performed": false,
+  "holdout_read_events": 1,
+  "primary_comparison_histories_fixed": true,
+  "Rod1_replication_validation_only": false
+}
