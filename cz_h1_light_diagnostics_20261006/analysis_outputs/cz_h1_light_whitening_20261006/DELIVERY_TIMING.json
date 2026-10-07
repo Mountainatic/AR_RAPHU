@@ -1,0 +1,8 @@
+{
+  "request_attachment_creation_unix": 1791217645.8289075,
+  "report_completion_unix": 1791218681.1881309,
+  "request_to_report_wall_seconds": 1035.3592233657837,
+  "runner_wall_seconds": 34.276598799973726,
+  "time_basis": "request attachment creation is approximate receipt time",
+  "timezone": "Asia/Shanghai"
+}

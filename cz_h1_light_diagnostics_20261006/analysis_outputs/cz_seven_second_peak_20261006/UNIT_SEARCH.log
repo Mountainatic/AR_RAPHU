@@ -1,0 +1,9 @@
+Read-only unit audit. Search pattern: rpm|rev/min|r/min|rev/s|rad/s|转/分|转每分钟.
+Scoped source trees: residual_rollout_authority_20260928/PRISM_INDUSTRIAL_BENCHMARK_V1; staging/cz_short_horizon_2s; analysis_outputs/cz_heater_identifiability_20261001; analysis_outputs/PRISM_R2_H1_WHITENING_CORE_IMPLEMENTATION_20261002/authority_source_snapshot.
+Result: zero unit-token matches in these CZ source/metadata trees.
+Whole-project visible text search also found only unrelated NanoDrone rad/s declarations. A second targeted search of that benchmark follows for provenance.
+external_nonlinear_benchmarks_src\nonlinear_benchmarks\benchmarks.py:447:    Inputs (u): 4 motor angular velocities [rad/s]
+external_nonlinear_benchmarks_src\nonlinear_benchmarks\benchmarks.py:454:        - Angular velocity (body frame): wx, wy, wz        [rad/s]
+external_nonlinear_benchmarks_src\README.md:194:(geodesic distance on SO(3)) [rad], and angular velocity [rad/s], evaluated at horizons h=1, 10, 50
+external_nonlinear_benchmarks_src\README.md:199:(report SimErr for position [m], linear velocity [m/s], orientation [rad], angular velocity [rad/s])
+external_nonlinear_benchmarks_src\README.md:232:#   cumulative MAE summed over h = 1..max_horizon  [m, m/s, rad, rad/s]

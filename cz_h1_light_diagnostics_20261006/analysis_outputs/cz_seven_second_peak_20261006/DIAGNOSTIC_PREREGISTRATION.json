@@ -1,0 +1,35 @@
+{
+  "task": "SEVEN_SECOND_PEAK_SOURCE_DIAGNOSTIC",
+  "classification": "POST_HOC_DESCRIPTIVE_DIAGNOSTIC",
+  "raw_sha256": "c3428966fe006572809156ee5e3f488264b8206b19b20887dcd00840bb26fbc3",
+  "sampling_seconds": 2.0,
+  "fs_Hz": 0.5,
+  "registered_band_Hz": [
+    0.125,
+    0.155
+  ],
+  "reference_frequency_Hz": 0.138,
+  "Welch_nperseg": 1024,
+  "Welch_noverlap": 512,
+  "short_segments": "nperseg=min(1024,n); noverlap=floor(nperseg/2); single-average coherence withheld",
+  "local_windows": "nonoverlapping 2048 raw rows per segment, retain final remainder only if >=1536; Welch on 2047 derivatives",
+  "lattice_q": 0.01,
+  "lattice_tolerance": 5e-05,
+  "spectral_null": {
+    "kind": "within-segment random permutation, test maximum PSD over fixed registered band",
+    "draws": 199,
+    "seed": 20261006,
+    "scope": "long-segment signals only",
+    "limitation": "Tests temporal ordering versus exchangeability, not physics; no global multiple-comparison adjustment"
+  },
+  "coherence": "scipy.signal.coherence with identical segment/Welch parameters; no phase inference; no independent significance claim",
+  "phase_condition": "only if rotation units verified; otherwise explicit NOT_PERFORMED",
+  "training": "none",
+  "input_artifact_hashes": {
+    "POINTWISE_VALIDATION.parquet": "ffa9f08a5b9264fc41c09115ae8bd4f751239c5663435e4f4b2348909913781c",
+    "POINTWISE_TEST.parquet": "cd24b67378835d505c7eea2cd20f4e8366e88d6abda07da2425bcc10ba109fba",
+    "GLOBAL_SELECTION_FREEZE.json": "fc6aaba866632d4c01ebc2336fb61341bf4171e7f1f432672493f26cd0d6e586",
+    "WHITENING_METRICS.csv": "e89a1b4716bca8eefd442f1290a1620dbe6ec17aeef0dc0b1547efe89ca1284c",
+    "SPECTRAL_SUMMARY.csv": "826333cdeaf6d2e72a6dde70cd5d3998bc401cd2d140bdbb13dcdac854eb5595"
+  }
+}

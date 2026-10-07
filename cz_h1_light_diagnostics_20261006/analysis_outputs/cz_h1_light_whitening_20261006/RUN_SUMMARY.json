@@ -1,0 +1,72 @@
+{
+  "status": "COMPLETE",
+  "runner_wall_seconds": 34.276598799973726,
+  "audit_to_completion_wall_seconds": 348.9480426311493,
+  "model_grid_base": 90,
+  "model_grid_A": 90,
+  "cpu_thread_limit": 2,
+  "classification": "POST_HOC_RESIDUAL_WHITENING_DIAGNOSTIC",
+  "recipes": {
+    "Rod1_Common4": {
+      "rod": "Rod_1",
+      "variables": [
+        "main_heater_power",
+        "joint_lift",
+        "crystal_rotation",
+        "crucible_rotation"
+      ],
+      "L": 64,
+      "alpha_base": 1.0,
+      "H": 96,
+      "alpha_A": 100.0,
+      "base_fit_rows": 15431
+    },
+    "Rod1_AllLegal": {
+      "rod": "Rod_1",
+      "variables": [
+        "main_heater_power",
+        "joint_lift",
+        "crystal_rotation",
+        "crucible_rotation",
+        "crystal_lift",
+        "crucible_lift",
+        "heater_temperature",
+        "argon_flow_setpoint",
+        "crystal_length",
+        "furnace_pressure"
+      ],
+      "L": 128,
+      "alpha_base": 100.0,
+      "H": 64,
+      "alpha_A": 100.0,
+      "base_fit_rows": 15431
+    },
+    "Rod2_Common4": {
+      "rod": "Rod_2",
+      "variables": [
+        "main_heater_power",
+        "joint_lift",
+        "crystal_rotation",
+        "crucible_rotation"
+      ],
+      "L": 128,
+      "alpha_base": 100.0,
+      "H": 96,
+      "alpha_A": 100.0,
+      "base_fit_rows": 16092
+    }
+  },
+  "python": "3.12.5 (tags/v3.12.5:ff3bc82, Aug  6 2024, 20:45:27) [MSC v.1940 64 bit (AMD64)]",
+  "versions": {
+    "numpy": "2.0.2",
+    "pandas": "2.2.3",
+    "scipy": "1.15.3",
+    "sklearn": "1.9.1",
+    "statsmodels": "0.15.0"
+  },
+  "test_target_open_events": 2,
+  "train_test_origin_disjoint": true,
+  "raw_control_history_max_index": "t-1",
+  "A_history_max_residual_origin": "t-1",
+  "canonical_runner_imported": false
+}

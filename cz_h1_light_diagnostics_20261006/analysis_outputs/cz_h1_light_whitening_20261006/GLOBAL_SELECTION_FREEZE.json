@@ -1,0 +1,71 @@
+{
+  "status": "FROZEN_BEFORE_TEST_TARGET_CONSTRUCTION_OR_SCORING",
+  "arms": {
+    "Rod1_Common4": {
+      "rod": "Rod_1",
+      "variables": [
+        "main_heater_power",
+        "joint_lift",
+        "crystal_rotation",
+        "crucible_rotation"
+      ],
+      "L": 64,
+      "alpha_base": 1.0,
+      "H": 96,
+      "alpha_A": 100.0,
+      "base_fit_rows": 15431
+    },
+    "Rod1_AllLegal": {
+      "rod": "Rod_1",
+      "variables": [
+        "main_heater_power",
+        "joint_lift",
+        "crystal_rotation",
+        "crucible_rotation",
+        "crystal_lift",
+        "crucible_lift",
+        "heater_temperature",
+        "argon_flow_setpoint",
+        "crystal_length",
+        "furnace_pressure"
+      ],
+      "L": 128,
+      "alpha_base": 100.0,
+      "H": 64,
+      "alpha_A": 100.0,
+      "base_fit_rows": 15431
+    },
+    "Rod2_Common4": {
+      "rod": "Rod_2",
+      "variables": [
+        "main_heater_power",
+        "joint_lift",
+        "crystal_rotation",
+        "crucible_rotation"
+      ],
+      "L": 128,
+      "alpha_base": 100.0,
+      "H": 96,
+      "alpha_A": 100.0,
+      "base_fit_rows": 16092
+    }
+  },
+  "probe_history": 32,
+  "probe_alpha": 1.0,
+  "artifacts": {
+    "Rod1_AllLegal_A.npz": "ba2ceef69dae996755c60d7145badeeefa6a7a1e63359aa320ecbca178345fce",
+    "Rod1_AllLegal_BASE.npz": "e796bf7bd141d3933196e21d0c3e70e225ea71e65b17a7e57f6e63a693dd4970",
+    "Rod1_AllLegal_PROBE_base.npz": "354573325bcee3ac70607f616344b79bcfb0a4014e38b3c7b5ea1f72cbcbe400",
+    "Rod1_AllLegal_PROBE_final.npz": "f848449b0f66e44c3e768c1c85261f2ea29e72624db08d64ef4525c71b6ea6f8",
+    "Rod1_Common4_A.npz": "374a99432ddc3b32753fe9353e696927a5762d98c465c11244bd0c902fdcd121",
+    "Rod1_Common4_BASE.npz": "fee18edca0ea09ff12081593ec4d73322593a083f224ae268bc3f6527a2c5ead",
+    "Rod1_Common4_PROBE_base.npz": "eb5d67d2bcf7253749db13dd3c099bfee943bf2d7e48519584d78b170d951427",
+    "Rod1_Common4_PROBE_final.npz": "edfd513056db8b1712063186eb20cb8850818c7f1cfd3c077d4f8b8130d866a4",
+    "Rod2_Common4_A.npz": "45f892bdacea66f8289b86926f7a50f82ad0904fa645f7130f3fc90bd5165419",
+    "Rod2_Common4_BASE.npz": "f63c6ac2b68fb1b63ab77b991727bb173485002e7214b33aeaa3ce2b2a65c85d",
+    "Rod2_Common4_PROBE_base.npz": "975d7240a865d27f76af3a606d076ab1de2d2b2acc4a496b29ffaab9b0649404",
+    "Rod2_Common4_PROBE_final.npz": "22b0f964bb02bbba4d01b08fe3b83364be53c5e8f3973ec199ca1770d5dff419"
+  },
+  "variable_list_sha256": "f01a2aec21c66b9683a54c7d16722ea4c856f36eee6bf5773049435c9c8dd473",
+  "membership_sha256": "585d1297e679b2f5755aa41c281ebbc86c5aeb336f087e692fcff7127b4e9a06"
+}

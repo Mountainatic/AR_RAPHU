@@ -1,0 +1,45 @@
+{
+  "status": "UNCONFIRMED",
+  "workbook_headers": [
+    {
+      "sheet": "Sheet1",
+      "field": "晶转速度",
+      "header": "晶转速度",
+      "header_comment": null,
+      "number_format": "General",
+      "visible_state": "visible"
+    },
+    {
+      "sheet": "Sheet1",
+      "field": "埚转速度",
+      "header": "埚转速度",
+      "header_comment": null,
+      "number_format": "General",
+      "visible_state": "visible"
+    },
+    {
+      "sheet": "Sheet2",
+      "field": "晶转速度",
+      "header": "晶转速度",
+      "header_comment": null,
+      "number_format": "General",
+      "visible_state": "visible"
+    },
+    {
+      "sheet": "Sheet2",
+      "field": "埚转速度",
+      "header": "埚转速度",
+      "header_comment": null,
+      "number_format": "General",
+      "visible_state": "visible"
+    }
+  ],
+  "descriptive_properties": {
+    "title": null,
+    "subject": null,
+    "description": null,
+    "keywords": null
+  },
+  "search_log": "UNIT_SEARCH.log",
+  "interpretation": "No RPM/rev/s/rad/s evidence in CZ code, metadata, workbook headers/comments. Other benchmark rad/s matches are not CZ evidence."
+}

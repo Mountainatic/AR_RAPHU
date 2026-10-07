@@ -1,0 +1,51 @@
+{
+  "status": "ALL_INCLUDED_RECIPES_AND_PROBES_FROZEN_BEFORE_CURRENT_HOLDOUT_ACCESS",
+  "included_arms": [
+    "Rod2_Common4"
+  ],
+  "Rod1_replication_gate_validation_only": false,
+  "recipes": {
+    "Rod2_Common4": {
+      "H": 96,
+      "alphas": {
+        "A0": 100.0,
+        "A1": 100.0,
+        "A2": 100.0
+      },
+      "feature_dims": {
+        "A0": 96,
+        "A1": 124,
+        "A2": 126
+      },
+      "A1_validation_success": false,
+      "A2_validation_success": false
+    }
+  },
+  "model_hashes": {
+    "Rod2_Common4_A0.npz": "45f892bdacea66f8289b86926f7a50f82ad0904fa645f7130f3fc90bd5165419",
+    "Rod2_Common4_A0_PROBE.npz": "22b0f964bb02bbba4d01b08fe3b83364be53c5e8f3973ec199ca1770d5dff419",
+    "Rod2_Common4_A1.npz": "9410929c2f4aa6c6a26fd4ff7446a0b17f53c452d562df5c4ed464ca5e24d469",
+    "Rod2_Common4_A1_PROBE.npz": "ff88f8534c71de3ff4ddc6180edbc440c23040025175912e057844bf78bbdc71",
+    "Rod2_Common4_A2.npz": "b7cfd7957bfea0da612d69a22acadce908f457a607d0f19ac6dea1dfff40121a",
+    "Rod2_Common4_A2_PROBE.npz": "79f3f252880c871be4df98a2cae7af68d5bf0bfa905ef7a95f3b8e4a60fa9130"
+  },
+  "source_hashes": {
+    "FROZEN_MEMBERSHIP.parquet": "585d1297e679b2f5755aa41c281ebbc86c5aeb336f087e692fcff7127b4e9a06",
+    "BASE_OOF_POINTWISE.parquet": "a744145e4d9065375e1056882e852910712223cdd80293ebb3d3b8eacb2dd594",
+    "POINTWISE_VALIDATION.parquet": "ffa9f08a5b9264fc41c09115ae8bd4f751239c5663435e4f4b2348909913781c",
+    "POINTWISE_TEST.parquet": "cd24b67378835d505c7eea2cd20f4e8366e88d6abda07da2425bcc10ba109fba",
+    "GLOBAL_SELECTION_FREEZE.json": "fc6aaba866632d4c01ebc2336fb61341bf4171e7f1f432672493f26cd0d6e586",
+    "Rod1_AllLegal_A.npz": "ba2ceef69dae996755c60d7145badeeefa6a7a1e63359aa320ecbca178345fce",
+    "Rod1_AllLegal_BASE.npz": "e796bf7bd141d3933196e21d0c3e70e225ea71e65b17a7e57f6e63a693dd4970",
+    "Rod1_AllLegal_PROBE_base.npz": "354573325bcee3ac70607f616344b79bcfb0a4014e38b3c7b5ea1f72cbcbe400",
+    "Rod1_AllLegal_PROBE_final.npz": "f848449b0f66e44c3e768c1c85261f2ea29e72624db08d64ef4525c71b6ea6f8",
+    "Rod1_Common4_A.npz": "374a99432ddc3b32753fe9353e696927a5762d98c465c11244bd0c902fdcd121",
+    "Rod1_Common4_BASE.npz": "fee18edca0ea09ff12081593ec4d73322593a083f224ae268bc3f6527a2c5ead",
+    "Rod1_Common4_PROBE_base.npz": "eb5d67d2bcf7253749db13dd3c099bfee943bf2d7e48519584d78b170d951427",
+    "Rod1_Common4_PROBE_final.npz": "edfd513056db8b1712063186eb20cb8850818c7f1cfd3c077d4f8b8130d866a4",
+    "Rod2_Common4_A.npz": "45f892bdacea66f8289b86926f7a50f82ad0904fa645f7130f3fc90bd5165419",
+    "Rod2_Common4_BASE.npz": "f63c6ac2b68fb1b63ab77b991727bb173485002e7214b33aeaa3ce2b2a65c85d",
+    "Rod2_Common4_PROBE_base.npz": "975d7240a865d27f76af3a606d076ab1de2d2b2acc4a496b29ffaab9b0649404",
+    "Rod2_Common4_PROBE_final.npz": "22b0f964bb02bbba4d01b08fe3b83364be53c5e8f3973ec199ca1770d5dff419"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "task": "SHORT_CYCLE_RESIDUAL_A_ONLY",
+  "classification": "POST_HOC_DESCRIPTIVE_DIAGNOSTIC",
+  "prior_files_sha256": {
+    "FROZEN_MEMBERSHIP.parquet": "585d1297e679b2f5755aa41c281ebbc86c5aeb336f087e692fcff7127b4e9a06",
+    "BASE_OOF_POINTWISE.parquet": "a744145e4d9065375e1056882e852910712223cdd80293ebb3d3b8eacb2dd594",
+    "POINTWISE_VALIDATION.parquet": "ffa9f08a5b9264fc41c09115ae8bd4f751239c5663435e4f4b2348909913781c",
+    "POINTWISE_TEST.parquet": "cd24b67378835d505c7eea2cd20f4e8366e88d6abda07da2425bcc10ba109fba",
+    "GLOBAL_SELECTION_FREEZE.json": "fc6aaba866632d4c01ebc2336fb61341bf4171e7f1f432672493f26cd0d6e586",
+    "Rod1_AllLegal_A.npz": "ba2ceef69dae996755c60d7145badeeefa6a7a1e63359aa320ecbca178345fce",
+    "Rod1_AllLegal_BASE.npz": "e796bf7bd141d3933196e21d0c3e70e225ea71e65b17a7e57f6e63a693dd4970",
+    "Rod1_AllLegal_PROBE_base.npz": "354573325bcee3ac70607f616344b79bcfb0a4014e38b3c7b5ea1f72cbcbe400",
+    "Rod1_AllLegal_PROBE_final.npz": "f848449b0f66e44c3e768c1c85261f2ea29e72624db08d64ef4525c71b6ea6f8",
+    "Rod1_Common4_A.npz": "374a99432ddc3b32753fe9353e696927a5762d98c465c11244bd0c902fdcd121",
+    "Rod1_Common4_BASE.npz": "fee18edca0ea09ff12081593ec4d73322593a083f224ae268bc3f6527a2c5ead",
+    "Rod1_Common4_PROBE_base.npz": "eb5d67d2bcf7253749db13dd3c099bfee943bf2d7e48519584d78b170d951427",
+    "Rod1_Common4_PROBE_final.npz": "edfd513056db8b1712063186eb20cb8850818c7f1cfd3c077d4f8b8130d866a4",
+    "Rod2_Common4_A.npz": "45f892bdacea66f8289b86926f7a50f82ad0904fa645f7130f3fc90bd5165419",
+    "Rod2_Common4_BASE.npz": "f63c6ac2b68fb1b63ab77b991727bb173485002e7214b33aeaa3ce2b2a65c85d",
+    "Rod2_Common4_PROBE_base.npz": "975d7240a865d27f76af3a606d076ab1de2d2b2acc4a496b29ffaab9b0649404",
+    "Rod2_Common4_PROBE_final.npz": "22b0f964bb02bbba4d01b08fe3b83364be53c5e8f3973ec199ca1770d5dff419"
+  },
+  "base_predictor": "EXACT_FROZEN_NO_REFIT",
+  "primary_history": "previous arm-specific H fixed for A0/A1/A2",
+  "sensitivity_histories": [
+    32,
+    64,
+    96
+  ],
+  "alphas": [
+    0.0001,
+    0.01,
+    1.0,
+    100.0
+  ],
+  "A0": "exact old A.npz loaded with old scaler/coefficients; no re-selection",
+  "A1": "full raw history plus sign/abs/difference/zero-crossing at fixed short lags only",
+  "short_lags": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    7,
+    8
+  ],
+  "feature_dimension": "A0 H; A1 H+28; A2 H+30",
+  "difference": "r(t-k)-r(t-k-1), short max k=8 needs <=9, all within H>=32",
+  "no_raw_lag_duplication": true,
+  "exact_zero_event_indicator": false,
+  "A2": {
+    "f0_Hz": 0.14,
+    "dt": 2.0,
+    "features": [
+      "sum past residual cos",
+      "sum past residual sin"
+    ],
+    "role": "DIAGNOSTIC_ONLY",
+    "note": "harmonics are linear combinations of raw lags already present; extra columns change Ridge penalty, not the information set"
+  },
+  "alpha_selection": "minimum online cold-start validation RMSE; exact ties prefer stronger alpha",
+  "history_sensitivity": "validation-only best H reported, does not replace frozen primary H and is not scored on holdout",
+  "selection_whiteness_used": false,
+  "replication_gate": "Rod2 validation only: A1 or A2 compared to A0 meets prespecified success; then replicate unchanged protocol on both Rod1 arms before any current holdout scoring",
+  "success": {
+    "band_power_reduction_min_percent": 10.0,
+    "E160_reduction_min_percent": 0.0,
+    "E900_reduction_min_percent": 0.0,
+    "RMSE_worsening_max_percent": 0.5,
+    "stable": "criteria met on both validation and descriptive holdout"
+  },
+  "A2_extra_diagnostic_success": "A2 meets same criteria vs A1 on validation and holdout while A1 has no stable success vs A0",
+  "cold_start": "empty each split/entity/continuous segment, correction=0 first H rows, append current residual after feature construction",
+  "train": "only saved prequential base OOF residuals, never base in-sample residuals",
+  "probe": {
+    "H": 32,
+    "alpha": 1.0,
+    "train": "A0 exact old saved probe; A1/A2 probe fit only another fixed-recipe prequential corrected residual stream",
+    "scope": "prediction metrics only, no tuning"
+  },
+  "PSD": {
+    "fs": 0.5,
+    "nperseg": 1024,
+    "noverlap": 512,
+    "band": [
+      0.125,
+      0.155
+    ],
+    "nearest_frequency": 0.14
+  },
+  "ACF": "same centered biased segmented FFT as prior experiment; maxlag900",
+  "budget_minutes": 30
+}

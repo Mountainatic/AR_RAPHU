@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "source_hashes_unchanged": true,
+  "strict_raw_residual_alignment": true,
+  "within_segment_intervals_only": true,
+  "local_windows_nonoverlap": true,
+  "local_event_rows_unique": true,
+  "phase_not_tested_honestly_recorded": true,
+  "independent_direct_Welch_max_error": 1.0842021724855044e-18,
+  "independent_direct_MSC_max_error": 1.4432899320127035e-15,
+  "prior_residual_PSD_reproduced": true,
+  "no_model_training": true
+}

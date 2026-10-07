@@ -1,0 +1,7 @@
+rod,arm,split,entity,n,global_origin_min,global_origin_max,raw_target_alignment_max_error,status
+Rod_1,Rod1_Common4,validation,Rod_1_segment_3,1800,16502,18301,0.0,PASS
+Rod_1,Rod1_AllLegal,validation,Rod_1_segment_3,1800,16502,18301,0.0,PASS
+Rod_2,Rod2_Common4,validation,Rod_2_segment_1,1883,16861,18743,0.0,PASS
+Rod_1,Rod1_Common4,test,Rod_1_segment_3,1544,18559,20102,0.0,PASS
+Rod_1,Rod1_AllLegal,test,Rod_1_segment_3,1544,18559,20102,0.0,PASS
+Rod_2,Rod2_Common4,test,Rod_2_segment_1,1626,19001,20626,0.0,PASS

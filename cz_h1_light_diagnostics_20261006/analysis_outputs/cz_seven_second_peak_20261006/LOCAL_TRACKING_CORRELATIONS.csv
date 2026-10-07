@@ -1,0 +1,7 @@
+rod,variable,n,Pearson_r,Spearman_r,first_difference_Pearson_r,linear_time_partial_Pearson_r,direction_match_fraction,warning
+Rod_1,median_crystal_rotation,9,0.9744984301123158,0.978945010372561,0.15421632928522264,0.3272977456804666,1.0,Descriptive only; time/regime confounding; dependent windows; no causal p-value claimed
+Rod_1,median_crucible_rotation,9,0.5651798709403285,0.6284170203214507,-0.22941573386455402,-0.32705748448755867,0.4,Descriptive only; time/regime confounding; dependent windows; no causal p-value claimed
+Rod_1,nonzero_step_rate_Hz,9,-0.27718060414889684,-0.2383518286124496,-0.5634434757872826,-0.7289482949418821,0.2,Descriptive only; time/regime confounding; dependent windows; no causal p-value claimed
+Rod_2,median_crystal_rotation,9,0.9711085206462031,0.991631652042901,0.7515560967982639,0.7511146458689552,0.75,Descriptive only; time/regime confounding; dependent windows; no causal p-value claimed
+Rod_2,median_crucible_rotation,9,0.5857120834803697,0.5823251360731082,0.19672424866541455,-0.09329799043159834,0.25,Descriptive only; time/regime confounding; dependent windows; no causal p-value claimed
+Rod_2,nonzero_step_rate_Hz,9,-0.3291796996422475,-0.33333333333333337,-0.4683255450461322,-0.5236465068092458,0.375,Descriptive only; time/regime confounding; dependent windows; no causal p-value claimed
