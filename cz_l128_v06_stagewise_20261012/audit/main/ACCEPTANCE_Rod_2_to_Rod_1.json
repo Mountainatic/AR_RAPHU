@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "seconds": 279.7658908367157,
+  "reports": [
+    {
+      "case": "Rod_2_to_Rod_1",
+      "K_route": "ADMITTED",
+      "K_max_abs_prediction_difference": 0.0,
+      "K_predictions_bitwise_equal": true,
+      "K_exact_imports": 21,
+      "C_route": "BYPASSED",
+      "finite_CF_rows": 3840,
+      "no_adaptive_calls_in_fixed_refits": true,
+      "heldout_target_values_not_predictor_inputs": true,
+      "future_residual_does_not_change_mature_features": true,
+      "empty_fold_identity_passed": true,
+      "full_source_K_C_W_A_completed": true,
+      "fit_calls": 12809
+    }
+  ],
+  "target_test_accessed": false,
+  "full_C_W_A_equivalence_claim": false,
+  "scientific_difference": "FINITE_PARAMETER_CF_RECIPES_FROZEN_WITHIN_OUTER_FIT"
+}

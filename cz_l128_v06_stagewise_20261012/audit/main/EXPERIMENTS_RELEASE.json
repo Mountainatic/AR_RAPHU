@@ -1,0 +1,115 @@
+{
+  "status": "FROZEN_BEFORE_EXTENSION_RUNS",
+  "main_release_sha256": "a1109dc5d5e3b6bc0f00ed018b4399ad87b2bf3691f6790c5d881e1b48b3f507",
+  "github_reference_commit": "6ba6f1b510cc3476f9dbd1c64e86b07710b239da",
+  "file_sha256": {
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/research_extension/authority_extension.py": "5bb03c27a7a1d0bcf5ea14a02cfbf1cb2ebc246590ece6cd12e705dd93e5ec5b",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/research_extension/l128_adapter.py": "3526efe2373cd23df5a8d8acd6bc5c29e5f49a1b51673741b04530e3fe1162cd",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/research_extension/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/run_synthetic_extensions.py": "e01fe49a777ef5b0f09595b4bf38795173a6aa08e5417f5d194249a9d26293bb",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/run_dependent_extensions.py": "33a45e838b91d7ece0fe0cc21b04c801fe4952e5727b1c6ca07bbd95c522020e",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/supervise_extensions.py": "b51b42188f293df413fd9c01084087359f8e6c663a08a86ff4d23ed395756328",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/code/src/prism_benchmark/e1e6_revalidation.py": "0a67668f6fecd2668cd3de4a8bfcb56f9317751a5ee1fe020d72a331d58a82a5",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/code/src/prism_benchmark/e1e6_phase_b.py": "f5ef94c2f0b2fcb57351299178dbc32b42dfa2bbdb8cd6a4902597391bc99054",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/code/src/prism_benchmark/e1e6_robustness.py": "b0d44b9fac65b45163438b9275a59356685847f44e1c2d56e77e96153b755f72",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/code/src/prism_benchmark/strict_oof_selection.py": "e7eb8c242b202dbfefc48bed575af0d93c52b8621fe746dd305a53c8241c79ed"
+  },
+  "experiments": {
+    "E2": {
+      "scope": "DATASET_INDEPENDENT_IDENTIFIABLE_E2_V2_ORIGINAL_PROTOCOL",
+      "workers": 6,
+      "dependency": []
+    },
+    "E3": {
+      "scope": "ORIGINAL_EQUAL_BUDGET_LINEAR_DIAGNOSTIC_ON_FROZEN_LEGAL_K_CHANNELS; NOT_FULL_PRISM_K_RETRAIN",
+      "histories": [
+        32,
+        64,
+        128
+      ],
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "fold_PCA": "FIT_PARTITION_ONLY",
+      "dependency": [
+        "BOTH_E1_FREEZES"
+      ]
+    },
+    "E4": {
+      "scope": "DATASET_INDEPENDENT_CANDIDATE_UNIVERSE_AND_FAMILY_SENSITIVITY",
+      "workers": 6,
+      "dependency": []
+    },
+    "E5": {
+      "scope": "E3_E4_STRUCTURAL_STABILITY_AGGREGATE_NO_NEW_FIT",
+      "dependency": [
+        "E3",
+        "E4"
+      ]
+    },
+    "E6": {
+      "scope": "ORIGINAL_COMPACT_SOURCE_MEASUREMENT_NOISE_SURROGATE; NOT_FULL_E1_DEPLOYMENT_ROBUSTNESS",
+      "histories": [
+        32,
+        64,
+        128
+      ],
+      "blocks": 4,
+      "block_rows": 512,
+      "embargo": 132,
+      "N1_seeds": 30,
+      "N2_seeds": 10,
+      "workers": 6,
+      "raw_control_coordinates": true,
+      "dependency": [
+        "BOTH_E1_FREEZES"
+      ]
+    }
+  },
+  "source_support_audit": [
+    {
+      "case": "Rod_1_to_Rod_2",
+      "information": "input_only",
+      "rows": 2048,
+      "strict_past_L128": true,
+      "head_H1": true,
+      "source_train_only": true
+    },
+    {
+      "case": "Rod_1_to_Rod_2",
+      "information": "dynamic",
+      "rows": 2048,
+      "strict_past_L128": true,
+      "head_H1": true,
+      "source_train_only": true
+    },
+    {
+      "case": "Rod_2_to_Rod_1",
+      "information": "input_only",
+      "rows": 2048,
+      "strict_past_L128": true,
+      "head_H1": true,
+      "source_train_only": true
+    },
+    {
+      "case": "Rod_2_to_Rod_1",
+      "information": "dynamic",
+      "rows": 2048,
+      "strict_past_L128": true,
+      "head_H1": true,
+      "source_train_only": true
+    }
+  ],
+  "baseline_models_retrained": false,
+  "private_data_publish": false,
+  "target_test_labels_used": false
+}

@@ -1,0 +1,19 @@
+{
+  "one_family_removed_per_arm": true,
+  "ood_accessed": false,
+  "reference": "STANDARD_FULL_FAMILY",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "status": "COMPLETED",
+  "test_accessed": false
+}

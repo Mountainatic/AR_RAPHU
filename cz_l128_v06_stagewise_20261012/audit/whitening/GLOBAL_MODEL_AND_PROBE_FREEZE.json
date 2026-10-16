@@ -1,0 +1,25 @@
+{
+  "status": "FROZEN_BEFORE_NEW_SAME_ROD_SCORING",
+  "main_release_sha256": "a1109dc5d5e3b6bc0f00ed018b4399ad87b2bf3691f6790c5d881e1b48b3f507",
+  "preregistration_sha256": "06b94e43a208e1c400898bf39c6ff917c168ae02b6c318cd722611783bac0db7",
+  "artifact_sha256": {
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probe_training/Rod1_Common4_K_CF.parquet": "6ed37344d5e025f26f5634bf0c6f56eae6b624f80492217bc9300484b316acf8",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probes/Rod1_Common4_K.npz": "a770a28f52a3e9135eab16d4e263523e93edfa6b509f31fd7ba262b4856f554c",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probe_training/Rod1_Common4_C_CF.parquet": "2ced114cb64898020898795445ffeb1ac389ddd9f07530773d63297bb223e5ff",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probes/Rod1_Common4_C.npz": "2a98871ba2fe8cbd272102e7008fd4eec6d1007927c4129ecab7330a13510900",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probe_training/Rod1_Common4_W_CF.parquet": "8431e211271af4697552ea2e4ff83c8b73956f67e9b77333fb28578a09769a3b",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probes/Rod1_Common4_W.npz": "4f304d6ab336d787cb3d5d373d3532e9f58a3048b18192b18494310782c8a0aa",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probe_training/Rod1_Common4_A_CF.parquet": "8ca610cefc98cfce26973fc5cf9bb812214201b4500cf0502eec53cf7a784386",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probes/Rod1_Common4_A.npz": "0fb24a40bb4a6906ab3332874749349d65d3e4f0377e57315291fd82fcf528fe",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probe_training/Rod2_Common4_K_CF.parquet": "b3e673640a42e6b39b21d24852cdd76e94ae7100c1576344f830c4194cd2bf2c",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probes/Rod2_Common4_K.npz": "5a4a63cb90a396e9ffef30344f668fd3356e1e06a061c43f7b8cdf0670d8d0d0",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probe_training/Rod2_Common4_C_CF.parquet": "b3e673640a42e6b39b21d24852cdd76e94ae7100c1576344f830c4194cd2bf2c",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probes/Rod2_Common4_C.npz": "5a4a63cb90a396e9ffef30344f668fd3356e1e06a061c43f7b8cdf0670d8d0d0",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probe_training/Rod2_Common4_W_CF.parquet": "3f757371123cb2b29cb161cb9ff7bebc47d9fb5a6b8531e1ed304874c088a735",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probes/Rod2_Common4_W.npz": "91866d90b3bfc675fd2a3535901c4be50235afc40c721d563bd4a9da3c5d52cd",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probe_training/Rod2_Common4_A_CF.parquet": "5f03d809b001f09921d30677e4c2c6c88158eda4c55cc10b92a77f9b99c844cc",
+    "/root/autodl-tmp/CZ_H1_WHITENING_NEW_E1_L128_20261012/probes/Rod2_Common4_A.npz": "03935ccbade5f060a1445adf7c502db7825bb7d79ae4de391bb085eaf23cd745"
+  },
+  "diagnostic_probe_fit_calls": 8,
+  "main_model_fit_calls": 0
+}

@@ -1,0 +1,8 @@
+{
+  "role": "READ_ONLY_FROZEN_DIAGNOSTICS",
+  "main_release_sha256": "a1109dc5d5e3b6bc0f00ed018b4399ad87b2bf3691f6790c5d881e1b48b3f507",
+  "fit_allowed": false,
+  "source_sha256": "bfb295cd144a5dd3b0e1769168aa6fe8b232c1ddb81aa4490aa65f606f2d7319",
+  "repair": "SUPPLY_ACTUAL_RECORDED_LEVEL_REQUIRED_BY_OBSERVATION_AUDIT",
+  "prior_error_preserved": true
+}

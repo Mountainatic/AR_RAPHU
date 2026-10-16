@@ -1,0 +1,15 @@
+{
+  "formal_seeds": 30,
+  "generator": "IDENTIFIABLE_E2_V2",
+  "null_sample_sizes": [
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "null_seeds_per_size": 30,
+  "ood_accessed": false,
+  "screening_seeds": 10,
+  "status": "COMPLETED",
+  "test_accessed": false
+}

@@ -1,0 +1,14 @@
+{
+  "status": "ACCEPTED_FROZEN_INFERENCE_REPLACEMENT",
+  "unix": 1791790732.246485,
+  "main_release_sha256": "a1109dc5d5e3b6bc0f00ed018b4399ad87b2bf3691f6790c5d881e1b48b3f507",
+  "acceptance_sha256": "f94cbd72183dc3ca1d43ff94cd7ddef2e54180f9dd529b5a22ec1c522e4b8f7d",
+  "inference_extension_sha256": "22d9e73a3a05b9f0f231b6c4e8fbafd11a42370d2be31d5ce592e26c33a29abc",
+  "controller_sha256": "77dbf0e30491586448b5673bf55b35bca0b32c6fc441de76a662d6815d0b9a35",
+  "global_freeze_sha256": "5ecd6f09c6595b45851225b3c8282ed44f00c7d03b416c3c66663735d1bf0e17",
+  "old_controller_pid": 69564,
+  "old_partial_predictions_archived": "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/inference_initial_scoring",
+  "training_repeated": false,
+  "fit_allowed": false,
+  "pid": 70102
+}

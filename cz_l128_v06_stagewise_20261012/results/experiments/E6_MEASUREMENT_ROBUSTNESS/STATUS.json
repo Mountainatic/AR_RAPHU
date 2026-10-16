@@ -1,0 +1,26 @@
+{
+  "alpha_zero_seed_invariance_certificate": true,
+  "block_embargo": 132,
+  "block_rows": 512,
+  "directions": [
+    "Rod_1_to_Rod_2",
+    "Rod_2_to_Rod_1"
+  ],
+  "finite_numeric_certificate": true,
+  "formal_test_used_as_evaluation": false,
+  "future_truth_clean": true,
+  "histories": [
+    32,
+    64,
+    128
+  ],
+  "n1_alpha_zero_seed_invariance_certificate": true,
+  "n1_rows": 900,
+  "n2_rows": 4560,
+  "ood_accessed": false,
+  "protocol": "CZ_RAW2S_CURRENT_L128_H1_W1_W0_1",
+  "row_count_certificate": true,
+  "scope": "PRIVATE_CZ_AUTHORITY_ALIGNED_EXTENSION_NOT_AUTHORITY_BRANCH_OUTPUT",
+  "status": "COMPLETED",
+  "test_accessed": false
+}

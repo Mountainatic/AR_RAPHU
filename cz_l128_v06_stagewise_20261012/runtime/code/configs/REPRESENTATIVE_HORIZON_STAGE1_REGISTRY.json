@@ -1,0 +1,141 @@
+{
+  "schema_version": "1.2",
+  "protocol_id": "REPRESENTATIVE_STAGE1_TEP_SRU_CZ_L256_FORMAL_V1",
+  "evidence_class": "POST_HOC_HORIZON_EXTENSION_WITH_PREDECLARED_SETTINGS",
+  "status": "FORMAL_RERUN_PROTOCOL_FROZEN_BEFORE_FRESH_C1",
+  "user_override_2026_08_24": {
+    "field": "CZ task semantics",
+    "supersedes_prompt2_cz_h120_and_l128_direct_level": true,
+    "value": "raw 2-second L256 past-only delta-nowcast with reconstructed-level primary R2"
+  },
+  "active_datasets": ["tep", "sru", "cz_czochralski"],
+  "reserved_datasets": {
+    "debutanizer": "NOT_RUN_BY_USER_SCOPE",
+    "pmsm": "NOT_RUN_BY_USER_SCOPE",
+    "metropt": "NOT_RUN_BY_USER_SCOPE"
+  },
+  "neural3_status": "NOT_RUN_BY_USER_SCOPE",
+  "stage2_status": "NOT_RUN_BY_USER_SCOPE",
+  "tasks": [
+    {
+      "task_id": "TEP_G_REP_H1",
+      "execution_status": "ACTIVE_FRESH_RERUN",
+      "parent_task_id": "TEP_G12",
+      "dataset": "tep",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 180,
+      "h_steps": 1,
+      "horizon_seconds": 180,
+      "w_steps": 2,
+      "w0_steps": 2,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "DEB_C4_REP_H3",
+      "execution_status": "NOT_RUN_BY_USER_SCOPE",
+      "parent_task_id": "DEB_C4",
+      "dataset": "debutanizer",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 360,
+      "h_steps": 3,
+      "horizon_seconds": 1080,
+      "w_steps": 1,
+      "w0_steps": 1,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "SRU_H2S_REP_H1",
+      "execution_status": "ACTIVE_FRESH_RERUN",
+      "parent_task_id": "SRU_H2S",
+      "dataset": "sru",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 60,
+      "h_steps": 1,
+      "horizon_seconds": 60,
+      "w_steps": 1,
+      "w0_steps": 1,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "SRU_SO2_REP_H1",
+      "execution_status": "ACTIVE_FRESH_RERUN",
+      "parent_task_id": "SRU_SO2",
+      "dataset": "sru",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 60,
+      "h_steps": 1,
+      "horizon_seconds": 60,
+      "w_steps": 1,
+      "w0_steps": 1,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "PMSM_PM_REP_H10",
+      "execution_status": "NOT_RUN_BY_USER_SCOPE",
+      "parent_task_id": "PMSM_PM5",
+      "dataset": "pmsm",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 0.5,
+      "h_steps": 10,
+      "horizon_seconds": 5,
+      "w_steps": 60,
+      "w0_steps": 60,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "METRO_P_REP_H360",
+      "execution_status": "NOT_RUN_BY_USER_SCOPE",
+      "parent_task_id": "METRO_P60",
+      "dataset": "metropt",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 10,
+      "h_steps": 360,
+      "horizon_seconds": 3600,
+      "w_steps": 1,
+      "w0_steps": 1,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "METRO_OIL_REP_H360",
+      "execution_status": "NOT_RUN_BY_USER_SCOPE",
+      "parent_task_id": "METRO_OIL20",
+      "dataset": "metropt",
+      "target_representation": "REGISTERED_CHANGE",
+      "cadence_seconds": 10,
+      "h_steps": 360,
+      "horizon_seconds": 3600,
+      "w_steps": 12,
+      "w0_steps": 12,
+      "changed_field": "horizon_only"
+    },
+    {
+      "task_id": "CZ_DIAM_RAW2S_CURRENT_L256",
+      "parent_task_id": "CZ_D20",
+      "execution_status": "ACTIVE_FRESH_RERUN",
+      "dataset": "cz_czochralski",
+      "target_representation": "DELTA_FROM_LAST_OBSERVED_LEVEL",
+      "target_semantics": "D[t]-D[t-1] with D[t-1]+delta_pred level reconstruction",
+      "origin_semantics": "current target row t at exclusive history stop",
+      "cadence_seconds": 2,
+      "aggregation": "NONE_RAW_ROWS",
+      "h_steps": 0,
+      "horizon_seconds": 0,
+      "target_window_steps": 1,
+      "lookback_steps": 256,
+      "lookback_seconds": 512,
+      "history_interval": "[t-256,t)",
+      "max_input_index": "t-1",
+      "target_index": "t",
+      "changed_field": "user_override_target_cadence_horizon_and_history"
+    }
+  ],
+  "global_order": [
+    "ALL_STAGE1_DEVELOPMENT",
+    "GLOBAL_SELECTION_FREEZE",
+    "FINAL_FIT_ONCE_AND_IMMUTABLE_CHECKPOINT",
+    "ALL_FINAL_TEST_AND_OOD_INFERENCE_ONLY"
+  ],
+  "test_accessed": false,
+  "ood_accessed": false,
+  "global_freeze_created": false
+}

@@ -1,0 +1,45 @@
+{
+  "experiment_id": "stage1_representative_ext_20260825",
+  "baseline_branch": "prism-v2-1-1-tep-sru-cz-l256-formal-20260825",
+  "baseline_commit": "89471c12001a9bc514e02fa2df82e77d3802170d",
+  "support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+  "tep": {
+    "shared_readonly": "/root/autodl-tmp/PRISM_V211_REPRESENTATIVE_TEP_SRU_CZ_L256_FORMAL_20260825_R3/public/shared",
+    "task_id": "TEP_G_REP_H1",
+    "head_id": "TEP_G_REP_H1__H1__W2",
+    "cadence_seconds": 180,
+    "prediction_scale_seconds": 180,
+    "history_steps": [128, 256],
+    "information_sets": ["input_only", "dynamic"],
+    "dynamic_availability": "analyzer_maturity_5_steps",
+    "proxy_policy": "proxy_excluded"
+  },
+  "cz": {
+    "raw_root": "/root/autodl-tmp/PRISM_DATASETS_V1/raw_sources/cz_czochralski",
+    "history_steps": 256,
+    "sampling_period_seconds": 2,
+    "h_steps": [1, 2, 4, 8, 16],
+    "h_unit": "sampling_points",
+    "directions": ["Rod_1_to_Rod_2", "Rod_2_to_Rod_1"],
+    "input_interval": "[t-256,t)",
+    "target_formula": "D[t+h-1]-D[t-1]",
+    "level_reconstruction": "D[t-1]+delta_pred"
+  },
+  "resources": {
+    "memory_hard_limit_gib": 90,
+    "memory_recommended_limit_gib": 75,
+    "storage_stopline_gib": 5,
+    "workers": 1,
+    "blas_threads": 1
+  },
+  "pilot": {
+    "tep_model": "LSTM",
+    "tep_information_set": "input_only",
+    "cz_h_steps": [1],
+    "cz_directions": ["Rod_1_to_Rod_2"],
+    "max_epochs": 2,
+    "patience": 1,
+    "fit_row_cap": 2048,
+    "validation_row_cap": 512
+  }
+}

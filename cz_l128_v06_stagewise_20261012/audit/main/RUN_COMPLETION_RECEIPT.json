@@ -1,0 +1,34 @@
+{
+  "status": "ALL_REGISTERED_TASKS_COMPLETED",
+  "utc": "2026-10-12T07:43:10Z",
+  "main_release_sha256": "a1109dc5d5e3b6bc0f00ed018b4399ad87b2bf3691f6790c5d881e1b48b3f507",
+  "main_directions": [
+    "Rod_1_to_Rod_2",
+    "Rod_2_to_Rod_1"
+  ],
+  "E1": "FULL_REGISTERED_URYSHON_K_C_W_A_SOURCE_FITS_AND_FROZEN_TARGET_PREDICTIONS",
+  "E2_E6": "ORIGINAL_BRANCH_EXPERIMENT_SCOPES_COMPLETED",
+  "E3_scope": "EQUAL_BUDGET_LINEAR_DIAGNOSTIC_NOT_FULL_MAIN_K_RETRAIN",
+  "E6_scope": "COMPACT_SOURCE_NOISE_SURROGATE_NOT_FULL_MAIN_ROBUSTNESS",
+  "metric_rows": 164,
+  "target_baseline_prediction_files": 148,
+  "main_stage_prediction_files": 16,
+  "inference_fit_calls": 0,
+  "receipt_sha256": {
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/inference/Rod_1_to_Rod_2/validation/INFERENCE_RECEIPT.json": "d7673e2228a312973646f26d11714f5bfae828c51e6a31a497ad19842815a15d",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/inference/Rod_1_to_Rod_2/test/INFERENCE_RECEIPT.json": "b2ea2247d625c04f5350c9617e3facf947810268871f67f02b4c2a14ca052185",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/inference/Rod_2_to_Rod_1/validation/INFERENCE_RECEIPT.json": "5c2b41304a283aa62766304654a0bfa05826a82afcc3920c7da2bb0ed6558b6a",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/inference/Rod_2_to_Rod_1/test/INFERENCE_RECEIPT.json": "9f79cc7d93d301e0d9d824c39fc22201a3744fa3652eefd9d58716844f66c0a2"
+  },
+  "metrics_sha256": "9e782d7a758c3e9d6b1292ff6d1e8e1bc947f1ba291665e5b705e8dcf6f60eda",
+  "free_GiB": 35.15071105957031,
+  "source_fit_seconds_by_direction": {
+    "Rod_1_to_Rod_2": 266.54903054237366,
+    "Rod_2_to_Rod_1": 279.7658908367157
+  },
+  "old_K_models_reused": 42,
+  "old_K_predictions_bitwise_equal": true,
+  "old_candidate_bytes_removed": 29679350904,
+  "adaptive_selection": "OUTER_FIT_LOCAL_STAGEWISE_PARAMETER_CF_NOT_FULLY_NESTED_HYPERPARAMETER_CF",
+  "target_claim": "RETROSPECTIVE_PROTOCOL_DEVELOPMENT_NOT_VIRGIN_CONFIRMATORY_TEST"
+}

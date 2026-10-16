@@ -1,0 +1,138 @@
+{
+  "candidates": [
+    [
+      "ADDITIVE_COMPRESSED",
+      1e-08
+    ],
+    [
+      "ADDITIVE_COMPRESSED",
+      2.848035868435799e-07
+    ],
+    [
+      "ADDITIVE_COMPRESSED",
+      8.111308307896873e-06
+    ],
+    [
+      "ADDITIVE_COMPRESSED",
+      0.0002310129700083158
+    ],
+    [
+      "ADDITIVE_COMPRESSED",
+      0.006579332246575682
+    ],
+    [
+      "ADDITIVE_COMPRESSED",
+      0.18738174228603832
+    ],
+    [
+      "ADDITIVE_COMPRESSED",
+      5.336699231206313
+    ],
+    [
+      "ADDITIVE_COMPRESSED",
+      151.99110829529332
+    ],
+    [
+      "ADDITIVE_COMPRESSED",
+      4328.7612810830615
+    ],
+    [
+      "ADDITIVE_COMPRESSED",
+      123284.67394420659
+    ],
+    [
+      "ADDITIVE_COMPRESSED",
+      3511191.7342151273
+    ],
+    [
+      "ADDITIVE_COMPRESSED",
+      100000000.0
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      1e-08
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      2.848035868435799e-07
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      8.111308307896873e-06
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      0.0002310129700083158
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      0.006579332246575682
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      0.18738174228603832
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      5.336699231206313
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      151.99110829529332
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      4328.7612810830615
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      123284.67394420659
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      3511191.7342151273
+    ],
+    [
+      "ADDITIVE_JOINT_BASIS",
+      100000000.0
+    ]
+  ],
+  "families": [
+    "ADDITIVE_COMPRESSED",
+    "ADDITIVE_JOINT_BASIS"
+  ],
+  "alpha_grid": [
+    1e-08,
+    2.848035868435799e-07,
+    8.111308307896873e-06,
+    0.0002310129700083158,
+    0.006579332246575682,
+    0.18738174228603832,
+    5.336699231206313,
+    151.99110829529332,
+    4328.7612810830615,
+    123284.67394420659,
+    3511191.7342151273,
+    100000000.0
+  ],
+  "fit_target": "y-F_K",
+  "support_role": "FROZEN_LEGAL_K_ASSEMBLY_EXACT_COMMON_SCORE",
+  "predictive_parameters": [
+    "family",
+    "alpha"
+  ],
+  "numerical_only_parameters": [],
+  "schema": "CZ_EFFECTIVE_MODEL_REGISTRY_V1",
+  "registration_order": "EXACT_CANDIDATES_LIST_ORDER",
+  "source_authority_binding": {
+    "configs/cz_h1_k_temporal_registry_v2/AUTHORITY_UNCHANGED_BINDINGS.json": "09ef030d72279704974670965d9eb40702f41a657f199c7df549e499062c6a29",
+    "configs/cz_h1_k_temporal_registry_v2/CZ_H1_K_REGISTRY_PREFLIGHT.json": "dfa7da5ca7d080b459ff2436cacd08616ac0b65fcb019001bce773b4cab20e3a",
+    "configs/cz_h1_k_temporal_registry_v2/CZ_H1_K_TEMPORAL_REGISTRY_V2.json": "c66d8dd92e9035a9411dcb7fe00898ad819cd268c7df6d38024e7bf029a6762e",
+    "configs/cz_h1_k_temporal_registry_v2/CZ_H1_K_TEMPORAL_REGISTRY_V2_SEAL.json": "4b2d1fda1186473141461921af19c9361cfd61ef79b0bec42b84623091446104",
+    "configs/cz_h1_k_temporal_registry_v2/H1_PROFILE_REGISTRY_BEFORE.json": "25c2979f77e4db6cd169e269737bcfbc921697cb3b35445e6dc8dac374eece0f",
+    "configs/cz_h1_k_temporal_registry_v2/H4_PROFILE_REGISTRY_AFTER.json": "6609958a2507a01aa3f28aa57e902d111c74009723bbb7e366d69359cf96a355",
+    "configs/cz_h1_k_temporal_registry_v2/H4_PROFILE_REGISTRY_BEFORE.json": "6609958a2507a01aa3f28aa57e902d111c74009723bbb7e366d69359cf96a355"
+  },
+  "identity_is_candidate": false,
+  "payload_sha256": "863b8e4fb940249336ed170a9c020cfcae553d2abecd5d937519efc7319cfb2d"
+}

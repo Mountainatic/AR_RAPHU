@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "reports": [
+    {
+      "case": "Rod_1_to_Rod_2",
+      "rows": 180,
+      "max_abs_error": 0.0,
+      "tolerance": 1.7763568394002505e-15,
+      "mask_equal": true,
+      "NA_parent_bitwise_equal": true,
+      "future_feedback_cannot_change_earlier_predictions": true,
+      "legacy_seconds": 4.259203672409058,
+      "fast_seconds": 0.02082657814025879,
+      "fit_calls": 0
+    },
+    {
+      "case": "Rod_2_to_Rod_1",
+      "rows": 180,
+      "max_abs_error": 0.0,
+      "tolerance": 1.7763568394002505e-15,
+      "mask_equal": true,
+      "NA_parent_bitwise_equal": true,
+      "future_feedback_cannot_change_earlier_predictions": true,
+      "legacy_seconds": 4.2877161502838135,
+      "fast_seconds": 0.029723644256591797,
+      "fit_calls": 0
+    }
+  ],
+  "target_test_accessed": false
+}

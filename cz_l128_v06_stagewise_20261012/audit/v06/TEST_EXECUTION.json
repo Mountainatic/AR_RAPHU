@@ -1,0 +1,7 @@
+{
+  "command": "/root/miniconda3/bin/python -m pytest tests/test_discrete_v06.py test_l128_adapter.py -q",
+  "elapsed_seconds": 3.33555253999657,
+  "exit_code": 0,
+  "stdout": "...............................                                          [100%]\n31 passed in 2.51s\n",
+  "stderr": ""
+}

@@ -1,0 +1,11 @@
+{
+  "status": "PINNED_BEFORE_EQUIVALENCE_ACCEPTANCE",
+  "main_release_sha256": "a1109dc5d5e3b6bc0f00ed018b4399ad87b2bf3691f6790c5d881e1b48b3f507",
+  "file_sha256": {
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/fast_inference.py": "dc39ea201800d06cf828c104d1516c9cf2cc4ec0a4d69f8f7a1a5aa7a94976e5",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/test_fast_inference.py": "13552cfd419165e30d3d5bbae92b011d99569c49d067b57d693a98ff97b61aec"
+  },
+  "fit_allowed": false,
+  "feature_maturity_unchanged": true,
+  "maximum_prediction_difference": 1.7763568394002505e-15
+}

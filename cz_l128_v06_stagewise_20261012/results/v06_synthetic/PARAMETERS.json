@@ -1,0 +1,52 @@
+{
+  "seed": 20261010,
+  "scenes": {
+    "S1": {
+      "N": 4096,
+      "Ts_seconds": 2.0,
+      "delta": 0.01,
+      "no_sine": true,
+      "ratios": [
+        0.14285714285714285,
+        0.2857142857142857,
+        0.375,
+        0.1414213562373095
+      ],
+      "q7_fundamental_seconds": 14.0,
+      "seven_seconds_is_possible_harmonic": true
+    },
+    "S2": {
+      "N": 4096,
+      "Ts_seconds": 2.0,
+      "delta": 0.01,
+      "noise_sd": 0.0025,
+      "noise_empirical_mean": 2.9652289640331132e-05,
+      "quantization_error_iid_claim": false
+    },
+    "S3": {
+      "N": 4096,
+      "Ts_seconds": 2.0,
+      "delta": 0.01,
+      "before_sampling_Ts_seconds": 0.2,
+      "injected_frequencies_Hz": [
+        0.14285714285714285,
+        0.137,
+        0.149
+      ],
+      "amplitude": 0.003,
+      "proves_quantization_root": false
+    },
+    "S4": {
+      "N": 4096,
+      "Ts_seconds": 2.0,
+      "delta": 0.01,
+      "f0_Hz": 0.357142857,
+      "fs_Hz": 0.5,
+      "alias_Hz": 0.14285714300000008,
+      "measured_sensor_high_frequency_claim": false,
+      "before_sampling_Ts_seconds": 0.2
+    }
+  },
+  "quantizer_tie_rule": "half-up floor(x/delta+0.5)",
+  "quantizer_tolerance_grid_units": 1e-10
+}

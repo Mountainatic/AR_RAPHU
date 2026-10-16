@@ -1,0 +1,8 @@
+{
+  "canonical_engine_sha256_lf": "3e96febddce0d9d48929837a079409f28cc3dff02143f80d1fbc3077f7c814d2",
+  "source_namespace": "CZ_R2_CANONICAL_V22_REPAIR_20261002",
+  "canonical_core_sha256_lf": "9e0cb152f8e6fb180be62e8ea2affe18fd1c7cd69aa1a5ad857d5f611f10e70a",
+  "registry_base_commit": "e6c7185fe8f2d5eddd47da2acc4361726ee51c09",
+  "baseline_modified": false,
+  "source_file": "analysis_outputs/cz_r2_canonical_v22_20261002/canonical_engine.py"
+}

@@ -1,0 +1,135 @@
+{
+  "schema": "CZ_NEW_E1_SAME_ROD_WHITENING_V1",
+  "classification": "POST_HOC_DESCRIPTIVE_WHITENING_DIAGNOSTIC",
+  "created_utc": "2026-10-12T08:28:33Z",
+  "main_root": "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012",
+  "main_release_sha256": "a1109dc5d5e3b6bc0f00ed018b4399ad87b2bf3691f6790c5d881e1b48b3f507",
+  "model": "COMPLETE_NEW_STAGEWISE_URYSHON_K_C_W_A",
+  "input_history_samples": 128,
+  "input_history_seconds": 256,
+  "membership_sha256": "585d1297e679b2f5755aa41c281ebbc86c5aeb336f087e692fcff7127b4e9a06",
+  "cases": {
+    "Rod1_Common4": {
+      "training_rod": "Rod_1",
+      "evaluation_rod": "Rod_1",
+      "inherited_case_id": "Rod_1_to_Rod_2",
+      "train_rows": 15431,
+      "validation_rows": 1800,
+      "descriptive_holdout_rows": 1544,
+      "routes": {
+        "K": "ADMITTED",
+        "C": "BYPASSED",
+        "W": "BYPASSED",
+        "A": "ADMITTED"
+      },
+      "A_profile": [
+        1,
+        96
+      ],
+      "deployment_sha256": "52fd5219e3e73971253a5fadfcccb5382880b17481c704214dc05e3e7b502d46",
+      "full_new_E1_model_used": true
+    },
+    "Rod2_Common4": {
+      "training_rod": "Rod_2",
+      "evaluation_rod": "Rod_2",
+      "inherited_case_id": "Rod_2_to_Rod_1",
+      "train_rows": 16092,
+      "validation_rows": 1883,
+      "descriptive_holdout_rows": 1626,
+      "routes": {
+        "K": "ADMITTED",
+        "C": "BYPASSED",
+        "W": "ADMITTED",
+        "A": "ADMITTED"
+      },
+      "A_profile": [
+        1,
+        32
+      ],
+      "deployment_sha256": "e10b355b20aca6f96be667528a32740d49178be6e6c5b3941cacf1a18d7cc323",
+      "full_new_E1_model_used": true
+    }
+  },
+  "split_rule": "EXACT_PRIOR_SAME_ROD_MEMBERSHIP: original source train; validation first half; purge257; descriptive tail",
+  "main_model_training": "EXACT_VERIFIED_REUSE_OF_NEW_E1_SOURCE_TRAIN_CHECKPOINTS",
+  "main_route_or_recipe_retuning": false,
+  "main_model_fit_allowed": false,
+  "A_recipe": "EXACT_NEW_E1_SOURCE_DEVELOPMENT_SELECTED_AND_FROZEN",
+  "scoring": "EMPTY_RESIDUAL_STATE_PER_SPLIT_AND_ENTITY; ONLY_MATURE_PREVIOUS_DEPLOYED_W_RESIDUALS",
+  "probe": {
+    "H": 32,
+    "alpha": 1.0,
+    "fit": "SEALED_NEW_E1_OUTER_OOF_GLOBAL_DEPLOYED_RESIDUALS",
+    "fold_boundary_reset": true,
+    "probe_fit_before_validation_and_holdout_scoring": true,
+    "used_for_selection": false
+  },
+  "PSD": {
+    "fs_Hz": 0.5,
+    "nperseg": 1024,
+    "noverlap": 512,
+    "band_Hz": [
+      0.125,
+      0.155
+    ],
+    "detrend": "constant",
+    "method": "WELCH_SAME_AS_PRIOR_WHITENING"
+  },
+  "ACF": {
+    "method": "GLOBAL_CENTERED_BIASED_SEGMENTED_FFT",
+    "E_lags": [
+      160,
+      900
+    ]
+  },
+  "v06_diagnostics": "CURRENT_RELEASE_DISCRETE_OBSERVATION_TARGET_AUDIT_SEGMENTED_PSD_ACF_PACF_READ_ONLY",
+  "white_noise_gate": false,
+  "instrument_unit_verified": false,
+  "cadence_evidence": "REGISTERED_2S_NOT_INDEPENDENT_TIMESTAMPS",
+  "all_legal_arm": "NOT_IN_CURRENT_NEW_E1_REGISTERED_CHANNEL_UNIVERSE; NOT_EXECUTED_OR_SUBSTITUTED_WITH_RIDGE",
+  "historical_test_seen": true,
+  "independent_confirmatory_claim": false,
+  "bound_artifact_sha256": {
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/DEPLOYMENT_SEAL.json": "52fd5219e3e73971253a5fadfcccb5382880b17481c704214dc05e3e7b502d46",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/K/72e718bac9e7adbe12429983705eb3c347d4e26655e417c04d390ac4e442534c/FROZEN_OOF_0.parquet": "7e1de01de2fe283f8a84f4ef5ebdc5784556aae78eba5d709080ddf465ce4eee",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/K/72e718bac9e7adbe12429983705eb3c347d4e26655e417c04d390ac4e442534c/FROZEN_OOF_1.parquet": "8411d654ccf1fb09bf03172d40d0e938638b5e0b065490d2223b48afe86abe43",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/K/72e718bac9e7adbe12429983705eb3c347d4e26655e417c04d390ac4e442534c/FROZEN_OOF_2.parquet": "e235a3d3ca5d2a218a4ece5c8a5dd61ab7c235dcc1701fdaa7703b76a84baea8",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/K/72e718bac9e7adbe12429983705eb3c347d4e26655e417c04d390ac4e442534c/FROZEN_OOF_3.parquet": "930efa36134cd1cb54a3cf74886f537011645f3f88de12e98c5f4f800002bc42",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/C/3b447a306c76c8adecc4a8ae8b18503f3d28b57af954d7ad237a6adabe8712b4/FROZEN_OOF_0.parquet": "9a8e3e30e592a9d986ca05b7eed5fab3b12854041462dfbaa66c5012a1db8a28",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/C/3b447a306c76c8adecc4a8ae8b18503f3d28b57af954d7ad237a6adabe8712b4/FROZEN_OOF_1.parquet": "60be7831c3d160e5cfb6272a27917c0b4fe46c13c94943a3102457f2feeace83",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/C/3b447a306c76c8adecc4a8ae8b18503f3d28b57af954d7ad237a6adabe8712b4/FROZEN_OOF_2.parquet": "35bf2884edbc94adf5d82cc33df7fc8037172eb8a043cded4bf3ced2a3aedc5a",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/C/3b447a306c76c8adecc4a8ae8b18503f3d28b57af954d7ad237a6adabe8712b4/FROZEN_OOF_3.parquet": "2405024d62b8d34c3ccac43549309ce6e3683b63e585cd482dcaf9a2ff74fb03",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/W/93bb507ce5273a4907cbf559454458adf2fce7ad11bb5086ad816e4549fc8300/FROZEN_OOF_0.parquet": "25be58c6249474abbc76eaf864c84af782e692fe67c44b3b8b3ea8212e885190",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/W/93bb507ce5273a4907cbf559454458adf2fce7ad11bb5086ad816e4549fc8300/FROZEN_OOF_1.parquet": "53a190216439b6e8829c8c3fe879d8c0b5390303b200767c2e7ab8d539f8db72",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/W/93bb507ce5273a4907cbf559454458adf2fce7ad11bb5086ad816e4549fc8300/FROZEN_OOF_2.parquet": "3a21c3d013b65621e64ff2e8630b24116060f16c8791429dd89feebc6d0ae644",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/W/93bb507ce5273a4907cbf559454458adf2fce7ad11bb5086ad816e4549fc8300/FROZEN_OOF_3.parquet": "3d1dd822bd4ccbf2100da636c06800d06c32dbcf6beca79242409fa8c1a42cc9",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/A/419585ef0aa42033c7d0c1080c5c3d4a84e378dd47472814cbfa5f43a8cbe564/FROZEN_OOF_0.parquet": "0adc4ae0868a0182aef53282899f2f180302c7c8ffa7af32c66a98eaf24944ed",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/A/419585ef0aa42033c7d0c1080c5c3d4a84e378dd47472814cbfa5f43a8cbe564/FROZEN_OOF_1.parquet": "eccf08f1f86095f774167b8f94357a06289a8648f08cc4de66892b048316213c",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/A/419585ef0aa42033c7d0c1080c5c3d4a84e378dd47472814cbfa5f43a8cbe564/FROZEN_OOF_2.parquet": "e8ff517b06c977a51348d0e1271e28c762486ba2eae2d7dda4785a0eb5ef93e8",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_1_to_Rod_2/models/A/419585ef0aa42033c7d0c1080c5c3d4a84e378dd47472814cbfa5f43a8cbe564/FROZEN_OOF_3.parquet": "4446f05f6e1bf51599663981a3cdb25724189c637f6c5d7c3ee81bf8157b4678",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/DEPLOYMENT_SEAL.json": "e10b355b20aca6f96be667528a32740d49178be6e6c5b3941cacf1a18d7cc323",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/K/0cff16fe03158f89156122cf79d80cb1e6d03195c2bc4cab247e64c8e639bf9d/FROZEN_OOF_0.parquet": "9aaf9f711e588517efa48f99c8986548631496a7ad49c7bff5814394799201a7",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/K/0cff16fe03158f89156122cf79d80cb1e6d03195c2bc4cab247e64c8e639bf9d/FROZEN_OOF_1.parquet": "1684a8a81f35a98ff62ace5f53a79b515cf4e40e3b0bad80c54bfff3bea27455",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/K/0cff16fe03158f89156122cf79d80cb1e6d03195c2bc4cab247e64c8e639bf9d/FROZEN_OOF_2.parquet": "d855ebb90d18047ce0458374ff81a4c434dbcdca0deca320f727405021aec096",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/K/0cff16fe03158f89156122cf79d80cb1e6d03195c2bc4cab247e64c8e639bf9d/FROZEN_OOF_3.parquet": "d818c0d7a1784919ff06b05a6591c5881bc93984532509b1f87a6a73acfc9b7b",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/C/1a366cef3b6c19b4b65cd5f40a056a63ad3aedd29e83cc97cd2f07bcb62a77bc/FROZEN_OOF_0.parquet": "c64af19128a56458101f824fdcafbfbb4b813a4d70aea891a786d9919b1e1910",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/C/1a366cef3b6c19b4b65cd5f40a056a63ad3aedd29e83cc97cd2f07bcb62a77bc/FROZEN_OOF_1.parquet": "d5bbd15ad639b71f3d2d8090ad77024d876cefa0b1b9a12808c4021f6991d023",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/C/1a366cef3b6c19b4b65cd5f40a056a63ad3aedd29e83cc97cd2f07bcb62a77bc/FROZEN_OOF_2.parquet": "56c3033102fc7ee5aeb78a32ae8cf9bcf2154c5699816016ed308d488c9f5250",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/C/1a366cef3b6c19b4b65cd5f40a056a63ad3aedd29e83cc97cd2f07bcb62a77bc/FROZEN_OOF_3.parquet": "b724638d94fc4b0f3792c20e38bd8a66d5c607be03f9719e3093329ae2a937c8",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/W/0ee78c5f29eb235ca6ecacb0907c3567d081118459502400d539452a24cb0f46/FROZEN_OOF_0.parquet": "1153793d154634612840341e37deacc4d529b74c6eb3ac84edf0f28d39c51aae",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/W/0ee78c5f29eb235ca6ecacb0907c3567d081118459502400d539452a24cb0f46/FROZEN_OOF_1.parquet": "466651ddc3db3fcb1afaa3584c093a0af8fad60903d02e750b82c72b8efe6c6c",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/W/0ee78c5f29eb235ca6ecacb0907c3567d081118459502400d539452a24cb0f46/FROZEN_OOF_2.parquet": "459f1ce120d459036d1cce9f5299149391c6c2bd336649b86747b2da04481a39",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/W/0ee78c5f29eb235ca6ecacb0907c3567d081118459502400d539452a24cb0f46/FROZEN_OOF_3.parquet": "f2ae4a4bd69a25c122c19be27cf5312c4548f20879354526583f1f8d2556872e",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/A/59ed9e36a2fbdf31840b5253ad41c92a9b1faf8adbc1bc5a82224110812dfe47/FROZEN_OOF_0.parquet": "00aefc92bcde8cce82bb7ca00a0241b1803dda6b91d4989cee4c3bb0af65e99e",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/A/59ed9e36a2fbdf31840b5253ad41c92a9b1faf8adbc1bc5a82224110812dfe47/FROZEN_OOF_1.parquet": "dcf2cb0089fb25d9d2d0ac646af1938dcbff11b6f668c3984fb118b45e921a5e",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/A/59ed9e36a2fbdf31840b5253ad41c92a9b1faf8adbc1bc5a82224110812dfe47/FROZEN_OOF_2.parquet": "e2098404077cddae0b1ad417110301bd0058edd211f481eae997ea02e37d24e8",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/formal_actual/Rod_2_to_Rod_1/models/A/59ed9e36a2fbdf31840b5253ad41c92a9b1faf8adbc1bc5a82224110812dfe47/FROZEN_OOF_3.parquet": "9f36da7b724ef717aa085fecee1fe837f8b4f75611da7c244e74b69daedbbb04",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/INFERENCE_EXTENSION_SEAL.json": "22d9e73a3a05b9f0f231b6c4e8fbafd11a42370d2be31d5ce592e26c33a29abc",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/INFERENCE_EXTENSION_ACCEPTANCE.json": "f94cbd72183dc3ca1d43ff94cd7ddef2e54180f9dd529b5a22ec1c522e4b8f7d",
+    "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V3_20261012/release/RELEASE_SEAL.json": "a1109dc5d5e3b6bc0f00ed018b4399ad87b2bf3691f6790c5d881e1b48b3f507"
+  },
+  "adapter_source_sha256": {
+    "rerun_new_e1.py": "281c162c2aaf342fcb00b318719070b9a4b3e14a0061445b40600cc1478a6adc",
+    "whitening_statistics.py": "4be347c2d74d5b9d6ed9559316686f7120176363a1f0b1d57b9f7be7ab3b1389"
+  }
+}

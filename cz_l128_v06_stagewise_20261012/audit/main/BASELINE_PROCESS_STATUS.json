@@ -1,0 +1,9 @@
+{
+  "status": "REUSED_VERIFIED_FROZEN_AND_TARGET_SCORED",
+  "cpu_deployments": 28,
+  "cpu_protocol_NA": 6,
+  "neural_jobs": 12,
+  "neural_seed_checkpoints": 120,
+  "train_repeated": false,
+  "baseline_import_receipt_sha256": "c4cd3842a4399a5a3dba4c342e87523aba5ca41f9f61b51480ecf3ab96f71716"
+}

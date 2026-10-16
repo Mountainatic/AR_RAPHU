@@ -1,0 +1,25 @@
+{
+  "schema": "CZ_H1_A_TEMPORAL_REGISTRY_POSTHOC_V1",
+  "head": {"h_steps": 1, "w_steps": 1, "sampling_period_seconds": 2},
+  "profiles_in_registered_order": [[1, 8], [1, 16], [1, 32], [1, 64], [1, 96], [1, 128]],
+  "maximum_lags": 128,
+  "maximum_history_steps": 128,
+  "offset_rule": "unique(rint(linspace(0, history-delta, min(maximum_lags, max(1, history//delta)))))",
+  "candidate_native_fit_support": "ALL_SELECTED_RESIDUAL_ORIGINS_PRESENT_FINITE_SAME_ENTITY_AND_MATURE",
+  "candidate_comparison_support": "INTERSECTION_OF_REGISTERED_CANDIDATE_NATIVE_SCORE_MASKS",
+  "unavailable_score_row": "IDENTITY_PARENT_RETAINED_IN_PAIRED_RISK",
+  "missing_history_zero_fill": false,
+  "training_state_role": "A_TRAINING_CROSS_FITTED_W_RESIDUAL",
+  "inference_state_role": "A_INFERENCE_DEPLOYED_W_RESIDUAL",
+  "target_end_formula": "origin + h_steps + w_steps - 2 (inclusive)",
+  "newest_mature_residual_origin_formula": "latest_available_target_index - h_steps - w_steps + 2",
+  "scientific_provenance": {
+    "revision_status": "POST_HOC_PROTOCOL_REVISION",
+    "historical_target_test_used_for_protocol_design": true,
+    "historical_residual_whitening_discussions_used_for_protocol_design": true,
+    "this_revision_target_test_accessed": false,
+    "evidence_interpretation": "RETROSPECTIVE_TRANSFER_PROTOCOL_DEVELOPMENT",
+    "virgin_test_confirmatory_claim_permitted": false,
+    "historical_sealed_false_flags_superseded_without_modifying_old_seals": true
+  }
+}

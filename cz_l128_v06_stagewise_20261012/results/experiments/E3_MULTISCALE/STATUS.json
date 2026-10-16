@@ -1,0 +1,31 @@
+{
+  "directions": [
+    "Rod_1_to_Rod_2",
+    "Rod_2_to_Rod_1"
+  ],
+  "exact_budget_equal": true,
+  "histories": [
+    32,
+    64,
+    128
+  ],
+  "ood_accessed": false,
+  "same_selected_candidate_within_pair": false,
+  "same_support_within_pair": true,
+  "scope": "PRIVATE_CZ_AUTHORITY_ALIGNED_EXTENSION_NOT_AUTHORITY_BRANCH_OUTPUT",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "single_active_channel_degeneracy": false,
+  "status": "COMPLETED",
+  "test_accessed": false
+}

@@ -1,0 +1,23 @@
+{
+  "status": "DERIVED_NOT_YET_VERIFIED",
+  "files": [
+    {
+      "file": "c2_models.py",
+      "source_sha256": "a4cf2bfc18df78377b4c1a8a5c0fecc7429d84413b6d8c74cff1c217379bcd09",
+      "adapter_sha256": "9bc2925d6dba292b9a9c05417270a2a97068dbf6603c4d2442e92482a406756b"
+    },
+    {
+      "file": "v211_public_all_baselines.py",
+      "source_sha256": "c4d8b29279789670ee9d1bb5beae2210068ad45235af956e3a7e0c9bb3c798c6",
+      "adapter_sha256": "95e4ce2b69a4daf819a1d1e2ad3bb223c73320369098a51e55c3a93511c2b9c2"
+    },
+    {
+      "file": "representative_baseline_checkpoints.py",
+      "source_sha256": "e9a0b0b0cf7127bed1d1c1c8049a1bfcf738f7c16aa89fc265aa2f535eed3558",
+      "adapter_sha256": "c0030e92fc1da8b2c026f3863751dcaead10cb133acd1d2d7629f597911a957d"
+    }
+  ],
+  "numerical_grids_changed": false,
+  "final_fit": "SOURCE_TRAIN_ONLY",
+  "PCA": "REFIT_PER_FOLD"
+}

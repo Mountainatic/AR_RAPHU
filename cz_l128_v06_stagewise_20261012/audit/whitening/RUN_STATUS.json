@@ -1,0 +1,13 @@
+{
+  "status": "COMPLETED",
+  "main_release_sha256": "a1109dc5d5e3b6bc0f00ed018b4399ad87b2bf3691f6790c5d881e1b48b3f507",
+  "main_model_fit_calls": 0,
+  "diagnostic_probe_fit_calls": 8,
+  "new_same_rod_prediction_stage_files": 16,
+  "independent_same_rod_whitening_rerun": true,
+  "full_new_E1_model_used": true,
+  "all_legal_executed": false,
+  "runtime_seconds": 16.659197747998405,
+  "verification": "PASS",
+  "formal_whiteness_claim": false
+}

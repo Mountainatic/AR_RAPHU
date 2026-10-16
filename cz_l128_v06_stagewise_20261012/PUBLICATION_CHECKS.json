@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "published_utc": "2026-10-16T13:08:25.558867+00:00",
+  "upload_scope": "aggregate metrics/spectra/figures/audit receipts and experiment code",
+  "experiments_rerun_for_publication": false,
+  "private_assets_published": false,
+  "original_whitening_delivery_files_hash_verified": 215,
+  "public_regressions": [
+    {
+      "test": "v06_compatibility/tests/test_discrete_v06.py",
+      "passed": 27,
+      "failed": 0,
+      "seconds": 2.33,
+      "note": "initial attempt had 21 passes/6 fixture setup errors from Windows temp directory permissions; isolated workspace --basetemp and disabled unrelated auto-loaded plugins, no model changes"
+    },
+    {
+      "test": "runtime/code/tests/test_v2_urysohn.py",
+      "passed": 11,
+      "failed": 0,
+      "seconds": 1.04
+    }
+  ],
+  "local_test_environment": {
+    "python": "3.12.5",
+    "packages": {
+      "numpy": "2.0.2",
+      "scipy": "1.15.3",
+      "pandas": "2.2.3",
+      "pyarrow": "24.0.0",
+      "pytest": "8.4.2"
+    }
+  },
+  "claims": {
+    "fully_nested_hyperparameter_CF": false,
+    "formal_whiteness_claim": false,
+    "v06_is_quantization_aware_predictor": false,
+    "AllLegal_executed": false,
+    "E3": "linear diagnostic",
+    "E6": "compact noise surrogate"
+  },
+  "privacy_verification": "verify_publication.py checks manifest, hashes, file types, CSV schemas, JSON rowwise vectors, credential markers"
+}

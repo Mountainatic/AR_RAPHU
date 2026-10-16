@@ -1,0 +1,8 @@
+{
+  "status": "E1_AND_BASELINE_TARGET_INFERENCE_COMPLETED",
+  "fit_during_inference": false,
+  "pointwise_exported": true,
+  "experiment_status_reference": "E2_E6_PROCESS_STATUS.json",
+  "inference_extension_sha256": "22d9e73a3a05b9f0f231b6c4e8fbafd11a42370d2be31d5ce592e26c33a29abc",
+  "main_release_sha256": "a1109dc5d5e3b6bc0f00ed018b4399ad87b2bf3691f6790c5d881e1b48b3f507"
+}

@@ -1,0 +1,56 @@
+{
+  "protocol_id": "PRISM_CPU_C6_FULL_FINAL_V2",
+  "status": "FROZEN_BEFORE_REPAIRED_BASELINE_TEST_ACCESS",
+  "repair_scope": "complete omitted formal CPU baselines without changing C2-C5 selections",
+  "prior_subset_test_access_disclosed": true,
+  "result_dependent_model_inclusion": false,
+  "leaderboards": {
+    "input_only": [
+      "PERSISTENCE",
+      "MEAN",
+      "RIDGE",
+      "PLS",
+      "DPLS",
+      "RBF_SVR",
+      "XGBOOST",
+      "PARALLEL_HAMMERSTEIN",
+      "HAMMERSTEIN_WIENER",
+      "PRISM_CHANNEL_SPECIFIC"
+    ],
+    "dynamic": [
+      "PERSISTENCE",
+      "MEAN",
+      "LOCAL_LINEAR_TREND",
+      "AR",
+      "ARX",
+      "LINEAR_NARX",
+      "N4SID",
+      "PRISM_PHYSICS_FIRST",
+      "PRISM_K_JOINT_AR"
+    ]
+  },
+  "information_set_correction": {
+    "PARALLEL_HAMMERSTEIN": "input_only because implemented features contain U/X history and no target history",
+    "HAMMERSTEIN_WIENER": "input_only because implemented features contain U/X history and no target history",
+    "LOCAL_LINEAR_TREND": "dynamic because it consumes strict-past target history"
+  },
+  "not_applicable_models": {
+    "SEASONAL_PERSISTENCE": "NO_TRAIN_ONLY_REGISTERED_PERIOD"
+  },
+  "failed_development_policy": "retain failure and do not fabricate test predictions",
+  "fit_partition": "train_plus_validation_after_contract_freeze",
+  "ood_policy": "same development-fitted contract; no OOD selection or adaptation",
+  "all_pairwise_comparisons": true,
+  "bootstrap_replicates": 500,
+  "bootstrap_seed": 20260802,
+  "block_lengths": [
+    "h_plus_w",
+    "two_times_h_plus_w",
+    "quarter_longest_selected_core_history"
+  ],
+  "complete_entity_resampling": true,
+  "holm_family": "target_head_split_information_set_block_length",
+  "holm_alpha": 0.05,
+  "cross_task_primary_rank_requires_complete_coverage": true,
+  "metrics_dtype": "float64"
+}

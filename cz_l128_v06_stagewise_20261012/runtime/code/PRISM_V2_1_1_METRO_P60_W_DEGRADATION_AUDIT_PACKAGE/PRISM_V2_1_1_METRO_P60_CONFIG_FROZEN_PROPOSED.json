@@ -1,0 +1,158 @@
+{
+  "protocol_id": "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_V1",
+  "evidence_class": "RETROSPECTIVE_TRANSFER_AND_DEGRADATION_AUDIT",
+  "inherits_theory": "PRISM_Theory_v2_1_1_Implementation_Safe_Stagewise_Routed_Modular_Assembly_Theory_Only.md",
+  "inherits_implementation_contract": "PRISM_V2_1_1_SRU_IMPLEMENTATION_CORRECTION",
+  "output_root": "results_prism_v2_1_1_metro_p60_w_audit",
+  "recommended_branch": "prism-v2-1-1-metro-p60-w-audit",
+  "active_datasets": [
+    "metropt"
+  ],
+  "active_heads": [
+    "METRO_P60__H6__W1"
+  ],
+  "write_shared_data": false,
+  "rebuild_or_resplit_c1": false,
+  "algorithm_change_allowed": false,
+  "historical_test_ood_known": true,
+  "historical_aggregates_selection_use_forbidden": true,
+  "test_access_before_freeze": false,
+  "ood_access_before_freeze": false,
+  "dtype": "float64",
+  "resource": {
+    "workers": 2,
+    "blas_threads": 1,
+    "prediction_chunk_rows": 50000,
+    "release_candidate_matrices_after_use": true,
+    "cache_all_candidate_design_matrices": false
+  },
+  "row_caps": {
+    "single_channel_k_fit": 100000,
+    "validation_selection_per_fold": 50000,
+    "joint_physical_fit": 250000,
+    "wiener_fit": 250000,
+    "state_fit": 250000,
+    "joint_predictive_fit": 250000,
+    "final_prediction": "ALL_IMMUTABLE_ROWS",
+    "subsample_order": "ASCENDING_SHA256_OF_BASE_ORIGIN_ID",
+    "nested_candidates_share_rows": true
+  },
+  "K": {
+    "profile_selection": {
+      "one_se_required": true,
+      "maximum_relative_regret_vs_best": 0.02,
+      "maximum_retained_profiles": 2,
+      "retain_best_mean_profile": true,
+      "retain_simplest_distinct_profile_within_guard": true
+    },
+    "fixed_support_refit": {
+      "ridge_semantics": "NUMERICAL_STABILITY_ONLY",
+      "selection": "SMALLEST_LAMBDA_PASSING_CERTIFICATES",
+      "lambda_zero_preferred_when_valid": true
+    }
+  },
+  "C": {
+    "candidates": [
+      "ADDITIVE_COMPRESSED",
+      "ADDITIVE_JOINT_BASIS"
+    ],
+    "selection": "FAMILY_ONE_SE_THEN_SMALLEST_STABLE_RIDGE",
+    "input_path_preservation": {
+      "minimum_variance_ratio_to_target": 1e-08,
+      "minimum_fraction_of_best_active_k_variance_ratio": 0.1,
+      "maximum_mse_ratio_vs_best_active_k": 1.02,
+      "minimum_nonintercept_coefficient_abs": 1e-10,
+      "fallback_order": [
+        "ADDITIVE_JOINT_BASIS",
+        "ADDITIVE_COMPRESSED",
+        "BEST_ACTIVE_K_CHANNEL"
+      ],
+      "silent_collapse_forbidden": true
+    }
+  },
+  "W": {
+    "candidates": [
+      "IDENTITY_CORRECTION",
+      "MONOTONE_I_SPLINE_CORRECTION",
+      "NATURAL_CUBIC_CORRECTION"
+    ],
+    "raw_absolute_variance_gate": false,
+    "minimum_usable_folds": 3,
+    "minimum_distinct_latent_values_per_fold": 20,
+    "minimum_rank_of_intercept_and_latent": 2,
+    "relative_scale_floor_multiplier_float64_eps": 64,
+    "degenerate_fold_status": "NOT_APPLICABLE",
+    "minimum_relative_mse_improvement": 0.01,
+    "minimum_positive_fold_fraction": 0.75,
+    "require_c_input_path_preservation": true,
+    "soft_overlap_mu": [
+      0.0,
+      0.03,
+      0.3,
+      3.0,
+      30.0
+    ],
+    "identity_prediction_equivalence_required": true,
+    "identity_residual_equivalence_required": true,
+    "same_fold_mask_and_row_ids_for_nested_candidates": true
+  },
+  "A": {
+    "maturity_rule": "s+h+target_window+D<=t",
+    "use_latest_available_target_index": true,
+    "fold_local_residual_centering": true,
+    "hard_feature_residualization": false,
+    "require_loss_prediction_candidate_consistency": true,
+    "active_near_zero_must_materialize_as_exact_zero": true
+  },
+  "J": {
+    "candidates": [
+      "J_K",
+      "J_KW",
+      "J_KA",
+      "J_KWA"
+    ],
+    "allow_k_zero": false,
+    "allow_ar_only": false,
+    "ar_only_diagnostic_allowed": true,
+    "jointly_fit_w_basis_coefficients": true,
+    "prefit_kw_scalar_as_joint_w_forbidden": true,
+    "share_pf_input_path_gate": true
+  },
+  "freeze_gate": {
+    "k_c_input_path_noncollapsed": true,
+    "pf_joint_input_status_must_match": true,
+    "w_candidates_actually_compared_when_applicable": true,
+    "identity_equivalence_must_pass": true,
+    "candidate_id_consistency_must_pass": true,
+    "test_accessed_must_be_false": true,
+    "ood_accessed_must_be_false": true,
+    "data_hash_unchanged": true
+  },
+  "post_freeze_materialized_candidates": {
+    "physics_first": [
+      "KC",
+      "KCW",
+      "KCA",
+      "KCWA",
+      "PF_SELECTED"
+    ],
+    "joint": [
+      "J_K",
+      "J_KW",
+      "J_KA",
+      "J_KWA",
+      "J_SELECTED"
+    ]
+  },
+  "statistics": {
+    "paired_moving_block_bootstrap_replicates": 500,
+    "holm_alpha": 0.05,
+    "primary_internal_comparisons": [
+      "KCW_vs_KC",
+      "KCWA_vs_KCA",
+      "J_KW_vs_J_K",
+      "J_KWA_vs_J_KA"
+    ],
+    "historical_aggregate_baselines_paired_test_forbidden": true
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "CZ_NUMERICAL_ENVIRONMENT_V1",
+  "python": "3.12.3 | packaged by Anaconda, Inc. | (main, May  6 2024, 19:46:43) [GCC 11.2.0]",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.15.3",
+    "pandas": "2.2.3",
+    "pyarrow": "24.0.0",
+    "threadpoolctl": "3.6.0"
+  },
+  "architecture": "x86_64",
+  "platform": "Linux-5.15.0-25-generic-x86_64-with-glibc2.35",
+  "float_dtype": "<f8",
+  "float_bits": 64,
+  "thread_environment": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1"
+  },
+  "blas": [
+    {
+      "user_api": "blas",
+      "internal_api": "openblas",
+      "prefix": "libscipy_openblas",
+      "version": "0.3.31.188.0",
+      "threading_layer": "pthreads",
+      "architecture": "SkylakeX",
+      "num_threads": 1
+    },
+    {
+      "user_api": "blas",
+      "internal_api": "openblas",
+      "prefix": "libscipy_openblas",
+      "version": "0.3.28",
+      "threading_layer": "pthreads",
+      "architecture": "SkylakeX",
+      "num_threads": 1
+    }
+  ],
+  "numpy_lapack_configuration": "Build Dependencies:\n  blas:\n    detection method: pkgconfig\n    found: true\n    include directory: /opt/_internal/cpython-3.12.12/lib/python3.12/site-packages/scipy_openblas64/include\n    lib directory: /opt/_internal/cpython-3.12.12/lib/python3.12/site-packages/scipy_openblas64/lib\n    name: scipy-openblas\n    openblas configuration: OpenBLAS 0.3.31.188.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY\n      SkylakeX MAX_THREADS=64\n    pc file directory: /project/.openblas\n    version: 0.3.31.188.0\n  lapack:\n    detection method: pkgconfig\n    found: true\n    include directory: /opt/_internal/cpython-3.12.12/lib/python3.12/site-packages/scipy_openblas64/include\n    lib directory: /opt/_internal/cpython-3.12.12/lib/python3.12/site-packages/scipy_openblas64/lib\n    name: scipy-openblas\n    openblas configuration: OpenBLAS 0.3.31.188.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY\n      SkylakeX MAX_THREADS=64\n    pc file directory: /project/.openblas\n    version: 0.3.31.188.0\nCompilers:\n  c:\n    commands: cc\n    linker: ld.bfd\n    name: gcc\n    version: 14.2.1\n  c++:\n    commands: c++\n    linker: ld.bfd\n    name: gcc\n    version: 14.2.1\n  cython:\n    commands: cython\n    linker: cython\n    name: cython\n    version: 3.2.4\nMachine Information:\n  build:\n    cpu: x86_64\n    endian: little\n    family: x86_64\n    system: linux\n  host:\n    cpu: x86_64\n    endian: little\n    family: x86_64\n    system: linux\nPython Information:\n  path: /tmp/build-env-tgi5ymto/bin/python\n  version: '3.12'\nSIMD Extensions:\n  baseline:\n  - X86_V2\n  found:\n  - X86_V3\n  - X86_V4\n  - AVX512_ICL\n  not found:\n  - AVX512_SPR\n\n",
+  "fingerprint_id": "503117cd117464f8bbfd8aa4d9e949a8d34e889a5a69af0e37412d391fdfa575"
+}

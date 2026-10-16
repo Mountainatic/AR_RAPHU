@@ -1,0 +1,244 @@
+{
+  "schema": "CZ_H1_POSTHOC_ACCEL12H_PROTOCOL_V1",
+  "scientific_gate_status": "FROZEN",
+  "user_confirmation": "采用建议方案，继续。 / 2026-10-03",
+  "scope": "EXPLICIT_H1_ONLY_H4_HISTORICAL",
+  "geometry": {
+    "inner": {
+      "block_rows": 320,
+      "count": 4,
+      "end_fractions": [
+        0.4,
+        0.6,
+        0.8,
+        1.0
+      ]
+    },
+    "outer": {
+      "block_rows": 320,
+      "count": 4,
+      "end_fractions": [
+        0.4,
+        0.6,
+        0.8,
+        1.0
+      ]
+    },
+    "placement": "ENTITY_AWARE_NEAREST_LEGAL_4X320_V1",
+    "purge": "STRICTLY_EARLIER_PARTITION_POSITIONS_AND_ENTITY_RAW_DEPENDENCY_DISJOINT",
+    "unavailable_geometry": "POLICY_NOT_ESTIMABLE_IN_PARTITION; TOP_LEVEL_FORMAL_HARD_FAIL",
+    "selection_cf_context_rows_per_block": 640,
+    "block_crosses_entity": "PROHIBITED_BY_JOINT_NEAREST_LEGAL_METADATA_PLACEMENT"
+  },
+  "final_development_cf": {
+    "block_rows": 320,
+    "support_rule": "PAST_ONLY_REALIZED_ROUTE_WITH_NA_IDENTITY",
+    "partial_tail_retained": true,
+    "coverage": "ALL_SOURCE_DEVELOPMENT_ANCHORS",
+    "fixed_library_lmax_warmup": false,
+    "refit_block_rows": 320,
+    "reselect_block_rows": 1280,
+    "reselect_at_entity_local_blocks": [
+      0,
+      4,
+      8,
+      12
+    ],
+    "route": "FROZEN_GLOBAL_VECTOR_NO_RE_ADMISSION",
+    "K_bypass": "IDENTITY_OUTPUT_WITH_PAST_ONLY_RETAINED_REPRESENTATION_SELECTION_AND_REFIT",
+    "C_W_bypass": "PARENT_IDENTITY_SKIP_MODEL_SEARCH",
+    "missing_recipe": "IDENTITY_UNTIL_NEXT_RESELECTION",
+    "user_confirmation": "2026-10-04 保留 past-only K 表征更新，K 输出仍为 identity"
+  },
+  "risk_contract": "INHERITED_CANONICAL_MSE_SUBTRACTION_PRODUCT_FSUM_DIVISION_V1",
+  "numerical_equivalence_tie_break": "REGISTRATION_ORDER_ONLY",
+  "PF_eligibility": "K_ROOT_ADMITTED",
+  "solver_smoke": {
+    "prefix_rows": 3000,
+    "K_scope": "FIRST_REGISTERED_LINEAR_PENALTY_MT4_DELTA2_PER_HISTORY",
+    "W_scope": "FIRST_REGISTERED_RECIPE_PER_FAMILY_AND_DIRECTION",
+    "A_scope": "FIRST_REGISTERED_PENALTIES_PER_HISTORY",
+    "formal_eligible": false,
+    "purpose": "BOUNDED_REAL_RECURSIVE_SOLVER_INTEGRATION_ONLY",
+    "supplemental_control_fixture": {
+      "metadata_prefix_rows": 6000,
+      "target": "MEAN_REGISTERED_JOINT_LIFT_DELTA2_HISTORY8_MT4_BINS",
+      "actual_source_target_used": false,
+      "purpose": "EXERCISE_NONCONSTANT_DEPLOYED_COORDINATE_AND_W_NUMERICAL_PATH"
+    }
+  },
+  "evidence": {
+    "replicates": 500,
+    "seed": 20260804,
+    "quantiles": [
+      0.025,
+      0.975
+    ],
+    "block_lengths_steps": [
+      2,
+      4,
+      64
+    ],
+    "complete_entity_resampling": true,
+    "selection_authority": false
+  },
+  "execution_authorization": {
+    "formal_development_training": true,
+    "source_validation_reporting": false,
+    "target_test_inference": false,
+    "development_only_solver_smoke": true,
+    "development_only_benchmark": true
+  },
+  "scientific_provenance": {
+    "revision_status": "POST_HOC_PROTOCOL_REVISION",
+    "historical_target_test_used_for_protocol_design": true,
+    "historical_residual_whitening_discussions_used_for_protocol_design": true,
+    "this_revision_target_test_accessed": false,
+    "virgin_test_confirmatory_claim_permitted": false,
+    "evidence_interpretation": "RETROSPECTIVE_TRANSFER_PROTOCOL_DEVELOPMENT"
+  },
+  "revision_id": "CZ_H1_POSTHOC_ACCEL12H_V1",
+  "A_initialization": {
+    "outer_scoring": "EMPTY_PER_INDEPENDENT_BLOCK",
+    "source_validation": "EMPTY_PER_ENTITY_SEGMENT",
+    "target_test": "EMPTY_PER_ENTITY_SEGMENT",
+    "pre_score_warmup": false,
+    "training_or_CF_or_backcast_seed": false,
+    "state_crosses_entity": false,
+    "prediction_before_maturity": true,
+    "missing_complete_history": "IDENTITY_KEEP_PAIRED_ROW",
+    "user_confirmation": "2026-10-03 explicit primary cold-start all three partitions"
+  },
+  "W_response_coordinate": {
+    "C_ADMITTED": "PSI_C_FROZEN_MODEL_SCALAR",
+    "C_BYPASSED_OR_NA": "PSI_K_RETAINED_REFERENCE_MODEL_SCALAR",
+    "baseline": "ROUTED_F_C",
+    "new_basis_or_family": false
+  },
+  "full_registry_smoke": {
+    "prefix_rows": 3000,
+    "candidate_scope": "FULL_UNCHANGED_FORMAL_REGISTRY",
+    "source_development_only": true,
+    "formal_eligible": false
+  },
+  "resume": {
+    "same_computation_only": true,
+    "exact_environment_fingerprint": true,
+    "artifact_hash_verification": true,
+    "unsealed_work": "RECOMPUTE_IDENTICAL_CANDIDATE_OR_BLOCK"
+  },
+  "environment_policy": {
+    "dtype": "float64",
+    "threads": 1,
+    "hard_check": [
+      "dtype",
+      "thread_environment",
+      "BLAS_backend"
+    ],
+    "release_records_all_versions": true
+  },
+  "revision": "CZ_H1_POSTHOC_ACCEL12H_V1",
+  "model_selection": {
+    "risk_support": "EXACT_LOCAL_COMMON_SUPPORT_ONLY",
+    "identity_rows_in_model_recipe_risk": false
+  },
+  "outer_admission": {
+    "paired_score_rows": "FULL_REGISTERED_320",
+    "unavailable_row": "PARENT_IDENTITY_RETAINED"
+  },
+  "candidate_status": {
+    "support_limited_distinct_from_numeric_invalid": true
+  },
+  "K_reference": {
+    "support": "SELECTED_REPRESENTATION_ASSEMBLY_INTERSECTION"
+  },
+  "C_regularization": {
+    "alpha_role": "PREDICTION_ORIENTED_MODEL_HYPERPARAMETER",
+    "selection": "INNER_COMMON_SUPPORT_MIN_RISK_FP_TIE",
+    "implicit_zero_alpha": false
+  },
+  "partition_invariants": {
+    "unique_sample_ids": true,
+    "contiguous_entity_runs": true,
+    "strictly_increasing_origins": true,
+    "target_maturity_valid": true
+  },
+  "maximal_inference_support": {
+    "role": "METADATA_ONLY_ORIGINAL_SPLIT_MEMBERSHIP",
+    "no_target_values": true
+  },
+  "K_search": "HIERARCHICAL_K_SEARCH_V1",
+  "execution_acceleration": {
+    "channel_processes": 4,
+    "multiprocessing_start_method": "spawn",
+    "BLAS_threads_per_process": 1,
+    "fold_cache_payload_bytes_per_channel": 134217728,
+    "scientific_protocol_change": true,
+    "legacy_candidate_import": false,
+    "fold_cache_budget_role": "HOT_WORKING_SET_ONLY; SEALED_EVIDENCE_NEVER_EVICTED"
+  },
+  "runtime_budget": {
+    "hard_budget_seconds": 43200,
+    "launch_gate_seconds": 36000,
+    "soft_stop_seconds": 39600,
+    "hard_stop_seconds": 41400,
+    "safety_factor": 1.25,
+    "cumulative_across_resume": true
+  },
+  "benchmark": {
+    "prefix_rows": [
+      3000,
+      8000,
+      15000
+    ],
+    "cases": [
+      "Rod1_to_Rod2",
+      "Rod2_to_Rod1"
+    ],
+    "source_development_only": true,
+    "audit_partition": "FIRST_REGISTERED_OUTER_K_MODEL_FIT_PARTITION",
+    "audits_are_reporting_only": true,
+    "forbidden_byte_reads": [
+      "SOURCE_VALIDATION_RAW",
+      "TARGET_TEST_RAW"
+    ],
+    "no_protocol_adaptation_from_losses": true
+  },
+  "DAG_contract": {
+    "identity_fields": [
+      "stage",
+      "ordered_fit_ids",
+      "entity_structure",
+      "policy_revision",
+      "registry_hashes",
+      "support_contract",
+      "upstream_route_vector",
+      "reselection_epoch",
+      "selected_recipe",
+      "source_config_hashes"
+    ],
+    "metadata_plan": "CONSERVATIVE_ROUTE_SUPERSET_SYMBOLIC_RECIPE_BINDING",
+    "reuse": "EXACT_SEALED_NODE_ONLY",
+    "numerical_compute_once": true
+  },
+  "incremental_sufficient_statistics": {
+    "enabled": false,
+    "reason": "No batch-equivalence proof; preserve authority batch reduction order"
+  },
+  "launch_gate_user_override": {
+    "schema": "CZ_H1_EXPLICIT_USER_LAUNCH_OVERRIDE_V1",
+    "authorization_source": "HUMAN_USER",
+    "user_instruction": "放宽快点给我开始正式训练，你耽误我太久了",
+    "utc_epoch": 1791200769.5250828,
+    "formal_development_training": true,
+    "source_validation_reporting": false,
+    "target_test_inference": false,
+    "waive_pending_benchmark_completion": true,
+    "waive_prelaunch_runtime_forecast": true,
+    "scientific_rules_unchanged": true,
+    "runtime_stop_limits_unchanged": true,
+    "original_benchmark_acceptance": "NOT_COMPLETED; BOTH_15000_PREFIXES_FAILED",
+    "original_runtime_forecast": "UNAVAILABLE; NO_FABRICATED_PASS",
+    "implementation_repair": "REUSE_EXACT_DEPLOYED_W_PARENT_FOR_A_IDENTITY_AND_MATURE_RESIDUALS"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "accepted_commit": "90616b233556929eb78c4a8f926a0c28842e76d3",
+  "accepted_package_sha256": "c1f4b32517120f7cac0202da67202a2d8c956555e2818b8469bb434cb3b48445",
+  "baseline_python_sha256": {
+    "a_registry.py": "0a3de6630420cce3eff59156ffd1552c11eaf221e1659cd590842339da937ba2",
+    "a_state.py": "8c802b2d7cdf4ddc2e1f1e8517d24c1babd0d66d208c4fc4b96d6c3f6d1b8427",
+    "candidate_status.py": "b0846929fc4f22c317c7e12996cdce7b9c5ee6cdf42209c15b0ae6c0471bf3ed",
+    "canonical_engine.py": "92fd4af53a12693369f8e8a28a9cfd3ff4fa32e7d740da4c9d2565a6cb4656a1",
+    "checkpoint.py": "ea8b6a6223d5fd8466be43f0fde3ad9d0d52ed30f19bd5e13dad02eb1baa2c16",
+    "data.py": "c690b1364dfe4a3a809cec161862169b02c01a770ebb8d050e8fac97fb2da1a4",
+    "deployment.py": "52fbd02dfec5335609b1da36a9f1b1e376a5f90300a3f557b84a36f9425c4487",
+    "environment.py": "0c52aeb8475127284141c72a45076d152c1a2075b2990c596a6b6720f19a88aa",
+    "evidence.py": "214b608f169cf03ed851521362be248da7c0bbd384183ded7b5b333c76cb510e",
+    "execution.py": "8829dabb10a80b2e0b8448d35cb11996225a658cc7d50efc6df7ace29245df44",
+    "final_development_cf.py": "66fb2ef260bdfa4faded9b019f239c917f85d8ad65927af3c614aebd0ba0df1a",
+    "fold_geometry.py": "c58500385b6e347b63d9c008e4bb9ed88c60698604cbdc59790073980fc88f49",
+    "geometry_audit.py": "106234ad25eeb1a0a828935d5f72c70ba8b0b015d59c2577ea068b1bb7d2011d",
+    "invariants.py": "ecd1b785c746daf6acbcef2e274bb91fcbd8f2bff89c75205afabbed09e04618",
+    "maximal_inference.py": "755124dcb548552709961b217e990b2fbb898fca0345826d814e650b6937da06",
+    "model_tuning.py": "0c5ed2ffbcfeb248625b3a51b35fafc9e7b40a98b72693a39952f25c7a2b4d94",
+    "partition.py": "56a569e0fbd0031f92991753743952244848f852838022b1f6b2177ae6cefd95",
+    "pointwise.py": "7fd3f1ad015e9878935faef182750130b64ddb54f965595f252e8d43dbe37738",
+    "registries.py": "d14f043cdb49b3457bf6ab57a4c4937538f14e498566572cb384bcf0474bcdd0",
+    "release.py": "b9dfbe42e3abf584feaa740b45e0fe3085a6b0d2bd23bae12d629bb22063f14a",
+    "risk.py": "ef4669c43cadb5bc9971e55a619d333641fa631b48aaa3067245047d36a2b717",
+    "runtime_seal.py": "be1d1bc446db49934a18379eea005901d41b94d1b4a2b7efff772eafcc49858f",
+    "run_canonical.py": "8319231258a1bfc077f56048b6caa61d6db8297f269202ceda60e0ebd5bcee48",
+    "temporal_support.py": "3bfb310928a01c691f39b7d3a8b3a3eaa41064c3216277bd03e733678fb7c8f0",
+    "__init__.py": "a530a9e2c8ab2695a6b973445f9cb67668c35c452598f1f56af586d114f4b31b"
+  },
+  "baseline_registry_sha256": {
+    "A_MODEL_REGISTRY.json": "f200f5f408f7dc890fd218097c9998ff19db394f85dac53ca956a554e785c963",
+    "A_TEMPORAL_REGISTRY.json": "fc9a0a824f2f3722c4d89acd338a2c0b406b84b07f83719c814ff1ef239b38e6",
+    "C_MODEL_REGISTRY.json": "1329d2db9080945e85629ab95197bdf88c41440ee404e2e9295639defcb29593",
+    "K_MODEL_REGISTRY.json": "6632c7798f2d3d3cd6038134254a9257005bd863a373e4dd9fc04cafa94661cd",
+    "W_MODEL_REGISTRY.json": "d021ad958ed63a6ac730e48f7597e4e3c63e5bb8143603f955765cd583f528c5"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "contract_id": "CZ_H1_FINAL_DEVELOPMENT_CF_REPLAY_V1",
+  "block_rows": 320,
+  "block_order": "contiguous_within_entity_expanding_past_only",
+  "include_partial_tail": true,
+  "start_rule": "earliest_recursive_metadata_support",
+  "fit_rule": "strict_earlier_partition_rows_and_original_raw_dependency_purge",
+  "upstream_learning": "original_recursive_prefix_learn_under_frozen_policy",
+  "selection_recipe_frozen_before_replay": true,
+  "inner_selection_block_rows": 8,
+  "inner_selection_warmup_rows": 640,
+  "data_dependent_geometry_changes_allowed": false
+}

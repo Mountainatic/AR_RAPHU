@@ -1,0 +1,47 @@
+{
+  "protocol_id": "PRISM_STRICT_NESTED_OOF_IDENTITY_INCREMENT_V1",
+  "status": "FROZEN_BEFORE_NEW_EXPERIMENT_EXECUTION",
+  "authority_branch": "prism-v2-1-1-public5-cz-neural3-level-r3-strict-oof",
+  "parent_branch": "prism-v2-1-1-public5-cz-neural3-level-r2-release-20260901",
+  "parent_commit": "be7557933f4a2ad11c7655c04ce031f524611cb0",
+  "stages": ["K", "C", "W", "A"],
+  "nonzero_family": {
+    "zero_in_candidates": false,
+    "near_zero_regularization_as_zero": false,
+    "selection": "MINIMUM_INNER_EMPIRICAL_RISK",
+    "complexity_preference": false,
+    "one_se": false
+  },
+  "admission": {
+    "method": "LEAVE_ONE_OUTER_FOLD_OUT_NESTED_OOF",
+    "parent_is_external_identity_increment": true,
+    "aggregate_risk": "ROW_WEIGHTED_OOF_EMPIRICAL_RISK",
+    "rule": "PARENT_RISK_MINUS_CHILD_RISK_GT_EPSILON_NUM",
+    "epsilon_num": {
+      "dtype": "float64",
+      "machine_epsilon_multiplier": 1000,
+      "scale": "MAX_1_ABS_PARENT_RISK_ABS_CHILD_RISK",
+      "statistical_meaning": false
+    }
+  },
+  "forbidden_selection_authority": [
+    "ONE_SE",
+    "MINIMUM_EFFECT_THRESHOLD",
+    "BOOTSTRAP_POSITIVE_PROBABILITY",
+    "CONFIDENCE_INTERVAL",
+    "POSITIVE_FOLD_COUNT_OR_FRACTION",
+    "COMPLEXITY_PREFERENCE",
+    "REGULARIZATION_STRENGTH_AS_ZERO_PROXY"
+  ],
+  "evidence": {
+    "bootstrap": "REPORTING_ONLY",
+    "confidence_interval": "REPORTING_ONLY",
+    "fold_stability": "REPORTING_ONLY"
+  },
+  "routing": {
+    "zero_semantics": "EXTERNAL_IDENTITY_INCREMENT",
+    "zero_blocks_downstream": false,
+    "residuals_continue_downstream": true,
+    "upstream_refit_after_stage": false
+  }
+}

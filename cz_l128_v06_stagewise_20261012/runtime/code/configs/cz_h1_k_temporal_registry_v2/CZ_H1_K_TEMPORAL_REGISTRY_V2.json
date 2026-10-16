@@ -1,0 +1,61 @@
+{
+  "amplitude_basis": "unchanged",
+  "authority_source_commit": "2ee6273b8f915cbcdff2f46d56bc80047ddae4a7",
+  "change_scope": "K_TEMPORAL_REPRESENTATION_REGISTRY_ONLY",
+  "channels": [
+    "main_heater_power",
+    "joint_lift",
+    "crystal_rotation",
+    "crucible_rotation"
+  ],
+  "delta_steps": [
+    2,
+    4,
+    8,
+    16
+  ],
+  "effective_forecast_steps": 1,
+  "historical_formal_model_freeze": "73d0bd4c69148c0cb91459f39f166acacf5856b6",
+  "history_seconds": [
+    16,
+    32,
+    64,
+    128,
+    256,
+    512
+  ],
+  "history_steps": [
+    8,
+    16,
+    32,
+    64,
+    128,
+    256
+  ],
+  "implementation_commit": "befcca5bf2d5491cc0cb03e475e96e3ce256b551",
+  "k_profile_semantics": "CZ_ONE_STEP_MULTISCALE_V2",
+  "lag_basis_family": "AUTHORITY_CAUSAL_GEOMETRIC_GROWTH_2",
+  "legacy_h0_alias_equivalent": true,
+  "legacy_protocols": "Historical frozen configs intentionally retain historical registry; explicitly select cz_h1_k_temporal_registry_v2 for corrected one-step semantics.",
+  "m_tau": [
+    4,
+    8,
+    12
+  ],
+  "native_support_contract": "NATIVE_K_COMMON_ASSEMBLY_R1",
+  "near_field_max_bin_seconds": 4,
+  "near_field_seconds": 20,
+  "profile_selection": "unchanged development-only nested selection",
+  "protocol_id": "CZ_H1_K_TEMPORAL_REGISTRY_V2",
+  "reason_for_change": "Correct one-step representation coverage: the generic forecast-horizon multiplier is not a validated physical-history upper bound; preregister multiscale short-to-medium histories.",
+  "registration_order": "history_ascending_delta_descending",
+  "residual_whitening_used_for_candidate_selection": false,
+  "routing_rule": "unchanged",
+  "sampling_seconds": 2,
+  "short_resolution_rule": "For each registered history, at least one delta/m_tau representation has every interval overlapping [0,min(20,history_seconds)) at width <=4 seconds. Full interval width is used, not clipped overlap width.",
+  "status": "CZ_H1_K_TEMPORAL_REGISTRY_V2_FROZEN",
+  "task_semantics": "explicit_H1_one_step",
+  "test_used_for_design": false,
+  "training_performed": false,
+  "urysohn_family": "unchanged"
+}

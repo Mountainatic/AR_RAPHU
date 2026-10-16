@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "independent_segmented_ACF_error": 5.551115123125783e-17,
+  "no_gap_or_entity_history_crossing": true,
+  "strictly_past_probe_features": true,
+  "current_future_residual_invariance": true,
+  "test_seed": 7
+}

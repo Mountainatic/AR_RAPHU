@@ -1,0 +1,60 @@
+{
+  "status": "RETIRED_RECURSIVE_RUN_STOPPED_CANDIDATE_CACHES_REMOVED",
+  "utc": "2026-10-12T07:14:45Z",
+  "deleted": [
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_1_to_Rod_2/checkpoints/CANDIDATES.sqlite3",
+      "bytes": 13322084352
+    },
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_1_to_Rod_2/checkpoints/CANDIDATES.sqlite3-wal",
+      "bytes": 222953832
+    },
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_1_to_Rod_2/checkpoints/CANDIDATES.sqlite3-shm",
+      "bytes": 32768
+    },
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_1_to_Rod_2/checkpoints/CANDIDATE_GROUPS.sqlite3",
+      "bytes": 482439168
+    },
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_1_to_Rod_2/checkpoints/CANDIDATE_GROUPS.sqlite3-wal",
+      "bytes": 5438432
+    },
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_1_to_Rod_2/checkpoints/CANDIDATE_GROUPS.sqlite3-shm",
+      "bytes": 32768
+    },
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_2_to_Rod_1/checkpoints/CANDIDATES.sqlite3",
+      "bytes": 14797619200
+    },
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_2_to_Rod_1/checkpoints/CANDIDATES.sqlite3-wal",
+      "bytes": 286031032
+    },
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_2_to_Rod_1/checkpoints/CANDIDATES.sqlite3-shm",
+      "bytes": 32768
+    },
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_2_to_Rod_1/checkpoints/CANDIDATE_GROUPS.sqlite3",
+      "bytes": 557277184
+    },
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_2_to_Rod_1/checkpoints/CANDIDATE_GROUPS.sqlite3-wal",
+      "bytes": 5376632
+    },
+    {
+      "path": "/root/autodl-tmp/CZ_CROSSROD_L128_V06_20261010/formal_actual/Rod_2_to_Rod_1/checkpoints/CANDIDATE_GROUPS.sqlite3-shm",
+      "bytes": 32768
+    }
+  ],
+  "removed_bytes": 29679350904,
+  "free_before": 9511841792,
+  "free_after": 9511849984,
+  "K_models_baselines_source_data_pointwise_and_seals_preserved": true,
+  "new_root": "/root/autodl-tmp/CZ_CROSSROD_L128_STAGEWISE_V2_20261012",
+  "restart_old_forbidden": true
+}
