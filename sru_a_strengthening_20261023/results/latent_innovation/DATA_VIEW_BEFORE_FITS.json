@@ -1,0 +1,313 @@
+{
+  "records": {
+    "SRU_H2S_D4": {
+      "name": "SRU_H2S_D4",
+      "target": "y1",
+      "inputs": [
+        "u1",
+        "u2",
+        "u3",
+        "u4",
+        "u5"
+      ],
+      "train": 6048,
+      "dev": 8064,
+      "total": 10081,
+      "upper": 3328,
+      "shared": "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S",
+      "dataset": "sru",
+      "historical_exposure": false,
+      "source_metadata": {
+        "id": "SRU_H2S",
+        "dataset": "sru",
+        "target": "y1",
+        "columns": [
+          "u1",
+          "u2",
+          "u3",
+          "u4",
+          "u5"
+        ],
+        "train_end": 6048,
+        "validation_end": 8064,
+        "total_rows": 10081,
+        "histories": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "horizons": [
+          1,
+          2,
+          5,
+          10,
+          20
+        ],
+        "cadence_seconds": 60.0,
+        "shared": "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S",
+        "base_train_sha256": "f0c6506b9546412dac6e8ebba4d0c9a264d4d38682b35fd275ea6c5e294313ea",
+        "base_validation_sha256": "67af6fcf79dca5cf1755eb85fb91fb7ff4b29bd030be813538000311160bc260"
+      },
+      "source_case": "SRU_H2S",
+      "delay": 4,
+      "files": {
+        "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S/base_data/sru/train.parquet": "f0c6506b9546412dac6e8ebba4d0c9a264d4d38682b35fd275ea6c5e294313ea",
+        "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S/base_data/sru/validation.parquet": "67af6fcf79dca5cf1755eb85fb91fb7ff4b29bd030be813538000311160bc260"
+      }
+    },
+    "SRU_H2S_D8": {
+      "name": "SRU_H2S_D8",
+      "target": "y1",
+      "inputs": [
+        "u1",
+        "u2",
+        "u3",
+        "u4",
+        "u5"
+      ],
+      "train": 6048,
+      "dev": 8064,
+      "total": 10081,
+      "upper": 3328,
+      "shared": "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S",
+      "dataset": "sru",
+      "historical_exposure": false,
+      "source_metadata": {
+        "id": "SRU_H2S",
+        "dataset": "sru",
+        "target": "y1",
+        "columns": [
+          "u1",
+          "u2",
+          "u3",
+          "u4",
+          "u5"
+        ],
+        "train_end": 6048,
+        "validation_end": 8064,
+        "total_rows": 10081,
+        "histories": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "horizons": [
+          1,
+          2,
+          5,
+          10,
+          20
+        ],
+        "cadence_seconds": 60.0,
+        "shared": "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S",
+        "base_train_sha256": "f0c6506b9546412dac6e8ebba4d0c9a264d4d38682b35fd275ea6c5e294313ea",
+        "base_validation_sha256": "67af6fcf79dca5cf1755eb85fb91fb7ff4b29bd030be813538000311160bc260"
+      },
+      "source_case": "SRU_H2S",
+      "delay": 8,
+      "files": {
+        "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S/base_data/sru/train.parquet": "f0c6506b9546412dac6e8ebba4d0c9a264d4d38682b35fd275ea6c5e294313ea",
+        "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S/base_data/sru/validation.parquet": "67af6fcf79dca5cf1755eb85fb91fb7ff4b29bd030be813538000311160bc260"
+      }
+    },
+    "SRU_H2S_D16": {
+      "name": "SRU_H2S_D16",
+      "target": "y1",
+      "inputs": [
+        "u1",
+        "u2",
+        "u3",
+        "u4",
+        "u5"
+      ],
+      "train": 6048,
+      "dev": 8064,
+      "total": 10081,
+      "upper": 3328,
+      "shared": "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S",
+      "dataset": "sru",
+      "historical_exposure": false,
+      "source_metadata": {
+        "id": "SRU_H2S",
+        "dataset": "sru",
+        "target": "y1",
+        "columns": [
+          "u1",
+          "u2",
+          "u3",
+          "u4",
+          "u5"
+        ],
+        "train_end": 6048,
+        "validation_end": 8064,
+        "total_rows": 10081,
+        "histories": [
+          10,
+          25,
+          50,
+          100
+        ],
+        "horizons": [
+          1,
+          2,
+          5,
+          10,
+          20
+        ],
+        "cadence_seconds": 60.0,
+        "shared": "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S",
+        "base_train_sha256": "f0c6506b9546412dac6e8ebba4d0c9a264d4d38682b35fd275ea6c5e294313ea",
+        "base_validation_sha256": "67af6fcf79dca5cf1755eb85fb91fb7ff4b29bd030be813538000311160bc260"
+      },
+      "source_case": "SRU_H2S",
+      "delay": 16,
+      "files": {
+        "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S/base_data/sru/train.parquet": "f0c6506b9546412dac6e8ebba4d0c9a264d4d38682b35fd275ea6c5e294313ea",
+        "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/public_data/SRU_H2S/base_data/sru/validation.parquet": "67af6fcf79dca5cf1755eb85fb91fb7ff4b29bd030be813538000311160bc260"
+      }
+    }
+  },
+  "existing_final_ledger_references": [
+    {
+      "path": "/root/autodl-tmp/PRISM_V06_DEBUTANIZER_KCWA_SEARCH_20261022/SHARED_FINAL_EXPOSURE.json",
+      "sha256": "5668b73d4118315d8f71bc89b6939b941cd6bb5ed56c5a1ecac2073ba3739f83",
+      "content": {
+        "physical_record_receipts": {
+          "debutanizer": {
+            "status": "HISTORICALLY_EXPOSED_IN_PRIOR_PROJECT",
+            "independent_lockbox": false,
+            "new_branch_remainder_numeric_read": false
+          }
+        },
+        "namespaces": [
+          "/root/autodl-tmp/PRISM_V06_DEBUTANIZER_KCWA_SEARCH_20261022"
+        ],
+        "boundary": "Retrospective2394-row benchmark. New branch prepares only first1915 rows, but historical exposure is permanent across representations."
+      }
+    },
+    {
+      "path": "/root/autodl-tmp/PRISM_V06_INDUSTRIAL_DATASET_SEARCH_20261021/NEW_SOURCE_EXPOSURE_AUDIT_20261022.json",
+      "sha256": "1cf2d2899de9732974884f454b67e0758538e23d7428421678adcb86476250b9",
+      "content": {
+        "status": "ALL_THIRTEEN_TRACKED_PHYSICAL_SOURCE_FINAL_RECEIPTS_STILL_NULL",
+        "physical_record_count": 13,
+        "new_measured_physical_records": 12,
+        "additional_original_ph_simulation": 1,
+        "time": 1792684381.1451652,
+        "records": [
+          {
+            "root": "PRISM_V06_NOBOOM_INDUSTRY_SEARCH_20261022",
+            "ledger_sha256": "783b6ea0598afb498fa9b70998af2ea1b1cc19475c9644fe9c83f4b86f9a6ad1",
+            "physical_record_receipts": {
+              "noboom_industry_3": null,
+              "noboom_industry_8": null
+            },
+            "namespaces": [
+              "/root/autodl-tmp/PRISM_V06_NOBOOM_INDUSTRY_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_NOBOOM_KREG_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_NOBOOM_NONLINEAR_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_NOBOOM_NONLINEAR_STORAGE_REPLAY_20261022",
+              "/root/autodl-tmp/PRISM_V06_NOBOOM_COMPLEMENT_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_NOBOOM_KCWA_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_UPGRADED_A_TRANSFER_20261022",
+              "/root/autodl-tmp/PRISM_V06_UPGRADED_A_MATCHED_HISTORY_20261022",
+              "/root/autodl-tmp/PRISM_RLS_A_MULTIHORIZON_20261022",
+              "/root/autodl-tmp/PRISM_NOBOOM_CONDITIONAL_DRIVERS_RLS_20261022",
+              "/root/autodl-tmp/PRISM_NOBOOM_TARGET_EXPANSION_RLS_20261022",
+              "/root/autodl-tmp/PRISM_NOBOOM_DELTA_TARGETS_RLS_20261022",
+              "/root/autodl-tmp/PRISM_NOBOOM_DELTA_DOMAIN_FIX_RLS_20261022"
+            ]
+          },
+          {
+            "root": "PRISM_V06_TWOTANK2026_SEARCH_20261022",
+            "ledger_sha256": "01ebc9edceeb417eef80fa3fb58339a3d5902f90a23022b704e2b648624a5c10",
+            "physical_record_receipts": {
+              "twotank2026_Disturbance_HighOutflow_100pct": null,
+              "twotank2026_Disturbance_HighOutflow_10pct": null,
+              "twotank2026_Disturbance_LowOutflow_40pct": null,
+              "twotank2026_Disturbance_LowOutflow_50pct": null
+            },
+            "namespaces": [
+              "/root/autodl-tmp/PRISM_V06_TWOTANK2026_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_TWOTANK2026_DELTA_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_TWOTANK2026_AR_DELTA_SEARCH_20261022"
+            ]
+          },
+          {
+            "root": "PRISM_V06_NAWI_CCRO_SEARCH_20261022",
+            "ledger_sha256": "da6bd921f0766c6e8d8ec6259d87321fd2f92c9a8820ddc15c74d4406d08a98d",
+            "physical_record_receipts": {
+              "ccro_openloop": null,
+              "ccro_step2": null
+            },
+            "namespaces": [
+              "/root/autodl-tmp/PRISM_V06_NAWI_CCRO_SEARCH_20261022"
+            ]
+          },
+          {
+            "root": "PRISM_V06_PRONTO_KCWA_SEARCH_20261022",
+            "ledger_sha256": "5b3d4c04b4a4cf27841c3569c4f86b229b6c42b5473ff1c5b0ab509d6b73d0fc",
+            "physical_record_receipts": {
+              "pronto_day4": null,
+              "pronto_day3": null
+            },
+            "namespaces": [
+              "/root/autodl-tmp/PRISM_V06_PRONTO_KCWA_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_PRONTO_CONTROL_KCWA_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_PRONTO_CONTROL_K8_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_UPGRADED_A_TRANSFER_20261022",
+              "/root/autodl-tmp/PRISM_V06_UPGRADED_A_MATCHED_HISTORY_20261022",
+              "/root/autodl-tmp/PRISM_RLS_A_MULTIHORIZON_20261022"
+            ]
+          },
+          {
+            "root": "PRISM_V06_PH_SCREEN_20261021",
+            "ledger_sha256": "8dd9cfe183f55c731a8bf8173e4783bab7fb8ce10bbecf6bdd19997f0448ef4d",
+            "physical_record_receipts": {
+              "ph": null
+            },
+            "namespaces": [
+              "/root/autodl-tmp/PRISM_V06_PH_SCREEN_20261021",
+              "/root/autodl-tmp/PRISM_V06_PH_OWNPAST_KCWA_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_PH_DELTA_KCWA_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_PH_FULLGRID_KCWA_SEARCH_20261022"
+            ]
+          },
+          {
+            "root": "PRISM_V06_EXCHANGER_KCWA_SEARCH_20261022",
+            "ledger_sha256": "f304cfefd488e9eb1380adc0e1a9386f849cff5982115fb7f559eb229c48f0c4",
+            "physical_record_receipts": {
+              "exchanger": null
+            },
+            "namespaces": [
+              "/root/autodl-tmp/PRISM_V06_EXCHANGER_KCWA_SEARCH_20261022"
+            ]
+          },
+          {
+            "root": "PRISM_V06_HAI22_TIT02_KCWA_SEARCH_20261022",
+            "ledger_sha256": "a058f917f626a687cbcf764fbb66aba66d517e5f9cafafcc6b534704406dfe0e",
+            "physical_record_receipts": {
+              "hai22_train2": null
+            },
+            "namespaces": [
+              "/root/autodl-tmp/PRISM_V06_HAI22_TIT02_KCWA_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_HAI22_TIT02_OWNPAST_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_HAI22_TIT01_OWNPAST_SEARCH_20261022",
+              "/root/autodl-tmp/PRISM_V06_HAI22_TEMPORAL8_KCWA_SEARCH_20261022"
+            ]
+          }
+        ],
+        "historically_exposed_not_in_null_claim": [
+          "HAI23 train1/train3/train4",
+          "Fortuna Debutanizer benchmark; new v0.6 root ledger explicitly historical"
+        ],
+        "ledger_audit_only_no_source_numeric_read": true
+      }
+    }
+  ],
+  "final_numeric_read": false,
+  "SRU_final_source_status": "Original branch records final20% not evaluated; shared historical project-ledger audit retained, no claim of a newly acquired source.",
+  "debutanizer_final_status": "Historically exposed; any results retrospective, never fresh test."
+}

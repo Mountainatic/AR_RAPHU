@@ -1,0 +1,11 @@
+{
+  "status": "HISTORICAL_SOURCE_NOT_NEW_INDEPENDENT_DATA",
+  "local_evidence": "E:\\silicon\\withhzf\\v211_cz\\delivery\\prism_full_e1_e6_adaptive_20261014\\authority\\code\\PRISM_V2_1_SRU_STAGEWISE_ROUTED\\PRISM_V2_1_SRU_BASELINE_REPLAY_AMENDMENT_20260806.json",
+  "local_evidence_sha256": "93ee0f35137e965901532cadd8569c767f3cb1b6f675a03c918a53774bb2ef2f",
+  "observation": "2026-08-06 amendment allowed baseline test access in B0 and candidate test first at E7. This document describes permission/materialization, not proof of actual numerical access.",
+  "historical_numeric_exposure": "NOT_RESOLVED_BY_THIS_METADATA",
+  "current_round_final_numeric_read": false,
+  "current_round_reserved_rows": "8064..10080",
+  "decision": "Keep reserved tail sealed in this review. Do not label this reused SRU source or its tail as newly acquired independent evidence.",
+  "no_new_holdout_permission_required": true
+}

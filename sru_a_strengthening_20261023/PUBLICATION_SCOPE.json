@@ -1,0 +1,29 @@
+{
+  "status": "COMPLETED",
+  "date": "2026-10-23 Asia/Shanghai",
+  "repository": "Mountainatic/AR_RAPHU",
+  "branch": "sru-conditional-feedback-a-20261023",
+  "base_commit": "48bfb3b9f30e37d69dc2dbd281329e648edda3d6",
+  "experiment_code_byte_unchanged": true,
+  "archive_sha256": "a4287706da5cd44db3c6d7e56035ccd2cae90f85c123f825cefff61b204be7a9",
+  "archive_bytes": 151919245,
+  "archive_members_verified": 244,
+  "scanned_text_members": 171,
+  "checked_SRU_training_arrays": [
+    "sru_dynamic_response_a_20261023/TRAINING_DATA.npz",
+    "sru_conditional_feedback_a_20261023/TRAINING_DATA.npz",
+    "sru_latent_innovation_a_20261023/TRAINING_DATA.npz"
+  ],
+  "private_CZ_raw_data_in_new_publication": false,
+  "source_final_numeric_read": false,
+  "development_rows": [
+    6048,
+    8064
+  ],
+  "reserved_rows_not_opened": [
+    8064,
+    10081
+  ],
+  "source_status": "Reused SRU development; historical exposure not fully resolved; not fresh independent evidence.",
+  "license": "No new data license asserted. Original third-party data provenance retained."
+}

@@ -1,0 +1,20 @@
+{
+  "fits": [
+    {
+      "case": "SRU_H2S_D4",
+      "mode": "train",
+      "exit_code": 0
+    },
+    {
+      "case": "SRU_H2S_D8",
+      "mode": "train",
+      "exit_code": 0
+    },
+    {
+      "case": "SRU_H2S_D16",
+      "mode": "train",
+      "exit_code": 0
+    }
+  ],
+  "all_models_frozen_before_any_development": true
+}

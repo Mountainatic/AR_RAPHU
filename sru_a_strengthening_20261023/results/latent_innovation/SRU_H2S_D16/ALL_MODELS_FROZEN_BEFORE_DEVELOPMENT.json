@@ -1,0 +1,11 @@
+{
+  "files": {
+    "full_FROZEN.pkl": "faf22fa8018fe0b26cab7da848135b9a169e6a392779ca54ee5550e0078af102",
+    "no_KC_FROZEN.pkl": "f5f6ea2ac6028fddb78efd69a1c4690f3cc0338df87a390ff1611c525e9dbca3",
+    "no_W_FROZEN.pkl": "ce29cb8200c2380251b9246e131d66890a024ad2742038ad609cfb8f12d2f85c",
+    "no_A_FROZEN.pkl": "d9c0a0b54de8cbd737677923ad358a26cbc789a1fdf5240297537d101a046a77",
+    "report_A_FROZEN.pkl": "f1a7aa41b0997aa25fa7d0175aee2ea7be147f24bfe26d653a50390114bd5ffe",
+    "BASELINES_FROZEN.pkl": "108aeb9f7aba7d3343be3f10f89711e0247f9f098e60680861a78c2dd12e895a"
+  },
+  "final_numeric_read": false
+}

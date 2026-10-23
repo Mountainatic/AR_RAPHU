@@ -1,0 +1,87 @@
+{
+  "references": [
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D4/DEVELOPMENT_predictions.parquet",
+      "sha256": "bf209cff9f7f4171ef8c2dc2650887adb6d94d01fe31697f920e29acbe7ae35a",
+      "archive_relative": "previous_frozen_references/V6/SRU_H2S_D4/DEVELOPMENT_predictions.parquet"
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D4/DEVELOPMENT_RESULT.json",
+      "sha256": "914c058495547c10aa5348ed991cfd51c3c925250005e5bdc60218133e8882ec",
+      "archive_relative": "previous_frozen_references/V6/SRU_H2S_D4/DEVELOPMENT_RESULT.json"
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D4/ALL_MODELS_FROZEN_BEFORE_DEVELOPMENT.json",
+      "sha256": "7b6a211123cf48a67af728f98e756db535ef4d34a3a2f029ed5a486f43882016",
+      "archive_relative": "previous_frozen_references/V6/SRU_H2S_D4/ALL_MODELS_FROZEN_BEFORE_DEVELOPMENT.json"
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D4/BASELINES_FROZEN.pkl",
+      "sha256": "5271437263ec6c1259c931c835f7df95eccbbf1086a7c60c18fea809d9723973",
+      "included_in_prior_verified_archive": true
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D8/DEVELOPMENT_predictions.parquet",
+      "sha256": "bd484a9978dd29be066d4209de83d5601a400789d21f101797ed646a0ac5e44d",
+      "archive_relative": "previous_frozen_references/V6/SRU_H2S_D8/DEVELOPMENT_predictions.parquet"
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D8/DEVELOPMENT_RESULT.json",
+      "sha256": "d15f553ddfcc63d5c8c5c2e7fcceee393c79deeca3451fa804ea543a270fe916",
+      "archive_relative": "previous_frozen_references/V6/SRU_H2S_D8/DEVELOPMENT_RESULT.json"
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D8/ALL_MODELS_FROZEN_BEFORE_DEVELOPMENT.json",
+      "sha256": "f38c61b207bba6c84db0c12dada16c298a4ce3d01d14f4bde9c30cf6cf7211d4",
+      "archive_relative": "previous_frozen_references/V6/SRU_H2S_D8/ALL_MODELS_FROZEN_BEFORE_DEVELOPMENT.json"
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D8/BASELINES_FROZEN.pkl",
+      "sha256": "41971ddee12458f55344a7666c5c514eb1017d63162c05a8a27f5a394a17fec1",
+      "included_in_prior_verified_archive": true
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D16/DEVELOPMENT_predictions.parquet",
+      "sha256": "19b346fff92e13569f1f51ee6d9e158a463f9b688b67180f0bcd60ba5b4d2625",
+      "archive_relative": "previous_frozen_references/V6/SRU_H2S_D16/DEVELOPMENT_predictions.parquet"
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D16/DEVELOPMENT_RESULT.json",
+      "sha256": "c49175a8e303d52abf9861ec11b6c1edaa03f033ea679ae2f6554dda944e277e",
+      "archive_relative": "previous_frozen_references/V6/SRU_H2S_D16/DEVELOPMENT_RESULT.json"
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D16/ALL_MODELS_FROZEN_BEFORE_DEVELOPMENT.json",
+      "sha256": "d19f18c5044bef17e04468defa69af0bb7339c7d2f1219453a3465a62d0b7656",
+      "archive_relative": "previous_frozen_references/V6/SRU_H2S_D16/ALL_MODELS_FROZEN_BEFORE_DEVELOPMENT.json"
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/cases/SRU_H2S_D16/BASELINES_FROZEN.pkl",
+      "sha256": "160e0ca0d805f341eef923fed5debdd7788f9e55c29f452c127aed9319defbfc",
+      "included_in_prior_verified_archive": true
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/REGISTRATION_BEFORE_FITS.json",
+      "sha256": "4fe2a3e025a5bc6bca797d8123db5e97ab5b6f5496c756553c3e4edf2c97a2d8"
+    },
+    {
+      "source": "/root/autodl-tmp/PRISM_SRU_ISSUED_RESPONSE_A_20261023/DATA_VIEW_BEFORE_FITS.json",
+      "sha256": "b2ada689f9c977c4731c1969402ca852ff40dcfc0a9bb0514e0f27e4a7ec341d"
+    }
+  ],
+  "prior_archive_receipt": {
+    "status": "VERIFIED",
+    "archive": "/root/autodl-tmp/PRISM_SRU_A_IMPROVEMENT_REVIEW_20261023/SRU_A_IMPROVEMENT_20261023.tar.gz",
+    "bytes": 37696691,
+    "sha256": "3a3d255fb0ef8332706983d709d78281e600e82d246f69195b549cc07366a2be",
+    "manifest_sha256": "3c8861a4c3352ac6ea404ddcc9782e12cabec62c5e63c3d995016185185dfbc8",
+    "members": 269,
+    "all_members_sha256_verified": true,
+    "final_configurations": 55,
+    "candidate_A_searches": 209,
+    "UTC": "2026-10-23T13:03:50.803436+00:00",
+    "source_final_numeric_read": false,
+    "server": "connect.westb.seetacloud.com:50905"
+  },
+  "source_final_numeric_read": false
+}

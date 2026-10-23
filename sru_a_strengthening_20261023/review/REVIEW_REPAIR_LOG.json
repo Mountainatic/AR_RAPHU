@@ -1,0 +1,8 @@
+{
+  "review_only_repairs": [
+    {"attempt": 1, "action": "replace copied previous-round review builder", "failure": "apply_patch atomically rejected delete plus add at same path", "effect": "No experiment or original archive modified; builder replaced in separate operations."},
+    {"attempt": 2, "action": "independent prefix replay", "failure": "bitwise comparison of one-row prediction against full batch differed by 5.55111512e-17", "effect": "Batch-size floating-point reduction order. Poison versus clean SAME-prefix remains bitwise; prefix versus saved full batch uses fixed 1e-13 tolerance. No model or selection change."},
+    {"attempt": 3, "action": "baseline reuse receipt audit", "failure": "review expected 16 fitted comparators in receipt", "effect": "Receipt correctly contains 15 fitted models; Persistence is computed directly. Check 15 frozen plus Persistence equals 16 unchanged non-ADAPTIVE comparisons. No experiment change."}
+  ],
+  "source_final_numeric_read": false
+}

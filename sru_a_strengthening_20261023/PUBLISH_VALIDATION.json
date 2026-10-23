@@ -1,0 +1,20 @@
+{
+  "status": "PASSED",
+  "portable_settings": 9,
+  "main_and_ablation_reproductions": 45,
+  "baseline_RMSE_recomputations": 153,
+  "original_code_byte_unchanged": true,
+  "new_experiments": false,
+  "source_final_numeric_read": false,
+  "environment": {
+    "python": "3.10.12 (main, Jul 15 2026, 23:40:17) [GCC 11.4.0]",
+    "packages": {
+      "numpy": "2.2.6",
+      "pandas": "2.2.3",
+      "scipy": "1.15.3",
+      "scikit-learn": "1.7.1",
+      "pyarrow": "24.0.0"
+    }
+  },
+  "publication_packaging": "Existing Env_pytorch was resolved by registered prefix; original scientific runtime used for numerical replay; no dependency installation."
+}

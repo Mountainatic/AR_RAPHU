@@ -1,0 +1,24 @@
+{
+  "source": "/root/autodl-tmp/PRISM_SRU_DYNAMIC_RESPONSE_A_20261023/cases/SRU_H2S_D4/BASELINES_FROZEN.pkl",
+  "source_sha256": "dfa6db1a9df9cf7f39bb3455c674b2cb4c60d3d2987acc7db1fdb04ebee352f5",
+  "unchanged_comparators": [
+    "OWN",
+    "ARX",
+    "WARX",
+    "HGB",
+    "SVR",
+    "ONLINE_ARX",
+    "OWN_AR128",
+    "ARX148",
+    "WARX148",
+    "ONLINE_ARX148",
+    "ARX163",
+    "WARX163",
+    "ONLINE_ARX163",
+    "HGB_LONG_MEMORY",
+    "SVR_LONG_MEMORY"
+  ],
+  "source_training_sha256": "30be0d77629b1d92dfb5fd51680f86d24eaca2cdf97d63eb8c8a8fd58fd42ea7",
+  "ADAPTIVE_ARX_retrained": true,
+  "development_used_for_baseline_tuning": false
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "SRU_DYNAMIC_ISSUED_RESPONSE_A_V8",
+  "cases": [
+    "SRU_H2S_D4",
+    "SRU_H2S_D8",
+    "SRU_H2S_D16"
+  ],
+  "variants": [
+    "full",
+    "no_KC",
+    "no_W",
+    "no_A",
+    "report_A"
+  ],
+  "training_sha256": "30be0d77629b1d92dfb5fd51680f86d24eaca2cdf97d63eb8c8a8fd58fd42ea7",
+  "view_sha256": "b2ada689f9c977c4731c1969402ca852ff40dcfc0a9bb0514e0f27e4a7ec341d",
+  "task": "Nowcasting H2S y(t) using measured process x(t), past x(t-1..t-7), mature y(t-delay..t-delay-7), delay4/8/16 steps. No current target or other output channel. User explicitly accepts concurrent industrial soft sensing and A/model improvement.",
+  "availability": "Label maturity4 or16 observation steps after issue, explicitly experimental, not asserted real analyzer timing. This is an experimental availability assumption, not reconstructed actual assay delivery latency. Every comparator has identical current process X and past target information. Current target can only enter later residuals/parameter updates after maturity.",
+  "source": "Adaptive followup after V6/V7 development. Training-only lag diagnosis found residual dependence on past16/32 response changes. Same repeatedly reused SRU H2S development, no new physical source or independent confirmation. All earlier negative and point-positive results retained.",
+  "model": "Explicit structural redesign, not unchanged v0.6: raw current/past input coordinates; KC own8/linear7-or5/finite Urysohn amplitude response with2 degree1 spline basis coefficients per input, either current or current+lag1-7 bin. Optional2 past own states. Ridge C. Joint scalar inverse W identity/signedsqrt/asinh/signedlog or q-only residual spline learned on2 forward parameter-CF streams. W/C scales fold-local; raw inputs never transformed with output.",
+  "deletion": "Independent upstream retrain and downstream retuning full/noKC/noW/noA; noKC keeps own8 response and all W/A choices, removes process-response K/C. Full also includes this bypass. noW identity. noA independently retunes upstream by mature parent outer risk.",
+  "joint_selection": "Same V2 identity/nonidentity recipe per OWN/LINEAR/URYSOHN and joint candidate A outer-risk selection. 15 final configurations,12 selected main A policies plus3 selected ADAPTIVE_ARX A policies. At most57 candidate A search calls (39 new-family,18 report controls). Exact fits counted in review. Each A stream uses one frozen KCW parent.",
+  "selection": "KC/W two outer purged forward folds70-85/85-100%. Learned W two subfolds60-80/80-100%. All choices training-only. 200rows/20per coefficient retained. Candidates unsupported/nonfinite retained as unavailable, no clipping.",
+  "A": "Retain225 V6 specs, add32 dynamic issued-response specs. QD8 features q,deltaq1/4/8,q*deltaq8; QD32 q,deltaq1/4/8/16/32,q*deltaq16/32; optionally one mature residual. Initialization last256/all,forget.995/.999,gain.5/1. No current y; all derivative features use only issued q from same stream, never cross generator/split/gaps. Original ridge100/stored-phi mature RLS and200/20/numerical gates unchanged. Pmax32 conservative raw support and fixed32+delay-1 startup common across variants/control. Three outer60/75/90 and twoinner60/80, each residual stream one frozen KCW. Current response transformation and calibration explicitly structural redesign, not unchanged report A. ADAPTIVE_ARX gets identical257-spec A; frozen-update control retained.",
+  "splits": {
+    "SRU_H2S_D4": {
+      "upper": 3328,
+      "delay": 4,
+      "calibration": 3344,
+      "train": 6048,
+      "last_available_training_label": 6044,
+      "development": 8064
+    },
+    "SRU_H2S_D8": {
+      "upper": 3328,
+      "delay": 8,
+      "calibration": 3352,
+      "train": 6048,
+      "last_available_training_label": 6040,
+      "development": 8064
+    },
+    "SRU_H2S_D16": {
+      "upper": 3328,
+      "delay": 16,
+      "calibration": 3368,
+      "train": 6048,
+      "last_available_training_label": 6032,
+      "development": 8064
+    }
+  },
+  "baselines": "Existing12 baselines including ADAPTIVE_ARX with same257-spec A. Add ARX163,warpedARX163,onlineARX163 using128 mature own-target lags+process lags0/1/4/7/16/32/39; add long-memory HGB and RBF-SVR using128 own-target+40 dense process lags. Same current X and label maturity, full original training budget; more process history covers q32 plus original7-step source span. Total17 baselines, all tuned only on training.",
+  "metrics": "Recorded units RMSE. Paired circular block2500 length192 covers the expanded finite raw/target span; full and fixed32+delay-1 startup sensitivity. Frozen-update and baseline comparisons retained. Adaptive descriptive intervals, not independent/search-adjusted.",
+  "final": "No final reader or final parsing in this branch. Existing ledger references hash-bound and never reset. Any qualified setting requires separate freeze/audit before one-shot eligible final; historically exposed sources never relabeled fresh.",
+  "code_sha256": {
+    "model.py": "a42f94401ac37f3437b84746f1d1ba2fec0dc5d9c585034967d71718a3fd3a0f",
+    "mature_a.py": "f839ac95aa586b18aabc0fc09bff6e74935d15035d3c1d79a8ee4f2c70858a39",
+    "legacy.py": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043",
+    "rls_core.py": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe",
+    "run.py": "517257a76bce0f75886b16878bc32c62fdfffd4cf10e0f620794ce1c8e6ca99d",
+    "data_view.py": "eeab88869f568231360a636d2bd3add13acd07aa71dbd92bb42e30801498a706",
+    "test_model.py": "f04fc95fb71f44d466f96a458520996a8417d894aeeef89141c1b1c1bdc65c3d",
+    "launch.py": "46245c23068048b38f79794726bb73b0d14321b9661971a58b681e5491a530d0"
+  },
+  "source_final_numeric_read": false
+}

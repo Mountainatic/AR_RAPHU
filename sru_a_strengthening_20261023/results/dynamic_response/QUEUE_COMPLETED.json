@@ -1,0 +1,36 @@
+{
+  "fits": [
+    {
+      "case": "SRU_H2S_D4",
+      "mode": "train",
+      "exit_code": 0
+    },
+    {
+      "case": "SRU_H2S_D8",
+      "mode": "train",
+      "exit_code": 0
+    },
+    {
+      "case": "SRU_H2S_D16",
+      "mode": "train",
+      "exit_code": 0
+    }
+  ],
+  "evaluations": [
+    {
+      "case": "SRU_H2S_D4",
+      "mode": "evaluate",
+      "exit_code": 0
+    },
+    {
+      "case": "SRU_H2S_D8",
+      "mode": "evaluate",
+      "exit_code": 0
+    },
+    {
+      "case": "SRU_H2S_D16",
+      "mode": "evaluate",
+      "exit_code": 0
+    }
+  ]
+}

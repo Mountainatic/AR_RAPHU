@@ -1,0 +1,14 @@
+{
+  "status": "VERIFIED",
+  "archive": "/root/autodl-tmp/PRISM_SRU_A_STRENGTHENING_REVIEW_20261023/SRU_A_STRENGTHENING_20261023.tar.gz",
+  "bytes": 151919245,
+  "sha256": "a4287706da5cd44db3c6d7e56035ccd2cae90f85c123f825cefff61b204be7a9",
+  "manifest_sha256": "79e242d4be2131bbcfd61aa3b86227af061e76d835fce28db3bd4d04de19561c",
+  "members": 244,
+  "all_members_sha256_verified": true,
+  "final_configurations": 45,
+  "candidate_A_searches": 186,
+  "UTC": "2026-10-23T13:51:45.197565+00:00",
+  "source_final_numeric_read": false,
+  "server": "connect.westb.seetacloud.com:50905"
+}

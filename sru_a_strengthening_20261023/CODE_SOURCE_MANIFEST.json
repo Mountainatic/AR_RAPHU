@@ -1,0 +1,162 @@
+[
+  {
+    "source": "sru_dynamic_response_a_20261023/data_view.py",
+    "published": "code/dynamic_response/data_view.py",
+    "sha256": "eeab88869f568231360a636d2bd3add13acd07aa71dbd92bb42e30801498a706"
+  },
+  {
+    "source": "sru_dynamic_response_a_20261023/diagnose.py",
+    "published": "code/dynamic_response/diagnose.py",
+    "sha256": "95f34b9f573a94db9641230e36dc12385b577c68442cdd5c072024016a1ebf07"
+  },
+  {
+    "source": "sru_dynamic_response_a_20261023/diagnose_dynamics.py",
+    "published": "code/dynamic_response/diagnose_dynamics.py",
+    "sha256": "70619c0a8d31eb632b9c8b554b5beafee1b3edbaa0367c670bcd87569be98ca4"
+  },
+  {
+    "source": "sru_dynamic_response_a_20261023/launch.py",
+    "published": "code/dynamic_response/launch.py",
+    "sha256": "46245c23068048b38f79794726bb73b0d14321b9661971a58b681e5491a530d0"
+  },
+  {
+    "source": "sru_dynamic_response_a_20261023/legacy.py",
+    "published": "code/dynamic_response/legacy.py",
+    "sha256": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043"
+  },
+  {
+    "source": "sru_dynamic_response_a_20261023/mature_a.py",
+    "published": "code/dynamic_response/mature_a.py",
+    "sha256": "f839ac95aa586b18aabc0fc09bff6e74935d15035d3c1d79a8ee4f2c70858a39"
+  },
+  {
+    "source": "sru_dynamic_response_a_20261023/model.py",
+    "published": "code/dynamic_response/model.py",
+    "sha256": "a42f94401ac37f3437b84746f1d1ba2fec0dc5d9c585034967d71718a3fd3a0f"
+  },
+  {
+    "source": "sru_dynamic_response_a_20261023/rls_core.py",
+    "published": "code/dynamic_response/rls_core.py",
+    "sha256": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe"
+  },
+  {
+    "source": "sru_dynamic_response_a_20261023/run.py",
+    "published": "code/dynamic_response/run.py",
+    "sha256": "517257a76bce0f75886b16878bc32c62fdfffd4cf10e0f620794ce1c8e6ca99d"
+  },
+  {
+    "source": "sru_dynamic_response_a_20261023/test_model.py",
+    "published": "code/dynamic_response/test_model.py",
+    "sha256": "f04fc95fb71f44d466f96a458520996a8417d894aeeef89141c1b1c1bdc65c3d"
+  },
+  {
+    "source": "sru_conditional_feedback_a_20261023/data_view.py",
+    "published": "code/conditional_feedback/data_view.py",
+    "sha256": "eeab88869f568231360a636d2bd3add13acd07aa71dbd92bb42e30801498a706"
+  },
+  {
+    "source": "sru_conditional_feedback_a_20261023/diagnose.py",
+    "published": "code/conditional_feedback/diagnose.py",
+    "sha256": "95f34b9f573a94db9641230e36dc12385b577c68442cdd5c072024016a1ebf07"
+  },
+  {
+    "source": "sru_conditional_feedback_a_20261023/diagnose_conditional.py",
+    "published": "code/conditional_feedback/diagnose_conditional.py",
+    "sha256": "4a1dcd784047b280537ec04bb641956acc19f549fde117741369ce6b133d9d67"
+  },
+  {
+    "source": "sru_conditional_feedback_a_20261023/diagnose_dynamics.py",
+    "published": "code/conditional_feedback/diagnose_dynamics.py",
+    "sha256": "70619c0a8d31eb632b9c8b554b5beafee1b3edbaa0367c670bcd87569be98ca4"
+  },
+  {
+    "source": "sru_conditional_feedback_a_20261023/launch.py",
+    "published": "code/conditional_feedback/launch.py",
+    "sha256": "46245c23068048b38f79794726bb73b0d14321b9661971a58b681e5491a530d0"
+  },
+  {
+    "source": "sru_conditional_feedback_a_20261023/legacy.py",
+    "published": "code/conditional_feedback/legacy.py",
+    "sha256": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043"
+  },
+  {
+    "source": "sru_conditional_feedback_a_20261023/mature_a.py",
+    "published": "code/conditional_feedback/mature_a.py",
+    "sha256": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa"
+  },
+  {
+    "source": "sru_conditional_feedback_a_20261023/model.py",
+    "published": "code/conditional_feedback/model.py",
+    "sha256": "a42f94401ac37f3437b84746f1d1ba2fec0dc5d9c585034967d71718a3fd3a0f"
+  },
+  {
+    "source": "sru_conditional_feedback_a_20261023/rls_core.py",
+    "published": "code/conditional_feedback/rls_core.py",
+    "sha256": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe"
+  },
+  {
+    "source": "sru_conditional_feedback_a_20261023/run.py",
+    "published": "code/conditional_feedback/run.py",
+    "sha256": "b801740e926e18c6531c1aa56fa261f246fb44ac821868a81e34e210db948ab1"
+  },
+  {
+    "source": "sru_conditional_feedback_a_20261023/test_model.py",
+    "published": "code/conditional_feedback/test_model.py",
+    "sha256": "75265d16a6910405a67f136787ff99ee69f29c73c610b3222e7f41d4105b0d73"
+  },
+  {
+    "source": "sru_latent_innovation_a_20261023/data_view.py",
+    "published": "code/latent_innovation/data_view.py",
+    "sha256": "eeab88869f568231360a636d2bd3add13acd07aa71dbd92bb42e30801498a706"
+  },
+  {
+    "source": "sru_latent_innovation_a_20261023/diagnose.py",
+    "published": "code/latent_innovation/diagnose.py",
+    "sha256": "95f34b9f573a94db9641230e36dc12385b577c68442cdd5c072024016a1ebf07"
+  },
+  {
+    "source": "sru_latent_innovation_a_20261023/diagnose_coordinates.py",
+    "published": "code/latent_innovation/diagnose_coordinates.py",
+    "sha256": "a55e09412422cea5300127c47f6411994d58794d86652da942295b47bfd71dee"
+  },
+  {
+    "source": "sru_latent_innovation_a_20261023/diagnose_dynamics.py",
+    "published": "code/latent_innovation/diagnose_dynamics.py",
+    "sha256": "70619c0a8d31eb632b9c8b554b5beafee1b3edbaa0367c670bcd87569be98ca4"
+  },
+  {
+    "source": "sru_latent_innovation_a_20261023/launch.py",
+    "published": "code/latent_innovation/launch.py",
+    "sha256": "46245c23068048b38f79794726bb73b0d14321b9661971a58b681e5491a530d0"
+  },
+  {
+    "source": "sru_latent_innovation_a_20261023/legacy.py",
+    "published": "code/latent_innovation/legacy.py",
+    "sha256": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043"
+  },
+  {
+    "source": "sru_latent_innovation_a_20261023/mature_a.py",
+    "published": "code/latent_innovation/mature_a.py",
+    "sha256": "9009c196b626457339e910e6c3d8fb9ee5cba6b5be1337b322f324d4ac449aef"
+  },
+  {
+    "source": "sru_latent_innovation_a_20261023/model.py",
+    "published": "code/latent_innovation/model.py",
+    "sha256": "1d84611af48da27307530de9e4fe2ed8d7c2c68c5d86886c49f4dbb1fd040095"
+  },
+  {
+    "source": "sru_latent_innovation_a_20261023/rls_core.py",
+    "published": "code/latent_innovation/rls_core.py",
+    "sha256": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe"
+  },
+  {
+    "source": "sru_latent_innovation_a_20261023/run.py",
+    "published": "code/latent_innovation/run.py",
+    "sha256": "7475c74d4ff36eb580af2fc8babf7a98862923c6bc39745499ad07e4aeef6b04"
+  },
+  {
+    "source": "sru_latent_innovation_a_20261023/test_model.py",
+    "published": "code/latent_innovation/test_model.py",
+    "sha256": "c336ee6b504b22b1a46ba5147af9560158eb068e6ba0093c00a40dda1cb831e1"
+  }
+]

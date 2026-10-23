@@ -1,3 +1,9 @@
+# SRU H2S 条件残差反馈 A：2026-10-23 开发归档
+
+最新入口：[代码、逐样本预测、三块消融及复核报告](sru_a_strengthening_20261023/README.md)。完整冻结模型与候选训练账本见 [Release](https://github.com/Mountainatic/AR_RAPHU/releases/tag/sru-conditional-feedback-a-20261023)。当前属于开发证据，未开启本轮保留尾段。
+
+---
+
 # CZ L128 v0.6 与逐层冻结实验归档
 
 本分支新增 [cz_l128_v06_stagewise_20261012](cz_l128_v06_stagewise_20261012)：2026-10-12 完成的实验代码、汇总指标、图表和审计证据，2026-10-16 发布。

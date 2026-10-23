@@ -1,0 +1,368 @@
+{
+  "status": "PASSED",
+  "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+  "records": [
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D4",
+      "variant": "full",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        4,
+        5,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D4",
+      "variant": "no_KC",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        4,
+        5,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D4",
+      "variant": "no_W",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        4,
+        5,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D4",
+      "variant": "no_A",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        4,
+        5,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D4",
+      "variant": "report_A",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        4,
+        5,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D4",
+      "variant": "ADAPTIVE_ARX",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        4,
+        5,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D8",
+      "variant": "full",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        8,
+        9,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D8",
+      "variant": "no_KC",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        8,
+        9,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D8",
+      "variant": "no_W",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        8,
+        9,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D8",
+      "variant": "no_A",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        8,
+        9,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D8",
+      "variant": "report_A",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        8,
+        9,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D8",
+      "variant": "ADAPTIVE_ARX",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        8,
+        9,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D16",
+      "variant": "full",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        16,
+        17,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D16",
+      "variant": "no_KC",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        16,
+        17,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D16",
+      "variant": "no_W",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        16,
+        17,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D16",
+      "variant": "no_A",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        16,
+        17,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D16",
+      "variant": "report_A",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        16,
+        17,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    },
+    {
+      "branch": "PRISM_SRU_LATENT_INNOVATION_A_20261023",
+      "case": "SRU_H2S_D16",
+      "variant": "ADAPTIVE_ARX",
+      "full_saved_prediction_reproduced": true,
+      "prefixes": [
+        1,
+        16,
+        17,
+        33,
+        64,
+        128,
+        513,
+        1024,
+        2016
+      ],
+      "all_unmatured_y_and_future_X_poison_passed": true,
+      "initial_label_maturity": true,
+      "parameter_and_feature_maturity": true
+    }
+  ],
+  "source_final_numeric_read": false,
+  "no_refits": true
+}

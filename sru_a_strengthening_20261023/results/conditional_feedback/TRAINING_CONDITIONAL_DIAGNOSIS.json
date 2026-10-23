@@ -1,0 +1,95 @@
+{
+  "scope": "Training calibration only; no new fit/development parse or final values",
+  "rows": [
+    {
+      "case": "SRU_H2S_D4",
+      "pooled_correlation": 0.06005421077681624,
+      "training_response_quartiles": [
+        {
+          "q_low": -0.016167371657846163,
+          "q_high": 0.06532941111748358,
+          "n": 675,
+          "mature_residual_correlation": 0.10284791717377995
+        },
+        {
+          "q_low": 0.06532941111748358,
+          "q_high": 0.07795985501535024,
+          "n": 674,
+          "mature_residual_correlation": 0.14075040617318405
+        },
+        {
+          "q_low": 0.07795985501535024,
+          "q_high": 0.0914651569343401,
+          "n": 675,
+          "mature_residual_correlation": 0.2546101247411122
+        },
+        {
+          "q_low": 0.0914651569343401,
+          "q_high": 0.42781893426917145,
+          "n": 676,
+          "mature_residual_correlation": -0.034723794873836186
+        }
+      ]
+    },
+    {
+      "case": "SRU_H2S_D8",
+      "pooled_correlation": 0.02509408565234817,
+      "training_response_quartiles": [
+        {
+          "q_low": -0.04259863546840259,
+          "q_high": 0.06474993678532119,
+          "n": 673,
+          "mature_residual_correlation": -0.049447910849537154
+        },
+        {
+          "q_low": 0.06474993678532119,
+          "q_high": 0.07843202529132849,
+          "n": 668,
+          "mature_residual_correlation": -0.09840371870640768
+        },
+        {
+          "q_low": 0.07843202529132849,
+          "q_high": 0.09274439245247784,
+          "n": 670,
+          "mature_residual_correlation": 0.006564921181467969
+        },
+        {
+          "q_low": 0.09274439245247784,
+          "q_high": 0.45533171607518713,
+          "n": 673,
+          "mature_residual_correlation": 0.05272364851020014
+        }
+      ]
+    },
+    {
+      "case": "SRU_H2S_D16",
+      "pooled_correlation": 0.17651355076172578,
+      "training_response_quartiles": [
+        {
+          "q_low": -0.03617730850916339,
+          "q_high": 0.06593372699711661,
+          "n": 665,
+          "mature_residual_correlation": 0.11411418768122236
+        },
+        {
+          "q_low": 0.06593372699711661,
+          "q_high": 0.07891290029752497,
+          "n": 662,
+          "mature_residual_correlation": 0.17189222856704453
+        },
+        {
+          "q_low": 0.07891290029752497,
+          "q_high": 0.09229510125445263,
+          "n": 659,
+          "mature_residual_correlation": 0.14346568480730443
+        },
+        {
+          "q_low": 0.09229510125445263,
+          "q_high": 0.4687579475472024,
+          "n": 666,
+          "mature_residual_correlation": 0.23378883645817009
+        }
+      ]
+    }
+  ]
+}

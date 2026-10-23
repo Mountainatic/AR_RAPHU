@@ -1,0 +1,50 @@
+{
+  "scope": "Existing training calibration only,no new fits,development or final values",
+  "rows": [
+    {
+      "case": "SRU_H2S_D4",
+      "link": {
+        "kind": "signed_sqrt",
+        "scale": 1.0
+      },
+      "physical_lag_correlation": 0.06005421077681624,
+      "latent_lag_correlation": 0.11789138674262768,
+      "latent_quarters": [
+        0.1361368745345829,
+        0.08907522075324449,
+        0.09023130121000406,
+        0.15209941335181876
+      ]
+    },
+    {
+      "case": "SRU_H2S_D8",
+      "link": {
+        "kind": "signed_sqrt",
+        "scale": 1.0
+      },
+      "physical_lag_correlation": 0.02509408565234817,
+      "latent_lag_correlation": 0.010841647288302858,
+      "latent_quarters": [
+        0.03059817935225476,
+        0.07743019838968794,
+        -0.15595203633619992,
+        -0.0743542667715
+      ]
+    },
+    {
+      "case": "SRU_H2S_D16",
+      "link": {
+        "kind": "signed_sqrt",
+        "scale": 1.0
+      },
+      "physical_lag_correlation": 0.17651355076172578,
+      "latent_lag_correlation": 0.21371772836154299,
+      "latent_quarters": [
+        0.285033715883904,
+        0.2503411648728377,
+        0.08623986116015253,
+        0.10952215560127643
+      ]
+    }
+  ]
+}
