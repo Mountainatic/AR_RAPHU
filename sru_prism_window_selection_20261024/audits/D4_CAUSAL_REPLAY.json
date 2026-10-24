@@ -1,0 +1,37 @@
+{
+  "status": "COMPLETED",
+  "records": [
+    {
+      "variant": "full",
+      "window": 8,
+      "poison_prefixes": [
+        1,
+        4,
+        5,
+        33,
+        65,
+        257,
+        2016
+      ],
+      "tolerance": 1e-12,
+      "passed": true
+    },
+    {
+      "variant": "no_A",
+      "window": 16,
+      "poison_prefixes": [
+        1,
+        4,
+        5,
+        33,
+        65,
+        257,
+        2016
+      ],
+      "tolerance": 1e-12,
+      "passed": true
+    }
+  ],
+  "no_fits": true,
+  "source_final_numeric_read": false
+}

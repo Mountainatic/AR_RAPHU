@@ -1,0 +1,30 @@
+{
+  "status": "COMPLETED",
+  "source_experiment": "sru_prism_window_selection_20261024",
+  "release": "https://github.com/Mountainatic/AR_RAPHU/releases/tag/sru-baselines-prism-window-selection-20261024",
+  "immutable_experiment_archive": {
+    "name": "SRU_PRISM_WINDOW_SELECTION_20261024.tar.gz",
+    "bytes": 41850934,
+    "sha256": "caec24da4431f15568d400a93287c29ff53d752846138d4bc68164dcf1f02a08",
+    "members": 147
+  },
+  "git_scope": [
+    "Original PRISM search/training/report source",
+    "Complete comparison metrics and CSV/Parquet point predictions",
+    "Scientific plots",
+    "All15 candidate freeze receipts and training score ledger",
+    "Causal replay receipts",
+    "Baseline prediction references, seed metrics and metadata",
+    "Independent and local verification receipts"
+  ],
+  "release_only": [
+    "All30 PRISM candidate model pickle files and complete training ledgers",
+    "Public SRU training/development prefix arrays",
+    "Original fixed128 baseline archive, containing all baseline code and weights"
+  ],
+  "private_CZ_data_in_new_publication": false,
+  "reserved_tail_included": false,
+  "credentials_included": false,
+  "data_licensing": "Original third-party SRU provenance retained; this publication does not grant additional third-party data rights",
+  "evidence": "Reused development comparison; fixed128 baselines vs train-selected PRISM windows and full online A; not an independent final test"
+}

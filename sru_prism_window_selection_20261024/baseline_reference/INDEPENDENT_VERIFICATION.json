@@ -1,0 +1,175 @@
+{
+  "status": "COMPLETED",
+  "checks": [
+    {
+      "delay": 4,
+      "model": "Persistence",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "AR",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "ARX",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "LSTM",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "Transformer",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "iTransformer",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "TimeXer",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "PRISM_L128_no_A",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "PRISM_L128",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "Persistence",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "AR",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "ARX",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "LSTM",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "Transformer",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "iTransformer",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "TimeXer",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "PRISM_L128_no_A",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "PRISM_L128",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "Persistence",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "AR",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "ARX",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "LSTM",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "Transformer",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "iTransformer",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "TimeXer",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "PRISM_L128_no_A",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "PRISM_L128",
+      "all_metrics_recomputed": true,
+      "pointwise_alignment": true
+    }
+  ],
+  "metric_rows": 27,
+  "point_rows": 54432,
+  "new_neural_checkpoints": 36,
+  "new_linear_models": 6,
+  "new_prism_models": 6,
+  "direct_input_length": 128,
+  "source_final_numeric_read": false,
+  "all_frozen_hashes_verified": true
+}

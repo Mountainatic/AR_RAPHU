@@ -1,0 +1,31 @@
+label_delay,variant,window,selection_MSE,selected,score_count,score_origin_sha256,KCW_config,W,A_admitted
+4,full,8,0.0002789919660146472,True,928,f6220937fd60c01fc29802bc0debaaaf877efe8d40e937573177bc66d8d91d76,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,True
+4,full,16,0.0002849311427761652,False,928,f6220937fd60c01fc29802bc0debaaaf877efe8d40e937573177bc66d8d91d76,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,True
+4,full,32,0.0003948428143810257,False,928,f6220937fd60c01fc29802bc0debaaaf877efe8d40e937573177bc66d8d91d76,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": false}",signed_sqrt,True
+4,full,64,0.0006948208634147828,False,928,f6220937fd60c01fc29802bc0debaaaf877efe8d40e937573177bc66d8d91d76,"{""alpha"": 0.01, ""kind"": ""OWN""}",identity,True
+4,full,128,0.0008094099993240392,False,928,f6220937fd60c01fc29802bc0debaaaf877efe8d40e937573177bc66d8d91d76,"{""alpha"": 100.0, ""kind"": ""URYSOHN"", ""memory"": false, ""own"": true}",signed_log1p,True
+4,no_A,8,0.0003384511221971694,False,928,f6220937fd60c01fc29802bc0debaaaf877efe8d40e937573177bc66d8d91d76,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,False
+4,no_A,16,0.00033671875783716716,True,928,f6220937fd60c01fc29802bc0debaaaf877efe8d40e937573177bc66d8d91d76,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,False
+4,no_A,32,0.000568220899050379,False,928,f6220937fd60c01fc29802bc0debaaaf877efe8d40e937573177bc66d8d91d76,"{""alpha"": 1.0, ""kind"": ""LINEAR"", ""memory"": true, ""own"": true}",signed_sqrt,False
+4,no_A,64,0.0007147892547401122,False,928,f6220937fd60c01fc29802bc0debaaaf877efe8d40e937573177bc66d8d91d76,"{""alpha"": 0.01, ""kind"": ""OWN""}",identity,False
+4,no_A,128,0.0008940243373744872,False,928,f6220937fd60c01fc29802bc0debaaaf877efe8d40e937573177bc66d8d91d76,"{""alpha"": 100.0, ""kind"": ""URYSOHN"", ""memory"": false, ""own"": true}",identity,False
+8,full,8,0.00033216595523335497,False,911,e4895261ca1baf8c865a101dcb8df95d7bfe6675837dac9f0daa0e954b5de63b,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,True
+8,full,16,0.00029511770675309616,True,911,e4895261ca1baf8c865a101dcb8df95d7bfe6675837dac9f0daa0e954b5de63b,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,True
+8,full,32,0.0004245199898490959,False,911,e4895261ca1baf8c865a101dcb8df95d7bfe6675837dac9f0daa0e954b5de63b,"{""alpha"": 1.0, ""kind"": ""LINEAR"", ""memory"": true, ""own"": true}",signed_sqrt,True
+8,full,64,0.0006081866479074646,False,911,e4895261ca1baf8c865a101dcb8df95d7bfe6675837dac9f0daa0e954b5de63b,"{""alpha"": 100.0, ""kind"": ""LINEAR"", ""memory"": true, ""own"": false}",signed_sqrt,True
+8,full,128,0.0007494208627223493,False,911,e4895261ca1baf8c865a101dcb8df95d7bfe6675837dac9f0daa0e954b5de63b,"{""alpha"": 100.0, ""kind"": ""LINEAR"", ""memory"": true, ""own"": false}",asinh,True
+8,no_A,8,0.0004119220456901853,False,911,e4895261ca1baf8c865a101dcb8df95d7bfe6675837dac9f0daa0e954b5de63b,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,False
+8,no_A,16,0.0003363501163434398,True,911,e4895261ca1baf8c865a101dcb8df95d7bfe6675837dac9f0daa0e954b5de63b,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,False
+8,no_A,32,0.0005407591518270873,False,911,e4895261ca1baf8c865a101dcb8df95d7bfe6675837dac9f0daa0e954b5de63b,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,False
+8,no_A,64,0.0009753879167043795,False,911,e4895261ca1baf8c865a101dcb8df95d7bfe6675837dac9f0daa0e954b5de63b,"{""alpha"": 100.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": false}",identity,False
+8,no_A,128,0.0011112581160199323,False,911,e4895261ca1baf8c865a101dcb8df95d7bfe6675837dac9f0daa0e954b5de63b,"{""alpha"": 100.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": false}",asinh,False
+16,full,8,0.000422548927906921,False,877,4e2ce53b880a8bdfac48c2b08dddd2ddc3f5cbdacd8e36fbadc94a7a999f9e5e,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,True
+16,full,16,0.0002579918847061376,True,877,4e2ce53b880a8bdfac48c2b08dddd2ddc3f5cbdacd8e36fbadc94a7a999f9e5e,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,True
+16,full,32,0.00036943801705583595,False,877,4e2ce53b880a8bdfac48c2b08dddd2ddc3f5cbdacd8e36fbadc94a7a999f9e5e,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,True
+16,full,64,0.0006976052342083307,False,877,4e2ce53b880a8bdfac48c2b08dddd2ddc3f5cbdacd8e36fbadc94a7a999f9e5e,"{""alpha"": 100.0, ""kind"": ""LINEAR"", ""memory"": true, ""own"": true}",signed_sqrt,True
+16,full,128,0.0007965895169214929,False,877,4e2ce53b880a8bdfac48c2b08dddd2ddc3f5cbdacd8e36fbadc94a7a999f9e5e,"{""alpha"": 100.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": false}",asinh,True
+16,no_A,8,0.0005009030357286605,False,877,4e2ce53b880a8bdfac48c2b08dddd2ddc3f5cbdacd8e36fbadc94a7a999f9e5e,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,False
+16,no_A,16,0.00030944239940773355,True,877,4e2ce53b880a8bdfac48c2b08dddd2ddc3f5cbdacd8e36fbadc94a7a999f9e5e,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,False
+16,no_A,32,0.00044823400934133217,False,877,4e2ce53b880a8bdfac48c2b08dddd2ddc3f5cbdacd8e36fbadc94a7a999f9e5e,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,False
+16,no_A,64,0.0008477006791580193,False,877,4e2ce53b880a8bdfac48c2b08dddd2ddc3f5cbdacd8e36fbadc94a7a999f9e5e,"{""alpha"": 100.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,False
+16,no_A,128,0.0010040916916762605,False,877,4e2ce53b880a8bdfac48c2b08dddd2ddc3f5cbdacd8e36fbadc94a7a999f9e5e,"{""alpha"": 100.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": false}",asinh,False

@@ -1,3 +1,11 @@
+# SRU H2S 基线比较与PRISM自选窗口：2026-10-24
+
+最新入口：[完整报告、基线指标和逐点预测](sru_prism_window_selection_20261024/README.md)。基线固定128步；PRISM按训练内验证从8/16/32/64/128选窗，标签延迟4/8/16分别选择8/16/16步，主表保留完整在线A。共27组指标、54,432行逐点记录。
+
+完整模型、全部候选账本及原基线冻结包见[开发版Release](https://github.com/Mountainatic/AR_RAPHU/releases/tag/sru-baselines-prism-window-selection-20261024)。这是已使用开发段的比较，独立保留尾段未打开；历史结果和标签保持原状。
+
+---
+
 # SRU H2S 条件残差反馈 A：2026-10-23 开发归档
 
 最新入口：[代码、逐样本预测、三块消融及复核报告](sru_a_strengthening_20261023/README.md)。完整冻结模型与候选训练账本见 [Release](https://github.com/Mountainatic/AR_RAPHU/releases/tag/sru-conditional-feedback-a-20261023)。当前属于开发证据，未开启本轮保留尾段。

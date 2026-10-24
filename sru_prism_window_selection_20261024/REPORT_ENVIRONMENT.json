@@ -1,0 +1,10 @@
+{
+  "python": "3.12.3 | packaged by Anaconda, Inc. | (main, May  6 2024, 19:46:43) [GCC 11.2.0]",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "2.2.3",
+    "matplotlib": "3.11.0",
+    "pyarrow": "24.0.0"
+  },
+  "role": "Aggregation, plots, independent verification and final packaging only; PRISM fits use registered Python3.10 environment"
+}

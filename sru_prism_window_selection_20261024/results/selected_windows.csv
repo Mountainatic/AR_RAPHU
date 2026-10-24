@@ -1,0 +1,7 @@
+label_delay,model,direct_window,training_selection_MSE,KCW_config,W,A
+4,PRISM,8,0.0002789919660146472,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,"{""admitted"": true, ""child_risk"": 0.0002789919660146472, ""parent_risk"": 0.0003384511221971694, ""selected"": {""family"": ""QC32_RLS"", ""forget"": 0.999, ""gain"": 1.0, ""p"": 1, ""window"": 512}}"
+4,PRISM_no_A,16,0.00033671875783716716,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,null
+8,PRISM,16,0.00029511770675309616,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,"{""admitted"": true, ""child_risk"": 0.00029511770675309616, ""parent_risk"": 0.0003363501163434398, ""selected"": {""family"": ""QC32_RLS"", ""forget"": 0.999, ""gain"": 0.5, ""p"": 1, ""window"": 0}}"
+8,PRISM_no_A,16,0.0003363501163434398,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,null
+16,PRISM,16,0.0002579918847061376,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,"{""admitted"": true, ""child_risk"": 0.0002579918847061376, ""parent_risk"": 0.00030944239940773355, ""selected"": {""family"": ""QC32_RLS"", ""forget"": 0.999, ""gain"": 0.5, ""p"": 1, ""window"": 512}}"
+16,PRISM_no_A,16,0.00030944239940773355,"{""alpha"": 1.0, ""kind"": ""URYSOHN"", ""memory"": true, ""own"": true}",signed_sqrt,null

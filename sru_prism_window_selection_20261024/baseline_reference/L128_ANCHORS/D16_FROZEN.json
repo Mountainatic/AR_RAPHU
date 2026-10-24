@@ -1,0 +1,118 @@
+{
+  "status": "COMPLETED",
+  "files": {
+    "full.pkl": "fb2ff297b6b3995444a02b5568d70de707d966e24f475702fa896f414f316bb4",
+    "no_A.pkl": "baf16da57f5371ad32a0c04ad3153dd37a9a7d7e0bde500016ec8d87c6aec215"
+  },
+  "selected": {
+    "full": {
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 100.0,
+          "own": false,
+          "memory": true
+        },
+        "mode": "asinh",
+        "status": "AVAILABLE",
+        "MSE": 0.0008113750311092872,
+        "proof": [
+          {
+            "last_fit_label": 2243,
+            "first_score_dependency": 2244,
+            "parent": {
+              "rows": 2052,
+              "parameters": 21,
+              "kkt": 3.2813574506408796e-17,
+              "condition": 92.28182841482523
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2713,
+            "first_score_dependency": 2714,
+            "parent": {
+              "rows": 2522,
+              "parameters": 21,
+              "kkt": 3.17400195872455e-17,
+              "condition": 108.95283901976643
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 0,
+          "window": 0,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true,
+        "parent_risk": 0.0010040916916762605,
+        "child_risk": 0.0007965895169214929
+      }
+    },
+    "no_A": {
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 100.0,
+          "own": false,
+          "memory": true
+        },
+        "mode": "asinh",
+        "status": "AVAILABLE",
+        "MSE": 0.0008113750311092872,
+        "proof": [
+          {
+            "last_fit_label": 2243,
+            "first_score_dependency": 2244,
+            "parent": {
+              "rows": 2052,
+              "parameters": 21,
+              "kkt": 3.2813574506408796e-17,
+              "condition": 92.28182841482523
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2713,
+            "first_score_dependency": 2714,
+            "parent": {
+              "rows": 2522,
+              "parameters": 21,
+              "kkt": 3.17400195872455e-17,
+              "condition": 108.95283901976643
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null
+    }
+  },
+  "staged_ridge_fit_counts": {
+    "full": 389,
+    "no_A": 389
+  },
+  "latest_fit_target": 6032,
+  "direct_input_length": 128,
+  "development_read_during_fit": false,
+  "runtime_seconds": 111.25808835029602,
+  "environment": {
+    "python": "3.10.12 (main, Jul 15 2026, 23:40:17) [GCC 11.4.0]",
+    "packages": {
+      "numpy": "2.2.6",
+      "scipy": "1.15.3",
+      "pandas": "2.2.3",
+      "scikit-learn": "1.7.1",
+      "pyarrow": "24.0.0"
+    }
+  }
+}

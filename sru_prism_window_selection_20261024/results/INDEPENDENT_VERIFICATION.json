@@ -1,0 +1,48 @@
+{
+  "status": "COMPLETED",
+  "metric_rows": 27,
+  "point_rows": 54432,
+  "baseline_predictions_bitwise_equal": true,
+  "all_source_and_freeze_hashes_checked": true,
+  "all_candidate_score_origins_identical": true,
+  "L128_retraining_anchors": [
+    {
+      "delay": 4,
+      "variant": "full",
+      "selected_KCW_equal": true,
+      "full_A_risks_equal": true
+    },
+    {
+      "delay": 4,
+      "variant": "no_A",
+      "selected_KCW_equal": true,
+      "full_A_risks_equal": false
+    },
+    {
+      "delay": 8,
+      "variant": "full",
+      "selected_KCW_equal": true,
+      "full_A_risks_equal": true
+    },
+    {
+      "delay": 8,
+      "variant": "no_A",
+      "selected_KCW_equal": true,
+      "full_A_risks_equal": false
+    },
+    {
+      "delay": 16,
+      "variant": "full",
+      "selected_KCW_equal": true,
+      "full_A_risks_equal": true
+    },
+    {
+      "delay": 16,
+      "variant": "no_A",
+      "selected_KCW_equal": true,
+      "full_A_risks_equal": false
+    }
+  ],
+  "reserved_tail_read": false,
+  "metrics_recomputed_from_serialized_predictions": true
+}
