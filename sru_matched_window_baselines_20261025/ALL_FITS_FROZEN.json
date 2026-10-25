@@ -1,0 +1,130 @@
+{
+  "all_fits_frozen_before_evaluation": true,
+  "jobs": [
+    {
+      "mode": "linear",
+      "name": "linear",
+      "delay": 4,
+      "exit_code": 0,
+      "seconds": 3.375774621963501
+    },
+    {
+      "mode": "linear",
+      "name": "linear",
+      "delay": 8,
+      "exit_code": 0,
+      "seconds": 3.5800602436065674
+    },
+    {
+      "mode": "linear",
+      "name": "linear",
+      "delay": 16,
+      "exit_code": 0,
+      "seconds": 3.4418840408325195
+    },
+    {
+      "mode": "train",
+      "name": "LSTM",
+      "delay": 4,
+      "exit_code": 0,
+      "seconds": 64.1248791217804
+    },
+    {
+      "mode": "train",
+      "name": "Transformer",
+      "delay": 4,
+      "exit_code": 0,
+      "seconds": 191.12215924263
+    },
+    {
+      "mode": "train",
+      "name": "iTransformer",
+      "delay": 4,
+      "exit_code": 0,
+      "seconds": 141.7836127281189
+    },
+    {
+      "mode": "train",
+      "name": "LSTM",
+      "delay": 8,
+      "exit_code": 0,
+      "seconds": 106.45829558372498
+    },
+    {
+      "mode": "train",
+      "name": "TimeXer",
+      "delay": 4,
+      "exit_code": 0,
+      "seconds": 292.3050525188446
+    },
+    {
+      "mode": "train",
+      "name": "Transformer",
+      "delay": 8,
+      "exit_code": 0,
+      "seconds": 198.33065700531006
+    },
+    {
+      "mode": "train",
+      "name": "iTransformer",
+      "delay": 8,
+      "exit_code": 0,
+      "seconds": 168.12021279335022
+    },
+    {
+      "mode": "train",
+      "name": "TimeXer",
+      "delay": 8,
+      "exit_code": 0,
+      "seconds": 173.8693106174469
+    },
+    {
+      "mode": "train",
+      "name": "LSTM",
+      "delay": 16,
+      "exit_code": 0,
+      "seconds": 105.69001603126526
+    },
+    {
+      "mode": "train",
+      "name": "iTransformer",
+      "delay": 16,
+      "exit_code": 0,
+      "seconds": 83.48361229896545
+    },
+    {
+      "mode": "train",
+      "name": "Transformer",
+      "delay": 16,
+      "exit_code": 0,
+      "seconds": 180.63086700439453
+    },
+    {
+      "mode": "train",
+      "name": "TimeXer",
+      "delay": 16,
+      "exit_code": 0,
+      "seconds": 121.20674443244934
+    }
+  ],
+  "receipts": {
+    "runs/D8/linear/FROZEN.json": "2df37caef002d45c172bb98dcd3b2497a87682c2d5748c316756c18ca1e91464",
+    "runs/D8/LSTM/FROZEN.json": "17fdbcfdf9d7e7245422efc835ae6dbbd9fb87d4820ba66fea23e671ba4dcd50",
+    "runs/D8/Transformer/FROZEN.json": "62193b73e7d739244bd6977df262eb1793b1963bdb665457bbd732281efd73ac",
+    "runs/D8/iTransformer/FROZEN.json": "10e8f63c1c34951a0c9bd33bde500e381013756b467fb48d3fbb9e509a012dc2",
+    "runs/D8/TimeXer/FROZEN.json": "37185c9b3cb625138f4229f67268fb7dfcfdea9b95d952e63ef0881242a43567",
+    "runs/D4/linear/FROZEN.json": "5fe7a2d0875dcab106b95fa909c57cba0114bdf930c871a5a3303f5bc4510f6d",
+    "runs/D4/LSTM/FROZEN.json": "d86473c7783ef01cc8156a6dd494d7ab1012c8f6946fc27a5d3b39c6d9f6ef56",
+    "runs/D4/Transformer/FROZEN.json": "538391e1d6cdc1035b81e99b70a985b7af6aaed6ec4367d103ba7b2060a4981a",
+    "runs/D4/iTransformer/FROZEN.json": "ddcebe0e0ff0d26c78c51d995c49e6d1bf3d2320a15d533bb51c5bfe59badc49",
+    "runs/D4/TimeXer/FROZEN.json": "296710daa2c61a03557e0f9afeeee4d87499d9e6179801efcd1af9d78dbe98da",
+    "runs/D16/linear/FROZEN.json": "2eb028d04b718cca9ae584243ce7107395f951e8ae9a55ff07569787008a2cee",
+    "runs/D16/LSTM/FROZEN.json": "8a82e8c8e71276aa89aff9ede8f48486454bb9aa9fa695aabf72e6e0dc3e6eaa",
+    "runs/D16/Transformer/FROZEN.json": "0f36e0a62b8b5be68c0950d14e688655b7cac3e1811d53f30e5e00f8dcce2cc0",
+    "runs/D16/iTransformer/FROZEN.json": "e057085fb72291e1216ad760f37fd82b691b5c6a163c3eb4bc6ed94580d229ce",
+    "runs/D16/TimeXer/FROZEN.json": "318794ec97865999926975b17c30f886ba38ed759366e53c197799b85f860548",
+    "prism_reference/D16/FROZEN.json": "b7098f7dc10b2607a7a3bf13be4c81d56f51245ea1497453091486ec468ba8ea",
+    "prism_reference/D4/FROZEN.json": "e61f27e6e2fcb4ff0dbfef04a9b9afde12688e23aab82a2b7fded59280f3bc2e",
+    "prism_reference/D8/FROZEN.json": "2be92dff4d90b8ccece5cd02941b65b8c27e2dcaf24e3fa2cea8c73d3c3c36ae"
+  }
+}

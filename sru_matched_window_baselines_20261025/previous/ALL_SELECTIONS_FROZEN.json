@@ -1,0 +1,56 @@
+{
+  "status": "COMPLETED",
+  "all_fits_frozen_before_evaluation": true,
+  "choices": {
+    "4": {
+      "full": {
+        "window": 8,
+        "selection_MSE": 0.0002789919660146472
+      },
+      "no_A": {
+        "window": 16,
+        "selection_MSE": 0.00033671875783716716
+      }
+    },
+    "8": {
+      "full": {
+        "window": 16,
+        "selection_MSE": 0.00029511770675309616
+      },
+      "no_A": {
+        "window": 16,
+        "selection_MSE": 0.0003363501163434398
+      }
+    },
+    "16": {
+      "full": {
+        "window": 16,
+        "selection_MSE": 0.0002579918847061376
+      },
+      "no_A": {
+        "window": 16,
+        "selection_MSE": 0.00030944239940773355
+      }
+    }
+  },
+  "receipts": {
+    "runs/D4/L8/FROZEN.json": "e61f27e6e2fcb4ff0dbfef04a9b9afde12688e23aab82a2b7fded59280f3bc2e",
+    "runs/D4/L16/FROZEN.json": "94239ed311a8db2ebf04e838022cbd3183ab6d825ed6976fb91aa98f017dc0d8",
+    "runs/D4/L32/FROZEN.json": "f5936033034f86c3228d9bdcaa1bf8c5715d9d0fc47af51ce170107d6ec0f8da",
+    "runs/D4/L64/FROZEN.json": "d71f5982b2f326781250e1c741a920fb69c24bd96b8d8de3b0596eb61a57768f",
+    "runs/D4/L128/FROZEN.json": "feca3ac6dcc923b7293be06caaae2606902bfd4b57510e73ee0f0a88a48ec94b",
+    "runs/D8/L8/FROZEN.json": "8887482c4905deb9ef6e5e0a7d8bcd31cb07f91f5cafbb32fe39d7f8aecb868b",
+    "runs/D8/L16/FROZEN.json": "2be92dff4d90b8ccece5cd02941b65b8c27e2dcaf24e3fa2cea8c73d3c3c36ae",
+    "runs/D8/L32/FROZEN.json": "6347a4c539edfb6fb1c3c81e9caccc151b99d27f88c59ec3b2b978fd8cf83313",
+    "runs/D8/L64/FROZEN.json": "1d95f0a314e6249ccfd1fd78fafa548de2918ef61fbc93a78de98a60498b537f",
+    "runs/D8/L128/FROZEN.json": "00fe1ba6756a33a82ec823bc2ae995d70e4ba0f5c5e994ec3305dda4df551e59",
+    "runs/D16/L8/FROZEN.json": "8e4046ed0ceeebdb3914da467a381fb89537b537358a8ea3877eb5a0f54ab453",
+    "runs/D16/L16/FROZEN.json": "b7098f7dc10b2607a7a3bf13be4c81d56f51245ea1497453091486ec468ba8ea",
+    "runs/D16/L32/FROZEN.json": "d237ac68c00b08d340c01c6c026f33c1c25a653ce206f9002e20f94aa04d9a1a",
+    "runs/D16/L64/FROZEN.json": "5bdacab753c93416430f9af9a255e9cde29bb4f15f5342e91f4a2d8236bcb9e4",
+    "runs/D16/L128/FROZEN.json": "4b2e0b7cc2b156764a45ed9c9a227220671c075acdc993debd5e295d20953ef4"
+  },
+  "ledger_sha256": "783dde37ad076ac583b9391ec5dbdff6596fc40da5b293cefd7352668a39750e",
+  "development_values_read_for_window_selection": false,
+  "selection_time_utc": "2026-10-23T16:33:41Z"
+}

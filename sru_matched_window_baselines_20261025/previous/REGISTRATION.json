@@ -1,0 +1,86 @@
+{
+  "status": "COMPLETED",
+  "task": "PRISM train-selected windows vs fixed128 baselines",
+  "source_branch": "sru-conditional-feedback-a-20261023",
+  "source_commit": "a4cdf17d31ae8956dffe20f8745d45802bd084f0",
+  "candidate_windows": [
+    8,
+    16,
+    32,
+    64,
+    128
+  ],
+  "label_delays": [
+    4,
+    8,
+    16
+  ],
+  "selection": "Minimum joint training-calibration nested MSE per delay and variant; ties choose shorter window",
+  "common_geometry": {
+    "parent_targets": [
+      192,
+      3328
+    ],
+    "calibration_start": "3328+128+2*delay",
+    "calibration_stop_exclusive": "6048-delay+1",
+    "common_dependency_embargo": "127+delay for all windows",
+    "score": "calibration blocks .6-.75/.75-.9/.9-1, each drops32+delay-1 cold rows"
+  },
+  "variants": [
+    "full",
+    "no_A"
+  ],
+  "unchanged_A_candidates": 273,
+  "numerical_and_support_gates": "Unchanged original PRISM",
+  "direct_X": "x(t-L+1)..x(t)",
+  "direct_y": "y(t-delay-L+1)..y(t-delay)",
+  "state_compression": "Original structure: two y endpoints0/L-1, current X and optional mean past X response; candidate may omit own or memory",
+  "online_A": "Full online A retained; issued q and matured residual/RLS history may exceed chosen direct window",
+  "development_targets": [
+    6048,
+    8064
+  ],
+  "reserved_tail": "[8064,10081) NEVER READ",
+  "development_role": "Previously reused development comparison, not independent final test",
+  "baseline_direct_length": 128,
+  "baseline_action": "Reuse exact frozen predictions and seed metrics; no baseline retraining",
+  "baseline_archive_sha256": "ca4d91e9fbcee61311ab6719ef82675ecf18efc367876aaca6f22198252f2fda",
+  "train_sha256": "c4e9ac57c8a60b6e948941bca5cf9323ea1b95cd1c433d74444a46b9b970452f",
+  "development_file_sha256": "8118be3f5b728c8ad3f9ccea50ed957d8d41319f6ea207b9de251506f31b137a",
+  "code_sha256": {
+    "launch.py": "2ad38b0fe50c2efc51148c041d219dbb6cd7fc8a95f56f237adcee2d006d42c1",
+    "prism/legacy.py": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043",
+    "prism/mature_a.py": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa",
+    "prism/model.py": "eec612d8cb7137cbdf676db5d2de61cfbb4fbfae2429aa9630865ad737ab300a",
+    "prism/rls_core.py": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe",
+    "prism_search.py": "a7b348a0d043aca0cdcd25dbed12632ebd7df8b43d972133e5bb51e41724ed02",
+    "report.py": "7d7b1d9f308bab40e5415ca620e1fdf33d54cd1a5950059514ba3dde58fa6e0a"
+  },
+  "baseline_files_sha256": {
+    "baseline_reference/CAUSAL_AUDIT.json": "696863d9421b46b93fc82e8af4e12666c8d1b35b98d4bdd49470c93feace743d",
+    "baseline_reference/INDEPENDENT_VERIFICATION.json": "c7a7120e75edf0b12b8883cae3aff49774efc601060ae734691eed8b3aaad059",
+    "baseline_reference/L128_ANCHORS/D16_FROZEN.json": "63ee97069664b100f49df0d6e264307c9541f4a57980b8e9e91bc8a3f5e0a1ad",
+    "baseline_reference/L128_ANCHORS/D4_FROZEN.json": "867a91fa22d8f222f964a280a4459608a65a2cb9f4b196aece620b7cd777574d",
+    "baseline_reference/L128_ANCHORS/D8_FROZEN.json": "2ff689551400a08ce16c971dd5c3f20da4c3609fd2aa6eaa480cbf6266e39fc6",
+    "baseline_reference/REGISTRATION.json": "70e8b7a5abef6e9a268d060a1e687557293f4f1c8b0355f44b356327e42048e6",
+    "baseline_reference/SRU_BASELINES_L128_20261023.tar.gz": "ca4d91e9fbcee61311ab6719ef82675ecf18efc367876aaca6f22198252f2fda",
+    "baseline_reference/metrics.csv": "e848fb023bb05a7589151f3d9f69895d129f82bdb20f81afd0e69b0fdef5409f",
+    "baseline_reference/metrics_by_seed.csv": "4106ad8922f32c17929e6e3a185b6de69ff274b61faff9d645e43dee9c7d47a5",
+    "baseline_reference/metrics_seed_mean_std.csv": "8380324183ba6a6c8151d51dad0a6096406786b3afe1eeaba8486ee9e2c24825",
+    "baseline_reference/point_predictions_D16.parquet": "4f04d3f845c6224590f53c0330946be1fa925caec7a23a7d0e75f919554e1178",
+    "baseline_reference/point_predictions_D4.parquet": "ccf1fae362075a09966273668da37c39a900a446b412c0cbe25e57109f77cda8",
+    "baseline_reference/point_predictions_D8.parquet": "909a8dda465d0330832eb9f99edc6a9e661a92f31601efc325d19783ce0f9d5f"
+  },
+  "parallel_workers": 3,
+  "threads_per_worker": 1,
+  "environment": {
+    "python": "3.10.12 (main, Jul 15 2026, 23:40:17) [GCC 11.4.0]",
+    "packages": {
+      "numpy": "2.2.6",
+      "scipy": "1.15.3",
+      "pandas": "2.2.3",
+      "scikit-learn": "1.7.1",
+      "pyarrow": "24.0.0"
+    }
+  }
+}

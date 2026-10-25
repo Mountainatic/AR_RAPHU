@@ -1,0 +1,18 @@
+{
+  "status": "COMPLETED",
+  "rows_metrics": 27,
+  "direct_input_lengths": {
+    "4": 8,
+    "8": 16,
+    "16": 16
+  },
+  "rows_per_model": 2016,
+  "delays": [
+    4,
+    8,
+    16
+  ],
+  "source_final_numeric_read": false,
+  "all_new_fits_frozen_before_evaluation": true,
+  "registration_sha256": "9f3bb8386dd6468d67f0cfc7882c540dd4dfae5d315e5c7f3c5b941a5e9bc898"
+}

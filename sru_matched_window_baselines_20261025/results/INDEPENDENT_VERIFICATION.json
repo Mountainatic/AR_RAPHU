@@ -1,0 +1,202 @@
+{
+  "status": "COMPLETED",
+  "checks": [
+    {
+      "delay": 4,
+      "model": "Persistence",
+      "window": 1,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "AR",
+      "window": 8,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "ARX",
+      "window": 8,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "LSTM",
+      "window": 8,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "Transformer",
+      "window": 8,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "iTransformer",
+      "window": 8,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "TimeXer",
+      "window": 8,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "PRISM_no_A",
+      "window": 8,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 4,
+      "model": "PRISM",
+      "window": 8,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "Persistence",
+      "window": 1,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "AR",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "ARX",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "LSTM",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "Transformer",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "iTransformer",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "TimeXer",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "PRISM_no_A",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 8,
+      "model": "PRISM",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "Persistence",
+      "window": 1,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "AR",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "ARX",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "LSTM",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "Transformer",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "iTransformer",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "TimeXer",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "PRISM_no_A",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    },
+    {
+      "delay": 16,
+      "model": "PRISM",
+      "window": 16,
+      "metrics_recomputed": true,
+      "point_alignment": true
+    }
+  ],
+  "new_neural_checkpoints": 36,
+  "new_linear_models": 6,
+  "existing_PRISM_checkpoints_replayed": 6,
+  "metric_rows": 27,
+  "point_rows": 54432,
+  "full_PRISM_predictions_preserved": true,
+  "all_frozen_hashes_verified": true,
+  "reserved_tail_read": false
+}

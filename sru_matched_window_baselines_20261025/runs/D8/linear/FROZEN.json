@@ -1,0 +1,710 @@
+{
+  "status": "COMPLETED",
+  "files": {
+    "linear.pkl": "f729986c9f55dd089a6ec27e156d90de9db4a675bd12ca14e2c51f8a55b1301f"
+  },
+  "selected": {
+    "AR": {
+      "config": {
+        "Ly": 16,
+        "Xlags": []
+      },
+      "alpha": 1000.0,
+      "target": "level",
+      "MSE": 0.0016967917517371849,
+      "proof": [
+        {
+          "last_fit_target": 4149,
+          "first_score": 4286,
+          "rows": 3958,
+          "parameters": 17
+        },
+        {
+          "last_fit_target": 5026,
+          "first_score": 5163,
+          "rows": 4835,
+          "parameters": 17
+        }
+      ]
+    },
+    "ARX": {
+      "config": {
+        "Ly": 16,
+        "Xlags": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      "alpha": 0.01,
+      "target": "delta",
+      "MSE": 0.0009019882555131402,
+      "proof": [
+        {
+          "last_fit_target": 4149,
+          "first_score": 4286,
+          "rows": 3958,
+          "parameters": 97
+        },
+        {
+          "last_fit_target": 5026,
+          "first_score": 5163,
+          "rows": 4835,
+          "parameters": 97
+        }
+      ]
+    }
+  },
+  "ledger": {
+    "AR": [
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": []
+        },
+        "alpha": 0.01,
+        "target": "level",
+        "MSE": 0.0017279304742151684,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 17
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 17
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": []
+        },
+        "alpha": 0.01,
+        "target": "delta",
+        "MSE": 0.001727935155122398,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 17
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 17
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": []
+        },
+        "alpha": 1.0,
+        "target": "level",
+        "MSE": 0.0017263157731289933,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 17
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 17
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": []
+        },
+        "alpha": 1.0,
+        "target": "delta",
+        "MSE": 0.0017267333160587994,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 17
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 17
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": []
+        },
+        "alpha": 100.0,
+        "target": "level",
+        "MSE": 0.0017169757791702604,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 17
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 17
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": []
+        },
+        "alpha": 100.0,
+        "target": "delta",
+        "MSE": 0.0017329590939368625,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 17
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 17
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": []
+        },
+        "alpha": 1000.0,
+        "target": "level",
+        "MSE": 0.0016967917517371849,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 17
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 17
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": []
+        },
+        "alpha": 1000.0,
+        "target": "delta",
+        "MSE": 0.0017741289934953884,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 17
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 17
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": []
+        },
+        "alpha": 10000.0,
+        "target": "level",
+        "MSE": 0.0017380776069968996,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 17
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 17
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": []
+        },
+        "alpha": 10000.0,
+        "target": "delta",
+        "MSE": 0.001866273332780811,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 17
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 17
+          }
+        ]
+      }
+    ],
+    "ARX": [
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        "alpha": 0.01,
+        "target": "level",
+        "MSE": 0.0009019886462471031,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 97
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 97
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        "alpha": 0.01,
+        "target": "delta",
+        "MSE": 0.0009019882555131402,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 97
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 97
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        "alpha": 1.0,
+        "target": "level",
+        "MSE": 0.0009096346233977045,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 97
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 97
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        "alpha": 1.0,
+        "target": "delta",
+        "MSE": 0.0009095475807469129,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 97
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 97
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        "alpha": 100.0,
+        "target": "level",
+        "MSE": 0.0010325054020705014,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 97
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 97
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        "alpha": 100.0,
+        "target": "delta",
+        "MSE": 0.0010283869525393233,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 97
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 97
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        "alpha": 1000.0,
+        "target": "level",
+        "MSE": 0.0014299815490576775,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 97
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 97
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        "alpha": 1000.0,
+        "target": "delta",
+        "MSE": 0.0014745963325704357,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 97
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 97
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        "alpha": 10000.0,
+        "target": "level",
+        "MSE": 0.001905179738640281,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 97
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 97
+          }
+        ]
+      },
+      {
+        "config": {
+          "Ly": 16,
+          "Xlags": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        "alpha": 10000.0,
+        "target": "delta",
+        "MSE": 0.0019142240524032332,
+        "proof": [
+          {
+            "last_fit_target": 4149,
+            "first_score": 4286,
+            "rows": 3958,
+            "parameters": 97
+          },
+          {
+            "last_fit_target": 5026,
+            "first_score": 5163,
+            "rows": 4835,
+            "parameters": 97
+          }
+        ]
+      }
+    ]
+  },
+  "latest_fit_target": 6040,
+  "development_read_during_fit": false,
+  "runtime_seconds": 0.27820611000061035
+}

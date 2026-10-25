@@ -1,0 +1,26 @@
+{
+  "status": "COMPLETED",
+  "release": "https://github.com/Mountainatic/AR_RAPHU/releases/tag/sru-matched-window-baselines-20261025",
+  "primary_run": "sru_baselines_matched_windows_repeat_20261025",
+  "first_run": "sru_baselines_matched_windows_20261025",
+  "windows_by_delay": {
+    "4": 8,
+    "8": 16,
+    "16": 16
+  },
+  "git": [
+    "All executed experiment/model source",
+    "All primary metrics and point predictions",
+    "All frozen receipts",
+    "Plots and numerical/causal audits"
+  ],
+  "release_only": [
+    "Two complete experiment bundles",
+    "All checkpoints and full candidate ledgers",
+    "Public SRU training/development prefix arrays"
+  ],
+  "private_CZ_data": false,
+  "reserved_tail_included": false,
+  "credentials": false,
+  "evidence": "Reused development comparison, not independent final test"
+}

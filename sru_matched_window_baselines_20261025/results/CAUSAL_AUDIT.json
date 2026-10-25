@@ -1,0 +1,330 @@
+{
+  "status": "COMPLETED",
+  "checks": [
+    {
+      "model": "LSTM",
+      "delay": 4,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "LSTM",
+      "delay": 4,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "LSTM",
+      "delay": 4,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "Transformer",
+      "delay": 4,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "Transformer",
+      "delay": 4,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "Transformer",
+      "delay": 4,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "iTransformer",
+      "delay": 4,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "iTransformer",
+      "delay": 4,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "iTransformer",
+      "delay": 4,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "TimeXer",
+      "delay": 4,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "TimeXer",
+      "delay": 4,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "TimeXer",
+      "delay": 4,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6044,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "LSTM",
+      "delay": 8,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "LSTM",
+      "delay": 8,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "LSTM",
+      "delay": 8,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "Transformer",
+      "delay": 8,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "Transformer",
+      "delay": 8,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "Transformer",
+      "delay": 8,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "iTransformer",
+      "delay": 8,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "iTransformer",
+      "delay": 8,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "iTransformer",
+      "delay": 8,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "TimeXer",
+      "delay": 8,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "TimeXer",
+      "delay": 8,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "TimeXer",
+      "delay": 8,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6040,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "LSTM",
+      "delay": 16,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "LSTM",
+      "delay": 16,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "LSTM",
+      "delay": 16,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "Transformer",
+      "delay": 16,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "Transformer",
+      "delay": 16,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "Transformer",
+      "delay": 16,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "iTransformer",
+      "delay": 16,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "iTransformer",
+      "delay": 16,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "iTransformer",
+      "delay": 16,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "TimeXer",
+      "delay": 16,
+      "seed": 0,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "TimeXer",
+      "delay": 16,
+      "seed": 1,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    },
+    {
+      "model": "TimeXer",
+      "delay": 16,
+      "seed": 2,
+      "unmatured_y_and_future_X_poison_passed": true,
+      "latest_fitted_label": 6032,
+      "first_evaluation_origin": 6048,
+      "batch_prefix_consistency": true
+    }
+  ],
+  "source_final_numeric_read": false
+}

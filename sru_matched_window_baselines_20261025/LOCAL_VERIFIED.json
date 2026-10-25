@@ -1,0 +1,15 @@
+{
+  "status": "COMPLETED",
+  "archive_sha256": "931c2baee2705eb440644a1a4bfac599448ab70294bef924f63c0bb33d1022f3",
+  "archive_bytes": 31094930,
+  "verified_members": 298,
+  "all_source_and_member_hashes_verified": true,
+  "metric_rows": 27,
+  "point_rows": 54432,
+  "windows_by_delay": {
+    "4": 8,
+    "8": 16,
+    "16": 16
+  },
+  "reserved_tail_read": false
+}

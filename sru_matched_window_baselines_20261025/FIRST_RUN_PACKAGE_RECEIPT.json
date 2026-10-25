@@ -1,0 +1,18 @@
+{
+  "status": "COMPLETED",
+  "archive_bytes": 30676062,
+  "archive_sha256": "ba38edafcb1ad2e3586dc9dded8ca0e68580f5749249b1e429c2a52717c3f421",
+  "verified_members": 301,
+  "all_members_verified": true,
+  "metric_rows": 27,
+  "point_rows": 54432,
+  "windows_by_delay": {
+    "4": 8,
+    "8": 16,
+    "16": 16
+  },
+  "new_neural_checkpoints": 36,
+  "new_linear_models": 6,
+  "frozen_PRISM_checkpoints_replayed": 6,
+  "reserved_tail_read": false
+}

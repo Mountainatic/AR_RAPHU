@@ -1,3 +1,11 @@
+# SRU H2S 全模型同窗口基线：2026-10-25
+
+最新入口：[SRU完整报告、指标和逐点预测](sru_matched_window_baselines_20261025/README.md)。全部基线采用PRISM预先选定的直接历史：标签延迟4/8/16步分别用8/16/16步窗口，完整PRISM在线A保留。当前表为新RTX4090实例的完整重训，首次同窗口实验也一并保留。
+
+两个完整模型与候选账本实验包见[开发版Release](https://github.com/Mountainatic/AR_RAPHU/releases/tag/sru-matched-window-baselines-20261025)。数据仍为已使用开发段，独立尾段未打开。
+
+---
+
 # SRU H2S 基线比较与PRISM自选窗口：2026-10-24
 
 最新入口：[完整报告、基线指标和逐点预测](sru_prism_window_selection_20261024/README.md)。基线固定128步；PRISM按训练内验证从8/16/32/64/128选窗，标签延迟4/8/16分别选择8/16/16步，主表保留完整在线A。共27组指标、54,432行逐点记录。

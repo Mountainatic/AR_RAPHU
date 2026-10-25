@@ -1,0 +1,53 @@
+{
+  "status": "COMPLETED",
+  "new_GPU": "NVIDIA GeForce RTX 4090",
+  "previous_GPU": "RTX4090D",
+  "checks": [
+    {
+      "model": "LSTM",
+      "old_window": 128,
+      "seed": 0,
+      "max_absolute_difference_to_FP64": 1.934206017795148e-06,
+      "descriptive_difference_to_previous_default_kernel": 0.0002522189126587804,
+      "rtol": 3e-05,
+      "atol": 2e-06,
+      "passed": true
+    },
+    {
+      "model": "Transformer",
+      "old_window": 128,
+      "seed": 0,
+      "max_absolute_difference_to_FP64": 1.2574403618348384e-07,
+      "descriptive_difference_to_previous_default_kernel": 5.2288296455829664e-05,
+      "rtol": 3e-05,
+      "atol": 2e-06,
+      "passed": true
+    },
+    {
+      "model": "iTransformer",
+      "old_window": 128,
+      "seed": 0,
+      "max_absolute_difference_to_FP64": 8.128236639315389e-08,
+      "descriptive_difference_to_previous_default_kernel": 5.77258514553175e-05,
+      "rtol": 3e-05,
+      "atol": 2e-06,
+      "passed": true
+    },
+    {
+      "model": "TimeXer",
+      "old_window": 128,
+      "seed": 0,
+      "max_absolute_difference_to_FP64": 6.8250862433894e-08,
+      "descriptive_difference_to_previous_default_kernel": 2.3876796324019678e-05,
+      "rtol": 3e-05,
+      "atol": 2e-06,
+      "passed": true
+    }
+  ],
+  "strict_FP32_to_FP64_passed": true,
+  "previous_default_kernel_equivalence_not_claimed": true,
+  "existing_development_predictions_read_only": true,
+  "no_new_fits": true,
+  "used_for_hyperparameter_selection": false,
+  "reserved_tail_read": false
+}

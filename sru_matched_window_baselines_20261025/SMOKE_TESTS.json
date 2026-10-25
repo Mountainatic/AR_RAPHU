@@ -1,0 +1,40 @@
+{
+  "status": "COMPLETED",
+  "models_forward_backward": [
+    {
+      "model": "LSTM",
+      "L": 8
+    },
+    {
+      "model": "LSTM",
+      "L": 16
+    },
+    {
+      "model": "Transformer",
+      "L": 8
+    },
+    {
+      "model": "Transformer",
+      "L": 16
+    },
+    {
+      "model": "iTransformer",
+      "L": 8
+    },
+    {
+      "model": "iTransformer",
+      "L": 16
+    },
+    {
+      "model": "TimeXer",
+      "L": 8
+    },
+    {
+      "model": "TimeXer",
+      "L": 16
+    }
+  ],
+  "unmatured_y_and_future_x_poison": true,
+  "folds_purged": true,
+  "source_final_numeric_read": false
+}

@@ -1,0 +1,19 @@
+{
+  "status": "COMPLETED",
+  "checks": [
+    {
+      "variant": "full",
+      "direct_window": 8,
+      "poison_prefix_checks": true,
+      "previous_selected_prediction_equal": true
+    },
+    {
+      "variant": "no_A",
+      "direct_window": 8,
+      "poison_prefix_checks": true,
+      "previous_selected_prediction_equal": false
+    }
+  ],
+  "new_fits": 0,
+  "reserved_tail_read": false
+}

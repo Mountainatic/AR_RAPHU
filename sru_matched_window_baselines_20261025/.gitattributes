@@ -1,0 +1,3 @@
+* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve byte-identical frozen upstream source, including original formatting.
+vendor/** -whitespace
