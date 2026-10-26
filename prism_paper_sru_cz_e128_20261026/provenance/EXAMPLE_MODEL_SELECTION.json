@@ -1,0 +1,108 @@
+{
+  "status": "COMPLETED",
+  "exports": [
+    {
+      "name": "SRU_H2S_D8",
+      "file": "SRU_H2S_D8.pkl",
+      "sha256": "f64d6ae5dab0961edf86d7ae2e95bac54fb2c7e3aedbb3d8a101d3295d5c7682",
+      "bytes": 4299,
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D8/full/model.pkl",
+      "source_model_sha256": "31e0db3aa81227399f148d7ca6be64dabf3b5295bd831c71db7cae0db1462a6a",
+      "source_prediction_sha256": "f65b3598605df65a41497967d1d18dbc3a161b61a6f3306c73f17becc3fc6e53",
+      "L": 16,
+      "delay": 8,
+      "regression_coefficients": 36,
+      "metrics": {
+        "n": 2016,
+        "RMSE": 0.02329186253632902,
+        "MAE": 0.013848173963661116
+      },
+      "KC": {
+        "kind": "URYSOHN",
+        "alpha": 1.0,
+        "own": true,
+        "memory": true
+      },
+      "W": "asinh",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "Transformer_RMSE": 0.024906279223459872,
+      "relative_RMSE_reduction_pct": 6.481966546051532,
+      "paired_comparator_interval": {
+        "skip": 0,
+        "increase_percent": 6.931247703410581,
+        "CI95": [
+          -17.736115841265335,
+          18.60383068763459
+        ],
+        "block": 192,
+        "bootstrap": 2500,
+        "role": "adaptive-development descriptive interval, not search adjusted"
+      },
+      "stream_max_absolute_error": 3.552713678800501e-15,
+      "warm_checkpoint_bytes": 10596
+    },
+    {
+      "name": "CZ_Rod1_D4_E128",
+      "file": "CZ_Rod1_D4_E128.pkl",
+      "sha256": "f4bcabd084850304411e942c18751358f6c24878dd5dfa773c9f119fbefbb9f4",
+      "bytes": 4529,
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D4/full/model.pkl",
+      "source_model_sha256": "351f88d9317b66b3cab1e10a265a818506ced542226e39b21d0d9390e6af2f4b",
+      "source_prediction_sha256": "59bd7c05be9c5d61936d9b66f42d25998bdf55838e4d374609b2aa29c6d2251a",
+      "L": 128,
+      "delay": 4,
+      "regression_coefficients": 90,
+      "metrics": {
+        "n": 4021,
+        "RMSE": 0.016020752608141522,
+        "MAE": 0.011805327400368144
+      },
+      "KC": {
+        "kind": "URYSOHN",
+        "alpha": 100.0,
+        "own": true,
+        "memory": true
+      },
+      "W": "signed_log1p",
+      "A": {
+        "selected": {
+          "family": "QD8_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "Transformer_RMSE": 0.016073668823283604,
+      "relative_RMSE_reduction_pct": 0.32921055997763293,
+      "paired_comparator_interval": {
+        "skip": 0,
+        "increase_percent": 0.330297935661239,
+        "CI95": [
+          -17.057881839606075,
+          16.52550343332581
+        ],
+        "block": 192,
+        "bootstrap": 2500,
+        "role": "adaptive-development descriptive interval, not search adjusted"
+      },
+      "stream_max_absolute_error": 0.0,
+      "warm_checkpoint_bytes": 17331
+    }
+  ],
+  "source_selection": "Examples selected after repeated development; formal SOTA/generalization not established",
+  "raw_workbook_read": false,
+  "reserved_tail_read": false,
+  "no_current_target_input": true,
+  "no_future_X_input": true
+}

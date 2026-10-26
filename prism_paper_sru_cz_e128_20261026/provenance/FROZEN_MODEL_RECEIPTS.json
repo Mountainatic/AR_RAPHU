@@ -1,0 +1,4790 @@
+{
+  "status": "COMPLETED",
+  "receipts": [
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/CZ_Rod1/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "CZ_Rod1",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "4da4e5cbadb97e9f6d5948a9bb46f74f76d2bf65433fdd007dd3ca4fc993cc7b",
+      "ledger_sha256": "b24c80e519c468c4dbbac03ade96a494f6bab64f34bf1273af313f24a0436034",
+      "seconds": 111.09356886707246,
+      "ridge_fits": 461,
+      "selection_MSE": 0.0005499665601986108,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.003567674523687928,
+        "proof": [
+          {
+            "last_fit_label": 4558,
+            "first_score_dependency": 4559,
+            "parent": {
+              "rows": 4367,
+              "parameters": 13,
+              "kkt": 4.362172931751027e-17,
+              "condition": 25564.639723496264
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5525,
+            "first_score_dependency": 5526,
+            "parent": {
+              "rows": 5334,
+              "parameters": 13,
+              "kkt": 2.1268705050841476e-17,
+              "condition": 26860.56158078399
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/CZ_Rod1/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "CZ_Rod1",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "3b5b330b824671cf293b5768bd712dd1f5b2517a15512b85ffaee8e34f211f5c",
+      "ledger_sha256": "16793c266290e597751446a45549144f825d2eaa1003a6ec1eee81553df6c255",
+      "seconds": 106.07108765468001,
+      "ridge_fits": 464,
+      "selection_MSE": 0.0001589200825790511,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "CF_spline",
+        "status": "AVAILABLE",
+        "MSE": 0.00027436263291979427,
+        "proof": [
+          {
+            "last_fit_label": 4570,
+            "first_score_dependency": 4571,
+            "parent": {
+              "rows": 4379,
+              "parameters": 13,
+              "kkt": 8.436046314424348e-17,
+              "condition": 21512.88955763495
+            },
+            "W": {
+              "rows": 1752,
+              "parameters": 4,
+              "kkt": 8.364030069848027e-17,
+              "condition": 34.52309189095459
+            },
+            "W_CF": [
+              {
+                "last_fit_label": 2687,
+                "first_score_dependency": 2688,
+                "certificate": {
+                  "rows": 2496,
+                  "parameters": 13,
+                  "kkt": 8.914527274403721e-17,
+                  "condition": 12581.073852734591
+                }
+              },
+              {
+                "last_fit_label": 3563,
+                "first_score_dependency": 3564,
+                "certificate": {
+                  "rows": 3372,
+                  "parameters": 13,
+                  "kkt": 5.830388612183197e-17,
+                  "condition": 16207.814520193071
+                }
+              }
+            ]
+          },
+          {
+            "last_fit_label": 5537,
+            "first_score_dependency": 5538,
+            "parent": {
+              "rows": 5346,
+              "parameters": 13,
+              "kkt": 4.5896348814044685e-17,
+              "condition": 21053.266513793264
+            },
+            "W": {
+              "rows": 2139,
+              "parameters": 4,
+              "kkt": 1.1201523442196228e-17,
+              "condition": 43.40115373585099
+            },
+            "W_CF": [
+              {
+                "last_fit_label": 3267,
+                "first_score_dependency": 3268,
+                "certificate": {
+                  "rows": 3076,
+                  "parameters": 13,
+                  "kkt": 3.346252872099062e-17,
+                  "condition": 15324.684428911189
+                }
+              },
+              {
+                "last_fit_label": 4336,
+                "first_score_dependency": 4337,
+                "certificate": {
+                  "rows": 4145,
+                  "parameters": 13,
+                  "kkt": 5.032900800748703e-17,
+                  "condition": 20436.637487724896
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/CZ_Rod1/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "CZ_Rod1",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "4755de73af58c0efe59641d3da2a5b5f884df61e7f58d92da73dcf3bde445b89",
+      "ledger_sha256": "733b2682dca6711579134a0190b11b66dc6d7658cd63e866c8e9808fdc971c74",
+      "seconds": 108.64155134698376,
+      "ridge_fits": 464,
+      "selection_MSE": 0.0002867441420997599,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0012774815030825726,
+        "proof": [
+          {
+            "last_fit_label": 4566,
+            "first_score_dependency": 4567,
+            "parent": {
+              "rows": 4375,
+              "parameters": 13,
+              "kkt": 4.730072288708072e-17,
+              "condition": 24086.293503342167
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5533,
+            "first_score_dependency": 5534,
+            "parent": {
+              "rows": 5342,
+              "parameters": 13,
+              "kkt": 1.0878610419444586e-16,
+              "condition": 24609.03027886417
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/CZ_Rod2/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "CZ_Rod2",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "f998d85e1f2341c07af6d9d096730cc2a5c709e105c613deb09d64ffd41a1d71",
+      "ledger_sha256": "0010d5fc0a822f9d87a134a4c0bf774a740a0e207a4f7dd9dc60ceedc269ce5e",
+      "seconds": 127.67501111607999,
+      "ridge_fits": 458,
+      "selection_MSE": 0.0008620522908799646,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0012510402835942875,
+        "proof": [
+          {
+            "last_fit_label": 4680,
+            "first_score_dependency": 4681,
+            "parent": {
+              "rows": 4489,
+              "parameters": 13,
+              "kkt": 4.154289518103485e-17,
+              "condition": 18670.435025251358
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5673,
+            "first_score_dependency": 5674,
+            "parent": {
+              "rows": 5482,
+              "parameters": 13,
+              "kkt": 3.23488789508842e-17,
+              "condition": 22519.831321923957
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/CZ_Rod2/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "CZ_Rod2",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "2635529782b116a7594126fb164f2097d209b170a98123c5abcb5bb16c4d60bd",
+      "ledger_sha256": "a28b37177ad18b6ec2700ac459b39e5646013cf38850a7f415057b12480c3596",
+      "seconds": 108.00507694482803,
+      "ridge_fits": 458,
+      "selection_MSE": 0.0001041394947255609,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.00018186638465479227,
+        "proof": [
+          {
+            "last_fit_label": 4692,
+            "first_score_dependency": 4693,
+            "parent": {
+              "rows": 4501,
+              "parameters": 23,
+              "kkt": 3.825128617455526e-17,
+              "condition": 22390.914071161835
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5685,
+            "first_score_dependency": 5686,
+            "parent": {
+              "rows": 5494,
+              "parameters": 23,
+              "kkt": 4.304625356411459e-17,
+              "condition": 27076.6627450935
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/CZ_Rod2/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "CZ_Rod2",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "114d5758a8fb2c4174cc2219b66a70215092c794943492b8f16ea6df597342c5",
+      "ledger_sha256": "6f358678463ec180a6b4adc40005a64430ea4d5e64193501bfc57fe5ca6fffb6",
+      "seconds": 106.72753796679899,
+      "ridge_fits": 458,
+      "selection_MSE": 0.00016207984320371692,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0003365206163044967,
+        "proof": [
+          {
+            "last_fit_label": 4688,
+            "first_score_dependency": 4689,
+            "parent": {
+              "rows": 4497,
+              "parameters": 23,
+              "kkt": 1.131597403720739e-16,
+              "condition": 22366.214544045477
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5681,
+            "first_score_dependency": 5682,
+            "parent": {
+              "rows": 5490,
+              "parameters": 23,
+              "kkt": 8.965563340243848e-17,
+              "condition": 27063.674745616972
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/SRU_H2S/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "SRU_H2S",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "ddd5f6f0d78b29bd849ce2c086582e9264cd441186bdb3c729158d4af49ceb80",
+      "ledger_sha256": "0c4518f44a369c617c8e5700a269a6748c9d18c3d7cbf088f47585e33a14c61d",
+      "seconds": 52.33701933780685,
+      "ridge_fits": 455,
+      "selection_MSE": 0.0002670603723074217,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.0003497467847978131,
+        "proof": [
+          {
+            "last_fit_label": 2243,
+            "first_score_dependency": 2244,
+            "parent": {
+              "rows": 2052,
+              "parameters": 23,
+              "kkt": 3.9165494112521024e-17,
+              "condition": 10170.034216682785
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2713,
+            "first_score_dependency": 2714,
+            "parent": {
+              "rows": 2522,
+              "parameters": 23,
+              "kkt": 2.830713620912331e-17,
+              "condition": 11537.750203762822
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 0.5,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/SRU_H2S/D16/no_KC/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "SRU_H2S",
+        "delay": 16,
+        "variant": "no_KC"
+      },
+      "model_sha256": "a7abf076e4f7a8c1b4b40b739f84ccd898ed27841bdcd360e78023fbf2980d75",
+      "ledger_sha256": "2047a4b5aea5e43125449f0c44bcb9d23cb7db2c04584321623ebb8367cca174",
+      "seconds": 16.48578526917845,
+      "ridge_fits": 67,
+      "selection_MSE": 0.0011657917776491432,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0010349095046100851,
+        "proof": [
+          {
+            "last_fit_label": 2243,
+            "first_score_dependency": 2244,
+            "parent": {
+              "rows": 2052,
+              "parameters": 17,
+              "kkt": 2.2229633707100303e-17,
+              "condition": 13054.207949483072
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2713,
+            "first_score_dependency": 2714,
+            "parent": {
+              "rows": 2522,
+              "parameters": 17,
+              "kkt": 4.2505855993820804e-17,
+              "condition": 13225.251330045097
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 0.5,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/SRU_H2S/D16/no_W/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "SRU_H2S",
+        "delay": 16,
+        "variant": "no_W"
+      },
+      "model_sha256": "964f239e36e30ab23340d7a5ca3d76cbdb93ad662e5e9cf6ffedcff774f50c71",
+      "ledger_sha256": "a3994b5722a22e46fcf277c35e4246924a6dc7c7f16459e6868224cbf928edf4",
+      "seconds": 24.926928700879216,
+      "ridge_fits": 60,
+      "selection_MSE": 0.000950197008390028,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 100.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0004485917780363096,
+        "proof": [
+          {
+            "last_fit_label": 2243,
+            "first_score_dependency": 2244,
+            "parent": {
+              "rows": 2052,
+              "parameters": 13,
+              "kkt": 1.970852763910386e-17,
+              "condition": 77.79617032014272
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2713,
+            "first_score_dependency": 2714,
+            "parent": {
+              "rows": 2522,
+              "parameters": 13,
+              "kkt": 3.71327501376713e-17,
+              "condition": 90.00106871940886
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/SRU_H2S/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "SRU_H2S",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "8877c457b43378a6cb978158a475df5205d2c5e8f212811ffc4d01de2835f9b6",
+      "ledger_sha256": "6cc94bc3829177f0024ca4fd61696cd3ea40104cfd9e0b32c4ed0bae9dee134b",
+      "seconds": 54.10764382220805,
+      "ridge_fits": 455,
+      "selection_MSE": 0.0002790313595734374,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.00025799231182678224,
+        "proof": [
+          {
+            "last_fit_label": 2255,
+            "first_score_dependency": 2256,
+            "parent": {
+              "rows": 2064,
+              "parameters": 23,
+              "kkt": 3.650333195071774e-17,
+              "condition": 10226.641677382673
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2725,
+            "first_score_dependency": 2726,
+            "parent": {
+              "rows": 2534,
+              "parameters": 23,
+              "kkt": 4.8665273393593344e-17,
+              "condition": 11617.719462160143
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/SRU_H2S/D4/no_KC/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "SRU_H2S",
+        "delay": 4,
+        "variant": "no_KC"
+      },
+      "model_sha256": "21e15b1898c26d66f22c103a06af1dbb6bb1500abcf73b9040c10c56b9149e3c",
+      "ledger_sha256": "df157327daaa8641185b6948c52ddacb0830f9bdcd06fae9d89aa8a96ef3b695",
+      "seconds": 17.270128750707954,
+      "ridge_fits": 67,
+      "selection_MSE": 0.0007123617077674699,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0006527072086466433,
+        "proof": [
+          {
+            "last_fit_label": 2255,
+            "first_score_dependency": 2256,
+            "parent": {
+              "rows": 2064,
+              "parameters": 9,
+              "kkt": 4.2551346454920296e-17,
+              "condition": 3902.1487621977435
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2725,
+            "first_score_dependency": 2726,
+            "parent": {
+              "rows": 2534,
+              "parameters": 9,
+              "kkt": 4.323042054441062e-17,
+              "condition": 3924.3813753339664
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 0.5,
+          "innovation_clip": 3.0
+        },
+        "admitted": false
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/SRU_H2S/D4/no_W/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "SRU_H2S",
+        "delay": 4,
+        "variant": "no_W"
+      },
+      "model_sha256": "a39d49db43e36e94ddc9f46cfa817162749ac3ee50c7d7aac84611435d68032a",
+      "ledger_sha256": "75c353db59a207e2675add6d19d2ee96e30c4395ff9150a082925fe6387d0045",
+      "seconds": 25.871971383690834,
+      "ridge_fits": 60,
+      "selection_MSE": 0.000345739197432356,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0006062378760913371,
+        "proof": [
+          {
+            "last_fit_label": 2255,
+            "first_score_dependency": 2256,
+            "parent": {
+              "rows": 2064,
+              "parameters": 23,
+              "kkt": 1.753090332856755e-17,
+              "condition": 10226.641677382673
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2725,
+            "first_score_dependency": 2726,
+            "parent": {
+              "rows": 2534,
+              "parameters": 23,
+              "kkt": 2.6878521518445474e-17,
+              "condition": 11617.719462160143
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/SRU_H2S/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "SRU_H2S",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "8a77e89b9699ff2f3cec803dc13f78eb23d810648203832d203a17881384227e",
+      "ledger_sha256": "5942b6ea36bb6784c342dc5b55f6615e7ede2d34448b33f4d470f85c1761453d",
+      "seconds": 54.22874875180423,
+      "ridge_fits": 455,
+      "selection_MSE": 0.00029511770675309616,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.0003650289743358853,
+        "proof": [
+          {
+            "last_fit_label": 2251,
+            "first_score_dependency": 2252,
+            "parent": {
+              "rows": 2060,
+              "parameters": 23,
+              "kkt": 2.402798694147771e-17,
+              "condition": 10191.37273295797
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2721,
+            "first_score_dependency": 2722,
+            "parent": {
+              "rows": 2530,
+              "parameters": 23,
+              "kkt": 3.1142010663253475e-17,
+              "condition": 11556.746853907553
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 0.5,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/SRU_H2S/D8/no_KC/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "SRU_H2S",
+        "delay": 8,
+        "variant": "no_KC"
+      },
+      "model_sha256": "c54307538b98ee6824922ff8f0008338d884ce0b2ca4f7c62518419d67298a23",
+      "ledger_sha256": "8096c192b51530cb4f061fdc2c093ad9e2ee43b58d2d7993ed1bfd34333c0e83",
+      "seconds": 18.246018442790955,
+      "ridge_fits": 67,
+      "selection_MSE": 0.0011817948101886632,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 1000.0
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0009913828212879119,
+        "proof": [
+          {
+            "last_fit_label": 2251,
+            "first_score_dependency": 2252,
+            "parent": {
+              "rows": 2060,
+              "parameters": 17,
+              "kkt": 4.334586020731044e-17,
+              "condition": 20.125683860962365
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2721,
+            "first_score_dependency": 2722,
+            "parent": {
+              "rows": 2530,
+              "parameters": 17,
+              "kkt": 3.076362659361e-17,
+              "condition": 24.528551709483168
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "Q_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": false
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/robust/SRU_H2S/D8/no_W/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "robust",
+        "entity": "SRU_H2S",
+        "delay": 8,
+        "variant": "no_W"
+      },
+      "model_sha256": "006099dd11ac9fdf6df55615aab016a27aa2d86e0b813fdfbcf366c94b7056e9",
+      "ledger_sha256": "1dd60206a2e9eba135ac23f8c4e9e29b6c57a16e0fc3e32261182e2755fcdaf3",
+      "seconds": 25.66901368414983,
+      "ridge_fits": 60,
+      "selection_MSE": 0.0009637715795770145,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 100.0,
+          "own": false,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0004524610181549597,
+        "proof": [
+          {
+            "last_fit_label": 2251,
+            "first_score_dependency": 2252,
+            "parent": {
+              "rows": 2060,
+              "parameters": 11,
+              "kkt": 1.7916503484800865e-17,
+              "condition": 75.38171142174453
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2721,
+            "first_score_dependency": 2722,
+            "parent": {
+              "rows": 2530,
+              "parameters": 11,
+              "kkt": 3.349289509318199e-17,
+              "condition": 88.07321619165094
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC8_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/standard/SRU_H2S/D16/no_KC/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "standard",
+        "entity": "SRU_H2S",
+        "delay": 16,
+        "variant": "no_KC"
+      },
+      "model_sha256": "55616cf87bb5ab3bf8959e3334578f1ab38d0fc63cb59a54159a941f84134fc0",
+      "ledger_sha256": "902fdfa6adc06d3c6a028ac51c60a8c9555d6698303d0ab131797357f2d8acdb",
+      "seconds": 13.636284271720797,
+      "ridge_fits": 67,
+      "selection_MSE": 0.0011657917776491432,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0010349095046100851,
+        "proof": [
+          {
+            "last_fit_label": 2243,
+            "first_score_dependency": 2244,
+            "parent": {
+              "rows": 2052,
+              "parameters": 17,
+              "kkt": 2.2229633707100303e-17,
+              "condition": 13054.207949483072
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2713,
+            "first_score_dependency": 2714,
+            "parent": {
+              "rows": 2522,
+              "parameters": 17,
+              "kkt": 4.2505855993820804e-17,
+              "condition": 13225.251330045097
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/standard/SRU_H2S/D16/no_W/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "standard",
+        "entity": "SRU_H2S",
+        "delay": 16,
+        "variant": "no_W"
+      },
+      "model_sha256": "0b3924cbbbfbea398df7564ee0a85b8f069835e709cf06b9d613009d6ee31cc8",
+      "ledger_sha256": "8e4461932956488d3924d237c5bf6d2bd5085732118bacb6a6122ff1fe63e719",
+      "seconds": 21.27912569884211,
+      "ridge_fits": 60,
+      "selection_MSE": 0.0009610163846704958,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 100.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0004485917780363096,
+        "proof": [
+          {
+            "last_fit_label": 2243,
+            "first_score_dependency": 2244,
+            "parent": {
+              "rows": 2052,
+              "parameters": 13,
+              "kkt": 1.970852763910386e-17,
+              "condition": 77.79617032014272
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2713,
+            "first_score_dependency": 2714,
+            "parent": {
+              "rows": 2522,
+              "parameters": 13,
+              "kkt": 3.71327501376713e-17,
+              "condition": 90.00106871940886
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 2,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/standard/SRU_H2S/D4/no_KC/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "standard",
+        "entity": "SRU_H2S",
+        "delay": 4,
+        "variant": "no_KC"
+      },
+      "model_sha256": "04e321ed92091d736597c87cf23e74b382254d0a3fc494b8122c8cabb254134a",
+      "ledger_sha256": "79a10c426d613b4df8bc4b7e59f648ddaa9160d6bc4158f30e01a6ce28e4b193",
+      "seconds": 14.426889673341066,
+      "ridge_fits": 67,
+      "selection_MSE": 0.0006927816817834667,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0006527072086466433,
+        "proof": [
+          {
+            "last_fit_label": 2255,
+            "first_score_dependency": 2256,
+            "parent": {
+              "rows": 2064,
+              "parameters": 9,
+              "kkt": 4.2551346454920296e-17,
+              "condition": 3902.1487621977435
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2725,
+            "first_score_dependency": 2726,
+            "parent": {
+              "rows": 2534,
+              "parameters": 9,
+              "kkt": 4.323042054441062e-17,
+              "condition": 3924.3813753339664
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/standard/SRU_H2S/D4/no_W/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "standard",
+        "entity": "SRU_H2S",
+        "delay": 4,
+        "variant": "no_W"
+      },
+      "model_sha256": "14df99592563d69d1f082127b2b142481174cc34f3d0078924132f0b28bf8c7d",
+      "ledger_sha256": "eb3e9427ad62d35e950e044a88b94856f2dcbe3e91e7b3366e3117b3977cd785",
+      "seconds": 21.608496798202395,
+      "ridge_fits": 60,
+      "selection_MSE": 0.00034571061274393534,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0006062378760913371,
+        "proof": [
+          {
+            "last_fit_label": 2255,
+            "first_score_dependency": 2256,
+            "parent": {
+              "rows": 2064,
+              "parameters": 23,
+              "kkt": 1.753090332856755e-17,
+              "condition": 10226.641677382673
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2725,
+            "first_score_dependency": 2726,
+            "parent": {
+              "rows": 2534,
+              "parameters": 23,
+              "kkt": 2.6878521518445474e-17,
+              "condition": 11617.719462160143
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/standard/SRU_H2S/D8/no_KC/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "standard",
+        "entity": "SRU_H2S",
+        "delay": 8,
+        "variant": "no_KC"
+      },
+      "model_sha256": "d4399c1471ec418a50f25f5a83b94572eca9c8af337ed2824923d946cf53f0a2",
+      "ledger_sha256": "09f5e11e187c703d75adf96f00761eb59466cbcc1126707c19d8c5b978a75a8a",
+      "seconds": 14.052875159308314,
+      "ridge_fits": 67,
+      "selection_MSE": 0.0011817948101886632,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 1000.0
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0009913828212879119,
+        "proof": [
+          {
+            "last_fit_label": 2251,
+            "first_score_dependency": 2252,
+            "parent": {
+              "rows": 2060,
+              "parameters": 17,
+              "kkt": 4.334586020731044e-17,
+              "condition": 20.125683860962365
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2721,
+            "first_score_dependency": 2722,
+            "parent": {
+              "rows": 2530,
+              "parameters": 17,
+              "kkt": 3.076362659361e-17,
+              "condition": 24.528551709483168
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "Q_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": false
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "source": "runs/standard/SRU_H2S/D8/no_W/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "standard",
+        "entity": "SRU_H2S",
+        "delay": 8,
+        "variant": "no_W"
+      },
+      "model_sha256": "82af66f782a2d11ffa28e9b9c3a3c5d9852cbd8fcfa9c4ca6255796938abcf26",
+      "ledger_sha256": "271ca6352030c82418baf47e6697db47927da73eeacd96455bf2cd4bcc25115b",
+      "seconds": 21.438711766619235,
+      "ridge_fits": 60,
+      "selection_MSE": 0.0009637715795770145,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 100.0,
+          "own": false,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0004524610181549597,
+        "proof": [
+          {
+            "last_fit_label": 2251,
+            "first_score_dependency": 2252,
+            "parent": {
+              "rows": 2060,
+              "parameters": 11,
+              "kkt": 1.7916503484800865e-17,
+              "condition": 75.38171142174453
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2721,
+            "first_score_dependency": 2722,
+            "parent": {
+              "rows": 2530,
+              "parameters": 11,
+              "kkt": 3.349289509318199e-17,
+              "condition": 88.07321619165094
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/CZ_Rod1/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "CZ_Rod1",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "cc74b209b665d04f44fa03c431e4bc771a1f29cc53d641900b46f737d2270694",
+      "ledger_sha256": "37685bcf50a5ff61644334c366ea88454680b16a4665411b8832d817498426cc",
+      "seconds": 89.46132177999243,
+      "ridge_fits": 461,
+      "selection_MSE": 0.0005499665601986108,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.003567674523687928,
+        "proof": [
+          {
+            "last_fit_label": 4558,
+            "first_score_dependency": 4559,
+            "parent": {
+              "rows": 4367,
+              "parameters": 13,
+              "kkt": 4.362172931751027e-17,
+              "condition": 25564.639723496264
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5525,
+            "first_score_dependency": 5526,
+            "parent": {
+              "rows": 5334,
+              "parameters": 13,
+              "kkt": 2.1268705050841476e-17,
+              "condition": 26860.56158078399
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/CZ_Rod1/D16/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "CZ_Rod1",
+        "delay": 16,
+        "variant": "no_A"
+      },
+      "model_sha256": "0ab4916cf43d36909c14e1317324aa4f24ad94dd87525e3cda4d58400ea5f8a7",
+      "ledger_sha256": "be1e5f891e2ccb79435547e4932d85be6d971c9c5146db70b42cb9ffd33c5627",
+      "seconds": 9.103396042715758,
+      "ridge_fits": 461,
+      "selection_MSE": 0.0015346440251601974,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.001724233678357172,
+        "proof": [
+          {
+            "last_fit_label": 4558,
+            "first_score_dependency": 4559,
+            "parent": {
+              "rows": 4367,
+              "parameters": 33,
+              "kkt": 2.493665685276162e-17,
+              "condition": 57601.72240031516
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5525,
+            "first_score_dependency": 5526,
+            "parent": {
+              "rows": 5334,
+              "parameters": 33,
+              "kkt": 3.7107871480341334e-17,
+              "condition": 62992.418743585
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/CZ_Rod1/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "CZ_Rod1",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "08b59855192d35e1863eaf25d4590c50807a65590676dab7fff3aa130c1fdba0",
+      "ledger_sha256": "4b23aa70fb4b9baeea33a902a7535ec51a3b7c022934482bb5b969e901c7d5fd",
+      "seconds": 87.2387234182097,
+      "ridge_fits": 467,
+      "selection_MSE": 0.00013419615344478978,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "CF_spline",
+        "status": "AVAILABLE",
+        "MSE": 0.000467764013361442,
+        "proof": [
+          {
+            "last_fit_label": 4570,
+            "first_score_dependency": 4571,
+            "parent": {
+              "rows": 4379,
+              "parameters": 23,
+              "kkt": 2.924260865251608e-17,
+              "condition": 43202.68201397578
+            },
+            "W": {
+              "rows": 1752,
+              "parameters": 4,
+              "kkt": 1.6546894831551782e-17,
+              "condition": 34.474167532849265
+            },
+            "W_CF": [
+              {
+                "last_fit_label": 2687,
+                "first_score_dependency": 2688,
+                "certificate": {
+                  "rows": 2496,
+                  "parameters": 23,
+                  "kkt": 3.900972002606244e-17,
+                  "condition": 24806.22631652388
+                }
+              },
+              {
+                "last_fit_label": 3563,
+                "first_score_dependency": 3564,
+                "certificate": {
+                  "rows": 3372,
+                  "parameters": 23,
+                  "kkt": 4.991431148131395e-17,
+                  "condition": 33354.5635549443
+                }
+              }
+            ]
+          },
+          {
+            "last_fit_label": 5537,
+            "first_score_dependency": 5538,
+            "parent": {
+              "rows": 5346,
+              "parameters": 23,
+              "kkt": 6.501720371726302e-17,
+              "condition": 51333.07850840311
+            },
+            "W": {
+              "rows": 2139,
+              "parameters": 4,
+              "kkt": 0.0,
+              "condition": 43.2967901272524
+            },
+            "W_CF": [
+              {
+                "last_fit_label": 3267,
+                "first_score_dependency": 3268,
+                "certificate": {
+                  "rows": 3076,
+                  "parameters": 23,
+                  "kkt": 3.4949568726584116e-17,
+                  "condition": 30800.684095529312
+                }
+              },
+              {
+                "last_fit_label": 4336,
+                "first_score_dependency": 4337,
+                "certificate": {
+                  "rows": 4145,
+                  "parameters": 23,
+                  "kkt": 7.030110507741766e-17,
+                  "condition": 41086.77975066832
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/CZ_Rod1/D4/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "CZ_Rod1",
+        "delay": 4,
+        "variant": "no_A"
+      },
+      "model_sha256": "173ecb5253974181f18726ec49c815431c41c53255d68484d6b7672108a929bc",
+      "ledger_sha256": "dfca8fb559d520846029ac710d421b38fac0cc058e73f849e78ab734a85c383b",
+      "seconds": 3.802260423079133,
+      "ridge_fits": 467,
+      "selection_MSE": 0.0002673174820936529,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0002455686161202795,
+        "proof": [
+          {
+            "last_fit_label": 4570,
+            "first_score_dependency": 4571,
+            "parent": {
+              "rows": 4379,
+              "parameters": 9,
+              "kkt": 3.575547901449703e-17,
+              "condition": 13499.863971914165
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5537,
+            "first_score_dependency": 5538,
+            "parent": {
+              "rows": 5346,
+              "parameters": 9,
+              "kkt": 3.573827586739058e-17,
+              "condition": 14814.847764266582
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/CZ_Rod1/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "CZ_Rod1",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "0a06ffc2ab9fd0cb91de8f5d1810fbef899db6ee6caa595f0c330b4518c92819",
+      "ledger_sha256": "37922b52f08c246732fc6734430db51bc95dcb0fba6ae5f4287fd2aed8d52899",
+      "seconds": 89.97506420593709,
+      "ridge_fits": 464,
+      "selection_MSE": 0.0002867441420997599,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0012774815030825726,
+        "proof": [
+          {
+            "last_fit_label": 4566,
+            "first_score_dependency": 4567,
+            "parent": {
+              "rows": 4375,
+              "parameters": 13,
+              "kkt": 4.730072288708072e-17,
+              "condition": 24086.293503342167
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5533,
+            "first_score_dependency": 5534,
+            "parent": {
+              "rows": 5342,
+              "parameters": 13,
+              "kkt": 1.0878610419444586e-16,
+              "condition": 24609.03027886417
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/CZ_Rod1/D8/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "CZ_Rod1",
+        "delay": 8,
+        "variant": "no_A"
+      },
+      "model_sha256": "358a9b38950b7511589cc3dd258960ec38a103c2fce5696d6103d88d2c792d7c",
+      "ledger_sha256": "5dbdbb1ad6efb4f29f866a1179c7aecdefe9fb6318ebaf402151a0dbda851dc6",
+      "seconds": 5.501744705252349,
+      "ridge_fits": 464,
+      "selection_MSE": 0.00063457871034001,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.000652320138890191,
+        "proof": [
+          {
+            "last_fit_label": 4566,
+            "first_score_dependency": 4567,
+            "parent": {
+              "rows": 4375,
+              "parameters": 17,
+              "kkt": 1.3177920290662557e-16,
+              "condition": 28283.59354401215
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5533,
+            "first_score_dependency": 5534,
+            "parent": {
+              "rows": 5342,
+              "parameters": 17,
+              "kkt": 5.852993385850634e-17,
+              "condition": 31002.059763583275
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/CZ_Rod2/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "CZ_Rod2",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "4712fa9cdadc9f2d3229101679267c1f8a565f223982656e767eb970dac71a6e",
+      "ledger_sha256": "6a413fdd3f81015a71b14f2e0fb988e29c9f2cdddac6a171285e6480137e1884",
+      "seconds": 110.0317671210505,
+      "ridge_fits": 458,
+      "selection_MSE": 0.00044019441486473255,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0009688224440902886,
+        "proof": [
+          {
+            "last_fit_label": 4680,
+            "first_score_dependency": 4681,
+            "parent": {
+              "rows": 4489,
+              "parameters": 23,
+              "kkt": 3.977448278976449e-17,
+              "condition": 38211.56470216452
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5673,
+            "first_score_dependency": 5674,
+            "parent": {
+              "rows": 5482,
+              "parameters": 23,
+              "kkt": 4.32437512975568e-17,
+              "condition": 46661.54221228107
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 0,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/CZ_Rod2/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "CZ_Rod2",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "086f11f68efbda3ab52c2f2b43e30b19f7a54ae321a922fbadd1d671ca166e38",
+      "ledger_sha256": "23f30c7275f1bc952e283beeffb159792400f78c5722d6115162a85351e63b41",
+      "seconds": 89.41226792801172,
+      "ridge_fits": 458,
+      "selection_MSE": 0.00010571211670745916,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.00017589659233651386,
+        "proof": [
+          {
+            "last_fit_label": 4692,
+            "first_score_dependency": 4693,
+            "parent": {
+              "rows": 4501,
+              "parameters": 13,
+              "kkt": 3.669023821238942e-17,
+              "condition": 14344.356072002895
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5685,
+            "first_score_dependency": 5686,
+            "parent": {
+              "rows": 5494,
+              "parameters": 13,
+              "kkt": 6.67883994338041e-17,
+              "condition": 15703.114376245347
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/CZ_Rod2/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "CZ_Rod2",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "1954dbdf8630c4533eeac861758cd1912b3704546a1097cde526a43be6e0bc45",
+      "ledger_sha256": "239537e3e7553190e7aa4a95fa8d2d5462a706fb5035f8134f17999b60b10f54",
+      "seconds": 88.62193391192704,
+      "ridge_fits": 458,
+      "selection_MSE": 0.00016459860375659768,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.00031054710628519375,
+        "proof": [
+          {
+            "last_fit_label": 4688,
+            "first_score_dependency": 4689,
+            "parent": {
+              "rows": 4497,
+              "parameters": 13,
+              "kkt": 9.632071865654181e-17,
+              "condition": 14324.785437760918
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5681,
+            "first_score_dependency": 5682,
+            "parent": {
+              "rows": 5490,
+              "parameters": 13,
+              "kkt": 8.662898027152213e-17,
+              "condition": 15695.853701441376
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "674c900b5993314fdb0fc7e9ea898b459a911123a1547f61bff4962105c245de",
+      "ledger_sha256": "fe27115bbe6269fe8920c08d1d8d5052ea431926527aa3552173416c3d7da11c",
+      "seconds": 43.19492085883394,
+      "ridge_fits": 455,
+      "selection_MSE": 0.00026716118746204125,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "asinh",
+        "status": "AVAILABLE",
+        "MSE": 0.0006320946580755452,
+        "proof": [
+          {
+            "last_fit_label": 2243,
+            "first_score_dependency": 2244,
+            "parent": {
+              "rows": 2052,
+              "parameters": 23,
+              "kkt": 2.4707840991534826e-17,
+              "condition": 3138.257816490798
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2713,
+            "first_score_dependency": 2714,
+            "parent": {
+              "rows": 2522,
+              "parameters": 23,
+              "kkt": 2.7315953148376877e-17,
+              "condition": 2980.794580529906
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D16/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 16,
+        "variant": "no_A"
+      },
+      "model_sha256": "af3c9210fb389a9b771b3385001e5de4e3d2f8bb8ebff09c80f134c91a365c7a",
+      "ledger_sha256": "57a8147a0c089ccd627d70b64847c5377a8c87652178b2c3058c615fd242f0ab",
+      "seconds": 2.8956326679326594,
+      "ridge_fits": 455,
+      "selection_MSE": 0.0003374850722137982,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "asinh",
+        "status": "AVAILABLE",
+        "MSE": 0.0006320946580755452,
+        "proof": [
+          {
+            "last_fit_label": 2243,
+            "first_score_dependency": 2244,
+            "parent": {
+              "rows": 2052,
+              "parameters": 23,
+              "kkt": 2.4707840991534826e-17,
+              "condition": 3138.257816490798
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2713,
+            "first_score_dependency": 2714,
+            "parent": {
+              "rows": 2522,
+              "parameters": 23,
+              "kkt": 2.7315953148376877e-17,
+              "condition": 2980.794580529906
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D16/no_KC/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 16,
+        "variant": "no_KC"
+      },
+      "model_sha256": "ff9562f7b14d59c56a6a4d46a739d86f84236bc0b78f3f427c5a8002492e9a69",
+      "ledger_sha256": "a91797286bc08fd0e88261391d03d2efee7f558a97951304b12e640ef66f64f2",
+      "seconds": 13.73848242778331,
+      "ridge_fits": 67,
+      "selection_MSE": 0.0011657917776491432,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0010349095046100851,
+        "proof": [
+          {
+            "last_fit_label": 2243,
+            "first_score_dependency": 2244,
+            "parent": {
+              "rows": 2052,
+              "parameters": 17,
+              "kkt": 2.2229633707100303e-17,
+              "condition": 13054.207949483072
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2713,
+            "first_score_dependency": 2714,
+            "parent": {
+              "rows": 2522,
+              "parameters": 17,
+              "kkt": 4.2505855993820804e-17,
+              "condition": 13225.251330045097
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D16/no_W/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 16,
+        "variant": "no_W"
+      },
+      "model_sha256": "e94ccf4c4c18257389e3fafb62fed0c5017eea446ca3d25468684d59b9c5e95c",
+      "ledger_sha256": "e948ba31d7a8b0a424344847cfe212cccd504fe1a5a0f7c351bb982411f4aba5",
+      "seconds": 20.438175399322063,
+      "ridge_fits": 60,
+      "selection_MSE": 0.0009610163846704958,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 100.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0004485917780363096,
+        "proof": [
+          {
+            "last_fit_label": 2243,
+            "first_score_dependency": 2244,
+            "parent": {
+              "rows": 2052,
+              "parameters": 13,
+              "kkt": 1.970852763910386e-17,
+              "condition": 77.79617032014272
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2713,
+            "first_score_dependency": 2714,
+            "parent": {
+              "rows": 2522,
+              "parameters": 13,
+              "kkt": 3.71327501376713e-17,
+              "condition": 90.00106871940886
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 2,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "2a9bfab6fff935efd594479a5581d8009e0b154ea9ba448f82c94e8b774c8776",
+      "ledger_sha256": "24c339ef7c5cc6615a70e7e65510a13068fcb027a0af3bf9de051a5a5667a2a5",
+      "seconds": 44.51214291807264,
+      "ridge_fits": 455,
+      "selection_MSE": 0.00030476315738519184,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.00022874307042408467,
+        "proof": [
+          {
+            "last_fit_label": 2255,
+            "first_score_dependency": 2256,
+            "parent": {
+              "rows": 2064,
+              "parameters": 13,
+              "kkt": 4.984678103199197e-17,
+              "condition": 1150.4353562908368
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2725,
+            "first_score_dependency": 2726,
+            "parent": {
+              "rows": 2534,
+              "parameters": 13,
+              "kkt": 5.124501808845725e-17,
+              "condition": 1179.29376945248
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D4/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 4,
+        "variant": "no_A"
+      },
+      "model_sha256": "0ff9ff65754ced14d87f4741fc6b0f0c6ff4d5a28c3887a5a7767239bd6c1a88",
+      "ledger_sha256": "e20ab25c0b3903288b753b3304020939b3907c7f33930bd86a8d7420061b6a45",
+      "seconds": 2.0949999750591815,
+      "ridge_fits": 455,
+      "selection_MSE": 0.00038925840480676327,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.00022874307042408467,
+        "proof": [
+          {
+            "last_fit_label": 2255,
+            "first_score_dependency": 2256,
+            "parent": {
+              "rows": 2064,
+              "parameters": 13,
+              "kkt": 4.984678103199197e-17,
+              "condition": 1150.4353562908368
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2725,
+            "first_score_dependency": 2726,
+            "parent": {
+              "rows": 2534,
+              "parameters": 13,
+              "kkt": 5.124501808845725e-17,
+              "condition": 1179.29376945248
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D4/no_KC/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 4,
+        "variant": "no_KC"
+      },
+      "model_sha256": "1ac5e44dcb592e3293ca5fb28b2bad0426ea0932328b12db8b8bbd0ee241d491",
+      "ledger_sha256": "ba71117aa0f0ab3a954a208a7a64419cc1429a6ccb3ea381eaa35cf508669adf",
+      "seconds": 14.627850477118045,
+      "ridge_fits": 67,
+      "selection_MSE": 0.0006927816817834667,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0006527072086466433,
+        "proof": [
+          {
+            "last_fit_label": 2255,
+            "first_score_dependency": 2256,
+            "parent": {
+              "rows": 2064,
+              "parameters": 9,
+              "kkt": 4.2551346454920296e-17,
+              "condition": 3902.1487621977435
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2725,
+            "first_score_dependency": 2726,
+            "parent": {
+              "rows": 2534,
+              "parameters": 9,
+              "kkt": 4.323042054441062e-17,
+              "condition": 3924.3813753339664
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D4/no_W/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 4,
+        "variant": "no_W"
+      },
+      "model_sha256": "d76371606b19484b84d53007e99b3b53eb9040098798269daf81a7bf219c3bed",
+      "ledger_sha256": "5983ffc5e244cefc77e16fb162b73227b7d0c5de71b2f56154bc0b9488ee4256",
+      "seconds": 21.7040605568327,
+      "ridge_fits": 60,
+      "selection_MSE": 0.0006927816817834667,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0006527072086466433,
+        "proof": [
+          {
+            "last_fit_label": 2255,
+            "first_score_dependency": 2256,
+            "parent": {
+              "rows": 2064,
+              "parameters": 9,
+              "kkt": 4.2551346454920296e-17,
+              "condition": 3902.1487621977435
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2725,
+            "first_score_dependency": 2726,
+            "parent": {
+              "rows": 2534,
+              "parameters": 9,
+              "kkt": 4.323042054441062e-17,
+              "condition": 3924.3813753339664
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "31e0db3aa81227399f148d7ca6be64dabf3b5295bd831c71db7cae0db1462a6a",
+      "ledger_sha256": "e911f71f53cf9e5152558e62cbb12f3384091715ca15bbd7f1f682cce73f6288",
+      "seconds": 44.62205443531275,
+      "ridge_fits": 455,
+      "selection_MSE": 0.0002908083955775131,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "asinh",
+        "status": "AVAILABLE",
+        "MSE": 0.000627547719132339,
+        "proof": [
+          {
+            "last_fit_label": 2251,
+            "first_score_dependency": 2252,
+            "parent": {
+              "rows": 2060,
+              "parameters": 23,
+              "kkt": 2.3088635106259982e-17,
+              "condition": 3134.9610280106617
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2721,
+            "first_score_dependency": 2722,
+            "parent": {
+              "rows": 2530,
+              "parameters": 23,
+              "kkt": 2.5652170017146217e-17,
+              "condition": 2986.546698175409
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D8/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 8,
+        "variant": "no_A"
+      },
+      "model_sha256": "56bd8efd70c3b7aadc9d9f14be29ecd19ab39930a633cbcdff1c7662489a19f5",
+      "ledger_sha256": "84cc71ddcdc6092827e0d18f32fb28ec5428eaa803a408628fa93edf06b77f66",
+      "seconds": 2.8590072649531066,
+      "ridge_fits": 455,
+      "selection_MSE": 0.00036802744186939745,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "asinh",
+        "status": "AVAILABLE",
+        "MSE": 0.000627547719132339,
+        "proof": [
+          {
+            "last_fit_label": 2251,
+            "first_score_dependency": 2252,
+            "parent": {
+              "rows": 2060,
+              "parameters": 23,
+              "kkt": 2.3088635106259982e-17,
+              "condition": 3134.9610280106617
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2721,
+            "first_score_dependency": 2722,
+            "parent": {
+              "rows": 2530,
+              "parameters": 23,
+              "kkt": 2.5652170017146217e-17,
+              "condition": 2986.546698175409
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D8/no_KC/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 8,
+        "variant": "no_KC"
+      },
+      "model_sha256": "21546003d0505f00e24b8cd93e8b8ecce1a37096cc20c868b11eb20709895352",
+      "ledger_sha256": "1488d5a19a60c59efb34d5b58c397195bb714d8a1480984b713dbbf14270b75a",
+      "seconds": 14.03208498377353,
+      "ridge_fits": 67,
+      "selection_MSE": 0.0011817948101886632,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 1000.0
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0009913828212879119,
+        "proof": [
+          {
+            "last_fit_label": 2251,
+            "first_score_dependency": 2252,
+            "parent": {
+              "rows": 2060,
+              "parameters": 17,
+              "kkt": 4.334586020731044e-17,
+              "condition": 20.125683860962365
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2721,
+            "first_score_dependency": 2722,
+            "parent": {
+              "rows": 2530,
+              "parameters": 17,
+              "kkt": 3.076362659361e-17,
+              "condition": 24.528551709483168
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "Q_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": false
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "source": "runs/repaired/SRU_H2S/D8/no_W/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "repaired",
+        "entity": "SRU_H2S",
+        "delay": 8,
+        "variant": "no_W"
+      },
+      "model_sha256": "775929b3825522ee02cd332f14f1188841294c49680e90fd8a20d26183959e35",
+      "ledger_sha256": "6e705e15afec9587d2cde9cc8c75001e8268ba7170acbb0efc00fe2a8ac42ff2",
+      "seconds": 21.267370503861457,
+      "ridge_fits": 60,
+      "selection_MSE": 0.0009637715795770145,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 100.0,
+          "own": false,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0004524610181549597,
+        "proof": [
+          {
+            "last_fit_label": 2251,
+            "first_score_dependency": 2252,
+            "parent": {
+              "rows": 2060,
+              "parameters": 11,
+              "kkt": 1.7916503484800865e-17,
+              "condition": 75.38171142174453
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 2721,
+            "first_score_dependency": 2722,
+            "parent": {
+              "rows": 2530,
+              "parameters": 11,
+              "kkt": 3.349289509318199e-17,
+              "condition": 88.07321619165094
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E128/CZ_Rod1/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E128",
+        "entity": "CZ_Rod1",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "b2c1a46f1ee15ed338e8738faa867b411ba10a8e62761a3ec908e11dcfcf9f50",
+      "ledger_sha256": "50b05950cc176e9400f209b0d0cd780caf2273632460d3e75b70f946dd5f2609",
+      "seconds": 89.08751005679369,
+      "ridge_fits": 235,
+      "selection_MSE": 0.0006526964987131442,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 100.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_log1p",
+        "status": "AVAILABLE",
+        "MSE": 0.06651503115771422,
+        "proof": [
+          {
+            "last_fit_label": 4558,
+            "first_score_dependency": 4559,
+            "parent": {
+              "rows": 4367,
+              "parameters": 83,
+              "kkt": 3.073856413333255e-17,
+              "condition": 1579.5983625446497
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5525,
+            "first_score_dependency": 5526,
+            "parent": {
+              "rows": 5334,
+              "parameters": 83,
+              "kkt": 5.729601661173983e-17,
+              "condition": 1845.6728148187888
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E128/CZ_Rod1/D16/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E128",
+        "entity": "CZ_Rod1",
+        "delay": 16,
+        "variant": "no_A"
+      },
+      "model_sha256": "38d252f88f29704b549e8741937470534f7ddd7546507e7ada20b133050889c2",
+      "ledger_sha256": "e121dafa16a6473fcc7ac2046c417cd6f38fa5443feb83f1c7c78f27389290b3",
+      "seconds": 7.250667094718665,
+      "ridge_fits": 235,
+      "selection_MSE": 0.0015507551494507265,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.0017441712840955198,
+        "proof": [
+          {
+            "last_fit_label": 4558,
+            "first_score_dependency": 4559,
+            "parent": {
+              "rows": 4367,
+              "parameters": 129,
+              "kkt": 4.060594620634506e-17,
+              "condition": 282941.3913832985
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5525,
+            "first_score_dependency": 5526,
+            "parent": {
+              "rows": 5334,
+              "parameters": 129,
+              "kkt": 2.685270999352443e-17,
+              "condition": 308156.3365713041
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E128/CZ_Rod1/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E128",
+        "entity": "CZ_Rod1",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "351f88d9317b66b3cab1e10a265a818506ced542226e39b21d0d9390e6af2f4b",
+      "ledger_sha256": "54f4cc78f9a9f5b1ad9787e8e21195e220fe266cd843267ad4a4e3de87decbbf",
+      "seconds": 91.57734220195562,
+      "ridge_fits": 235,
+      "selection_MSE": 0.0001850967268985184,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 100.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_log1p",
+        "status": "AVAILABLE",
+        "MSE": 0.025853381891471384,
+        "proof": [
+          {
+            "last_fit_label": 4570,
+            "first_score_dependency": 4571,
+            "parent": {
+              "rows": 4379,
+              "parameters": 83,
+              "kkt": 3.4988911551765965e-17,
+              "condition": 1584.3463918537257
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5537,
+            "first_score_dependency": 5538,
+            "parent": {
+              "rows": 5346,
+              "parameters": 83,
+              "kkt": 3.0319988482597614e-17,
+              "condition": 1848.4587988246224
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD8_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E128/CZ_Rod1/D4/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E128",
+        "entity": "CZ_Rod1",
+        "delay": 4,
+        "variant": "no_A"
+      },
+      "model_sha256": "0f6e19c9e7aabbdac7e2b8a93c39f2bb847b5903be68eb5652ac30ada4044ea1",
+      "ledger_sha256": "1a22d0bfdd7a25bed29600281db02dd74165282319d82e8864429e741975b7b9",
+      "seconds": 7.232032412197441,
+      "ridge_fits": 235,
+      "selection_MSE": 0.0002818054342878581,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.00025136449973292,
+        "proof": [
+          {
+            "last_fit_label": 4570,
+            "first_score_dependency": 4571,
+            "parent": {
+              "rows": 4379,
+              "parameters": 129,
+              "kkt": 3.918613471303678e-17,
+              "condition": 281933.6499910529
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5537,
+            "first_score_dependency": 5538,
+            "parent": {
+              "rows": 5346,
+              "parameters": 129,
+              "kkt": 2.712291857522695e-17,
+              "condition": 307446.63070902904
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E128/CZ_Rod1/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E128",
+        "entity": "CZ_Rod1",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "cbaf0940847d69a8f1bd93239bfe77ec9caa7bd6a62bd11acfa9f93c1b7157ea",
+      "ledger_sha256": "cbf49e89df2faa4ccff3823a2b7906d62a919fa437071813c5e264ebe828d6ec",
+      "seconds": 92.23303728923202,
+      "ridge_fits": 235,
+      "selection_MSE": 0.000347657204633526,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 100.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_log1p",
+        "status": "AVAILABLE",
+        "MSE": 0.04457252780475405,
+        "proof": [
+          {
+            "last_fit_label": 4566,
+            "first_score_dependency": 4567,
+            "parent": {
+              "rows": 4375,
+              "parameters": 83,
+              "kkt": 5.650213472307597e-17,
+              "condition": 1582.7690218529942
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5533,
+            "first_score_dependency": 5534,
+            "parent": {
+              "rows": 5342,
+              "parameters": 83,
+              "kkt": 2.711775156779345e-17,
+              "condition": 1847.5257532639102
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E128/CZ_Rod1/D8/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E128",
+        "entity": "CZ_Rod1",
+        "delay": 8,
+        "variant": "no_A"
+      },
+      "model_sha256": "6657b86eb01eb67b3ae97b5eff2683a88ca26168b6ce1f01b6a3d392b3cf31c2",
+      "ledger_sha256": "21980a29e7ca82815abafd4636324dc30ed64f2939c0afc1250a42e1f11c4ebc",
+      "seconds": 7.110363767948002,
+      "ridge_fits": 235,
+      "selection_MSE": 0.0006779928409181157,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.0006660658381222135,
+        "proof": [
+          {
+            "last_fit_label": 4566,
+            "first_score_dependency": 4567,
+            "parent": {
+              "rows": 4375,
+              "parameters": 129,
+              "kkt": 3.975520927719536e-17,
+              "condition": 282291.95194965333
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5533,
+            "first_score_dependency": 5534,
+            "parent": {
+              "rows": 5342,
+              "parameters": 129,
+              "kkt": 5.58221205867696e-17,
+              "condition": 307693.42558986833
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E128/CZ_Rod2/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E128",
+        "entity": "CZ_Rod2",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "4bbed9cf96e52a7614ed63dd1346a5142fcda4bd20ab28899a30712088d9fe5e",
+      "ledger_sha256": "1d1bf87ee84f0936eb0025943b4ba8f20272dc9c538d182e98f41d5fa5a2c806",
+      "seconds": 92.1142076049,
+      "ridge_fits": 235,
+      "selection_MSE": 0.0007870355141864919,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1000.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.03874657467692983,
+        "proof": [
+          {
+            "last_fit_label": 4680,
+            "first_score_dependency": 4681,
+            "parent": {
+              "rows": 4489,
+              "parameters": 83,
+              "kkt": 2.4294763311559933e-17,
+              "condition": 150.7009147347208
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5673,
+            "first_score_dependency": 5674,
+            "parent": {
+              "rows": 5482,
+              "parameters": 83,
+              "kkt": 1.9017602350558692e-17,
+              "condition": 189.11563165566218
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E128/CZ_Rod2/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E128",
+        "entity": "CZ_Rod2",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "654b5eb0d0510c421d9a0da276ed8ec2d49376765dd4faac8921b0e0f537adaf",
+      "ledger_sha256": "a4999bbec5f3a29c682e25c20e90dda114f7fc34d7399c3856b015844601d109",
+      "seconds": 92.35437623830512,
+      "ridge_fits": 235,
+      "selection_MSE": 0.00012097930183411743,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.00018094776006716593,
+        "proof": [
+          {
+            "last_fit_label": 4692,
+            "first_score_dependency": 4693,
+            "parent": {
+              "rows": 4501,
+              "parameters": 43,
+              "kkt": 4.029098307318469e-17,
+              "condition": 75470.96849576
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5685,
+            "first_score_dependency": 5686,
+            "parent": {
+              "rows": 5494,
+              "parameters": 43,
+              "kkt": 2.9127428059985454e-17,
+              "condition": 91209.16961318247
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 8,
+          "window": 256,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E128/CZ_Rod2/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E128",
+        "entity": "CZ_Rod2",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "0aa8a9e42e8c52c8c20a6b3967fc7ea5a998db501eec96c8e0bc2b6cd8499113",
+      "ledger_sha256": "7e8913f922335d8bc8ad8fe99effcefc65a9d0896dfd919b28e6b25538590e5a",
+      "seconds": 92.43116135103628,
+      "ridge_fits": 235,
+      "selection_MSE": 0.0002397473582682041,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0003655429083399714,
+        "proof": [
+          {
+            "last_fit_label": 4688,
+            "first_score_dependency": 4689,
+            "parent": {
+              "rows": 4497,
+              "parameters": 43,
+              "kkt": 4.755494088511912e-17,
+              "condition": 75408.35761447792
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5681,
+            "first_score_dependency": 5682,
+            "parent": {
+              "rows": 5490,
+              "parameters": 43,
+              "kkt": 1.514760629676237e-17,
+              "condition": 91182.37038178918
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 8,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E16/CZ_Rod1/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E16",
+        "entity": "CZ_Rod1",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "f9b9dd3010d4f02624ac78d5ecc2017259de042b97b952dec8d41b985dab26d7",
+      "ledger_sha256": "73bb016d4855bdc8bf23688a02609c2e46f239ac569a1d06a5dc38d2fa26b957",
+      "seconds": 84.34585145581514,
+      "ridge_fits": 272,
+      "selection_MSE": 0.000732842773153827,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.004769105324224785,
+        "proof": [
+          {
+            "last_fit_label": 4558,
+            "first_score_dependency": 4559,
+            "parent": {
+              "rows": 4367,
+              "parameters": 28,
+              "kkt": 3.6660095676728385e-17,
+              "condition": 49507.89547414882
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5525,
+            "first_score_dependency": 5526,
+            "parent": {
+              "rows": 5334,
+              "parameters": 28,
+              "kkt": 3.3234665610548467e-17,
+              "condition": 50446.236710742705
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E16/CZ_Rod1/D16/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E16",
+        "entity": "CZ_Rod1",
+        "delay": 16,
+        "variant": "no_A"
+      },
+      "model_sha256": "b73fd0233be7c277ee96683cdcbacfab55d424e64118b10d7961588ceaade042",
+      "ledger_sha256": "0d3b35bfd7f78ff5590250180c8b83403cf8998a90c4723b8ac3eb3d8d64279d",
+      "seconds": 2.7614649911411107,
+      "ridge_fits": 272,
+      "selection_MSE": 0.0014654644755910215,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0017211687682469844,
+        "proof": [
+          {
+            "last_fit_label": 4558,
+            "first_score_dependency": 4559,
+            "parent": {
+              "rows": 4367,
+              "parameters": 17,
+              "kkt": 8.208550017984375e-17,
+              "condition": 28388.132004692565
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5525,
+            "first_score_dependency": 5526,
+            "parent": {
+              "rows": 5334,
+              "parameters": 17,
+              "kkt": 3.684751983213779e-17,
+              "condition": 31076.462365291736
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E16/CZ_Rod1/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E16",
+        "entity": "CZ_Rod1",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "0677b0738237804516b7398660ea55c5bc2f8798e43c4676c906674e2411585c",
+      "ledger_sha256": "c505c338342f2687cd0fe6f50eabdc8a407726567461705c646e6ed76389fae2",
+      "seconds": 87.80081758229062,
+      "ridge_fits": 269,
+      "selection_MSE": 0.0001740351252422298,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_log1p",
+        "status": "AVAILABLE",
+        "MSE": 0.0004855961684708482,
+        "proof": [
+          {
+            "last_fit_label": 4570,
+            "first_score_dependency": 4571,
+            "parent": {
+              "rows": 4379,
+              "parameters": 53,
+              "kkt": 3.589523147105927e-17,
+              "condition": 102206.21548514893
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5537,
+            "first_score_dependency": 5538,
+            "parent": {
+              "rows": 5346,
+              "parameters": 53,
+              "kkt": 3.826755087577283e-17,
+              "condition": 118392.49110139224
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD8_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E16/CZ_Rod1/D4/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E16",
+        "entity": "CZ_Rod1",
+        "delay": 4,
+        "variant": "no_A"
+      },
+      "model_sha256": "01f4c0b121ae020d72c640901f6c8ad3f96ce906fef29426cff4771661790aab",
+      "ledger_sha256": "e4a5a04869075801f7b4eaa3e7b9469f7543f3149488618c283819c34e0fbed9",
+      "seconds": 2.7060228888876736,
+      "ridge_fits": 269,
+      "selection_MSE": 0.0002664793221065687,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0002451511800851511,
+        "proof": [
+          {
+            "last_fit_label": 4570,
+            "first_score_dependency": 4571,
+            "parent": {
+              "rows": 4379,
+              "parameters": 17,
+              "kkt": 7.510929935247577e-17,
+              "condition": 28226.61690526581
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5537,
+            "first_score_dependency": 5538,
+            "parent": {
+              "rows": 5346,
+              "parameters": 17,
+              "kkt": 3.876239113249776e-17,
+              "condition": 30959.547575134387
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E16/CZ_Rod1/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E16",
+        "entity": "CZ_Rod1",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "5339b65c33c9f70574351b238f790c016fe8ff7550157cf76d2b7a648999af3e",
+      "ledger_sha256": "3e439862afaece4d43436aa9e7f4f42adf3ff856ec7088e79ae168794f4a8db7",
+      "seconds": 85.12017903383821,
+      "ridge_fits": 272,
+      "selection_MSE": 0.00031550509082370695,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0013745102973057235,
+        "proof": [
+          {
+            "last_fit_label": 4566,
+            "first_score_dependency": 4567,
+            "parent": {
+              "rows": 4375,
+              "parameters": 28,
+              "kkt": 3.44834686697967e-17,
+              "condition": 49695.21523073216
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5533,
+            "first_score_dependency": 5534,
+            "parent": {
+              "rows": 5342,
+              "parameters": 28,
+              "kkt": 6.262467560698925e-17,
+              "condition": 50532.73669109084
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E16/CZ_Rod1/D8/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E16",
+        "entity": "CZ_Rod1",
+        "delay": 8,
+        "variant": "no_A"
+      },
+      "model_sha256": "e2fbd546bd2a3319a3696ee939649d475847d4b6d395cc4c49cb91bc6e9ac5ab",
+      "ledger_sha256": "8ed1bfe863cd702af629ec32e260788dcf8810a3f4d21ba8c51d93f3edcc484e",
+      "seconds": 2.716114853043109,
+      "ridge_fits": 272,
+      "selection_MSE": 0.00063457871034001,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.000652320138890191,
+        "proof": [
+          {
+            "last_fit_label": 4566,
+            "first_score_dependency": 4567,
+            "parent": {
+              "rows": 4375,
+              "parameters": 17,
+              "kkt": 1.3177920290662557e-16,
+              "condition": 28283.59354401215
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5533,
+            "first_score_dependency": 5534,
+            "parent": {
+              "rows": 5342,
+              "parameters": 17,
+              "kkt": 5.852993385850634e-17,
+              "condition": 31002.059763583275
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E16/CZ_Rod2/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E16",
+        "entity": "CZ_Rod2",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "7f79ef4e801dd4a408418044ec7200a1c8291b157920504159be2cb7ce243969",
+      "ledger_sha256": "745718103f8db45ba71363b4fa55988d1974c10f21b488bed2bfd9e880ca5386",
+      "seconds": 86.91748300381005,
+      "ridge_fits": 266,
+      "selection_MSE": 0.00044872942776787546,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "asinh",
+        "status": "AVAILABLE",
+        "MSE": 0.001156421605832513,
+        "proof": [
+          {
+            "last_fit_label": 4680,
+            "first_score_dependency": 4681,
+            "parent": {
+              "rows": 4489,
+              "parameters": 53,
+              "kkt": 3.7208002098693386e-17,
+              "condition": 95363.21200460824
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5673,
+            "first_score_dependency": 5674,
+            "parent": {
+              "rows": 5482,
+              "parameters": 53,
+              "kkt": 3.297521868756244e-17,
+              "condition": 114601.60847021782
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E16/CZ_Rod2/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E16",
+        "entity": "CZ_Rod2",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "4719e3b3c31dfb98bbd5508484b00f4ada25209543f3d5985e6e374522121c60",
+      "ledger_sha256": "3535e44f537ffb0c7507fc71f94142cd6502c89c51ae2ca87b01987511ea0906",
+      "seconds": 88.73410631762818,
+      "ridge_fits": 266,
+      "selection_MSE": 0.00010412021829342118,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "asinh",
+        "status": "AVAILABLE",
+        "MSE": 0.00017232917106489,
+        "proof": [
+          {
+            "last_fit_label": 4692,
+            "first_score_dependency": 4693,
+            "parent": {
+              "rows": 4501,
+              "parameters": 28,
+              "kkt": 1.2671991458255131e-17,
+              "condition": 38022.20030681177
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5685,
+            "first_score_dependency": 5686,
+            "parent": {
+              "rows": 5494,
+              "parameters": 28,
+              "kkt": 2.192385708599765e-17,
+              "condition": 41913.716272314974
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/E16/CZ_Rod2/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "E16",
+        "entity": "CZ_Rod2",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "0069f2a45f1107d7511a2405296bbb0920a1cc6e23287fb619f0e82dfc37cb93",
+      "ledger_sha256": "741890f4026727f3ed5be50fc0095a13a04707d2d62bb7f696fb3f484f3f81e0",
+      "seconds": 87.91262652305886,
+      "ridge_fits": 266,
+      "selection_MSE": 0.00015384820899634513,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0002908206811760718,
+        "proof": [
+          {
+            "last_fit_label": 4688,
+            "first_score_dependency": 4689,
+            "parent": {
+              "rows": 4497,
+              "parameters": 28,
+              "kkt": 2.698346451173113e-17,
+              "condition": 37982.528498960404
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5681,
+            "first_score_dependency": 5682,
+            "parent": {
+              "rows": 5490,
+              "parameters": 28,
+              "kkt": 2.2044597620653654e-17,
+              "condition": 41890.129356139834
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/fixed128/CZ_Rod1/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "fixed128",
+        "entity": "CZ_Rod1",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "032ed82b5fdbe652c2aca6568614bf428a94b11ebca135f2fae3ba2afc6cb08d",
+      "ledger_sha256": "751e96af864506c441d92b8509236bd7183ba9589dbba8610abb1c5826af885d",
+      "seconds": 114.33577439794317,
+      "ridge_fits": 427,
+      "selection_MSE": 0.0006238445521675724,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0023793318437845506,
+        "proof": [
+          {
+            "last_fit_label": 4558,
+            "first_score_dependency": 4559,
+            "parent": {
+              "rows": 4367,
+              "parameters": 13,
+              "kkt": 2.2858097487720358e-17,
+              "condition": 25713.653034899264
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5525,
+            "first_score_dependency": 5526,
+            "parent": {
+              "rows": 5334,
+              "parameters": 13,
+              "kkt": 3.246129314743545e-17,
+              "condition": 27985.602787364583
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/fixed128/CZ_Rod1/D16/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "fixed128",
+        "entity": "CZ_Rod1",
+        "delay": 16,
+        "variant": "no_A"
+      },
+      "model_sha256": "1b8247743665ea7c0715923b470f380cc36e23b4ffdd8b43c8eb3ed2af8b8390",
+      "ledger_sha256": "721af3988c920295a078fa6c085a94382ad6cc1505778d59b1598916f5f8c860",
+      "seconds": 35.03333515441045,
+      "ridge_fits": 427,
+      "selection_MSE": 0.0015507551494507265,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.0017441712840955198,
+        "proof": [
+          {
+            "last_fit_label": 4558,
+            "first_score_dependency": 4559,
+            "parent": {
+              "rows": 4367,
+              "parameters": 129,
+              "kkt": 4.060594620634506e-17,
+              "condition": 282941.3913832985
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5525,
+            "first_score_dependency": 5526,
+            "parent": {
+              "rows": 5334,
+              "parameters": 129,
+              "kkt": 2.685270999352443e-17,
+              "condition": 308156.3365713041
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/fixed128/CZ_Rod1/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "fixed128",
+        "entity": "CZ_Rod1",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "bf0f97a85846b9af2127ec734d50e3fc45da1baba9371118750d91e90bc62b45",
+      "ledger_sha256": "1aef458c3a6cca0f59dbf83444a1a09c3493659b793cbbca9848fc3d2aefdc94",
+      "seconds": 120.11781730921939,
+      "ridge_fits": 433,
+      "selection_MSE": 0.00023744042266729234,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": false
+        },
+        "mode": "CF_spline",
+        "status": "AVAILABLE",
+        "MSE": 0.000543784191907344,
+        "proof": [
+          {
+            "last_fit_label": 4570,
+            "first_score_dependency": 4571,
+            "parent": {
+              "rows": 4379,
+              "parameters": 13,
+              "kkt": 1.5326798966774036e-16,
+              "condition": 22559.614876464966
+            },
+            "W": {
+              "rows": 1752,
+              "parameters": 4,
+              "kkt": 9.07564081318814e-18,
+              "condition": 34.46383342416089
+            },
+            "W_CF": [
+              {
+                "last_fit_label": 2687,
+                "first_score_dependency": 2688,
+                "certificate": {
+                  "rows": 2496,
+                  "parameters": 13,
+                  "kkt": 6.824743084980479e-17,
+                  "condition": 13257.808283986846
+                }
+              },
+              {
+                "last_fit_label": 3563,
+                "first_score_dependency": 3564,
+                "certificate": {
+                  "rows": 3372,
+                  "parameters": 13,
+                  "kkt": 6.152133780182907e-17,
+                  "condition": 17625.595640360894
+                }
+              }
+            ]
+          },
+          {
+            "last_fit_label": 5537,
+            "first_score_dependency": 5538,
+            "parent": {
+              "rows": 5346,
+              "parameters": 13,
+              "kkt": 1.9728872300689626e-17,
+              "condition": 26669.19952583281
+            },
+            "W": {
+              "rows": 2139,
+              "parameters": 4,
+              "kkt": 1.3583177749045318e-17,
+              "condition": 42.88393296833434
+            },
+            "W_CF": [
+              {
+                "last_fit_label": 3267,
+                "first_score_dependency": 3268,
+                "certificate": {
+                  "rows": 3076,
+                  "parameters": 13,
+                  "kkt": 8.190954405910637e-17,
+                  "condition": 16401.623761298255
+                }
+              },
+              {
+                "last_fit_label": 4336,
+                "first_score_dependency": 4337,
+                "certificate": {
+                  "rows": 4145,
+                  "parameters": 13,
+                  "kkt": 9.97923239344178e-17,
+                  "condition": 21438.058698525816
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/fixed128/CZ_Rod1/D4/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "fixed128",
+        "entity": "CZ_Rod1",
+        "delay": 4,
+        "variant": "no_A"
+      },
+      "model_sha256": "7743039a107dce7bc468d9b0da6623c0bde0fad945237355faa264eddb1d00b8",
+      "ledger_sha256": "8161fce062352c1f4cf8eece369117b92cca19fe8a34650cfb77a8af5313bab6",
+      "seconds": 37.144203112926334,
+      "ridge_fits": 433,
+      "selection_MSE": 0.0002818054342878581,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.00025136449973292,
+        "proof": [
+          {
+            "last_fit_label": 4570,
+            "first_score_dependency": 4571,
+            "parent": {
+              "rows": 4379,
+              "parameters": 129,
+              "kkt": 3.918613471303678e-17,
+              "condition": 281933.6499910529
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5537,
+            "first_score_dependency": 5538,
+            "parent": {
+              "rows": 5346,
+              "parameters": 129,
+              "kkt": 2.712291857522695e-17,
+              "condition": 307446.63070902904
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/fixed128/CZ_Rod1/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "fixed128",
+        "entity": "CZ_Rod1",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "97ef1b02517dcc86a5cb0c7d8a81e1b850d4c143f10ae3444f294087b1c7e9d6",
+      "ledger_sha256": "5c3732a69d56b75f3b79bccfad20f08be0648ec603037da12f3b705edc72fcdb",
+      "seconds": 119.0801288378425,
+      "ridge_fits": 427,
+      "selection_MSE": 0.00040871741852040015,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0008110742995243033,
+        "proof": [
+          {
+            "last_fit_label": 4566,
+            "first_score_dependency": 4567,
+            "parent": {
+              "rows": 4375,
+              "parameters": 13,
+              "kkt": 3.300812098106995e-17,
+              "condition": 25797.78392588538
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5533,
+            "first_score_dependency": 5534,
+            "parent": {
+              "rows": 5342,
+              "parameters": 13,
+              "kkt": 2.3302391502645948e-17,
+              "condition": 27989.241110932795
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/fixed128/CZ_Rod1/D8/no_A/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "fixed128",
+        "entity": "CZ_Rod1",
+        "delay": 8,
+        "variant": "no_A"
+      },
+      "model_sha256": "f9a22724ec4b3ae12d7dc49ff916ecc56ba7bacb8428ba7aac91f4a403c51bb0",
+      "ledger_sha256": "b5a79ca58903223d8269ff4f8565ecccf4151faccfd8912a1a6336685e515e35",
+      "seconds": 34.042666730005294,
+      "ridge_fits": 427,
+      "selection_MSE": 0.0006779928409181157,
+      "KCW": {
+        "config": {
+          "kind": "OWN",
+          "alpha": 0.01
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.0006660658381222135,
+        "proof": [
+          {
+            "last_fit_label": 4566,
+            "first_score_dependency": 4567,
+            "parent": {
+              "rows": 4375,
+              "parameters": 129,
+              "kkt": 3.975520927719536e-17,
+              "condition": 282291.95194965333
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5533,
+            "first_score_dependency": 5534,
+            "parent": {
+              "rows": 5342,
+              "parameters": 129,
+              "kkt": 5.58221205867696e-17,
+              "condition": 307693.42558986833
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": null,
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/fixed128/CZ_Rod2/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "fixed128",
+        "entity": "CZ_Rod2",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "ff9a966751cf0190429fc0404e5b2d4b2b5d685ec293d5c5e0c640613502c9b7",
+      "ledger_sha256": "d60d7073c5bfdee2f91f292959ed833f62201a6b3e25d74bca9f46ca156d310f",
+      "seconds": 119.22452670102939,
+      "ridge_fits": 427,
+      "selection_MSE": 0.000333488130671289,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0006827509667595774,
+        "proof": [
+          {
+            "last_fit_label": 4680,
+            "first_score_dependency": 4681,
+            "parent": {
+              "rows": 4489,
+              "parameters": 23,
+              "kkt": 6.483152827016923e-17,
+              "condition": 38234.8370365113
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5673,
+            "first_score_dependency": 5674,
+            "parent": {
+              "rows": 5482,
+              "parameters": 23,
+              "kkt": 3.16144506859573e-17,
+              "condition": 46883.876441951965
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/fixed128/CZ_Rod2/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "fixed128",
+        "entity": "CZ_Rod2",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "55ce40d093abfbcca0ff0b70fb7a71642da27a8e24f97a982c397a1f900a6e71",
+      "ledger_sha256": "431bcb18faef16e7a74fcb1dd70f516e1b6fb666c125aed6a5c6b2f6df7cd58f",
+      "seconds": 122.80866809887812,
+      "ridge_fits": 427,
+      "selection_MSE": 0.00016491848128772775,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.00023756439087030612,
+        "proof": [
+          {
+            "last_fit_label": 4692,
+            "first_score_dependency": 4693,
+            "parent": {
+              "rows": 4501,
+              "parameters": 23,
+              "kkt": 2.3971065613905017e-17,
+              "condition": 38299.908081643494
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5685,
+            "first_score_dependency": 5686,
+            "parent": {
+              "rows": 5494,
+              "parameters": 23,
+              "kkt": 2.893993710619689e-17,
+              "condition": 47332.723255906705
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "source": "runs/fixed128/CZ_Rod2/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "fixed128",
+        "entity": "CZ_Rod2",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "40813b45d1eed1d98bbd9b12dc2439338590760840d1847267966e5bcf718d9d",
+      "ledger_sha256": "b7235c21a5c76c31f805ccc54b25e1ccfedf2f987ff3509516f5ba956842a34d",
+      "seconds": 120.43247320177034,
+      "ridge_fits": 427,
+      "selection_MSE": 0.0002585181319028387,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0004632240379636391,
+        "proof": [
+          {
+            "last_fit_label": 4688,
+            "first_score_dependency": 4689,
+            "parent": {
+              "rows": 4497,
+              "parameters": 23,
+              "kkt": 8.554514722373591e-17,
+              "condition": 38278.21614521076
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5681,
+            "first_score_dependency": 5682,
+            "parent": {
+              "rows": 5490,
+              "parameters": 23,
+              "kkt": 3.540697339570091e-17,
+              "condition": 47321.0225224557
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "source": "runs/transport/CZ_Rod1/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "transport",
+        "entity": "CZ_Rod1",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "f4f78997f844d83195f1287d6bcc49bcec3d29f2f8f7bbe6784a772d0b22546e",
+      "ledger_sha256": "1611e6b1659fd2f9f7dfd2d1c548861b766348dbdb0b072fd6e3b1d24d3d4f1f",
+      "seconds": 88.41596466815099,
+      "ridge_fits": 235,
+      "selection_MSE": 0.0006526964987131442,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 100.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_log1p",
+        "status": "AVAILABLE",
+        "MSE": 0.06651503115771422,
+        "proof": [
+          {
+            "last_fit_label": 4558,
+            "first_score_dependency": 4559,
+            "parent": {
+              "rows": 4367,
+              "parameters": 83,
+              "kkt": 3.073856413333255e-17,
+              "condition": 1579.5983625446497
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5525,
+            "first_score_dependency": 5526,
+            "parent": {
+              "rows": 5334,
+              "parameters": 83,
+              "kkt": 5.729601661173983e-17,
+              "condition": 1845.6728148187888
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "source": "runs/transport/CZ_Rod1/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "transport",
+        "entity": "CZ_Rod1",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "42f1bed3cc22fc75668d2b0d9efb59321f6b56fc81a11a4c2f64dcc6d7c1c426",
+      "ledger_sha256": "536bd68ff9fee46a4695f9c82eaa72aacfe4fdcad5e708983364b9a6d7724c21",
+      "seconds": 90.4892357182689,
+      "ridge_fits": 235,
+      "selection_MSE": 0.0001850967268985184,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 100.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_log1p",
+        "status": "AVAILABLE",
+        "MSE": 0.025853381891471384,
+        "proof": [
+          {
+            "last_fit_label": 4570,
+            "first_score_dependency": 4571,
+            "parent": {
+              "rows": 4379,
+              "parameters": 83,
+              "kkt": 3.4988911551765965e-17,
+              "condition": 1584.3463918537257
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5537,
+            "first_score_dependency": 5538,
+            "parent": {
+              "rows": 5346,
+              "parameters": 83,
+              "kkt": 3.0319988482597614e-17,
+              "condition": 1848.4587988246224
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QD8_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "source": "runs/transport/CZ_Rod1/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "transport",
+        "entity": "CZ_Rod1",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "5802dbe75cdd5dccce1c47746943355e9ec6c31a18c1c9e1e9166e717d36febf",
+      "ledger_sha256": "b7d06d02e394f909a5627945955607f9e98bf00aa3fb4bc2b6266c87b63a994f",
+      "seconds": 91.23305214755237,
+      "ridge_fits": 235,
+      "selection_MSE": 0.000347657204633526,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 100.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_log1p",
+        "status": "AVAILABLE",
+        "MSE": 0.04457252780475405,
+        "proof": [
+          {
+            "last_fit_label": 4566,
+            "first_score_dependency": 4567,
+            "parent": {
+              "rows": 4375,
+              "parameters": 83,
+              "kkt": 5.650213472307597e-17,
+              "condition": 1582.7690218529942
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5533,
+            "first_score_dependency": 5534,
+            "parent": {
+              "rows": 5342,
+              "parameters": 83,
+              "kkt": 2.711775156779345e-17,
+              "condition": 1847.5257532639102
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "source": "runs/transport/CZ_Rod2/D16/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "transport",
+        "entity": "CZ_Rod2",
+        "delay": 16,
+        "variant": "full"
+      },
+      "model_sha256": "9f17ce20200ece8ceab9a8756f8ec3915e4f3d9b5dfef6f83d0dafb7804a5103",
+      "ledger_sha256": "938c7b9781c24b9309be160ac959033cce55aa4860d5e7f40feb2ea246d6c65b",
+      "seconds": 97.42964967573062,
+      "ridge_fits": 235,
+      "selection_MSE": 0.0007870355141864919,
+      "KCW": {
+        "config": {
+          "kind": "URYSOHN",
+          "alpha": 1000.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "signed_sqrt",
+        "status": "AVAILABLE",
+        "MSE": 0.03874657467692983,
+        "proof": [
+          {
+            "last_fit_label": 4680,
+            "first_score_dependency": 4681,
+            "parent": {
+              "rows": 4489,
+              "parameters": 83,
+              "kkt": 2.4294763311559933e-17,
+              "condition": 150.7009147347208
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5673,
+            "first_score_dependency": 5674,
+            "parent": {
+              "rows": 5482,
+              "parameters": 83,
+              "kkt": 1.9017602350558692e-17,
+              "condition": 189.11563165566218
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "source": "runs/transport/CZ_Rod2/D4/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "transport",
+        "entity": "CZ_Rod2",
+        "delay": 4,
+        "variant": "full"
+      },
+      "model_sha256": "f670a415929db7c474821ec11d3fc0962c2f6df5bf3e1bb618452cff2f508586",
+      "ledger_sha256": "3cb22550c376db3e75fe53de971363a360c9d446b4191817b2aa422a96e9a4b1",
+      "seconds": 93.63160104304552,
+      "ridge_fits": 235,
+      "selection_MSE": 0.00012097930183411743,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.00018094776006716593,
+        "proof": [
+          {
+            "last_fit_label": 4692,
+            "first_score_dependency": 4693,
+            "parent": {
+              "rows": 4501,
+              "parameters": 43,
+              "kkt": 4.029098307318469e-17,
+              "condition": 75470.96849576
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5685,
+            "first_score_dependency": 5686,
+            "parent": {
+              "rows": 5494,
+              "parameters": 43,
+              "kkt": 2.9127428059985454e-17,
+              "condition": 91209.16961318247
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 8,
+          "window": 256,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "source": "runs/transport/CZ_Rod2/D8/full/FROZEN.json",
+      "status": "COMPLETED",
+      "job": {
+        "runtime": "transport",
+        "entity": "CZ_Rod2",
+        "delay": 8,
+        "variant": "full"
+      },
+      "model_sha256": "aafe735f3d24e01b47cae481d9043e6d900148dad7b9ab027c2c5e5e87f2ec63",
+      "ledger_sha256": "8857761d53347e0549fbd622704fe33435bd0bf0f113f4d9152bfb7d777dba9e",
+      "seconds": 93.62859940994531,
+      "ridge_fits": 235,
+      "selection_MSE": 0.0002397473582682041,
+      "KCW": {
+        "config": {
+          "kind": "LINEAR",
+          "alpha": 1.0,
+          "own": true,
+          "memory": true
+        },
+        "mode": "identity",
+        "status": "AVAILABLE",
+        "MSE": 0.0003655429083399714,
+        "proof": [
+          {
+            "last_fit_label": 4688,
+            "first_score_dependency": 4689,
+            "parent": {
+              "rows": 4497,
+              "parameters": 43,
+              "kkt": 4.755494088511912e-17,
+              "condition": 75408.35761447792
+            },
+            "W": null,
+            "W_CF": []
+          },
+          {
+            "last_fit_label": 5681,
+            "first_score_dependency": 5682,
+            "parent": {
+              "rows": 5490,
+              "parameters": 43,
+              "kkt": 1.514760629676237e-17,
+              "condition": 91182.37038178918
+            },
+            "W": null,
+            "W_CF": []
+          }
+        ]
+      },
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 8,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "development_read": false
+    }
+  ]
+}

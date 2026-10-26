@@ -1,0 +1,815 @@
+{
+  "status": "COMPLETED",
+  "effects": [
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_KC",
+      "skip": 0,
+      "increase_percent": 22.08172482615316,
+      "CI95": [
+        12.733848894897623,
+        61.493286750123
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_KC",
+      "skip": 35,
+      "increase_percent": 22.117247762862213,
+      "CI95": [
+        11.965343759782996,
+        61.8641738930998
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_W",
+      "skip": 0,
+      "increase_percent": -1.1495964411380122,
+      "CI95": [
+        -5.87752914720572,
+        19.927253878029713
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_W",
+      "skip": 35,
+      "increase_percent": -1.3276845105687052,
+      "CI95": [
+        -6.372278394104342,
+        19.707304605488723
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_A",
+      "skip": 0,
+      "increase_percent": -12.770439796629496,
+      "CI95": [
+        -21.350062428269016,
+        20.46750519410249
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_A",
+      "skip": 35,
+      "increase_percent": -12.821544746275993,
+      "CI95": [
+        -22.095951759012525,
+        20.801189461634
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_KC",
+      "skip": 0,
+      "increase_percent": 94.84309325910824,
+      "CI95": [
+        51.62165565076055,
+        107.51958291990096
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_KC",
+      "skip": 39,
+      "increase_percent": 95.23917981476151,
+      "CI95": [
+        51.467894445374036,
+        108.17733089666778
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_W",
+      "skip": 0,
+      "increase_percent": 46.43862347919274,
+      "CI95": [
+        21.850702175966674,
+        59.98524149038277
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_W",
+      "skip": 39,
+      "increase_percent": 45.82546786144937,
+      "CI95": [
+        19.817422705854618,
+        59.180442482925486
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_A",
+      "skip": 0,
+      "increase_percent": 19.921637599037002,
+      "CI95": [
+        1.8183458185749009,
+        25.00603007210222
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_A",
+      "skip": 39,
+      "increase_percent": 20.07925541595641,
+      "CI95": [
+        1.888757331943337,
+        25.097733119122456
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_KC",
+      "skip": 0,
+      "increase_percent": 85.23114387876531,
+      "CI95": [
+        60.69994197352015,
+        100.02700085405586
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_KC",
+      "skip": 47,
+      "increase_percent": 85.35344098794148,
+      "CI95": [
+        61.47877435832525,
+        99.7751527588681
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_W",
+      "skip": 0,
+      "increase_percent": 94.51215987286443,
+      "CI95": [
+        38.0435571973585,
+        125.32715122856169
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_W",
+      "skip": 47,
+      "increase_percent": 94.37703079661917,
+      "CI95": [
+        34.83017484341052,
+        124.99210857788961
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_A",
+      "skip": 0,
+      "increase_percent": 4.332232690635229,
+      "CI95": [
+        -6.612273857318576,
+        13.800247982204297
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_A",
+      "skip": 47,
+      "increase_percent": 4.380919195152422,
+      "CI95": [
+        -6.712135045494623,
+        15.054604019511348
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_KC",
+      "skip": 0,
+      "increase_percent": 57.71374729722674,
+      "CI95": [
+        31.298607006316967,
+        70.86400642584438
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_KC",
+      "skip": 35,
+      "increase_percent": 57.970575214778755,
+      "CI95": [
+        31.943675868870724,
+        71.84764891472517
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_W",
+      "skip": 0,
+      "increase_percent": 30.205749142214543,
+      "CI95": [
+        12.080011173971501,
+        35.683658192418164
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_W",
+      "skip": 35,
+      "increase_percent": 30.158436721492833,
+      "CI95": [
+        11.228936047377326,
+        35.87507733160763
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_A",
+      "skip": 0,
+      "increase_percent": 13.68504933951633,
+      "CI95": [
+        1.4570244640923693,
+        24.327785572317545
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_A",
+      "skip": 35,
+      "increase_percent": 13.773161803382038,
+      "CI95": [
+        1.0600860319671297,
+        24.56928763281631
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_KC",
+      "skip": 0,
+      "increase_percent": 95.91468011670004,
+      "CI95": [
+        51.16698561348836,
+        108.58100778078294
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_KC",
+      "skip": 39,
+      "increase_percent": 96.32190941970632,
+      "CI95": [
+        51.27727740790499,
+        109.22013546906389
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_W",
+      "skip": 0,
+      "increase_percent": 57.64086130847734,
+      "CI95": [
+        31.960286053687337,
+        75.57508182102934
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_W",
+      "skip": 39,
+      "increase_percent": 56.85127185947216,
+      "CI95": [
+        29.490551894456626,
+        75.53756943148164
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_A",
+      "skip": 0,
+      "increase_percent": 20.581175736327427,
+      "CI95": [
+        1.5705429254390053,
+        26.1785909799716
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_A",
+      "skip": 39,
+      "increase_percent": 20.745173828961107,
+      "CI95": [
+        1.5945966266547624,
+        26.280309550067713
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_KC",
+      "skip": 0,
+      "increase_percent": 98.81900690843996,
+      "CI95": [
+        62.58193289240401,
+        108.84634347128197
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_KC",
+      "skip": 47,
+      "increase_percent": 99.06922667893102,
+      "CI95": [
+        62.27360618017367,
+        109.15282806840422
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_W",
+      "skip": 0,
+      "increase_percent": 58.93342132514625,
+      "CI95": [
+        44.456197692323,
+        73.55865860581423
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_W",
+      "skip": 47,
+      "increase_percent": 58.708898154198444,
+      "CI95": [
+        43.86170364104832,
+        73.52382764266227
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_A",
+      "skip": 0,
+      "increase_percent": 11.087101694627076,
+      "CI95": [
+        -0.9085009904631252,
+        18.214065711513356
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_A",
+      "skip": 47,
+      "increase_percent": 11.199350815137809,
+      "CI95": [
+        -1.1424349642629354,
+        18.564882181120712
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_KC",
+      "skip": 0,
+      "increase_percent": 36.04173330629084,
+      "CI95": [
+        26.317343621222655,
+        66.7080132602863
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_KC",
+      "skip": 35,
+      "increase_percent": 36.21592471581812,
+      "CI95": [
+        25.414036354002473,
+        67.15914292816342
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_W",
+      "skip": 0,
+      "increase_percent": 36.04173330629084,
+      "CI95": [
+        26.317343621222655,
+        66.7080132602863
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_W",
+      "skip": 35,
+      "increase_percent": 36.21592471581812,
+      "CI95": [
+        25.414036354002473,
+        67.15914292816342
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_A",
+      "skip": 0,
+      "increase_percent": 1.0764225084559431,
+      "CI95": [
+        -5.7170159510028835,
+        20.567219833817997
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "control": "no_A",
+      "skip": 35,
+      "increase_percent": 1.083834272458728,
+      "CI95": [
+        -6.9455243627303265,
+        20.31935627117762
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_KC",
+      "skip": 0,
+      "increase_percent": 105.63700773807172,
+      "CI95": [
+        50.793460605216644,
+        122.19024952728604
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_KC",
+      "skip": 39,
+      "increase_percent": 106.16490161730306,
+      "CI95": [
+        50.418794676112064,
+        123.13626764301465
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_W",
+      "skip": 0,
+      "increase_percent": 65.4638386333174,
+      "CI95": [
+        32.03257221985917,
+        86.42257747318928
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_W",
+      "skip": 39,
+      "increase_percent": 64.71532457605058,
+      "CI95": [
+        28.791987397454,
+        85.58710695917507
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_A",
+      "skip": 0,
+      "increase_percent": 30.766184617579363,
+      "CI95": [
+        3.5715355720210784,
+        39.17299853713118
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "control": "no_A",
+      "skip": 39,
+      "increase_percent": 31.02432954064738,
+      "CI95": [
+        3.4556412923133806,
+        39.432761389216054
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_KC",
+      "skip": 0,
+      "increase_percent": 48.47682986295418,
+      "CI95": [
+        21.084234139361815,
+        114.09995731614977
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_KC",
+      "skip": 47,
+      "increase_percent": 48.37563577674751,
+      "CI95": [
+        21.443947903202016,
+        115.79784148163155
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_W",
+      "skip": 0,
+      "increase_percent": 18.69051618640396,
+      "CI95": [
+        -7.038782790338631,
+        83.2096005938753
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_W",
+      "skip": 47,
+      "increase_percent": 18.293189057475658,
+      "CI95": [
+        -6.413090911430712,
+        83.51258107141749
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_A",
+      "skip": 0,
+      "increase_percent": -14.642834188621734,
+      "CI95": [
+        -35.63966617136988,
+        28.234145622729283
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "control": "no_A",
+      "skip": 47,
+      "increase_percent": -14.722050286529376,
+      "CI95": [
+        -35.543837145504504,
+        34.76444429886619
+      ],
+      "block": 192,
+      "bootstrap": 2500,
+      "role": "adaptive-development descriptive interval, not search adjusted"
+    }
+  ]
+}

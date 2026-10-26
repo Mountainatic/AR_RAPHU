@@ -1,0 +1,1840 @@
+{
+  "status": "COMPLETED",
+  "metrics": [
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 8,
+      "variant": "full",
+      "RMSE": 0.014393127759415415,
+      "MAE": 0.011207095896986144,
+      "n": 4021,
+      "model_sha256": "3b5b330b824671cf293b5768bd712dd1f5b2517a15512b85ffaee8e34f211f5c",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/CZ_Rod1/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 8,
+      "variant": "no_A",
+      "RMSE": 0.017098404352446278,
+      "MAE": 0.013542628804863156,
+      "n": 4021,
+      "model_sha256": "cf3e2a20c9fa00546eaa9d96c3fc8c367b4b4ffae1993addc5b0b8618324cefe",
+      "source_model": "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D4/L8/no_A.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.02102527582053778,
+      "MAE": 0.015858408817701918,
+      "n": 4021,
+      "model_sha256": "4755de73af58c0efe59641d3da2a5b5f884df61e7f58d92da73dcf3bde445b89",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/CZ_Rod1/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_A",
+      "RMSE": 0.02572435304319588,
+      "MAE": 0.0202224781909484,
+      "n": 4021,
+      "model_sha256": "594086adeb6b08e8d2bc7444c28cb36e7a05b5fe8297b3c97900ddcdf414893a",
+      "source_model": "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D8/L16/no_A.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 32,
+      "variant": "full",
+      "RMSE": 0.03313657042105275,
+      "MAE": 0.023491819689502074,
+      "n": 4021,
+      "model_sha256": "4da4e5cbadb97e9f6d5948a9bb46f74f76d2bf65433fdd007dd3ca4fc993cc7b",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/CZ_Rod1/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 32,
+      "variant": "no_A",
+      "RMSE": 0.040527491112440396,
+      "MAE": 0.03190733540121115,
+      "n": 4021,
+      "model_sha256": "264e128b5a12d4c80671dc3cbc6cb4f6f79e1b4ab47801aed7be9927050db5b3",
+      "source_model": "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D16/L32/no_A.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "window": 8,
+      "variant": "full",
+      "RMSE": 0.012078454803767418,
+      "MAE": 0.009008643937038414,
+      "n": 4125,
+      "model_sha256": "2635529782b116a7594126fb164f2097d209b170a98123c5abcb5bb16c4d60bd",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/CZ_Rod2/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "window": 8,
+      "variant": "full",
+      "RMSE": 0.01927423584539431,
+      "MAE": 0.011472364534555322,
+      "n": 4125,
+      "model_sha256": "114d5758a8fb2c4174cc2219b66a70215092c794943492b8f16ea6df597342c5",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/CZ_Rod2/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "window": 64,
+      "variant": "full",
+      "RMSE": 0.044680311450533305,
+      "MAE": 0.024567500238045232,
+      "n": 4125,
+      "model_sha256": "f998d85e1f2341c07af6d9d096730cc2a5c709e105c613deb09d64ffd41a1d71",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/CZ_Rod2/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "full",
+      "RMSE": 0.03179934406294511,
+      "MAE": 0.012737084106527533,
+      "n": 2016,
+      "model_sha256": "8877c457b43378a6cb978158a475df5205d2c5e8f212811ffc4d01de2835f9b6",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/SRU_H2S/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "no_KC",
+      "RMSE": 0.03882118771544632,
+      "MAE": 0.015398184895006706,
+      "n": 2016,
+      "model_sha256": "21e15b1898c26d66f22c103a06af1dbb6bb1500abcf73b9040c10c56b9149e3c",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/SRU_H2S/D4/no_KC/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 0.5,
+          "innovation_clip": 3.0
+        },
+        "admitted": false
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "no_W",
+      "RMSE": 0.03143377993529226,
+      "MAE": 0.014228977926076547,
+      "n": 2016,
+      "model_sha256": "a39d49db43e36e94ddc9f46cfa817162749ac3ee50c7d7aac84611435d68032a",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/SRU_H2S/D4/no_W/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "no_A",
+      "RMSE": 0.02773842797366363,
+      "MAE": 0.013580223856244055,
+      "n": 2016,
+      "model_sha256": "ce2d665ddaade5f9ec420228e174a81c758df3bbf709a310ba6b9aacda397ba4",
+      "source_model": "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D4/L8/no_A.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.024582184754415426,
+      "MAE": 0.014131719774540079,
+      "n": 2016,
+      "model_sha256": "8a77e89b9699ff2f3cec803dc13f78eb23d810648203832d203a17881384227e",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/SRU_H2S/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 0.5,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_KC",
+      "RMSE": 0.04789668916617193,
+      "MAE": 0.02294732367237807,
+      "n": 2016,
+      "model_sha256": "c54307538b98ee6824922ff8f0008338d884ce0b2ca4f7c62518419d67298a23",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/SRU_H2S/D8/no_KC/model.pkl",
+      "A": {
+        "selected": {
+          "family": "Q_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": false
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_W",
+      "RMSE": 0.035997812975477925,
+      "MAE": 0.017752750152072488,
+      "n": 2016,
+      "model_sha256": "006099dd11ac9fdf6df55615aab016a27aa2d86e0b813fdfbcf366c94b7056e9",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/SRU_H2S/D8/no_W/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC8_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_A",
+      "RMSE": 0.02947935851511579,
+      "MAE": 0.014973982721911035,
+      "n": 2016,
+      "model_sha256": "067784825a11c5ea585932e9a9c91b3a123e0b79686d1904824f14487460c6b1",
+      "source_model": "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D8/L16/no_A.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.028023936772907876,
+      "MAE": 0.01467884417151196,
+      "n": 2016,
+      "model_sha256": "ddd5f6f0d78b29bd849ce2c086582e9264cd441186bdb3c729158d4af49ceb80",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/SRU_H2S/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 0.5,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "no_KC",
+      "RMSE": 0.05190905864431921,
+      "MAE": 0.025482448564418208,
+      "n": 2016,
+      "model_sha256": "a7abf076e4f7a8c1b4b40b739f84ccd898ed27841bdcd360e78023fbf2980d75",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/SRU_H2S/D16/no_KC/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 0.5,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "no_W",
+      "RMSE": 0.054509964698389014,
+      "MAE": 0.02366816255847585,
+      "n": 2016,
+      "model_sha256": "964f239e36e30ab23340d7a5ca3d76cbdb93ad662e5e9cf6ffedcff774f50c71",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/robust/SRU_H2S/D16/no_W/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0,
+          "innovation_clip": 3.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "no_A",
+      "RMSE": 0.029237998922986737,
+      "MAE": 0.015145906974876512,
+      "n": 2016,
+      "model_sha256": "a83263a3eccaf490fbe35ffd0d83fc69ef8a3a05705846f8655d3bdc481e463d",
+      "source_model": "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D16/L16/no_A.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "full",
+      "RMSE": 0.0243993630955147,
+      "MAE": 0.012420925925022008,
+      "n": 2016,
+      "model_sha256": "4e5467835caa2e2ceb1a29311517f47866240416076b3fd0b6a8a0af97bf6568",
+      "source_model": "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D4/L8/full.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "no_KC",
+      "RMSE": 0.038481149854592854,
+      "MAE": 0.015320979329648104,
+      "n": 2016,
+      "model_sha256": "04e321ed92091d736597c87cf23e74b382254d0a3fc494b8122c8cabb254134a",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/standard/SRU_H2S/D4/no_KC/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "no_W",
+      "RMSE": 0.03176937350444395,
+      "MAE": 0.015243271137174212,
+      "n": 2016,
+      "model_sha256": "14df99592563d69d1f082127b2b142481174cc34f3d0078924132f0b28bf8c7d",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/standard/SRU_H2S/D4/no_W/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "no_A",
+      "RMSE": 0.02773842797366363,
+      "MAE": 0.013580223856244055,
+      "n": 2016,
+      "model_sha256": "ce2d665ddaade5f9ec420228e174a81c758df3bbf709a310ba6b9aacda397ba4",
+      "source_model": "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D4/L8/no_A.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.02444772854062872,
+      "MAE": 0.014196475387430687,
+      "n": 2016,
+      "model_sha256": "cd5e043cdb3f211617b78fd805c0f53d13413330ffc3babc515f8eadcae97fe6",
+      "source_model": "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D8/L16/full.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_KC",
+      "RMSE": 0.04789668916617193,
+      "MAE": 0.02294732367237807,
+      "n": 2016,
+      "model_sha256": "d4399c1471ec418a50f25f5a83b94572eca9c8af337ed2824923d946cf53f0a2",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/standard/SRU_H2S/D8/no_KC/model.pkl",
+      "A": {
+        "selected": {
+          "family": "Q_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": false
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_W",
+      "RMSE": 0.03853960984180555,
+      "MAE": 0.019659451587988243,
+      "n": 2016,
+      "model_sha256": "82af66f782a2d11ffa28e9b9c3a3c5d9852cbd8fcfa9c4ca6255796938abcf26",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/standard/SRU_H2S/D8/no_W/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_A",
+      "RMSE": 0.02947935851511579,
+      "MAE": 0.014973982721911035,
+      "n": 2016,
+      "model_sha256": "067784825a11c5ea585932e9a9c91b3a123e0b79686d1904824f14487460c6b1",
+      "source_model": "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D8/L16/no_A.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.026319886356708216,
+      "MAE": 0.014591363158486376,
+      "n": 2016,
+      "model_sha256": "27201cf5a558c1f17faeff46310c046d57ec0caa388c38529a9f86e7b46df14d",
+      "source_model": "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D16/L16/full.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "no_KC",
+      "RMSE": 0.052328936673837256,
+      "MAE": 0.0258471367621332,
+      "n": 2016,
+      "model_sha256": "55616cf87bb5ab3bf8959e3334578f1ab38d0fc63cb59a54159a941f84134fc0",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/standard/SRU_H2S/D16/no_KC/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "no_W",
+      "RMSE": 0.04183109587560675,
+      "MAE": 0.02392945952637765,
+      "n": 2016,
+      "model_sha256": "0b3924cbbbfbea398df7564ee0a85b8f069835e709cf06b9d613009d6ee31cc8",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_OPTIMIZATION_20261026/runs/standard/SRU_H2S/D16/no_W/model.pkl",
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 2,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_OPTIMIZATION_20261026",
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "no_A",
+      "RMSE": 0.029237998922986737,
+      "MAE": 0.015145906974876512,
+      "n": 2016,
+      "model_sha256": "a83263a3eccaf490fbe35ffd0d83fc69ef8a3a05705846f8655d3bdc481e463d",
+      "source_model": "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D16/L16/no_A.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 8,
+      "variant": "full",
+      "RMSE": 0.013809797430376703,
+      "MAE": 0.010504066434822218,
+      "n": 4021,
+      "model_sha256": "08b59855192d35e1863eaf25d4590c50807a65590676dab7fff3aa130c1fdba0",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/CZ_Rod1/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 8,
+      "variant": "no_A",
+      "RMSE": 0.017098404352446278,
+      "MAE": 0.013542628804863156,
+      "n": 4021,
+      "model_sha256": "173ecb5253974181f18726ec49c815431c41c53255d68484d6b7672108a929bc",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/CZ_Rod1/D4/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.02102527582053778,
+      "MAE": 0.015858408817701918,
+      "n": 4021,
+      "model_sha256": "0a06ffc2ab9fd0cb91de8f5d1810fbef899db6ee6caa595f0c330b4518c92819",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/CZ_Rod1/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_A",
+      "RMSE": 0.02572435304319588,
+      "MAE": 0.0202224781909484,
+      "n": 4021,
+      "model_sha256": "358a9b38950b7511589cc3dd258960ec38a103c2fce5696d6103d88d2c792d7c",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/CZ_Rod1/D8/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 32,
+      "variant": "full",
+      "RMSE": 0.03313657042105275,
+      "MAE": 0.023491819689502074,
+      "n": 4021,
+      "model_sha256": "cc74b209b665d04f44fa03c431e4bc771a1f29cc53d641900b46f737d2270694",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/CZ_Rod1/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 32,
+      "variant": "no_A",
+      "RMSE": 0.040527491112440396,
+      "MAE": 0.03190733540121115,
+      "n": 4021,
+      "model_sha256": "0ab4916cf43d36909c14e1317324aa4f24ad94dd87525e3cda4d58400ea5f8a7",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/CZ_Rod1/D16/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "window": 8,
+      "variant": "full",
+      "RMSE": 0.01259916771192672,
+      "MAE": 0.009138202913457587,
+      "n": 4125,
+      "model_sha256": "086f11f68efbda3ab52c2f2b43e30b19f7a54ae321a922fbadd1d671ca166e38",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/CZ_Rod2/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "window": 8,
+      "variant": "full",
+      "RMSE": 0.020120865811628273,
+      "MAE": 0.011588405841945724,
+      "n": 4125,
+      "model_sha256": "1954dbdf8630c4533eeac861758cd1912b3704546a1097cde526a43be6e0bc45",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/CZ_Rod2/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "window": 64,
+      "variant": "full",
+      "RMSE": 0.06829278129502206,
+      "MAE": 0.02449865158552207,
+      "n": 4125,
+      "model_sha256": "4712fa9cdadc9f2d3229101679267c1f8a565f223982656e767eb970dac71a6e",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/CZ_Rod2/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 0,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "full",
+      "RMSE": 0.028286283127512468,
+      "MAE": 0.012598471857992871,
+      "n": 2016,
+      "model_sha256": "2a9bfab6fff935efd594479a5581d8009e0b154ea9ba448f82c94e8b774c8776",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "no_KC",
+      "RMSE": 0.038481149854592854,
+      "MAE": 0.015320979329648104,
+      "n": 2016,
+      "model_sha256": "1ac5e44dcb592e3293ca5fb28b2bad0426ea0932328b12db8b8bbd0ee241d491",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D4/no_KC/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "no_W",
+      "RMSE": 0.038481149854592854,
+      "MAE": 0.015320979329648104,
+      "n": 2016,
+      "model_sha256": "d76371606b19484b84d53007e99b3b53eb9040098798269daf81a7bf219c3bed",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D4/no_W/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "window": 8,
+      "variant": "no_A",
+      "RMSE": 0.02859076304590259,
+      "MAE": 0.013178833090113163,
+      "n": 2016,
+      "model_sha256": "0ff9ff65754ced14d87f4741fc6b0f0c6ff4d5a28c3887a5a7767239bd6c1a88",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D4/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.023291862536329016,
+      "MAE": 0.013848173963661115,
+      "n": 2016,
+      "model_sha256": "31e0db3aa81227399f148d7ca6be64dabf3b5295bd831c71db7cae0db1462a6a",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_KC",
+      "RMSE": 0.04789668916617193,
+      "MAE": 0.02294732367237807,
+      "n": 2016,
+      "model_sha256": "21546003d0505f00e24b8cd93e8b8ecce1a37096cc20c868b11eb20709895352",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D8/no_KC/model.pkl",
+      "A": {
+        "selected": {
+          "family": "Q_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": false
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_W",
+      "RMSE": 0.03853960984180555,
+      "MAE": 0.019659451587988243,
+      "n": 2016,
+      "model_sha256": "775929b3825522ee02cd332f14f1188841294c49680e90fd8a20d26183959e35",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D8/no_W/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_A",
+      "RMSE": 0.030457879965128803,
+      "MAE": 0.015051225357217285,
+      "n": 2016,
+      "model_sha256": "56bd8efd70c3b7aadc9d9f14be29ecd19ab39930a633cbcdff1c7662489a19f5",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D8/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.03524384021543123,
+      "MAE": 0.015612172109976395,
+      "n": 2016,
+      "model_sha256": "674c900b5993314fdb0fc7e9ea898b459a911123a1547f61bff4962105c245de",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "no_KC",
+      "RMSE": 0.052328936673837256,
+      "MAE": 0.0258471367621332,
+      "n": 2016,
+      "model_sha256": "ff9562f7b14d59c56a6a4d46a739d86f84236bc0b78f3f427c5a8002492e9a69",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D16/no_KC/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 0.5
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "no_W",
+      "RMSE": 0.04183109587560675,
+      "MAE": 0.02392945952637765,
+      "n": 2016,
+      "model_sha256": "e94ccf4c4c18257389e3fafb62fed0c5017eea446ca3d25468684d59b9c5e95c",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D16/no_W/model.pkl",
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 2,
+          "window": 512,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_PAPER_SPLINE_REPAIR_20261026",
+      "runtime": "repaired",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "window": 16,
+      "variant": "no_A",
+      "RMSE": 0.03008314313098285,
+      "MAE": 0.015213769213431204,
+      "n": 2016,
+      "model_sha256": "af3c9210fb389a9b771b3385001e5de4e3d2f8bb8ebff09c80f134c91a365c7a",
+      "source_model": "/root/autodl-tmp/PRISM_PAPER_SPLINE_REPAIR_20261026/runs/repaired/SRU_H2S/D16/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.016020752608141522,
+      "MAE": 0.011805327400368144,
+      "n": 4021,
+      "model_sha256": "351f88d9317b66b3cab1e10a265a818506ced542226e39b21d0d9390e6af2f4b",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD8_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 128,
+      "variant": "no_A",
+      "RMSE": 0.01730178801304751,
+      "MAE": 0.013811319169905226,
+      "n": 4021,
+      "model_sha256": "0f6e19c9e7aabbdac7e2b8a93c39f2bb847b5903be68eb5652ac30ada4044ea1",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D4/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.02340394786284364,
+      "MAE": 0.017589494675931926,
+      "n": 4021,
+      "model_sha256": "cbaf0940847d69a8f1bd93239bfe77ec9caa7bd6a62bd11acfa9f93c1b7157ea",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 128,
+      "variant": "no_A",
+      "RMSE": 0.026109814736090805,
+      "MAE": 0.020628692995492873,
+      "n": 4021,
+      "model_sha256": "6657b86eb01eb67b3ae97b5eff2683a88ca26168b6ce1f01b6a3d392b3cf31c2",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D8/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.034440534386261205,
+      "MAE": 0.025398433206850167,
+      "n": 4021,
+      "model_sha256": "b2c1a46f1ee15ed338e8738faa867b411ba10a8e62761a3ec908e11dcfcf9f50",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 128,
+      "variant": "no_A",
+      "RMSE": 0.040614939181896875,
+      "MAE": 0.03195918761649855,
+      "n": 4021,
+      "model_sha256": "38d252f88f29704b549e8741937470534f7ddd7546507e7ada20b133050889c2",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D16/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E128",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.020023752418084403,
+      "MAE": 0.010529284248703237,
+      "n": 4125,
+      "model_sha256": "654b5eb0d0510c421d9a0da276ed8ec2d49376765dd4faac8921b0e0f537adaf",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod2/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 8,
+          "window": 256,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E128",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.03998093011369684,
+      "MAE": 0.015074856534762024,
+      "n": 4125,
+      "model_sha256": "0aa8a9e42e8c52c8c20a6b3967fc7ea5a998db501eec96c8e0bc2b6cd8499113",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod2/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 8,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E128",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.450672210605936,
+      "MAE": 0.0621759796142544,
+      "n": 4125,
+      "model_sha256": "4bbed9cf96e52a7614ed63dd1346a5142fcda4bd20ab28899a30712088d9fe5e",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod2/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.015869390174017728,
+      "MAE": 0.01134865961375593,
+      "n": 4021,
+      "model_sha256": "0677b0738237804516b7398660ea55c5bc2f8798e43c4676c906674e2411585c",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E16/CZ_Rod1/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD8_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 16,
+      "variant": "no_A",
+      "RMSE": 0.017044721887669454,
+      "MAE": 0.013519202237461631,
+      "n": 4021,
+      "model_sha256": "01f4c0b121ae020d72c640901f6c8ad3f96ce906fef29426cff4771661790aab",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E16/CZ_Rod1/D4/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.02194164539396297,
+      "MAE": 0.016678242096402285,
+      "n": 4021,
+      "model_sha256": "5339b65c33c9f70574351b238f790c016fe8ff7550157cf76d2b7a648999af3e",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E16/CZ_Rod1/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 16,
+      "variant": "no_A",
+      "RMSE": 0.02572435304319588,
+      "MAE": 0.0202224781909484,
+      "n": 4021,
+      "model_sha256": "e2fbd546bd2a3319a3696ee939649d475847d4b6d395cc4c49cb91bc6e9ac5ab",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E16/CZ_Rod1/D8/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.03719632249929606,
+      "MAE": 0.02784335627440703,
+      "n": 4021,
+      "model_sha256": "f9b9dd3010d4f02624ac78d5ecc2017259de042b97b952dec8d41b985dab26d7",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E16/CZ_Rod1/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 16,
+      "variant": "no_A",
+      "RMSE": 0.039551484137798375,
+      "MAE": 0.031219942544598443,
+      "n": 4021,
+      "model_sha256": "b73fd0233be7c277ee96683cdcbacfab55d424e64118b10d7961588ceaade042",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E16/CZ_Rod1/D16/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E16",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.015531088973623994,
+      "MAE": 0.009923264694157573,
+      "n": 4125,
+      "model_sha256": "4719e3b3c31dfb98bbd5508484b00f4ada25209543f3d5985e6e374522121c60",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E16/CZ_Rod2/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E16",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.01968863078416949,
+      "MAE": 0.011727433640540725,
+      "n": 4125,
+      "model_sha256": "0069f2a45f1107d7511a2405296bbb0920a1cc6e23287fb619f0e82dfc37cb93",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E16/CZ_Rod2/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "E16",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "window": 16,
+      "variant": "full",
+      "RMSE": 0.0625831703818398,
+      "MAE": 0.021918648739270144,
+      "n": 4125,
+      "model_sha256": "7f79ef4e801dd4a408418044ec7200a1c8291b157920504159be2cb7ce243969",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E16/CZ_Rod2/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.020563080966460544,
+      "MAE": 0.013834135005247623,
+      "n": 4021,
+      "model_sha256": "bf0f97a85846b9af2127ec734d50e3fc45da1baba9371118750d91e90bc62b45",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/fixed128/CZ_Rod1/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 128,
+      "variant": "no_A",
+      "RMSE": 0.01730178801304751,
+      "MAE": 0.013811319169905226,
+      "n": 4021,
+      "model_sha256": "7743039a107dce7bc468d9b0da6623c0bde0fad945237355faa264eddb1d00b8",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/fixed128/CZ_Rod1/D4/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.03365634698106992,
+      "MAE": 0.02001520802317588,
+      "n": 4021,
+      "model_sha256": "97ef1b02517dcc86a5cb0c7d8a81e1b850d4c143f10ae3444f294087b1c7e9d6",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/fixed128/CZ_Rod1/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 128,
+      "variant": "no_A",
+      "RMSE": 0.026109814736090805,
+      "MAE": 0.020628692995492873,
+      "n": 4021,
+      "model_sha256": "f9a22724ec4b3ae12d7dc49ff916ecc56ba7bacb8428ba7aac91f4a403c51bb0",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/fixed128/CZ_Rod1/D8/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.0329377673913346,
+      "MAE": 0.02409335766333045,
+      "n": 4021,
+      "model_sha256": "032ed82b5fdbe652c2aca6568614bf428a94b11ebca135f2fae3ba2afc6cb08d",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/fixed128/CZ_Rod1/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 128,
+      "variant": "no_A",
+      "RMSE": 0.040614939181896875,
+      "MAE": 0.03195918761649855,
+      "n": 4021,
+      "model_sha256": "1b8247743665ea7c0715923b470f380cc36e23b4ffdd8b43c8eb3ed2af8b8390",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/fixed128/CZ_Rod1/D16/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "fixed128",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.018271319877749704,
+      "MAE": 0.011813496349952856,
+      "n": 4125,
+      "model_sha256": "55ce40d093abfbcca0ff0b70fb7a71642da27a8e24f97a982c397a1f900a6e71",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/fixed128/CZ_Rod2/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "fixed128",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.032536179645357426,
+      "MAE": 0.015478946058825303,
+      "n": 4125,
+      "model_sha256": "40813b45d1eed1d98bbd9b12dc2439338590760840d1847267966e5bcf718d9d",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/fixed128/CZ_Rod2/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_20261026",
+      "runtime": "fixed128",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.05430956768973334,
+      "MAE": 0.01975759248436141,
+      "n": 4125,
+      "model_sha256": "ff9a966751cf0190429fc0404e5b2d4b2b5d685ec293d5c5e0c640613502c9b7",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/fixed128/CZ_Rod2/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "runtime": "transport",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.016020752608141522,
+      "MAE": 0.011805327400368144,
+      "n": 4021,
+      "model_sha256": "42f1bed3cc22fc75668d2b0d9efb59321f6b56fc81a11a4c2f64dcc6d7c1c426",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_TRANSPORT_20261026/runs/transport/CZ_Rod1/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QD8_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "runtime": "transport",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 128,
+      "variant": "no_A",
+      "RMSE": 0.01730178801304751,
+      "MAE": 0.013811319169905226,
+      "n": 4021,
+      "model_sha256": "0f6e19c9e7aabbdac7e2b8a93c39f2bb847b5903be68eb5652ac30ada4044ea1",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D4/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "runtime": "transport",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.02340394786284364,
+      "MAE": 0.017589494675931926,
+      "n": 4021,
+      "model_sha256": "5802dbe75cdd5dccce1c47746943355e9ec6c31a18c1c9e1e9166e717d36febf",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_TRANSPORT_20261026/runs/transport/CZ_Rod1/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "runtime": "transport",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 128,
+      "variant": "no_A",
+      "RMSE": 0.026109814736090805,
+      "MAE": 0.020628692995492873,
+      "n": 4021,
+      "model_sha256": "6657b86eb01eb67b3ae97b5eff2683a88ca26168b6ce1f01b6a3d392b3cf31c2",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D8/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "runtime": "transport",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.034440534386261205,
+      "MAE": 0.025398433206850167,
+      "n": 4021,
+      "model_sha256": "f4f78997f844d83195f1287d6bcc49bcec3d29f2f8f7bbe6784a772d0b22546e",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_TRANSPORT_20261026/runs/transport/CZ_Rod1/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "runtime": "transport",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 128,
+      "variant": "no_A",
+      "RMSE": 0.040614939181896875,
+      "MAE": 0.03195918761649855,
+      "n": 4021,
+      "model_sha256": "38d252f88f29704b549e8741937470534f7ddd7546507e7ada20b133050889c2",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D16/no_A/model.pkl",
+      "A": null
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "runtime": "transport",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.020023752418084403,
+      "MAE": 0.010529284248703237,
+      "n": 4125,
+      "model_sha256": "f670a415929db7c474821ec11d3fc0962c2f6df5bf3e1bb618452cff2f508586",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_TRANSPORT_20261026/runs/transport/CZ_Rod2/D4/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 8,
+          "window": 256,
+          "forget": 0.999,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "runtime": "transport",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.03998093011369684,
+      "MAE": 0.015074856534762024,
+      "n": 4125,
+      "model_sha256": "aafe735f3d24e01b47cae481d9043e6d900148dad7b9ab027c2c5e5e87f2ec63",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_TRANSPORT_20261026/runs/transport/CZ_Rod2/D8/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "RLS",
+          "p": 8,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    },
+    {
+      "experiment": "PRISM_CZ_E128_TRANSPORT_20261026",
+      "runtime": "transport",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "window": 128,
+      "variant": "full",
+      "RMSE": 0.450672210605936,
+      "MAE": 0.0621759796142544,
+      "n": 4125,
+      "model_sha256": "9f17ce20200ece8ceab9a8756f8ec3915e4f3d9b5dfef6f83d0dafb7804a5103",
+      "source_model": "/root/autodl-tmp/PRISM_CZ_E128_TRANSPORT_20261026/runs/transport/CZ_Rod2/D16/full/model.pkl",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 512,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      }
+    }
+  ]
+}

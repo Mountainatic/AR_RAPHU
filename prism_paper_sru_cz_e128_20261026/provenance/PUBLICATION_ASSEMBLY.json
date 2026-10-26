@@ -1,0 +1,15 @@
+{
+  "status": "COMPLETED",
+  "original_registered_code_hashes_checked": 47,
+  "published_model_metric_rows": 90,
+  "frozen_receipts_included": 75,
+  "new_attribution_heads": 7,
+  "new_Rod1_ablation_rows": 12,
+  "source_models_untouched": true,
+  "raw_data_included": false,
+  "fitted_weights_included": false,
+  "reserved_tail_read": false,
+  "original_results_root": "outputs/paper_optimization_20261026/server_bundle",
+  "base_repository": "Mountainatic/AR_RAPHU",
+  "base_commit": "44ae45fe342c17fa2d76216f76fbbb8c12001877"
+}

@@ -1,0 +1,639 @@
+{
+  "status": "COMPLETED",
+  "records": [
+    {
+      "delay": 4,
+      "baseline": "V9_prior_Persistence",
+      "RMSE": 0.04424099849076601,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 36.06319004437392
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_OWN",
+      "RMSE": 0.038611188548685005,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 26.740708611323427
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_ARX",
+      "RMSE": 0.029171757423672846,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 3.0353820762331507
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_WARX",
+      "RMSE": 0.028223341322977994,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": -0.22301329886560417
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_HGB",
+      "RMSE": 0.0666963885151439,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 57.58948309309152
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_SVR",
+      "RMSE": 0.05783956329621016,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 51.09526850565644
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_ONLINE_ARX",
+      "RMSE": 0.03648247772547288,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 22.466112799782913
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_OWN_AR128",
+      "RMSE": 0.03913822674654423,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 27.7272235385318
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_ARX148",
+      "RMSE": 0.029359233250689905,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 3.6545577127843565
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_WARX148",
+      "RMSE": 0.028187356060570795,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": -0.3509625618276946
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_ADAPTIVE_ARX",
+      "RMSE": 0.030913533389769578,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 8.498705822889086
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_ONLINE_ARX148",
+      "RMSE": 0.03161552141612171,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 10.530391843898423
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_ARX163",
+      "RMSE": 0.0298149478697754,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 5.127175633309089
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_WARX163",
+      "RMSE": 0.029068074388766248,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 2.689518579035677
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_HGB_LONG_MEMORY",
+      "RMSE": 0.11893205203010448,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 76.21643396823545
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_SVR_LONG_MEMORY",
+      "RMSE": 0.04477162546246404,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 36.82096007162544
+    },
+    {
+      "delay": 4,
+      "baseline": "V9_prior_ONLINE_ARX163",
+      "RMSE": 0.032014542283179764,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 11.645517598501165
+    },
+    {
+      "delay": 4,
+      "baseline": "V6_ADAPTIVE_ARX",
+      "RMSE": 0.027340220771337288,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": -3.460331809635586
+    },
+    {
+      "delay": 4,
+      "baseline": "V8_ADAPTIVE_ARX",
+      "RMSE": 0.03464413170547165,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 18.351877403107288
+    },
+    {
+      "delay": 4,
+      "baseline": "V10_ADAPTIVE_ARX",
+      "RMSE": 0.03388649595226708,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 16.526385120028753
+    },
+    {
+      "delay": 4,
+      "baseline": "matched_AR",
+      "RMSE": 0.03862276945980079,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 26.762675170268935
+    },
+    {
+      "delay": 4,
+      "baseline": "matched_ARX",
+      "RMSE": 0.028957162466255494,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 2.3167993049209135
+    },
+    {
+      "delay": 4,
+      "baseline": "matched_LSTM",
+      "RMSE": 0.06525508016506866,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 56.652749401334354
+    },
+    {
+      "delay": 4,
+      "baseline": "matched_Transformer",
+      "RMSE": 0.026819265798176235,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": -5.4700130136895675
+    },
+    {
+      "delay": 4,
+      "baseline": "matched_iTransformer",
+      "RMSE": 0.03875444600700792,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 27.01151469847487
+    },
+    {
+      "delay": 4,
+      "baseline": "matched_TimeXer",
+      "RMSE": 0.03876828214689498,
+      "repaired_RMSE": 0.028286283127512468,
+      "repaired_relative_reduction_pct": 27.03756379935972
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_Persistence",
+      "RMSE": 0.05720161525293679,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 59.281110448829175
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_OWN",
+      "RMSE": 0.047645249556162686,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 51.1139877463055
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_ARX",
+      "RMSE": 0.03232496370257144,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 27.944659889977974
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_WARX",
+      "RMSE": 0.030415115508483078,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 23.420108235878033
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_HGB",
+      "RMSE": 0.06827461266364328,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 65.88503159867489
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_SVR",
+      "RMSE": 0.09102021446856359,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 74.41023109830891
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_ONLINE_ARX",
+      "RMSE": 0.04942598334913942,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 52.87526730262907
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_OWN_AR128",
+      "RMSE": 0.04854675306391508,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 52.02179122944906
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_ARX148",
+      "RMSE": 0.03279109708191521,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 28.96894398457064
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_WARX148",
+      "RMSE": 0.03066975786267805,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 24.055929490487358
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_ADAPTIVE_ARX",
+      "RMSE": 0.030536110250889485,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 23.72354453478387
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_ONLINE_ARX148",
+      "RMSE": 0.03480897991066089,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 33.0866270826987
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_ARX163",
+      "RMSE": 0.033316102882740006,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 30.088274074829513
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_WARX163",
+      "RMSE": 0.03157088689598499,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 26.22360400242304
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_HGB_LONG_MEMORY",
+      "RMSE": 0.10733041080421037,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 78.298916065068
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_SVR_LONG_MEMORY",
+      "RMSE": 0.04642515377558437,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 49.829218339437084
+    },
+    {
+      "delay": 8,
+      "baseline": "V9_prior_ONLINE_ARX163",
+      "RMSE": 0.03527240773117621,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 33.965770882881785
+    },
+    {
+      "delay": 8,
+      "baseline": "V6_ADAPTIVE_ARX",
+      "RMSE": 0.029506168082807056,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 21.061038929345255
+    },
+    {
+      "delay": 8,
+      "baseline": "V8_ADAPTIVE_ARX",
+      "RMSE": 0.030536110250889485,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 23.72354453478387
+    },
+    {
+      "delay": 8,
+      "baseline": "V10_ADAPTIVE_ARX",
+      "RMSE": 0.030536110250889485,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 23.72354453478387
+    },
+    {
+      "delay": 8,
+      "baseline": "matched_AR",
+      "RMSE": 0.04781683483622793,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 51.28940964808031
+    },
+    {
+      "delay": 8,
+      "baseline": "matched_ARX",
+      "RMSE": 0.03222121424840998,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 27.712648080981616
+    },
+    {
+      "delay": 8,
+      "baseline": "matched_LSTM",
+      "RMSE": 0.06712232549569956,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 65.29938084785026
+    },
+    {
+      "delay": 8,
+      "baseline": "matched_Transformer",
+      "RMSE": 0.024906279223459872,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 6.481966546051543
+    },
+    {
+      "delay": 8,
+      "baseline": "matched_iTransformer",
+      "RMSE": 0.04809020352620461,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 51.56630492603935
+    },
+    {
+      "delay": 8,
+      "baseline": "matched_TimeXer",
+      "RMSE": 0.05186321807800522,
+      "repaired_RMSE": 0.023291862536329016,
+      "repaired_relative_reduction_pct": 55.089823964843966
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_Persistence",
+      "RMSE": 0.06400568843871168,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 44.93639381884192
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_OWN",
+      "RMSE": 0.050637945623983494,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 30.400335595884055
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_ARX",
+      "RMSE": 0.034679892222458326,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -1.6261526689742567
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_WARX",
+      "RMSE": 0.03265584503813022,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -7.925059585134497
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_HGB",
+      "RMSE": 0.0656263363936929,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 46.29619425347295
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_SVR",
+      "RMSE": 0.07767579852690144,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 54.62699980712109
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_ONLINE_ARX",
+      "RMSE": 0.03464919728384054,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -1.7161809744666412
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_OWN_AR128",
+      "RMSE": 0.051822675784589156,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 31.99146959927547
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_ARX148",
+      "RMSE": 0.035472985760908494,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 0.645971971521464
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_WARX148",
+      "RMSE": 0.03314110934800528,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -6.344781175988334
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_ADAPTIVE_ARX",
+      "RMSE": 0.031729457794142366,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -11.076087224968777
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_ONLINE_ARX148",
+      "RMSE": 0.03716355499179029,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 5.1655843386972595
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_ARX163",
+      "RMSE": 0.0344670300252939,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -2.2537775653059144
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_WARX163",
+      "RMSE": 0.03340056313006357,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -5.51870062247104
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_HGB_LONG_MEMORY",
+      "RMSE": 0.11033027377692325,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 68.05605659359574
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_SVR_LONG_MEMORY",
+      "RMSE": 0.050048454829849286,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 29.580562806083822
+    },
+    {
+      "delay": 16,
+      "baseline": "V9_prior_ONLINE_ARX163",
+      "RMSE": 0.03696709702708151,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 4.661596257850187
+    },
+    {
+      "delay": 16,
+      "baseline": "V6_ADAPTIVE_ARX",
+      "RMSE": 0.03219200733955081,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -9.480094992805753
+    },
+    {
+      "delay": 16,
+      "baseline": "V8_ADAPTIVE_ARX",
+      "RMSE": 0.022589524740674764,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -56.018511323397014
+    },
+    {
+      "delay": 16,
+      "baseline": "V10_ADAPTIVE_ARX",
+      "RMSE": 0.022589524740674764,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -56.018511323397014
+    },
+    {
+      "delay": 16,
+      "baseline": "matched_AR",
+      "RMSE": 0.05097041509542583,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 30.8543198060122
+    },
+    {
+      "delay": 16,
+      "baseline": "matched_ARX",
+      "RMSE": 0.032849210055165654,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -7.289764826137768
+    },
+    {
+      "delay": 16,
+      "baseline": "matched_LSTM",
+      "RMSE": 0.03615414352967037,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 2.517839520917131
+    },
+    {
+      "delay": 16,
+      "baseline": "matched_Transformer",
+      "RMSE": 0.02620405268762907,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": -34.49766963745206
+    },
+    {
+      "delay": 16,
+      "baseline": "matched_iTransformer",
+      "RMSE": 0.05195036135888643,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 32.15862355228343
+    },
+    {
+      "delay": 16,
+      "baseline": "matched_TimeXer",
+      "RMSE": 0.053757272856307776,
+      "repaired_RMSE": 0.03524384021543123,
+      "repaired_relative_reduction_pct": 34.4389357145453
+    }
+  ],
+  "best": [
+    {
+      "delay": 4,
+      "comparator": "matched_Transformer",
+      "all_available_count": 26,
+      "full_interval": {
+        "skip": 0,
+        "increase_percent": -5.186320601837391,
+        "CI95": [
+          -16.743512125528742,
+          33.372619023535954
+        ],
+        "block": 192,
+        "bootstrap": 2500,
+        "role": "adaptive-development descriptive interval, not search adjusted"
+      },
+      "startup_interval": {
+        "skip": 35,
+        "increase_percent": -5.016804310911372,
+        "CI95": [
+          -16.51878582167168,
+          34.027605162611565
+        ],
+        "block": 192,
+        "bootstrap": 2500,
+        "role": "adaptive-development descriptive interval, not search adjusted"
+      },
+      "purpose": "Descriptive comparison on reused development; no independent/search-adjusted significance"
+    },
+    {
+      "delay": 8,
+      "comparator": "matched_Transformer",
+      "all_available_count": 26,
+      "full_interval": {
+        "skip": 0,
+        "increase_percent": 6.931247703410581,
+        "CI95": [
+          -17.736115841265296,
+          18.60383068763459
+        ],
+        "block": 192,
+        "bootstrap": 2500,
+        "role": "adaptive-development descriptive interval, not search adjusted"
+      },
+      "startup_interval": {
+        "skip": 39,
+        "increase_percent": 7.186667651572498,
+        "CI95": [
+          -17.43285253527578,
+          19.014266942620335
+        ],
+        "block": 192,
+        "bootstrap": 2500,
+        "role": "adaptive-development descriptive interval, not search adjusted"
+      },
+      "purpose": "Descriptive comparison on reused development; no independent/search-adjusted significance"
+    },
+    {
+      "delay": 16,
+      "comparator": "V8_ADAPTIVE_ARX",
+      "all_available_count": 26,
+      "full_interval": {
+        "skip": 0,
+        "increase_percent": -35.905041554512195,
+        "CI95": [
+          -43.57982038639784,
+          -2.4450917521548132
+        ],
+        "block": 192,
+        "bootstrap": 2500,
+        "role": "adaptive-development descriptive interval, not search adjusted"
+      },
+      "startup_interval": {
+        "skip": 47,
+        "increase_percent": -36.66636997556954,
+        "CI95": [
+          -44.01239828219828,
+          -5.0598237791951615
+        ],
+        "block": 192,
+        "bootstrap": 2500,
+        "role": "adaptive-development descriptive interval, not search adjusted"
+      },
+      "purpose": "Descriptive comparison on reused development; no independent/search-adjusted significance"
+    }
+  ],
+  "reserved_tail_read": false,
+  "raw_workbook_read": false
+}

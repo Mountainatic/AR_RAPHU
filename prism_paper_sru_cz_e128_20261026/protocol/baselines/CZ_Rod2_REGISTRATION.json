@@ -1,0 +1,209 @@
+{
+  "status": "FROZEN_BEFORE_NEW_FITS",
+  "task": "CZ same-protocol replication of latest SRU baselines and train-selected PRISM windows",
+  "source_branch": "sru-conditional-feedback-a-20261023",
+  "source_commit": "9907723c3a3917a852c46fa0870cdf245f60f0a0",
+  "rod": "CZ_Rod2",
+  "geometry": {
+    "rod": "CZ_Rod2",
+    "train_end": 12376,
+    "development_end": 16501,
+    "total_rows": 20627,
+    "parent_end": 6810
+  },
+  "raw_train": [
+    0,
+    12376
+  ],
+  "development_targets": [
+    12376,
+    16501
+  ],
+  "reserved_tail": [
+    16501,
+    20627
+  ],
+  "label_delays": [
+    4,
+    8,
+    16
+  ],
+  "candidate_windows": [
+    8,
+    16,
+    32,
+    64,
+    128
+  ],
+  "baseline_direct_length": 128,
+  "availability": "Predict observed y(t), X through t and y through t-delay; delay is an experimental label-maturity assumption, not forecast horizon or certified sensor latency.",
+  "channels": [
+    "main_heater_power",
+    "crystal_lift",
+    "crucible_lift",
+    "crystal_rotation",
+    "crucible_rotation"
+  ],
+  "channel_selection": "Inherit existing native CZ five-process-channel cache; no PCA, interpolation, resampling or new variable screening. These columns exclude constant argon.",
+  "variants": [
+    "full",
+    "no_A"
+  ],
+  "unchanged_A_candidates": 273,
+  "PRISM_geometry": {
+    "parent_targets": [
+      192,
+      6810
+    ],
+    "calibration_start": "parent_end+128+2*delay",
+    "calibration_stop": "train_end-delay+1",
+    "common_support": "127+delay"
+  },
+  "PRISM_selection": "Original train-only KCW/A nested joint MSE; cross-window minimum, ties shorter; no_A independently selected. Fixed128 controls use same candidate fits.",
+  "baseline_selection": "Original purged forward70-85/85-100% training folds; dense AR/ARX128, alpha .01/1/100/1000/10000, level/delta; neural four configurations width32/64 level/delta, epochs80 patience12, seeds0/1/2 mean.",
+  "A": "Full online mature-feedback A retained, additional issued-q and residual/RLS history may exceed direct window.",
+  "scientific_support": "Original200-row/20-per-coefficient admission and FP64 numerical certificates unmodified.",
+  "retrospective": true,
+  "final_numeric_read": false,
+  "scope": "Same-rod development comparison on previously exposed data; not cross-rod generalization or new independent final test.",
+  "privacy": "Private raw caches, predictions and weights remain private; no GitHub upload authorized or performed.",
+  "metrics": [
+    "R2",
+    "RMSE",
+    "MAE",
+    "MAPE_pct",
+    "sMAPE_pct",
+    "WAPE_pct",
+    "bias"
+  ],
+  "mape": "Percent excluding abs(y)<=1e-8; count exclusions",
+  "runtime": {
+    "manager": "uv",
+    "gpu_workers": 2,
+    "neural_threads": 3,
+    "prism_workers": 3,
+    "prism_threads": 1,
+    "MPS": true
+  },
+  "source_cache": {
+    "train": {
+      "source": "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/private_data/CZ_Rod2/base_data/cz_czochralski/train.parquet",
+      "source_sha256": "1e1fdbd545482b639f73c2b8798e3e4510f7fcb6f7d1fd9c080f39fbe3d444c6",
+      "rows": 12376,
+      "columns": [
+        "diameter",
+        "main_heater_power",
+        "crystal_lift",
+        "crucible_lift",
+        "crystal_rotation",
+        "crucible_rotation"
+      ],
+      "export_sha256": "f5d63a87a7560405d94140f26f629d5c48ccfc83c1e6b50930f826d9ffce6613"
+    },
+    "development": {
+      "source": "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/private_data/CZ_Rod2/base_data/cz_czochralski/validation.parquet",
+      "source_sha256": "f6856ddc19e08a40594cc00854cc8755c8ee2d36cbc3bab0fd9a3976219bb3eb",
+      "rows": 4125,
+      "columns": [
+        "diameter",
+        "main_heater_power",
+        "crystal_lift",
+        "crucible_lift",
+        "crystal_rotation",
+        "crucible_rotation"
+      ],
+      "export_sha256": "b09b2da27fd62a5158b638d350deaae91606bd9510d61eddd9a08c3775d610c5"
+    }
+  },
+  "code_sha256": {
+    "baseline_models.py": "759c44313f5d88c9682984a7201a07f006532d826bdcaac9aebd2ebbfc0d541b",
+    "experiment.py": "f71a63cb8b8b62a554a0adef213f2af5030605f681b9c13102da69b386cca04f",
+    "prism/legacy.py": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043",
+    "prism/mature_a.py": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa",
+    "prism/model.py": "eec612d8cb7137cbdf676db5d2de61cfbb4fbfae2429aa9630865ad737ab300a",
+    "prism/rls_core.py": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe",
+    "prism_search.py": "035a9f649399e9b2965fe83e578ed0a596c2d6c03c14e0bd3e9b3304ed816b66",
+    "vendor/TimeXer/data_provider/__init__.py": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "vendor/TimeXer/data_provider/data_factory.py": "abe7b970967ed8c50208f39b5273fbd41b3b67a7ff81962923fc069ab31afe8f",
+    "vendor/TimeXer/data_provider/data_loader.py": "d97225d54cfb1c5a08b572e7a69053a52be208df3bf657b394b35f590f071a15",
+    "vendor/TimeXer/data_provider/m4.py": "6558b7bf479e2be239a34977fd35c5160809d6d18dbe9aa67ed4856f0ef66aae",
+    "vendor/TimeXer/data_provider/uea.py": "346752340c0182656207e822b8c83b101260c2be101d48c061eebadf02d564f3",
+    "vendor/TimeXer/exp/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "vendor/TimeXer/exp/exp_anomaly_detection.py": "a5cb4e0858dd69fe20ca0f9d405abd9bed9045a5f9c91845cc546a7ddc99f87f",
+    "vendor/TimeXer/exp/exp_basic.py": "d56de1ddaef097cfa8cf6991c1326a1cfdd60739990fe3469405c2d93de1cb3f",
+    "vendor/TimeXer/exp/exp_classification.py": "bdd50d45b724881b5f0101e8c9dce8b06d045e43e421e9da50d422a0c94903a5",
+    "vendor/TimeXer/exp/exp_imputation.py": "de739c0e143d2fc5d5b5c614082a9d4ba06288ae998a7d200e1a6bcadce7b882",
+    "vendor/TimeXer/exp/exp_long_term_forecasting.py": "e9e13a4abe188daf2258dd8958647953b0410b03c7f49a43515fb7ddf7d70fdd",
+    "vendor/TimeXer/exp/exp_short_term_forecasting.py": "6e85af30dc02515d0ffb65adfff9ee5b26b5b36bfe6a676a0604e790625e0477",
+    "vendor/TimeXer/layers/AutoCorrelation.py": "5c1064ff7a39d475f3a949bf1973d12176655cffc9469f1ce9940039e18f07cb",
+    "vendor/TimeXer/layers/Autoformer_EncDec.py": "f69c563c6f7a59ed77769fa26380b583fe63e17a8deb5ee6573a923cccc7d8e7",
+    "vendor/TimeXer/layers/Conv_Blocks.py": "3ef9f4dfd5ef52ee42c72c907b270d3a842fe6809b0c7efeee013c52769bdafc",
+    "vendor/TimeXer/layers/Crossformer_EncDec.py": "6b279d6a1996254839a570ba50695f8e31d1085639980328dbbb12bddb7bd054",
+    "vendor/TimeXer/layers/ETSformer_EncDec.py": "f68d8390bb63f9fac3b4651d6a443290bb0c2dd5e5ad0f0c4af6852ad3f15a9e",
+    "vendor/TimeXer/layers/Embed.py": "0a29593e3796b5a3798bd3d37c1150fc2256c559abdee36e83eecd1a05787247",
+    "vendor/TimeXer/layers/FourierCorrelation.py": "028a78efb47bff58629d7d8e4628c61e7a59b816c3f9f4cf1ce93bdc0e00032e",
+    "vendor/TimeXer/layers/MultiWaveletCorrelation.py": "49d34c949882d4a00345f31f1fbd7be00060525b0d5b488a87bb474128dab8a8",
+    "vendor/TimeXer/layers/Pyraformer_EncDec.py": "6bf671b660f71ca23825cb5ad26cbf58998fd1aa7bbaa3bf36537ece5c965302",
+    "vendor/TimeXer/layers/SelfAttention_Family.py": "ef88653639c37460bdcabee2a9d3dfbfb3545a63ce08ad148b927adf3e250242",
+    "vendor/TimeXer/layers/StandardNorm.py": "42c0d7f8019d899e1dac23ffc81fd2e08763f7d824142a3e29842fc3847c5e15",
+    "vendor/TimeXer/layers/Transformer_EncDec.py": "031b26a6ed774442bfb4cf316d4a605f7642cd652a4c2b82f5e3d1fcdc47b098",
+    "vendor/TimeXer/layers/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "vendor/TimeXer/models/Autoformer.py": "365e392a84a4dafe415b0180cf892cad14836d925558f43133d3f671d77f4890",
+    "vendor/TimeXer/models/Crossformer.py": "095c2d972505b266f57495371d32dad9354373aa64dbfbfcf6fb9212a333e1c5",
+    "vendor/TimeXer/models/DLinear.py": "ca5dd503827fb4cc49ca4cf76ba5fba26ffe22a4e765c2c494590741359f33d5",
+    "vendor/TimeXer/models/ETSformer.py": "2ee919a7030c1fd645499f2f6b91f72a66ed25b2fee856e196b42e61bb72aeb8",
+    "vendor/TimeXer/models/FEDformer.py": "10f65ea07c139b51b6e71739796acd10b9199d32d7636fc8ff45b309803808de",
+    "vendor/TimeXer/models/FiLM.py": "ad5280625e1fffa84d626b4ff97eed82bcbbc219001ffda5b795ac21a51e8e41",
+    "vendor/TimeXer/models/FreTS.py": "b7a0d4e8025c50117be3a60db83bc361094974c103a09610ac05a886e9d64308",
+    "vendor/TimeXer/models/Informer.py": "907b1244cb836838c6f8722c4c9ea5033871b8c50ff54d1b882db5354a78937d",
+    "vendor/TimeXer/models/Koopa.py": "63f0325ca96f7255035af5df40071efb7ef99fb48a98054bb7545c7cfabf14b1",
+    "vendor/TimeXer/models/LightTS.py": "724801749cc5625878ddef218f944e0376e1c73ee5f21ec58b4b211d737abf96",
+    "vendor/TimeXer/models/MICN.py": "50765f3cbd9299b3b9cf4e42200aad441f4ba312a2a77aa5579775886ceba8e8",
+    "vendor/TimeXer/models/Mamba.py": "22d83a8d9a711f14bc25290e5dc344ecb21081fd4f75f7c7291b55815623d57e",
+    "vendor/TimeXer/models/MambaSimple.py": "d56403ddded26d152093bb42d1cafff7c2ea2c9f17823e4c62ee4573dc7def34",
+    "vendor/TimeXer/models/Nonstationary_Transformer.py": "6d95287b7e99889372a3eedd67780379d2841a9f19465c9f1b80cc0edf82f22c",
+    "vendor/TimeXer/models/PatchTST.py": "e677cd698a9a14f036fbbecc3395146a6407a04ab790d52d433f44e3402e0616",
+    "vendor/TimeXer/models/Pyraformer.py": "0905408e4d19944157ffde8e8391aaef93ddfe5153e62e74909ad21b90612206",
+    "vendor/TimeXer/models/Reformer.py": "4ce9a8f57d68937bd50b6dceade205be9d21b27ad40f913afa883bacdb055863",
+    "vendor/TimeXer/models/SCINet.py": "65540a638885bae2d0b019ec72e86b08ba6394abdcf3a312e9c370eddd221e72",
+    "vendor/TimeXer/models/SegRNN.py": "15d19ba920e43a7bca255cefd7baf58cce06b49e02fa4e0184f9121cdee0c978",
+    "vendor/TimeXer/models/TSMixer.py": "0efbce31f764ffbdab7efe84b9332fb021e461ae774a8bbf9137521ae7c3e594",
+    "vendor/TimeXer/models/TemporalFusionTransformer.py": "f56074f1edd7f04698baa49d7a969fab23025d74a67e9d2bb44a4f15bfd8807f",
+    "vendor/TimeXer/models/TiDE.py": "80b34056e8a8cd8645482787d8cdceb8d06874f194b9fb7fb9297deb7f9b594e",
+    "vendor/TimeXer/models/TimeMixer.py": "6347ac78b137d52aad8298cbd0299f0b9b7b79f0804295fd592ce176a8ce4e33",
+    "vendor/TimeXer/models/TimeXer.py": "498165f2532a8434c39060471e5a150af81a16fa9124dc6163d33e885fa2aeae",
+    "vendor/TimeXer/models/TimesNet.py": "504d2ef9986057787bf304f17c83c03b0b6b2bbc66ace0303eb8bc68ee980fe4",
+    "vendor/TimeXer/models/Transformer.py": "8325b0fd814888c8001992eeea43aca2ec998ffede1dd88fa18c9a8924fcbf8c",
+    "vendor/TimeXer/models/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "vendor/TimeXer/models/iTransformer.py": "6de6b88dc0bfcaa36599c12626d611205acca7aa4d572f8da5a769ef7afee232",
+    "vendor/TimeXer/run.py": "8465b0ea2112a30e41c4a28056277e7dcef20c66189a12fe30a43a39e628a463",
+    "vendor/TimeXer/utils/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "vendor/TimeXer/utils/augmentation.py": "0e45703897ce5c0934f65ec92a20e6fa94737ac08c881e9a8baae4cde6601253",
+    "vendor/TimeXer/utils/losses.py": "0f401a20774cabea4e2ddf5e2f0acf66a606e9d783733e19cbf3dc52da5313a3",
+    "vendor/TimeXer/utils/m4_summary.py": "4ac27f12c37c431ea38b68ac318aab6ec5b96910aaff6a88325740410430252e",
+    "vendor/TimeXer/utils/masking.py": "a3c74975db5fcca6837d94e676d4282a38306cfc099bf6eb5f1128cd252863a8",
+    "vendor/TimeXer/utils/metrics.py": "cdfd70bfd6ca02a9f1a338259958eb77924eeed11f610b9f0ec31b7b701a2069",
+    "vendor/TimeXer/utils/print_args.py": "f94789792fce88b2517632c231bc6b4cef9aa579222592ad9854beea28855328",
+    "vendor/TimeXer/utils/timefeatures.py": "ec08852581cedb577b42df903c9bc962041c7258bd38a007c71bad94cde1e4a2",
+    "vendor/TimeXer/utils/tools.py": "810dbcfb72a33e5652219b66a95f7dd1feb86ceece4700a55b10e904eb4a3f32"
+  },
+  "orchestration_sha256": {
+    "launch.py": "3d63ea3f3ab68a0d923bfdcdc006eb11e13193c902254b514dd31aecf651acb0",
+    "prepare.py": "f35aff7c68aeb9fd61f0ea422ce645d72f2b3265f323bc6937379025dadc8fba",
+    "report.py": "7772ec6ec43e9a7589cc979598754d76f9e9c94e59372efb0622c9f8cb74d16b"
+  },
+  "train_sha256": "f5d63a87a7560405d94140f26f629d5c48ccfc83c1e6b50930f826d9ffce6613",
+  "development_file_sha256": "b09b2da27fd62a5158b638d350deaae91606bd9510d61eddd9a08c3775d610c5",
+  "environment": {
+    "python": "3.12.3 | packaged by Anaconda, Inc. | (main, May  6 2024, 19:46:43) [GCC 11.2.0]",
+    "packages": {
+      "torch": "2.12.1+cu130",
+      "numpy": "2.4.6",
+      "scipy": "1.15.3",
+      "pandas": "2.2.3",
+      "scikit-learn": "1.7.1",
+      "pyarrow": "24.0.0"
+    },
+    "GPU": "NVIDIA GeForce RTX 5090"
+  }
+}

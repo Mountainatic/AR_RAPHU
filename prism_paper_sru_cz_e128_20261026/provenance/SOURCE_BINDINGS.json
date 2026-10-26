@@ -1,0 +1,242 @@
+{
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/benchmark_cpu.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/benchmark_cpu.py",
+    "sha256": "a0e17d97e56947bde44203fb0ccad1462d696d0efc4724c78d1aee0c447ce930"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/benchmark_cz128.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/benchmark_cz128.py",
+    "sha256": "f6ffb412ca1564043593c30b986bb14e750be6f9576d78e81f6725f9a8328730"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/benchmark_repaired_cpu.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/benchmark_repaired_cpu.py",
+    "sha256": "a12cf33dc842d6f262c024aa0680b1551b81acc34bf357ad0aeb0cef5df29f68"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/finalize.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/finalize.py",
+    "sha256": "cdeef825b365126e1a54dd50bb79ff2c9e6cb9de13c56daff38565618a7c6390"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/package_final.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/package_final.py",
+    "sha256": "2931a3ed93fd7fc079bde8b8f689ce5d53140a2e39a6a2c4345119c55eaf1aac"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/plot_cz_history.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/plot_cz_history.py",
+    "sha256": "0d16b58fadfe5525da692eefde003355868212d6bbcd5db933dc97f2c660f154"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/plot_summary.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/plot_summary.py",
+    "sha256": "f4d4bb2f9ff7f50f85ad9394fff09e4b6925eb143efbbfb37bb429f72961048a"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/review_cz128.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/review_cz128.py",
+    "sha256": "dc5d28feacc0a4599d175e38c927b5421cccc50058a65c4868b752a87ef3e052"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/robust/legacy.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/robust/legacy.py",
+    "sha256": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/robust/mature_a.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/robust/mature_a.py",
+    "sha256": "dae8dd73780ce46cb5b243d32a42e830aed1dd55d8b14b6ca1f03f78aae13338"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/robust/model.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/robust/model.py",
+    "sha256": "eec612d8cb7137cbdf676db5d2de61cfbb4fbfae2429aa9630865ad737ab300a"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/robust/rls_core.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/robust/rls_core.py",
+    "sha256": "cca7b202e65f90a1afc2af818d91b50ba3f72e53349ec676f86899fe24357812"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/selftest.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/selftest.py",
+    "sha256": "98cbb5efb70c3182975126bd3d04089e0e8e9136c119b749d06f5c5d919eab1a"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/setup_remote.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/setup_remote.py",
+    "sha256": "c84296bbf169c9eea6f8256b72073253d21a2e4fd5de94bf3b16a59aa65ac32d"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/standard/legacy.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/standard/legacy.py",
+    "sha256": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/standard/mature_a.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/standard/mature_a.py",
+    "sha256": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/standard/model.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/standard/model.py",
+    "sha256": "eec612d8cb7137cbdf676db5d2de61cfbb4fbfae2429aa9630865ad737ab300a"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/standard/rls_core.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/standard/rls_core.py",
+    "sha256": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/streaming.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/streaming.py",
+    "sha256": "25ca6893f23d9b4563f44d4e5f47b0766bc2a1f646b776029d16b858ba40b1b2"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/strong_baseline_audit.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/strong_baseline_audit.py",
+    "sha256": "4d55f402ff7ff401f884133a5198942d20721591330de68313c3c8330b63a484"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/suite.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/suite.py",
+    "sha256": "d2fabba9bce8ecf7eac00e1f2242d9cc97f9795c80c67638b6def82c4c287370"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/summarize_results.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/summarize_results.py",
+    "sha256": "9e4197e27de0336e5053ee80eb94007ae2605826151cec31da11b9da4c4349ba"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/verify_repaired_stream.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/verify_repaired_stream.py",
+    "sha256": "f5e665b8801fed77eae7793943abd63222703e997f5db3cec694112c9192c957"
+  },
+  "source/PRISM_PAPER_OPTIMIZATION_20261026/verify_stream.py": {
+    "source": "PRISM_PAPER_OPTIMIZATION_20261026/verify_stream.py",
+    "sha256": "d6e879147af8ada423d342fad73872c44056038ce91242ef5955c3cdb817e2a7"
+  },
+  "source/PRISM_PAPER_SPLINE_REPAIR_20261026/robust/legacy.py": {
+    "source": "PRISM_PAPER_SPLINE_REPAIR_20261026/robust/legacy.py",
+    "sha256": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043"
+  },
+  "source/PRISM_PAPER_SPLINE_REPAIR_20261026/robust/mature_a.py": {
+    "source": "PRISM_PAPER_SPLINE_REPAIR_20261026/robust/mature_a.py",
+    "sha256": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa"
+  },
+  "source/PRISM_PAPER_SPLINE_REPAIR_20261026/robust/model.py": {
+    "source": "PRISM_PAPER_SPLINE_REPAIR_20261026/robust/model.py",
+    "sha256": "09ce3b631804b0e215443f39893e22d207e62a22e98e20eae2280094907466c0"
+  },
+  "source/PRISM_PAPER_SPLINE_REPAIR_20261026/robust/rls_core.py": {
+    "source": "PRISM_PAPER_SPLINE_REPAIR_20261026/robust/rls_core.py",
+    "sha256": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe"
+  },
+  "source/PRISM_PAPER_SPLINE_REPAIR_20261026/robust/stable_spline.py": {
+    "source": "PRISM_PAPER_SPLINE_REPAIR_20261026/robust/stable_spline.py",
+    "sha256": "501e25c5580f9a731a0bb86a10c552b958761da138264e8d3ec78b65fd538c48"
+  },
+  "source/PRISM_PAPER_SPLINE_REPAIR_20261026/setup_spline_repair.py": {
+    "source": "PRISM_PAPER_SPLINE_REPAIR_20261026/setup_spline_repair.py",
+    "sha256": "96f9f598d6499d12be1d8045b124e358ee4d425f9903b5b3c08c16e2c567f5ba"
+  },
+  "source/PRISM_PAPER_SPLINE_REPAIR_20261026/spline_repair_selftest.py": {
+    "source": "PRISM_PAPER_SPLINE_REPAIR_20261026/spline_repair_selftest.py",
+    "sha256": "116fe192e58a727d55f006681923f70c14c6732eab9eec529fdcb48846062616"
+  },
+  "source/PRISM_PAPER_SPLINE_REPAIR_20261026/stable_spline.py": {
+    "source": "PRISM_PAPER_SPLINE_REPAIR_20261026/stable_spline.py",
+    "sha256": "501e25c5580f9a731a0bb86a10c552b958761da138264e8d3ec78b65fd538c48"
+  },
+  "source/PRISM_PAPER_SPLINE_REPAIR_20261026/suite.py": {
+    "source": "PRISM_PAPER_SPLINE_REPAIR_20261026/suite.py",
+    "sha256": "6dcadc5829575eabd21d4bd676fd367535992451f7e9356eb303e0143e9858d4"
+  },
+  "source/PRISM_CZ_E128_20261026/E128/legacy.py": {
+    "source": "PRISM_CZ_E128_20261026/E128/legacy.py",
+    "sha256": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043"
+  },
+  "source/PRISM_CZ_E128_20261026/E128/mature_a.py": {
+    "source": "PRISM_CZ_E128_20261026/E128/mature_a.py",
+    "sha256": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa"
+  },
+  "source/PRISM_CZ_E128_20261026/E128/model.py": {
+    "source": "PRISM_CZ_E128_20261026/E128/model.py",
+    "sha256": "e40573213c7dc936f6288d6a83d6d24182a9a22bc130eb2ca13d3d64b78a352c"
+  },
+  "source/PRISM_CZ_E128_20261026/E128/rls_core.py": {
+    "source": "PRISM_CZ_E128_20261026/E128/rls_core.py",
+    "sha256": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe"
+  },
+  "source/PRISM_CZ_E128_20261026/E128/stable_spline.py": {
+    "source": "PRISM_CZ_E128_20261026/E128/stable_spline.py",
+    "sha256": "501e25c5580f9a731a0bb86a10c552b958761da138264e8d3ec78b65fd538c48"
+  },
+  "source/PRISM_CZ_E128_20261026/e128_selftest.py": {
+    "source": "PRISM_CZ_E128_20261026/e128_selftest.py",
+    "sha256": "fb5d75a32e34569fd8d5bf90a1bd47d198c4f81f885f4bdad7a72be33eb69b20"
+  },
+  "source/PRISM_CZ_E128_20261026/E16/legacy.py": {
+    "source": "PRISM_CZ_E128_20261026/E16/legacy.py",
+    "sha256": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043"
+  },
+  "source/PRISM_CZ_E128_20261026/E16/mature_a.py": {
+    "source": "PRISM_CZ_E128_20261026/E16/mature_a.py",
+    "sha256": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa"
+  },
+  "source/PRISM_CZ_E128_20261026/E16/model.py": {
+    "source": "PRISM_CZ_E128_20261026/E16/model.py",
+    "sha256": "a1a726a0137ecc47ffa363f50b15c704c0d1a479701c2aa6b99859309dd869d6"
+  },
+  "source/PRISM_CZ_E128_20261026/E16/rls_core.py": {
+    "source": "PRISM_CZ_E128_20261026/E16/rls_core.py",
+    "sha256": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe"
+  },
+  "source/PRISM_CZ_E128_20261026/E16/stable_spline.py": {
+    "source": "PRISM_CZ_E128_20261026/E16/stable_spline.py",
+    "sha256": "501e25c5580f9a731a0bb86a10c552b958761da138264e8d3ec78b65fd538c48"
+  },
+  "source/PRISM_CZ_E128_20261026/e_design_append.py": {
+    "source": "PRISM_CZ_E128_20261026/e_design_append.py",
+    "sha256": "d2235bbe9e26338332e124237020b8ece401b6fc78bdf5160f65d8f64c609550"
+  },
+  "source/PRISM_CZ_E128_20261026/fixed128/legacy.py": {
+    "source": "PRISM_CZ_E128_20261026/fixed128/legacy.py",
+    "sha256": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043"
+  },
+  "source/PRISM_CZ_E128_20261026/fixed128/mature_a.py": {
+    "source": "PRISM_CZ_E128_20261026/fixed128/mature_a.py",
+    "sha256": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa"
+  },
+  "source/PRISM_CZ_E128_20261026/fixed128/model.py": {
+    "source": "PRISM_CZ_E128_20261026/fixed128/model.py",
+    "sha256": "09ce3b631804b0e215443f39893e22d207e62a22e98e20eae2280094907466c0"
+  },
+  "source/PRISM_CZ_E128_20261026/fixed128/rls_core.py": {
+    "source": "PRISM_CZ_E128_20261026/fixed128/rls_core.py",
+    "sha256": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe"
+  },
+  "source/PRISM_CZ_E128_20261026/fixed128/stable_spline.py": {
+    "source": "PRISM_CZ_E128_20261026/fixed128/stable_spline.py",
+    "sha256": "501e25c5580f9a731a0bb86a10c552b958761da138264e8d3ec78b65fd538c48"
+  },
+  "source/PRISM_CZ_E128_20261026/setup_cz_e128.py": {
+    "source": "PRISM_CZ_E128_20261026/setup_cz_e128.py",
+    "sha256": "612e90b12c57f57bc2b2349a343506d7f7f8dfe19850f8e6496a6c3681d817d3"
+  },
+  "source/PRISM_CZ_E128_20261026/suite.py": {
+    "source": "PRISM_CZ_E128_20261026/suite.py",
+    "sha256": "d397b7fd554ae70555447feefb0e3fe3c5796b7fcd542881e9baac5d50d03ee8"
+  },
+  "source/PRISM_CZ_E128_TRANSPORT_20261026/setup_cz_transport.py": {
+    "source": "PRISM_CZ_E128_TRANSPORT_20261026/setup_cz_transport.py",
+    "sha256": "0352c3fc910f98d84210ca6634346269022f60f50a60bd20e6ffd2c321e29478"
+  },
+  "source/PRISM_CZ_E128_TRANSPORT_20261026/suite.py": {
+    "source": "PRISM_CZ_E128_TRANSPORT_20261026/suite.py",
+    "sha256": "1a1af8b1e4e895dc2129903e4f537c1d8daa5deebec6152a56daaf72828346cb"
+  },
+  "source/PRISM_CZ_E128_TRANSPORT_20261026/transport/legacy.py": {
+    "source": "PRISM_CZ_E128_TRANSPORT_20261026/transport/legacy.py",
+    "sha256": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043"
+  },
+  "source/PRISM_CZ_E128_TRANSPORT_20261026/transport/mature_a.py": {
+    "source": "PRISM_CZ_E128_TRANSPORT_20261026/transport/mature_a.py",
+    "sha256": "7a4904d7b5b81d14cc73ffd0da2a4d1be1e4bc1ea23d937f5835dd0b8812a41a"
+  },
+  "source/PRISM_CZ_E128_TRANSPORT_20261026/transport/model.py": {
+    "source": "PRISM_CZ_E128_TRANSPORT_20261026/transport/model.py",
+    "sha256": "e40573213c7dc936f6288d6a83d6d24182a9a22bc130eb2ca13d3d64b78a352c"
+  },
+  "source/PRISM_CZ_E128_TRANSPORT_20261026/transport/rls_core.py": {
+    "source": "PRISM_CZ_E128_TRANSPORT_20261026/transport/rls_core.py",
+    "sha256": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe"
+  },
+  "source/PRISM_CZ_E128_TRANSPORT_20261026/transport/stable_spline.py": {
+    "source": "PRISM_CZ_E128_TRANSPORT_20261026/transport/stable_spline.py",
+    "sha256": "501e25c5580f9a731a0bb86a10c552b958761da138264e8d3ec78b65fd538c48"
+  },
+  "source/PRISM_CZ_E128_TRANSPORT_20261026/transport_selftest.py": {
+    "source": "PRISM_CZ_E128_TRANSPORT_20261026/transport_selftest.py",
+    "sha256": "1c82151eedaf3bb98499e3302e2ac33e4597ddf9bc79000e9a9c3b02cdfef464"
+  }
+}

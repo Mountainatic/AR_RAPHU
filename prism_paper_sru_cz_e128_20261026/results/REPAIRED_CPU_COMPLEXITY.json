@@ -1,0 +1,50 @@
+{
+  "status": "COMPLETED",
+  "device": "CPU",
+  "cpu_threads": 1,
+  "cpu_affinity": [
+    0
+  ],
+  "numpy": "2.4.6",
+  "python": "3.12.3 | packaged by Anaconda, Inc. | (main, May  6 2024, 19:46:43) [GCC 11.2.0]",
+  "method": "Identical timed origins6112..6367, four chronological passes with first warmup excluded. Includes mature-label updates. Existing neural runtime; single-thread FP64 PRISM versus FP32 neural models on the same CPU.",
+  "records": [
+    {
+      "model": "PRISM_spline_repaired",
+      "delay": 4,
+      "L": 8,
+      "ensemble": 1,
+      "regression_coefficients": 26,
+      "compact_deployment_bytes": 2788,
+      "median_us": 60.491496697068214,
+      "p95_us": 62.98900116235018,
+      "samples": 768,
+      "includes_RLS_update": true
+    },
+    {
+      "model": "PRISM_spline_repaired",
+      "delay": 8,
+      "L": 16,
+      "ensemble": 1,
+      "regression_coefficients": 36,
+      "compact_deployment_bytes": 3865,
+      "median_us": 87.26818487048149,
+      "p95_us": 89.74187076091766,
+      "samples": 768,
+      "includes_RLS_update": true
+    },
+    {
+      "model": "PRISM_spline_repaired",
+      "delay": 16,
+      "L": 16,
+      "ensemble": 1,
+      "regression_coefficients": 36,
+      "compact_deployment_bytes": 3865,
+      "median_us": 87.87214756011963,
+      "p95_us": 90.6710047274828,
+      "samples": 768,
+      "includes_RLS_update": true
+    }
+  ],
+  "reserved_tail_read": false
+}

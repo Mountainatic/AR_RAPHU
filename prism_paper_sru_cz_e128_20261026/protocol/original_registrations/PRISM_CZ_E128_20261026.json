@@ -1,0 +1,294 @@
+{
+  "status": "FROZEN_BEFORE_NEW_FITS",
+  "cases": {
+    "CZ_Rod1": {
+      "root": "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1",
+      "parent_end": 6636,
+      "train_end": 12061,
+      "dev_end": 16082,
+      "windows": {
+        "4": 128,
+        "8": 128,
+        "16": 128
+      }
+    },
+    "CZ_Rod2": {
+      "root": "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2",
+      "parent_end": 6810,
+      "train_end": 12376,
+      "dev_end": 16501,
+      "windows": {
+        "4": 128,
+        "8": 128,
+        "16": 128
+      }
+    }
+  },
+  "jobs": [
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "full"
+    },
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "full"
+    },
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "full"
+    },
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "variant": "full"
+    },
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "variant": "full"
+    },
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "variant": "full"
+    },
+    {
+      "runtime": "fixed128",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "full"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "full"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "full"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "variant": "full"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "variant": "full"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "variant": "full"
+    },
+    {
+      "runtime": "E128",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "full"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "full"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "full"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "variant": "full"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "variant": "full"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "variant": "no_A"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "variant": "full"
+    },
+    {
+      "runtime": "E16",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "variant": "no_A"
+    }
+  ],
+  "source_hashes": {
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D4/L128/full.pkl": "3d35a4d70774b480e50402a1c90cc482a576fccc15db85a29fe6b8147a869181",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D4/L128/no_A.pkl": "d0a7ee96c28b1eb4a10bb0e894f6a5a9b2fca12933642b5f5e0fe9e20fca78a6",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D8/L128/full.pkl": "65cf4b5ec11485d390accaaec499095088666f201f86ae3a7b285a6ca9c4a3e1",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D8/L128/no_A.pkl": "c822b3ec0ccc3fe2c8cf3f41cf73775b33188e95cab0b0510a112a3e5a115789",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D16/L128/full.pkl": "9a03999a8a3786b479f1e5b759f0f13f3281222d10341ae503dbd3501066ae2d",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D16/L128/no_A.pkl": "ed7043b754aa69b2eedbd32935da301015d045ab116c1c08cad8f1c2279a9214",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/data/train.npz": "7c102e24d4de760200f467bfac6af844375fbb83d01f7bb904d46ca1993da985",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D4/L128/full.pkl": "f7169a262ea126967040a07ae1c1bab941c8c9e0592f6d01f21911e46c40074b",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D4/L128/no_A.pkl": "1624ccc2b5f39b07509ca7eaf412fe7bc3f2b69013a15211728e957ccffc3a1a",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D8/L128/full.pkl": "4f101f464c101afd2f2ca2492eb4c4aec79e325396b388785cc2c48254050551",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D8/L128/no_A.pkl": "af529bbe344b9694d1aa9b10b8ac16cf816de1d419971b5a941bae1f19d7c976",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D16/L128/full.pkl": "ddccaad0ae82b52baaa16774c8df570e5e346e51dca43a929e4a82d55bb864a8",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D16/L128/no_A.pkl": "ebcfc59759217f7f9f7230cf74734cb3728fc6daf1bb92f153db66e29d102417",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/data/train.npz": "f5d63a87a7560405d94140f26f629d5c48ccfc83c1e6b50930f826d9ffce6613"
+  },
+  "code_hashes": {
+    "suite.py": "d397b7fd554ae70555447feefb0e3fe3c5796b7fcd542881e9baac5d50d03ee8",
+    "setup_cz_e128.py": "612e90b12c57f57bc2b2349a343506d7f7f8dfe19850f8e6496a6c3681d817d3",
+    "e_design_append.py": "d2235bbe9e26338332e124237020b8ece401b6fc78bdf5160f65d8f64c609550",
+    "e128_selftest.py": "fb5d75a32e34569fd8d5bf90a1bd47d198c4f81f885f4bdad7a72be33eb69b20",
+    "fixed128/model.py": "09ce3b631804b0e215443f39893e22d207e62a22e98e20eae2280094907466c0",
+    "fixed128/mature_a.py": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa",
+    "fixed128/legacy.py": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043",
+    "fixed128/rls_core.py": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe",
+    "fixed128/stable_spline.py": "501e25c5580f9a731a0bb86a10c552b958761da138264e8d3ec78b65fd538c48",
+    "E128/model.py": "e40573213c7dc936f6288d6a83d6d24182a9a22bc130eb2ca13d3d64b78a352c",
+    "E128/mature_a.py": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa",
+    "E128/legacy.py": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043",
+    "E128/rls_core.py": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe",
+    "E128/stable_spline.py": "501e25c5580f9a731a0bb86a10c552b958761da138264e8d3ec78b65fd538c48",
+    "E16/model.py": "a1a726a0137ecc47ffa363f50b15c704c0d1a479701c2aa6b99859309dd869d6",
+    "E16/mature_a.py": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa",
+    "E16/legacy.py": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043",
+    "E16/rls_core.py": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe",
+    "E16/stable_spline.py": "501e25c5580f9a731a0bb86a10c552b958761da138264e8d3ec78b65fd538c48"
+  },
+  "task": "Concurrent y(t) soft sensing; same current X and strictly matured y as original. Label delays are experimental availability assumptions.",
+  "ablations": "CZ main128 imposed by user; E16 is an explicit ablation, common support127+delay and original training geometry. no_KC/no_W independently refit and reselect KCW/A; all36 full/no_A chains are newly fitted. This is conditional fixed-window ablation, not reselecting the entire window-search procedure.",
+  "robust_extension": "CZ fixed128 main input history, corrected degree1 spline. E128 uses raw block averages on lag bins[0,1),[1,2),[2,4),[4,8),[8,16),[16,32),[32,64),[64,128), then per-channel amplitude basis and learned ridge coefficients. This is FIXED_MULTIRESOLUTION E, not full original channel-specific profile/rank search. E16 is a short-history refit control only, never selected as the CZ main model. Candidate process families require memory=True; OWN bypass and exact-zero A remain. Original273 A policies and gates retained. No Huber extension.",
+  "selection": "Original training-only nested A MSE and three outer admission folds, joint KCW/A risk. No development-driven model selection, task/window changes, or repeated grid edits.",
+  "evaluation": "Generate all new development predictions only after every36 new job freezes. Previously reused development, exploratory, not independent test.",
+  "resources": {
+    "workers": 3,
+    "threads": 1,
+    "GPU_training": false
+  },
+  "reserved_tail_read": false,
+  "raw_workbook_read": false
+}

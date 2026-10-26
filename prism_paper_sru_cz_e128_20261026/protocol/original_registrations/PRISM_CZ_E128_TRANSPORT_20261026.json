@@ -1,0 +1,103 @@
+{
+  "status": "FROZEN_BEFORE_NEW_FITS",
+  "cases": {
+    "CZ_Rod1": {
+      "root": "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1",
+      "parent_end": 6636,
+      "train_end": 12061,
+      "dev_end": 16082,
+      "windows": {
+        "4": 128,
+        "8": 128,
+        "16": 128
+      }
+    },
+    "CZ_Rod2": {
+      "root": "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2",
+      "parent_end": 6810,
+      "train_end": 12376,
+      "dev_end": 16501,
+      "windows": {
+        "4": 128,
+        "8": 128,
+        "16": 128
+      }
+    }
+  },
+  "jobs": [
+    {
+      "runtime": "transport",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "full"
+    },
+    {
+      "runtime": "transport",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "full"
+    },
+    {
+      "runtime": "transport",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "full"
+    },
+    {
+      "runtime": "transport",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "variant": "full"
+    },
+    {
+      "runtime": "transport",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "variant": "full"
+    },
+    {
+      "runtime": "transport",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "variant": "full"
+    }
+  ],
+  "source_hashes": {
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D4/full/model.pkl": "351f88d9317b66b3cab1e10a265a818506ced542226e39b21d0d9390e6af2f4b",
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D4/no_A/model.pkl": "0f6e19c9e7aabbdac7e2b8a93c39f2bb847b5903be68eb5652ac30ada4044ea1",
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D8/full/model.pkl": "cbaf0940847d69a8f1bd93239bfe77ec9caa7bd6a62bd11acfa9f93c1b7157ea",
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D8/no_A/model.pkl": "6657b86eb01eb67b3ae97b5eff2683a88ca26168b6ce1f01b6a3d392b3cf31c2",
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D16/full/model.pkl": "b2c1a46f1ee15ed338e8738faa867b411ba10a8e62761a3ec908e11dcfcf9f50",
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod1/D16/no_A/model.pkl": "38d252f88f29704b549e8741937470534f7ddd7546507e7ada20b133050889c2",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/data/train.npz": "7c102e24d4de760200f467bfac6af844375fbb83d01f7bb904d46ca1993da985",
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod2/D4/full/model.pkl": "654b5eb0d0510c421d9a0da276ed8ec2d49376765dd4faac8921b0e0f537adaf",
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod2/D4/no_A/model.pkl": "20c6993ea04741520d589aff2f68944b8a7effdca5ee588181697e5d6f4c7aed",
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod2/D8/full/model.pkl": "0aa8a9e42e8c52c8c20a6b3967fc7ea5a998db501eec96c8e0bc2b6cd8499113",
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod2/D8/no_A/model.pkl": "10f4faec86e3b68b5fab09387280e3c632f71c8bde03b3957e3843d5c9f4d3b8",
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod2/D16/full/model.pkl": "4bbed9cf96e52a7614ed63dd1346a5142fcda4bd20ab28899a30712088d9fe5e",
+    "/root/autodl-tmp/PRISM_CZ_E128_20261026/runs/E128/CZ_Rod2/D16/no_A/model.pkl": "383066b82ae496e7e4ff14e1e6989aac1de258e0eae66e6c1a2cc34fb0583b6c",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/data/train.npz": "f5d63a87a7560405d94140f26f629d5c48ccfc83c1e6b50930f826d9ffce6613"
+  },
+  "code_hashes": {
+    "suite.py": "1a1af8b1e4e895dc2129903e4f537c1d8daa5deebec6152a56daaf72828346cb",
+    "setup_cz_transport.py": "0352c3fc910f98d84210ca6634346269022f60f50a60bd20e6ffd2c321e29478",
+    "transport_selftest.py": "1c82151eedaf3bb98499e3302e2ac33e4597ddf9bc79000e9a9c3b02cdfef464",
+    "transport/model.py": "e40573213c7dc936f6288d6a83d6d24182a9a22bc130eb2ca13d3d64b78a352c",
+    "transport/mature_a.py": "7a4904d7b5b81d14cc73ffd0da2a4d1be1e4bc1ea23d937f5835dd0b8812a41a",
+    "transport/legacy.py": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043",
+    "transport/rls_core.py": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe",
+    "transport/stable_spline.py": "501e25c5580f9a731a0bb86a10c552b958761da138264e8d3ec78b65fd538c48"
+  },
+  "task": "Concurrent y(t) soft sensing; same current X and strictly matured y as original. Label delays are experimental availability assumptions.",
+  "ablations": "User-fixed128 history and fixed8-bin E, common support127+delay and original training geometry. no_KC/no_W independently refit and reselect KCW/A; frozen full/no_A are reused only for standard. This is conditional fixed-window ablation, not reselecting the entire window-search procedure.",
+  "robust_extension": "E128 encoding and corrected spline retained. Add8 fixed mature-residual transport A policies: p1 or4, gain.25/.5/.75/1. All273 original policies retained. Same nested MSE selection, admission, maturity/support/numerical gates; no new gain grid edits after development evaluation. Transport has zero adaptive regression coefficients, no parameter updates; original initializer is retained only for common support/certificate bookkeeping. Refit6 full chains; reuse exact E128 no_A controls. Retrospective exploratory extension motivated by observed A instability; not independent validation.",
+  "selection": "Original training-only nested A MSE and three outer admission folds, joint KCW/A risk. No development-driven model selection, task/window changes, or repeated grid edits.",
+  "evaluation": "Generate all new development predictions only after every6 new job freezes. Previously reused development, exploratory, not independent test.",
+  "resources": {
+    "workers": 3,
+    "threads": 1,
+    "GPU_training": false
+  },
+  "reserved_tail_read": false,
+  "raw_workbook_read": false
+}

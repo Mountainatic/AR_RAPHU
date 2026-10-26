@@ -1,0 +1,902 @@
+{
+  "status": "COMPLETED",
+  "attribution_method": "scalar-secant allocation; R2_j=[2Cov(y,g_j)-Cov(pred,g_j)]/Var(y); add mean-bias penalty for exact R2 closure; predictive/noncausal/nonunique",
+  "masking_method": "set a feature group to its parent ridge training center before scalar output link, replay frozen A; no refit",
+  "rod1_ablation_method": "saved candidate-ledger restriction; recover parent using frozen recipe on original training rows, retain frozen A; not a fresh nested ablation search",
+  "rod2_module_ablation": "DEFERRED_BY_USER; no Rod2 ablation evaluated or exported by this script",
+  "attribution": [
+    {
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "window": 16,
+      "n": 2016,
+      "RMSE": 0.023291862536329016,
+      "R2": 0.7937732613011276,
+      "model_sha256": "31e0db3aa81227399f148d7ca6be64dabf3b5295bd831c71db7cae0db1462a6a",
+      "saved_prediction_sha256": "f65b3598605df65a41497967d1d18dbc3a161b61a6f3306c73f17becc3fc6e53",
+      "output_path_R2_points": {
+        "history_y": 1.7079565602977864,
+        "u1": 1.5042563422531239,
+        "u2": -0.23488609579702976,
+        "u3": 49.862085890678316,
+        "u4": -1.0503251908120081,
+        "u5": 2.7405679778630825,
+        "A": 24.86442905835386
+      },
+      "mean_bias_penalty_R2_points": -0.01675841272435332,
+      "centered_feature_mask_with_A_replay": {
+        "history_y": {
+          "RMSE": 0.023661186029588624,
+          "RMSE_increase_pct": 1.5856331484163766
+        },
+        "u1": {
+          "RMSE": 0.026146896666687982,
+          "RMSE_increase_pct": 12.257646317059812
+        },
+        "u2": {
+          "RMSE": 0.024200534446752176,
+          "RMSE_increase_pct": 3.9012419423559486
+        },
+        "u3": {
+          "RMSE": 0.048478315676086736,
+          "RMSE_increase_pct": 108.13413096730096
+        },
+        "u4": {
+          "RMSE": 0.024504595493568978,
+          "RMSE_increase_pct": 5.206680897023275
+        },
+        "u5": {
+          "RMSE": 0.02515218411482915,
+          "RMSE_increase_pct": 7.987002222765716
+        }
+      },
+      "additive_closure_max_abs": 1.249000902703301e-16
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.016020752608141522,
+      "R2": 0.9966778835733286,
+      "model_sha256": "351f88d9317b66b3cab1e10a265a818506ced542226e39b21d0d9390e6af2f4b",
+      "saved_prediction_sha256": "59bd7c05be9c5d61936d9b66f42d25998bdf55838e4d374609b2aa29c6d2251a",
+      "output_path_R2_points": {
+        "history_y": 84.1303477332691,
+        "main_heater_power": 3.4159966328242444,
+        "crystal_lift_speed": 11.404816862523973,
+        "crucible_lift_speed": 0.43016429940000483,
+        "crystal_rotation": 3.778023475506433,
+        "crucible_rotation": -0.10334874388391625,
+        "A": -3.3861126075985863
+      },
+      "mean_bias_penalty_R2_points": -0.0020992947084556945,
+      "centered_feature_mask_with_A_replay": {
+        "history_y": {
+          "RMSE": 0.016835431995802137,
+          "RMSE_increase_pct": 5.085150539348593
+        },
+        "main_heater_power": {
+          "RMSE": 0.01704515047251896,
+          "RMSE_increase_pct": 6.3941931408194375
+        },
+        "crystal_lift_speed": {
+          "RMSE": 0.017800877565057435,
+          "RMSE_increase_pct": 11.111369112655023
+        },
+        "crucible_lift_speed": {
+          "RMSE": 0.016564156883658837,
+          "RMSE_increase_pct": 3.3918773281672365
+        },
+        "crystal_rotation": {
+          "RMSE": 0.015353038707230992,
+          "RMSE_increase_pct": -4.167806077794422
+        },
+        "crucible_rotation": {
+          "RMSE": 0.01594528444304131,
+          "RMSE_increase_pct": -0.47106504261142934
+        }
+      },
+      "additive_closure_max_abs": 1.1368683772161603e-13
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.02340394786284364,
+      "R2": 0.9929103096986641,
+      "model_sha256": "cbaf0940847d69a8f1bd93239bfe77ec9caa7bd6a62bd11acfa9f93c1b7157ea",
+      "saved_prediction_sha256": "895b905a31c08b2d28091eb651aa274aaf24eca1d2cd54e8cee549397922779e",
+      "output_path_R2_points": {
+        "history_y": 80.16413331780238,
+        "main_heater_power": 4.650463400280255,
+        "crystal_lift_speed": 13.340568439802983,
+        "crucible_lift_speed": 1.033628252877644,
+        "crystal_rotation": 4.1788789186383015,
+        "crucible_rotation": -0.11655455951968627,
+        "A": -3.955321339025889
+      },
+      "mean_bias_penalty_R2_points": -0.004765460989698198,
+      "centered_feature_mask_with_A_replay": {
+        "history_y": {
+          "RMSE": 0.04137147182853865,
+          "RMSE_increase_pct": 76.771338198973
+        },
+        "main_heater_power": {
+          "RMSE": 0.021876027465487984,
+          "RMSE_increase_pct": -6.528472915381089
+        },
+        "crystal_lift_speed": {
+          "RMSE": 0.02944402464268835,
+          "RMSE_increase_pct": 25.807939819563508
+        },
+        "crucible_lift_speed": {
+          "RMSE": 0.026606457350718607,
+          "RMSE_increase_pct": 13.683629388695163
+        },
+        "crystal_rotation": {
+          "RMSE": 0.024688105700971987,
+          "RMSE_increase_pct": 5.486928297969285
+        },
+        "crucible_rotation": {
+          "RMSE": 0.022957760698934546,
+          "RMSE_increase_pct": -1.9064611087151961
+        }
+      },
+      "additive_closure_max_abs": 1.1368683772161603e-13
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.034440534386261205,
+      "R2": 0.98464715790201,
+      "model_sha256": "b2c1a46f1ee15ed338e8738faa867b411ba10a8e62761a3ec908e11dcfcf9f50",
+      "saved_prediction_sha256": "f2731ce544e6896725975da3d192e4ab2a07708f537ccc9d05a56f9ad259c3e7",
+      "output_path_R2_points": {
+        "history_y": 73.08888749228109,
+        "main_heater_power": 6.781217557074887,
+        "crystal_lift_speed": 17.32531536548602,
+        "crucible_lift_speed": 1.6554518652359684,
+        "crystal_rotation": 4.962308288868306,
+        "crucible_rotation": -0.19025778490027398,
+        "A": -5.147915258241119
+      },
+      "mean_bias_penalty_R2_points": -0.010291735603759662,
+      "centered_feature_mask_with_A_replay": {
+        "history_y": {
+          "RMSE": 0.04796619462835744,
+          "RMSE_increase_pct": 39.27250399311981
+        },
+        "main_heater_power": {
+          "RMSE": 0.031721481675050615,
+          "RMSE_increase_pct": -7.894920214406598
+        },
+        "crystal_lift_speed": {
+          "RMSE": 0.04600641238341335,
+          "RMSE_increase_pct": 33.582167650005836
+        },
+        "crucible_lift_speed": {
+          "RMSE": 0.03640543118332057,
+          "RMSE_increase_pct": 5.705186728586842
+        },
+        "crystal_rotation": {
+          "RMSE": 0.034623464825313276,
+          "RMSE_increase_pct": 0.5311486662792353
+        },
+        "crucible_rotation": {
+          "RMSE": 0.033598116279991694,
+          "RMSE_increase_pct": -2.4460076513956874
+        }
+      },
+      "additive_closure_max_abs": 1.1368683772161603e-13
+    },
+    {
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "window": 128,
+      "n": 4125,
+      "RMSE": 0.020023752418084403,
+      "R2": 0.9716385799861867,
+      "model_sha256": "654b5eb0d0510c421d9a0da276ed8ec2d49376765dd4faac8921b0e0f537adaf",
+      "saved_prediction_sha256": "d13e46feb1a2fd012b2071d149445262118fc1f5413a9fed51a000fc886ef936",
+      "output_path_R2_points": {
+        "history_y": 99.36696763557296,
+        "main_heater_power": 0.0769044266470568,
+        "crystal_lift_speed": 1.4454910343812468,
+        "crucible_lift_speed": -0.8120179898440674,
+        "crystal_rotation": 0.919570540308104,
+        "crucible_rotation": -0.02527290680343708,
+        "A": -3.7903204928925147
+      },
+      "mean_bias_penalty_R2_points": -0.017464248752008894,
+      "centered_feature_mask_with_A_replay": {
+        "history_y": {
+          "RMSE": 0.03732541110682721,
+          "RMSE_increase_pct": 86.40567625634871
+        },
+        "main_heater_power": {
+          "RMSE": 0.020011205311268036,
+          "RMSE_increase_pct": -0.06266111643007388
+        },
+        "crystal_lift_speed": {
+          "RMSE": 0.022628580601400435,
+          "RMSE_increase_pct": 13.008691522591388
+        },
+        "crucible_lift_speed": {
+          "RMSE": 0.020392891674982545,
+          "RMSE_increase_pct": 1.8435068971625723
+        },
+        "crystal_rotation": {
+          "RMSE": 0.013343056499196548,
+          "RMSE_increase_pct": -33.363855981630095
+        },
+        "crucible_rotation": {
+          "RMSE": 0.020008509160227027,
+          "RMSE_increase_pct": -0.07612588059973113
+        }
+      },
+      "additive_closure_max_abs": 0.0
+    },
+    {
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "window": 128,
+      "n": 4125,
+      "RMSE": 0.03998093011369684,
+      "R2": 0.8869311892147012,
+      "model_sha256": "0aa8a9e42e8c52c8c20a6b3967fc7ea5a998db501eec96c8e0bc2b6cd8499113",
+      "saved_prediction_sha256": "fb30d4c6a0dd520c89f6f623519014d0dab4601d9024338853dde6ac150e7caf",
+      "output_path_R2_points": {
+        "history_y": 100.74774801959276,
+        "main_heater_power": 0.12322544234435444,
+        "crystal_lift_speed": 5.832062821961941,
+        "crucible_lift_speed": -4.35773547127715,
+        "crystal_rotation": 2.4699618941811994,
+        "crucible_rotation": -0.07531116066168413,
+        "A": -15.99058388931507
+      },
+      "mean_bias_penalty_R2_points": -0.05624873535924425,
+      "centered_feature_mask_with_A_replay": {
+        "history_y": {
+          "RMSE": 0.06239611111854111,
+          "RMSE_increase_pct": 56.064681189508335
+        },
+        "main_heater_power": {
+          "RMSE": 0.04001461436907112,
+          "RMSE_increase_pct": 0.084250804767394
+        },
+        "crystal_lift_speed": {
+          "RMSE": 0.045923599765901796,
+          "RMSE_increase_pct": 14.86376038602737
+        },
+        "crucible_lift_speed": {
+          "RMSE": 0.039856005113260824,
+          "RMSE_increase_pct": -0.3124614662059044
+        },
+        "crystal_rotation": {
+          "RMSE": 0.021539980997532016,
+          "RMSE_increase_pct": -46.124362449104815
+        },
+        "crucible_rotation": {
+          "RMSE": 0.04005290708847105,
+          "RMSE_increase_pct": 0.1800282648990903
+        }
+      },
+      "additive_closure_max_abs": 5.684341886080802e-14
+    },
+    {
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "window": 128,
+      "n": 4125,
+      "RMSE": 0.450672210605936,
+      "R2": -13.366752053852357,
+      "model_sha256": "4bbed9cf96e52a7614ed63dd1346a5142fcda4bd20ab28899a30712088d9fe5e",
+      "saved_prediction_sha256": "de73f67610d1ad67b05616f6b7911f26248902c077790727b4b472586c5e8d37",
+      "output_path_R2_points": {
+        "history_y": 127.69739659894448,
+        "main_heater_power": 1.3183512938473838,
+        "crystal_lift_speed": 30.62918309572233,
+        "crucible_lift_speed": 37.6291029754205,
+        "crystal_rotation": 149.16214702983956,
+        "crucible_rotation": 1.436697907431512,
+        "A": -1672.4064253674112
+      },
+      "mean_bias_penalty_R2_points": -12.14165891903654,
+      "centered_feature_mask_with_A_replay": {
+        "history_y": {
+          "RMSE": 0.474340546716974,
+          "RMSE_increase_pct": 5.25178512320863
+        },
+        "main_heater_power": {
+          "RMSE": 0.46003333122866247,
+          "RMSE_increase_pct": 2.077146183506695
+        },
+        "crystal_lift_speed": {
+          "RMSE": 0.4627723345522667,
+          "RMSE_increase_pct": 2.68490571674298
+        },
+        "crucible_lift_speed": {
+          "RMSE": 0.46811092275675714,
+          "RMSE_increase_pct": 3.8694891187931235
+        },
+        "crystal_rotation": {
+          "RMSE": 0.18628547932108744,
+          "RMSE_increase_pct": -58.66497313632371
+        },
+        "crucible_rotation": {
+          "RMSE": 0.4515749167487316,
+          "RMSE_increase_pct": 0.20030215343918023
+        }
+      },
+      "additive_closure_max_abs": 5.684341886080802e-14
+    }
+  ],
+  "rod1_ablations": [
+    {
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "full",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.016020752608141522,
+      "MAE": 0.011805327400368144,
+      "KC": {
+        "kind": "URYSOHN",
+        "alpha": 100.0,
+        "own": true,
+        "memory": true
+      },
+      "W": "signed_log1p",
+      "A": {
+        "selected": {
+          "family": "QD8_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "provenance": "persisted model",
+      "effects": []
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "no_KC",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.017027392027738206,
+      "MAE": 0.01357036727384967,
+      "KC": {
+        "kind": "OWN",
+        "alpha": 0.01
+      },
+      "W": "identity",
+      "A": {
+        "selected": {
+          "family": "QD8_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "provenance": "frozen candidate-restricted reconstruction",
+      "effects": [
+        {
+          "skip": 0,
+          "increase_percent": 6.283346633073439,
+          "CI95": [
+            -7.8675852433636235,
+            19.830489520920796
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        },
+        {
+          "skip": 35,
+          "increase_percent": 16.1228644153546,
+          "CI95": [
+            10.959463937740747,
+            21.437024888209645
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        }
+      ]
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "no_W",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.016019749705394583,
+      "MAE": 0.011805367233105962,
+      "KC": {
+        "kind": "URYSOHN",
+        "alpha": 100.0,
+        "own": true,
+        "memory": true
+      },
+      "W": "identity",
+      "A": {
+        "selected": {
+          "family": "QD8_RLS",
+          "p": 1,
+          "window": 256,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "provenance": "frozen candidate-restricted reconstruction",
+      "effects": [
+        {
+          "skip": 0,
+          "increase_percent": -0.006260022681014998,
+          "CI95": [
+            -0.05191412880867802,
+            0.05002339138988844
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        },
+        {
+          "skip": 35,
+          "increase_percent": 0.014414025407294417,
+          "CI95": [
+            -0.030819525000677084,
+            0.057606829451268826
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        }
+      ]
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "no_A",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.01730178801304751,
+      "MAE": 0.013811319169905226,
+      "KC": {
+        "kind": "OWN",
+        "alpha": 0.01
+      },
+      "W": "signed_sqrt",
+      "A": null,
+      "provenance": "persisted model",
+      "effects": [
+        {
+          "skip": 0,
+          "increase_percent": 7.996100034994513,
+          "CI95": [
+            -7.526855151483957,
+            23.08756545132179
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        },
+        {
+          "skip": 35,
+          "increase_percent": 17.995334641316173,
+          "CI95": [
+            11.547478143706838,
+            24.66849909890761
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        }
+      ]
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "full",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.02340394786284364,
+      "MAE": 0.017589494675931926,
+      "KC": {
+        "kind": "URYSOHN",
+        "alpha": 100.0,
+        "own": true,
+        "memory": true
+      },
+      "W": "signed_log1p",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "provenance": "persisted model",
+      "effects": []
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "no_KC",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.025626982286892613,
+      "MAE": 0.020238944730210127,
+      "KC": {
+        "kind": "OWN",
+        "alpha": 0.01
+      },
+      "W": "signed_sqrt",
+      "A": {
+        "selected": {
+          "family": "QD32_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "provenance": "frozen candidate-restricted reconstruction",
+      "effects": [
+        {
+          "skip": 0,
+          "increase_percent": 9.498544592035628,
+          "CI95": [
+            -5.582560154325491,
+            26.977630851289625
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        },
+        {
+          "skip": 39,
+          "increase_percent": 9.232055108603387,
+          "CI95": [
+            -5.912768747701623,
+            26.773504459651825
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        }
+      ]
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "no_W",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.023438948361943903,
+      "MAE": 0.017613692521989768,
+      "KC": {
+        "kind": "URYSOHN",
+        "alpha": 100.0,
+        "own": true,
+        "memory": true
+      },
+      "W": "identity",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "provenance": "frozen candidate-restricted reconstruction",
+      "effects": [
+        {
+          "skip": 0,
+          "increase_percent": 0.14954955166273098,
+          "CI95": [
+            0.036077821264008936,
+            0.2555394412636769
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        },
+        {
+          "skip": 39,
+          "increase_percent": 0.1503443924132153,
+          "CI95": [
+            0.03777695987724594,
+            0.25698097805317566
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        }
+      ]
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "no_A",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.026109814736090805,
+      "MAE": 0.020628692995492873,
+      "KC": {
+        "kind": "OWN",
+        "alpha": 0.01
+      },
+      "W": "signed_sqrt",
+      "A": null,
+      "provenance": "persisted model",
+      "effects": [
+        {
+          "skip": 0,
+          "increase_percent": 11.561583067543179,
+          "CI95": [
+            -3.843030252421333,
+            29.833424451749238
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        },
+        {
+          "skip": 39,
+          "increase_percent": 11.318764456494247,
+          "CI95": [
+            -4.343366683764265,
+            29.154189825174058
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        }
+      ]
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "full",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.034440534386261205,
+      "MAE": 0.025398433206850167,
+      "KC": {
+        "kind": "URYSOHN",
+        "alpha": 100.0,
+        "own": true,
+        "memory": true
+      },
+      "W": "signed_log1p",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "provenance": "persisted model",
+      "effects": []
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "no_KC",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.04035952492036519,
+      "MAE": 0.03208800527999279,
+      "KC": {
+        "kind": "OWN",
+        "alpha": 0.01
+      },
+      "W": "signed_sqrt",
+      "A": {
+        "selected": {
+          "family": "QC32_RLS",
+          "p": 1,
+          "window": 0,
+          "forget": 0.995,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "provenance": "frozen candidate-restricted reconstruction",
+      "effects": [
+        {
+          "skip": 0,
+          "increase_percent": 17.18611699725876,
+          "CI95": [
+            -4.104906492033189,
+            45.28288852427038
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        },
+        {
+          "skip": 47,
+          "increase_percent": 17.07719302413029,
+          "CI95": [
+            -4.2137215934945,
+            45.0326705337024
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        }
+      ]
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "no_W",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.03450711083878171,
+      "MAE": 0.025444522916481544,
+      "KC": {
+        "kind": "URYSOHN",
+        "alpha": 100.0,
+        "own": true,
+        "memory": true
+      },
+      "W": "identity",
+      "A": {
+        "selected": {
+          "family": "BIAS",
+          "p": 0,
+          "window": 256,
+          "tau": 32,
+          "gain": 1.0
+        },
+        "admitted": true
+      },
+      "provenance": "frozen candidate-restricted reconstruction",
+      "effects": [
+        {
+          "skip": 0,
+          "increase_percent": 0.19330841900950801,
+          "CI95": [
+            0.09316841072385229,
+            0.28986510781817915
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        },
+        {
+          "skip": 47,
+          "increase_percent": 0.19242494935625132,
+          "CI95": [
+            0.09350269833771352,
+            0.28376259794837877
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        }
+      ]
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "no_A",
+      "window": 128,
+      "n": 4021,
+      "RMSE": 0.040614939181896875,
+      "MAE": 0.03195918761649855,
+      "KC": {
+        "kind": "OWN",
+        "alpha": 0.01
+      },
+      "W": "signed_sqrt",
+      "A": null,
+      "provenance": "persisted model",
+      "effects": [
+        {
+          "skip": 0,
+          "increase_percent": 17.92772645856133,
+          "CI95": [
+            -2.7284808323475818,
+            44.329425024760326
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        },
+        {
+          "skip": 47,
+          "increase_percent": 17.827086576832784,
+          "CI95": [
+            -2.4558800561973997,
+            44.11979015444176
+          ],
+          "block": 192,
+          "bootstrap": 2500,
+          "role": "reused-development descriptive interval; not adjusted for search"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "frozen_full_prediction_match": true,
+      "fits_during_development_replay": 0,
+      "raw_workbook_read": false,
+      "reserved_tail_read": false
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "frozen_full_prediction_match": true,
+      "fits_during_development_replay": 0,
+      "raw_workbook_read": false,
+      "reserved_tail_read": false
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "frozen_full_prediction_match": true,
+      "fits_during_development_replay": 0,
+      "raw_workbook_read": false,
+      "reserved_tail_read": false
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "frozen_full_prediction_match": true,
+      "fits_during_development_replay": 0,
+      "raw_workbook_read": false,
+      "reserved_tail_read": false
+    },
+    {
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "frozen_full_prediction_match": true,
+      "fits_during_development_replay": 0,
+      "raw_workbook_read": false,
+      "reserved_tail_read": false
+    },
+    {
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "frozen_full_prediction_match": true,
+      "fits_during_development_replay": 0,
+      "raw_workbook_read": false,
+      "reserved_tail_read": false
+    },
+    {
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "frozen_full_prediction_match": true,
+      "fits_during_development_replay": 0,
+      "raw_workbook_read": false,
+      "reserved_tail_read": false
+    }
+  ]
+}

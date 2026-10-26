@@ -1,0 +1,11 @@
+{
+  "python": "3.10.12 (main, Jul 15 2026, 23:40:17) [GCC 11.4.0]",
+  "executable": "/root/autodl-tmp/PRISM_V06_SRU_CZ_SCALE_SEARCH_20261020/.venv/bin/python",
+  "packages": {
+    "numpy": "2.2.6",
+    "scipy": "1.15.3",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.7.1",
+    "pyarrow": "24.0.0"
+  }
+}

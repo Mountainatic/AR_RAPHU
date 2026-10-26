@@ -1,0 +1,62 @@
+{
+  "status": "PARTIAL_NUMERICAL_REJECTION",
+  "records": [
+    {
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "passed": true,
+      "max_absolute_error": 6.772360450213455e-15
+    },
+    {
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "passed": true,
+      "max_absolute_error": 3.552713678800501e-15
+    },
+    {
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "passed": true,
+      "max_absolute_error": 4.9960036108132044e-15
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "passed": true,
+      "max_absolute_error": 5.684341886080802e-14
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "passed": true,
+      "max_absolute_error": 5.684341886080802e-14
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "passed": true,
+      "max_absolute_error": 5.684341886080802e-14
+    },
+    {
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "passed": true,
+      "max_absolute_error": 8.009237717487849e-11
+    },
+    {
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "passed": true,
+      "max_absolute_error": 1.1237943908781745e-10
+    },
+    {
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "passed": false,
+      "max_absolute_error": 3.7636027627740987e-10
+    }
+  ],
+  "rtol": 1e-12,
+  "atol": 1e-12,
+  "reserved_tail_read": false
+}

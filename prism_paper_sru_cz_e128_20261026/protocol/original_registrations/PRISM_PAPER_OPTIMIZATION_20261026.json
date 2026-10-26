@@ -1,0 +1,214 @@
+{
+  "status": "FROZEN_BEFORE_NEW_FITS",
+  "cases": {
+    "SRU_H2S": {
+      "root": "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024",
+      "parent_end": 3328,
+      "train_end": 6048,
+      "dev_end": 8064,
+      "windows": {
+        "4": 8,
+        "8": 16,
+        "16": 16
+      }
+    },
+    "CZ_Rod1": {
+      "root": "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1",
+      "parent_end": 6636,
+      "train_end": 12061,
+      "dev_end": 16082,
+      "windows": {
+        "4": 8,
+        "8": 16,
+        "16": 32
+      }
+    },
+    "CZ_Rod2": {
+      "root": "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2",
+      "parent_end": 6810,
+      "train_end": 12376,
+      "dev_end": 16501,
+      "windows": {
+        "4": 8,
+        "8": 8,
+        "16": 64
+      }
+    }
+  },
+  "jobs": [
+    {
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "variant": "no_KC"
+    },
+    {
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "variant": "no_W"
+    },
+    {
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "variant": "full"
+    },
+    {
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "variant": "no_KC"
+    },
+    {
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 4,
+      "variant": "no_W"
+    },
+    {
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "variant": "no_KC"
+    },
+    {
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "variant": "no_W"
+    },
+    {
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "variant": "full"
+    },
+    {
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "variant": "no_KC"
+    },
+    {
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "variant": "no_W"
+    },
+    {
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "variant": "no_KC"
+    },
+    {
+      "runtime": "standard",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "variant": "no_W"
+    },
+    {
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "variant": "full"
+    },
+    {
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "variant": "no_KC"
+    },
+    {
+      "runtime": "robust",
+      "entity": "SRU_H2S",
+      "delay": 16,
+      "variant": "no_W"
+    },
+    {
+      "runtime": "robust",
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "variant": "full"
+    },
+    {
+      "runtime": "robust",
+      "entity": "CZ_Rod1",
+      "delay": 8,
+      "variant": "full"
+    },
+    {
+      "runtime": "robust",
+      "entity": "CZ_Rod1",
+      "delay": 16,
+      "variant": "full"
+    },
+    {
+      "runtime": "robust",
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "variant": "full"
+    },
+    {
+      "runtime": "robust",
+      "entity": "CZ_Rod2",
+      "delay": 8,
+      "variant": "full"
+    },
+    {
+      "runtime": "robust",
+      "entity": "CZ_Rod2",
+      "delay": 16,
+      "variant": "full"
+    }
+  ],
+  "source_hashes": {
+    "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D4/L8/full.pkl": "4e5467835caa2e2ceb1a29311517f47866240416076b3fd0b6a8a0af97bf6568",
+    "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D4/L8/no_A.pkl": "ce2d665ddaade5f9ec420228e174a81c758df3bbf709a310ba6b9aacda397ba4",
+    "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D8/L16/full.pkl": "cd5e043cdb3f211617b78fd805c0f53d13413330ffc3babc515f8eadcae97fe6",
+    "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D8/L16/no_A.pkl": "067784825a11c5ea585932e9a9c91b3a123e0b79686d1904824f14487460c6b1",
+    "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D16/L16/full.pkl": "27201cf5a558c1f17faeff46310c046d57ec0caa388c38529a9f86e7b46df14d",
+    "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/runs/D16/L16/no_A.pkl": "a83263a3eccaf490fbe35ffd0d83fc69ef8a3a05705846f8655d3bdc481e463d",
+    "/root/autodl-tmp/PRISM_SRU_WINDOW_SELECTION_20261024/data/train.npz": "c4e9ac57c8a60b6e948941bca5cf9323ea1b95cd1c433d74444a46b9b970452f",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D4/L8/full.pkl": "0000a21d18475bd02ab42e2239f5e770b167cb46394564c845bcc382ee53bdf9",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D4/L8/no_A.pkl": "cf3e2a20c9fa00546eaa9d96c3fc8c367b4b4ffae1993addc5b0b8618324cefe",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D8/L16/full.pkl": "9cfe34f869bc3f3be427550332699cf0846536caea69365d82a80a9c8a71ae62",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D8/L16/no_A.pkl": "594086adeb6b08e8d2bc7444c28cb36e7a05b5fe8297b3c97900ddcdf414893a",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D16/L32/full.pkl": "709848d900c13b38335478ab340819e2c821d70498618eef600c75ff47ac7e85",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/runs/D16/L32/no_A.pkl": "264e128b5a12d4c80671dc3cbc6cb4f6f79e1b4ab47801aed7be9927050db5b3",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod1/data/train.npz": "7c102e24d4de760200f467bfac6af844375fbb83d01f7bb904d46ca1993da985",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D4/L8/full.pkl": "f6229b8aa99ca4bbe6bb5579cc31ff413c2b59d124eee6dcaf9d979e019d9a4e",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D4/L8/no_A.pkl": "54790874e73b11c77a9536f6786c7c66d45549b9590aefaceb0366317f55ca36",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D8/L8/full.pkl": "dc01ab6a12bea0282f968ac274f048ac017ec2ff9760418d98741d1e80cde535",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D8/L8/no_A.pkl": "beaeb2a4bae4405af1e99851b24b836a7d137aacce2f89ea0417b40780017ae5",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D16/L64/full.pkl": "43d4f3a364b18c09daf347c2f354f7c3778f97c0aac9fda1c45783081d8486b9",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/runs/D16/L64/no_A.pkl": "c03d16ddfeabb3fbfe308e7c28af321394922c9fbac8baf353d3a2a92735e583",
+    "/root/autodl-tmp/cz_sru_matched_20261024/CZ_Rod2/data/train.npz": "f5d63a87a7560405d94140f26f629d5c48ccfc83c1e6b50930f826d9ffce6613"
+  },
+  "code_hashes": {
+    "suite.py": "d2fabba9bce8ecf7eac00e1f2242d9cc97f9795c80c67638b6def82c4c287370",
+    "setup_remote.py": "c84296bbf169c9eea6f8256b72073253d21a2e4fd5de94bf3b16a59aa65ac32d",
+    "selftest.py": "98cbb5efb70c3182975126bd3d04089e0e8e9136c119b749d06f5c5d919eab1a",
+    "standard/model.py": "eec612d8cb7137cbdf676db5d2de61cfbb4fbfae2429aa9630865ad737ab300a",
+    "standard/mature_a.py": "d90eb7bce5ec832e4776c2dfc79f31b76b99566619bfcd8451f01cab62bd04aa",
+    "standard/legacy.py": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043",
+    "standard/rls_core.py": "4adea2db3dd2acd80278443df2e5fef776590306e750cac7573ebcb212eec5fe",
+    "robust/model.py": "eec612d8cb7137cbdf676db5d2de61cfbb4fbfae2429aa9630865ad737ab300a",
+    "robust/mature_a.py": "dae8dd73780ce46cb5b243d32a42e830aed1dd55d8b14b6ca1f03f78aae13338",
+    "robust/legacy.py": "8ff0b2b1a3a6f24591d48b5f39cae0e57face50703e3cef8ad188e63d0297043",
+    "robust/rls_core.py": "cca7b202e65f90a1afc2af818d91b50ba3f72e53349ec676f86899fe24357812"
+  },
+  "task": "Concurrent y(t) soft sensing; same current X and strictly matured y as original. Label delays are experimental availability assumptions.",
+  "ablations": "Fixed original train-selected full window per task, common support127+delay and original training geometry. no_KC/no_W independently refit and reselect KCW/A; frozen full/no_A are reused only for standard. This is conditional fixed-window ablation, not reselecting the entire window-search procedure.",
+  "robust_extension": "Original273 A specs retained. Add32 QC8/QC32 specifications with innovation_clip3 or6 in training-residual standard deviations, window512/all,forget.995/.999,gain.5/1. Ridge100 initialization, stored-issued phi, original support/numerical gates and fully nested A policy selection remain. Only theta update innovation is bounded; no prediction/target clipping.",
+  "selection": "Original training-only nested A MSE and three outer admission folds, joint KCW/A risk. No development-driven model selection, task/window changes, or repeated grid edits.",
+  "evaluation": "Generate all new development predictions only after every21 new job freezes. Previously reused development, exploratory, not independent test.",
+  "resources": {
+    "workers": 3,
+    "threads": 1,
+    "GPU_training": false
+  },
+  "reserved_tail_read": false,
+  "raw_workbook_read": false
+}

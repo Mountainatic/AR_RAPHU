@@ -1,0 +1,4 @@
+model,delay,L,ensemble,regression_coefficients,compact_deployment_bytes,median_us,p95_us,samples,includes_RLS_update
+PRISM_spline_repaired,4,8,1,26,2788,60.491496697068214,62.98900116235018,768,True
+PRISM_spline_repaired,8,16,1,36,3865,87.26818487048149,89.74187076091766,768,True
+PRISM_spline_repaired,16,16,1,36,3865,87.87214756011963,90.6710047274828,768,True

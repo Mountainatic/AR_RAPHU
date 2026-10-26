@@ -1,0 +1,152 @@
+{
+  "status": "COMPLETED",
+  "role": "retrospective archive of exploratory reused-development results",
+  "task": "concurrent y(t), process inputs through t, target history only through t-delay",
+  "delay_steps": [
+    4,
+    8,
+    16
+  ],
+  "delay_is_forecast_horizon": false,
+  "physical_label_delay_verified": false,
+  "outer_split": "independent chronological 60/20/20 within each trajectory; no cross-rod training",
+  "intervals": {
+    "SRU_H2S": {
+      "train": [
+        0,
+        6048
+      ],
+      "development": [
+        6048,
+        8064
+      ],
+      "reserved_tail": [
+        8064,
+        10080
+      ],
+      "parent_end": 3328
+    },
+    "CZ_Rod1": {
+      "train": [
+        0,
+        12061
+      ],
+      "development": [
+        12061,
+        16082
+      ],
+      "reserved_tail": [
+        16082,
+        20103
+      ],
+      "parent_end": 6636
+    },
+    "CZ_Rod2": {
+      "train": [
+        0,
+        12376
+      ],
+      "development": [
+        12376,
+        16501
+      ],
+      "reserved_tail": [
+        16501,
+        20627
+      ],
+      "parent_end": 6810
+    }
+  },
+  "intervals_convention": "zero-based, left-closed right-open",
+  "parent_fit_origins": "[192,parent_end)",
+  "A_calibration_origins": "[parent_end+128+2*delay,train_end-delay+1)",
+  "common_dependency_support": "127+delay",
+  "KCW_inner_validation_fractions": [
+    [
+      0.7,
+      0.85
+    ],
+    [
+      0.85,
+      1.0
+    ]
+  ],
+  "A_outer_validation_fractions": [
+    [
+      0.6,
+      0.75
+    ],
+    [
+      0.75,
+      0.9
+    ],
+    [
+      0.9,
+      1.0
+    ]
+  ],
+  "CZ_main_history": 128,
+  "CZ_short_history_control": 16,
+  "SRU_selected_history": {
+    "4": 8,
+    "8": 16,
+    "16": 16
+  },
+  "E128_bins": [
+    [
+      0,
+      1
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      4,
+      8
+    ],
+    [
+      8,
+      16
+    ],
+    [
+      16,
+      32
+    ],
+    [
+      32,
+      64
+    ],
+    [
+      64,
+      128
+    ]
+  ],
+  "E128_operation": "raw process block means, then per-channel amplitude basis; learned ridge coefficients",
+  "preprocessing": "fit within each corresponding training fold only",
+  "SRU_ablation": "independent refit/reselection conditional on full-model selected window; KC jointly removed",
+  "Rod1_ablation": "diagnostic frozen candidate restriction/reconstruction, not a new full nested search",
+  "Rod2_module_ablation": "DEFERRED_BY_USER_20261026; omitted from published metric/effect tables; no universal positive-module claim",
+  "main_metric": "all development targets, including startup",
+  "startup_sensitivity": "skip 32+delay-1 fixed points; diagnostic only",
+  "uncertainty": {
+    "method": "paired circular block bootstrap",
+    "block": 192,
+    "replicates": 2500,
+    "seed": 20261026,
+    "role": "descriptive; no correction for adaptive development reuse"
+  },
+  "neural_main_aggregation": "pointwise mean of seed0/1/2; metrics_by_seed separately retained",
+  "numerical_tolerance": {
+    "rtol": 1e-12,
+    "atol": 1e-12
+  },
+  "new_hyperparameter_search": false,
+  "raw_workbook_read": false,
+  "reserved_tail_read": false,
+  "data_release": "no raw caches/workbooks, CZ sample trajectories, predictions/residuals, fitted weights or checkpoints"
+}

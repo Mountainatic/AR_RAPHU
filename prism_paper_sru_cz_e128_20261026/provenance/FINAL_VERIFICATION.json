@@ -1,0 +1,12 @@
+{
+  "status": "COMPLETED",
+  "new_variant_task_fits": 87,
+  "frozen_model_files_verified": 87,
+  "saved_metric_RMSE_recomputed": 108,
+  "original_source_bindings_verified": 70,
+  "export_count": 2,
+  "no_new_fitting_during_evaluation": true,
+  "raw_workbook_read": false,
+  "reserved_tail_read": false,
+  "all_negative_results_retained": true
+}

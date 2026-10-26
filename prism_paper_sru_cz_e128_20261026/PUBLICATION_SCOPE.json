@@ -1,0 +1,21 @@
+{
+  "status": "COMPLETED",
+  "included": [
+    "SRU comparison and KC/W/A ablations",
+    "CZ Rod1/Rod2 full-model comparisons",
+    "CZ E128, E16 and fixed128 history controls",
+    "Rod1 frozen-candidate ablation diagnostics",
+    "input attribution aggregates",
+    "complexity and deployment verification",
+    "code and frozen registrations"
+  ],
+  "excluded": {
+    "CZ_Rod2_module_ablation": "user requested deferral after weak/inconsistent diagnostic effects",
+    "Rod2_break_cleanup_sensitivity": "exploratory RAM-only diagnosis; not promoted to the published main model",
+    "private_data_and_model_weights": "preserve existing CZ public-release boundary"
+  },
+  "omission_does_not_imply_positive_result": true,
+  "original_server_records_preserved": true,
+  "no_claim_of_all_CZ_modules_positive": true,
+  "no_new_independent_test": true
+}
