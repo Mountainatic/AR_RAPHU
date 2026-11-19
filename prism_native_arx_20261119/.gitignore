@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pkl
+*.npz
+*.npy
+*.parquet
+*.so
+model_constants.h
+build/

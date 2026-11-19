@@ -1,0 +1,469 @@
+{
+  "version": "prism-native-arx-20261119",
+  "date_local": "2026-11-19",
+  "evidence_role": "Reused development segments; reference and native predictions agree at rtol=1e-12, atol=1e-12",
+  "profile": [
+    {
+      "entity": "SRU_H2S",
+      "delay": 8,
+      "source": "historical_frozen_plus_history",
+      "recipe": "level",
+      "KC_kind": "URYSOHN",
+      "process_E128_active": false,
+      "target_history_mode": "endpoints",
+      "RMSE": 0.023237965052984963,
+      "best_baseline": "Transformer",
+      "baseline_RMSE": 0.024906279223459872,
+      "relative_RMSE_reduction_pct": 6.698367730911325,
+      "baseline_effect": {
+        "control_RMSE_increase_pct": 7.17926103542621,
+        "CI95": [
+          -17.197664812621085,
+          19.34982123491023
+        ],
+        "role": "adaptive-development descriptive; not search adjusted",
+        "block": 192
+      },
+      "regression_coefficients": 36,
+      "model_sha256": "40814b311ba3cda024a0a05b7a2a12a183802d0cba1bb1933a6882aaea450fff",
+      "ablations": [
+        {
+          "control": "no_KC",
+          "RMSE": 0.04789668916617193,
+          "control_RMSE_increase_pct": 106.11395643707411,
+          "CI95": [
+            51.605615355928045,
+            122.87026487825952
+          ],
+          "role": "adaptive-development descriptive; not search adjusted",
+          "block": 192
+        },
+        {
+          "control": "no_W",
+          "RMSE": 0.037907551808372346,
+          "control_RMSE_increase_pct": 63.12767370954906,
+          "CI95": [
+            29.724438852894817,
+            79.5322078289097
+          ],
+          "role": "adaptive-development descriptive; not search adjusted",
+          "block": 192
+        },
+        {
+          "control": "no_A",
+          "RMSE": 0.030457879965128803,
+          "control_RMSE_increase_pct": 31.06948003270378,
+          "CI95": [
+            3.947141928304749,
+            39.58673978577446
+          ],
+          "role": "adaptive-development descriptive; not search adjusted",
+          "block": 192
+        }
+      ]
+    },
+    {
+      "entity": "CZ_Rod1",
+      "delay": 4,
+      "source": "historical_frozen_plus_history",
+      "recipe": "level",
+      "KC_kind": "URYSOHN",
+      "process_E128_active": true,
+      "target_history_mode": "endpoints",
+      "RMSE": 0.014646376709909368,
+      "best_baseline": "Transformer",
+      "baseline_RMSE": 0.016073668823283604,
+      "relative_RMSE_reduction_pct": 8.879690934696393,
+      "baseline_effect": {
+        "control_RMSE_increase_pct": 9.745018455032417,
+        "CI95": [
+          1.5865735749983452,
+          17.76473656903065
+        ],
+        "role": "adaptive-development descriptive; not search adjusted",
+        "block": 192
+      },
+      "regression_coefficients": 90,
+      "model_sha256": "f6e90a5400d9dfc7060ef6af0d7bb5ae3d6987a11a951a1131aa66b9151772b7"
+    },
+    {
+      "entity": "CZ_Rod2",
+      "delay": 4,
+      "source": "PRISM_PAPER_DRIVER_E128_20261030",
+      "recipe": "delta",
+      "KC_kind": "LINEAR",
+      "process_E128_active": true,
+      "target_history_mode": "endpoints",
+      "RMSE": 0.010969733881612882,
+      "best_baseline": "Transformer",
+      "baseline_RMSE": 0.010956350523028012,
+      "relative_RMSE_reduction_pct": -0.12215161021675858,
+      "baseline_effect": {
+        "control_RMSE_increase_pct": -0.12200258209821291,
+        "CI95": [
+          -4.716366867440226,
+          3.9881657257070895
+        ],
+        "role": "adaptive-development descriptive; not search adjusted",
+        "block": 192
+      },
+      "regression_coefficients": 66,
+      "model_sha256": "5104655c40f4e473b7fc33ea766b0eea7a69433b6ac3971160c7a95d21341d81"
+    }
+  ],
+  "benchmarks": [
+    {
+      "cpu": "Intel(R) Xeon(R) Platinum 8352V CPU @ 2.10GHz",
+      "core": 0,
+      "platform": "Linux-5.15.0-78-generic-x86_64-with-glibc2.35",
+      "flags": [
+        "-O3",
+        "-march=native",
+        "-fopenmp-simd",
+        "-fno-math-errno",
+        "-ffp-contract=off",
+        "-mprefer-vector-width=512"
+      ],
+      "compiler": "gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0",
+      "dtype": "float64",
+      "rows": [
+        {
+          "entity": "SRU_H2S",
+          "delay": 8,
+          "history": 16,
+          "step_count": 2016,
+          "warmup": 64,
+          "measurements": {
+            "PRISM": {
+              "max_abs_error": 5.245803791353865e-15,
+              "RMSE": 0.023237965052985,
+              "median_ns_per_sample": 290.48002049180326,
+              "p10_ns": 289.54149590163934,
+              "p90_ns": 296.2325819672131,
+              "repeats": 51
+            },
+            "AR": {
+              "max_abs_error": 5.551115123125783e-17,
+              "RMSE": 0.04781683483622794,
+              "median_ns_per_sample": 39.3780737704918,
+              "p10_ns": 39.357069672131146,
+              "p90_ns": 39.669569672131146,
+              "repeats": 51
+            },
+            "ARX": {
+              "max_abs_error": 1.27675647831893e-15,
+              "RMSE": 0.03222121424840999,
+              "median_ns_per_sample": 60.53842213114754,
+              "p10_ns": 60.50819672131148,
+              "p90_ns": 61.298668032786885,
+              "repeats": 51
+            }
+          },
+          "A_parameters": 13,
+          "prism_state_bytes": 4888,
+          "prism_source_sha256": "40814b311ba3cda024a0a05b7a2a12a183802d0cba1bb1933a6882aaea450fff",
+          "linear_source_sha256": "f729986c9f55dd089a6ec27e156d90de9db4a675bd12ca14e2c51f8a55b1301f",
+          "constants_sha256": "c85edec5d4e6784f30c67adc8872e65ce9286f6e41f923d50df06833b4caef4d",
+          "PRISM_over_AR": 7.3766945073244345,
+          "PRISM_over_ARX": 4.798275380592531,
+          "single_step_api_verified": true
+        },
+        {
+          "entity": "CZ_Rod1",
+          "delay": 4,
+          "history": 128,
+          "step_count": 4021,
+          "warmup": 64,
+          "measurements": {
+            "PRISM": {
+              "max_abs_error": 2.2851054382044822e-11,
+              "RMSE": 0.014646376709831623,
+              "median_ns_per_sample": 253.00732878443264,
+              "p10_ns": 229.0763204447814,
+              "p90_ns": 304.9931766489765,
+              "repeats": 51
+            },
+            "AR": {
+              "max_abs_error": 5.684341886080802e-14,
+              "RMSE": 0.01709676068567859,
+              "median_ns_per_sample": 48.576699519838265,
+              "p10_ns": 44.02223907000253,
+              "p90_ns": 58.69446550416983,
+              "repeats": 51
+            },
+            "ARX": {
+              "max_abs_error": 5.684341886080802e-14,
+              "RMSE": 0.01832889766079568,
+              "median_ns_per_sample": 136.78342178417992,
+              "p10_ns": 125.96638867829164,
+              "p90_ns": 165.24614607025524,
+              "repeats": 51
+            }
+          },
+          "A_parameters": 7,
+          "prism_state_bytes": 13192,
+          "prism_source_sha256": "f6e90a5400d9dfc7060ef6af0d7bb5ae3d6987a11a951a1131aa66b9151772b7",
+          "linear_source_sha256": "3ed139e1ddb220852be659ce693acf61dce0160b1c6187db45051f63958a4052",
+          "constants_sha256": "db183524d47953b42df78453aa3431fd3904987aa6caaf78fe525b24abee7741",
+          "PRISM_over_AR": 5.208409202051836,
+          "PRISM_over_ARX": 1.8496929341600588,
+          "single_step_api_verified": true
+        },
+        {
+          "entity": "CZ_Rod2",
+          "delay": 4,
+          "history": 128,
+          "step_count": 4125,
+          "warmup": 64,
+          "measurements": {
+            "PRISM": {
+              "max_abs_error": 1.1368683772161603e-13,
+              "RMSE": 0.010969733881612776,
+              "median_ns_per_sample": 395.90667323319377,
+              "p10_ns": 392.3277517852746,
+              "p90_ns": 502.87047525240087,
+              "repeats": 51
+            },
+            "AR": {
+              "max_abs_error": 5.684341886080802e-14,
+              "RMSE": 0.01391243251964912,
+              "median_ns_per_sample": 50.31617828121153,
+              "p10_ns": 50.3016498399409,
+              "p90_ns": 64.04383156857917,
+              "repeats": 51
+            },
+            "ARX": {
+              "max_abs_error": 5.684341886080802e-14,
+              "RMSE": 0.011915135893760054,
+              "median_ns_per_sample": 141.74858409258803,
+              "p10_ns": 140.85939423787244,
+              "p90_ns": 181.59763605023394,
+              "repeats": 51
+            }
+          },
+          "A_parameters": 23,
+          "prism_state_bytes": 17800,
+          "prism_source_sha256": "5104655c40f4e473b7fc33ea766b0eea7a69433b6ac3971160c7a95d21341d81",
+          "linear_source_sha256": "61e81e677541726675efde4276e62b5697632d2765e68df07228c1bcf58849b4",
+          "constants_sha256": "804c7d2f3de60625166b1bc903434d977c9a071b9e4a050cd02db5ff31c523e8",
+          "PRISM_over_AR": 7.8683772646745025,
+          "PRISM_over_ARX": 2.793020302584423,
+          "single_step_api_verified": true
+        }
+      ],
+      "source_sha256": "c224121caf77ce0bf10214ce78def4dd5d16b8967497433bed5e1f7ac22fbf4b"
+    },
+    {
+      "cpu": "Intel(R) Xeon(R) Platinum 8352V CPU @ 2.10GHz",
+      "core": 12,
+      "platform": "Linux-5.15.0-78-generic-x86_64-with-glibc2.35",
+      "flags": [
+        "-O3",
+        "-march=native",
+        "-fopenmp-simd",
+        "-fno-math-errno",
+        "-ffp-contract=off",
+        "-mprefer-vector-width=512"
+      ],
+      "compiler": "gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0",
+      "dtype": "float64",
+      "rows": [
+        {
+          "entity": "SRU_H2S",
+          "delay": 8,
+          "history": 16,
+          "step_count": 2016,
+          "warmup": 64,
+          "measurements": {
+            "PRISM": {
+              "max_abs_error": 5.245803791353865e-15,
+              "RMSE": 0.023237965052985,
+              "median_ns_per_sample": 263.4385245901639,
+              "p10_ns": 207.31352459016392,
+              "p90_ns": 264.93493852459017,
+              "repeats": 51
+            },
+            "AR": {
+              "max_abs_error": 5.551115123125783e-17,
+              "RMSE": 0.04781683483622794,
+              "median_ns_per_sample": 34.658299180327866,
+              "p10_ns": 27.248975409836067,
+              "p90_ns": 34.88319672131148,
+              "repeats": 51
+            },
+            "ARX": {
+              "max_abs_error": 1.27675647831893e-15,
+              "RMSE": 0.03222121424840999,
+              "median_ns_per_sample": 54.9656762295082,
+              "p10_ns": 43.18801229508197,
+              "p90_ns": 55.01229508196721,
+              "repeats": 51
+            }
+          },
+          "A_parameters": 13,
+          "prism_state_bytes": 4888,
+          "prism_source_sha256": "40814b311ba3cda024a0a05b7a2a12a183802d0cba1bb1933a6882aaea450fff",
+          "linear_source_sha256": "f729986c9f55dd089a6ec27e156d90de9db4a675bd12ca14e2c51f8a55b1301f",
+          "constants_sha256": "c85edec5d4e6784f30c67adc8872e65ce9286f6e41f923d50df06833b4caef4d",
+          "PRISM_over_AR": 7.6010228666873605,
+          "PRISM_over_ARX": 4.792782380956819,
+          "single_step_api_verified": true
+        },
+        {
+          "entity": "CZ_Rod1",
+          "delay": 4,
+          "history": 128,
+          "step_count": 4021,
+          "warmup": 64,
+          "measurements": {
+            "PRISM": {
+              "max_abs_error": 2.2851054382044822e-11,
+              "RMSE": 0.014646376709831623,
+              "median_ns_per_sample": 252.44882486732374,
+              "p10_ns": 215.72731867576448,
+              "p90_ns": 256.694970937579,
+              "repeats": 51
+            },
+            "AR": {
+              "max_abs_error": 5.684341886080802e-14,
+              "RMSE": 0.01709676068567859,
+              "median_ns_per_sample": 48.57391963608794,
+              "p10_ns": 42.682335102350265,
+              "p90_ns": 50.306039929239326,
+              "repeats": 51
+            },
+            "ARX": {
+              "max_abs_error": 5.684341886080802e-14,
+              "RMSE": 0.01832889766079568,
+              "median_ns_per_sample": 138.72934040940106,
+              "p10_ns": 125.11170078342178,
+              "p90_ns": 141.30957796310335,
+              "repeats": 51
+            }
+          },
+          "A_parameters": 7,
+          "prism_state_bytes": 13192,
+          "prism_source_sha256": "f6e90a5400d9dfc7060ef6af0d7bb5ae3d6987a11a951a1131aa66b9151772b7",
+          "linear_source_sha256": "3ed139e1ddb220852be659ce693acf61dce0160b1c6187db45051f63958a4052",
+          "constants_sha256": "db183524d47953b42df78453aa3431fd3904987aa6caaf78fe525b24abee7741",
+          "PRISM_over_AR": 5.1972092587678915,
+          "PRISM_over_ARX": 1.8197219429021116,
+          "single_step_api_verified": true
+        },
+        {
+          "entity": "CZ_Rod2",
+          "delay": 4,
+          "history": 128,
+          "step_count": 4125,
+          "warmup": 64,
+          "measurements": {
+            "PRISM": {
+              "max_abs_error": 1.1368683772161603e-13,
+              "RMSE": 0.010969733881612776,
+              "median_ns_per_sample": 393.0541738488057,
+              "p10_ns": 392.8332922925388,
+              "p90_ns": 475.36468850036937,
+              "repeats": 51
+            },
+            "AR": {
+              "max_abs_error": 5.684341886080802e-14,
+              "RMSE": 0.01391243251964912,
+              "median_ns_per_sample": 50.31100714109825,
+              "p10_ns": 50.29918739226792,
+              "p90_ns": 64.0177296232455,
+              "repeats": 51
+            },
+            "ARX": {
+              "max_abs_error": 5.684341886080802e-14,
+              "RMSE": 0.011915135893760054,
+              "median_ns_per_sample": 141.4902733316917,
+              "p10_ns": 139.74341295247476,
+              "p90_ns": 179.88081753262742,
+              "repeats": 51
+            }
+          },
+          "A_parameters": 23,
+          "prism_state_bytes": 17800,
+          "prism_source_sha256": "5104655c40f4e473b7fc33ea766b0eea7a69433b6ac3971160c7a95d21341d81",
+          "linear_source_sha256": "61e81e677541726675efde4276e62b5697632d2765e68df07228c1bcf58849b4",
+          "constants_sha256": "804c7d2f3de60625166b1bc903434d977c9a071b9e4a050cd02db5ff31c523e8",
+          "PRISM_over_AR": 7.812488681581691,
+          "PRISM_over_ARX": 2.777958969146803,
+          "single_step_api_verified": true
+        }
+      ],
+      "source_sha256": "c224121caf77ce0bf10214ce78def4dd5d16b8967497433bed5e1f7ac22fbf4b"
+    }
+  ],
+  "rod2_cadence": [
+    {
+      "name": "incumbent",
+      "RMSE": 0.010969733881612882,
+      "updates": 4121,
+      "spec": {
+        "family": "EX_RLS",
+        "p": 1,
+        "window": 512,
+        "forget": 0.999,
+        "gain": 1.0,
+        "stride": 1
+      },
+      "MSE": 9.605943503275825e-05
+    },
+    {
+      "name": "selected",
+      "RMSE": 0.010969733881612882,
+      "updates": 4121,
+      "spec": {
+        "family": "EX_RLS",
+        "p": 1,
+        "window": 512,
+        "forget": 0.999,
+        "gain": 1.0,
+        "stride": 1
+      },
+      "MSE": 9.605943503275825e-05
+    },
+    {
+      "name": "selected_sparse",
+      "RMSE": 0.011134220810308262,
+      "updates": 2061,
+      "spec": {
+        "family": "EX_RLS",
+        "p": 1,
+        "window": 512,
+        "forget": 0.995,
+        "gain": 1.0,
+        "stride": 2
+      },
+      "MSE": 9.664543839496496e-05
+    }
+  ],
+  "timing": "Median of 51 per-replay averages after 64 warmup steps; excludes wrapper, initialization, file I/O.",
+  "synthetic_smoke": {
+    "profiles": [
+      "QC32_RLS",
+      "QD8_RLS",
+      "EX_RLS"
+    ],
+    "steps_per_profile": 768,
+    "native": true,
+    "portable": true,
+    "AR_ARX_checked": true
+  },
+  "private_package": {
+    "sha256": "da669aa340a314c5f841fd70ad891a8e2f76c3aa4cb40cd30442b65dc95af3a7",
+    "verified_members": 39,
+    "bytes": 289714
+  },
+  "source_files_sha256": {
+    "benchmark.py": "77f419fa112cdb90be0b1d1ed40f7b40dc9591343d0ff9e94ed6cbb3262a3c57",
+    "deploy_history.py": "d877009db28d003f2d32ee5cabdcbb2ef8b6f4ff02298d16834334bb424cd15a",
+    "native_predictor.py": "2e5fb261d29c8c42d3c00cb69a07a75a4148722e85d224137567bde5d5e40307",
+    "native_stream.c": "c224121caf77ce0bf10214ce78def4dd5d16b8967497433bed5e1f7ac22fbf4b",
+    "rod2_cadence.py": "682aa297afbdf686e6d27fcaa6675a846604f2b3dbd9720b5f2b674cb70b21f4",
+    "smoke.py": "0aa3dd30dbffaa3427d60e28cbc2a6435c4b6fd93d9f1730e94cb94fdfa2fd0e",
+    "stable_spline.py": "501e25c5580f9a731a0bb86a10c552b958761da138264e8d3ec78b65fd538c48",
+    "streaming_balance.py": "e32ab9e5de47def9a162d4eceb04547a2ccd856ab54a9d5ed6155aefd3f002ab"
+  }
+}
