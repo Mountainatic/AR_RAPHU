@@ -1,0 +1,48 @@
+{
+  "amendment_id": "PRISM_V2_1_SRU_BASELINE_REPLAY_AMENDMENT_20260806",
+  "status": "FROZEN_USER_AUTHORIZED_BEFORE_BASELINE_REPLAY",
+  "historical_baseline_parquet": "NOT_AVAILABLE_NOT_SEARCHED_NOT_REQUIRED",
+  "execution_order": [
+    "B0",
+    "E0",
+    "E1",
+    "E2_K",
+    "E2_C",
+    "E3_W",
+    "E4_A",
+    "E5_JOINT",
+    "E6",
+    "E7",
+    "E8"
+  ],
+  "active_datasets": [
+    "sru"
+  ],
+  "active_heads": [
+    "SRU_H2S__H5__W1",
+    "SRU_SO2__H5__W1"
+  ],
+  "splits_materialized_by_b0": [
+    "validation",
+    "test"
+  ],
+  "ood_enabled": false,
+  "other_datasets_enabled": false,
+  "private_cz_enabled": false,
+  "baseline_source_configs": [
+    "configs/cpu_model_freeze_v1.json",
+    "configs/c6_full_final_v2.json"
+  ],
+  "baseline_test_access": {
+    "allowed_in_b0": true,
+    "metrics_computed_in_b0": false,
+    "selection_exposure": false,
+    "separate_subprocess_required": true
+  },
+  "v21_candidate_test_access": {
+    "allowed_before_e6": false,
+    "first_allowed_stage": "E7"
+  },
+  "external_baseline_root_allowed": false,
+  "historical_prediction_search_allowed": false
+}

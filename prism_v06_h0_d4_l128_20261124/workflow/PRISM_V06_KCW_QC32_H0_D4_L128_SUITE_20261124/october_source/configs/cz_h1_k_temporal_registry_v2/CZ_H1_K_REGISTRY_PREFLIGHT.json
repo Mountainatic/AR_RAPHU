@@ -1,0 +1,93 @@
+{
+  "access_log": [
+    {
+      "columns": [
+        "base_origin_id",
+        "view_sample_id",
+        "dataset",
+        "entity_id",
+        "task_id",
+        "split",
+        "origin",
+        "dependency_start",
+        "dependency_stop_exclusive",
+        "causal_history_floor",
+        "anchor_history_steps",
+        "sample_support_contract"
+      ],
+      "kind": "SOURCE_TRAIN_SUPPORT_METADATA_ONLY",
+      "path": "/root/autodl-tmp/CZ_LONG_HISTORY_20260930/shared/H1/Rod_1_to_Rod_2/sample_ids/CZ_DIAM_RAW2S_CURRENT_L256_H1/input_only/record_time/primary/train.parquet",
+      "rows": 14535,
+      "sample_id_sha256": "c5d92f2b1e9cfdf72268ac02e9e52178affd7259ee53b11a631ac65235ac5ea4"
+    },
+    {
+      "columns": [
+        "base_origin_id",
+        "view_sample_id",
+        "dataset",
+        "entity_id",
+        "task_id",
+        "split",
+        "origin",
+        "dependency_start",
+        "dependency_stop_exclusive",
+        "causal_history_floor",
+        "anchor_history_steps",
+        "sample_support_contract"
+      ],
+      "kind": "SOURCE_TRAIN_SUPPORT_METADATA_ONLY",
+      "path": "/root/autodl-tmp/CZ_LONG_HISTORY_20260930/shared/H1/Rod_2_to_Rod_1/sample_ids/CZ_DIAM_RAW2S_CURRENT_L256_H1/input_only/record_time/primary/train.parquet",
+      "rows": 14945,
+      "sample_id_sha256": "eeb0fe0601dcdb5f1fcfd702db987ba8932e6f748a8842a195b63711d6a223a8"
+    }
+  ],
+  "availability_counts": [
+    {
+      "channel_profile_count": 92,
+      "direction": "Rod_1_to_Rod_2",
+      "status": "AVAILABLE"
+    },
+    {
+      "channel_profile_count": 92,
+      "direction": "Rod_2_to_Rod_1",
+      "status": "AVAILABLE"
+    }
+  ],
+  "checks": {
+    "both_direction_support": "PASS",
+    "candidate_native_support": "PASS",
+    "causal_intervals": "PASS",
+    "h0_h1_semantic_invariance": "PASS",
+    "h4_unchanged": "PASS",
+    "no_test_access": "PASS",
+    "numerical_core_unchanged": "PASS",
+    "protected_authority_unchanged": "PASS",
+    "registry_exact": "PASS",
+    "short_resolution_preserved": "PASS",
+    "unit_tests": "PASS"
+  },
+  "directions": [
+    "Rod_1_to_Rod_2",
+    "Rod_2_to_Rod_1"
+  ],
+  "explicit_coordinates_per_channel": 69,
+  "interpreter": "/root/miniconda3/bin/python",
+  "mode": "NO_TRAINING_K_REGISTRY_PREFLIGHT",
+  "protocol_id": "CZ_H1_K_TEMPORAL_REGISTRY_V2",
+  "registered_profiles_per_channel": 23,
+  "registry_sha256": "c66d8dd92e9035a9411dcb7fe00898ad819cd268c7df6d38024e7bf029a6762e",
+  "residual_statistics_accessed": false,
+  "short_resolution_contract": "For each registered history, at least one delta/m_tau representation has every interval overlapping [0,min(20,history_seconds)) at width <=4 seconds. Full interval width is used, not clipped overlap width.",
+  "short_resolution_failures": [],
+  "source_commit": "befcca5bf2d5491cc0cb03e475e96e3ce256b551",
+  "status": "CZ_H1_K_TEMPORAL_REGISTRY_V2_READY_FOR_CANONICAL_TRAINING",
+  "target_values_accessed": false,
+  "test_accessed": false,
+  "training_performed": false,
+  "unit_test_counts": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "tests": 22
+  }
+}

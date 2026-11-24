@@ -1,0 +1,45 @@
+{
+  "entity": "SRU_H2S",
+  "core": 12,
+  "L": 128,
+  "repeats": 3,
+  "scope": "October StagewisePipeline.online_a with incoming warm history for process inputs and cold-start residual state.",
+  "rows": [
+    {
+      "N": 128,
+      "median_ms": 3021.068058,
+      "samples_ms": [
+        3492.321514,
+        3021.068058,
+        2989.841858
+      ]
+    },
+    {
+      "N": 256,
+      "median_ms": 7285.182232,
+      "samples_ms": [
+        7285.182232,
+        7537.713124,
+        7283.229757
+      ]
+    },
+    {
+      "N": 512,
+      "median_ms": 20225.857944,
+      "samples_ms": [
+        20225.857944,
+        20371.172026,
+        20106.274807
+      ]
+    },
+    {
+      "N": 1024,
+      "median_ms": 64638.871222,
+      "samples_ms": [
+        65835.77267,
+        64265.7683,
+        64638.871222
+      ]
+    }
+  ]
+}

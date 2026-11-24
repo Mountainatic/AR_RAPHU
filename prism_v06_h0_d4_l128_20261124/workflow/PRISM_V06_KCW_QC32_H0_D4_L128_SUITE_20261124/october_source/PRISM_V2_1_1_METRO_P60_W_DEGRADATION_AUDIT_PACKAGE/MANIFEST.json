@@ -1,0 +1,61 @@
+{
+  "package": "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_PACKAGE",
+  "file_count": 11,
+  "files": [
+    {
+      "path": "PRISM_V2_1_1_METRO_P60_ACCEPTANCE_MATRIX.md",
+      "size": 1501,
+      "sha256": "9b5c6fe6b149bb02668880693c90b35345750fd89b0ea448b11abdb70c618e45"
+    },
+    {
+      "path": "PRISM_V2_1_1_METRO_P60_CODEX_EXECUTION_PROMPT.md",
+      "size": 3319,
+      "sha256": "99739a37642036d582af6d4692d84e7f2240c1d803facdca1cee0b91a85ed8d3"
+    },
+    {
+      "path": "PRISM_V2_1_1_METRO_P60_CONFIG_FROZEN_PROPOSED.json",
+      "size": 4801,
+      "sha256": "764cd2b7d8a94a3a2e0391629f75afce79df1ffcbebad0fdce8b7cd514106bba"
+    },
+    {
+      "path": "PRISM_V2_1_1_METRO_P60_REQUIRED_OUTPUT_CONTRACT.md",
+      "size": 2436,
+      "sha256": "1e772c25d46f093e322bd965dd882823c159f4023819621b6ebabd16195363a4"
+    },
+    {
+      "path": "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_PLAN.md",
+      "size": 10793,
+      "sha256": "4e664b74f935327ad4b66a7bacc5a8aee0032698910b7224f49600bcca3a639e"
+    },
+    {
+      "path": "README.md",
+      "size": 2066,
+      "sha256": "e8f60d686cf5da3968675eaa7d0efb1fd0471f3333df069b297cf6cdd18e33b6"
+    },
+    {
+      "path": "SOURCE_PROVENANCE.md",
+      "size": 743,
+      "sha256": "aa2f84bafa78b2666e93dfe38f299f6093c24aa16c60c65e9a2d51d451a7f2f5"
+    },
+    {
+      "path": "reference/METRO_P60_V1_3_HISTORICAL_AGGREGATES.json",
+      "size": 14824,
+      "sha256": "2f0d7ae70daa318d86399560c0e45189ae6e6ea74091e56d778c9837d4259e51"
+    },
+    {
+      "path": "reference/PRISM_Theory_v2_1_1_Implementation_Safe_Stagewise_Routed_Modular_Assembly_Theory_Only.md",
+      "size": 57351,
+      "sha256": "504a8a63829fdb53c9d22786c5a5581eedb69397c466102ab759b6eb83de53a4"
+    },
+    {
+      "path": "scripts/package_results.sh",
+      "size": 1816,
+      "sha256": "1ecd48b64506ad21057b47d5f035b54fc1c26403bc4588227082551dafbfb9eb"
+    },
+    {
+      "path": "scripts/preflight_env.sh",
+      "size": 1139,
+      "sha256": "518c11cf86a842564f758f8bafaec2ad3c743f93abf72dcde137245b4fbdad22"
+    }
+  ]
+}

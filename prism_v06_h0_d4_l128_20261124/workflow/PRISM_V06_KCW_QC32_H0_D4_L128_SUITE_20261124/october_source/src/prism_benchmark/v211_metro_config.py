@@ -1,0 +1,287 @@
+from __future__ import annotations
+
+import json
+import os
+import subprocess
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+from .v2_config import sha256_file
+
+
+PROTOCOL_ID = "PRISM_V2_1_2_METRO_P60_JOINT_OOF_PROTOCOL_CORRECTION_V1"
+EVIDENCE_CLASS = "RETROSPECTIVE_TRANSFER_AND_DEGRADATION_AUDIT"
+OUTPUT_DIRECTORY = "results_prism_v2_1_2_metro_p60_joint_oof_correction"
+PLAN_DIRECTORY = "PRISM_V2_1_1_METRO_P60_W_DEGRADATION_AUDIT_PACKAGE"
+CONFIG_NAME = "PRISM_V2_1_2_JOINT_OOF_PROTOCOL_CORRECTION_CONFIG.json"
+CONFIG_SHA256 = "a14c05cb51d94c4af3f5aed33f6ec810f93170acfdf2e513292ae49e2566f1f7"
+ACTIVE_DATASET = "metropt"
+ACTIVE_HEAD = "METRO_P60__H6__W1"
+RECOMMENDED_BRANCH = "prism-v2-1-2-joint-oof-protocol-correction"
+SOURCE_COMMIT = "29ff09f88ca4d3424cb36e4d508db9e2d220f119"
+DEVELOPMENT_FREEZE_NAME = "METRO_P60_V211_JOINT_STABILITY_FINAL_DEVELOPMENT_FREEZE.json"
+DEVELOPMENT_DECISION_NAME = "METRO_P60_V211_JOINT_STABILITY_FINAL_DEVELOPMENT_DECISION.json"
+TEST_ACCESS_AUDIT_NAME = "TEST_OOD_ACCESS_AUDIT.json"
+CANONICAL_CONFIG_RELATIVE = (
+    "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_PACKAGE/"
+    "PRISM_V2_1_1_JOINT_PREDICTIVE_STABILITY_PRACTICE_CONFIG.json"
+)
+WORKER_OVERRIDE_ENV = "PRISM_V211_METRO_WORKERS"
+K_MEMORY_GIB_ENV = "PRISM_V211_K_MEMORY_GIB_PER_WORKER"
+K_INNER_WORKERS_ENV = "PRISM_V211_K_INNER_WORKERS"
+K_OUTER_WORKERS_ENV = "PRISM_V211_K_OUTER_WORKERS"
+W_INNER_WORKERS_ENV = "PRISM_V211_W_INNER_WORKERS"
+A_INNER_WORKERS_ENV = "PRISM_V211_A_INNER_WORKERS"
+J_INNER_WORKERS_ENV = "PRISM_V211_J_INNER_WORKERS"
+
+
+@dataclass(frozen=True)
+class MetroV211Paths:
+    project: Path
+    shared: Path
+    output: Path
+
+    @property
+    def plan(self) -> Path:
+        return self.project / PLAN_DIRECTORY
+
+    @property
+    def config_path(self) -> Path:
+        return self.project / CANONICAL_CONFIG_RELATIVE
+
+    @property
+    def theory_path(self) -> Path:
+        return (
+            self.plan
+            / "reference"
+            / "PRISM_Theory_v2_1_1_Implementation_Safe_Stagewise_Routed_Modular_Assembly_Theory_Only.md"
+        )
+
+    @property
+    def historical_reference_path(self) -> Path:
+        return self.plan / "reference" / "METRO_P60_V1_3_HISTORICAL_AGGREGATES.json"
+
+    @property
+    def development_freeze_path(self) -> Path:
+        return self.output / "FREEZE" / DEVELOPMENT_FREEZE_NAME
+
+    @property
+    def development_decision_path(self) -> Path:
+        return self.output / "FREEZE" / DEVELOPMENT_DECISION_NAME
+
+    @property
+    def test_access_audit_path(self) -> Path:
+        return self.output / "FINAL" / TEST_ACCESS_AUDIT_NAME
+
+
+def _require_equal(actual: Any, expected: Any, label: str) -> None:
+    if actual != expected:
+        raise RuntimeError(f"Metro-P60 frozen config mismatch: {label}")
+
+
+def load_metro_config(project: Path) -> dict[str, Any]:
+    path = project / PLAN_DIRECTORY / CONFIG_NAME
+    if sha256_file(path) != CONFIG_SHA256:
+        raise RuntimeError("Metro-P60 frozen config SHA256 mismatch")
+    config = json.loads(path.read_text(encoding="utf-8"))
+    fixed = {
+        "protocol_id": PROTOCOL_ID,
+        "evidence_class": EVIDENCE_CLASS,
+        "inherits_theory": "PRISM_Theory_v2_1_1_Implementation_Safe_Stagewise_Routed_Modular_Assembly_Theory_Only.md",
+        "inherits_implementation_contract": "PRISM_V2_1_1_SRU_IMPLEMENTATION_CORRECTION",
+        "output_root": OUTPUT_DIRECTORY,
+        "recommended_branch": RECOMMENDED_BRANCH,
+        "active_datasets": [ACTIVE_DATASET],
+        "active_heads": [ACTIVE_HEAD],
+        "write_shared_data": False,
+        "rebuild_or_resplit_c1": False,
+        "algorithm_change_allowed": False,
+        "historical_test_ood_known": True,
+        "historical_aggregates_selection_use_forbidden": True,
+        "test_access_before_freeze": False,
+        "ood_access_before_freeze": False,
+        "dtype": "float64",
+    }
+    for key, expected in fixed.items():
+        _require_equal(config.get(key), expected, key)
+    _require_equal(
+        config.get("resource"),
+        {
+            "workers": 2,
+            "blas_threads": 1,
+            "prediction_chunk_rows": 50000,
+            "release_candidate_matrices_after_use": True,
+            "cache_all_candidate_design_matrices": False,
+        },
+        "resource",
+    )
+    _require_equal(
+        config.get("row_caps"),
+        {
+            "single_channel_k_fit": 100000,
+            "validation_selection_per_fold": 50000,
+            "joint_physical_fit": 250000,
+            "wiener_fit": 250000,
+            "state_fit": 250000,
+            "joint_predictive_fit": 250000,
+            "final_prediction": "ALL_IMMUTABLE_ROWS",
+            "subsample_order": "ASCENDING_SHA256_OF_BASE_ORIGIN_ID",
+            "nested_candidates_share_rows": True,
+        },
+        "row_caps",
+    )
+    _require_equal(
+        config["W"].get("candidates"),
+        [
+            "IDENTITY_CORRECTION",
+            "MONOTONE_I_SPLINE_CORRECTION",
+            "NATURAL_CUBIC_CORRECTION",
+        ],
+        "W.candidates",
+    )
+    _require_equal(config["W"].get("minimum_usable_folds"), 3, "W.minimum_usable_folds")
+    _require_equal(config["W"].get("raw_absolute_variance_gate"), False, "W.raw_absolute_variance_gate")
+    _require_equal(config["W"].get("identity_prediction_equivalence_required"), True, "W.identity_prediction_equivalence_required")
+    _require_equal(config["W"].get("identity_residual_equivalence_required"), True, "W.identity_residual_equivalence_required")
+    _require_equal(
+        config["J"].get("candidates"),
+        ["J_K", "J_KW", "J_KA", "J_KWA"],
+        "J.candidates",
+    )
+    _require_equal(config["J"].get("allow_k_zero"), False, "J.allow_k_zero")
+    _require_equal(config["J"].get("allow_ar_only"), False, "J.allow_ar_only")
+    _require_equal(
+        config["J"].get("jointly_fit_w_basis_coefficients"),
+        True,
+        "J.jointly_fit_w_basis_coefficients",
+    )
+    _require_equal(config["J"].get("share_pf_input_path_gate"), True, "J.share_pf_input_path_gate")
+    _require_equal(
+        config["post_freeze_materialized_candidates"],
+        {
+            "physics_first": ["KC", "KCW", "KCA", "KCWA", "PF_SELECTED"],
+            "joint": ["J_K", "J_KW", "J_KA", "J_KWA", "J_SELECTED"],
+        },
+        "post_freeze_materialized_candidates",
+    )
+    _require_equal(config["statistics"].get("paired_moving_block_bootstrap_replicates"), 500, "statistics.bootstrap")
+    _require_equal(config["statistics"].get("holm_alpha"), 0.05, "statistics.holm_alpha")
+    return config
+
+
+def git_value(project: Path, *arguments: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(project), *arguments],
+        check=True,
+        text=True,
+        capture_output=True,
+    ).stdout.strip()
+
+
+def effective_worker_count(config: dict[str, Any]) -> int:
+    configured = int(config["resource"]["workers"])
+    raw = os.environ.get(WORKER_OVERRIDE_ENV)
+    workers = configured if raw is None else int(raw)
+    cpu_count = os.cpu_count() or 1
+    if workers < 1 or workers > cpu_count:
+        raise RuntimeError(
+            f"{WORKER_OVERRIDE_ENV} must be within [1, {cpu_count}]"
+        )
+    return workers
+
+
+def _positive_worker_env(name: str, default: int) -> int:
+    raw = os.environ.get(name)
+    value = default if raw is None else int(raw)
+    cpu_count = os.cpu_count() or 1
+    if value < 1 or value > cpu_count:
+        raise RuntimeError(f"{name} must be within [1, {cpu_count}]")
+    return value
+
+
+def effective_k_inner_workers() -> int:
+    return _positive_worker_env(K_INNER_WORKERS_ENV, 1)
+
+
+def effective_w_inner_workers() -> int:
+    return _positive_worker_env(W_INNER_WORKERS_ENV, 1)
+
+
+def effective_a_inner_workers() -> int:
+    return _positive_worker_env(A_INNER_WORKERS_ENV, 1)
+
+
+def effective_j_inner_workers() -> int:
+    return _positive_worker_env(J_INNER_WORKERS_ENV, 1)
+
+
+def effective_k_outer_workers(config: dict[str, Any], task_count: int) -> int:
+    if task_count < 1:
+        return 1
+    inner = effective_k_inner_workers()
+    task_budget = effective_worker_count(config)
+    default_outer = max(1, (task_budget + inner - 1) // inner)
+    requested = _positive_worker_env(K_OUTER_WORKERS_ENV, default_outer)
+    return min(requested, int(task_count))
+
+
+def runtime_parallelism_audit(config: dict[str, Any]) -> dict[str, Any]:
+    effective = effective_worker_count(config)
+    configured = int(config["resource"]["workers"])
+    k_inner = effective_k_inner_workers()
+    k_outer = effective_k_outer_workers(config, 27)
+    w_inner = effective_w_inner_workers()
+    a_inner = effective_a_inner_workers()
+    j_inner = effective_j_inner_workers()
+    return {
+        "configured_workers": configured,
+        "effective_task_workers": effective,
+        "worker_override_environment": os.environ.get(WORKER_OVERRIDE_ENV),
+        "k_memory_gib_per_worker": float(os.environ.get(K_MEMORY_GIB_ENV, "20")),
+        "k_outer_task_workers": k_outer,
+        "k_inner_candidate_workers": k_inner,
+        "k_total_candidate_thread_budget": int(k_outer * k_inner),
+        "k_parallelism_scope": "TASK_LEVEL_THROUGHPUT_ONLY_ORDER_PRESERVED",
+        "general_memory_gib_per_outer_worker": float(
+            os.environ.get("PRISM_V211_MEMORY_GIB_PER_WORKER", "20")
+        ),
+        "w_inner_candidate_workers": w_inner,
+        "a_inner_candidate_workers": a_inner,
+        "j_inner_candidate_workers": j_inner,
+        "w_total_candidate_thread_budget": int(2 * w_inner),
+        "a_total_candidate_thread_budget": int(2 * a_inner),
+        "j_total_candidate_thread_budget": int(2 * j_inner),
+        "stage_inner_parallelism_scope": (
+            "ORDERED_INDEPENDENT_CANDIDATES_ONLY"
+        ),
+        "blas_threads_per_worker": int(config["resource"]["blas_threads"]),
+        "override_active": effective != configured,
+        "override_scope": "TASK_LEVEL_THROUGHPUT_ONLY",
+        "scientific_contract_unchanged": True,
+        "user_authorized_on": "2026-08-08",
+    }
+
+
+def require_metro_test_freeze(paths: MetroV211Paths) -> dict[str, Any]:
+    if not paths.development_freeze_path.is_file():
+        raise RuntimeError("Metro-P60 test/OOD access requires development freeze")
+    if paths.test_access_audit_path.exists():
+        raise RuntimeError("Metro-P60 test/OOD was already accessed")
+    manifest = json.loads(paths.development_freeze_path.read_text(encoding="utf-8"))
+    if manifest.get("status") != "METRO_P60_V2_1_1_DEVELOPMENT_FROZEN":
+        raise RuntimeError("Metro-P60 development freeze is not valid")
+    if manifest.get("test_accessed") is not False or manifest.get("ood_accessed") is not False:
+        raise RuntimeError("Metro-P60 freeze records early test/OOD access")
+    if manifest.get("config_sha256") != sha256_file(paths.config_path):
+        raise RuntimeError("Metro-P60 config changed after freeze")
+    if manifest.get("development_decision_sha256") != sha256_file(
+        paths.development_decision_path
+    ):
+        raise RuntimeError("Metro-P60 development decision changed after freeze")
+    if manifest.get("code_commit") != git_value(paths.project, "rev-parse", "HEAD"):
+        raise RuntimeError("Metro-P60 code commit changed after freeze")
+    if git_value(paths.project, "status", "--porcelain=v1"):
+        raise RuntimeError("Metro-P60 worktree is dirty after freeze")
+    load_metro_config(paths.project)
+    return manifest

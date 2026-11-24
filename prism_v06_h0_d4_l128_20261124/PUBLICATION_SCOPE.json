@@ -1,0 +1,19 @@
+{
+  "evidence_scope": "within-entity previously used development segments",
+  "october_publication_commit": "48bfb3b9f30e37d69dc2dbd281329e648edda3d6",
+  "publication_base_commit": "a7fe4de2059a897c3216074a2e094f7c635bd161",
+  "included": ["time protocol", "model and experiment source", "aggregate metrics by model and seed", "aggregate ablation and interpretability", "timing summaries and plots"],
+  "raw_cz_records_included": false,
+  "fitted_weights_included": false,
+  "pointwise_forecasts_or_residuals_included": false,
+  "reserved_tail_accessed": false,
+  "release_adapter_checks": {
+    "synthetic_process_endpoints_and_causal_qc32": "passed",
+    "matched_reference_input_hashes": 6,
+    "development_rows_replayed_exactly": {"SRU_H2S": 2016, "CZ_Rod1": 4021, "CZ_Rod2": 4125},
+    "exact_replay_outputs": ["KCW", "KCW + QC32", "Persistence + QC32", "original KCWA"],
+    "portable_baseline_fit_smoke": ["SRU AR", "SRU ARX"],
+    "inherited_neural_source_files_byte_matched": 64,
+    "score_runs_verified": 285
+  }
+}

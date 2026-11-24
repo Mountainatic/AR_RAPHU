@@ -1,0 +1,162 @@
+{
+  "protocol_id": "PRISM_V2_1_SRU_STAGEWISE_ROUTED_PROPOSED_V1",
+  "status": "PROPOSED_BEFORE_IMPLEMENTATION_AND_TEST_ACCESS",
+  "active_datasets": [
+    "sru"
+  ],
+  "active_heads": [
+    "SRU_H2S__H5__W1",
+    "SRU_SO2__H5__W1"
+  ],
+  "preserve_all_c1_data_bases": true,
+  "write_shared_data": false,
+  "output_root": "results_prism_v2_1_sru",
+  "selection": {
+    "inner_folds": 4,
+    "minimum_usable_folds": 3,
+    "one_se_ddof": 1,
+    "guarded_local_one_se": true,
+    "minimum_relative_improvement": {
+      "K": 0.01,
+      "C": 0.01,
+      "W": 0.01,
+      "A": 0.01,
+      "J": 0.01
+    },
+    "minimum_positive_fold_fraction": 0.75,
+    "global_assembly_one_se": false,
+    "a_only_in_physical_assembly": false
+  },
+  "K_C": {
+    "inherit_v2_frozen_profiles_and_penalties": true,
+    "m_tau": [
+      4,
+      8,
+      12
+    ],
+    "m_x": [
+      4,
+      6,
+      8
+    ],
+    "rank_candidates": [
+      0,
+      1,
+      2,
+      3,
+      "FULL"
+    ],
+    "fixed_support_weak_ridge_oof_refit": true,
+    "C_candidates": [
+      "ADDITIVE_COMPRESSED",
+      "ADDITIVE_JOINT_BASIS"
+    ],
+    "pairwise_interactions_enabled": false
+  },
+  "W": {
+    "target": "r1=y-pK_oof",
+    "candidates": [
+      "IDENTITY_CORRECTION",
+      "MONOTONE_I_SPLINE_CORRECTION",
+      "NATURAL_CUBIC_CORRECTION"
+    ],
+    "monotone_knots": [
+      4,
+      6
+    ],
+    "natural_cubic_knots": [
+      4,
+      6,
+      8
+    ],
+    "inherit_v2_smoothness_grid": true,
+    "hard_feature_residualization": false,
+    "soft_overlap_mu": [
+      0.0,
+      0.03,
+      0.3,
+      3.0,
+      30.0
+    ]
+  },
+  "A": {
+    "target": "r2=y-pK_oof-deltaW_oof",
+    "candidates": [
+      "EXACT_ZERO",
+      "MATURE_RESIDUAL_AR"
+    ],
+    "orthogonal_mature_residual_ar_enabled": false,
+    "hard_feature_residualization": false,
+    "soft_overlap_mu": [
+      0.0,
+      0.03,
+      0.3,
+      3.0,
+      30.0
+    ],
+    "maturity_rule": "s+h+W+D<=t",
+    "use_latest_available_target_index": true,
+    "fold_local_residual_centering": true
+  },
+  "J": {
+    "candidates": [
+      "J_K",
+      "J_KW",
+      "J_KA",
+      "J_KWA"
+    ],
+    "allow_k_zero": false,
+    "allow_ar_only": false,
+    "hard_feature_residualization": false,
+    "soft_overlap_penalty": false,
+    "k_over_a_ratio": [
+      0.25,
+      1.0,
+      4.0
+    ],
+    "w_over_a_ratio": [
+      0.25,
+      1.0,
+      4.0
+    ],
+    "input_path_gain_over_ar_diagnostic_min": 0.01,
+    "input_path_positive_fold_fraction_min": 0.75
+  },
+  "baselines": {
+    "dynamic": [
+      "PERSISTENCE",
+      "MEAN",
+      "LOCAL_LINEAR_TREND",
+      "AR",
+      "ARX",
+      "LINEAR_NARX",
+      "N4SID",
+      "PRISM_PHYSICS_FIRST",
+      "PRISM_K_JOINT_AR"
+    ],
+    "input_only": [
+      "PERSISTENCE",
+      "MEAN",
+      "RIDGE",
+      "PLS",
+      "DPLS",
+      "RBF_SVR",
+      "XGBOOST",
+      "PARALLEL_HAMMERSTEIN",
+      "HAMMERSTEIN_WIENER",
+      "PRISM_CHANNEL_SPECIFIC"
+    ],
+    "reuse_only_when_sample_ids_and_hashes_match": true,
+    "retune_baselines": false
+  },
+  "test_access": {
+    "allowed_only_after": "V21_SRU_FINAL_FREEZE_MANIFEST.json",
+    "ood": "NOT_REGISTERED_FOR_SRU_UNLESS_EXISTING_C1_VIEW_PRESENT"
+  },
+  "statistics": {
+    "paired_block_bootstrap_replicates": 500,
+    "holm_correction": true,
+    "report_cross_task_rank": false,
+    "within_dataset_summary_label": "SRU_WITHIN_DATASET_SUMMARY"
+  }
+}

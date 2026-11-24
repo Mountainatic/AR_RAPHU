@@ -1,0 +1,24 @@
+{
+  "artifact_sha256": {
+    "AUTHORITY_UNCHANGED_BINDINGS.json": "09ef030d72279704974670965d9eb40702f41a657f199c7df549e499062c6a29",
+    "CZ_H1_K_AVAILABLE_PROFILES_BY_DIRECTION.csv": "a9b9a3790059fef5ad7b10276703cf92804427225c5b5d7fffd24bf43a4cdb55",
+    "CZ_H1_K_INTERVAL_GEOMETRY.csv": "edacbdac4c6a58cf357b267664bd5ed12df6362738b4ce3f06be7289a48a08da",
+    "CZ_H1_K_REGISTERED_PROFILES.csv": "af7c4ad308f107d59863cca2747af2e0f990e8fc895287ec011445cae5e3803a",
+    "CZ_H1_K_SHORT_RESOLUTION_AUDIT.csv": "ccbc39103ebfad2442644a7d8f23464d6710f1587a395cfbf991fbe8add536ed",
+    "CZ_H1_K_SUPPORT_COUNTS.csv": "dbccd4235461cf1fbcdb79a839134dcbdb54872d0141a215d805539fa408d9ba",
+    "H1_PROFILE_REGISTRY_BEFORE.json": "25c2979f77e4db6cd169e269737bcfbc921697cb3b35445e6dc8dac374eece0f",
+    "H4_PROFILE_REGISTRY_AFTER.json": "6609958a2507a01aa3f28aa57e902d111c74009723bbb7e366d69359cf96a355",
+    "H4_PROFILE_REGISTRY_BEFORE.json": "6609958a2507a01aa3f28aa57e902d111c74009723bbb7e366d69359cf96a355",
+    "UNIT_TESTS.xml": "7d38b006791fe16d717a19513b3fba86c24bee2fca322fc885e6a37f26dda74d"
+  },
+  "preflight_sha256": "dfa7da5ca7d080b459ff2436cacd08616ac0b65fcb019001bce773b4cab20e3a",
+  "protocol_id": "CZ_H1_K_TEMPORAL_REGISTRY_V2",
+  "registry_sha256": "c66d8dd92e9035a9411dcb7fe00898ad819cd268c7df6d38024e7bf029a6762e",
+  "runtime_source_bindings": {
+    "scripts/preflight_cz_h1_k_registry_v2.py": "e213a1ae5e5e817fdc28e9a113db98c1373f771263250c5c7c0a7714a365afb7",
+    "src/prism_benchmark/cz_h1_temporal_registry.py": "49b71902aceee83951835b1e5bdd933e216c33b460cc4bb83a9698450bf82475",
+    "src/prism_benchmark/v211_config.py": "488dec9f7f14217b0715993b646b11f27cfbb4e868c218e0064294caa0390629",
+    "src/prism_benchmark/v2_k.py": "3f9efad93111f352a14dabc729dccac9cd498bc1a5e26e9a0aa621c1413f07fb"
+  },
+  "status": "CZ_H1_K_TEMPORAL_REGISTRY_V2_READY_FOR_CANONICAL_TRAINING"
+}

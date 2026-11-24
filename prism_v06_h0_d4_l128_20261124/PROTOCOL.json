@@ -1,0 +1,43 @@
+{
+  "protocol": {"H": 0, "D": 4, "L": 128},
+  "intervals": "Zero-based, half-open target-row indices",
+  "information": {"target": "y[t]", "process_latest": "t", "label_latest": "t-4", "anchor": "y[t-4]"},
+  "upstream_target": "y[t]-y[t-4]",
+  "a_feature": "latest mature parent residual y[t-4]-q[t-4]",
+  "qc32": {"family": "QC32_RLS", "coefficients_with_intercept": 13, "p": 1, "window": 0, "forget": 0.995, "gain": 1.0},
+  "baseline_first_issue": 192,
+  "baseline_seeds": [0, 1, 2, 3, 4],
+  "baseline_metrics": ["RMSE", "MAE", "MSE", "R2"],
+  "entities": {
+    "SRU_H2S": {
+      "columns": ["y1", "u1", "u2", "u3", "u4", "u5"],
+      "kcw_train": [192, 3328],
+      "qc32_calibration": [3464, 6045],
+      "development": [6048, 8064],
+      "reference_sha256": {
+        "train": "c4e9ac57c8a60b6e948941bca5cf9323ea1b95cd1c433d74444a46b9b970452f",
+        "development": "8118be3f5b728c8ad3f9ccea50ed957d8d41319f6ea207b9de251506f31b137a"
+      }
+    },
+    "CZ_Rod1": {
+      "columns": ["diameter", "main_heater_power", "crystal_lift", "crucible_lift", "crystal_rotation", "crucible_rotation"],
+      "kcw_train": [192, 6636],
+      "qc32_calibration": [6772, 12058],
+      "development": [12061, 16082],
+      "reference_sha256": {
+        "train": "7c102e24d4de760200f467bfac6af844375fbb83d01f7bb904d46ca1993da985",
+        "development": "1e6650cfc1ff45c1d7815095465253e39553726c32575ec8e9f6d6ed21bb22bb"
+      }
+    },
+    "CZ_Rod2": {
+      "columns": ["diameter", "main_heater_power", "crystal_lift", "crucible_lift", "crystal_rotation", "crucible_rotation"],
+      "kcw_train": [192, 6810],
+      "qc32_calibration": [6946, 12373],
+      "development": [12376, 16501],
+      "reference_sha256": {
+        "train": "f5d63a87a7560405d94140f26f629d5c48ccfc83c1e6b50930f826d9ffce6613",
+        "development": "b09b2da27fd62a5158b638d350deaae91606bd9510d61eddd9a08c3775d610c5"
+      }
+    }
+  }
+}
