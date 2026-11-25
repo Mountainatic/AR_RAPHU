@@ -1,0 +1,116 @@
+{
+  "code_lock": "52ec8b0dfe871a7266588d30a7e44e56e9d0d121b13aa3d2c53126323aa43797",
+  "source_sha256": "21dd6cc02364e864f309de62143e760bf9ab4704a25e09770d98def0066899c7",
+  "architecture_sha256": "759c44313f5d88c9682984a7201a07f006532d826bdcaac9aebd2ebbfc0d541b",
+  "grid": [
+    [
+      32,
+      0.0001,
+      "level"
+    ],
+    [
+      32,
+      0.0001,
+      "delta"
+    ],
+    [
+      32,
+      0.0003,
+      "level"
+    ],
+    [
+      32,
+      0.0003,
+      "delta"
+    ],
+    [
+      32,
+      0.001,
+      "level"
+    ],
+    [
+      32,
+      0.001,
+      "delta"
+    ],
+    [
+      64,
+      0.0001,
+      "level"
+    ],
+    [
+      64,
+      0.0001,
+      "delta"
+    ],
+    [
+      64,
+      0.0003,
+      "level"
+    ],
+    [
+      64,
+      0.0003,
+      "delta"
+    ],
+    [
+      64,
+      0.001,
+      "level"
+    ],
+    [
+      64,
+      0.001,
+      "delta"
+    ],
+    [
+      128,
+      0.0001,
+      "level"
+    ],
+    [
+      128,
+      0.0001,
+      "delta"
+    ],
+    [
+      128,
+      0.0003,
+      "level"
+    ],
+    [
+      128,
+      0.0003,
+      "delta"
+    ],
+    [
+      128,
+      0.001,
+      "level"
+    ],
+    [
+      128,
+      0.001,
+      "delta"
+    ]
+  ],
+  "screen_epochs": 3,
+  "refine_epochs": 8,
+  "refine_candidates": 3,
+  "folds": "70\u201385% and 85\u2013100%, causal history embargo",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "selection_seed": 20261023,
+  "cpu": "FP32 deterministic",
+  "batch": 256,
+  "protocol": {
+    "H": 0,
+    "D": 8,
+    "L": 64
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "data": "CZ_Rod1",
+    "period": 65536,
+    "rows": 10000000,
+    "max_raw_mean_absolute_error": 2.706168622523819e-15
+  },
+  {
+    "data": "CZ_Rod1",
+    "period": 0,
+    "rows": 10000000,
+    "max_raw_mean_absolute_error": 2.706168622523819e-15
+  },
+  {
+    "data": "SRU_H2S",
+    "period": 65536,
+    "rows": 10000000,
+    "max_raw_mean_absolute_error": 7.099321130965563e-13
+  },
+  {
+    "data": "SRU_H2S",
+    "period": 0,
+    "rows": 10000000,
+    "max_raw_mean_absolute_error": 6.280939830738408e-11
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "code_lock": "52ec8b0dfe871a7266588d30a7e44e56e9d0d121b13aa3d2c53126323aa43797",
+  "source_sha256": {
+    "e4.py": "fb38480b91a3e8cc08430b68409e85e46443f41ec513bd3cd065ba2e1cc57bce",
+    "arx_mirror.c": "3a88a845629d54795f54bb63215eea6c3eef2f7bd1ed50db81768d7d4ef87370",
+    "elastic_sparse.c": "0c42bcdcdf1658f6f785c9311766ac34e6e544b43e629fa70d812ced35c87ae4"
+  },
+  "clock": "CLOCK_MONOTONIC_RAW",
+  "core": 64,
+  "cpu": "Intel(R) Xeon(R) Platinum 8352V CPU @ 2.10GHz",
+  "compiler": "gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0",
+  "flags": [
+    "-O3",
+    "-std=c11",
+    "-ffp-contract=off",
+    "-fPIC",
+    "-shared",
+    "-mavx2",
+    "-mfma",
+    "-funroll-loops"
+  ],
+  "paired_randomized_repeats": 35,
+  "matched_rows": 2048,
+  "scaling_rows": 8192,
+  "L": [
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048
+  ],
+  "long_rows": 10000000,
+  "scaling": "Fixed selected PRISM box count and extended far widths; synthetic fixed-seed dense ARX; one reanchor within the timed window",
+  "stability": "Cyclic observed training block, compare to same kernel reanchored every 256 steps"
+}

@@ -1,0 +1,11 @@
+{
+  "code_lock": "52ec8b0dfe871a7266588d30a7e44e56e9d0d121b13aa3d2c53126323aa43797",
+  "rows": 10000000,
+  "sources": {
+    "prefix_probe.py": "201240d75241090d98008f0aacf20c2aa9f20ec6ab67da7a6400d6707ef9f01c",
+    "prefix_probe.c": "0f466e49e75bef3d803129ae6c44a072d77366660bbe059ce434485c2f50d5d1"
+  },
+  "reference": "Independent C long-double sum of transformed raw process values, including delayed subtraction",
+  "timestamps": "Every 1024 steps, and at the first step after the production reanchor",
+  "tolerance": 1e-07
+}

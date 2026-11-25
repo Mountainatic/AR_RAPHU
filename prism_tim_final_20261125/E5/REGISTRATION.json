@@ -1,0 +1,29 @@
+{
+  "code_lock": "52ec8b0dfe871a7266588d30a7e44e56e9d0d121b13aa3d2c53126323aa43797",
+  "runner": "4dca1bbd20ce57c9f3d288c1f5c7524b096038c961a2960e1e6e0f5cdaeb3cd8",
+  "thresholds": [
+    [
+      0.15,
+      0.3
+    ],
+    [
+      0.2,
+      0.35
+    ],
+    [
+      0.25,
+      0.4
+    ],
+    [
+      0.3,
+      0.45
+    ],
+    [
+      0.35,
+      0.5
+    ]
+  ],
+  "gate_window": 128,
+  "bias": "Shift all physical process channels by five parent ranges at training boundary and wait L+H+D",
+  "audit": "Separate level and difference view diagnostics. Compare additive and telescoping identities on common tail."
+}
