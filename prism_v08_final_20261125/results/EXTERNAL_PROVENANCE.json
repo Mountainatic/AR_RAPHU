@@ -1,0 +1,37 @@
+{
+  "release": "4403fe0c314b0d5f4fe773c2f4a34ef5d17914db030f09efb657d86eafbc1a53",
+  "candidate": "Debutanizer",
+  "status": "EXCLUDED_FROM_ZERO_CONTACT",
+  "evidence": {
+    "DEBUT_original_registration": {
+      "sha256": "c82f93aec741e70c25c8db5d9578e0bc413150997313722b38f8ccdfbb02a6c9",
+      "artifact": "REGISTRATION.json"
+    },
+    "REGISTRATION.json": {
+      "sha256": "0ced51fcaecb4f73d53f6f87dbee9dd5a545ca8525afb9f306ca637f9525ada6",
+      "artifact": "REGISTRATION.json"
+    },
+    "RESULTS.json": {
+      "sha256": "d61524d5a8fce1d7aef2c8c125b22f5cab73bfc99ba8fddda312c41abf8702c3",
+      "artifact": "RESULTS.json"
+    }
+  },
+  "earlier_protocol": {
+    "H": 0,
+    "D": 4,
+    "L": 16
+  },
+  "earlier_scored_origins": [
+    1436,
+    1915
+  ],
+  "earlier_N": 479,
+  "prior_use": "historical train, architecture comparison and baseline scoring; same registered source hashes",
+  "eligible_frozen_entry_entities": [
+    "SRU_H2S",
+    "CZ_Rod1",
+    "CZ_Rod2"
+  ],
+  "v08_external_fit_or_score_executed": false,
+  "raw_external_observations_read_by_this_audit": false
+}

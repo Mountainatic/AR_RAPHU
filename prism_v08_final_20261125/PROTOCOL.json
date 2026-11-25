@@ -1,0 +1,121 @@
+{
+  "version": "PRISM v0.8",
+  "protocol": {
+    "H": 0,
+    "D": 4,
+    "L": 128
+  },
+  "row_coordinates": "zero-based, start inclusive, end exclusive",
+  "information_at_t": "process through t, outcomes through t-D",
+  "geometry": {
+    "CZ_Rod1": {
+      "parent": [
+        192,
+        6636
+      ],
+      "calibration": [
+        6772,
+        12058
+      ],
+      "development": [
+        12061,
+        16082
+      ],
+      "tail": [
+        16082,
+        20103
+      ],
+      "historical_target_scoring": {
+        "range": [
+          18184,
+          19369
+        ],
+        "detail": "Historically scored origins excluded from paired subset."
+      },
+      "continuous_issue_start": 12061
+    },
+    "CZ_Rod2": {
+      "parent": [
+        192,
+        6810
+      ],
+      "calibration": [
+        6946,
+        12373
+      ],
+      "development": [
+        12376,
+        16501
+      ],
+      "tail": [
+        16501,
+        20627
+      ],
+      "historical_target_scoring": {
+        "range": [
+          18631,
+          19882
+        ],
+        "detail": "Historically scored origins excluded from paired subset."
+      },
+      "continuous_issue_start": 12376
+    },
+    "SRU_H2S": {
+      "parent": [
+        192,
+        3328
+      ],
+      "calibration": [
+        3464,
+        6045
+      ],
+      "development": [
+        6048,
+        8064
+      ],
+      "tail": [
+        8064,
+        10081
+      ],
+      "historical_target_scoring": {
+        "range": [
+          8064,
+          10081
+        ],
+        "detail": "2026-11-19 D=8; same physical y rows"
+      },
+      "continuous_issue_start": 6048
+    }
+  },
+  "natural_outer_quantiles": [
+    0.05,
+    0.95
+  ],
+  "shrinkage_modes": {
+    "standalone_robust": [
+      1e-9,
+      1e-7,
+      0.00001,
+      0.001,
+      0.03
+    ],
+    "fusion_fidelity": [
+      1e-9,
+      1e-7,
+      0.00001
+    ]
+  },
+  "near_bins": [
+    4,
+    8
+  ],
+  "lambda_per_row": true,
+  "downstream": "K-C-A core with conditional W, active-coefficient trust and family-separated A vote",
+  "mode_gate": {
+    "blocks": 4,
+    "minimum_wins": 3,
+    "mean_gain_above_se": 0.5,
+    "training_outer_embargo": 131
+  },
+  "state": "warm K and use actual mature residuals replayed from the first post-fit issue"
+}

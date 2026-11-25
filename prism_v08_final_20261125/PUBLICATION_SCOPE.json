@@ -1,0 +1,46 @@
+{
+  "version": "PRISM v0.8",
+  "execution_date": "2026-11-25",
+  "release_lock_sha256": "4403fe0c314b0d5f4fe773c2f4a34ef5d17914db030f09efb657d86eafbc1a53",
+  "registration_sha256": "7c745a1fd01eed88a46592863cb535bb3e615064dc6f0eb0ebabcb8b0da4f46a",
+  "model_lock_sha256": "0b5cbbb545431e721d65d7b9c3e5efd5075a812f6f1d055b5c83882b53b15b08",
+  "frozen_model_sha256_by_entity": {
+    "SRU_H2S": "8c0b9c0b472e8d12b3a2136817ef73f9861b63ac3a97e7ae7dc4a2d0c0fd8fa5",
+    "CZ_Rod1": "997a2519babf0d207b8a94e299181c6de6c6220499b8752d563efa6e28fd1925",
+    "CZ_Rod2": "3407884c65dc6399c5dd8d9fb755d8661280815b209512547a9a111a77efca9e"
+  },
+  "source_receipt_sha256_by_relative_path": {
+    "PRISM_V08_20261125/v08.py": "901ccfeaf39afef5dab7a0a1b6db3b30872f3483a8b752257dbae098f68127d9",
+    "PRISM_V08_20261125/preflight.py": "8c3c51f53c89df593979c3543a7ed0ead8d1d94101a85aa4ec04e0dcf9e774db",
+    "PRISM_V08_20261125/simd.py": "86d49a4f92960b4100c03b8d08b22ae7a982ca78a9bfa32d8b82e1482b6d4a0c",
+    "PRISM_V08_20261125/arx_mirror.c": "d26adcf1f29a429f83302e6dfdc8755190e3afb2626daac1d36eff45e0d50e06",
+    "PRISM_V08_FINAL_EVIDENCE_20261125/neural_replay.py": "e3622f9c73e0a8cc56760bd4cdc02bf0d973da1f6ab25a9e8cebf373ad0ae892",
+    "PRISM_V08_FINAL_EVIDENCE_20261125/benchmark.py": "e708bb19a0df2c51d5e5e96058c4e553f96b93cb77bcdc8daaa7df2b17ddcb26",
+    "PRISM_V08_FINAL_EVIDENCE_20261125/elastic_sparse.c": "263ef90950bba8c9f31d22b3176c6e1f86da95e73d88d2fd1dec5e02b8f25d75",
+    "PRISM_V07_20261125/v07.py": "3de6eb3ebf51fcfdedc8ad44daa55651df92b9f309a6f6884a6051905ece70b7",
+    "PRISM_V07_20261125/native.py": "fa42bd03213f23e90869e75a3275c964a184a2f33d5206aba5d5b97860f18f65",
+    "PRISM_V07_20261125/stream.c": "4882f67b3b519f56cd406058969b5b8c259f06e326460c2969954c4d1ff8cee3",
+    "PRISM_V071_REVIEW_20261125/native_fast.py": "d1de75afc484b4279dc675ee3e021d27525ea5892d0cde9089567f4146cf808c",
+    "PRISM_V071_REVIEW_20261125/stream_fast.c": "36a6089d3e7ab012397819f97111e2bc099846f2151de01bfb8dba5aec69f379",
+    "PRISM_V06_SPRINT_20261125/sprint.py": "a07f505b63a66305a136ed82ee46ca27e8e8777b3f180210b16b2ab315b3ca7d",
+    "PRISM_V06_GUARD_NESTED_RESOLUTION_20261124/common.py": "5c203169bfa4a702f57136bffaaaefb698b929e33496152fa788ac30b1a42517",
+    "PRISM_V06_GUARD_NESTED_RESOLUTION_20261124/guarded.py": "998e2a6314631ad007014f2f9dfec93330d6c2ab5c4c922e78ea99aad054e976",
+    "PRISM_V06_GUARD_NESTED_RESOLUTION_20261124/resolution.py": "c569762ea4674ad28f31a7129834a9d30de0de5c0a171fa71b7df6b1c26bb45a"
+  },
+  "description": "Public receipt excerpt. The original locks are retained in the authorized replay environment.",
+  "included": [
+    "implementation source",
+    "protocol",
+    "aggregate scores",
+    "audit summaries",
+    "single-core timing",
+    "figures"
+  ],
+  "withheld": [
+    "raw observations",
+    "frozen weights",
+    "pointwise predictions and attributions",
+    "internal receipt paths"
+  ],
+  "zero_contact_external_test_executed": false
+}
