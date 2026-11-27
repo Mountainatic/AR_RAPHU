@@ -1,0 +1,56 @@
+{
+  "case": "H2S",
+  "script": "d4efecde7f02b834b00d7a1d0663228893930c0d8a03b238f2693910adb92273",
+  "source_lock": "8be4eeefa6a1d7dc1a06bdad1c19d3a6d99a4084fc46e7721edd1d4317716194",
+  "archive_model": "6c3f6fcfee479011ad05ae28ef516552391fec42ae80b9a2d57235b715ad2237",
+  "training_issues": [
+    72,
+    6040
+  ],
+  "folds": [
+    [
+      [
+        72,
+        4177
+      ],
+      [
+        4249,
+        5144
+      ]
+    ],
+    [
+      [
+        72,
+        5072
+      ],
+      [
+        5144,
+        6040
+      ]
+    ]
+  ],
+  "label_span": 8,
+  "tail_issue": 8064,
+  "clipping": {
+    "quantile": [
+      0.01,
+      0.99
+    ],
+    "lower": [
+      0.35909234419999997,
+      0.1662872226,
+      0.15210451,
+      0.04352209056,
+      0.4030307511
+    ],
+    "upper": [
+      0.9121436403,
+      0.9164389772,
+      0.8059790907,
+      0.9214850364999999,
+      0.9862122047999999
+    ],
+    "raw_sensors_only": true,
+    "all_issued_input_history": true
+  }
+}

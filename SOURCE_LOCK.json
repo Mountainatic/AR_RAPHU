@@ -1,0 +1,95 @@
+{
+  "status": "uniform_ecm_frozen",
+  "commit": "7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c",
+  "code": {
+    "laguerre_aligned.py": "3f93bd0e99da59153f994a34ae2da557133147701bfa86583b7122bb6318c77e",
+    "laguerre_anchored.py": "cd3fb927eb324791b1321d09b4dc236ab690dfeda4d5b3591d688480dfe7ac7a",
+    "laguerre_bj.py": "5a2cd73e7115f47defaae154058e3c208815ebefcc7ae48d41fce425f1f394ba",
+    "laguerre_blind_baselines.py": "89385c7fe24279c53c2f6f0204312fa3863dc6d4c2e81b708f9089e2ee68448c",
+    "laguerre_blind_cz.py": "a41eec09777a7a084ede5da5215ef1a8d953082fe1db820fac836e46702d89b5",
+    "laguerre_blind_so2.py": "7ec31b2572b8e4b041eb37f24aec9bf450fb0a43f4315e33b60d8fb2ec972eba",
+    "laguerre_control.py": "790f2e84cee747f8119455806b217b30a85a5796e591c35635968a92d02811a3",
+    "laguerre_dual.py": "fb22aa5aa2ec217237eb240b6905988e990889998088b6a56fd4cbcebcbe59de",
+    "laguerre_dual_views.py": "954dba8be1a65b6c5e142bfb5587e0eb72cd58e110095d112b37060525a3ac93",
+    "laguerre_ecm.py": "29656dd945dd75f06ce20043cc088f322df5cab76f11f6aba6c6a978b119d285",
+    "laguerre_joint.py": "0838ba72f748612eaba087f2dfebfc8ca915bca9c66230995a3d2ad82f844a08",
+    "laguerre_pressure.py": "258bf5eccb0bdcae0e7d3451e4fbc9e8bcc7545bc92d9ec06a90c53f6baf84f5",
+    "laguerre_process.py": "27cd0575ca591094b96612bcea1a2dbee9f201d4c328eb62472d6b40b44fd56d",
+    "laguerre_screen.py": "116b0bed7c1a34e2cd74fb7a845b70af23d73221fc0cd113eaf10777c3d6b70f",
+    "laguerre_sparse_views.py": "d86b5068fd631054554d3ebeb5657413e320335b6a4f285632ec4793976e2ebd",
+    "laguerre_unified.py": "6e0c94490a3158e085f64fdc5dc7b3ea7afe10a8befa5a08ef71999e91d06fba",
+    "test_laguerre_blind_cz.py": "8b3aba870d191d285648089a65f1aa21ad8653771a87bb5099c102d8d42edd09",
+    "test_laguerre_dual.py": "70d9ca1adc1829d1447df89ad2566169685866bab7e10309e4d46b99d787c7ed"
+  },
+  "endogenous": {
+    "train_weights": "uniform",
+    "training_window": "all eligible rows after registered warmup",
+    "span": "H+D",
+    "state": "mature increment taps and one centered anchor level",
+    "near": [
+      4,
+      8,
+      16
+    ],
+    "alpha": [
+      0.0001,
+      0.0005,
+      0.0015,
+      0.003,
+      0.008
+    ],
+    "l1_fraction": 0.2
+  },
+  "exogenous": {
+    "near": [
+      4,
+      8,
+      12
+    ],
+    "alpha": [
+      0.0001,
+      0.0005,
+      0.0015,
+      0.003,
+      0.008,
+      0.018,
+      0.04,
+      0.1
+    ],
+    "mix": [
+      0.0,
+      0.05,
+      0.2,
+      0.5
+    ],
+    "curve": [
+      0.008,
+      0.04,
+      0.16
+    ]
+  },
+  "fold_fractions": [
+    [
+      0.7,
+      0.85
+    ],
+    [
+      0.85,
+      1.0
+    ]
+  ],
+  "windows": [
+    64,
+    128
+  ],
+  "cz_horizons": [
+    8,
+    16,
+    32,
+    48,
+    64
+  ],
+  "prior_receipt": "77fec87d2c50964ba5d3d76ce4419d95d22d0ea54a52df38d0e010a3a8fb817e",
+  "change_reason": "Correct the endogenous level-drift defect in multi-step prediction",
+  "evaluation": "frozen-version regression on previously scored tails, no tail-based parameter selection"
+}

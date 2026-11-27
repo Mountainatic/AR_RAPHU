@@ -1,0 +1,487 @@
+{
+  "algorithm_commit": "7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c",
+  "source_lock": "8be4eeefa6a1d7dc1a06bdad1c19d3a6d99a4084fc46e7721edd1d4317716194",
+  "benchmark_source": "d4efecde7f02b834b00d7a1d0663228893930c0d8a03b238f2693910adb92273",
+  "preserved_native_latency": "5e354a0e01f112c205a0d198e2b32339e9da4780c4e18aa1982cc4d8bf264249",
+  "score_type": "regression on previously scored tails",
+  "validation": [
+    "causal features",
+    "input-only clipping",
+    "fault window parity",
+    "HAC parity and log-Holm monotonicity",
+    "archived six-baseline replay checks",
+    "frozen files and model weights"
+  ],
+  "data_boundaries": "public on server and CZ raw data and weights on local machine",
+  "charts": {
+    "CLEAN.csv": "9f4159c01d9cd9d5defad34081b3ec0f1142d908a3a43b5ab28762895f5f3c6b",
+    "PRESSURE.csv": "57634e8f3258fad2db51be3b229f3bcde818d859431595106d46d4df1292e961",
+    "DM_HAC_HOLM.csv": "162a5cd7b8eb92213ad29792c4e1805b968c0d39f7dbbda8840b5efd521e3d83"
+  },
+  "dataset_result_sha256": {
+    "TEP_D1": "1d31820a354fca0f428537943971e7c186d84118b3e09f5e4778a3fee7de5b84",
+    "TEP_D2": "d62d8bff29c0e1eccf30d7a6f8f72ca530ebfcf4f064bd230775697ae5992ec7",
+    "H2S": "9f91a91c8638b2e39b36b3e923694ad496cf4e1a994b6e2f19a003514967e1a6",
+    "SO2": "5686c73e24e076abb84c09d2e3497b09e410ee563aad186e83a24d06da78d590",
+    "Rod1": "6ee4f0e80103b98bca9e9b157a8eb98e0f31045237163cd5b23f3e0bc4a2ce79",
+    "Rod2": "98ebc1024753a442e41f60ff3d5b52615574010f2ff5cf51c75a73038efeeddc"
+  },
+  "cases": {
+    "TEP_D1": {
+      "issues": [
+        65,
+        5999
+      ],
+      "dpls": 24,
+      "gru_width": 48,
+      "gru_epochs": 8,
+      "gru_seed_count": 5,
+      "baseline_version_warnings": [],
+      "conditions": {
+        "clean": {
+          "rmse_rank": 1,
+          "rmse_best": "PRISM",
+          "rank_order": [
+            "PRISM",
+            "ElasticNet",
+            "ARX",
+            "ElasticNet_clipped",
+            "DPLS",
+            "Transformer",
+            "GRU",
+            "LightGBM",
+            "AR",
+            "Persistence"
+          ],
+          "prism_rmse": 0.0024570646836683183,
+          "clipped_rmse": 0.0026880404794134304,
+          "clipped_p_holm": 1.9978661616359637e-10,
+          "gru_rmse": 0.003546164712680267,
+          "dpls_rmse": 0.002911722353233761
+        },
+        "oscillation": {
+          "rmse_rank": 1,
+          "rmse_best": "PRISM",
+          "rank_order": [
+            "PRISM",
+            "AR",
+            "Persistence",
+            "LightGBM",
+            "GRU",
+            "Transformer",
+            "ElasticNet_clipped",
+            "ElasticNet",
+            "ARX",
+            "DPLS"
+          ],
+          "prism_rmse": 0.00870633871048458,
+          "clipped_rmse": 0.029507401408006687,
+          "clipped_p_holm": 2.8465927834151125e-156,
+          "gru_rmse": 0.016529819012002928,
+          "dpls_rmse": 0.05740172786423892
+        },
+        "bias": {
+          "rmse_rank": 4,
+          "rmse_best": "AR",
+          "rank_order": [
+            "AR",
+            "Persistence",
+            "LightGBM",
+            "PRISM",
+            "Transformer",
+            "GRU",
+            "ElasticNet_clipped",
+            "ElasticNet",
+            "DPLS",
+            "ARX"
+          ],
+          "prism_rmse": 0.016976712886306557,
+          "clipped_rmse": 0.030459408110555846,
+          "clipped_p_holm": 1.5943227115081073e-14,
+          "gru_rmse": 0.025780794771869887,
+          "dpls_rmse": 0.04590150810055253
+        }
+      }
+    },
+    "TEP_D2": {
+      "issues": [
+        66,
+        5998
+      ],
+      "dpls": 24,
+      "gru_width": 48,
+      "gru_epochs": 8,
+      "gru_seed_count": 5,
+      "baseline_version_warnings": [],
+      "conditions": {
+        "clean": {
+          "rmse_rank": 1,
+          "rmse_best": "PRISM",
+          "rank_order": [
+            "PRISM",
+            "ElasticNet",
+            "ARX",
+            "ElasticNet_clipped",
+            "Transformer",
+            "DPLS",
+            "GRU",
+            "LightGBM",
+            "AR",
+            "Persistence"
+          ],
+          "prism_rmse": 0.0024735495862262613,
+          "clipped_rmse": 0.002707403329787965,
+          "clipped_p_holm": 1.5848176353680966e-09,
+          "gru_rmse": 0.0037602530680892355,
+          "dpls_rmse": 0.0029950752352145946
+        },
+        "oscillation": {
+          "rmse_rank": 1,
+          "rmse_best": "PRISM",
+          "rank_order": [
+            "PRISM",
+            "AR",
+            "Persistence",
+            "LightGBM",
+            "GRU",
+            "Transformer",
+            "ElasticNet_clipped",
+            "ElasticNet",
+            "ARX",
+            "DPLS"
+          ],
+          "prism_rmse": 0.010537851924539748,
+          "clipped_rmse": 0.030611104524759927,
+          "clipped_p_holm": 5.1572057958209415e-157,
+          "gru_rmse": 0.018784383223818858,
+          "dpls_rmse": 0.06329197969166515
+        },
+        "bias": {
+          "rmse_rank": 4,
+          "rmse_best": "AR",
+          "rank_order": [
+            "AR",
+            "Persistence",
+            "LightGBM",
+            "PRISM",
+            "GRU",
+            "Transformer",
+            "ElasticNet_clipped",
+            "ElasticNet",
+            "DPLS",
+            "ARX"
+          ],
+          "prism_rmse": 0.017584318982790836,
+          "clipped_rmse": 0.0312756059907694,
+          "clipped_p_holm": 1.4064062058154037e-14,
+          "gru_rmse": 0.02968672661774737,
+          "dpls_rmse": 0.05184203205405718
+        }
+      }
+    },
+    "H2S": {
+      "issues": [
+        72,
+        6040
+      ],
+      "dpls": 24,
+      "gru_width": 48,
+      "gru_epochs": 8,
+      "gru_seed_count": 5,
+      "baseline_version_warnings": [],
+      "conditions": {
+        "clean": {
+          "rmse_rank": 2,
+          "rmse_best": "ElasticNet",
+          "rank_order": [
+            "ElasticNet",
+            "PRISM",
+            "Transformer",
+            "ElasticNet_clipped",
+            "ARX",
+            "DPLS",
+            "AR",
+            "GRU",
+            "Persistence",
+            "LightGBM"
+          ],
+          "prism_rmse": 0.032817784002948144,
+          "clipped_rmse": 0.03331777078530024,
+          "clipped_p_holm": 1.0,
+          "gru_rmse": 0.05757248077118349,
+          "dpls_rmse": 0.03455056868730126
+        },
+        "oscillation": {
+          "rmse_rank": 2,
+          "rmse_best": "Persistence",
+          "rank_order": [
+            "Persistence",
+            "PRISM",
+            "AR",
+            "GRU",
+            "Transformer",
+            "LightGBM",
+            "ElasticNet_clipped",
+            "DPLS",
+            "ElasticNet",
+            "ARX"
+          ],
+          "prism_rmse": 0.04766348182439556,
+          "clipped_rmse": 0.3266608366038905,
+          "clipped_p_holm": 0.0,
+          "gru_rmse": 0.07274298852989372,
+          "dpls_rmse": 0.3324503596953546
+        },
+        "bias": {
+          "rmse_rank": 1,
+          "rmse_best": "PRISM",
+          "rank_order": [
+            "PRISM",
+            "Persistence",
+            "AR",
+            "GRU",
+            "ElasticNet_clipped",
+            "LightGBM",
+            "ElasticNet",
+            "DPLS",
+            "Transformer",
+            "ARX"
+          ],
+          "prism_rmse": 0.043152009585883805,
+          "clipped_rmse": 0.05950882245321725,
+          "clipped_p_holm": 0.5569125418618748,
+          "gru_rmse": 0.057349808871120796,
+          "dpls_rmse": 0.0728067379803083
+        }
+      }
+    },
+    "SO2": {
+      "issues": [
+        72,
+        6040
+      ],
+      "dpls": 24,
+      "gru_width": 48,
+      "gru_epochs": 8,
+      "gru_seed_count": 5,
+      "baseline_version_warnings": [],
+      "conditions": {
+        "clean": {
+          "rmse_rank": 2,
+          "rmse_best": "ElasticNet",
+          "rank_order": [
+            "ElasticNet",
+            "PRISM",
+            "ARX",
+            "DPLS",
+            "ElasticNet_clipped",
+            "Transformer",
+            "LightGBM",
+            "AR",
+            "GRU",
+            "Persistence"
+          ],
+          "prism_rmse": 0.024318307079725168,
+          "clipped_rmse": 0.027590406954033673,
+          "clipped_p_holm": 0.07740232202343071,
+          "gru_rmse": 0.05616451406893267,
+          "dpls_rmse": 0.026973276334688295
+        },
+        "oscillation": {
+          "rmse_rank": 1,
+          "rmse_best": "PRISM",
+          "rank_order": [
+            "PRISM",
+            "AR",
+            "Persistence",
+            "GRU",
+            "LightGBM",
+            "Transformer",
+            "DPLS",
+            "ElasticNet_clipped",
+            "ElasticNet",
+            "ARX"
+          ],
+          "prism_rmse": 0.04673390089757144,
+          "clipped_rmse": 0.4760719889569871,
+          "clipped_p_holm": 0.0,
+          "gru_rmse": 0.08189505485099885,
+          "dpls_rmse": 0.42848765417496854
+        },
+        "bias": {
+          "rmse_rank": 2,
+          "rmse_best": "AR",
+          "rank_order": [
+            "AR",
+            "PRISM",
+            "Persistence",
+            "ElasticNet_clipped",
+            "Transformer",
+            "DPLS",
+            "GRU",
+            "ElasticNet",
+            "LightGBM",
+            "ARX"
+          ],
+          "prism_rmse": 0.048452432980940936,
+          "clipped_rmse": 0.054937036843505385,
+          "clipped_p_holm": 1.0,
+          "gru_rmse": 0.06944979732327926,
+          "dpls_rmse": 0.06874726937354855
+        }
+      }
+    },
+    "Rod1": {
+      "issues": [
+        192,
+        12045
+      ],
+      "dpls": 2,
+      "gru_width": 24,
+      "gru_epochs": 1,
+      "gru_seed_count": 3,
+      "baseline_version_warnings": [],
+      "conditions": {
+        "clean": {
+          "rmse_rank": 3,
+          "rmse_best": "LightGBM",
+          "rank_order": [
+            "LightGBM",
+            "Transformer",
+            "PRISM",
+            "ARX",
+            "AR",
+            "ElasticNet_clipped",
+            "ElasticNet",
+            "Persistence",
+            "GRU",
+            "DPLS"
+          ],
+          "prism_rmse": 0.04252038324411339,
+          "clipped_rmse": 0.0431615773767573,
+          "clipped_p_holm": 1.0,
+          "gru_rmse": 0.045075970581180506,
+          "dpls_rmse": 0.04628115907638925
+        },
+        "oscillation": {
+          "rmse_rank": 3,
+          "rmse_best": "Persistence",
+          "rank_order": [
+            "Persistence",
+            "AR",
+            "PRISM",
+            "GRU",
+            "ARX",
+            "ElasticNet_clipped",
+            "ElasticNet",
+            "DPLS",
+            "LightGBM",
+            "Transformer"
+          ],
+          "prism_rmse": 0.03523321672347171,
+          "clipped_rmse": 0.03969107041260458,
+          "clipped_p_holm": 0.46007589396947635,
+          "gru_rmse": 0.037003035250118235,
+          "dpls_rmse": 0.05114141759342508
+        },
+        "bias": {
+          "rmse_rank": 4,
+          "rmse_best": "Persistence",
+          "rank_order": [
+            "Persistence",
+            "GRU",
+            "AR",
+            "PRISM",
+            "ARX",
+            "ElasticNet_clipped",
+            "ElasticNet",
+            "DPLS",
+            "LightGBM",
+            "Transformer"
+          ],
+          "prism_rmse": 0.03523321672347171,
+          "clipped_rmse": 0.058376318079196673,
+          "clipped_p_holm": 0.0013812499442958331,
+          "gru_rmse": 0.033952921462831416,
+          "dpls_rmse": 0.10299195320690446
+        }
+      }
+    },
+    "Rod2": {
+      "issues": [
+        192,
+        12360
+      ],
+      "dpls": 4,
+      "gru_width": 24,
+      "gru_epochs": 5,
+      "gru_seed_count": 3,
+      "baseline_version_warnings": [],
+      "conditions": {
+        "clean": {
+          "rmse_rank": 2,
+          "rmse_best": "AR",
+          "rank_order": [
+            "AR",
+            "PRISM",
+            "GRU",
+            "Persistence",
+            "ARX",
+            "ElasticNet",
+            "ElasticNet_clipped",
+            "LightGBM",
+            "DPLS",
+            "Transformer"
+          ],
+          "prism_rmse": 0.03939152135831497,
+          "clipped_rmse": 0.040636630139836025,
+          "clipped_p_holm": 0.00034253116717317307,
+          "gru_rmse": 0.03990616261329457,
+          "dpls_rmse": 0.043836590249014325
+        },
+        "oscillation": {
+          "rmse_rank": 2,
+          "rmse_best": "GRU",
+          "rank_order": [
+            "GRU",
+            "PRISM",
+            "Persistence",
+            "AR",
+            "ARX",
+            "DPLS",
+            "ElasticNet",
+            "ElasticNet_clipped",
+            "LightGBM",
+            "Transformer"
+          ],
+          "prism_rmse": 0.031463850774127944,
+          "clipped_rmse": 0.03319995314891711,
+          "clipped_p_holm": 0.08415799729088662,
+          "gru_rmse": 0.030614573584668927,
+          "dpls_rmse": 0.03316853401364169
+        },
+        "bias": {
+          "rmse_rank": 1,
+          "rmse_best": "PRISM",
+          "rank_order": [
+            "PRISM",
+            "Persistence",
+            "AR",
+            "ElasticNet",
+            "ElasticNet_clipped",
+            "ARX",
+            "LightGBM",
+            "DPLS",
+            "GRU",
+            "Transformer"
+          ],
+          "prism_rmse": 0.031463850774127944,
+          "clipped_rmse": 0.03319995314891711,
+          "clipped_p_holm": 0.04809028416622093,
+          "gru_rmse": 0.0839607027040486,
+          "dpls_rmse": 0.06283038453983322
+        }
+      }
+    }
+  }
+}
