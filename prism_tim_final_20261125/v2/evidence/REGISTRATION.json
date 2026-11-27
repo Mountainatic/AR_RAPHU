@@ -1,0 +1,75 @@
+{
+  "base_commit": "f111106ffef38587869276281f32abe1fd87983e",
+  "archived_code": "52ec8b0dfe871a7266588d30a7e44e56e9d0d121b13aa3d2c53126323aa43797",
+  "archived_results": "a4f520e13d1647b97b9433f0f87560e55fe79d44b114a7c33444701fd2e08e93",
+  "archived_fit": "75a00f985e842f48182ecb2fb7f64bc954b30c84d754735485276da15aff43a2",
+  "frozen_data_receipt": "a1f8072c5bb3b922fab423946ac48448f62db7cba58229d0a677ef3e43789010",
+  "source": {
+    "model.py": "a95d569dc9cda673258feda5368df35341922eebf00d9c40d1da067595b92fef",
+    "group_en.c": "06ea25c1567a6a6082b371996c0c9a25c10c83068085cbd8f832c67593177de0",
+    "experiments.py": "da21ad2f2716b5130a9652cc9ebfc40829f24de47b7a5d229598ee3fb6acdfec"
+  },
+  "cases": [
+    [
+      "CZ_Rod1",
+      8
+    ],
+    [
+      "CZ_Rod1",
+      16
+    ],
+    [
+      "CZ_Rod1",
+      32
+    ],
+    [
+      "CZ_Rod1",
+      48
+    ],
+    [
+      "CZ_Rod1",
+      64
+    ],
+    [
+      "CZ_Rod2",
+      8
+    ],
+    [
+      "CZ_Rod2",
+      16
+    ],
+    [
+      "CZ_Rod2",
+      32
+    ],
+    [
+      "CZ_Rod2",
+      48
+    ],
+    [
+      "CZ_Rod2",
+      64
+    ],
+    [
+      "SRU_H2S",
+      0
+    ]
+  ],
+  "experiments": [
+    "E1",
+    "E2",
+    "E3"
+  ],
+  "same_entity_time_holdout": true,
+  "moment_support": "01/99 percentiles of box means; 99th percentile of box standard deviation",
+  "sigma_scale": "99th minus median, floored at 1e-9 times one plus the upper bound",
+  "trust": "C group norm weighted; moving average of the last 128 issued rows",
+  "e1_primary": "CZ Rod1 excludes the known overlap; SRU H2S uses the historical-contact tail",
+  "e2": [
+    "full",
+    "equal_bins",
+    "mean_only",
+    "no_A0"
+  ],
+  "stress": "Constant and balanced-pair pulses, each 4 train standard deviations for 512 rows"
+}

@@ -1,3 +1,9 @@
+# PRISM v2.0 TIM 实验 E1–E3（2026-11-26）
+
+[代码、完整报告与结果](prism_tim_final_20261125/v2/README.md)覆盖 CZ 和 SRU 的 v2.0 复跑，以及 Rod1 内生先行诊断。 [GitHub Release](https://github.com/Mountainatic/AR_RAPHU/releases/tag/prism-tim-v2.0-20261126)
+
+---
+
 # PRISM IEEE TIM 实验 E1–E5（2026-11-25）
 
 [完整实验、代码与图表](prism_tim_final_20261125/README.md)覆盖 Rod1 和 SRU 两套主协议及 Rod2 漂移专项，含主基线、DM 检验、六组消融、原生计时和闭环审计。
