@@ -1,0 +1,622 @@
+{
+  "case": "TEP_D1",
+  "commit": "7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c",
+  "panels": {
+    "clean": {
+      "metrics": {
+        "Persistence": {
+          "n": 2000,
+          "rmse": 0.012206908492398619,
+          "mae": 0.009818529138064825,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.033476741844019275,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.012206908492398619,
+          "mean_seed_mae": 0.009818529138064825,
+          "seeds": 1
+        },
+        "AR": {
+          "n": 2000,
+          "rmse": 0.009281575215913301,
+          "mae": 0.007470633819708315,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.01874267386601758,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.009281575215913301,
+          "mean_seed_mae": 0.007470633819708315,
+          "seeds": 1
+        },
+        "ARX": {
+          "n": 2000,
+          "rmse": 0.0026735681886080917,
+          "mae": 0.002123739575067796,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.025390801466124824,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.0026735681886080917,
+          "mean_seed_mae": 0.002123739575067796,
+          "seeds": 1
+        },
+        "ElasticNet": {
+          "n": 2000,
+          "rmse": 0.0026415973259417327,
+          "mae": 0.0021001071671461315,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.024191640479824472,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.0026415973259417327,
+          "mean_seed_mae": 0.0021001071671461315,
+          "seeds": 1
+        },
+        "LightGBM": {
+          "n": 2000,
+          "rmse": 0.003875588156814205,
+          "mae": 0.003030246612620746,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.019550774151139927,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.003941168272204806,
+          "mean_seed_mae": 0.003089322157245147,
+          "seeds": 5
+        },
+        "Transformer": {
+          "n": 2000,
+          "rmse": 0.002912832962905781,
+          "mae": 0.0023360219576524033,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.02436094239419495,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.003273157839103748,
+          "mean_seed_mae": 0.002620060796018903,
+          "seeds": 5
+        },
+        "PRISM": {
+          "n": 2000,
+          "rmse": 0.0024570646836683183,
+          "mae": 0.00197305430340254,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.027336043053440173,
+          "max_fallback_error": 0.027336043053440173,
+          "zero_trust_fraction": 0.0,
+          "first_step_trust": 1.0,
+          "max_error_on_zero_trust": null,
+          "mean_seed_rmse": 0.0024570646836683183,
+          "mean_seed_mae": 0.00197305430340254,
+          "seeds": 1
+        },
+        "ElasticNet_clipped": {
+          "n": 2000,
+          "rmse": 0.0026880404794134304,
+          "mae": 0.0021267667648280507,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.02310935340461473,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.0026880404794134304,
+          "mean_seed_mae": 0.0021267667648280507,
+          "seeds": 1
+        },
+        "DPLS": {
+          "n": 2000,
+          "rmse": 0.002656029116866713,
+          "mae": 0.002122838247494119,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.025761921263560805,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.002656029116866713,
+          "mean_seed_mae": 0.002122838247494119,
+          "seeds": 1
+        },
+        "GRU": {
+          "n": 2000,
+          "rmse": 0.002968492480773618,
+          "mae": 0.002352072568869529,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.024576503857573373,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.003090117141644838,
+          "mean_seed_mae": 0.0024494537853080025,
+          "seeds": 5
+        }
+      },
+      "dm": {
+        "Persistence": {
+          "n": 2000,
+          "bartlett_lag": 7,
+          "mean_loss_gain": 0.00014297144808206346,
+          "t": 29.34916268593979,
+          "log_p": -434.29288813928326,
+          "p_holm": 2.2041323093040895e-188,
+          "log10_p_holm": -187.65676233927758
+        },
+        "AR": {
+          "n": 2000,
+          "bartlett_lag": 7,
+          "mean_loss_gain": 8.011047162892595e-05,
+          "t": 24.358667660485967,
+          "log_p": -300.0927025154885,
+          "p_holm": 3.753921832221472e-130,
+          "log10_p_holm": -129.42551477491878
+        },
+        "ARX": {
+          "n": 2000,
+          "bartlett_lag": 7,
+          "mean_loss_gain": 1.1107999994070602e-06,
+          "t": 6.266026684241864,
+          "log_p": -21.71650000057495,
+          "p_holm": 7.407537848420661e-10,
+          "log10_p_holm": -9.130326120837685
+        },
+        "ElasticNet": {
+          "n": 2000,
+          "bartlett_lag": 7,
+          "mean_loss_gain": 9.408695726924208e-07,
+          "t": 6.852896715868954,
+          "log_p": -25.65182349579766,
+          "p_holm": 2.894773553942719e-11,
+          "log10_p_holm": -10.538385403653145
+        },
+        "LightGBM": {
+          "n": 2000,
+          "bartlett_lag": 7,
+          "mean_loss_gain": 9.496165562375475e-06,
+          "t": 14.640316841626264,
+          "log_p": -110.083621418879,
+          "p_holm": 9.32055814832101e-48,
+          "log10_p_holm": -47.03055807976212
+        },
+        "Transformer": {
+          "n": 2000,
+          "bartlett_lag": 7,
+          "mean_loss_gain": 4.692626303061342e-06,
+          "t": 20.816030511766943,
+          "log_p": -219.91737253941125,
+          "p_holm": 2.168685978068664e-95,
+          "log10_p_holm": -94.66380332851377
+        },
+        "ElasticNet_clipped": {
+          "n": 2000,
+          "bartlett_lag": 7,
+          "mean_loss_gain": 1.1883947592350928e-06,
+          "t": 6.467112460629521,
+          "log_p": -23.0269184186859,
+          "p_holm": 2.996799242453954e-10,
+          "log10_p_holm": -9.523342349751974
+        },
+        "DPLS": {
+          "n": 2000,
+          "bartlett_lag": 7,
+          "mean_loss_gain": 1.01732380991368e-06,
+          "t": 5.21569616126784,
+          "log_p": -15.513079687513882,
+          "p_holm": 1.8312814422119936e-07,
+          "log10_p_holm": -6.7372449056127
+        },
+        "GRU": {
+          "n": 2000,
+          "bartlett_lag": 7,
+          "mean_loss_gain": 3.5178174974412265e-06,
+          "t": 13.072027376880001,
+          "log_p": -88.24098474286507,
+          "p_holm": 2.379015396990049e-38,
+          "log10_p_holm": -37.62360274719931
+        }
+      },
+      "count": 2000,
+      "first_issue": 8000,
+      "stop_issue": 10000,
+      "issue_sha256": "0e8b6052df80b8cd6f3c52c8d60b1812f332874e5c2da408fd2c92eb3eb574e1"
+    },
+    "oscillation": {
+      "metrics": {
+        "Persistence": {
+          "n": 512,
+          "rmse": 0.011938741493023475,
+          "mae": 0.009567639747255965,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.033476741844019275,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.011938741493023475,
+          "mean_seed_mae": 0.009567639747255965,
+          "seeds": 1
+        },
+        "AR": {
+          "n": 512,
+          "rmse": 0.008927072101761755,
+          "mae": 0.007350687102638681,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.01704926267509166,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.008927072101761755,
+          "mean_seed_mae": 0.007350687102638681,
+          "seeds": 1
+        },
+        "ARX": {
+          "n": 512,
+          "rmse": 0.05009749018564909,
+          "mae": 0.049860432506307305,
+          "shift_mae": 0.04978690368220697,
+          "max_distance_to_PRISM_endo": 0.07832814209784178,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.05009749018564909,
+          "mean_seed_mae": 0.049860432506307305,
+          "seeds": 1
+        },
+        "ElasticNet": {
+          "n": 512,
+          "rmse": 0.04167142486757769,
+          "mae": 0.04142509464568979,
+          "shift_mae": 0.04135423396551638,
+          "max_distance_to_PRISM_endo": 0.06464626366940474,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.04167142486757769,
+          "mean_seed_mae": 0.04142509464568979,
+          "seeds": 1
+        },
+        "LightGBM": {
+          "n": 512,
+          "rmse": 0.012750032434868977,
+          "mae": 0.010775709261169393,
+          "shift_mae": 0.010466433948723892,
+          "max_distance_to_PRISM_endo": 0.031000165810113445,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.012785006505220489,
+          "mean_seed_mae": 0.010788520686850295,
+          "seeds": 5
+        },
+        "Transformer": {
+          "n": 512,
+          "rmse": 0.023389919093166803,
+          "mae": 0.022167393574989987,
+          "shift_mae": 0.02222316969026886,
+          "max_distance_to_PRISM_endo": 0.04279215731320363,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.023471813429124327,
+          "mean_seed_mae": 0.022174551905471573,
+          "seeds": 5
+        },
+        "PRISM": {
+          "n": 512,
+          "rmse": 0.00870633871048458,
+          "mae": 0.006938653555423838,
+          "shift_mae": 0.006541892529229802,
+          "max_distance_to_PRISM_endo": 0.03900329731616692,
+          "max_fallback_error": 0.03900329731616692,
+          "zero_trust_fraction": 0.00390625,
+          "first_step_trust": 0.937154744091111,
+          "max_error_on_zero_trust": 0.0,
+          "mean_seed_rmse": 0.00870633871048458,
+          "mean_seed_mae": 0.006938653555423838,
+          "seeds": 1
+        },
+        "ElasticNet_clipped": {
+          "n": 512,
+          "rmse": 0.029507401408006687,
+          "mae": 0.025421854252641256,
+          "shift_mae": 0.025140945368069337,
+          "max_distance_to_PRISM_endo": 0.06110600686452916,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.029507401408006687,
+          "mean_seed_mae": 0.025421854252641256,
+          "seeds": 1
+        },
+        "DPLS": {
+          "n": 512,
+          "rmse": 0.04557847194000783,
+          "mae": 0.04510553560550208,
+          "shift_mae": 0.04506587710577224,
+          "max_distance_to_PRISM_endo": 0.07891558667357024,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.04557847194000783,
+          "mean_seed_mae": 0.04510553560550208,
+          "seeds": 1
+        },
+        "GRU": {
+          "n": 512,
+          "rmse": 0.024197273258219205,
+          "mae": 0.022409700268724787,
+          "shift_mae": 0.02243894966498495,
+          "max_distance_to_PRISM_endo": 0.048451794174242724,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.024326351407469988,
+          "mean_seed_mae": 0.022436799094817477,
+          "seeds": 5
+        }
+      },
+      "dm": {
+        "Persistence": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 6.673321469555812e-05,
+          "t": 7.92792237171191,
+          "log_p": -33.73748120271871,
+          "p_holm": 4.45685059845997e-15,
+          "log10_p_holm": -14.350971923991438
+        },
+        "AR": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 3.892282568370754e-06,
+          "t": 0.6965045205182938,
+          "log_p": -0.721314321431486,
+          "p_holm": 0.4861129272718711,
+          "log10_p_holm": -0.31326282951548284
+        },
+        "ARX": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.0024339581891595244,
+          "t": 116.41067465981634,
+          "log_p": -6780.7055767465,
+          "p_holm": 0.0,
+          "log10_p_holm": -2943.868772882172
+        },
+        "ElasticNet": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.0016607073167524897,
+          "t": 100.92090418077059,
+          "log_p": -5097.354676927136,
+          "p_holm": 0.0,
+          "log10_p_holm": -2212.849918506196
+        },
+        "LightGBM": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 8.769669932981667e-05,
+          "t": 10.513888003437463,
+          "log_p": -57.85825921909597,
+          "p_holm": 2.236652647525045e-25,
+          "log10_p_holm": -24.650401456661665
+        },
+        "Transformer": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.0004771224878799409,
+          "t": 37.155659902326995,
+          "log_p": -694.113161899164,
+          "p_holm": 2.131254047721042e-301,
+          "log10_p_holm": -300.6713647788417
+        },
+        "ElasticNet_clipped": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.0007948864041115527,
+          "t": 26.692883048730742,
+          "log_p": -359.7665896550135,
+          "p_holm": 2.2772742267321243e-156,
+          "log10_p_holm": -155.6425846689959
+        },
+        "DPLS": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.0020015967706443986,
+          "t": 76.79663952347035,
+          "log_p": -2953.429042769685,
+          "p_holm": 0.0,
+          "log10_p_holm": -1281.8128379276632
+        },
+        "GRU": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.0005186591284348049,
+          "t": 34.968910884957594,
+          "log_p": -615.1934311125076,
+          "p_holm": 3.3408545559453744e-267,
+          "log10_p_holm": -266.47614243095427
+        }
+      },
+      "count": 512,
+      "first_issue": 8000,
+      "stop_issue": 8512,
+      "issue_sha256": "06e4c0f8dbcf829562fbc420a1cae3728d503992d2143e3878db4b92815d9865"
+    },
+    "bias": {
+      "metrics": {
+        "Persistence": {
+          "n": 512,
+          "rmse": 0.011938741493023475,
+          "mae": 0.009567639747255965,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.033476741844019275,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.011938741493023475,
+          "mean_seed_mae": 0.009567639747255965,
+          "seeds": 1
+        },
+        "AR": {
+          "n": 512,
+          "rmse": 0.008927072101761755,
+          "mae": 0.007350687102638681,
+          "shift_mae": 0.0,
+          "max_distance_to_PRISM_endo": 0.01704926267509166,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.008927072101761755,
+          "mean_seed_mae": 0.007350687102638681,
+          "seeds": 1
+        },
+        "ARX": {
+          "n": 512,
+          "rmse": 0.062359844577522555,
+          "mae": 0.06216980307064257,
+          "shift_mae": 0.061673823828067395,
+          "max_distance_to_PRISM_endo": 0.0821185401101786,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.062359844577522555,
+          "mean_seed_mae": 0.06216980307064257,
+          "seeds": 1
+        },
+        "ElasticNet": {
+          "n": 512,
+          "rmse": 0.04338042881238942,
+          "mae": 0.043281195765171525,
+          "shift_mae": 0.042703025940414724,
+          "max_distance_to_PRISM_endo": 0.06128533151378279,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.04338042881238942,
+          "mean_seed_mae": 0.043281195765171525,
+          "seeds": 1
+        },
+        "LightGBM": {
+          "n": 512,
+          "rmse": 0.013104977255988125,
+          "mae": 0.010637692051336693,
+          "shift_mae": 0.010038937281650699,
+          "max_distance_to_PRISM_endo": 0.025995013163183978,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.01313019232461134,
+          "mean_seed_mae": 0.01065823343795821,
+          "seeds": 5
+        },
+        "Transformer": {
+          "n": 512,
+          "rmse": 0.023876422048439892,
+          "mae": 0.02233108311901094,
+          "shift_mae": 0.02229490615656736,
+          "max_distance_to_PRISM_endo": 0.03791341916531876,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.023905012321308428,
+          "mean_seed_mae": 0.022333677418891567,
+          "seeds": 5
+        },
+        "PRISM": {
+          "n": 512,
+          "rmse": 0.016976712886306557,
+          "mae": 0.01271032867684,
+          "shift_mae": 0.012393254573396097,
+          "max_distance_to_PRISM_endo": 0.061251159319725135,
+          "max_fallback_error": 0.061251159319725135,
+          "zero_trust_fraction": 0.0,
+          "first_step_trust": 0.8486000327102378,
+          "max_error_on_zero_trust": null,
+          "mean_seed_rmse": 0.016976712886306557,
+          "mean_seed_mae": 0.01271032867684,
+          "seeds": 1
+        },
+        "ElasticNet_clipped": {
+          "n": 512,
+          "rmse": 0.030459408110555846,
+          "mae": 0.02625988688639647,
+          "shift_mae": 0.025676886165803818,
+          "max_distance_to_PRISM_endo": 0.05971948290313478,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.030459408110555846,
+          "mean_seed_mae": 0.02625988688639647,
+          "seeds": 1
+        },
+        "DPLS": {
+          "n": 512,
+          "rmse": 0.07049409312170113,
+          "mae": 0.07027021492414987,
+          "shift_mae": 0.06988520872590896,
+          "max_distance_to_PRISM_endo": 0.09106499113617161,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.07049409312170113,
+          "mean_seed_mae": 0.07027021492414987,
+          "seeds": 1
+        },
+        "GRU": {
+          "n": 512,
+          "rmse": 0.03490302644469895,
+          "mae": 0.03361497065103338,
+          "shift_mae": 0.033311677688829436,
+          "max_distance_to_PRISM_endo": 0.055801180337125,
+          "max_fallback_error": null,
+          "mean_seed_rmse": 0.034930647145417666,
+          "mean_seed_mae": 0.03361497065103338,
+          "seeds": 5
+        }
+      },
+      "dm": {
+        "Persistence": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": -0.0001456752319868467,
+          "t": -2.9539224342261416,
+          "log_p": -5.764287997476301,
+          "p_holm": 0.006275257136244091,
+          "log10_p_holm": -2.2023684737411218
+        },
+        "AR": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": -0.00020851616411403406,
+          "t": -4.199130244350779,
+          "log_p": -10.52732445294274,
+          "p_holm": 8.038265295904094e-05,
+          "log10_p_holm": -4.094837664398538
+        },
+        "ARX": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.003600541435308682,
+          "t": 38.79097884322187,
+          "log_p": -756.254662341943,
+          "p_holm": 0.0,
+          "log10_p_holm": -327.53413678172086
+        },
+        "ElasticNet": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.001593652823522699,
+          "t": 30.609634638298502,
+          "log_p": -472.1230369747793,
+          "p_holm": 6.377761910307549e-205,
+          "log10_p_holm": -204.1953316975373
+        },
+        "LightGBM": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": -0.00011570543705606871,
+          "t": -2.4095609708865307,
+          "log_p": -4.136935175394529,
+          "p_holm": 0.015971727110914543,
+          "log10_p_holm": -1.7966481186653052
+        },
+        "Transformer": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.0002844084153577431,
+          "t": 5.555568815039682,
+          "log_p": -17.402883897300747,
+          "p_holm": 1.1068366864312696e-07,
+          "log10_p_holm": -6.955916454472709
+        },
+        "ElasticNet_clipped": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.0006395667620213081,
+          "t": 7.906033146799801,
+          "log_p": -33.56150175737302,
+          "p_holm": 1.3286022595900892e-14,
+          "log10_p_holm": -13.876605013277374
+        },
+        "DPLS": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.004681208384626982,
+          "t": 42.62078906178505,
+          "log_p": -912.2445133616682,
+          "p_holm": 0.0,
+          "log10_p_holm": -395.2285157900504
+        },
+        "GRU": {
+          "n": 512,
+          "bartlett_lag": 5,
+          "mean_loss_gain": 0.0009390113199211991,
+          "t": 14.419881277349319,
+          "log_p": -106.86564002431561,
+          "p_holm": 2.328056321448341e-46,
+          "log10_p_holm": -45.63300651723591
+        }
+      },
+      "count": 512,
+      "first_issue": 8000,
+      "stop_issue": 8512,
+      "issue_sha256": "06e4c0f8dbcf829562fbc420a1cae3728d503992d2143e3878db4b92815d9865"
+    }
+  },
+  "tail_variance": 0.0003300857865209077,
+  "clean_count": 2000,
+  "frozen_replay": "validated against archived RMSE and MAE",
+  "test_lock": "e1d33d4df595721641829c7d50af0e45b8f8ea3471044691659ee4c627dbf6b1"
+}

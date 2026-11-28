@@ -1,6 +1,17 @@
-# PRISM TIM baseline addendum
+# PRISM TIM experiment archive
 
-This branch archives the clipped Elastic Net, dynamic PLS, and GRU comparison against the frozen PRISM Laguerre ECM. Its parent commit is `7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c`, and the [source lock](SOURCE_LOCK.json) binds the original algorithm files.
+The [source lock](SOURCE_LOCK.json) binds the PRISM Laguerre ECM snapshot at commit `7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c`. Use the final tables and architecture evidence below for the manuscript.
+
+| Final material | Contents |
+|---|---|
+| [Manuscript tables](results/prism_tim_final_tables_20261127/README.md) | Expanded DPLS and GRU search, three-metric tables, signed significance markers, and nine-way Holm adjustment |
+| [IEEE LaTeX tables](results/prism_tim_final_tables_20261127/IEEE_TABLES.tex) | Three clean-tail tables and six matched fault tables |
+| [Architecture evidence](results/prism_tim_architecture_evidence_20261128/README.md) | Six-row ablation, frozen channel attribution, support recovery, and zero-leakage probes |
+| [Native complexity evidence](results/prism_tim_architecture_evidence_20261128/MEMORY_SPAN.pdf) | Xeon history-span sweep, million-step checks, and deployment inventory in the accompanying evidence directory |
+
+## Earlier baseline addendum
+
+These files preserve the initial clipped Elastic Net, dynamic PLS, and GRU comparison.
 
 | Artifact | Contents |
 |---|---|

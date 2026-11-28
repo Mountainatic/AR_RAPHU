@@ -1,0 +1,14 @@
+{
+  "case": "H2S",
+  "commit": "7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c",
+  "study": "74ab409ca48c0a500e0f70855f32e4ee0b72d744e94d4c2a925ff5a9bd71904e",
+  "source_lock": "8be4eeefa6a1d7dc1a06bdad1c19d3a6d99a4084fc46e7721edd1d4317716194",
+  "frozen_fit": "6c3f6fcfee479011ad05ae28ef516552391fec42ae80b9a2d57235b715ad2237",
+  "parent_result": "9f91a91c8638b2e39b36b3e923694ad496cf4e1a994b6e2f19a003514967e1a6",
+  "parent_fit": "26e75ade46e27ea96e915373ee3e0c8b4931c1afe84f7fff2c46ec71fa12619a",
+  "baseline_script": "d4efecde7f02b834b00d7a1d0663228893930c0d8a03b238f2693910adb92273",
+  "training_issues": [
+    72,
+    6040
+  ]
+}

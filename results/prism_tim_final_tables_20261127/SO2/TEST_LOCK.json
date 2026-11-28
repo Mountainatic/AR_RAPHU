@@ -1,0 +1,9 @@
+{
+  "fits": {
+    "dpls": "4aec10d12e15923eaaa72aef7b7dc72b123f554921a8285ea52e660d0f1f1682",
+    "gru": "37f20f18dfc32f30b2c62e10c9707e479e174f00d2148a020a7ca12354a1ae36"
+  },
+  "source_lock": "8be4eeefa6a1d7dc1a06bdad1c19d3a6d99a4084fc46e7721edd1d4317716194",
+  "old_result": "5686c73e24e076abb84c09d2e3497b09e410ee563aad186e83a24d06da78d590",
+  "model": "dfe1ed10b92f751d882bcac5ae82994e6baf1f92ceb2a4447efc49197c4cd7f5"
+}

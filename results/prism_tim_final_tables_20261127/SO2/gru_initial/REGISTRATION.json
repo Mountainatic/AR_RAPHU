@@ -1,0 +1,14 @@
+{
+  "case": "SO2",
+  "commit": "7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c",
+  "study": "74ab409ca48c0a500e0f70855f32e4ee0b72d744e94d4c2a925ff5a9bd71904e",
+  "source_lock": "8be4eeefa6a1d7dc1a06bdad1c19d3a6d99a4084fc46e7721edd1d4317716194",
+  "frozen_fit": "b9f4ab5e203bd4956f4ca104c58ea6147701d4d04d7f5224b8c72de9db048bd0",
+  "parent_result": "5686c73e24e076abb84c09d2e3497b09e410ee563aad186e83a24d06da78d590",
+  "parent_fit": "84450638c9d020cb7f3a820831ad8942a279d7c729c9e44d025434c670760355",
+  "baseline_script": "d4efecde7f02b834b00d7a1d0663228893930c0d8a03b238f2693910adb92273",
+  "training_issues": [
+    72,
+    6040
+  ]
+}

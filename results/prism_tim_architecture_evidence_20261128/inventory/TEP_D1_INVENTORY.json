@@ -1,0 +1,145 @@
+{
+  "task": "TEP_D1",
+  "commit": "7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c",
+  "source_lock": "8be4eeefa6a1d7dc1a06bdad1c19d3a6d99a4084fc46e7721edd1d4317716194",
+  "archive_model": "a2f8bab99484dd15933a667d3cadcdfb41cc65323fcc3a9d7cff719ee317a605",
+  "pressure_native": "71425a9c12ad3e773f2ea8f056325d1315130376b429136ee4c652e37d5977c4",
+  "timing": "One seed-zero selected-recipe fit including feature preparation; excludes selection, historical HAC nesting and artifact I/O",
+  "state": "PRISM and dense ARX/Elastic Net use measured C struct bytes; other methods show causal history storage, excluding temporary activations and immutable coefficients",
+  "count": "Readout coefficients including bias for PRISM and linear methods; effective DPLS slopes; trainable tensors for neural models and thresholds/leaf values for LightGBM",
+  "rows": {
+    "prism": [
+      65,
+      5999
+    ],
+    "archival": [
+      65,
+      5999
+    ]
+  },
+  "code": "f32f40d7296273ae39ddbae2dd545a4038de45f0bc7f7f4f4891c432aee8632f",
+  "methods": {
+    "PRISM": {
+      "online_state_bytes": 27312,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        275
+      ],
+      "nonzero_total": 275,
+      "refit_seconds": 1.1928824819624424,
+      "incremental_seconds": 1.1928824819624424,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "Persistence": {
+      "online_state_bytes": 8,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        0
+      ],
+      "nonzero_total": 0,
+      "refit_seconds": 0.0,
+      "incremental_seconds": 0.0,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "AR": {
+      "online_state_bytes": 40,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        5
+      ],
+      "nonzero_total": 5,
+      "refit_seconds": 0.0565927866846323,
+      "incremental_seconds": 0.0565927866846323,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "ARX": {
+      "online_state_bytes": 17448,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        566
+      ],
+      "nonzero_total": 566,
+      "refit_seconds": 0.1404375433921814,
+      "incremental_seconds": 0.1404375433921814,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "ElasticNet": {
+      "online_state_bytes": 17448,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        205
+      ],
+      "nonzero_total": 205,
+      "refit_seconds": 4.083770755678415,
+      "incremental_seconds": 4.083770755678415,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "ElasticNet_clipped": {
+      "online_state_bytes": 17448,
+      "auxiliary_static_bytes": 544,
+      "per_seed_nonzero": [
+        205
+      ],
+      "nonzero_total": 205,
+      "refit_seconds": 4.089507652446628,
+      "incremental_seconds": 0.005736896768212318,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "LightGBM": {
+      "online_state_bytes": 17448,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        18300,
+        18300,
+        18300,
+        18300,
+        18300
+      ],
+      "nonzero_total": 91500,
+      "refit_seconds": 18.42513650842011,
+      "incremental_seconds": 18.42513650842011,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "Transformer": {
+      "online_state_bytes": 17448,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        102529,
+        102529,
+        102529,
+        102529,
+        102529
+      ],
+      "nonzero_total": 512645,
+      "refit_seconds": 4.14208110421896,
+      "incremental_seconds": 4.14208110421896,
+      "timing_device": "NVIDIA GeForce RTX 4080 SUPER"
+    },
+    "DPLS": {
+      "online_state_bytes": 17448,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        566
+      ],
+      "nonzero_total": 566,
+      "refit_seconds": 1.4050927311182022,
+      "incremental_seconds": 1.4050927311182022,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "GRU": {
+      "online_state_bytes": 17448,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        64641,
+        64641,
+        64641,
+        64641,
+        64641
+      ],
+      "nonzero_total": 323205,
+      "refit_seconds": 0.9987860918045044,
+      "incremental_seconds": 0.9987860918045044,
+      "timing_device": "NVIDIA GeForce RTX 4080 SUPER"
+    }
+  }
+}

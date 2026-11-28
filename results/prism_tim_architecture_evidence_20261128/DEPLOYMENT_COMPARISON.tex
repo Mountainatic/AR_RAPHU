@@ -1,0 +1,26 @@
+\begin{table*}[!t]
+\centering
+\caption{Online history state, nonzero parameters, and one fixed-recipe fit}
+\label{tab:deployment-inventory}
+\small\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrrr}
+\hline
+& \multicolumn{3}{c}{TEP D=1} & \multicolumn{3}{c}{SRU $\mathrm{H_2S}$} \\
+\cline{2-4}\cline{5-7}
+Method & State (B) & Nonzeros & Fit (s) & State (B) & Nonzeros & Fit (s) \\
+\hline
+PRISM & 27312 & 275 & 1.193 & 7576 & 535 & 0.328 \\
+Persistence & 8 & 0 & 0.000 & 8 & 0 & 0.000 \\
+AR & 40 & 5 & 0.057 & 520 & 65 & 0.015 \\
+DPLS & 17448 & 566 & 1.405 & 3080 & 385 & 1.620 \\
+ARX & 17448 & 566 & 0.140 & 3080 & 385 & 0.088 \\
+Elastic Net & 17448 & 205 & 4.084 & 3080 & 440 & 0.146 \\
+Clipped Elastic Net & 17448 & 205 & 4.090 & 3080 & 440 & 0.147 \\
+LightGBM & 17448 & 91500 & 18.425 & 3080 & 58000 & 6.597 \\
+GRU & 17448 & 323205 & 0.999$^\dagger$ & 3080 & 261765 & 3.743$^\dagger$ \\
+Transformer & 17448 & 512645 & 4.142$^\dagger$ & 3080 & 502405 & 110.196 \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.96\textwidth}{\footnotesize Nonzeros are summed over the archived seeds. Fit time covers one seed with fixed settings, including input preparation. $^\dagger$ marks GPU fits. State represents the C struct for PRISM and dense linear readouts, and the causal history budget for the other methods. Immutable parameters and temporary activations are outside the state column.}
+\end{table*}

@@ -1,0 +1,156 @@
+{
+  "commit": "7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c",
+  "source_lock": "8be4eeefa6a1d7dc1a06bdad1c19d3a6d99a4084fc46e7721edd1d4317716194",
+  "platform": {
+    "core": 126,
+    "wsl": null,
+    "cpu": "Intel(R) Xeon(R) Platinum 8352V CPU @ 2.10GHz",
+    "kernel": "5.15.0-25-generic",
+    "compiler": "gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0",
+    "flags": "-O3 -std=c11 -mavx2 -mfma -ffp-contract=off",
+    "clock": "CLOCK_MONOTONIC_RAW",
+    "sample": "full step including state update, output and timer overhead"
+  },
+  "spans": [
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048
+  ],
+  "sweep": [
+    {
+      "span": 64,
+      "method": "PRISM",
+      "state_bytes": 27312,
+      "n": 131072,
+      "median_ns": 4654.0,
+      "p999_ns": 8179,
+      "max_observed_ns": 13660
+    },
+    {
+      "span": 64,
+      "method": "ARX",
+      "state_bytes": 17448,
+      "n": 131072,
+      "median_ns": 539.0,
+      "p999_ns": 1148,
+      "max_observed_ns": 6776
+    },
+    {
+      "span": 128,
+      "method": "PRISM",
+      "state_bytes": 27312,
+      "n": 131072,
+      "median_ns": 4660.0,
+      "p999_ns": 8434,
+      "max_observed_ns": 81674
+    },
+    {
+      "span": 128,
+      "method": "ARX",
+      "state_bytes": 34856,
+      "n": 131072,
+      "median_ns": 1531.0,
+      "p999_ns": 2263,
+      "max_observed_ns": 20377
+    },
+    {
+      "span": 256,
+      "method": "PRISM",
+      "state_bytes": 27312,
+      "n": 131072,
+      "median_ns": 4693.0,
+      "p999_ns": 8269,
+      "max_observed_ns": 24603
+    },
+    {
+      "span": 256,
+      "method": "ARX",
+      "state_bytes": 69672,
+      "n": 131072,
+      "median_ns": 2982.0,
+      "p999_ns": 4685,
+      "max_observed_ns": 56958
+    },
+    {
+      "span": 512,
+      "method": "PRISM",
+      "state_bytes": 27312,
+      "n": 131072,
+      "median_ns": 4716.0,
+      "p999_ns": 8359,
+      "max_observed_ns": 15786
+    },
+    {
+      "span": 512,
+      "method": "ARX",
+      "state_bytes": 139304,
+      "n": 131072,
+      "median_ns": 5086.0,
+      "p999_ns": 9071,
+      "max_observed_ns": 23065
+    },
+    {
+      "span": 1024,
+      "method": "PRISM",
+      "state_bytes": 27312,
+      "n": 131072,
+      "median_ns": 4005.0,
+      "p999_ns": 6868,
+      "max_observed_ns": 28417
+    },
+    {
+      "span": 1024,
+      "method": "ARX",
+      "state_bytes": 278568,
+      "n": 131072,
+      "median_ns": 9709.0,
+      "p999_ns": 14808,
+      "max_observed_ns": 24988
+    },
+    {
+      "span": 2048,
+      "method": "PRISM",
+      "state_bytes": 27312,
+      "n": 131072,
+      "median_ns": 3890.0,
+      "p999_ns": 7259,
+      "max_observed_ns": 16267
+    },
+    {
+      "span": 2048,
+      "method": "ARX",
+      "state_bytes": 557096,
+      "n": 131072,
+      "median_ns": 20828.0,
+      "p999_ns": 28223,
+      "max_observed_ns": 68003
+    }
+  ],
+  "long": {
+    "TEP_D1": {
+      "issues": 1000000,
+      "local_reset_history": 4096,
+      "checkpoints": 99,
+      "checked_points": 12672,
+      "prediction_max_abs": 0.0,
+      "endo_max_abs": 0.0,
+      "trust_max_abs": 0.0
+    },
+    "H2S": {
+      "issues": 1000000,
+      "local_reset_history": 4096,
+      "checkpoints": 99,
+      "checked_points": 12672,
+      "prediction_max_abs": 0.0,
+      "endo_max_abs": 0.0,
+      "trust_max_abs": 0.0
+    }
+  },
+  "code": {
+    "native_complexity.py": "1d6c1505ec33c1660f8966b23b3d1c189a87159ff872676a8ed52ac8869e61fc",
+    "long_stream.c": "6636c7595fb691b57c026a36abbe216c9ee8d7f282fd6e738b83ea74786efdc9"
+  }
+}

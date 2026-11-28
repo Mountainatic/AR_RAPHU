@@ -1,0 +1,153 @@
+{
+  "task": "H2S",
+  "commit": "7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c",
+  "source_lock": "8be4eeefa6a1d7dc1a06bdad1c19d3a6d99a4084fc46e7721edd1d4317716194",
+  "archive_model": "bba16d2de804c2d0ec45de19e7d53e7647616a16fb02ff8b200d3fed75bdd6a6",
+  "pressure_native": "abf39a4925e3a295f8d00065e59e1efd76f439cf4c44ef556f2692bc55b0b344",
+  "timing": "One seed-zero selected-recipe fit including feature preparation; excludes selection, historical HAC nesting and artifact I/O",
+  "state": "PRISM and dense ARX/Elastic Net use measured C struct bytes; other methods show causal history storage, excluding temporary activations and immutable coefficients",
+  "count": "Readout coefficients including bias for PRISM and linear methods; effective DPLS slopes; trainable tensors for neural models and thresholds/leaf values for LightGBM",
+  "rows": {
+    "prism": [
+      72,
+      6040
+    ],
+    "archival": [
+      71,
+      6041
+    ]
+  },
+  "code": "f32f40d7296273ae39ddbae2dd545a4038de45f0bc7f7f4f4891c432aee8632f",
+  "methods": {
+    "PRISM": {
+      "online_state_bytes": 7576,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        535
+      ],
+      "nonzero_total": 535,
+      "refit_seconds": 0.327882569283247,
+      "incremental_seconds": 0.327882569283247,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "Persistence": {
+      "online_state_bytes": 8,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        0
+      ],
+      "nonzero_total": 0,
+      "refit_seconds": 0.0,
+      "incremental_seconds": 0.0,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "AR": {
+      "online_state_bytes": 520,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        65
+      ],
+      "nonzero_total": 65,
+      "refit_seconds": 0.014585742726922035,
+      "incremental_seconds": 0.014585742726922035,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "ARX": {
+      "online_state_bytes": 3080,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        385
+      ],
+      "nonzero_total": 385,
+      "refit_seconds": 0.08811386860907078,
+      "incremental_seconds": 0.08811386860907078,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "ElasticNet": {
+      "online_state_bytes": 3080,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        88,
+        88,
+        88,
+        88,
+        88
+      ],
+      "nonzero_total": 440,
+      "refit_seconds": 0.14638236537575722,
+      "incremental_seconds": 0.14638236537575722,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "ElasticNet_clipped": {
+      "online_state_bytes": 3080,
+      "auxiliary_static_bytes": 80,
+      "per_seed_nonzero": [
+        88,
+        88,
+        88,
+        88,
+        88
+      ],
+      "nonzero_total": 440,
+      "refit_seconds": 0.1470517572015524,
+      "incremental_seconds": 0.0006693918257951736,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "LightGBM": {
+      "online_state_bytes": 3080,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        11600,
+        11600,
+        11600,
+        11600,
+        11600
+      ],
+      "nonzero_total": 58000,
+      "refit_seconds": 6.596865545958281,
+      "incremental_seconds": 6.596865545958281,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "Transformer": {
+      "online_state_bytes": 3080,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        100481,
+        100481,
+        100481,
+        100481,
+        100481
+      ],
+      "nonzero_total": 502405,
+      "refit_seconds": 110.1958967000246,
+      "incremental_seconds": 110.1958967000246,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "DPLS": {
+      "online_state_bytes": 3080,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        385
+      ],
+      "nonzero_total": 385,
+      "refit_seconds": 1.6197976600378752,
+      "incremental_seconds": 1.6197976600378752,
+      "timing_device": "Xeon CPU, one affinity core"
+    },
+    "GRU": {
+      "online_state_bytes": 3080,
+      "auxiliary_static_bytes": 0,
+      "per_seed_nonzero": [
+        52353,
+        52353,
+        52353,
+        52353,
+        52353
+      ],
+      "nonzero_total": 261765,
+      "refit_seconds": 3.742652738466859,
+      "incremental_seconds": 3.742652738466859,
+      "timing_device": "NVIDIA GeForce RTX 4080 SUPER"
+    }
+  }
+}

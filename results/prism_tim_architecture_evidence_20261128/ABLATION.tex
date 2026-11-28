@@ -1,0 +1,22 @@
+\begin{table*}[!t]
+\centering
+\caption{Clean and oscillation RMSE for controlled ablations}
+\label{tab:architecture-ablation}
+\small\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lrrrrrrrr}
+\hline
+ & \multicolumn{2}{c}{TEP D=1} & \multicolumn{2}{c}{SRU $\mathrm{H_2S}$} & \multicolumn{2}{c}{CZ Rod1} & \multicolumn{2}{c}{CZ Rod2} \\
+\cline{2-3}\cline{4-5}\cline{6-7}\cline{8-9}
+Variant & Clean & Osc. & Clean & Osc. & Clean & Osc. & Clean & Osc. \\
+\hline
+Full PRISM & 0.002457 & 0.008706 & 0.032818 & 0.047663 & 0.042520 & 0.035233 & 0.039392 & 0.031464 \\
+Level views only & 0.002451 & 0.008782 & 0.035888 & 0.047663 & 0.042520 & 0.035233 & 0.039392 & 0.031464 \\
+FIR only & 0.002494 & 0.009012 & 0.030475 & 0.047663 & 0.042520 & 0.035233 & 0.039392 & 0.031464 \\
+Trust fixed at one & 0.002457 & 0.046960 & 0.031035 & 0.909752 & 0.042520 & 0.035233 & 0.039392 & 0.031464 \\
+HAC forced open & 0.002457 & 0.008706 & 0.032818 & 0.047663 & 0.041816 & 0.035233 & 0.039392 & 0.031464 \\
+Level endogenous state & 0.002452 & 0.008788 & 0.032714 & 0.047653 & 0.044358 & 0.035761 & 0.040075 & 0.031394 \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.96\textwidth}{\footnotesize The level-view, FIR, and endogenous-state variants refit only their restricted training readouts under the frozen recipe. The support and HAC rows switch the frozen deployment gates. CZ has zero observation delay and already uses level views.}
+\end{table*}

@@ -1,0 +1,14 @@
+{
+  "case": "TEP_D2",
+  "commit": "7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c",
+  "study": "74ab409ca48c0a500e0f70855f32e4ee0b72d744e94d4c2a925ff5a9bd71904e",
+  "source_lock": "8be4eeefa6a1d7dc1a06bdad1c19d3a6d99a4084fc46e7721edd1d4317716194",
+  "frozen_fit": "a2dad2a0557ea111980c466c1d6394ad968a0ec8fb5915ca08b8ab6798c6b890",
+  "parent_result": "d62d8bff29c0e1eccf30d7a6f8f72ca530ebfcf4f064bd230775697ae5992ec7",
+  "parent_fit": "d4b75ad9cb28ef99e81c507898c7fca2399ba88ca6b4034892c8ae9b938fda48",
+  "baseline_script": "d4efecde7f02b834b00d7a1d0663228893930c0d8a03b238f2693910adb92273",
+  "training_issues": [
+    66,
+    5998
+  ]
+}

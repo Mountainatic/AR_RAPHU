@@ -1,0 +1,8 @@
+protocol,ingress,sensor,scenario,std_multiplier,training_sd,max_input_shift,max_shift,window_points,gate_admitted,view
+TEP_D1,raw_sensor,XMV12,bias,,0.0,100.0,0.0,512,True,
+TEP_D1,raw_sensor,XMV12,oscillation,,0.0,100.0,0.0,512,True,
+TEP_D1,post_view,XMEAS5,100sigma_oscillation,,,20.7772226261259,0.0,512,True,level
+Rod1,raw_sensor,heater,bias,100.0,1.2205514235039836,122.05514235039837,0.0,512,False,
+Rod1,raw_sensor,heater,oscillation,100.0,1.2205514235039836,122.05514235039837,0.0,512,False,
+Rod2,raw_sensor,heater,bias,100.0,1.4602851788615197,146.02851788615197,0.0,512,False,
+Rod2,raw_sensor,heater,oscillation,100.0,1.4602851788615197,146.02851788615197,0.0,512,False,

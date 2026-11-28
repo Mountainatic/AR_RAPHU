@@ -1,0 +1,5 @@
+protocol,scenario,channel,view,within_001_for_16,max_recovery_above_clean
+TEP_D1,oscillation,XMEAS18,level,126,0.0
+TEP_D1,bias,XMEAS18,level,16,0.0
+H2S,oscillation,AIR_MEA2,level,124,0.0
+H2S,bias,AIR_MEA2,level,47,0.0

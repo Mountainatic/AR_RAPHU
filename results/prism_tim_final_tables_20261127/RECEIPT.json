@@ -1,0 +1,83 @@
+{
+  "commit": "7bf849fa0c2453ea58412cc631c3cddf9b6d4e3c",
+  "source_lock": "8be4eeefa6a1d7dc1a06bdad1c19d3a6d99a4084fc46e7721edd1d4317716194",
+  "parent_receipt": "b54f0fbc691aed242cb6c2f84bee2702573c38f6f642eb66c2f3029d88290f6c",
+  "selection": {
+    "TEP_D1": {
+      "dpls_components": 80,
+      "dpls_grid_max": 160,
+      "dpls_at_upper_boundary": false,
+      "gru_width": 128,
+      "gru_width_max": 160,
+      "gru_epochs": 22,
+      "gru_epochs_evaluated": 31,
+      "gru_width_at_upper_boundary": false,
+      "gru_optimum_at_last_epoch": false,
+      "gru_stop_at_epoch_cap": false
+    },
+    "TEP_D2": {
+      "dpls_components": 80,
+      "dpls_grid_max": 160,
+      "dpls_at_upper_boundary": false,
+      "gru_width": 384,
+      "gru_width_max": 640,
+      "gru_epochs": 13,
+      "gru_epochs_evaluated": 22,
+      "gru_width_at_upper_boundary": false,
+      "gru_optimum_at_last_epoch": false,
+      "gru_stop_at_epoch_cap": false
+    },
+    "H2S": {
+      "dpls_components": 160,
+      "dpls_grid_max": 256,
+      "dpls_at_upper_boundary": false,
+      "gru_width": 128,
+      "gru_width_max": 160,
+      "gru_epochs": 75,
+      "gru_epochs_evaluated": 84,
+      "gru_width_at_upper_boundary": false,
+      "gru_optimum_at_last_epoch": false,
+      "gru_stop_at_epoch_cap": false
+    },
+    "SO2": {
+      "dpls_components": 192,
+      "dpls_grid_max": 256,
+      "dpls_at_upper_boundary": false,
+      "gru_width": 48,
+      "gru_width_max": 96,
+      "gru_epochs": 150,
+      "gru_epochs_evaluated": 159,
+      "gru_width_at_upper_boundary": false,
+      "gru_optimum_at_last_epoch": false,
+      "gru_stop_at_epoch_cap": false
+    },
+    "Rod1": {
+      "reused": true
+    },
+    "Rod2": {
+      "reused": true
+    }
+  },
+  "tail_population_variances": {
+    "TEP_D1": 0.0003300857865209077,
+    "TEP_D2": 0.0003300857865209077,
+    "H2S": 0.0031835011282487424,
+    "SO2": 0.003342287474571645,
+    "Rod1": 0.4052898548216233,
+    "Rod2": 0.01393616956729766
+  },
+  "case_results": {
+    "TEP_D1": "9091907997a8139e45ecb09defafabeb8e3c84278e1541f4f82bf4eec3fb2575",
+    "TEP_D2": "9b5633f446825eaa0b8d6af58ffe9bc23c44454a006a6e5faa5e0f89451263fd",
+    "H2S": "f526004580923aa5ad1e3ec4f35b98742be1aed95fbfb27bc614cf7fb911fd45",
+    "SO2": "253834fe2377f72336496aebc62942e9e09a252a80e58a3391513f865e095c6a",
+    "Rod1": "22ba3d375d89fc9ea9923c425b02b1746149d9e18c9552f2f449b646ef85bff5",
+    "Rod2": "4bb597519e0c84de795f78bf667ed62b0902162db5ecb9438da6ffb32f4a48f8"
+  },
+  "tables": {
+    "CLEAN_THREE_METRICS.csv": "0bfeef0e0677943298abf16be2303953829da38a35e688f209cd829cc3c12f39",
+    "FAULT_THREE_METRICS.csv": "064016544bbadceb2982837611e2d19f74f59a5278cceefa5c924b8f308b97eb",
+    "DM_HAC_HOLM.csv": "daf5c4b54d1217eb7e79bd3081de6e0aabec3cec7a8051d3f772d34f79aab0e8",
+    "IEEE_TABLES.tex": "4576ceeaf57cb594d15d13a0d8122f48a497bd5df13fff5f36699a14742e679c"
+  }
+}

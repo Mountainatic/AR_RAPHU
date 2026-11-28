@@ -1,0 +1,243 @@
+% Import into the manuscript with \input.
+\begin{table*}[!t]
+\centering
+\caption{Clean-tail results on Tennessee Eastman}
+\label{tab:clean-tep}
+\small
+\begin{tabular}{lrrrrrr}
+\hline
+ & \multicolumn{3}{c}{TEP ($D=1$)} & \multicolumn{3}{c}{TEP ($D=2$)} \\
+\cline{2-4}\cline{5-7}
+Method & RMSE & MAE & $R^2$ & RMSE & MAE & $R^2$ \\
+\hline
+PRISM & \(0.002457\) & \(0.001973\) & \(0.9817\) & \(0.002474\) & \(0.001984\) & \(0.9815\) \\
+Persistence & \(0.012207^{\ast\ast\ast+}\) & \(0.009819\) & \(0.5486\) & \(0.016054^{\ast\ast\ast+}\) & \(0.012821\) & \(0.2192\) \\
+AR & \(0.009282^{\ast\ast\ast+}\) & \(0.007471\) & \(0.7390\) & \(0.011224^{\ast\ast\ast+}\) & \(0.009058\) & \(0.6184\) \\
+DPLS & \(0.002656^{\ast\ast\ast+}\) & \(0.002123\) & \(0.9786\) & \(0.002676^{\ast\ast\ast+}\) & \(0.002136\) & \(0.9783\) \\
+ARX & \(0.002674^{\ast\ast\ast+}\) & \(0.002124\) & \(0.9783\) & \(0.002691^{\ast\ast\ast+}\) & \(0.002141\) & \(0.9781\) \\
+Elastic Net & \(0.002642^{\ast\ast\ast+}\) & \(0.002100\) & \(0.9789\) & \(0.002660^{\ast\ast\ast+}\) & \(0.002112\) & \(0.9786\) \\
+Clipped Elastic Net & \(0.002688^{\ast\ast\ast+}\) & \(0.002127\) & \(0.9781\) & \(0.002707^{\ast\ast\ast+}\) & \(0.002136\) & \(0.9778\) \\
+LightGBM & \(0.003876^{\ast\ast\ast+}\) & \(0.003030\) & \(0.9545\) & \(0.003898^{\ast\ast\ast+}\) & \(0.003047\) & \(0.9540\) \\
+GRU & \(0.002968^{\ast\ast\ast+}\) & \(0.002352\) & \(0.9733\) & \(0.002968^{\ast\ast\ast+}\) & \(0.002345\) & \(0.9733\) \\
+Transformer & \(0.002913^{\ast\ast\ast+}\) & \(0.002336\) & \(0.9743\) & \(0.002960^{\ast\ast\ast+}\) & \(0.002365\) & \(0.9735\) \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.96\textwidth}{\footnotesize $R^2=1-\sum_t(y_t-\hat y_t)^2/\sum_t(y_t-\bar y_{\mathrm{tail}})^2$, where $\bar y_{\mathrm{tail}}$ is the mean of the scored targets in each tail. Stars indicate two-sided Bartlett HAC Diebold--Mariano tests against PRISM using mean per-seed squared loss with Holm correction across nine baselines (\({}^*p<.05\), \({}^{**}p<.01\), \({}^{***}p<.001\)). \(+\) denotes higher baseline loss and \(-\) denotes lower baseline loss.}
+\end{table*}
+
+\begin{table*}[!t]
+\centering
+\caption{Clean-tail results on sulfur recovery}
+\label{tab:clean-sru}
+\small
+\begin{tabular}{lrrrrrr}
+\hline
+ & \multicolumn{3}{c}{SRU ($\mathrm{H_2S}$)} & \multicolumn{3}{c}{SRU ($\mathrm{SO_2}$)} \\
+\cline{2-4}\cline{5-7}
+Method & RMSE & MAE & $R^2$ & RMSE & MAE & $R^2$ \\
+\hline
+PRISM & \(0.032818\) & \(0.021005\) & \(0.6617\) & \(0.024318\) & \(0.018656\) & \(0.8231\) \\
+Persistence & \(0.062171^{\ast\ast+}\) & \(0.029879\) & \(-0.2141\) & \(0.060781^{\ast\ast\ast+}\) & \(0.039241\) & \(-0.1053\) \\
+AR & \(0.052611^{\ast\ast+}\) & \(0.029840\) & \(0.1305\) & \(0.051622^{\ast\ast\ast+}\) & \(0.036308\) & \(0.2027\) \\
+DPLS & \(0.033900\) & \(0.020287\) & \(0.6390\) & \(0.024933\) & \(0.019183\) & \(0.8140\) \\
+ARX & \(0.033857\) & \(0.020259\) & \(0.6399\) & \(0.024930\) & \(0.019185\) & \(0.8140\) \\
+Elastic Net & \(0.032423\) & \(0.018118\) & \(0.6698\) & \(0.023910\) & \(0.018594\) & \(0.8289\) \\
+Clipped Elastic Net & \(0.033318\) & \(0.018457\) & \(0.6513\) & \(0.027590\) & \(0.019881\) & \(0.7722\) \\
+LightGBM & \(0.062731^{\ast\ast\ast+}\) & \(0.048646\) & \(-0.2361\) & \(0.042637^{\ast\ast\ast+}\) & \(0.031204\) & \(0.4561\) \\
+GRU & \(0.034234\) & \(0.023876\) & \(0.6319\) & \(0.043887^{\ast\ast\ast+}\) & \(0.032224\) & \(0.4237\) \\
+Transformer & \(0.033311\) & \(0.017769\) & \(0.6514\) & \(0.027721^{\ast\ast\ast+}\) & \(0.020908\) & \(0.7701\) \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.96\textwidth}{\footnotesize $R^2=1-\sum_t(y_t-\hat y_t)^2/\sum_t(y_t-\bar y_{\mathrm{tail}})^2$, where $\bar y_{\mathrm{tail}}$ is the mean of the scored targets in each tail. Stars indicate two-sided Bartlett HAC Diebold--Mariano tests against PRISM using mean per-seed squared loss with Holm correction across nine baselines (\({}^*p<.05\), \({}^{**}p<.01\), \({}^{***}p<.001\)). \(+\) denotes higher baseline loss and \(-\) denotes lower baseline loss.}
+\end{table*}
+
+\begin{table*}[!t]
+\centering
+\caption{Clean-tail results on CZ crystal growth after target-overlap masking}
+\label{tab:clean-cz}
+\small
+\begin{tabular}{lrrrrrr}
+\hline
+ & \multicolumn{3}{c}{CZ Rod1 ($H=16$)} & \multicolumn{3}{c}{CZ Rod2 ($H=16$)} \\
+\cline{2-4}\cline{5-7}
+Method & RMSE & MAE & $R^2$ & RMSE & MAE & $R^2$ \\
+\hline
+PRISM & \(0.042520\) & \(0.034395\) & \(0.9955\) & \(0.039392\) & \(0.031724\) & \(0.8887\) \\
+Persistence & \(0.043987\) & \(0.035507\) & \(0.9952\) & \(0.040414^{\ast+}\) & \(0.032172\) & \(0.8828\) \\
+AR & \(0.043119\) & \(0.034798\) & \(0.9954\) & \(0.038628^{\ast-}\) & \(0.031195\) & \(0.8929\) \\
+DPLS & \(0.046281\) & \(0.038204\) & \(0.9947\) & \(0.043837^{\ast\ast+}\) & \(0.034990\) & \(0.8621\) \\
+ARX & \(0.043030\) & \(0.035451\) & \(0.9954\) & \(0.040606^{\ast\ast\ast+}\) & \(0.032640\) & \(0.8817\) \\
+Elastic Net & \(0.043459\) & \(0.035925\) & \(0.9953\) & \(0.040637^{\ast\ast\ast+}\) & \(0.032651\) & \(0.8815\) \\
+Clipped Elastic Net & \(0.043162\) & \(0.035681\) & \(0.9954\) & \(0.040637^{\ast\ast\ast+}\) & \(0.032651\) & \(0.8815\) \\
+LightGBM & \(0.041966\) & \(0.034202\) & \(0.9957\) & \(0.042924^{\ast+}\) & \(0.034065\) & \(0.8678\) \\
+GRU & \(0.045076\) & \(0.037206\) & \(0.9950\) & \(0.039906^{\ast\ast\ast+}\) & \(0.032052\) & \(0.8857\) \\
+Transformer & \(0.042342\) & \(0.034770\) & \(0.9956\) & \(0.044571^{\ast\ast\ast+}\) & \(0.036376\) & \(0.8575\) \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.96\textwidth}{\footnotesize $R^2=1-\sum_t(y_t-\hat y_t)^2/\sum_t(y_t-\bar y_{\mathrm{tail}})^2$, where $\bar y_{\mathrm{tail}}$ is the mean of the scored targets in each tail. Stars indicate two-sided Bartlett HAC Diebold--Mariano tests against PRISM using mean per-seed squared loss with Holm correction across nine baselines (\({}^*p<.05\), \({}^{**}p<.01\), \({}^{***}p<.001\)). \(+\) denotes higher baseline loss and \(-\) denotes lower baseline loss.}
+\end{table*}
+
+\begin{table*}[!t]
+\centering
+\caption{TEP ($D=1$) performance in matched 512-point sensor-fault windows}
+\label{tab:fault-tep-d1}
+\small
+\begin{tabular}{lrrrrrr}
+\hline
+ & \multicolumn{3}{c}{Oscillation} & \multicolumn{3}{c}{$4\sigma$ constant bias} \\
+\cline{2-4}\cline{5-7}
+Method & RMSE & MAE & Shift MAE & RMSE & MAE & Shift MAE \\
+\hline
+PRISM & \(0.008706\) & \(0.006939\) & \(0.006542\) & \(0.016977\) & \(0.012710\) & \(0.012393\) \\
+Persistence & \(0.011939\) & \(0.009568\) & \(0.000000\) & \(0.011939\) & \(0.009568\) & \(0.000000\) \\
+AR & \(0.008927\) & \(0.007351\) & \(0.000000\) & \(0.008927\) & \(0.007351\) & \(0.000000\) \\
+DPLS & \(0.045578\) & \(0.045106\) & \(0.045066\) & \(0.070494\) & \(0.070270\) & \(0.069885\) \\
+ARX & \(0.050097\) & \(0.049860\) & \(0.049787\) & \(0.062360\) & \(0.062170\) & \(0.061674\) \\
+Elastic Net & \(0.041671\) & \(0.041425\) & \(0.041354\) & \(0.043380\) & \(0.043281\) & \(0.042703\) \\
+Clipped Elastic Net & \(0.029507\) & \(0.025422\) & \(0.025141\) & \(0.030459\) & \(0.026260\) & \(0.025677\) \\
+LightGBM & \(0.012750\) & \(0.010776\) & \(0.010466\) & \(0.013105\) & \(0.010638\) & \(0.010039\) \\
+GRU & \(0.024197\) & \(0.022410\) & \(0.022439\) & \(0.034903\) & \(0.033615\) & \(0.033312\) \\
+Transformer & \(0.023390\) & \(0.022167\) & \(0.022223\) & \(0.023876\) & \(0.022331\) & \(0.022295\) \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.96\textwidth}{\footnotesize Shift MAE is the mean absolute difference between a method's perturbed prediction and its own clean prediction on the same issues.}
+\end{table*}
+
+\begin{table*}[!t]
+\centering
+\caption{TEP ($D=2$) performance in matched 512-point sensor-fault windows}
+\label{tab:fault-tep-d2}
+\small
+\begin{tabular}{lrrrrrr}
+\hline
+ & \multicolumn{3}{c}{Oscillation} & \multicolumn{3}{c}{$4\sigma$ constant bias} \\
+\cline{2-4}\cline{5-7}
+Method & RMSE & MAE & Shift MAE & RMSE & MAE & Shift MAE \\
+\hline
+PRISM & \(0.010538\) & \(0.008358\) & \(0.007867\) & \(0.017584\) & \(0.013138\) & \(0.012823\) \\
+Persistence & \(0.015751\) & \(0.012576\) & \(0.000000\) & \(0.015751\) & \(0.012576\) & \(0.000000\) \\
+AR & \(0.011231\) & \(0.009266\) & \(0.000000\) & \(0.011231\) & \(0.009266\) & \(0.000000\) \\
+DPLS & \(0.051374\) & \(0.051084\) & \(0.051041\) & \(0.074138\) & \(0.073900\) & \(0.073510\) \\
+ARX & \(0.056145\) & \(0.055940\) & \(0.055874\) & \(0.065763\) & \(0.065566\) & \(0.065055\) \\
+Elastic Net & \(0.043306\) & \(0.043058\) & \(0.042984\) & \(0.044392\) & \(0.044292\) & \(0.043720\) \\
+Clipped Elastic Net & \(0.030611\) & \(0.026372\) & \(0.026080\) & \(0.031276\) & \(0.026921\) & \(0.026333\) \\
+LightGBM & \(0.017571\) & \(0.015106\) & \(0.014843\) & \(0.015822\) & \(0.012806\) & \(0.012442\) \\
+GRU & \(0.028265\) & \(0.026915\) & \(0.026956\) & \(0.035284\) & \(0.033780\) & \(0.033508\) \\
+Transformer & \(0.029556\) & \(0.028256\) & \(0.028269\) & \(0.030682\) & \(0.028752\) & \(0.028359\) \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.96\textwidth}{\footnotesize Shift MAE is the mean absolute difference between a method's perturbed prediction and its own clean prediction on the same issues.}
+\end{table*}
+
+\begin{table*}[!t]
+\centering
+\caption{SRU ($\mathrm{H_2S}$) performance in matched 512-point sensor-fault windows}
+\label{tab:fault-h2s}
+\small
+\begin{tabular}{lrrrrrr}
+\hline
+ & \multicolumn{3}{c}{Oscillation} & \multicolumn{3}{c}{$4\sigma$ constant bias} \\
+\cline{2-4}\cline{5-7}
+Method & RMSE & MAE & Shift MAE & RMSE & MAE & Shift MAE \\
+\hline
+PRISM & \(0.047663\) & \(0.024636\) & \(0.023096\) & \(0.043152\) & \(0.029660\) & \(0.024890\) \\
+Persistence & \(0.046296\) & \(0.023050\) & \(0.000000\) & \(0.046296\) & \(0.023050\) & \(0.000000\) \\
+AR & \(0.050091\) & \(0.025956\) & \(0.000000\) & \(0.050091\) & \(0.025956\) & \(0.000000\) \\
+DPLS & \(2.098804\) & \(1.680673\) & \(1.681688\) & \(0.083725\) & \(0.037182\) & \(0.024860\) \\
+ARX & \(1.994539\) & \(1.599770\) & \(1.600837\) & \(0.082797\) & \(0.036957\) & \(0.024558\) \\
+Elastic Net & \(0.604328\) & \(0.577603\) & \(0.577821\) & \(0.071688\) & \(0.033766\) & \(0.026314\) \\
+Clipped Elastic Net & \(0.326661\) & \(0.310778\) & \(0.310924\) & \(0.059509\) & \(0.028866\) & \(0.024727\) \\
+LightGBM & \(0.259292\) & \(0.241897\) & \(0.194619\) & \(0.068977\) & \(0.034157\) & \(0.052121\) \\
+GRU & \(0.240184\) & \(0.197472\) & \(0.194126\) & \(0.176260\) & \(0.164769\) & \(0.147431\) \\
+Transformer & \(0.227193\) & \(0.179585\) & \(0.178909\) & \(0.077733\) & \(0.041475\) & \(0.037941\) \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.96\textwidth}{\footnotesize Shift MAE is the mean absolute difference between a method's perturbed prediction and its own clean prediction on the same issues.}
+\end{table*}
+
+\begin{table*}[!t]
+\centering
+\caption{SRU ($\mathrm{SO_2}$) performance in matched 512-point sensor-fault windows}
+\label{tab:fault-so2}
+\small
+\begin{tabular}{lrrrrrr}
+\hline
+ & \multicolumn{3}{c}{Oscillation} & \multicolumn{3}{c}{$4\sigma$ constant bias} \\
+\cline{2-4}\cline{5-7}
+Method & RMSE & MAE & Shift MAE & RMSE & MAE & Shift MAE \\
+\hline
+PRISM & \(0.046734\) & \(0.032097\) & \(0.029412\) & \(0.048452\) & \(0.033607\) & \(0.027285\) \\
+Persistence & \(0.052148\) & \(0.033685\) & \(0.000000\) & \(0.052148\) & \(0.033685\) & \(0.000000\) \\
+AR & \(0.046766\) & \(0.031859\) & \(0.000000\) & \(0.046766\) & \(0.031859\) & \(0.000000\) \\
+DPLS & \(2.665777\) & \(2.175768\) & \(2.176322\) & \(0.091817\) & \(0.032738\) & \(0.022967\) \\
+ARX & \(2.506388\) & \(2.048978\) & \(2.049021\) & \(0.090045\) & \(0.031930\) & \(0.022290\) \\
+Elastic Net & \(0.822894\) & \(0.804667\) & \(0.804492\) & \(0.072708\) & \(0.028837\) & \(0.022678\) \\
+Clipped Elastic Net & \(0.476072\) & \(0.463678\) & \(0.463319\) & \(0.054937\) & \(0.037294\) & \(0.029838\) \\
+LightGBM & \(0.168385\) & \(0.142785\) & \(0.138788\) & \(0.073658\) & \(0.058944\) & \(0.064734\) \\
+GRU & \(0.237049\) & \(0.192885\) & \(0.186295\) & \(0.236191\) & \(0.219736\) & \(0.194223\) \\
+Transformer & \(0.172643\) & \(0.164678\) & \(0.163872\) & \(0.058132\) & \(0.050179\) & \(0.052629\) \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.96\textwidth}{\footnotesize Shift MAE is the mean absolute difference between a method's perturbed prediction and its own clean prediction on the same issues.}
+\end{table*}
+
+\begin{table*}[!t]
+\centering
+\caption{CZ Rod1 ($H=16$) performance in matched 512-point sensor-fault windows}
+\label{tab:fault-rod1}
+\small
+\begin{tabular}{lrrrrrr}
+\hline
+ & \multicolumn{3}{c}{Oscillation} & \multicolumn{3}{c}{$4\sigma$ constant bias} \\
+\cline{2-4}\cline{5-7}
+Method & RMSE & MAE & Shift MAE & RMSE & MAE & Shift MAE \\
+\hline
+PRISM & \(0.035233\) & \(0.030098\) & \(0.000000\) & \(0.035233\) & \(0.030098\) & \(0.000000\) \\
+Persistence & \(0.033936\) & \(0.027657\) & \(0.000000\) & \(0.033936\) & \(0.027657\) & \(0.000000\) \\
+AR & \(0.034730\) & \(0.029562\) & \(0.000000\) & \(0.034730\) & \(0.029562\) & \(0.000000\) \\
+DPLS & \(0.051141\) & \(0.043338\) & \(0.001917\) & \(0.102992\) & \(0.094314\) & \(0.118595\) \\
+ARX & \(0.038396\) & \(0.032875\) & \(0.000151\) & \(0.042152\) & \(0.033432\) & \(0.036365\) \\
+Elastic Net & \(0.045247\) & \(0.038210\) & \(0.011536\) & \(0.058579\) & \(0.049412\) & \(0.063555\) \\
+Clipped Elastic Net & \(0.039691\) & \(0.033063\) & \(0.029851\) & \(0.058376\) & \(0.049174\) & \(0.060234\) \\
+LightGBM & \(0.088320\) & \(0.076945\) & \(0.045956\) & \(0.129519\) & \(0.119051\) & \(0.089389\) \\
+GRU & \(0.037003\) & \(0.031776\) & \(0.004497\) & \(0.033953\) & \(0.027770\) & \(0.020645\) \\
+Transformer & \(0.666239\) & \(0.507999\) & \(0.507621\) & \(0.200367\) & \(0.192672\) & \(0.172935\) \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.96\textwidth}{\footnotesize Shift MAE is the mean absolute difference between a method's perturbed prediction and its own clean prediction on the same issues.}
+\end{table*}
+
+\begin{table*}[!t]
+\centering
+\caption{CZ Rod2 ($H=16$) performance in matched 512-point sensor-fault windows}
+\label{tab:fault-rod2}
+\small
+\begin{tabular}{lrrrrrr}
+\hline
+ & \multicolumn{3}{c}{Oscillation} & \multicolumn{3}{c}{$4\sigma$ constant bias} \\
+\cline{2-4}\cline{5-7}
+Method & RMSE & MAE & Shift MAE & RMSE & MAE & Shift MAE \\
+\hline
+PRISM & \(0.031464\) & \(0.024503\) & \(0.000000\) & \(0.031464\) & \(0.024503\) & \(0.000000\) \\
+Persistence & \(0.032064\) & \(0.024960\) & \(0.000000\) & \(0.032064\) & \(0.024960\) & \(0.000000\) \\
+AR & \(0.032445\) & \(0.026095\) & \(0.000000\) & \(0.032445\) & \(0.026095\) & \(0.000000\) \\
+DPLS & \(0.033169\) & \(0.027794\) & \(0.001779\) & \(0.062830\) & \(0.054401\) & \(0.064236\) \\
+ARX & \(0.032917\) & \(0.025736\) & \(0.000027\) & \(0.033382\) & \(0.026147\) & \(0.001193\) \\
+Elastic Net & \(0.033200\) & \(0.026006\) & \(0.000000\) & \(0.033200\) & \(0.026006\) & \(0.000000\) \\
+Clipped Elastic Net & \(0.033200\) & \(0.026006\) & \(0.000000\) & \(0.033200\) & \(0.026006\) & \(0.000000\) \\
+LightGBM & \(0.041840\) & \(0.033709\) & \(0.028294\) & \(0.038998\) & \(0.031148\) & \(0.024856\) \\
+GRU & \(0.030615\) & \(0.025435\) & \(0.016489\) & \(0.083961\) & \(0.078531\) & \(0.066531\) \\
+Transformer & \(0.095461\) & \(0.076962\) & \(0.055420\) & \(0.095983\) & \(0.085665\) & \(0.064695\) \\
+\hline
+\end{tabular}
+\par\smallskip
+\parbox{0.96\textwidth}{\footnotesize Shift MAE is the mean absolute difference between a method's perturbed prediction and its own clean prediction on the same issues.}
+\end{table*}
